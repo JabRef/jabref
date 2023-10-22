@@ -34,10 +34,9 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.1016/j.tbs.2019.12.003")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.hrzlqd");
 
-        Optional<BibEntry> optionalBibEntry = fetcher.performSearchById("https://isidore.science/document/10670/1.hrzlqd");
-        BibEntry actual = optionalBibEntry.get();
-        
-        assertEquals(Optional.of(expected), Optional.of(actual));
+        Optional<BibEntry> actual = fetcher.performSearchById("https://isidore.science/document/10670/1.hrzlqd");
+
+        assertEquals(Optional.of(expected), actual);
     }
 
     @Test
@@ -51,10 +50,9 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.3917/popu.1601.0153")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.d2vlam");
 
-        Optional<BibEntry> optionalBibEntry = fetcher.performSearchById("d2vlam");
-        BibEntry actual = optionalBibEntry.get();
+        Optional<BibEntry> actual = fetcher.performSearchById("d2vlam");
 
-        assertEquals(Optional.of(expected), Optional.of(actual));
+        assertEquals(Optional.of(expected), actual);
     }
 
     @Test
@@ -65,10 +63,9 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.YEAR, "2015")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.m05oth");
 
-        Optional<BibEntry> optionalBibEntry = fetcher.performSearchById("1.m05oth");
-        BibEntry actual = optionalBibEntry.get();
+        Optional<BibEntry> actual = fetcher.performSearchById("1.m05oth");
 
-        assertEquals(Optional.of(expected), Optional.of(actual));
+        assertEquals(Optional.of(expected), actual);
     }
 
     @Test
@@ -81,9 +78,8 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.1016/j.eururo.2018.10.041")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.zm7q2x");
 
-        Optional<BibEntry> optionalBibEntry = fetcher.performSearchById("https://isidore.science/document/10670/1.zm7q2x");
-        BibEntry actual = optionalBibEntry.get();
+        Optional<BibEntry> actual = fetcher.performSearchById("https://isidore.science/document/10670/1.zm7q2x");
 
-        assertEquals(Optional.of(expected), Optional.of(actual));
+        assertEquals(Optional.of(expected), actual);
     }
 }
