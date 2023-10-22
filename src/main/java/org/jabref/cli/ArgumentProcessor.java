@@ -277,6 +277,10 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
+        if (!cli.isBlank() && cli.isJumpToEntryKey()) {
+            jumpToEntryKey();
+        }
+
         this.parserResults = loaded;
     }
 
@@ -771,6 +775,10 @@ public class ArgumentProcessor {
                 return Optional.empty();
             }
         }
+    }
+
+    private void jumpToEntryKey(){
+
     }
 
     public boolean isBlank() {

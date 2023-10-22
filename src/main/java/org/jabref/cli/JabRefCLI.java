@@ -169,6 +169,10 @@ public class JabRefCLI {
                         cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
+    public boolean isJumpToEntryKey() {
+        return cl.hasOption("jumpToEntryKey");
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -286,6 +290,14 @@ public class JabRefCLI {
                 .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("j")
+                .longOpt("jumpToEntryKey")
+                .desc(String.format("%s: '%s'", Localization.lang("Jump to the BibEntry of the given key."), "-j key"))
+                .hasArg()
+                .argName("ENTRYKEY")
                 .build());
 
         return options;
