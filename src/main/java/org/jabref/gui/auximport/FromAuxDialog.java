@@ -117,11 +117,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
                         return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
                     }
 
-                    if (dbOpt.isEmpty()) {
-                        return Localization.lang("untitled");
-                    }
-
-                    return dbOpt.get();
+                    return dbOpt.orElse(Localization.lang("untitled"));
                 })
                 .install(libraryListView);
     }
