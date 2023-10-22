@@ -195,15 +195,18 @@ public class ImportHandler {
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         BibEntry cleanedEntry = cleanUpEntry(bibDatabaseContext, entry);
-
         Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, cleanedEntry);
-        BibEntry entryToInsert = cleanedEntry;
 
+        BibEntry entryToInsert = cleanedEntry;
         if (existingDuplicateInLibrary.isPresent()) {
-            entryToInsert = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
-            // If handleDuplicates returned null, stop processing
-            if (entryToInsert == null) {
-                return;
+            Optional<BibEntry> entriesToInsert = Optional.of(cleanedEntry);
+            if (existingDuplicateInLibrary.isPresent()) {
+                BibEntry duplicateHandledEntry = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
+                entriesToInsert = Optional.ofNullable(duplicateHandledEntry);
+                // If handleDuplicates returns null, stop processing
+                if (entryToInsert.isEmpty()) {
+                    return;
+                }
             }
         }
 
@@ -214,7 +217,7 @@ public class ImportHandler {
 
         addEntryToGroups(entryToInsert);
 
-        downloadLinkedFiles(entry);
+        downloadLinkedFiles(entryToInsert);
     }
 
     public BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
