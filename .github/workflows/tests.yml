@@ -142,10 +142,9 @@ jobs:
           set -e
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           source ~/.zshrc
-          jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
-          cat heylogs.txt
-          # We have 7 "valid" issues in CHANGELOG.md
-          grep -q "7 problems" heylogs.txt || exit 1
+          jbang .github/heylogs.java check CHANGELOG.md | tee heylogs.txt
+          # We have 2 "valid" issue in CHANGELOG.md
+          grep -q "2 problems" heylogs.txt || exit 1
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
