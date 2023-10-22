@@ -156,6 +156,8 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
           fetch-depth: 0
+      - run: git remote -v
+      - run: git show origin/main:CHANGELOG.md
       - run: git show main:CHANGELOG.md
       - run: git show HEAD:CHANGELOG.md
       - name: Check
