@@ -149,8 +149,6 @@ jobs:
           fetch-depth: 0
       - name: Lint CHANGELOG.md
         run: |
-          set -e
-
           # ensure that refs are available
           BRANCH=`git rev-parse HEAD`
           git checkout main
