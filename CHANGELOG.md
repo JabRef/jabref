@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 ### Fixed
+- We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list [#10415](https://github.com/JabRef/jabref/issues/10415).
 
 ### Removed
 
@@ -68,7 +69,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where there was a failure to access the url link for "eprint" for the ArXiv entry.[#10474](https://github.com/JabRef/jabref/issues/10474)
 - We fixed an issue where it was not possible to connect to a shared database once a group with entries was added or other metadata modified [#10336](https://github.com/JabRef/jabref/issues/10336)
 - We fixed an issue where middle-button paste in X not always worked [#7905](https://github.com/JabRef/jabref/issues/7905)
-- We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word after or at the cursor in the textbox can be added to the list [#10415](https://github.com/JabRef/jabref/issues/10415).
 
 ## [5.10] – 2023-09-02
 
