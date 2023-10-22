@@ -106,4 +106,8 @@ public class FileHistoryMenu extends Menu {
         history.clear();
         setDisable(true);
     }
+
+    public boolean checkIfHistoryIsEmpty(){
+        return history.isEmpty();
+    }
 }

@@ -16,7 +16,9 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -110,10 +112,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
-
     private Subscription dividerSubscription;
 
     private final TaskExecutor taskExecutor;
+
+    private WelcomeTab welcomeTab;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -133,6 +136,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 }
             }
         });
+
+
     }
 
     private void initDragAndDrop() {
@@ -401,7 +406,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 return false;
             }
         }
-
+        //Remove welcome tab
+        welcomeTab.consumeWelcomeTab();
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
@@ -429,6 +435,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         saveWindowState();
         // Good bye!
         tearDownJabRef(filenames);
+
         Platform.exit();
         return true;
     }
@@ -564,6 +571,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         tabbedPane.getSelectionModel().select(libraryTab);
     }
 
+
     public void init() {
         sidePane = new SidePane(
                 this,
@@ -585,6 +593,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         // Bind global state
         FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
         filteredTabs.setPredicate(LibraryTab.class::isInstance);
+        //welcomeTab = WelcomeTab.getInstance(tabbedPane);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
         openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
@@ -656,6 +665,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             mainStage.titleProperty().bind(windowTitle);
         });
         initShowTrackingNotification();
+        // Adding the welcome
+        if (fileHistory.checkIfHistoryIsEmpty()) {
+            addTabWelcome();
+        }
     }
 
     /**
@@ -692,6 +705,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         tabbedPane.getTabs().forEach(tab -> {
             if (tab instanceof LibraryTab libraryTab && (libraryTab.getDatabase() != null)) {
                 DefaultTaskExecutor.runInJavaFXThread(libraryTab::setupMainPanel);
+            }
+            if (tab instanceof WelcomeTab) {
+                DefaultTaskExecutor.runInJavaFXThread(welcomeTab::runLabelTasks);
             }
         });
     }
@@ -730,10 +746,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
+    public void addTabWelcome() {
+        welcomeTab = WelcomeTab.getInstance(tabbedPane, prefs, stateManager, fileUpdateMonitor, taskExecutor, dialogService);
+        welcomeTab.setOnCloseRequest(Event::consume);
+    }
+
     /**
      * Opens a new tab with existing data.
      * Asynchronous loading is done at  {@link org.jabref.gui.LibraryTab#createLibraryTab(BackgroundTask, Path, DialogService, PreferencesService, StateManager, JabRefFrame, FileUpdateMonitor, BibEntryTypesManager, CountingUndoManager)}.
      */
+
     public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
@@ -760,6 +782,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
             LibraryTab libraryTab = getCurrentLibraryTab();
+//            WelcomeTab welcomeTab = WelcomeTab.getInstance(tabbedPane);
             if (libraryTab == null) {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(parserResult.getDatabaseContext(), raisePanel);
