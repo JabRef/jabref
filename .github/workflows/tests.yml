@@ -132,7 +132,6 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
-          fetch-depth: 0
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
@@ -156,6 +155,7 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+          fetch-depth: 1000
       - name: Check
         run: |
           curl -LO https://github.com/marcaddeo/clparse/releases/download/0.8.1/clparse_0.8.1_amd64.deb
