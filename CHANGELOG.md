@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 ### Fixed
+
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list [#10415](https://github.com/JabRef/jabref/issues/10415).
 
 ### Removed
