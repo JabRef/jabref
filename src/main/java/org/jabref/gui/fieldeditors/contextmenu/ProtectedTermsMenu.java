@@ -63,7 +63,16 @@ class ProtectedTermsMenu extends Menu {
         @Override
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
-            textInputControl.replaceSelection("{" + selectedText + "}");
+            String firstStr = "{";
+            String lastStr = "}";
+            // If the selected text contains spaces at the beginning and end, then add spaces before or after the brackets
+            if (selectedText.startsWith(" ")) {
+                firstStr = " {";
+            }
+            if (selectedText.endsWith(" ")) {
+                lastStr = "} ";
+            }
+            textInputControl.replaceSelection(firstStr + selectedText.strip() + lastStr);
         }
     }
 
