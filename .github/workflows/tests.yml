@@ -163,7 +163,7 @@ jobs:
           echo "TEST"
 
           # run heylogs verification
-          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH | tee heylogs.txt
+          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH > heylogs.txt
 
           echo "TEST3"
 
