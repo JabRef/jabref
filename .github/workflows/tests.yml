@@ -158,7 +158,7 @@ jobs:
           git checkout main
 
           # run heylogs verification
-          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH > heylogs.txt || true
+          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check CHANGELOG.md --gitdiff main...$BRANCH > heylogs.txt || true
 
           # improve output
           sed -i 's/consistent-separator/consistent-separator (ignored)/' heylogs.txt
