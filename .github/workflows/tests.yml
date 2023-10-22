@@ -153,12 +153,7 @@ jobs:
 
           # ensure that refs are available
           BRANCH=`git rev-parse HEAD`
-          echo BRANCH: $BRANCH
-          git log | head
           git checkout main
-
-          # debug
-          git diff main $BRANCH -- CHANGELOG.md
 
           # install jbang
           curl -Ls https://sh.jbang.dev | bash -s - app setup
