@@ -40,6 +40,7 @@ public class JournalAbbreviationLoader {
                 LOGGER.warn("There is no journal-list.mv. We use a default journal list");
                 repository = new JournalAbbreviationRepository();
             } else {
+
                 Path tempDir = Files.createTempDirectory("jabref-journal");
                 Path tempJournalList = tempDir.resolve("journal-list.mv");
                 Files.copy(resourceAsStream, tempJournalList);
