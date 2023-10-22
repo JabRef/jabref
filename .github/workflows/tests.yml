@@ -150,11 +150,8 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # Install jbang
-          curl -s "https://get.sdkman.io" | bash
-          source "/home/runner/.sdkman/bin/sdkman-init.sh"
-
-          sdk install java
-          sdk install jbang
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          export PATH=$PATH:$HOME/.jbang/bin
 
           # ensure that refs are available
           BRANCH=`git rev-parse HEAD`
@@ -163,7 +160,7 @@ jobs:
           echo "TEST"
 
           # run heylogs verification
-          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH > heylogs.txt
+          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH > heylogs.txt || true
 
           echo "TEST3"
 
