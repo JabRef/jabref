@@ -189,7 +189,7 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Setup rsync (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
         if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
@@ -198,8 +198,8 @@ jobs:
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         run: choco install --no-progress rsync
-      - name: Setup ssh key
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+      - name: Setup SSH key
+        if: ${{ (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && ((matrix.os != 'macos-latest') || !((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
