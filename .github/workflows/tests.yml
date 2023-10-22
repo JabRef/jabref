@@ -152,8 +152,8 @@ jobs:
     steps:
       - name: Check
         run: |
-          wget -qq https://github.com/NiclasvanEyk/keepac/releases/download/0.0.9/keepac_0.0.9_linux_amd64.deb
-          sudo dpkg -i keepac_0.0.9_linux_amd64.deb
+          curl -LO https://github.com/marcaddeo/clparse/releases/download/0.8.1/clparse_0.8.1_amd64.deb
+          sudo dpkg -i clparse_0.8.1_amd64.deb
           diff \
             <(git show main:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)')
