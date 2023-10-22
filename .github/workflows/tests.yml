@@ -150,6 +150,11 @@ jobs:
     name: Changelog right section
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Check
         run: |
           curl -LO https://github.com/marcaddeo/clparse/releases/download/0.8.1/clparse_0.8.1_amd64.deb
