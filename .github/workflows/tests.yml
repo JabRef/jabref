@@ -124,7 +124,7 @@ jobs:
               You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
           comment_tag: modernizer
   markdown-checks:
-    name: Markdown style check
+    name: Markdown
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -137,17 +137,8 @@ jobs:
         with:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
-      - name: Lint CHANGELOG.md
-        run: |
-          set -e
-          curl -Ls https://sh.jbang.dev | bash -s - app setup
-          source ~/.zshrc
-          jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
-          cat heylogs.txt
-          # We have 7 "valid" issues in CHANGELOG.md
-          grep -q "7 problems" heylogs.txt || exit 1
   changelog-non-frozen:
-    name: Changelog right section
+    name: CHANGELOG.md
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -156,16 +147,14 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
           fetch-depth: 0
-      - run: git remote -v
-      - run: git show origin/main:CHANGELOG.md
-      - run: git show HEAD:CHANGELOG.md
-      - name: Check
+      - name: Lint CHANGELOG.md
         run: |
-          curl -LO https://github.com/marcaddeo/clparse/releases/download/0.8.1/clparse_0.8.1_amd64.deb
-          sudo dpkg -i clparse_0.8.1_amd64.deb
-          diff \
-            <(git show origin/main:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)') \
-            <(git show HEAD:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)')
+          set -e
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          source ~/.zshrc
+          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...add-changelog-diff-check | tee heylogs.txt
+          # We have 2 "valid" issues in CHANGELOG.md
+          grep -q "2 problems" heylogs.txt || exit 1
       - name: Add comment on pull request
         if: ${{ failure() }}
         uses: thollander/actions-comment-pull-request@v2
@@ -173,6 +162,10 @@ jobs:
           message: >
               While the PR was in progress, JabRef released a new version.
               You have to merge `upstream/main` and move your entry in `CHANGELOG.md` to section `## [Unreleased]`.
+
+
+              It might also be that another CHANGELOG.md issue arose.
+              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "CHANGELOG.md".
           comment_tag: changelog
   tests:
     name: Unit tests
