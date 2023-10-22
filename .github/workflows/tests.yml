@@ -152,15 +152,15 @@ jobs:
           set -e
 
           # ensure that refs are available
+          BRANCH=`git rev-parse --abbrev-ref HEAD`
           git checkout main
-          git checkout ${GITHUB_REF##*/}
 
           # install jbang
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           source ~/.zshrc
 
           # run heylogs verification
-          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...${GITHUB_REF##*/} | tee heylogs.txt
+          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH | tee heylogs.txt
 
           # exit 1 in case of error
           # We have 2 "valid" issues in CHANGELOG.md
