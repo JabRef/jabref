@@ -40,7 +40,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     private EditExternalFileTypeViewModel viewModel;
 
     public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
-        this.isNewItem = (item.extensionProperty().get().equals("")) ? true : false;
+        this.isNewItem = item.extensionProperty().get().equals("");
 
         this.item = item;
 
@@ -68,13 +68,9 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     }
 
     public boolean isValidExternalFileTypeEntry() {
-        if (name.getText().trim().equalsIgnoreCase("")
+        return !(name.getText().trim().equalsIgnoreCase("")
                 || extension.getText().trim().equalsIgnoreCase("")
-                || mimeType.getText().trim().equalsIgnoreCase("")
-            ) {
-            return false;
-        }
-        return true;
+                || mimeType.getText().trim().equalsIgnoreCase(""));
     }
 
     @FXML
