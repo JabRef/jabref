@@ -155,6 +155,10 @@ jobs:
           BRANCH=`git rev-parse --abbrev-ref HEAD`
           git checkout main
 
+          # debug
+          echo BRANCH: $BRANCH
+          git diff main $BRANCH -- CHANGELOG.md
+
           # install jbang
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           source ~/.zshrc
