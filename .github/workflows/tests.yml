@@ -163,8 +163,8 @@ jobs:
           jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH > heylogs.txt
 
           # improve output
-          sed -i 's/consistent-separator/consistent-separator (ignored)' heylogs.txt
-          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)' heylogs.txt
+          sed -i 's/consistent-separator/consistent-separator (ignored)/' heylogs.txt
+          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
 
           cat heylogs.txt
 
