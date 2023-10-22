@@ -212,7 +212,7 @@ public class ImportHandler {
 
         setAutomaticFieldsForEntry(entryToInsert);
 
-        addEntryToGroups(entry);
+        addEntryToGroups(entryToInsert);
 
         downloadLinkedFiles(entry);
     }

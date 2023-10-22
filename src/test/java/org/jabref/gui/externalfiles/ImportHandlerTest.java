@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -46,9 +47,8 @@ class ImportHandlerTest {
     private DuplicateCheck duplicateCheck;
 
     @BeforeEach
-
     void setUp() {
-        MockitoAnnotations.initMocks(this);  // Initialize the mocks
+        MockitoAnnotations.initMocks(this);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
@@ -74,7 +74,6 @@ class ImportHandlerTest {
     }
 
     @Test
-
     void handleBibTeXData() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
@@ -109,7 +108,13 @@ class ImportHandlerTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
         BibEntry cleanedEntry = importHandler.cleanUpEntry(bibDatabaseContext, entry);
 
-        assertEquals("Clear Author", cleanedEntry.getField(StandardField.AUTHOR).orElse(""));
+        Optional<String> authorOptional = cleanedEntry.getField(StandardField.AUTHOR);
+
+        // Make sure the value exists in Optional
+        assertTrue(authorOptional.isPresent());
+
+        // Get and verify the actual value in Optional
+        assertEquals("Clear Author", authorOptional.get());
     }
 
     @Test
