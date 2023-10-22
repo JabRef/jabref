@@ -2,6 +2,20 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
+// custom build script for spotbugs integration with gradle
+// see https://plugins.gradle.org/plugin/com.github.spotbugs
+// further development will see this refactored to gradle settings
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.0-rc.2"
+    }
+}
+
 plugins {
     id 'application'
 
@@ -28,7 +42,15 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.3.18'
+
+    //required for the spotbugs plugin
+    id 'java'
+    // spotbugs plugin
+    id "com.github.spotbugs" version "6.0.0-rc.2"
 }
+
+
+apply plugin: "com.github.spotbugs"
 
 // Enable following for debugging
 // gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.
@@ -255,7 +277,30 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+
+
 }
+
+// simple tool configuration based on https://github.com/spotbugs/spotbugs-gradle-plugin/blob/master/README.md
+spotbugs {
+    toolVersion = '4.8.0'
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = true
+}
+
+// HTML report config
+spotbugsMain {
+    reports {
+        html {
+            required = true
+            outputLocation = file("src/test/spotbugs_output/log") // overwrites log file each time
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+check.dependsOn(spotbugsMain)
 
 clean {
     delete "src/main/generated"
