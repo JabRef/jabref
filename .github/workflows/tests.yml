@@ -155,7 +155,7 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
-          fetch-depth: 1000
+      - run: git fetch --depth=1 origin/main
       - name: Check
         run: |
           curl -LO https://github.com/marcaddeo/clparse/releases/download/0.8.1/clparse_0.8.1_amd64.deb
