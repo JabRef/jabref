@@ -1,13 +1,16 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -19,22 +22,22 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jooq.lambda.Unchecked;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
- * Fetcher for ISIDORE (<a href="https://isidore.science">...</a>)
+ * Fetcher for <a href="https://isidore.science">ISIDORE</a>```
  * Will take in the link to the website or the last six digits that identify the reference
- * Uses ISIDORE's API.
- * API explanation: <a href="https://isidore.science/api">...</a>
- */
+ * Uses <a href="https://isidore.science/api">ISIDORE's API</a>. */
 public class ISIDOREFetcher implements IdBasedParserFetcher {
     private static final int LINKLENGTH = 47;
 
     private String URL;
-    private Parser parser;
+    private final Parser parser;
 
     public ISIDOREFetcher() {
         this.parser = xmlData -> {
@@ -50,29 +53,29 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
                     return Collections.emptyList();
                 }
 
-                return Collections.singletonList(xmlItemToBibEntry(document));
-            } catch (Exception e) {
-                // Handle parsing exceptions
-                try {
-                    throw new FetcherException("Issue with parsing link");
-                } catch (FetcherException ex) {
-                    throw new RuntimeException(ex);
-                }
+                return Collections.singletonList(xmlItemToBibEntry(document.getDocumentElement()));
+            } catch (
+                    ParserConfigurationException |
+                    IOException |
+                    SAXException e) {
+                Unchecked.throwChecked(new FetcherException("Issue with parsing link"));
             }
+            return null;
         };
     }
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         identifier = identifier.trim();
-        // this allows the user to input only the six-digit code at the end.
+
         if (identifier.length() == 6) {
+            // this allows the user to input only the six-digit code at the end.
             identifier = "https://isidore.science/document/10670/1." + identifier;
         } else if (identifier.length() == 8) {
             // allows the user to put in the eight digits including the "1."
             identifier = "https://isidore.science/document/10670/" + identifier;
         }
-        // Throw an error if this is not the starting link
+
         if (identifier.startsWith("https://isidore.science/document/10670/1.") && (identifier.length() == LINKLENGTH)) {
             this.URL = identifier;
             // change the link to be the correct link for the api.
@@ -80,6 +83,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
             identifier = identifier.replace("https://isidore.science/", "https://api.isidore.science/");
             return new URL(identifier);
         } else {
+            // Throw an error if the link does not start with the link above
             throw new FetcherException("Could not construct url for ISIDORE");
         }
     }
@@ -89,8 +93,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         return this.parser;
     }
 
-    private BibEntry xmlItemToBibEntry(Document document) {
-        Element itemElement = document.getDocumentElement();
+    private BibEntry xmlItemToBibEntry(Element itemElement) {
         return new BibEntry(getType(itemElement.getElementsByTagName("types").item(0).getChildNodes()))
                 .withField(StandardField.TITLE, itemElement.getElementsByTagName("title").item(0).getTextContent())
                 .withField(StandardField.AUTHOR, getAuthor(itemElement.getElementsByTagName("enrichedCreators").item(0)))
@@ -103,11 +106,12 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
 
     private String getDOI(NodeList list) {
         for (int i = 0; i < list.getLength(); i++) {
-            if (list.item(i).getTextContent().contains("DOI:")) {
-                return list.item(i).getTextContent().replace("DOI: ", "");
+            String content = list.item(i).getTextContent();
+            if (content.contains("DOI:")) {
+                return content.replace("DOI: ", "");
             }
             if (list.item(i).getTextContent().contains("doi:")) {
-                return list.item(i).getTextContent().replace("info:doi:", "");
+                return content.replace("info:doi:", "");
             }
         }
         return "";
@@ -134,22 +138,16 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
     // Gets all the authors, separated with the word "and"
     // For some reason the author field sometimes has extra numbers and letters.
     private String getAuthor(Node itemElement) {
-        boolean singleAuthor = true;
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner stringJoiner = new StringJoiner(" and ");
         for (int i = 1; i < itemElement.getChildNodes().getLength(); i += 2) {
             String next = removeNumbers(itemElement.getChildNodes().item(i).getTextContent()).replaceAll("\\s+", " ");
             next = next.replace("\n", "");
             if (next.isBlank()) {
                 continue;
             }
-            if (singleAuthor) {
-                singleAuthor = false;
-            } else {
-                stringBuilder.append(" and ");
-            }
-            stringBuilder.append(next);
+            stringJoiner.add(next);
         }
-        return (stringBuilder.substring(0, stringBuilder.length())).trim().replaceAll("\\s+", " ");
+        return (stringJoiner.toString().substring(0, stringJoiner.length())).trim().replaceAll("\\s+", " ");
     }
 
     // Remove numbers from a string and everything after the number, (helps with the author field).
@@ -170,16 +168,14 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         if (itemElement == null) {
             return "";
         }
-
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner stringJoiner = new StringJoiner(", ");
         for (int i = 0; i < itemElement.getChildNodes().getLength(); i++) {
-            stringBuilder.append(itemElement.getChildNodes().item(i).getTextContent().trim());
             if (itemElement.getChildNodes().item(i).getTextContent().isBlank()) {
                 continue;
             }
-            stringBuilder.append(", ");
+            stringJoiner.add(itemElement.getChildNodes().item(i).getTextContent().trim());
         }
-        return stringBuilder.substring(0, stringBuilder.length() - 2);
+        return stringJoiner.toString();
     }
 
     private String getJournal(NodeList list) {
