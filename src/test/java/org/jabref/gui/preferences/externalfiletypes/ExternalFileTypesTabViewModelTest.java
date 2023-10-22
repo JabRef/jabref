@@ -46,10 +46,10 @@ public class ExternalFileTypesTabViewModelTest {
             return null;
         }).when(externalFileTypesTabViewModel).addNewType();
 
-        //Action
+        // Action
         externalFileTypesTabViewModel.addNewType();
 
-        //Assert
+        // Assert
         assertEquals(fileTypes.size(), 6);
     }
 
@@ -58,10 +58,10 @@ public class ExternalFileTypesTabViewModelTest {
         // Arrange
         doNothing().when(externalFileTypesTabViewModel).addNewType();
 
-        //Action
+        // Action
         externalFileTypesTabViewModel.addNewType();
 
-        //Assert
+        // Assert
         assertEquals(fileTypes.size(), 5);
     }
 }
