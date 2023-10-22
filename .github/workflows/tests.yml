@@ -159,6 +159,8 @@ jobs:
           echo BRANCH: $BRANCH
           git diff main $BRANCH -- CHANGELOG.md
 
+          git log
+
           # install jbang
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           source ~/.zshrc
