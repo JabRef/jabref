@@ -149,17 +149,18 @@ jobs:
           fetch-depth: 0
       - name: Lint CHANGELOG.md
         run: |
+          # Install jbang
+          curl -s "https://get.sdkman.io" | bash
+          source ~/.bash_profile
+
+          sdk install java
+          sdk install jbang
+
           # ensure that refs are available
           BRANCH=`git rev-parse HEAD`
           git checkout main
 
           echo "TEST"
-
-          # install jbang
-          curl -Ls https://sh.jbang.dev | bash -s - app setup
-          source ~/.bash_profile
-
-          echo "TEST2"
 
           # run heylogs verification
           jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check --debug CHANGELOG.md  --gitdiff main...$BRANCH > heylogs.txt
