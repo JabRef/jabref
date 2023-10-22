@@ -7,11 +7,11 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [Unreleased] – 2023-10-22
 
 ### Added
 
-### Changed - 2023-10-22
+### Changed
 
 - We changed the TextField for KeywordSeparator to only accepting 1 single character by using a TextFormatter in EntryTab.java so that Prefs dialog for groups should be adjusted that it is only possible to insert a single character as delimiter.[#177](https://github.com/koppor/jabref/issues/177)
 
