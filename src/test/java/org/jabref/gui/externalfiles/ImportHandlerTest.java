@@ -1,7 +1,6 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -13,6 +12,7 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -56,6 +56,7 @@ class ImportHandlerTest {
 
         bibDatabaseContext = mock(BibDatabaseContext.class);
         BibDatabase bibDatabase = new BibDatabase();
+        when(bibDatabaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
         importHandler = new ImportHandler(
@@ -107,16 +108,13 @@ class ImportHandlerTest {
     void cleanUpEntryTest() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
         BibEntry cleanedEntry = importHandler.cleanUpEntry(bibDatabaseContext, entry);
-
-        Optional<String> authorOptional = cleanedEntry.getField(StandardField.AUTHOR);
-
-        assertEquals(Optional.of("Clear Author"), authorOptional);
+        assertEquals(new BibEntry().withField(StandardField.AUTHOR, "Clear Author"), cleanedEntry);
     }
 
     @Test
     void findDuplicateTest() {
-        // Assume there's no duplicate initially
-        assertFalse(importHandler.findDuplicate(bibDatabaseContext, testEntry).isPresent());
+        // Assume there is no duplicate initially
+        assertTrue(importHandler.findDuplicate(bibDatabaseContext, testEntry).isEmpty());
     }
 
     @Test

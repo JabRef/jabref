@@ -52,6 +52,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,10 +182,10 @@ public class ImportHandler {
     public void importEntries(List<BibEntry> entries) {
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
         cleanup.doPostCleanup(entries);
-        importCleanUpEntries(entries);
+        importCleanedEntries(entries);
     }
 
-    public void importCleanUpEntries(List<BibEntry> entries) {
+    public void importCleanedEntries(List<BibEntry> entries) {
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
@@ -201,10 +202,11 @@ public class ImportHandler {
             }
             entryToInsert = duplicateHandledEntry.get();
         }
-        importCleanUpEntries(List.of(entryToInsert));
+        importCleanedEntries(List.of(entryToInsert));
         downloadLinkedFiles(entryToInsert);
     }
 
+    @VisibleForTesting
     BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
         return cleanup.doPostCleanup(entry);
