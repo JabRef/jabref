@@ -42,6 +42,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
+import com.jthemedetecor.OsThemeDetector;
+
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
@@ -186,7 +188,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 workspacePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
             }
             case SYNC -> {
-                workspacePreferences.setTheme(Theme.dark());
+                workspacePreferences.setTheme(detectOSThemePreference());
                 flagWhenAutomaticButtonSelected.setValue(true);
                 workspacePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
             }
@@ -207,6 +209,16 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
+    }
+
+    public Theme detectOSThemePreference() {
+        final OsThemeDetector detector = OsThemeDetector.getDetector();
+        final boolean isDarkThemeUsed = detector.isDark();
+        if (isDarkThemeUsed) {
+            return Theme.dark();
+        } else {
+            return Theme.light();
+        }
     }
 
     public ValidationStatus fontSizeValidationStatus() {

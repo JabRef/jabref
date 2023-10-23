@@ -253,6 +253,8 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+
+    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
 }
 
 clean {

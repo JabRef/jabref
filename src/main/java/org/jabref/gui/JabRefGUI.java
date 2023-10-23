@@ -18,6 +18,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.theme.Theme;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -35,6 +36,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.jthemedetecor.OsThemeDetector;
 
 public class JabRefGUI {
 
@@ -145,6 +147,31 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
+        // Call the OsThemeDetector from jSystemThemeDetector library (https://github.com/Dansoftowner/jSystemThemeDetector)
+        final OsThemeDetector detector = OsThemeDetector.getDetector();
+        // If OS theme is light or dark, JabRef UI Theme will correspond to it. If JabRef is then closed and user modifies their
+        // OS theme settings, the code below will make the necessary theme switch IF automatic detection is enabled by user in
+        // JabRef Appearance Preferences.
+        if(preferencesService.getWorkspacePreferences().automaticThemeDetectionFlag().getValue()){
+            final boolean isDarkThemeUsed = detector.isDark();
+            if (isDarkThemeUsed) {
+                //The OS uses a dark theme
+                preferencesService.getWorkspacePreferences().setTheme(Theme.dark());
+            } else {
+                //The OS uses a light theme
+                preferencesService.getWorkspacePreferences().setTheme(Theme.light());
+            }
+        }
+        // Listening to changes
+        detector.registerListener(isDark -> {
+            if (isDark) {
+                //The OS switched to a dark theme
+                preferencesService.getWorkspacePreferences().setTheme(Theme.dark());
+            } else {
+                //The OS switched to a light theme
+                preferencesService.getWorkspacePreferences().setTheme(Theme.light());
+            }
+        });
         Globals.getThemeManager().installCss(scene);
 
         // Handle TextEditor key bindings
