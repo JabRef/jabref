@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.jabref.gui.git.GitPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -45,8 +46,6 @@ class GitHandlerTest {
     Path repositoryPath;
     private GitHandler gitHandler;
     private GitPreferences gitPreferences;
-    private final String port = "8080";
-    private final String localUrl = "http://localhost:" + port + '/';
 
 
     private static Repository createRepository() throws IOException, GitAPIException {
@@ -144,7 +143,7 @@ class GitHandlerTest {
         Path clonedRepPath = createFolder();
         Git.cloneRepository()
            .setCredentialsProvider(credentialsProvider)
-           .setURI( "http://localhost:8080/repoTest")
+           .setURI( "http://localhost:8080/repoTest/.git")
            .setDirectory(clonedRepPath.toFile())
            .call();
 
@@ -164,6 +163,9 @@ class GitHandlerTest {
         git.pushCommitsToRemoteRepository();
 
         Assertions.assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile", false));
+
+        Git.lsRemoteRepository();
+
         server.stop();
     }
 
@@ -200,11 +202,14 @@ class GitHandlerTest {
     private Server createServer(String username, String password, Repository repository) {
         GitServlet gs = new GitServlet();
         gs.setRepositoryResolver((req, name) -> {
-            repository.incrementOpen();
-            return repository;
+            if (Objects.equals(name, ".git")) {
+                repository.incrementOpen();
+                return repository;
+            }
+            return null;
         });
         Server server = new Server(8080);
-        ServletContextHandler context = new ServletContextHandler(server, "/*", ServletContextHandler.SESSIONS);
+        ServletContextHandler context = new ServletContextHandler(server, "/repoTest", ServletContextHandler.SESSIONS);
         context.setSecurityHandler(basicAuth(username, password, "Private!"));
         context.addServlet(new ServletHolder(gs), "/*");
         server.setHandler(context);
