@@ -137,6 +137,7 @@ class GitHandlerTest {
         // Server
         Repository repository = createRepository();
         Server server = createServer(username, password, repository);
+        server.start();
 
         //Clone
         CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
