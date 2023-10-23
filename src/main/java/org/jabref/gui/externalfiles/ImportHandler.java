@@ -194,25 +194,19 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        BibEntry cleanedEntry = cleanUpEntry(bibDatabaseContext, entry);
-        Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, cleanedEntry);
-
-        BibEntry entryToInsert = cleanedEntry;
-
+        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
+        Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
         if (existingDuplicateInLibrary.isPresent()) {
-            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get());
             if (duplicateHandledEntry.isEmpty()) {
                 return;
             }
             entryToInsert = duplicateHandledEntry.get();
         }
-        regenerateCiteKey(entryToInsert);
+        generateKey(entryToInsert);
         bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
-
         setAutomaticFieldsForEntry(entryToInsert);
-
         addEntryToGroups(entryToInsert);
-
         downloadLinkedFiles(entryToInsert);
     }
 
@@ -251,7 +245,7 @@ public class ImportHandler {
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
-    public void regenerateCiteKey(BibEntry entry) {
+    public void generateKey(BibEntry entry) {
         if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
             generateKeys(List.of(entry));
         }
@@ -310,10 +304,7 @@ public class ImportHandler {
                                                                                      .getKeyPattern()),
                 bibDatabaseContext.getDatabase(),
                 preferencesService.getCitationKeyPatternPreferences());
-
-        for (BibEntry entry : entries) {
-            keyGenerator.generateAndSetKey(entry);
-        }
+        entries.forEach(keyGenerator::generateAndSetKey);
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {
