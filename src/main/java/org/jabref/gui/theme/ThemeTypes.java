@@ -6,6 +6,7 @@ public enum ThemeTypes {
 
         LIGHT(Localization.lang("Light")),
         DARK(Localization.lang("Dark")),
+        SYNC(Localization.lang("Use System Preference")),
         CUSTOM(Localization.lang("Custom..."));
 
         private final String displayName;

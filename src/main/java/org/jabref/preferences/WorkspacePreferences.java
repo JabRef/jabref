@@ -20,6 +20,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
+    private final BooleanProperty automaticThemeDetectionFlag;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -29,7 +30,8 @@ public class WorkspacePreferences {
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
-                                boolean confirmDelete) {
+                                boolean confirmDelete,
+                                boolean automaticThemeDetectionFlag) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -39,6 +41,15 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+        this.automaticThemeDetectionFlag = new SimpleBooleanProperty(automaticThemeDetectionFlag);
+    }
+
+    public BooleanProperty automaticThemeDetectionFlag() {
+        return automaticThemeDetectionFlag;
+    }
+
+    public void setAutomaticThemeDetectionFlag(boolean newValue) {
+        this.automaticThemeDetectionFlag.setValue(newValue);
     }
 
     public Language getLanguage() {
