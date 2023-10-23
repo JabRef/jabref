@@ -211,8 +211,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             }
             entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
             return entry;
-        } catch (
-                JSONException exception) {
+        } catch (JSONException exception) {
             throw new ParseException("SemanticScholar API JSON format has changed", exception);
         }
     }
