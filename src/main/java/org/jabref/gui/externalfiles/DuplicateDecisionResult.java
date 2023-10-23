@@ -6,13 +6,6 @@ import org.jabref.model.entry.BibEntry;
 public record DuplicateDecisionResult(
         DuplicateResolverDialog.DuplicateResolverResult decision,
         BibEntry mergedEntry) {
-
-    public DuplicateResolverDialog.DuplicateResolverResult getDecision() {
-        return decision;
-    }
-
-    public BibEntry getMergedEntry() {
-        return mergedEntry;
-    }
 }
+
 

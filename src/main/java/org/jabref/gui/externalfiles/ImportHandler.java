@@ -227,7 +227,7 @@ public class ImportHandler {
 
     public BibEntry handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
         DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
-        switch (decisionResult.getDecision()) {
+        switch (decisionResult.decision()) {
             case KEEP_RIGHT:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
                 break;
@@ -235,7 +235,7 @@ public class ImportHandler {
                 break;
             case KEEP_MERGE:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
-                return decisionResult.getMergedEntry();
+                return decisionResult.mergedEntry();
             case KEEP_LEFT:
             case AUTOREMOVE_EXACT:
             case BREAK:
