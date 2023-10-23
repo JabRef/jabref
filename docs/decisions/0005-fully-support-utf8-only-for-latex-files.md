@@ -47,4 +47,3 @@ Chosen option: "Support UTF-8 encoding only", because comes out best \(see below
   This causes issues during compilation \(see [https://github.com/JabRef/jabref/pull/3421\#issuecomment-524532832](https://github.com/JabRef/jabref/pull/3421#issuecomment-524532832)\).
 
   Example: `error: module java.xml.bind reads package javax.activation from both java.activation and jakarta.activation`.
-
