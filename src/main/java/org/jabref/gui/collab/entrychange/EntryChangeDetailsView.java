@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -41,6 +42,20 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
 
         // we need a copy here as we otherwise would set the same entry twice
         PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+
+        // The scroll bar used is not part of ScrollPane, but the attached WebView.
+        // https://stackoverflow.com/questions/31264847/how-to-set-remember-scrollbar-thumb-position-in-javafx-8-webview
+        WebView previewCloneView = (WebView) previewClone.getContent();
+        WebView previewViewerView = (WebView) previewViewer.getContent();
+        previewCloneView.setOnScroll(event -> {
+            int value = (Integer) previewCloneView.getEngine().executeScript("window.scrollY");
+            previewViewerView.getEngine().executeScript("window.scrollTo(0, " + value + ")");
+        });
+        previewViewerView.setOnScroll(event -> {
+            int value = (Integer) previewViewerView.getEngine().executeScript("window.scrollY");
+            previewCloneView.getEngine().executeScript("window.scrollTo(0, " + value + ")");
+        });
+        // TODO: Currently does not update position when scroll bar itself is dragged, and the updated position appears to lag behind for the other panel.
 
         TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
         TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
