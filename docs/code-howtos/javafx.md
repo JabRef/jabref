@@ -128,7 +128,7 @@ public class AboutDialogView extends BaseDialog<Void>
 @Inject private DialogService dialogService;
 ```
 
-*   It is convenient to load the FXML-view directly from the controller class.
+* It is convenient to load the FXML-view directly from the controller class.
 
     The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
 

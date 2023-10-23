@@ -1,4 +1,4 @@
-name: GreetingFirstTimeCodeContribution
+name: Add greeting to issues for first time contributors
 
 on: 
   issues:
