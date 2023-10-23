@@ -51,63 +51,16 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         this.importerPreferences = importerPreferences;
     }
 
+
     /**
-     * Tries
-     * to
-     * find
-     * a
-     * fulltext
-     * URL
-     * for
-     * a
-     * given
-     * BibTex
-     * entry.
+     * Tries to find a fulltext URL for a given BibTex entry.
      * <p>
-     * Uses
-     * the
-     * DOI
-     * if
-     * present,
-     * otherwise
-     * the
-     * arXiv
-     * identifier.
+     * Uses the DOI if present, otherwise the arXiv identifier.
      *
-     * @param entry The
-     *              Bibtex
-     *              entry
-     * @return The
-     * fulltext
-     * PDF
-     * URL
-     * Optional,
-     * if
-     * found,
-     * or
-     * an
-     * empty
-     * Optional
-     * if
-     * not
-     * found.
-     * @throws IOException      if
-     *                          a
-     *                          page
-     *                          could
-     *                          not
-     *                          be
-     *                          fetched
-     *                          correctly
-     * @throws FetcherException if
-     *                          the
-     *                          received
-     *                          page
-     *                          differs
-     *                          from
-     *                          what
-     *                          was
-     *                          expected
+     * @param entry The Bibtex entry
+     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+     * @throws IOException      if a page could not be fetched correctly
+     * @throws FetcherException if the received page differs from what was expected
      */
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
@@ -128,7 +81,8 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
                 importerPreferences.getApiKey(getName()).ifPresent(
                         key -> jsoupRequest.header("x-api-key", key));
                 html = jsoupRequest.get();
-            } catch (IOException e) {
+            } catch (
+                    IOException e) {
                 LOGGER.info("Error for pdf lookup with DOI");
             }
         }
@@ -195,20 +149,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /**
-     * Returns
-     * the
-     * parser
-     * used
-     * to
-     * convert
-     * the
-     * response
-     * to
-     * a
-     * list
-     * of
-     * {@link
-     * BibEntry}.
+     * Returns the parser used to convert the response to a list of {@link BibEntry}.
      */
     @Override
     public Parser getParser() {
@@ -241,41 +182,11 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /**
-     * This
-     * is
-     * copy-paste
-     * from
-     * CrossRef,
-     * need
-     * to
-     * be
-     * checked.
+     * This is copy-paste from CrossRef, need to be checked.
      *
-     * @param item an
-     *             entry
-     *             received,
-     *             needs
-     *             to
-     *             be
-     *             parsed
-     *             into
-     *             a
-     *             BibEntry
-     * @return The
-     * BibEntry
-     * that
-     * corresponds
-     * to
-     * the
-     * received
-     * object
-     * @throws ParseException if
-     *                        the
-     *                        JSONObject
-     *                        could
-     *                        not
-     *                        be
-     *                        parsed
+     * @param item an entry received, needs to be parsed into a BibEntry
+     * @return The BibEntry that corresponds to the received object
+     * @throws ParseException if the JSONObject could not be parsed
      */
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
@@ -307,34 +218,9 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /**
-     * Returns
-     * the
-     * localized
-     * name
-     * of
-     * this
-     * fetcher.
-     * The
-     * title
-     * can
-     * be
-     * used
-     * to
-     * display
-     * the
-     * fetcher
-     * in
-     * the
-     * menu
-     * and
-     * in
-     * the
-     * side
-     * pane.
+     * Returns the localized name of this fetcher. The title can be used to display the fetcher in the menu and in the side pane.
      *
-     * @return the
-     * localized
-     * name
+     * @return the localized name
      */
     @Override
     public String getName() {
@@ -342,46 +228,11 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /**
-     * Looks
-     * for
-     * hits
-     * which
-     * are
-     * matched
-     * by
-     * the
-     * given
-     * {@link
-     * BibEntry}.
+     * Looks for hits which are matched by the given {@link BibEntry}.
      *
-     * @param entry entry
-     *              to
-     *              search
-     *              bibliographic
-     *              information
-     *              for
-     * @return a
-     * list
-     * of
-     * {@link
-     * BibEntry},
-     * which
-     * are
-     * matched
-     * by
-     * the
-     * query
-     * (may
-     * be
-     * empty)
-     * @throws FetcherException if
-     *                          an
-     *                          error
-     *                          linked
-     *                          to
-     *                          the
-     *                          Fetcher
-     *                          applies
+     * @param entry entry to search bibliographic information for
+     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+     * @throws FetcherException if an error linked to the Fetcher applies
      */
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
