@@ -204,8 +204,8 @@ public class ImportHandler {
             if (duplicateHandledEntry.isEmpty()) {
                 return;
             }
+            entryToInsert = duplicateHandledEntry.get();
         }
-
         regenerateCiteKey(entryToInsert);
         bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
 
