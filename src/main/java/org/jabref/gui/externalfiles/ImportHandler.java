@@ -197,23 +197,23 @@ public class ImportHandler {
         BibEntry cleanedEntry = cleanUpEntry(bibDatabaseContext, entry);
         Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, cleanedEntry);
 
-        Optional<BibEntry> entryToInsert = Optional.of(cleanedEntry);
+        BibEntry entryToInsert = cleanedEntry;
+
         if (existingDuplicateInLibrary.isPresent()) {
-            BibEntry duplicateHandledEntry = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
-            entryToInsert = Optional.ofNullable(duplicateHandledEntry);
-            // If handleDuplicates returns null, stop processing
-            if (entryToInsert.isEmpty()) {
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
+            if (duplicateHandledEntry.isEmpty()) {
                 return;
             }
         }
-        regenerateCiteKey(entryToInsert.get());
-        bibDatabaseContext.getDatabase().insertEntry(entryToInsert.get());
 
-        setAutomaticFieldsForEntry(entryToInsert.get());
+        regenerateCiteKey(entryToInsert);
+        bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
 
-        addEntryToGroups(entryToInsert.get());
+        setAutomaticFieldsForEntry(entryToInsert);
 
-        downloadLinkedFiles(entryToInsert.get());
+        addEntryToGroups(entryToInsert);
+
+        downloadLinkedFiles(entryToInsert);
     }
 
     public BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -225,7 +225,7 @@ public class ImportHandler {
         return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
     }
 
-    public BibEntry handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
+    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
         DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
@@ -235,14 +235,14 @@ public class ImportHandler {
                 break;
             case KEEP_MERGE:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
-                return decisionResult.mergedEntry();
+                return Optional.of(decisionResult.mergedEntry());
             case KEEP_LEFT:
             case AUTOREMOVE_EXACT:
             case BREAK:
             default:
-                return null;
+                return Optional.empty();
         }
-        return originalEntry;
+        return Optional.of(originalEntry);
     }
 
     public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {

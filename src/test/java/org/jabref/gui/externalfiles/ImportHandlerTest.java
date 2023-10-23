@@ -143,11 +143,12 @@ class ImportHandlerTest {
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry);
+        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry).get();
 
-        // Assert
-        assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
-        assertEquals(testEntry, result); // Assert that the original entry is returned
+        // Assert that the duplicate entry was removed from the database
+        assertFalse(bibDatabase.getEntries().contains(duplicateEntry));
+        // Assert that the original entry is returned
+        assertEquals(testEntry, result);
     }
 
     @Test
@@ -174,7 +175,7 @@ class ImportHandlerTest {
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry);
+        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry).get();
 
         // Assert
         assertTrue(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry is still in the database
@@ -209,13 +210,14 @@ class ImportHandlerTest {
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry);
+        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry)
+                                       .orElseGet(() -> {
+                                           // create and return a default BibEntry or do other computations
+                                           return new BibEntry();
+                                       });
 
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
     }
 }
-
-
-
