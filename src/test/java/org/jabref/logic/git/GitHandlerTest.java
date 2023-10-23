@@ -59,6 +59,8 @@ class GitHandlerTest {
         Repository repository = FileRepositoryBuilder.create(new File(localPath, ".git"));
         repository.create();
         repository.getConfig().setBoolean("http", null, "receivepack", true);
+        Git git = new Git(repository);
+        git.commit().setMessage("Initial commit").call();
         return repository;
     }
     private static Path createFolder() throws IOException {
@@ -149,7 +151,6 @@ class GitHandlerTest {
 
         //Add files
         Files.createFile(Path.of(clonedRepPath.toString(), "bib_1.bib"));
-        Files.createFile(Path.of(clonedRepPath.toString(), "bib_2.bib"));
 
         //Commit
         GitHandler git = new GitHandler(clonedRepPath);
@@ -162,10 +163,14 @@ class GitHandlerTest {
         git.setGitPreferences(preferences.getGitPreferences());
         git.pushCommitsToRemoteRepository();
 
-        Assertions.assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile", false));
-
-        Git.lsRemoteRepository();
-
+        //Check
+        Git gitRemoteRep = new Git(repository);
+        AnyObjectId head = gitRemoteRep.getRepository().resolve(Constants.HEAD);
+        Iterator<RevCommit> log = gitRemoteRep.log()
+                                     .add(head)
+                                     .call().iterator();
+        assertEquals("PushSingleFile", log.next().getFullMessage());
+        assertEquals("Initial commit", log.next().getFullMessage());
         server.stop();
     }
 
