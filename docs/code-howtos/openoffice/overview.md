@@ -65,7 +65,7 @@ A group of parenthesized citations share the parentheses around, like this:\
 
 From the user's point of view, citation groups can be created by
 
-1.  Selecting multiple entries in a bibliography database, then
+1. Selecting multiple entries in a bibliography database, then
 
     * `[click:Cite]` or
     * `[click:Cite in-text]` or
@@ -140,8 +140,8 @@ The order of appearance of citations (as considered during numbering and adding 
 
 The order of citations within a citation group is controlled by `jstyle:MultiCiteChronological`.
 
-* true asks for (year, author, title) ordering,
-* false for (author, year, title).
+* `true` asks for (year, author, title) ordering,
+* `false` for (author, year, title).
 * (There is no option for "in the order provided by the user").
 
 For author-year citation styles this ordering is used directly.
@@ -159,21 +159,21 @@ The location of each citation group in the document is provided by the user. In 
 #### Order of the citations
 
 * `globalOrder` and `localOrder` together provide the order of appearance of citations
-*   This also provides the order of first appearance of the cited sources.
+* This also provides the order of first appearance of the cited sources.
 
-    First appearance order of sources is used
+  First appearance order of sources is used
 
-    * in `jstyle:IsSortByPosition` numbered styles
-    * in author-year styles: first appearance of "Smith200a" should precede that of "Smith200b".\
-      To achieve this, the sources get the letters according the order of their first appearance.
-      * This seems to contradict the statement "The bibliography is sorted in (author, year, title) order" above.\
-        It does not. As of JabRef 5.3 both are true.\
-        Consequence: in the references Smith2000b may precede Smith2000a. ([reported](https://github.com/JabRef/jabref/issues/7805))
-    * Some author-year citation styles prescribe a higher threshold on the number of authors for switching to "FirstAuthor et al." form (`jstyle:MaxAuthors`) at the first citation of a source (`jstyle:MaxAuthorsFirst`)
+  * in `jstyle:IsSortByPosition` numbered styles
+  * in author-year styles: first appearance of "Smith200a" should precede that of "Smith200b".\
+    To achieve this, the sources get the letters according the order of their first appearance.
+    * This seems to contradict the statement "The bibliography is sorted in (author, year, title) order" above.\
+      It does not. As of JabRef 5.3 both are true.\
+      Consequence: in the references Smith2000b may precede Smith2000a. ([reported](https://github.com/JabRef/jabref/issues/7805))
+  * Some author-year citation styles prescribe a higher threshold on the number of authors for switching to "FirstAuthor et al." form (`jstyle:MaxAuthors`) at the first citation of a source (`jstyle:MaxAuthorsFirst`)
 
 ## What is stored in a document (JabRef5.2)
 
-*   Each group of citations has a reference mark.
+* Each group of citations has a reference mark.
 
     (Reference marks are shown in LibreOffice in Navigator, under "References".\
     To show the Navigator: `LibreOffice:[menu:View]/[Navigator]` or `LibreOffice:[key:F5]`)

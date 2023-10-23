@@ -65,7 +65,7 @@ Add new `Localization.lang("KEY")` to a Java file. The tests will fail. In the t
 
 Example:
 
-```
+```text
 java.lang.AssertionError: DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
 PASTE THESE INTO THE ENGLISH LANGUAGE FILE
 [
@@ -91,7 +91,7 @@ We simply ask to create a new markdown file in `docs/adr` following the template
 
 In case you want to directly add a comment to a class, simply use the following template (based on [sustainable architectural decisions](https://www.infoq.com/articles/sustainable-architectural-design-decisions)):
 
-```
+```text
 In the context of <use case/user story u>,
 facing <concern c>
 we decided for <option o>
