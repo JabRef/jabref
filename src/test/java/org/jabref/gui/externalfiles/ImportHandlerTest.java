@@ -110,11 +110,7 @@ class ImportHandlerTest {
 
         Optional<String> authorOptional = cleanedEntry.getField(StandardField.AUTHOR);
 
-        // Make sure the value exists in Optional
-        assertTrue(authorOptional.isPresent());
-
-        // Get and verify the actual value in Optional
-        assertEquals("Clear Author", authorOptional.get());
+        assertEquals(Optional.of("Clear Author"), authorOptional);
     }
 
     @Test
