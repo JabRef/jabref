@@ -197,27 +197,23 @@ public class ImportHandler {
         BibEntry cleanedEntry = cleanUpEntry(bibDatabaseContext, entry);
         Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, cleanedEntry);
 
-        BibEntry entryToInsert = cleanedEntry;
+        Optional<BibEntry> entryToInsert = Optional.of(cleanedEntry);
         if (existingDuplicateInLibrary.isPresent()) {
-            Optional<BibEntry> entriesToInsert = Optional.of(cleanedEntry);
-            if (existingDuplicateInLibrary.isPresent()) {
-                BibEntry duplicateHandledEntry = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
-                entriesToInsert = Optional.ofNullable(duplicateHandledEntry);
-                // If handleDuplicates returns null, stop processing
-                if (entryToInsert.isEmpty()) {
-                    return;
-                }
+            BibEntry duplicateHandledEntry = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
+            entryToInsert = Optional.ofNullable(duplicateHandledEntry);
+            // If handleDuplicates returns null, stop processing
+            if (entryToInsert.isEmpty()) {
+                return;
             }
         }
+        regenerateCiteKey(entryToInsert.get());
+        bibDatabaseContext.getDatabase().insertEntry(entryToInsert.get());
 
-        regenerateCiteKey(entryToInsert);
-        bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
+        setAutomaticFieldsForEntry(entryToInsert.get());
 
-        setAutomaticFieldsForEntry(entryToInsert);
+        addEntryToGroups(entryToInsert.get());
 
-        addEntryToGroups(entryToInsert);
-
-        downloadLinkedFiles(entryToInsert);
+        downloadLinkedFiles(entryToInsert.get());
     }
 
     public BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
