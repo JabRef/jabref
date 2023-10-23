@@ -51,7 +51,6 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         this.importerPreferences = importerPreferences;
     }
 
-
     /**
      * Tries to find a fulltext URL for a given BibTex entry.
      * <p>
