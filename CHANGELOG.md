@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list [#10415](https://github.com/JabRef/jabref/issues/10415).
+- We fixed an issue where in the merge dialog the file field of entries was not correctly merged when the first and second entry both contained values inside the file field [#10572](https://github.com/JabRef/jabref/issues/10572)
 
 ### Removed
 
