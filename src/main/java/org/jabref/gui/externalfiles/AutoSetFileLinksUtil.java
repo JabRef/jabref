@@ -1,8 +1,10 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 
+import jakarta.ws.rs.core.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +101,18 @@ public class AutoSetFileLinksUtil {
                 if (changed) {
                     result.addBibEntry(entry);
                 }
+                // do yo thing here
+                Object[] relink = relinkingFiles(entry.getFiles());
+                List<LinkedFile> relinkedFiles = (List<LinkedFile>) relink[0];
+                Boolean isChanged = (Boolean) relink[1];
+                List<IOException> exceptions = (List<IOException>) relink[2];
+                entry.setFiles(relinkedFiles);
+                if (!isChanged) {
+                    result.addBibEntry(entry);
+                }
+                for (IOException e : exceptions) {
+                    result.addFileException(e);
+                }
             }
         }
         return result;
@@ -136,7 +151,51 @@ public class AutoSetFileLinksUtil {
                 linkedFiles.add(linkedFile);
             }
         }
-
         return linkedFiles;
+    }
+
+    public Object[] relinkingFiles(List<LinkedFile> listlinked) {
+        // Output is Changed Input, Boolean if Changed and List of Exceptions
+        Object[] output = new Object[3];
+        Boolean changed = false;
+        List<IOException> exceptions = null;
+
+        for (LinkedFile file : listlinked) {
+            Path path = Paths.get(file.getLink());
+            if (!Files.exists(path)) {
+                Path filePath = Path.of(file.getLink());
+                String directoryPath = filePath.getParent().getParent().toString();
+                File directory = new File(directoryPath);
+
+                String fileNameString = filePath.getFileName().toString();
+
+                List<String> fileLocations = new ArrayList<>();
+
+                searchFileInDirectoryAndSubdirectories(directory, fileNameString, fileLocations);
+                if (!fileLocations.isEmpty()) {
+                    file.setLink(fileLocations.get(0));
+                    changed = true;
+                } else {
+                    exceptions.add(new IOException("couldn't find file: " + file.getLink()));
+                }
+            }
+        }
+        output[0] = listlinked;
+        output[1] = changed;
+        output[2] = exceptions;
+        return output;
+    }
+
+    public static void searchFileInDirectoryAndSubdirectories(File directory, String targetFileName, List<String> fileLocations) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    searchFileInDirectoryAndSubdirectories(file, targetFileName, fileLocations);
+                } else if (file.getName().equals(targetFileName)) {
+                    fileLocations.add(file.getAbsolutePath());
+                }
+            }
+        }
     }
 }

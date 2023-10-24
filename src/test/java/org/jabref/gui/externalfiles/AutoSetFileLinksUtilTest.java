@@ -1,13 +1,19 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.AutomaticRelink;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,10 +44,16 @@ public class AutoSetFileLinksUtilTest {
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
     private Path path = null;
+    private Path A;
+    private Path B;
 
     @BeforeEach
     public void setUp(@TempDir Path folder) throws Exception {
-        path = folder.resolve("CiteKey.pdf");
+        A = folder.resolve("A");
+        Files.createDirectory(A);
+        B = folder.resolve("B");
+        Files.createDirectory(B);
+        path = A.resolve("CiteKey.pdf");
         Files.createFile(path);
         entry.setCitationKey("CiteKey");
         when(filePreferences.getExternalFileTypes())
@@ -61,5 +75,35 @@ public class AutoSetFileLinksUtilTest {
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(Collections.emptyList(), actual);
+    }
+
+    @Test
+    public void testFileLinksAfterMoving() throws Exception {
+        // Run "Automatically set file links" - check that the bib file was not modified
+        LinkedFile linkedFile = new LinkedFile("desc", path, "PDF");
+        List<LinkedFile> listLinked = new ArrayList<>();
+        listLinked.add(linkedFile);
+        entry.setFiles(listLinked);
+
+        // Copy Bib file from A to B
+        Path destination = B.resolve("CiteKey.pdf");
+        Files.copy(A.resolve("CiteKey.pdf"), destination, StandardCopyOption.REPLACE_EXISTING);
+        Files.deleteIfExists(A.resolve("CiteKey.pdf"));
+
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, filePreferences, autoLinkPrefs);
+        Object[] results = util.relinkingFiles(entry.getFiles());
+        List<LinkedFile> list = (List<LinkedFile>) results[0];
+        Boolean isChanged = (Boolean) results[1];
+        List<IOException> exceptions = (List<IOException>) results[2];
+
+        assertTrue(isChanged);
+        assertEquals(null, exceptions);
+
+        // Change Entry to match required result and run method on bib
+        LinkedFile linkedDestFile = new LinkedFile("desc", B.resolve("CiteKey.pdf"), "PDF");
+        List<LinkedFile> listLinked2 = new ArrayList<>();
+        listLinked2.add(linkedDestFile);
+        entry.setFiles(listLinked2);
+        assertEquals(entry.getFiles(), list);
     }
 }
