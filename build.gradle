@@ -288,7 +288,7 @@ spotbugsMain {
     reports {
         html {
             required = true
-            // outputLocation = file("src/test/spotbugs_output/log") // commented out to refactor method to produce artifact.
+            outputLocation = file("build/reports/spotbugs")
             stylesheet = 'fancy-hist.xsl'
         }
     }
