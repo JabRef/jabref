@@ -482,3 +482,7 @@ lib/ojdbc.jar
 
 # generated during release process
 CHANGELOG.html
+
+
+### Spotbugs ###
+spotbugs_output/
