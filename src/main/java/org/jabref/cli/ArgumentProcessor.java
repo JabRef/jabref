@@ -278,7 +278,7 @@ public class ArgumentProcessor {
         }
 
         if (!cli.isBlank() && cli.isJumpToEntryKey()) {
-            jumpToEntryKey();
+            jumpToEntryKey(loaded, cli.getJumpToEntryKey());
         }
 
         this.parserResults = loaded;
@@ -777,8 +777,16 @@ public class ArgumentProcessor {
         }
     }
 
-    private void jumpToEntryKey(){
-
+    private void jumpToEntryKey(List<ParserResult> loaded, String citationKey) {
+        // search for this key in imported files
+        for (ParserResult parserResult : loaded) {
+            Optional<BibEntry> entry = parserResult.getDatabase().getEntryByCitationKey(citationKey);
+            if (entry.isPresent()) {
+                parserResult.setEntryToFocus(entry.get());
+                return;
+            }
+        }
+        LOGGER.error("Could not find given citation key to jump to");
     }
 
     public boolean isBlank() {

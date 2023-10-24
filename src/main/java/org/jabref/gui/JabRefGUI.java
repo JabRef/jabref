@@ -25,6 +25,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
@@ -201,12 +202,25 @@ public class JabRefGUI {
                                         .orElse(preferencesService.getGuiPreferences()
                                                                  .getLastFocusedFile())
                                         .toAbsolutePath();
+        // check whether there is a jump to entry and need to focus different file
+        boolean focusDifferent = false;
+        Optional<BibEntry> focusedEntry = Optional.empty();
+        for (ParserResult parserResult : parserResults) {
+            // Make sure this parser result is its own library instead of imported entries
+            if (parserResult.getEntryToFocus().isPresent() && !parserResult.toOpenTab()) {
+                focusDifferent = true;
+                focusedEntry = parserResult.getEntryToFocus();
+            }
+        }
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
         for (ParserResult parserResult : parserResults) {
             // Define focused tab
-            if (parserResult.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
+            if (parserResult.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent() && !focusDifferent) {
+                first = true;
+            }
+            if (parserResult.getEntryToFocus().isPresent() && focusDifferent) {
                 first = true;
             }
 
@@ -278,6 +292,10 @@ public class JabRefGUI {
             LibraryTab libraryTab = mainFrame.getLibraryTabAt(i);
 
             OpenDatabaseAction.performPostOpenActions(libraryTab, pr);
+        }
+        // focus a particular entry if CLI has received a jump to entry key command
+        if (focusedEntry.isPresent()) {
+            mainFrame.getCurrentLibraryTab().clearAndSelect(focusedEntry.get());
         }
 
         LOGGER.debug("Finished adding panels");
