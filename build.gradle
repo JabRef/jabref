@@ -43,8 +43,6 @@ plugins {
 
     id 'org.openrewrite.rewrite' version '6.3.18'
 
-    //required for the spotbugs plugin
-    id 'java'
     // spotbugs plugin
     id "com.github.spotbugs" version "6.0.0-rc.2"
 }
@@ -277,11 +275,8 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
-
-
 }
 
-// simple tool configuration based on https://github.com/spotbugs/spotbugs-gradle-plugin/blob/master/README.md
 spotbugs {
     toolVersion = '4.8.0'
     ignoreFailures = false
@@ -289,12 +284,11 @@ spotbugs {
     showProgress = true
 }
 
-// HTML report config
 spotbugsMain {
     reports {
         html {
             required = true
-            outputLocation = file("src/test/spotbugs_output/log") // overwrites log file each time
+            // outputLocation = file("src/test/spotbugs_output/log") // commented out to refactor method to produce artifact.
             stylesheet = 'fancy-hist.xsl'
         }
     }
