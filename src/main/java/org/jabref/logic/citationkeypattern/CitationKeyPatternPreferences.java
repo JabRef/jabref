@@ -54,7 +54,7 @@ public class CitationKeyPatternPreferences {
     }
 
     @VisibleForTesting
-    CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
                                          boolean shouldGenerateCiteKeysBeforeSaving,
                                          KeySuffix keySuffix,
