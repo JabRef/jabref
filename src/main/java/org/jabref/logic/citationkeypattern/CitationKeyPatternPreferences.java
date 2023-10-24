@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class CitationKeyPatternPreferences {
 
     public enum KeySuffix {
@@ -51,10 +53,8 @@ public class CitationKeyPatternPreferences {
         this.keywordDelimiter = keywordDelimiter;
     }
 
-    /**
-     * For use in test
-     */
-    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+    @VisibleForTesting
+    CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
                                          boolean shouldGenerateCiteKeysBeforeSaving,
                                          KeySuffix keySuffix,
