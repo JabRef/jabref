@@ -111,7 +111,7 @@ public class CitationStyle {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
                 // if the url is null then the style is located outside the classpath
-                text = new String(Files.readAllBytes(Path.of(styleFile)), StandardCharsets.UTF_8);
+                text = Files.readString(Path.of(styleFile));
             }
             return createCitationStyleFromSource(text, styleFile);
         } catch (NoSuchFileException e) {

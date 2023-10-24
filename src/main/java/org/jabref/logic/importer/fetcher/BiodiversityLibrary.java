@@ -17,7 +17,6 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.BiodiversityLibraryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -64,7 +63,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {
         URIBuilder baseURI = new URIBuilder(BASE_URL);
-        baseURI.addParameter("apikey", getApiKey());
+        baseURI.addParameter("apikey", importerPreferences.getApiKey(getName()).orElse(API_KEY));
         baseURI.addParameter("format", RESPONSE_FORMAT);
 
         return baseURI.build().toURL();
@@ -208,15 +207,5 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         uriBuilder.addParameter("searchtype", "C");
         uriBuilder.addParameter("searchterm", transformer.transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
     }
 }
