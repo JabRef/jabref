@@ -48,7 +48,9 @@ java {
     modularity.inferModulePath.set(false)
 
     toolchain {
-        // If this is updated, also update .devcontainer/devcontainer.json#L34
+        // If this is updated, also update
+        // - .devcontainer/devcontainer.json#L34 and
+        // - .gitpod.Dockerfile
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
