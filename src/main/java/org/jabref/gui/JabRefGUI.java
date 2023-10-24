@@ -206,10 +206,11 @@ public class JabRefGUI {
         boolean focusDifferent = false;
         Optional<BibEntry> focusedEntry = Optional.empty();
         for (ParserResult parserResult : parserResults) {
-            // Make sure this parser result is its own library instead of imported entries
+            // Make sure this parser result is its own library instead of imported BibTex entries
             if (parserResult.getEntryToFocus().isPresent() && !parserResult.toOpenTab()) {
                 focusDifferent = true;
                 focusedEntry = parserResult.getEntryToFocus();
+                break;
             }
         }
 
@@ -222,6 +223,7 @@ public class JabRefGUI {
             }
             if (parserResult.getEntryToFocus().isPresent() && focusDifferent) {
                 first = true;
+                focusDifferent = false;
             }
 
             if (parserResult.getDatabase().isShared()) {
@@ -296,6 +298,7 @@ public class JabRefGUI {
         // focus a particular entry if CLI has received a jump to entry key command
         if (focusedEntry.isPresent()) {
             mainFrame.getCurrentLibraryTab().clearAndSelect(focusedEntry.get());
+            mainFrame.showLibraryTab(mainFrame.getCurrentLibraryTab());
         }
 
         LOGGER.debug("Finished adding panels");
