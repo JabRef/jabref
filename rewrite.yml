@@ -19,6 +19,8 @@ recipeList:
   # - org.openrewrite.staticanalysis.AvoidBoxedBooleanExpressions
   # Leads to exception
   # - org.openrewrite.staticanalysis.CombineSemanticallyEqualCatchBlocks
+  # Needs parameters
+  # - org.openrewrite.staticanalysis.DeclarationSiteTypeVariance
   # Unreadable code
   #   .ifPresent((Path selectedDirectory) -> {
   # - org.openrewrite.staticanalysis.ExplicitLambdaArgumentTypes
@@ -121,7 +123,6 @@ recipeList:
   - org.openrewrite.staticanalysis.CompareEnumsWithEqualityOperator
   - org.openrewrite.staticanalysis.ControlFlowIndentation
   - org.openrewrite.staticanalysis.CovariantEquals
-  - org.openrewrite.staticanalysis.DeclarationSiteTypeVariance
   # Needs manual intervention
 #  - org.openrewrite.staticanalysis.DefaultComesLast
   - org.openrewrite.staticanalysis.EmptyBlock

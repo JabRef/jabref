@@ -2,25 +2,37 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="650.0" prefWidth="500.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.auximport.FromAuxDialog">
     <content>
         <VBox spacing="30">
             <VBox spacing="5.0">
                 <Label text="%LaTeX AUX file:"/>
-                <HBox spacing="10">
+                <HBox spacing="10" alignment="BASELINE_LEFT">
                     <TextField fx:id="auxFileField" HBox.hgrow="ALWAYS"/>
-                    <Button onAction="#browseButtonClicked" text="%Browse"/>
+                    <Button onAction="#browseButtonClicked"
+                            styleClass="icon-button,narrow"
+                            minWidth="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="20.0">
+                        <graphic>
+                            <JabRefIconView glyph="OPEN"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Browse"/>
+                        </tooltip>
+                    </Button>
                 </HBox>
-                <Button defaultButton="true" onAction="#parseActionPerformed" text="%Parse"/>
+                <Button defaultButton="true" onAction="#parseActionPerformed" text="%Parse" maxWidth="Infinity"/>
             </VBox>
             <VBox spacing="5">
                 <Label text="%Result">
@@ -28,9 +40,15 @@
                         <Font name="System Bold"/>
                     </font>
                 </Label>
-                <TextArea fx:id="statusInfos" editable="false" prefHeight="300.0"/>
+                <TextArea fx:id="statusInfos" editable="false" prefHeight="300.0" wrapText="true"/>
                 <Label text="%Unknown BibTeX entries:"/>
                 <ListView fx:id="notFoundList" prefHeight="200"/>
+                <VBox spacing="10">
+                    <HBox spacing="4" alignment="CENTER_LEFT">
+                        <Label text="%Select library"/>
+                        <ComboBox fx:id="libraryListView" layoutX="16.0" layoutY="52.0"/>
+                    </HBox>
+                </VBox>
             </VBox>
         </VBox>
     </content>
