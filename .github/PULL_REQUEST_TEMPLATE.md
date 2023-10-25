@@ -1,7 +1,7 @@
 <!-- 
 Describe the changes you have made here: what, why, ... 
-Link issues that are fixed, e.g. "Fixes #333".
-If you fixed a koppor issue, link it, e.g. "Fixes https://github.com/koppor/jabref/issues/47".
+Link issues that are fixed, e.g. "Resolves #333".
+If you resolved a koppor issue, link it, e.g. "Resolves https://github.com/koppor/jabref/issues/47".
 The title of the PR must not reference an issue, because GitHub does not support autolinking there.
 -->
 
