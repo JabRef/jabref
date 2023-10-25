@@ -169,12 +169,12 @@ public class JabRefCLI {
                         cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
-    public String getJumpToEntryKey() {
-        return cl.getOptionValue("jumpToEntryKey");
+    public String getJumpToKey() {
+        return cl.getOptionValue("jumpToKey");
     }
 
-    public boolean isJumpToEntryKey() {
-        return cl.hasOption("jumpToEntryKey");
+    public boolean isJumpToKey() {
+        return cl.hasOption("jumpToKey");
     }
 
     private static Options getOptions() {

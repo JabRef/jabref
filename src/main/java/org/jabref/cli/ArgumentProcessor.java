@@ -277,8 +277,8 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
-        if (!cli.isBlank() && cli.isJumpToEntryKey()) {
-            jumpToEntryKey(loaded, cli.getJumpToEntryKey());
+        if (!cli.isBlank() && cli.isJumpToKey()) {
+            jumpToKey(loaded, cli.getJumpToKey());
         }
 
         this.parserResults = loaded;
@@ -777,7 +777,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void jumpToEntryKey(List<ParserResult> loaded, String citationKey) {
+    private void jumpToKey(List<ParserResult> loaded, String citationKey) {
         for (ParserResult parserResult : loaded) {
             Optional<BibEntry> entry = parserResult.getDatabase().getEntryByCitationKey(citationKey);
             if (entry.isPresent()) {
