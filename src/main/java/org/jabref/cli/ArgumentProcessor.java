@@ -778,7 +778,6 @@ public class ArgumentProcessor {
     }
 
     private void jumpToEntryKey(List<ParserResult> loaded, String citationKey) {
-        // search for this key in imported files
         for (ParserResult parserResult : loaded) {
             Optional<BibEntry> entry = parserResult.getDatabase().getEntryByCitationKey(citationKey);
             if (entry.isPresent()) {
@@ -786,7 +785,7 @@ public class ArgumentProcessor {
                 return;
             }
         }
-        LOGGER.error("Could not find given citation key to jump to");
+        System.out.printf("Could not find citation key %s in any library%n", citationKey);
     }
 
     public boolean isBlank() {

@@ -206,7 +206,7 @@ public class JabRefGUI {
         boolean focusDifferent = false;
         Optional<BibEntry> focusedEntry = Optional.empty();
         for (ParserResult parserResult : parserResults) {
-            // Make sure this parser result is its own library instead of imported BibTex entries
+            // Make sure this parser result is its own library instead of imported BibTeX entries
             if (parserResult.getEntryToFocus().isPresent() && !parserResult.toOpenTab()) {
                 focusDifferent = true;
                 focusedEntry = parserResult.getEntryToFocus();

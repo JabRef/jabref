@@ -298,10 +298,10 @@ public class JabRefCLI {
 
         options.addOption(Option
                 .builder("j")
-                .longOpt("jumpToEntryKey")
-                .desc(String.format("%s: '%s'", Localization.lang("Jump to the BibEntry of the given key."), "-j key"))
+                .longOpt("jumpToKey")
+                .desc(String.format("%s: '%s'", Localization.lang("Jump to the entry of the given citation key."), "-j key"))
                 .hasArg()
-                .argName("ENTRYKEY")
+                .argName("CITEKEY")
                 .build());
 
         return options;
