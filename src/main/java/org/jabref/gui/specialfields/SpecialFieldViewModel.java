@@ -21,8 +21,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.preferences.PreferencesService;
 
-import static org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell.LOGGER;
-
 public class SpecialFieldViewModel {
 
     private final SpecialField field;
@@ -89,7 +87,6 @@ public class SpecialFieldViewModel {
         Optional<FieldChange> change = UpdateField.updateField(bibEntry, getField(), value.getFieldValue().orElse(null), getField().isSingleValueField());
 
         change.ifPresent(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
-        LOGGER.info("HERE");
     }
 
     public void toggle(BibEntry entry) {

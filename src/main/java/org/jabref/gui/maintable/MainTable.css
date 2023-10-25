@@ -12,11 +12,6 @@
     visibility: hidden;
 }
 
-.table-row-cell:hover .empty-special-field {
-    visibility: visible;
-    -fx-fill: -jr-gray-2;
-}
-
 .table-row-cell:dragOver-bottom {
     -fx-border-color: -jr-drag-target;
     -fx-border-width: 0 0 2 0;
