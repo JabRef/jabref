@@ -7,6 +7,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ExternalFilesContentImporter {
@@ -17,9 +18,9 @@ public class ExternalFilesContentImporter {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public ParserResult importPDFContent(Path file) {
+    public ParserResult importPDFContent(Path file, MetaData metaData) {
         try {
-            return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file);
+            return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, metaData);
         } catch (IOException e) {
            return ParserResult.fromError(e);
         }
