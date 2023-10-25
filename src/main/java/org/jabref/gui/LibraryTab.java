@@ -222,7 +222,7 @@ public class LibraryTab extends Tab {
     public void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        frame.addTab(this, true);
+        frame.addTab(this, false);
     }
 
     public void onDatabaseLoadingSucceed(ParserResult result) {

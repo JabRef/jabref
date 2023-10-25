@@ -172,9 +172,10 @@ public class OpenDatabaseAction extends SimpleCommand {
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);
             });
-        } else if (toRaise != null) {
+        } else if (toRaise != null && frame.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
+            // If there is already a library focused, do not show this library
             frame.showLibraryTab(toRaise);
         }
     }
