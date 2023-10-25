@@ -24,6 +24,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -72,6 +73,10 @@ public class PdfMergeMetadataImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
+        return importDatabase(filePath, new MetaData());
+    }
+
+    public ParserResult importDatabase(Path filePath, MetaData metaData) throws IOException {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (Importer metadataImporter : metadataImporters) {
@@ -124,8 +129,13 @@ public class PdfMergeMetadataImporter extends Importer {
                 }
             }
         }
-
-        entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
+        Optional<String> defaultFileDirectoryOptional = metaData.getDefaultFileDirectory();
+        if(defaultFileDirectoryOptional.isPresent()) {
+            Path relativizedFilePath = Path.of(defaultFileDirectoryOptional.get()).relativize(filePath);
+            entry.addFile(new LinkedFile("", relativizedFilePath, StandardFileType.PDF.getName()));
+        } else {
+            entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
+        }
         return new ParserResult(List.of(entry));
     }
 
