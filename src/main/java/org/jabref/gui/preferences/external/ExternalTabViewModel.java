@@ -24,6 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.ExternalApplicationsPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -226,5 +227,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty customFileBrowserCommandProperty() {
         return this.customFileBrowserCommandProperty;
+    }
+
+    // Reset Cite Command
+
+    public void resetCiteCommandToDefault() {
+        this.citeCommandProperty.setValue(preferences.getDefaults().get(JabRefPreferences.CITE_COMMAND).toString());
     }
 }
