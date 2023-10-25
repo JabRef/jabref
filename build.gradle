@@ -143,8 +143,10 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '6.7.0.202309050840-r'
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '6.7.0.202309050840-r'
-    implementation 'org.eclipse.jetty:jetty-servlet:9.4.51.v20230217'
-    implementation 'org.eclipse.jetty:jetty-security:9.4.51.v20230217'
+
+    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.51.v20230217'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-security', version: '9.4.51.v20230217'
+    
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     configurations.all {
         exclude group: "commons-logging", module: "commons-logging"

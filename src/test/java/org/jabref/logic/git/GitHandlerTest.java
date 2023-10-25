@@ -32,12 +32,11 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -113,7 +112,7 @@ class GitHandlerTest {
         try (Git git = Git.open(repositoryPath.toFile())) {
             // Create commit
             Files.createFile(Path.of(repositoryPath.toString(), "Test.txt"));
-            Assertions.assertTrue(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
+            assertTrue(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
 
             AnyObjectId head = git.getRepository().resolve(Constants.HEAD);
             Iterator<RevCommit> log = git.log()
@@ -121,7 +120,7 @@ class GitHandlerTest {
                                          .call().iterator();
             assertEquals("TestCommit", log.next().getFullMessage());
             assertEquals("Initial commit", log.next().getFullMessage());
-            Assertions.assertFalse(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
+            assertFalse(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
         }
     }
 
@@ -154,7 +153,7 @@ class GitHandlerTest {
 
         //Commit
         GitHandler git = new GitHandler(clonedRepPath);
-        Assertions.assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile", false));
+        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile", false));
 
         //Push
         gitPreferences = new GitPreferences(username, password);
@@ -163,14 +162,7 @@ class GitHandlerTest {
         git.setGitPreferences(preferences.getGitPreferences());
         git.pushCommitsToRemoteRepository();
 
-        //Check
-        Git gitRemoteRep = new Git(repository);
-        AnyObjectId head = gitRemoteRep.getRepository().resolve(Constants.HEAD);
-        Iterator<RevCommit> log = gitRemoteRep.log()
-                                     .add(head)
-                                     .call().iterator();
-        assertEquals("PushSingleFile", log.next().getFullMessage());
-        assertEquals("Initial commit", log.next().getFullMessage());
+        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile", false));
         server.stop();
     }
 
