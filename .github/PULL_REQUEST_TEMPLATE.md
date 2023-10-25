@@ -1,18 +1,17 @@
 <!-- 
 Describe the changes you have made here: what, why, ... 
-Link the issues that will be closed, e.g., "Closes [#333](https://github.com/JabRef/jabref/issues/333)".	 
+Link the issue that will be closed, e.g., "Closes https://github.com/JabRef/jabref/issues/333".
 If your PR closes a koppor issue, link it using its URL, e.g., "Closes https://github.com/koppor/jabref/issues/47".
 "Closes" is a keyword GitHub uses to link PRs with issues; do not change it.
 Don't reference an issue in the PR title because GitHub does not support auto-linking there.
 -->
 
+### Mandatory checks
 
 <!-- 
 - Go through the list below. Please don't remove any items.
 - [x] done; [ ] not done / not applicable
 -->
-
-### Mandatory checks
 
 - [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
