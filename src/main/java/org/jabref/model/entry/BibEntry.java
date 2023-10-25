@@ -52,17 +52,17 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
  * <p>
- *     Example:
+ * Example:
  *
- *     <pre>{@code
+ * <pre>{@code
  * Some commment
  * @misc{key,
  *   fieldName = {fieldValue},
  *   otherFieldName = {otherVieldValue}
  * }
  *     }</pre>
- *
- *     Then,
+ * <p>
+ * Then,
  *     <ul>
  *         <li>"Some comment" is the comment before the entry,</li>
  *         <li>"misc" is the entry type</li>
@@ -157,14 +157,20 @@ public class BibEntry implements Cloneable {
         return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());
     }
 
+    /**
+     * Retrieves the first resolved field or its alias from the provided OrFields object using Stream API.
+     *
+     * @param fields    The OrFields object containing a list of fields to be resolved.
+     * @param database  The BibDatabase used for resolving the field or its alias.
+     * @return          An Optional containing the first resolved field or alias if present,
+     *                  otherwise an empty Optional.
+     */
     public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
-        for (Field field : fields.getFields()) {
-            Optional<String> value = getResolvedFieldOrAlias(field, database);
-            if (value.isPresent()) {
-                return value;
-            }
-        }
-        return Optional.empty();
+        return fields.getFields().stream()
+                     .map(field -> getResolvedFieldOrAlias(field, database))
+                     .filter(Optional::isPresent)
+                     .map(Optional::get)
+                     .findFirst();
     }
 
     /**
@@ -478,7 +484,7 @@ public class BibEntry implements Cloneable {
 
     /**
      * Internal method used to get the content of a field (or its alias)
-     *
+     * <p>
      * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
      *
      * @param field         the field
@@ -711,7 +717,7 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
+        String[] s = new String[] {getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
                 getField(StandardField.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
@@ -907,7 +913,7 @@ public class BibEntry implements Cloneable {
 
     /**
      * On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
-     *
+     * <p>
      * The content is
      *
      * <ul>
@@ -928,7 +934,8 @@ public class BibEntry implements Cloneable {
     public void unregisterListener(Object object) {
         try {
             this.eventBus.unregister(object);
-        } catch (IllegalArgumentException e) {
+        } catch (
+                IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
             LOGGER.debug("Problem unregistering", e);
         }
@@ -1106,7 +1113,7 @@ public class BibEntry implements Cloneable {
      * This method. adds the given path (as file) to the entry and removes the url.
      *
      * @param linkToDownloadedFile the link to the file, which was downloaded
-     * @param downloadedFile the path to be added to the entry
+     * @param downloadedFile       the path to be added to the entry
      */
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
@@ -1144,7 +1151,7 @@ public class BibEntry implements Cloneable {
      * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
      * intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
      *
-     * @param other another BibEntry from which fields are sourced from
+     * @param other                  another BibEntry from which fields are sourced from
      * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
      */
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {
