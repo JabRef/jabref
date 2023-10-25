@@ -1,7 +1,8 @@
 <!-- 
 Describe the changes you have made here: what, why, ... 
-Link issues that are fixed, e.g. "Resolves #333".
-If you resolved a koppor issue, link it, e.g. "Resolves https://github.com/koppor/jabref/issues/47".
+Link issues that are closed, e.g. "Closes #333".
+If you resolved a koppor issue, link it, e.g. "Closes https://github.com/koppor/jabref/issues/47".
+You need to stick with "Closes" as verb, because GitHub recognizes this word (and not other words).
 The title of the PR must not reference an issue, because GitHub does not support autolinking there.
 -->
 
