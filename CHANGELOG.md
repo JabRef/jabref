@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
 - We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
+- Git support for backing up bib files with integration to local and remote repositories and support for SSH and username/password authentication [#578](https://github.com/koppor/jabref/issues/578)
 
 ### Changed
 
