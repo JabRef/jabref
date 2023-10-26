@@ -33,9 +33,8 @@ public class CiteSeerParser {
      *
      * @param jsonObj Search response as a JSON Object
      * @return BibEntry
-     * @throws ParseException
      */
-    private BibEntry parseBibEntry(JSONObject jsonObj) throws ParseException {
+    private BibEntry parseBibEntry(JSONObject jsonObj) {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.DOI, jsonObj.optString("id"));
         bibEntry.setField(StandardField.TITLE, jsonObj.optString("title"));
@@ -50,7 +49,7 @@ public class CiteSeerParser {
     }
 
     private String parseAuthors(Optional<JSONArray> authorsOpt) {
-        if (!authorsOpt.isPresent()) {
+        if (authorsOpt.isEmpty()) {
             return "";
         }
         String separator = " and ";

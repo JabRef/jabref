@@ -16,7 +16,6 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -172,16 +171,6 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
         return Optional.of(HelpFile.FETCHER_SPRINGER);
     }
 
-    private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
-    }
-
     @Override
     public String getTestUrl() {
         return TEST_URL_WITHOUT_API_KEY;
@@ -199,7 +188,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
 
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
-        uriBuilder.addParameter("api_key", getApiKey()); // API key
+        uriBuilder.addParameter("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY)); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
         return uriBuilder.build().toURL();

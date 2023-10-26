@@ -104,7 +104,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
         columnsNotEmptyValidator = new FunctionBasedValidator<>(
                 columnsListProperty,
-                list -> list.size() > 0,
+                list -> !list.isEmpty(),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
                         Localization.lang("Entry table columns"),
                         Localization.lang("Columns"),
@@ -193,8 +193,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     public void insertColumnInList() {
-        if (addColumnProperty.getValue() == null ||
-            addColumnProperty.getValue().getQualifier().isEmpty()) {
+        if (addColumnProperty.getValue() == null) {
             return;
         }
 

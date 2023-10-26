@@ -155,4 +155,4 @@ Press "OK".
 > The code formatting rules are imported - and the most common styling issue at imports is automatically resolved by IntelliJ.
 > Finally, you have Checkstyle running locally so that you can check for styling errors before submitting the pull request.
 
-Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md).
+Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://devdocs.jabref.org/contributing#contribute-code).
