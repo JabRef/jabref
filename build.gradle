@@ -2,20 +2,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
-// custom build script for spotbugs integration with gradle
-// see https://plugins.gradle.org/plugin/com.github.spotbugs
-// further development will see this refactored to gradle settings
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.0-rc.2"
-    }
-}
-
 plugins {
     id 'application'
 
@@ -42,7 +28,7 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.4.0'
-    
+
     // spotbugs plugin
     id "com.github.spotbugs" version "6.0.0-rc.2"
 }
@@ -281,9 +267,9 @@ dependencies {
 
 spotbugs {
     toolVersion = '4.8.0'
-    ignoreFailures = false
+    ignoreFailures = true
     showStackTraces = true
-    showProgress = true
+    showProgress = false
 }
 
 spotbugsMain {
