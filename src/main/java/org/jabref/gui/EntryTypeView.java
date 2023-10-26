@@ -89,6 +89,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
 
+        btnGenerate.setStyle("-fx-padding: 6 20px; -fx-min-width: 150px;"); // Changes the button length
+
         btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> searching ? Localization.lang("Searching...") : Localization.lang("Generate")));
         btnGenerate.disableProperty().bind(viewModel.idFieldValidationStatus().validProperty().not().or(viewModel.searchingProperty()));
 
