@@ -130,7 +130,7 @@ public class PdfMergeMetadataImporter extends Importer {
             }
         }
         Optional<String> defaultFileDirectoryOptional = metaData.getDefaultFileDirectory();
-        if(defaultFileDirectoryOptional.isPresent()) {
+        if (defaultFileDirectoryOptional.isPresent()) {
             Path relativizedFilePath = Path.of(defaultFileDirectoryOptional.get()).relativize(filePath);
             entry.addFile(new LinkedFile("", relativizedFilePath, StandardFileType.PDF.getName()));
         } else {
