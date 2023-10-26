@@ -18,6 +18,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
+//import javafx.scene.control.*;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.Dragboard;
@@ -25,8 +26,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.ActionFactory;
