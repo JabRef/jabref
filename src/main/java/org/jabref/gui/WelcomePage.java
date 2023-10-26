@@ -1,13 +1,13 @@
 package org.jabref.gui;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -15,14 +15,11 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class WelcomeTab extends Tab {
+public class WelcomePage {
     String fontStyle = """
                     -fx-text-fill: #007ACC;
                     -fx-font-weight: bold;
@@ -45,11 +42,7 @@ public class WelcomeTab extends Tab {
                    -fx-font-family: Arial;""";
 
 
-    private TabPane tabPane;
-    //private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
-    private JabRefFrame jabRefFrame;
-    private Tab welcome;
-    private SplitPane splitPane;
+    private VBox welcomeBox;
     private final PreferencesService preferencesService;
 
     private final StateManager stateManager;
@@ -57,49 +50,66 @@ public class WelcomeTab extends Tab {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
     VBox items = new VBox();
-    VBox welcomeTabItems;
-    ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+    VBox welcomePageItems;
     Label newLibraryLabel;
     Label openLibrarylabel;
     Label connectToDatabase;
 
     Label importNewLib;
 
-    private static WelcomeTab welcomeTabInstance = null;
+    private static WelcomePage welcomeTabInstance = null;
 
-    public static WelcomeTab getInstance(TabPane welcomeTabPane, PreferencesService preferencesService,
-                                         StateManager stateManager,
-                                         FileUpdateMonitor fileUpdateMonitor,
-                                         TaskExecutor taskExecutor,
-                                         DialogService dialogService) {
+    public static WelcomePage getInstance(PreferencesService preferencesService,
+                                          StateManager stateManager,
+                                          FileUpdateMonitor fileUpdateMonitor,
+                                          TaskExecutor taskExecutor,
+                                          DialogService dialogService,
+                                          VBox welcomeBox) {
         if (welcomeTabInstance == null) {
-            welcomeTabInstance = new WelcomeTab(welcomeTabPane, preferencesService, stateManager, fileUpdateMonitor, taskExecutor, dialogService);
+            welcomeTabInstance = new WelcomePage(preferencesService, stateManager, fileUpdateMonitor, taskExecutor, dialogService, welcomeBox);
         }
         return welcomeTabInstance;
     }
 
-    private WelcomeTab(TabPane tabPane, PreferencesService preferencesService,
-                       StateManager stateManager,
-                       FileUpdateMonitor fileUpdateMonitor,
-                       TaskExecutor taskExecutor,
-                       DialogService dialogService) {
-        this.tabPane = tabPane;
+    private WelcomePage(PreferencesService preferencesService,
+                        StateManager stateManager,
+                        FileUpdateMonitor fileUpdateMonitor,
+                        TaskExecutor taskExecutor,
+                        DialogService dialogService,
+                        VBox welcomeBox) {
         this.preferencesService = preferencesService;
-
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-
-        initialiseWelcomeTab();
+        this.welcomeBox = welcomeBox;
+        welcomeBox.resize(50, 50);
+        initialiseWelcomePage();
         runLabelTasks();
+    }
+
+    public void initialiseWelcomePage() {
+        welcomePageItems = new VBox();
+        // Need to set Padding for the Elements inside the Veritcal Box
+        welcomePageItems.setPadding(new Insets(10));
+        welcomePageItems.setAlignment(Pos.BASELINE_CENTER);
+        // Adding the title for the Welcome Tab
+        Label title = new Label();
+        title.setText("Welcome to JabRef – Your Bibliographic Management and Citation Tool");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+        welcomePageItems.getChildren().add(title);
+
+
+        addStartLabel();
+        items.setAlignment(Pos.CENTER);
+        welcomePageItems.getChildren().add(items);
+        welcomeBox.getChildren().add(welcomePageItems);
     }
 
     public void addStartLabel() {
         Label start = new Label("Start:");
         start.setStyle(headings);
 //        start.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-
 
         start.setTranslateX(start.getTranslateX() - 90);
         items.getChildren().add(start);
@@ -108,25 +118,6 @@ public class WelcomeTab extends Tab {
 //        addOpenLibraryButton();
         addConnectDataBaseButton();
         addImportLibraryButton();
-    }
-
-    public void initialiseWelcomeTab() {
-        welcome = new Tab("Welcome to JabRef");
-        welcomeTabItems = new VBox();
-        // Need to set Padding for the Elements inside the Veritcal Box
-        welcomeTabItems.setPadding(new Insets(10));
-        welcomeTabItems.setAlignment(Pos.BASELINE_CENTER);
-        // Adding the title for teh Welcome Tab
-        Label title = new Label();
-        title.setText("Welcome to JabRef – Your Bibliographic Management and Citation Tool");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-        welcomeTabItems.getChildren().add(title);
-        welcome.setContent(welcomeTabItems);
-        tabPane.getTabs().add(welcome);
-
-        addStartLabel();
-        items.setAlignment(Pos.CENTER);
-        welcomeTabItems.getChildren().add(items);
     }
 
     public void addNewLibraryButton() {
@@ -141,7 +132,6 @@ public class WelcomeTab extends Tab {
         newLibraryLabel.setAlignment(Pos.CENTER);
         //VBox.setMargin(newLibraryLabel, new javafx.geometry.Insets(0, 0, 0, 20));
         items.getChildren().add(newLibraryLabel);
-
     }
 
     public void addOpenLibraryButton() {
@@ -208,18 +198,12 @@ public class WelcomeTab extends Tab {
         });
     }
 
-    public void consumeWelcomeTab() {
-        try {
-            if (tabPane != null && welcome != null) {
-                tabPane.getTabs().remove(welcome);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            //LOGGER.error("Cannot consume Welcome tab", e);
-        }
+    public void removeWelcomePage() {
+        welcomeBox.getChildren().remove(welcomePageItems);
     }
 
-
-
+    public void addWelcomePage() {
+        welcomeBox.getChildren().add(welcomePageItems);
+    }
 }
 

@@ -15,24 +15,18 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
-import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.Event;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -112,11 +106,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
+    private VBox welcomeBox = new VBox();
     private Subscription dividerSubscription;
-
     private final TaskExecutor taskExecutor;
-
-    private WelcomeTab welcomeTab;
+    private WelcomePage welcomePage;
+    private BooleanBinding booleanBinding;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -136,8 +130,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 }
             }
         });
-
-
     }
 
     private void initDragAndDrop() {
@@ -407,7 +399,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             }
         }
         //Remove welcome tab
-        welcomeTab.consumeWelcomeTab();
+        welcomePage.removeWelcomePage();
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
@@ -654,7 +646,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
             // Update search autocompleter with information for the correct database:
             libraryTab.updateSearchManager();
-
             libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
 
@@ -665,9 +656,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             mainStage.titleProperty().bind(windowTitle);
         });
         initShowTrackingNotification();
+        booleanBinding = Bindings.isEmpty(tabbedPane.getTabs());
         // Adding the welcome
-        if (fileHistory.checkIfHistoryIsEmpty()) {
-            addTabWelcome();
+        welcomePage = WelcomePage.getInstance(prefs, stateManager, fileUpdateMonitor, taskExecutor, dialogService, welcomeBox);
+        if (tabbedPane.getTabs().isEmpty()) {
+            addWelcomePage();
         }
     }
 
@@ -706,9 +699,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             if (tab instanceof LibraryTab libraryTab && (libraryTab.getDatabase() != null)) {
                 DefaultTaskExecutor.runInJavaFXThread(libraryTab::setupMainPanel);
             }
-            if (tab instanceof WelcomeTab) {
-                DefaultTaskExecutor.runInJavaFXThread(welcomeTab::runLabelTasks);
-            }
         });
     }
 
@@ -742,13 +732,28 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         });
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
-
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    public void addTabWelcome() {
-        welcomeTab = WelcomeTab.getInstance(tabbedPane, prefs, stateManager, fileUpdateMonitor, taskExecutor, dialogService);
-        welcomeTab.setOnCloseRequest(Event::consume);
+    public void addWelcomePage() {
+        welcomeBox.setSpacing(0d);
+        welcomeBox.visibleProperty().bind(booleanBinding);
+        welcomeBox.managedProperty().bind(booleanBinding);
+        welcomeBox.setSpacing(0d);
+        booleanBinding.addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                setCenter(splitPane);
+            } else {
+                setCenter(welcomeBox);
+            }
+        });
+        setCenter(welcomeBox);
+    }
+
+    public void removeWelcomePage(){
+//        splitPane.getItems().remove(welcomeBox);
+        setCenter(null);
+        setCenter(sidePane);
     }
 
     /**
