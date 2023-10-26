@@ -3,6 +3,8 @@
         "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
         "http://www.checkstyle.org/dtds/configuration_1_3.dtd">
 
+<!-- Extended version of https://github.com/jhipster/prettier-java/blob/main/docs/checkstyle/checkstyle.xml -->
+
 <module name="Checker">
     <property name="charset" value="UTF-8"/>
 
@@ -15,7 +17,7 @@
     </module>
 
     <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value="(module\-info|heylogs)\.java$"/>
+        <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>
 
     <module name="FileTabCharacter"/>
@@ -38,6 +40,8 @@
     <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->
 
     <module name="TreeWalker">
+        <module name="OuterTypeFilename"/>
+
         <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
         <module name="InvalidJavadocPosition"/>
         <module name="JavadocMethod">
@@ -53,12 +57,12 @@
         <module name="RedundantImport"/>
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
-        <module name="ImportOrder">
-            <property name="groups" value="java,javax,javafx,org.jabref,*"/>
-            <property name="ordered" value="true"/>
-            <property name="separated" value="true"/>
-            <property name="option" value="bottom"/>
-            <property name="sortStaticImportsAlphabetically" value="true"/>
+
+        <module name="CustomImportOrder">
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+            <property name="separateLineBetweenGroups" value="true"/>
+            <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
+            <property name="tokens" value="IMPORT, STATIC_IMPORT, PACKAGE_DEF"/>
         </module>
 
         <!-- Checks for whitespace: https://checkstyle.org/config_whitespace.html -->
@@ -67,19 +71,53 @@
         <module name="EmptyLineSeparator">
             <!-- check all except variable declarations -->
             <property name="tokens"
-                      value="IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF"/>
+                        value="PACKAGE_DEF, IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
+                            STATIC_INIT, INSTANCE_INIT, CTOR_DEF, VARIABLE_DEF, RECORD_DEF,
+                            COMPACT_CTOR_DEF"/>
             <property name="allowMultipleEmptyLines" value="false"/>
             <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
         </module>
-        <module name="GenericWhitespace"/>
-        <module name="MethodParamPad"/>
-        <module name="NoLineWrap"/>
+        <module name="GenericWhitespace">
+        <message key="ws.followed"
+                value="GenericWhitespace ''{0}'' is followed by whitespace."/>
+        <message key="ws.preceded"
+                value="GenericWhitespace ''{0}'' is preceded with whitespace."/>
+        <message key="ws.illegalFollow"
+                value="GenericWhitespace ''{0}'' should followed by whitespace."/>
+        <message key="ws.notPreceded"
+                value="GenericWhitespace ''{0}'' is not preceded with whitespace."/>
+        </module>
+        <module name="MethodParamPad">
+            <property name="tokens"
+                      value="CTOR_DEF, LITERAL_NEW, METHOD_CALL, METHOD_DEF,
+                            SUPER_CTOR_CALL, ENUM_CONSTANT_DEF, RECORD_DEF"/>
+        </module>
+        <module name="NoLineWrap">
+            <property name="tokens" value="PACKAGE_DEF, IMPORT, STATIC_IMPORT"/>
+        </module>
         <module name="NoWhitespaceAfter"/>
-        <module name="NoWhitespaceBefore"/>
+        <module name="NoWhitespaceBefore">
+            <property name="tokens"
+                        value="COMMA, SEMI, POST_INC, POST_DEC, DOT,
+                            LABELED_STAT, METHOD_REF"/>
+            <property name="allowLineBreaks" value="true"/>
+        </module>
         <module name="ParenPad"/>
         <module name="SeparatorWrap">
             <property name="tokens" value="COMMA, SEMI, ELLIPSIS, ARRAY_DECLARATOR, RBRACK, METHOD_REF"/>
         </module>
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapDot"/>
+            <property name="tokens" value="DOT"/>
+            <property name="option" value="nl"/>
+        </module>
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapComma"/>
+            <property name="tokens" value="COMMA"/>
+            <property name="option" value="EOL"/>
+        </module>
+
         <module name="SingleSpaceSeparator"/>
         <module name="NoWhitespaceBeforeCaseDefaultColon"/>
         <module name="WhitespaceAfter"/>
@@ -135,6 +173,7 @@
         <module name="OneStatementPerLine">
             <property name="treatTryResourcesAsStatement" value="true"/>
         </module>
+        <module name="ModifierOrder"/>
 
         <module name="UnnecessarySemicolonInTryWithResources"/>
 
@@ -158,5 +197,11 @@
         <module name="IllegalIdentifierName"/>
 
         <module name="RecordTypeParameterNameCheck"/>
+
+        <module name="AnnotationLocation">
+            <property name="allowSamelineMultipleAnnotations" value="false"/>
+            <property name="allowSamelineSingleParameterlessAnnotation" value="false"/>
+            <property name="allowSamelineParameterizedAnnotation" value="false"/>
+        </module>
     </module>
 </module>

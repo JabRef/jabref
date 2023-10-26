@@ -2,6 +2,16 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
+buildscript {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.40")
+    }
+}
+
 plugins {
     id 'application'
 
@@ -22,16 +32,17 @@ plugins {
     id 'jacoco'
 
     id 'checkstyle'
+    id 'org.openrewrite.rewrite' version '6.4.0'
 
     id 'project-report'
 
     id 'idea'
-
-    id 'org.openrewrite.rewrite' version '6.4.0'
 }
 
 // Enable following for debugging
 // gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.
+
+apply plugin: 'io.spring.javaformat'
 
 apply plugin: XjcPlugin
 

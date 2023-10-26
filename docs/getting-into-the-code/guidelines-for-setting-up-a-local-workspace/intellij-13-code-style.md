@@ -6,16 +6,24 @@ nav_order: 13
 
 # Step 3: Using JabRef's code style
 
-Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
+Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code.
+For that purpose, JabRef relies on both the [Prettier Java](https://github.com/jhipster/prettier-java#prettier-java) and [checkstyle](https://checkstyle.sourceforge.io/).
+On each push, the [GitHub Prettier Action](https://github.com/marketplace/actions/prettier-action#github-prettier-action) runs and reformats the code.
+JabRef's IntelliJ configuration ensures a close-enough configuration.
+In case you use IntelliJ ultimate, you can also configure prettier to do the formatting.
 
-Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
+## Checkstyle
+
+### Install checkstyle plugin
+
+Install the [Checkstyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
 Navigate to **File > Settings... > Plugins"**.
 On the top, click on "Marketplace".
 Then, search for "Checkstyle".
-Click on "Install" choose "CheckStyle-IDEA".
+Click on "Install" choose "Checkstyle-IDEA".
 
-{% figure caption:"Install CheckStyle" %}
-![Install CheckStyle](guidelines-intellij-install-checkstyle.png)
+{% figure caption:"Install Checkstyle" %}
+![Install Checkstyle](guidelines-intellij-install-checkstyle.png)
 {% endfigure %}
 
 After clicking, IntelliJ asks for confirmation:
@@ -64,7 +72,7 @@ Click there "OK", too.
 
 Click on "Apply" to store the preferences.
 
-## Put JabRef's checkstyle configuration in place
+### Put JabRef's checkstyle configuration in place
 
 Now, put the checkstyle configuration file is in place:
 
@@ -110,18 +118,6 @@ Then, you can run a check on all modified files.
 
 {% figure caption:"JabRef's style is active - and we are ready to run a check on all modified files" %}
 ![JabRef's style is active - and we are ready to run a check on all modified files](guidelines-intellij-checkstyle-window.png)
-{% endfigure %}
-
-## Have auto format working properly in JavaDoc
-
-To have auto format working properly in the context of JavaDoc and line wrapping, "Wrap at right margin" has to be disabled. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
-
-Go to **File > Settings... > Editor > Code Style > Java > JavaDoc**.
-
-At "Other", disable "Wrap at right margin"
-
-{% figure caption:"”Wrap at right margin” disabled" %}
-!["Wrap at right margin" disabled](guidelines-intellij-editor-javadoc-do-not-wrap.png)
 {% endfigure %}
 
 ## Enable proper import cleanup

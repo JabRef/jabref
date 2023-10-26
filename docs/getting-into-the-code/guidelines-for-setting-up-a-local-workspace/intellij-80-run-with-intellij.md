@@ -1,7 +1,7 @@
 ---
 parent: Set up a local workspace
 grand_parent: Getting into the code
-nav_order: 89
+nav_order: 80
 ---
 
 # Advanced: Build and run using IntelliJ IDEA

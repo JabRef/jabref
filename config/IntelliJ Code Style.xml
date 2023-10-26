@@ -11,28 +11,20 @@
     </option>
     <option name="IMPORT_LAYOUT_TABLE">
       <value>
-        <package name="java" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="javax" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="javafx" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="org.jabref" withSubpackages="true" static="false" />
+        <package name="" withSubpackages="true" static="true" />
         <emptyLine />
         <package name="" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="" withSubpackages="true" static="true" />
       </value>
     </option>
   </JavaCodeStyleSettings>
   <codeStyleSettings language="JAVA">
+    <option name="RIGHT_MARGIN" value="255" />
     <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
     <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
     <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
     <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
     <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
     <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
-    <option name="WRAP_COMMENTS" value="true" />
     <arrangement>
       <rules>
         <section>
