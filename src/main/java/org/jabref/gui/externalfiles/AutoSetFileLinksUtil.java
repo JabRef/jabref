@@ -27,11 +27,12 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 
-import jakarta.ws.rs.core.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AutoSetFileLinksUtil {
+
+    record RelinkedResults(List<LinkedFile> relinkedFiles, List<IOException> exceptions) { }
 
     public static class LinkFilesResult {
         private final List<BibEntry> changedEntries = new ArrayList<>();
@@ -97,20 +98,16 @@ public class AutoSetFileLinksUtil {
                         entry.addFile(linkedFile);
                     });
                 }
-
                 if (changed) {
                     result.addBibEntry(entry);
                 }
-                // do yo thing here
-                Object[] relink = relinkingFiles(entry.getFiles());
-                List<LinkedFile> relinkedFiles = (List<LinkedFile>) relink[0];
-                Boolean isChanged = (Boolean) relink[1];
-                List<IOException> exceptions = (List<IOException>) relink[2];
-                entry.setFiles(relinkedFiles);
-                if (!isChanged) {
+                // Run Relinking Process
+                RelinkedResults relink = relinkingFiles(entry.getFiles());
+                entry.setFiles(relink.relinkedFiles);
+                if (!relink.relinkedFiles().isEmpty()) {
                     result.addBibEntry(entry);
                 }
-                for (IOException e : exceptions) {
+                for (IOException e : (relink.exceptions)) {
                     result.addFileException(e);
                 }
             }
@@ -154,11 +151,9 @@ public class AutoSetFileLinksUtil {
         return linkedFiles;
     }
 
-    public Object[] relinkingFiles(List<LinkedFile> listlinked) {
-        // Output is Changed Input, Boolean if Changed and List of Exceptions
-        Object[] output = new Object[3];
-        Boolean changed = false;
-        List<IOException> exceptions = null;
+    public RelinkedResults relinkingFiles(List<LinkedFile> listlinked) {
+        List<LinkedFile> changedFiles = new ArrayList<>();
+        List<IOException> exceptions = new ArrayList<>();
 
         for (LinkedFile file : listlinked) {
             Path path = Paths.get(file.getLink());
@@ -174,16 +169,13 @@ public class AutoSetFileLinksUtil {
                 searchFileInDirectoryAndSubdirectories(directory, fileNameString, fileLocations);
                 if (!fileLocations.isEmpty()) {
                     file.setLink(fileLocations.get(0));
-                    changed = true;
+                    changedFiles.add(file);
                 } else {
                     exceptions.add(new IOException("couldn't find file: " + file.getLink()));
                 }
             }
         }
-        output[0] = listlinked;
-        output[1] = changed;
-        output[2] = exceptions;
-        return output;
+        return new RelinkedResults(changedFiles, exceptions);
     }
 
     public static void searchFileInDirectoryAndSubdirectories(File directory, String targetFileName, List<String> fileLocations) {
