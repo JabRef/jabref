@@ -6,10 +6,13 @@ import java.util.Random;
 
 import javafx.scene.paint.Color;
 
+import org.jabref.gui.icon.IconTheme;
+
 public class GroupColorPicker {
+    public static boolean useRandom = false;
     private static final Random RANDOM = new Random();
     private static final List<Color> TOP_LEVEL_COLORS = new ArrayList<>();
-    private static final int TRIES = 1000;
+    private static final int TRIES = 10000;
 
     // Get most distinct color
     private static Color getDistinctHue() {
@@ -39,7 +42,7 @@ public class GroupColorPicker {
 
     // Generate color for top groups
     public static Color generateTopGroupColor() {
-        return getDistinctHue();
+        return useRandom ? getDistinctHue() : IconTheme.getDefaultGroupColor();
     }
 
     // Generate color for subgroups

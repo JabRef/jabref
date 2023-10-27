@@ -59,6 +59,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
     @FXML private Button iconPickerButton;
+    @FXML private Button autoColorAssignButton;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
 
@@ -207,6 +208,22 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
             nameField.requestFocus();
         });
+
+        updateColorButtonText();
+
+        autoColorAssignButton.setOnAction(event -> {
+            GroupColorPicker.useRandom = !GroupColorPicker.useRandom;
+
+            updateColorButtonText();
+        });
+    }
+
+    private void updateColorButtonText() {
+        if (GroupColorPicker.useRandom) {
+            autoColorAssignButton.setText("Auto: ON");
+        } else {
+            autoColorAssignButton.setText("Auto: OFF");
+        }
     }
 
     @FXML

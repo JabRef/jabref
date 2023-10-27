@@ -48,9 +48,10 @@
                         </Button>
                     </HBox>
                 </VBox>
-                <VBox layoutX="10.0" layoutY="10.0" minWidth="130.0" maxWidth="130.0" prefWidth="130.0">
+                <VBox layoutX="10.0" layoutY="10.0" minWidth="130.0" maxWidth="130.0" prefWidth="130.0" spacing="10.0">
                     <Label text="%Color"/>
-                    <ColorPicker fx:id="colorField"/>
+                    <ColorPicker fx:id="colorField" minHeight="25.0"/>
+                    <Button fx:id="autoColorAssignButton" text="Auto: OFF" wrapText="true"/>
                 </VBox>
                 <VBox>
                     <Label text="%Hierarchical context"/>
