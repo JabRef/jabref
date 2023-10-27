@@ -50,6 +50,7 @@ public class PredatoryJournalRepository {
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         if (predatoryJournals.containsKey(journal)) {
+            LOGGER.info("match: " + journal);
             return true;
         }
 
