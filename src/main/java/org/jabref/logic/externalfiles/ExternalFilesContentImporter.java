@@ -2,7 +2,6 @@ package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
@@ -18,7 +17,7 @@ public class ExternalFilesContentImporter {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public ParserResult importPDFContent(Path file, Optional<Path> globalFileDir) {
+    public ParserResult importPDFContent(Path file, Path globalFileDir) {
         try {
             return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, globalFileDir);
         } catch (IOException e) {

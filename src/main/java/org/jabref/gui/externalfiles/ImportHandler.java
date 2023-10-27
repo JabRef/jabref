@@ -116,7 +116,9 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            Optional<Path> globalFileDir = bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences());
+                            var filePreferences = preferencesService.getFilePreferences();
+                            Path globalFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences)
+                                    .orElse(filePreferences.getWorkingDirectory());
                             var pdfImporterResult = contentImporter.importPDFContent(file, globalFileDir);
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
