@@ -111,10 +111,12 @@ This privacy policy is in effect as of the day mentioned as "last updated" above
 
 ## Contact
 
-If you get in touch with us, we may aks you to provide us with certain personal information (e.g. name and email address) to stay in contact with you.
+If you get in touch with us, we may ask you to provide us with certain personal information (e.g. name and email address) to stay in contact with you.
 For any questions or concerns regarding the privacy policy, please send us an email to <vorstand@jabref.org> or write to
 
 JabRef e.V.  
 Josef-Lanner-Str. 9  
 71069 Sindelfingen  
 Germany
+
+<!-- markdownlint-disable-file MD024 -->

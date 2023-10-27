@@ -78,7 +78,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                    ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
                     root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
