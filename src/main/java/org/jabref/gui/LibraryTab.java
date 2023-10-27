@@ -34,6 +34,7 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -419,7 +420,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries and files linked to selected entries from the database
      *
      * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
@@ -428,7 +429,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries and files linked to selected entries from the database
      *
      * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
@@ -440,8 +441,18 @@ public class LibraryTab extends Tab {
             return;
         }
 
+        // Delete selected entries
         getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
         bibDatabaseContext.getDatabase().removeEntries(entries);
+
+        // Delete files which linked to selected entries when user select deletion
+        // Keep files unchanged when user select cut
+        if (!cut) {
+            for (BibEntry entry : entries) {
+                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, null, null).deleteFileFromDisk(entry.getFiles());
+            }
+        }
+
         ensureNotShowingBottomPanel(entries);
 
         this.changedProperty.setValue(true);
@@ -679,6 +690,13 @@ public class LibraryTab extends Tab {
         return bibDatabaseContext.getDatabase();
     }
 
+    /**
+     * Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
+     * If the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
+     *
+     * @param numberOfEntries number of entries user is selecting
+     * @return true if user confirm to delete entry
+     */
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (preferencesService.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
@@ -692,7 +710,8 @@ public class LibraryTab extends Tab {
                 cancelButton = Localization.lang("Keep entries");
             }
 
-            return dialogService.showConfirmationDialogWithOptOutAndWait(title,
+            return dialogService.showConfirmationDialogWithOptOutAndWait(
+                    title,
                     message,
                     okButton,
                     cancelButton,

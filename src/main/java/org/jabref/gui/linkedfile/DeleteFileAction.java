@@ -116,7 +116,26 @@ public class DeleteFileAction extends SimpleCommand {
      */
     public void deleteFileFromDisk(LinkedFileViewModel fileViewModel) {
         LinkedFile linkedFile = fileViewModel.getFile();
+        deleteFileHelper(linkedFile);
+    }
 
+    /**
+     * Deletes files from disk without asking the user for confirmation, for a list of files
+     *
+     * @param filesLinkedToEntry A list of LinkedFile to be deleted
+     */
+    public void deleteFileFromDisk(List<LinkedFile> filesLinkedToEntry) {
+        for (LinkedFile linkedFile : filesLinkedToEntry) {
+            deleteFileHelper(linkedFile);
+        }
+    }
+
+    /**
+     * Helper method to delete the specified file from disk
+     *
+     * @param linkedFile The LinkedFile (file which linked to an entry) to be deleted from disk
+     */
+    private void deleteFileHelper(LinkedFile linkedFile) {
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
