@@ -57,7 +57,7 @@ public class PredatoryJournalLoader {
 
     public static PredatoryJournalRepository loadRepository() {
         PredatoryJournalLoader loader = new PredatoryJournalLoader();
-        // Initialize repository
+        // Initialize with built-in list
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/predatoryJournalList.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no predatoryJournalList.mv. We use a default predatory journal list");
