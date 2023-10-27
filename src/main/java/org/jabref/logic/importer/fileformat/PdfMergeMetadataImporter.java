@@ -75,7 +75,7 @@ public class PdfMergeMetadataImporter extends Importer {
         return importDatabase(filePath, null);
     }
 
-    public ParserResult importDatabase(Path filePath, Path globalFileDir) throws IOException {
+    public ParserResult importDatabase(Path filePath, Path workingDir) throws IOException {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (Importer metadataImporter : metadataImporters) {
@@ -128,8 +128,8 @@ public class PdfMergeMetadataImporter extends Importer {
                 }
             }
         }
-        if (globalFileDir != null) {
-            Path relativizedFilePath = globalFileDir.relativize(filePath);
+        if (workingDir != null) {
+            Path relativizedFilePath = workingDir.relativize(filePath);
             entry.addFile(new LinkedFile("", relativizedFilePath, StandardFileType.PDF.getName()));
         } else {
             entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
