@@ -156,7 +156,7 @@ public class AutoSetFileLinksUtil {
         List<IOException> exceptions = new ArrayList<>();
 
         for (LinkedFile file : listlinked) {
-            Path path = Paths.get(file.getLink());
+            Path path = Path.of(file.getLink());
             if (!Files.exists(path)) {
                 Path filePath = Path.of(file.getLink());
                 String directoryPath = filePath.getParent().getParent().toString();
