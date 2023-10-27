@@ -445,11 +445,19 @@ public class LibraryTab extends Tab {
         getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
         bibDatabaseContext.getDatabase().removeEntries(entries);
 
-        // Delete files which linked to selected entries when user select deletion
-        // Keep files unchanged when user select cut
+        // Not delete files when user select cut
         if (!cut) {
+            // Keep track of linked files from selected entries
+            List<LinkedFile> linkedFileList = new ArrayList<>();
+
             for (BibEntry entry : entries) {
-                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, null, null).deleteFileFromDisk(entry.getFiles());
+                List<LinkedFile> linkedFilesFromEntry = entry.getFiles();
+                linkedFileList.addAll(linkedFilesFromEntry);
+            }
+
+            // Delete files which linked to selected entries when user select deletion
+            if (linkedFileList.size() > 0 && showLinkedFileDeleteConfirmationDialog(linkedFileList)) {
+                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, null, null).deleteFileFromDisk(linkedFileList);
             }
         }
 
@@ -692,7 +700,8 @@ public class LibraryTab extends Tab {
 
     /**
      * Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
-     * If the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
+     * Keep track of user preference:
+     * if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
      *
      * @param numberOfEntries number of entries user is selecting
      * @return true if user confirm to delete entry
@@ -719,6 +728,41 @@ public class LibraryTab extends Tab {
                     optOut -> preferencesService.getWorkspacePreferences().setConfirmDelete(!optOut));
         } else {
             return true;
+        }
+    }
+
+    /**
+     * Initializes a pop-up dialog box to confirm whether the user wants to delete attached files from selected entry
+     * Keep track of user preference:
+     * if the user prefers always delete attached files, delete the files without displaying the dialog box
+     *
+     * @param linkedFileList A list of LinkedFile to be deleted
+     * @return true if user confirm to delete attached files
+     */
+    private boolean showLinkedFileDeleteConfirmationDialog(List<LinkedFile> linkedFileList) {
+        if (preferencesService.getFilePreferences().alwaysDeleteLinkedFile()) {
+            return true;
+        } else {
+            Optional<Path> file = linkedFileList.get(0).findIn(bibDatabaseContext, preferencesService.getFilePreferences());
+
+            String title = Localization.lang("Delete attached file");
+            String message = Localization.lang("Delete '%0'", file.get().getFileName().toString());
+            String okButton = Localization.lang("Delete attached file");
+            String cancelButton = Localization.lang("Keep attached file");
+            if (linkedFileList.size() > 1) {
+                title = Localization.lang("Delete attached files");
+                message = Localization.lang("Delete %0 attached files", linkedFileList.size());
+                okButton = Localization.lang("Delete attached files");
+                cancelButton = Localization.lang("Keep attached files");
+            }
+
+            return dialogService.showConfirmationDialogWithOptOutAndWait(
+                    title,
+                    message,
+                    okButton,
+                    cancelButton,
+                    Localization.lang("Always delete attached file(s)"),
+                    optOut -> preferencesService.getFilePreferences().setAlwaysDeleteLinkedFile(optOut));
         }
     }
 

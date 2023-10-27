@@ -39,6 +39,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
+    private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -80,6 +81,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
+        confirmLinkedFileDeleteProperty.setValue(filePreferences.alwaysDeleteLinkedFile());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -110,6 +112,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         }
 
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
+        filePreferences.setAlwaysDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -177,6 +180,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty useMainFileDirectoryProperty() {
         return useMainFileDirectoryProperty;
+    }
+
+    public BooleanProperty confirmLinkedFileDeleteProperty() {
+        return this.confirmLinkedFileDeleteProperty;
     }
 }
 

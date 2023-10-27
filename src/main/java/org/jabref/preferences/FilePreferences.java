@@ -36,6 +36,7 @@ public class FilePreferences {
     private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
+    private final BooleanProperty confirmDeleteLinkedFile;
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -47,7 +48,8 @@ public class FilePreferences {
                            Path workingDirectory,
                            Set<ExternalFileType> externalFileTypes,
                            boolean createBackup,
-                           Path backupDirectory) {
+                           Path backupDirectory,
+                           boolean confirmDeleteLinkedFile) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -59,6 +61,7 @@ public class FilePreferences {
         this.externalFileTypes.addAll(externalFileTypes);
         this.createBackup.setValue(createBackup);
         this.backupDirectory.setValue(backupDirectory);
+        this.confirmDeleteLinkedFile = new SimpleBooleanProperty(confirmDeleteLinkedFile);
     }
 
     public String getUserAndHost() {
@@ -179,5 +182,17 @@ public class FilePreferences {
 
     public Path getBackupDirectory() {
         return this.backupDirectory.getValue();
+    }
+
+    public boolean alwaysDeleteLinkedFile() {
+        return confirmDeleteLinkedFile.get();
+    }
+
+    public BooleanProperty alwaysDeleteLinkedFileProperty() {
+        return confirmDeleteLinkedFile;
+    }
+
+    public void setAlwaysDeleteLinkedFile(boolean confirmLinkedFileDelete) {
+        this.confirmDeleteLinkedFile.set(confirmLinkedFileDelete);
     }
 }
