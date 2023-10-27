@@ -33,7 +33,7 @@
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="20.0"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
@@ -60,6 +60,15 @@
                     styleClass="icon-button,narrow"
                     prefHeight="20.0" prefWidth="20.0"
                     GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            <Button styleClass="icon-button,narrow" onAction="#resetCiteCommandToDefault"
+                    prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                <graphic>
+                    <JabRefIconView glyph="REFRESH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Reset to default"/>
+                </tooltip>
+            </Button>
         </GridPane>
     </HBox>
 

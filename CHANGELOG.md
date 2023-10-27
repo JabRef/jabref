@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
+- We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
 
 ### Changed
 
