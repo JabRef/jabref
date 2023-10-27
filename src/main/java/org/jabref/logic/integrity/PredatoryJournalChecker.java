@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,9 +17,9 @@ public class PredatoryJournalChecker implements EntryChecker {
     private final PredatoryJournalRepository predatoryJournalRepository;
     private final Set<String> fieldNames;
 
-    public PredatoryJournalChecker(PredatoryJournalRepository predatoryJournalRepository, Field... fieldsToCheck) {
+    public PredatoryJournalChecker(PredatoryJournalRepository predatoryJournalRepository, List<Field> fieldsToCheck) {
         this.predatoryJournalRepository = Objects.requireNonNull(predatoryJournalRepository);
-        this.fieldNames = Arrays.stream(fieldsToCheck).map(Field::getName).collect(Collectors.toSet());
+        this.fieldNames = fieldsToCheck.stream().map(Field::getName).collect(Collectors.toSet());
     }
 
     @Override
