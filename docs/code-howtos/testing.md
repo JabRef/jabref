@@ -24,7 +24,7 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 
 * _Placing:_ all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`.
 * _Naming:_ the name should be descriptive enough to describe the whole test. Use the format `methodUnderTest_ expectedBehavior_context` (without the dashes). So for example `formatRemovesDoubleBracesAtBeginning`. Try to avoid naming the tests with a `test` prefix since this information is already contained in the class name. Moreover, starting the name with `test` leads often to inferior test names (see also the [Stackoverflow discussion about naming](http://stackoverflow.com/questions/155436/unit-test-naming-best-practices)).
-*   _Test only one thing per test:_ tests should be short and test only one small part of the method. So instead of
+* _Test only one thing per test:_ tests should be short and test only one small part of the method. So instead of
 
     ```java
     testFormat() {
@@ -36,14 +36,14 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 
     we would have five tests containing a single `assert` statement and named accordingly (`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, , etc.). See [JUnit AntiPattern](https://exubero.com/junit/anti-patterns/#Multiple\_Assertions) for background.
 * Do _not just test happy paths_, but also wrong/weird input.
-* It is recommend to write tests _before_ you actually implement the functionality (test driven development).
+* It is recommended to write tests _before_ you actually implement the functionality (test driven development).
 * _Bug fixing:_ write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
 * Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, ()->doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/) to the test method.
 
 ## Lists in tests
 
 * Use `assertEquals(Collections.emptyList(), actualList);` instead of `assertEquals(0, actualList.size());` to test whether a list is empty.
-*   Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of
+* Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of
 
     ```java
            assertEquals(2, actualList.size());
@@ -57,7 +57,7 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 
 ## Files and folders in tests
 
-*   If you need a temporary file in tests, then add the following Annotation before the class:
+* If you need a temporary file in tests, then add the following Annotation before the class:
 
     ```java
     @ExtendWith(TempDirectory.class)
@@ -112,7 +112,7 @@ To test that a preferences migration works successfully, use the mockito method 
 
 To quickly host a local PostgreSQL database, execute following statement:
 
-```
+```shell
 docker run -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 --name db postgres:10 postgres -c log_statement=all
 ```
 
@@ -124,7 +124,7 @@ Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTes
 
 A MySQL DBMS can be started using following command:
 
-```
+```shell
 docker run -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=jabref -p 3800:3307 mysql:8.0 --port=3307
 ```
 
