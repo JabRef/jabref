@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
  * A repository for all predatory journals and publishers, including add and find methods.
  */
 public class PredatoryJournalRepository {
-    private final Map<String, List<String>> predatoryJournals = new HashMap<>();
     private final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalRepository.class);
+    private final Map<String, List<String>> predatoryJournals = new HashMap<>();
 
     /**
      * Initializes the internal data based on the predatory journals found in the given MV file
@@ -113,4 +113,3 @@ public class PredatoryJournalRepository {
         return Math.sqrt(v.stream().mapToDouble(x -> x * x).sum());
     }
 }
-
