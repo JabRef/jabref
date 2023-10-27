@@ -1,7 +1,7 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -138,8 +138,8 @@ public class AutoSetFileLinksUtil {
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
-                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
-                                                            .orElse(Optional.of(new UnknownExternalFileType("")));
+                                                          .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
+                                                          .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
@@ -159,13 +159,10 @@ public class AutoSetFileLinksUtil {
             if (!Files.exists(path)) {
                 Path filePath = Path.of(file.getLink());
                 String directoryPath = filePath.getParent().getParent().toString();
-                File directory = new File(directoryPath);
 
                 String fileNameString = filePath.getFileName().toString();
 
-                List<String> fileLocations = new ArrayList<>();
-
-                searchFileInDirectoryAndSubdirectories(directory, fileNameString, fileLocations);
+                List<String> fileLocations = searchFileInDirectoryAndSubdirectories(Path.of(directoryPath), fileNameString);
                 if (!fileLocations.isEmpty()) {
                     file.setLink(fileLocations.get(0));
                     changedFiles.add(file);
@@ -177,16 +174,20 @@ public class AutoSetFileLinksUtil {
         return new RelinkedResults(changedFiles, exceptions);
     }
 
-    public static void searchFileInDirectoryAndSubdirectories(File directory, String targetFileName, List<String> fileLocations) {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    searchFileInDirectoryAndSubdirectories(file, targetFileName, fileLocations);
-                } else if (file.getName().equals(targetFileName)) {
-                    fileLocations.add(file.getAbsolutePath());
-                }
-            }
+    public List<String> searchFileInDirectoryAndSubdirectories(Path directory, String targetFileName) {
+        List<Path> paths = new ArrayList<>();
+        try {
+            Files.walk(directory, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)
+                 .filter(path -> Files.isRegularFile(path))
+                 .filter(path -> path.getFileName().toString().equals(targetFileName))
+                 .forEach(paths::add);
+        } catch (IOException e) {
+            // Handle any exceptions here
         }
+        List<String> output = new ArrayList<>();
+        for (Path p : paths) {
+            output.add(p.toString());
+        }
+        return output;
     }
 }
