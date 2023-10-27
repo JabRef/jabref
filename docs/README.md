@@ -9,7 +9,7 @@ Installing the latest version of ruby followed by `gem install bundler` should b
 
 Afterwards, run
 
-```terminal
+```shell
 bundle install
 jekyll serve --livereload
 ```
@@ -18,7 +18,7 @@ and go to <http://localhost:4000/> in your browser.
 
 On **Windows**, using a dockerized environment is recommended:
 
-```terminal
+```shell
 docker build . -t jrjekyll
 docker run -p 4000:4000 -it --rm --volume="C:\git-repositories\jabref\docs":/srv/jekyll jrjekyll jekyll serve -H 0.0.0.0 -t
 ```
@@ -27,3 +27,13 @@ docker run -p 4000:4000 -it --rm --volume="C:\git-repositories\jabref\docs":/srv
 * In case you get errors regarding `Gemfile.lock`, just delete `Gemfile.lock` and rerun.
 * The current `Dockerfile` is based on <https://github.com/just-the-docs/just-the-docs/blob/main/Dockerfile>.
   The [Jekyll Docker image](https://github.com/envygeeks/jekyll-docker#jekyll-docker) did not work end of 2022 (because Ruby was too new).
+
+## Execute linting action
+
+You can execute the linting action as if it was executed by GitHub by executing following command.
+
+```shell
+act --rm --platform ubuntu-latest=fwilhe2/act-runner:latest -W .github/workflows/tests.yml -j "markdown"
+```
+
+That command uses [act](https://github.com/nektos/act), which brings GitHub actions execution to the developer machine.
