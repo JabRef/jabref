@@ -89,8 +89,7 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
     @FXML
     private void addNewType() {
         int fileTypeCount = fileTypesTable.getItems().size();
-        viewModel.addNewType();
-        if (fileTypeCount < fileTypesTable.getItems().size()) {
+        if (viewModel.addNewType()) {
             fileTypesTable.getSelectionModel().selectLast();
             fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);
         }

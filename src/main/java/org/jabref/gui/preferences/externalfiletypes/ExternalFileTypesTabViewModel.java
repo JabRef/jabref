@@ -54,22 +54,23 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         fileTypes.sort(Comparator.comparing(ExternalFileTypeItemViewModel::getName));
     }
 
-    public void addNewType() {
+    public boolean addNewType() {
         ExternalFileTypeItemViewModel item = new ExternalFileTypeItemViewModel();
         showEditDialog(item, Localization.lang("Add new file type"));
 
         if ("".equals(item.getName())) {
-            return;
+            return false;
         }
 
         String newExt = item.extensionProperty().get();
         for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
             if (newExt.equalsIgnoreCase(fileTypeItem.extensionProperty().get())) {
-                return;
+                return false;
             }
         }
 
         fileTypes.add(item);
+        return true;
     }
 
     public ObservableList<ExternalFileTypeItemViewModel> getFileTypes() {
