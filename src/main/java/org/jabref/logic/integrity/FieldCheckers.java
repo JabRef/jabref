@@ -30,7 +30,15 @@ public class FieldCheckers {
         for (Field field : FieldFactory.getPersonNameFields()) {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
+        fieldCheckers.put(StandardField.BOOKTITLE, new AuthorsContainedChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new DateContainedChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new PageNumbersContainedChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new YearContainedChecker());
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleChecker());
+        fieldCheckers.put(StandardField.JOURNALTITLE, new AuthorsContainedChecker());
+        fieldCheckers.put(StandardField.JOURNALTITLE, new DateContainedChecker());
+        fieldCheckers.put(StandardField.JOURNALTITLE, new PageNumbersContainedChecker());
+        fieldCheckers.put(StandardField.JOURNALTITLE, new YearContainedChecker());
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
         fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
         fieldCheckers.put(StandardField.DOI, new DoiValidityChecker());
