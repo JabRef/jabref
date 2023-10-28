@@ -81,10 +81,7 @@ public class PdfGrobidImporter extends Importer {
     public boolean isRecognizedFormat(Path filePath) throws IOException {
         Objects.requireNonNull(filePath);
         Optional<String> extension = FileUtil.getFileExtension(filePath);
-        if (extension.isEmpty()) {
-            return false;
-        }
-        return getFileType().getExtensions().contains(extension.get());
+        return extension.filter(s -> getFileType().getExtensions().contains(s)).isPresent();
     }
 
     @Override

@@ -64,25 +64,26 @@ Global variables should be avoided. Try to pass them as dependency.
 
 ### keywords sync
 
-Database.addDatabaseChangeListener does not work as the DatabaseChangedEvent does not provide the field information. Therefore, we have to use BibtexEntry.addPropertyChangeListener(VetoableChangeListener listener)
+`Database.addDatabaseChangeListener` does not work as the `DatabaseChangedEvent` does not provide the field information.
+Therefore, we have to use `BibtexEntry.addPropertyChangeListener(VetoableChangeListener listener)`.
 
 ## Working with BibTeX data
 
 ### Working with authors
 
-You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor_firstNameFirst(String)`. Then the authors always look nice. The only alternative containing all data of the names is `org.jabref.model.entry.AuthorList.fixAuthor_lastNameFirst(String)`. The other `fix...` methods omit data (like the von parts or the junior information).
+You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor_firstNameFirst(String)`. Then the authors always look nice. The only alternative containing all data of the names is `org.jabref.model.entry.AuthorList.fixAuthor_lastNameFirst(String)`. The other `fix...` methods omit data (like the "von" parts or the junior information).
 
 ## Benchmarks
 
 * Benchmarks can be executed by running the `jmh` gradle task (this functionality uses the [JMH Gradle plugin](https://github.com/melix/jmh-gradle-plugin))
 * Best practices:
-    * Read test input from `@State` objects
-    * Return result of calculations (either explicitly or via a `BlackHole` object)
+  * Read test input from `@State` objects
+  * Return result of calculations (either explicitly or via a `BlackHole` object)
 * [List of examples](https://github.com/melix/jmh-gradle-example/tree/master/src/jmh/java/org/openjdk/jmh/samples)
 
 ## Measure performance
 
-Try out the [YourKit JAva Profiler](https://www.yourkit.com).
+Try out the [YourKit Java Profiler](https://www.yourkit.com).
 
 ## equals
 
@@ -92,7 +93,7 @@ When creating an `equals` method follow:
 2. Use the `instanceof` operator to check if the argument has the correct type. If not, return `false`.
 3. Cast the argument to the correct type.
 4. For each “significant” field in the class, check if that field of the argument matches the corresponding field of this object. If all these tests succeed, return `true` otherwise, return `false`.
-5. When you are finished writing your equals method, ask yourself three questions: Is it symmetric? Is it transitive? Is it consistent?
+5. When you are finished writing your `equals` method, ask yourself three questions: Is it symmetric? Is it transitive? Is it consistent?
 
 Also, note:
 
@@ -103,4 +104,3 @@ Also, note:
 ## Files and Paths
 
 Always try to use the methods from the nio-package. For interoperability, they provide methods to convert between file and path. [https://docs.oracle.com/javase/tutorial/essential/io/path.html](https://docs.oracle.com/javase/tutorial/essential/io/path.html) Mapping between old methods and new methods [https://docs.oracle.com/javase/tutorial/essential/io/legacy.html#mapping](https://docs.oracle.com/javase/tutorial/essential/io/legacy.html#mapping)
-

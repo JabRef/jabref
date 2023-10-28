@@ -24,7 +24,7 @@ Note that we are currently switching to JavaFX's observables, as this concepts s
 
 Permitted dependencies in our architecture are:
 
-```
+```monospaced
 gui --> logic --> model
 gui ------------> model
 gui ------------> preferences

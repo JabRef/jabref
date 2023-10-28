@@ -81,45 +81,48 @@ public class InspecImporter extends Importer {
             for (String s : fields) {
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
-                if ("TI".equals(f3)) {
-                    h.put(StandardField.TITLE, frest);
-                } else if ("PY".equals(f3)) {
-                    h.put(StandardField.YEAR, frest);
-                } else if ("AU".equals(f3)) {
-                    h.put(StandardField.AUTHOR,
-                            AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
-                } else if ("AB".equals(f3)) {
-                    h.put(StandardField.ABSTRACT, frest);
-                } else if ("ID".equals(f3)) {
-                    h.put(StandardField.KEYWORDS, frest);
-                } else if ("SO".equals(f3)) {
-                    int m = frest.indexOf('.');
-                    if (m >= 0) {
-                        String jr = frest.substring(0, m);
-                        h.put(StandardField.JOURNAL, jr.replace("-", " "));
-                        frest = frest.substring(m);
-                        m = frest.indexOf(';');
-                        if (m >= 5) {
-                            String yr = frest.substring(m - 5, m).trim();
-                            h.put(StandardField.YEAR, yr);
+                switch (f3) {
+                    case "TI" ->
+                            h.put(StandardField.TITLE, frest);
+                    case "PY" ->
+                            h.put(StandardField.YEAR, frest);
+                    case "AU" ->
+                            h.put(StandardField.AUTHOR,
+                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                    case "AB" ->
+                            h.put(StandardField.ABSTRACT, frest);
+                    case "ID" ->
+                            h.put(StandardField.KEYWORDS, frest);
+                    case "SO" -> {
+                        int m = frest.indexOf('.');
+                        if (m >= 0) {
+                            String jr = frest.substring(0, m);
+                            h.put(StandardField.JOURNAL, jr.replace("-", " "));
                             frest = frest.substring(m);
-                            m = frest.indexOf(':');
-                            if (m >= 0) {
-                                String pg = frest.substring(m + 1).trim();
-                                h.put(StandardField.PAGES, pg);
-                                String vol = frest.substring(1, m).trim();
-                                h.put(StandardField.VOLUME, vol);
+                            m = frest.indexOf(';');
+                            if (m >= 5) {
+                                String yr = frest.substring(m - 5, m).trim();
+                                h.put(StandardField.YEAR, yr);
+                                frest = frest.substring(m);
+                                m = frest.indexOf(':');
+                                if (m >= 0) {
+                                    String pg = frest.substring(m + 1).trim();
+                                    h.put(StandardField.PAGES, pg);
+                                    String vol = frest.substring(1, m).trim();
+                                    h.put(StandardField.VOLUME, vol);
+                                }
                             }
                         }
                     }
-                } else if ("RT".equals(f3)) {
-                    frest = frest.trim();
-                    if ("Journal-Paper".equals(frest)) {
-                        type = StandardEntryType.Article;
-                    } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
-                        type = StandardEntryType.InProceedings;
-                    } else {
-                        type = EntryTypeFactory.parse(frest.replace(" ", ""));
+                    case "RT" -> {
+                        frest = frest.trim();
+                        if ("Journal-Paper".equals(frest)) {
+                            type = StandardEntryType.Article;
+                        } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
+                            type = StandardEntryType.InProceedings;
+                        } else {
+                            type = EntryTypeFactory.parse(frest.replace(" ", ""));
+                        }
                     }
                 }
             }

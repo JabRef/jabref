@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -25,9 +24,9 @@ import org.jabref.model.entry.types.StandardEntryType;
  * Importer for the Refer/Endnote format.
  * modified to use article number for pages if pages are missing (some
  * journals, e.g., Physical Review Letters, don't use pages anymore)
- *
+ * <br>
  * check here for details on the format
- * http://libguides.csuchico.edu/c.php?g=414245&p=2822898
+ * <a href="http://libguides.csuchico.edu/c.php?g=414245&p=2822898">...</a>
  */
 public class EndnoteImporter extends Importer {
 
@@ -35,12 +34,6 @@ public class EndnoteImporter extends Importer {
 
     private static final Pattern A_PATTERN = Pattern.compile("%A .*");
     private static final Pattern E_PATTERN = Pattern.compile("%E .*");
-
-    private final ImportFormatPreferences preferences;
-
-    public EndnoteImporter(ImportFormatPreferences preferences) {
-        this.preferences = preferences;
-    }
 
     @Override
     public String getName() {
@@ -97,15 +90,15 @@ public class EndnoteImporter extends Importer {
 
         String[] entries = sb.toString().split(ENDOFRECORD);
         Map<Field, String> hm = new HashMap<>();
-        String author;
+        StringBuilder author;
         EntryType type;
-        String editor;
+        StringBuilder editor;
         String artnum;
         for (String entry : entries) {
             hm.clear();
-            author = "";
+            author = new StringBuilder();
             type = BibEntry.DEFAULT_TYPE;
-            editor = "";
+            editor = new StringBuilder();
             artnum = "";
 
             boolean isEditedBook = false;
@@ -132,122 +125,131 @@ public class EndnoteImporter extends Importer {
 
                 String val = field.substring(2);
 
-                if ("A".equals(prefix)) {
-                    if ("".equals(author)) {
-                        author = val;
-                    } else {
-                        author += " and " + val;
+                switch (prefix) {
+                    case "A" -> {
+                        if (author.isEmpty()) {
+                            author = new StringBuilder(val);
+                        } else {
+                            author.append(" and ").append(val);
+                        }
                     }
-                } else if ("E".equals(prefix)) {
-                    if ("".equals(editor)) {
-                        editor = val;
-                    } else {
-                        editor += " and " + val;
+                    case "E" -> {
+                        if (editor.isEmpty()) {
+                            editor = new StringBuilder(val);
+                        } else {
+                            editor.append(" and ").append(val);
+                        }
                     }
-                } else if ("T".equals(prefix)) {
-                    hm.put(StandardField.TITLE, val);
-                } else if ("0".equals(prefix)) {
-                    if (val.indexOf("Journal") == 0) {
-                        type = StandardEntryType.Article;
-                    } else if (val.indexOf("Book Section") == 0) {
-                        type = StandardEntryType.InCollection;
-                    } else if (val.indexOf("Book") == 0) {
-                        type = StandardEntryType.Book;
-                    } else if (val.indexOf("Edited Book") == 0) {
-                        type = StandardEntryType.Book;
-                        isEditedBook = true;
-                    } else if (val.indexOf("Conference") == 0) {
-                        type = StandardEntryType.InProceedings;
-                    } else if (val.indexOf("Report") == 0) {
-                        type = StandardEntryType.TechReport;
-                    } else if (val.indexOf("Review") == 0) {
-                        type = StandardEntryType.Article;
-                    } else if (val.indexOf("Thesis") == 0) {
-                        type = StandardEntryType.PhdThesis;
-                    } else {
-                        type = BibEntry.DEFAULT_TYPE; //
+                    case "T" ->
+                            hm.put(StandardField.TITLE, val);
+                    case "0" -> {
+                        if (val.indexOf("Journal") == 0) {
+                            type = StandardEntryType.Article;
+                        } else if (val.indexOf("Book Section") == 0) {
+                            type = StandardEntryType.InCollection;
+                        } else if (val.indexOf("Book") == 0) {
+                            type = StandardEntryType.Book;
+                        } else if (val.indexOf("Edited Book") == 0) {
+                            type = StandardEntryType.Book;
+                            isEditedBook = true;
+                        } else if (val.indexOf("Conference") == 0) {
+                            type = StandardEntryType.InProceedings;
+                        } else if (val.indexOf("Report") == 0) {
+                            type = StandardEntryType.TechReport;
+                        } else if (val.indexOf("Review") == 0) {
+                            type = StandardEntryType.Article;
+                        } else if (val.indexOf("Thesis") == 0) {
+                            type = StandardEntryType.PhdThesis;
+                        } else {
+                            type = BibEntry.DEFAULT_TYPE; //
+                        }
                     }
-                } else if ("7".equals(prefix)) {
-                    hm.put(StandardField.EDITION, val);
-                } else if ("C".equals(prefix)) {
-                    hm.put(StandardField.ADDRESS, val);
-                } else if ("D".equals(prefix)) {
-                    hm.put(StandardField.YEAR, val);
-                } else if ("8".equals(prefix)) {
-                    hm.put(StandardField.DATE, val);
-                } else if ("J".equals(prefix)) {
-                    // "Alternate journal. Let's set it only if no journal
-                    // has been set with %B.
-                    hm.putIfAbsent(StandardField.JOURNAL, val);
-                } else if ("B".equals(prefix)) {
-                    // This prefix stands for "journal" in a journal entry, and
-                    // "series" in a book entry.
-                    if (type.equals(StandardEntryType.Article)) {
-                        hm.put(StandardField.JOURNAL, val);
-                    } else if (type.equals(StandardEntryType.Book) || type.equals(StandardEntryType.InBook)) {
-                        hm.put(StandardField.SERIES, val);
-                    } else {
-                        /* type = inproceedings */
-                        hm.put(StandardField.BOOKTITLE, val);
+                    case "7" ->
+                            hm.put(StandardField.EDITION, val);
+                    case "C" ->
+                            hm.put(StandardField.ADDRESS, val);
+                    case "D" ->
+                            hm.put(StandardField.YEAR, val);
+                    case "8" ->
+                            hm.put(StandardField.DATE, val);
+                    case "J" ->
+                        // "Alternate journal. Let's set it only if no journal
+                        // has been set with %B.
+                            hm.putIfAbsent(StandardField.JOURNAL, val);
+                    case "B" -> {
+                        // This prefix stands for "journal" in a journal entry, and
+                        // "series" in a book entry.
+                        if (type.equals(StandardEntryType.Article)) {
+                            hm.put(StandardField.JOURNAL, val);
+                        } else if (type.equals(StandardEntryType.Book) || type.equals(StandardEntryType.InBook)) {
+                            hm.put(StandardField.SERIES, val);
+                        } else {
+                            /* type = inproceedings */
+                            hm.put(StandardField.BOOKTITLE, val);
+                        }
                     }
-                } else if ("I".equals(prefix)) {
-                    if (type.equals(StandardEntryType.PhdThesis)) {
-                        hm.put(StandardField.SCHOOL, val);
-                    } else {
-                        hm.put(StandardField.PUBLISHER, val);
+                    case "I" -> {
+                        if (type.equals(StandardEntryType.PhdThesis)) {
+                            hm.put(StandardField.SCHOOL, val);
+                        } else {
+                            hm.put(StandardField.PUBLISHER, val);
+                        }
                     }
-                } else if ("P".equals(prefix)) {
-                    // replace single dash page ranges (23-45) with double dashes (23--45):
-                    hm.put(StandardField.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
-                } else if ("V".equals(prefix)) {
-                    hm.put(StandardField.VOLUME, val);
-                } else if ("N".equals(prefix)) {
-                    hm.put(StandardField.NUMBER, val);
-                } else if ("U".equals(prefix)) {
-                    hm.put(StandardField.URL, val);
-                } else if ("R".equals(prefix)) {
-                    String doi = val;
-                    if (doi.startsWith("doi:")) {
-                        doi = doi.substring(4);
+                    case "P" ->
+                        // replace single dash page ranges (23-45) with double dashes (23--45):
+                            hm.put(StandardField.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
+                    case "V" ->
+                            hm.put(StandardField.VOLUME, val);
+                    case "N" ->
+                            hm.put(StandardField.NUMBER, val);
+                    case "U" ->
+                            hm.put(StandardField.URL, val);
+                    case "R" -> {
+                        String doi = val;
+                        if (doi.startsWith("doi:")) {
+                            doi = doi.substring(4);
+                        }
+                        hm.put(StandardField.DOI, doi);
                     }
-                    hm.put(StandardField.DOI, doi);
-                } else if ("O".equals(prefix)) {
-                    // Notes may contain Article number
-                    if (val.startsWith("Artn")) {
-                        String[] tokens = val.split("\\s");
-                        artnum = tokens[1];
-                    } else {
-                        hm.put(StandardField.NOTE, val);
+                    case "O" -> {
+                        // Notes may contain Article number
+                        if (val.startsWith("Artn")) {
+                            String[] tokens = val.split("\\s");
+                            artnum = tokens[1];
+                        } else {
+                            hm.put(StandardField.NOTE, val);
+                        }
                     }
-                } else if ("K".equals(prefix)) {
-                    hm.put(StandardField.KEYWORDS, val);
-                } else if ("X".equals(prefix)) {
-                    hm.put(StandardField.ABSTRACT, val);
-                } else if ("9".equals(prefix)) {
-                    if (val.indexOf("Ph.D.") == 0) {
-                        type = StandardEntryType.PhdThesis;
+                    case "K" ->
+                            hm.put(StandardField.KEYWORDS, val);
+                    case "X" ->
+                            hm.put(StandardField.ABSTRACT, val);
+                    case "9" -> {
+                        if (val.indexOf("Ph.D.") == 0) {
+                            type = StandardEntryType.PhdThesis;
+                        }
+                        if (val.indexOf("Masters") == 0) {
+                            type = StandardEntryType.MastersThesis;
+                        }
                     }
-                    if (val.indexOf("Masters") == 0) {
-                        type = StandardEntryType.MastersThesis;
-                    }
-                } else if ("F".equals(prefix)) {
-                    hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.cleanKey(val, ""));
+                    case "F" ->
+                            hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.cleanKey(val, ""));
                 }
             }
 
             // For Edited Book, EndNote puts the editors in the author field.
             // We want them in the editor field so that bibtex knows it's an edited book
-            if (isEditedBook && "".equals(editor)) {
-                editor = author;
-                author = "";
+            if (isEditedBook && editor.toString().isEmpty()) {
+                editor = new StringBuilder(author.toString());
+                author = new StringBuilder();
             }
 
             // fixauthorscomma
-            if (!"".equals(author)) {
-                hm.put(StandardField.AUTHOR, fixAuthor(author));
+            if (!"".contentEquals(author)) {
+                hm.put(StandardField.AUTHOR, fixAuthor(author.toString()));
             }
-            if (!"".equals(editor)) {
-                hm.put(StandardField.EDITOR, fixAuthor(editor));
+            if (!"".contentEquals(editor)) {
+                hm.put(StandardField.EDITOR, fixAuthor(editor.toString()));
             }
             // if pages missing and article number given, use the article number
             if (((hm.get(StandardField.PAGES) == null) || "-".equals(hm.get(StandardField.PAGES))) && !"".equals(artnum)) {
