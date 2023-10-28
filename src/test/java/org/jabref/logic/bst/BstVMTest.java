@@ -102,7 +102,7 @@ public class BstVMTest {
         vm.render(Collections.emptyList());
 
         assertEquals(Integer.MAX_VALUE, vm.latestContext.stack().pop());
-        assertTrue(vm.latestContext.stack().empty());
+        assertTrue(vm.latestContext.stack().isEmpty());
     }
 
     @Test
