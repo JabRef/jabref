@@ -442,7 +442,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
-            if (entries.size() >= 1) {
+            if (!entries.isEmpty()) {
                 return Optional.of(entries.get(0));
             } else {
                 return Optional.empty();

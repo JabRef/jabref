@@ -63,7 +63,16 @@ class ProtectedTermsMenu extends Menu {
         @Override
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
-            textInputControl.replaceSelection("{" + selectedText + "}");
+            String firstStr = "{";
+            String lastStr = "}";
+            // If the selected text contains spaces at the beginning and end, then add spaces before or after the brackets
+            if (selectedText.startsWith(" ")) {
+                firstStr = " {";
+            }
+            if (selectedText.endsWith(" ")) {
+                lastStr = "} ";
+            }
+            textInputControl.replaceSelection(firstStr + selectedText.strip() + lastStr);
         }
     }
 
@@ -99,12 +108,29 @@ class ProtectedTermsMenu extends Menu {
             Objects.requireNonNull(list);
 
             this.list = list;
-            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
+            this.executable.bind(textInputControl.focusedProperty());
         }
 
         @Override
         public void execute() {
-            list.addProtectedTerm(textInputControl.getSelectedText());
+            // If no selected term, then add the word after or at the cursor
+            if (textInputControl.getSelectedText().isEmpty()) {
+                int beginIdx = textInputControl.getCaretPosition();
+                int endIdx = textInputControl.getCaretPosition();
+                String text = textInputControl.getText();
+                // While the beginIdx > 0 and the previous char is not a space
+                while (beginIdx > 0 && text.charAt(beginIdx - 1) != ' ') {
+                    --beginIdx;
+                }
+                // While the endIdx < length and the current char is not a space
+                while (endIdx < text.length() && text.charAt(endIdx) != ' ') {
+                    ++endIdx;
+                }
+                list.addProtectedTerm(text.substring(beginIdx, endIdx));
+            } else {
+                // Remove leading and trailing whitespaces
+                list.addProtectedTerm(textInputControl.getSelectedText().strip());
+            }
         }
     }
 

@@ -17,7 +17,9 @@ Howto for Windows - other operating systems work similar:
 
 Note: If you do not do this, you get following error message:
 
-    Could not find server key store C:\Users\USERNAME\AppData\Local\org.jabref\jabref\ssl\server.p12.
+```text
+Could not find server key store C:\Users\USERNAME\AppData\Local\org.jabref\jabref\ssl\server.p12.
+```
 
 ## Start http server
 
@@ -33,13 +35,15 @@ Does not work.
 
 Current try:
 
-    ./gradlew run -Pcomment=httpserver
+```shell
+./gradlew run -Pcomment=httpserver
+```
 
-However, there are with `ForkJoin` (discussion at https://discuss.gradle.org/t/is-it-ok-to-use-collection-parallelstream-or-other-potentially-multi-threaded-code-within-gradle-plugin-code/28003)
+However, there are with `ForkJoin` (discussion at <https://discuss.gradle.org/t/is-it-ok-to-use-collection-parallelstream-or-other-potentially-multi-threaded-code-within-gradle-plugin-code/28003>)
 
 Gradle output:
 
-```
+```shell
 > Task :run
 2023-04-22 11:30:59 [main] org.jabref.http.server.Server.main()
 DEBUG: Libraries served: [C:\git-repositories\jabref-all\jabref\src\main\resources\org\jabref\http\server\http-server-demo.bib]
@@ -51,7 +55,7 @@ DEBUG: Starting server...
 
 IntelliJ output, if `org.jabref.http.server.Server#main` is executed:
 
-```
+```shell
 DEBUG: Starting server...
 2023-04-22 11:44:59 [ForkJoinPool.commonPool-worker-1] org.glassfish.grizzly.http.server.NetworkListener.start()
 INFO: Started listener bound to [localhost:6051]
