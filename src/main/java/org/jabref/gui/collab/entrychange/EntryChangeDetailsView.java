@@ -88,8 +88,10 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
             if (!scrolling) {
                 scrolling = true;
                 if (event instanceof MouseEvent) {
-                    int value = (Integer) webView.getEngine().executeScript("window.scrollY");
-                    otherWebView.getEngine().executeScript("window.scrollTo(0, " + value + ")");
+                    if (((MouseEvent) event).isPrimaryButtonDown()) {
+                        int value = (Integer) webView.getEngine().executeScript("window.scrollY");
+                        otherWebView.getEngine().executeScript("window.scrollTo(0, " + value + ")");
+                    }
                 } else {
                     otherWebView.fireEvent(event.copyFor(otherWebView, otherWebView));
                 }
