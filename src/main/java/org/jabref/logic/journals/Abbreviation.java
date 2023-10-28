@@ -6,7 +6,6 @@ import java.util.Objects;
 public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private static final long serialVersionUID = 1;
-
     private transient String name;
     private final String abbreviation;
     private transient String dotlessAbbreviation;
@@ -26,7 +25,8 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
                 shortestUniqueAbbreviation.trim());
     }
 
-    private Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {
+    private Abbreviation(String name, String abbreviation,
+                         String dotlessAbbreviation, String shortestUniqueAbbreviation) {
         this.name = name.intern();
         this.abbreviation = abbreviation.intern();
         this.dotlessAbbreviation = dotlessAbbreviation.intern();

@@ -230,7 +230,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     public void addAbbreviation() {
         addAbbreviation(new Abbreviation(
                 Localization.lang("Name"),
-                Localization.lang("Abbreviation"),
+                Localization.lang("abbreviation"),
                 Localization.lang("Shortest unique abbreviation")));
     }
 
