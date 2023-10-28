@@ -30,8 +30,13 @@
           <Insets left="20.0" />
        </VBox.margin>
       </VBox>
-      <CheckBox fx:id="cleanUpBiblatex" text="%Convert to biblatex format (e.g., store publication date in date field)" />
-      <CheckBox fx:id="cleanUpBibtex" text="%Convert to BibTeX format (e.g., store publication date in year and month fields)" />
+     <RadioButton text="%Convert to biblatex format (e.g., store publication date in date field)">
+      <toggleGroup>
+        <ToggleGroup fx:id="conversionToggleGroup" />
+       </toggleGroup>
+   </RadioButton>
+
+   <RadioButton text="%Convert to BibTeX format (e.g., store publication date in year and month fields)" toggleGroup="$conversionToggleGroup" />
       <CheckBox fx:id="cleanUpTimestampToCreationDate" text="%Convert timestamp field to field 'creationdate'" />
       <CheckBox fx:id="cleanUpTimestampToModificationDate" text="%Convert timestamp field to field 'modificationdate'" />
             <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />
