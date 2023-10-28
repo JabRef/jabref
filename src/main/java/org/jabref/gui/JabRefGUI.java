@@ -32,11 +32,11 @@ import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.jthemedetecor.OsThemeDetector;
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.jthemedetecor.OsThemeDetector;
 
 public class JabRefGUI {
 
@@ -152,7 +152,7 @@ public class JabRefGUI {
         // If OS theme is light or dark, JabRef UI Theme will correspond to it. If JabRef is then closed and user modifies their
         // OS theme settings, the code below will make the necessary theme switch IF automatic detection is enabled by user in
         // JabRef Appearance Preferences.
-        if(preferencesService.getWorkspacePreferences().automaticThemeDetectionFlag().getValue()){
+        if (preferencesService.getWorkspacePreferences().automaticThemeDetectionFlag().getValue()) {
             final boolean isDarkThemeUsed = detector.isDark();
             if (isDarkThemeUsed) {
                 //The OS uses a dark theme

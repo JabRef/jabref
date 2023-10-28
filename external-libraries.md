@@ -640,7 +640,6 @@ URL:     https://github.com/unitsofmeasurement/uom-lib
 License: BSD-3-Clause
 ```
 
-
 ## Sorted list of runtime dependencies output by gradle
 
 1. `./gradlew dependencies > build/dependencies.txt`

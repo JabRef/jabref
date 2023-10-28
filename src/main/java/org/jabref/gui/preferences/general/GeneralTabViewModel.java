@@ -36,13 +36,12 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 import org.jabref.preferences.WorkspacePreferences;
 
+import com.jthemedetecor.OsThemeDetector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-
-import com.jthemedetecor.OsThemeDetector;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
@@ -132,13 +131,15 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         switch (workspacePreferences.getTheme().getType()) {
             case DEFAULT -> {
                 selectedThemeProperty.setValue(ThemeTypes.LIGHT);
-                if(workspacePreferences.automaticThemeDetectionFlag().getValue())
+                if (workspacePreferences.automaticThemeDetectionFlag().getValue()) {
                     selectedThemeProperty.setValue(ThemeTypes.SYNC);
+                }
             }
             case EMBEDDED -> {
                 selectedThemeProperty.setValue(ThemeTypes.DARK);
-                if(workspacePreferences.automaticThemeDetectionFlag().getValue())
+                if (workspacePreferences.automaticThemeDetectionFlag().getValue()) {
                     selectedThemeProperty.setValue(ThemeTypes.SYNC);
+                }
             }
             case CUSTOM -> {
                 selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
