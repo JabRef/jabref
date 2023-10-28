@@ -62,11 +62,10 @@ public class CustomImporter extends Importer {
             return true;
         }
 
-        if (!(other instanceof CustomImporter)) {
+        if (!(other instanceof CustomImporter otherImporter)) {
             return false;
         }
 
-        CustomImporter otherImporter = (CustomImporter) other;
         return Objects.equals(className, otherImporter.className) && Objects.equals(basePath, otherImporter.basePath);
     }
 
