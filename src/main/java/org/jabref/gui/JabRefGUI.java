@@ -155,20 +155,20 @@ public class JabRefGUI {
         if (preferencesService.getWorkspacePreferences().automaticThemeDetectionFlag().getValue()) {
             final boolean isDarkThemeUsed = detector.isDark();
             if (isDarkThemeUsed) {
-                //The OS uses a dark theme
+                // The OS uses a dark theme
                 preferencesService.getWorkspacePreferences().setTheme(Theme.dark());
             } else {
-                //The OS uses a light theme
+                // The OS uses a light theme
                 preferencesService.getWorkspacePreferences().setTheme(Theme.light());
             }
         }
         // Listening to changes
         detector.registerListener(isDark -> {
             if (isDark) {
-                //The OS switched to a dark theme
+                // The OS switched to a dark theme
                 preferencesService.getWorkspacePreferences().setTheme(Theme.dark());
             } else {
-                //The OS switched to a light theme
+                // The OS switched to a light theme
                 preferencesService.getWorkspacePreferences().setTheme(Theme.light());
             }
         });
