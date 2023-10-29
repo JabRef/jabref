@@ -8,13 +8,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.OS;
 
+import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -58,23 +61,25 @@ public class PredatoryJournalLoader {
     public static PredatoryJournalRepository loadRepository() {
         PredatoryJournalLoader loader = new PredatoryJournalLoader();
         // Initialize with built-in list
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/predatoryJournalList.mv")) {
+        try (InputStream resourceAsStream = PredatoryJournalRepository.class.getResourceAsStream("/journals/predatoryJournal-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no predatoryJournalList.mv. We use a default predatory journal list");
             } else {
-                Path tempDir = Files.createTempDirectory("jabref-journal");
-                Path tempJournalList = tempDir.resolve("predatoryJournalList.mv");
-                Files.copy(resourceAsStream, tempJournalList);
-                loader.repository = new PredatoryJournalRepository(tempJournalList);
-                tempDir.toFile().deleteOnExit();
-                tempJournalList.toFile().deleteOnExit();
+                // Use user's app data directory for more permanent storage
+                Path appDataDir = Path.of(AppDirsFactory.getInstance()
+                                                        .getUserDataDir(
+                                                                OS.APP_DIR_APP_NAME,
+                                                                "predatoryJournals",
+                                                                OS.APP_DIR_APP_AUTHOR));
+                Files.createDirectories(appDataDir); // Ensure the directory exists
+                Path predatoryJournalListPath = appDataDir.resolve("predatoryJournal-list.mv");
+                Files.copy(resourceAsStream, predatoryJournalListPath, StandardCopyOption.REPLACE_EXISTING);
+                loader.repository = new PredatoryJournalRepository(predatoryJournalListPath);
             }
         } catch (IOException e) {
             LOGGER.error("Error while copying predatory journal list", e);
             return null;
         }
-
-        loader.update();
         return loader.repository;
     }
 
@@ -132,5 +137,9 @@ public class PredatoryJournalLoader {
         if (m_name.find() && m_url.find()) {
             repository.addToPredatoryJournals(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group());
         }
+    }
+
+    public PredatoryJournalRepository getRepository() {
+        return repository;
     }
 }
