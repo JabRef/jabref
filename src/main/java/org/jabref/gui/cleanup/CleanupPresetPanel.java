@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -34,8 +35,9 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpRenamePDF;
     @FXML private CheckBox cleanUpRenamePDFonlyRelativePaths;
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
-    @FXML private CheckBox cleanUpBiblatex;
-    @FXML private CheckBox cleanUpBibtex;
+    @FXML private RadioButton cleanUpBiblatex;
+    @FXML private RadioButton cleanUpBibtex;
+    @FXML private ToggleGroup conversionToggleGroup;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
@@ -71,18 +73,8 @@ public class CleanupPresetPanel extends VBox {
                                             .concat(": ")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
-        cleanUpBibtex.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanUpBiblatex.selectedProperty().setValue(false);
-                    }
-                });
-        cleanUpBiblatex.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanUpBibtex.selectedProperty().setValue(false);
-                    }
-                });
+        cleanUpBiblatex.setToggleGroup(conversionToggleGroup);
+        cleanUpBibtex.setToggleGroup(conversionToggleGroup);
         cleanUpTimestampToCreationDate.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
@@ -121,7 +113,6 @@ public class CleanupPresetPanel extends VBox {
 
     public CleanupPreferences getCleanupPreset() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-
         if (cleanUpMovePDF.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.MOVE_PDF);
         }
