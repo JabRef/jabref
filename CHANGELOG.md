@@ -12,10 +12,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
+- We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
 
 ### Changed
 
 - We changed the location of the 'Open only one instance of JabRef' preference option.[#9306](https://github.com/JabRef/jabref/issues/9306)
+- The two previews in the change resolver dialog now have their scrollbars synchronized [#9576](https://github.com/JabRef/jabref/issues/9576).
 - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
 
 ### Fixed
