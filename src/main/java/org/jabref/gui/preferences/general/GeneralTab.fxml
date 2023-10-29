@@ -52,7 +52,7 @@
 
         <CheckBox fx:id="fontOverride" text="%Override default font settings"
                   GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <HBox alignment="CENTER_LEFT" spacing="4.0"
+        <HBox alignment="CENTER_LEFT" spacing="4.0" disable="${!fontOverride.selected}"
               GridPane.rowIndex="4" GridPane.columnIndex="1">
             <Label text="%Size"/>
             <Spinner fx:id="fontSize" styleClass="fontsizeSpinner" editable="true"/>
