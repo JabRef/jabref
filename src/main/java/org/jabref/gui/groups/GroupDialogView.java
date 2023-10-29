@@ -59,9 +59,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
     @FXML private Button iconPickerButton;
-    @FXML private Button autoColorAssignButton;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
+    @FXML private CheckBox autoColorCheckbox;
 
     // Type
     @FXML private RadioButton explicitRadioButton;
@@ -209,21 +209,15 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             nameField.requestFocus();
         });
 
-        updateColorButtonText();
-
-        autoColorAssignButton.setOnAction(event -> {
-            GroupColorPicker.useRandom = !GroupColorPicker.useRandom;
-
-            updateColorButtonText();
+        autoColorCheckbox.setSelected(GroupColorPicker.useRandom);
+        autoColorCheckbox.setOnAction(event -> {
+            GroupColorPicker.useRandom = autoColorCheckbox.isSelected();
+            if (autoColorCheckbox.isSelected()) {
+                viewModel.colorFieldProperty().setValue(GroupColorPicker.generateTopGroupColor());
+            } else {
+                viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
+            }
         });
-    }
-
-    private void updateColorButtonText() {
-        if (GroupColorPicker.useRandom) {
-            autoColorAssignButton.setText("Auto: ON");
-        } else {
-            autoColorAssignButton.setText("Auto: OFF");
-        }
     }
 
     @FXML
