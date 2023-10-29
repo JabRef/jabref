@@ -42,7 +42,7 @@ public class ISIDOREFetcherTest {
     @Test
     public void checkArticle2() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.TITLE, "“ Anthony B. Atkinson, Inequality – What Can Be Done ? Cambridge (Mass.) Harvard University Press, 2015, XI-384 p. ”")
+                .withField(StandardField.TITLE, " Anthony B. Atkinson, Inequality – What Can Be Done ? Cambridge (Mass.) Harvard University Press, 2015, XI-384 p. ")
                 .withField(StandardField.AUTHOR, "Benoît Rapoport")
                 .withField(StandardField.YEAR, "2016")
                 .withField(StandardField.JOURNAL, "Population (édition française)")
