@@ -13,7 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -136,8 +135,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
         backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
 
-        ActionFactory actionFactory1 = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory1.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
