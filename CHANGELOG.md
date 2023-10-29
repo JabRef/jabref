@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The two previews in the change resolver dialog now have their scrollbars synchronized [#9576](https://github.com/JabRef/jabref/issues/9576).
 - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
 
 ### Fixed
