@@ -14,8 +14,8 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-
 import com.google.common.collect.Streams;
+
 
 public class BibEntryTypeBuilder {
 

@@ -160,10 +160,10 @@ public class BibEntry implements Cloneable {
     /**
      * Retrieves the first resolved field or its alias from the provided OrFields object using Stream API.
      *
-     * @param fields    The OrFields object containing a list of fields to be resolved.
-     * @param database  The BibDatabase used for resolving the field or its alias.
-     * @return          An Optional containing the first resolved field or alias if present,
-     *                  otherwise an empty Optional.
+     * @param fields   The OrFields object containing a list of fields to be resolved.
+     * @param database The BibDatabase used for resolving the field or its alias.
+     * @return An Optional containing the first resolved field or alias if present,
+     * otherwise an empty Optional.
      */
     public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
         return fields.getFields().stream()
@@ -1180,5 +1180,53 @@ public class BibEntry implements Cloneable {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    public void addCrossref(BibEntry crossrefEntry) {
+        // Adding cross-references
+        this.setField(StandardField.CROSSREF, crossrefEntry.getCitationKey().toString());
+        // Updating Cells
+        updateCell();
+    }
+
+    public void addFileFromCrossref(LinkedFile file) {
+        List<LinkedFile> linkedFiles = this.getFiles();
+        // If the cross-referenced entry already has documentation from the cross-referenced entry, the documentation is not updated
+        if (!linkedFiles.stream().anyMatch(f -> f.getLink().equalsIgnoreCase(file.getLink()))) {
+            linkedFiles.add(file);
+            // Updated documents
+            updateFiles(linkedFiles);
+        }
+    }
+
+    public void removeCrossref() {
+        // Removing cross-references
+//        this.removeCrossrefedEntry(StandardField.ENTRYSET);
+        // Updating Cells
+        updateCell();
+    }
+
+    public void updateCitationKey(String newCitationKey) {
+        // Changing the reference key of a cross-reference entry
+        this.setField(InternalField.KEY_FIELD, newCitationKey);
+        // Updating Cells
+        updateCell();
+    }
+
+    public void removeCrossrefedEntry(BibEntry crossrefedEntry) {
+        // Remove cross-referenced entries
+        crossrefedEntry.removeCrossref();
+        // Updating Cells
+        updateCell();
+    }
+
+    private void updateCell() {
+        // Logic for updating cells
+        // ...
+    }
+
+    private void updateFiles(List<LinkedFile> linkedFiles) {
+        // Logic for updating documents
+        // ...
     }
 }
