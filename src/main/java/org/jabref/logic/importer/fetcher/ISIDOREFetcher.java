@@ -37,31 +37,13 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
     private static final int LINKLENGTH = 47;
 
     private String URL;
-    private final Parser parser;
+    private Parser parser;
+
+    private DocumentBuilderFactory factory;
 
     public ISIDOREFetcher() {
-        this.parser = xmlData -> {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            try {
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document document = builder.parse(xmlData);
-
-                // Assuming the root element represents an entry
-                Element entryElement = document.getDocumentElement();
-
-                if (entryElement == null) {
-                    return Collections.emptyList();
-                }
-
-                return Collections.singletonList(xmlItemToBibEntry(document.getDocumentElement()));
-            } catch (
-                    ParserConfigurationException |
-                    IOException |
-                    SAXException e) {
-                Unchecked.throwChecked(new FetcherException("Issue with parsing link"));
-            }
-            return null;
-        };
+        this.factory = DocumentBuilderFactory.newInstance();
+        this.parser = getParser();
     }
 
     @Override
@@ -90,7 +72,28 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return this.parser;
+        return xmlData -> {
+
+            try {
+                DocumentBuilder builder = this.factory.newDocumentBuilder();
+                Document document = builder.parse(xmlData);
+
+                // Assuming the root element represents an entry
+                Element entryElement = document.getDocumentElement();
+
+                if (entryElement == null) {
+                    return Collections.emptyList();
+                }
+
+                return Collections.singletonList(xmlItemToBibEntry(document.getDocumentElement()));
+            } catch (
+                    ParserConfigurationException |
+                    IOException |
+                    SAXException e) {
+                Unchecked.throwChecked(new FetcherException("Issue with parsing link"));
+            }
+            return null;
+        };
     }
 
     private BibEntry xmlItemToBibEntry(Element itemElement) {
