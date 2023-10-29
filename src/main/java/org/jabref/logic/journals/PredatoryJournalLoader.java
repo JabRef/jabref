@@ -35,7 +35,7 @@ public class PredatoryJournalLoader {
             } catch (MalformedURLException ex) {
                 LOGGER.error("Malformed URL has occurred in PJSource", ex);
             }
-            this.elementPattern = (regex != null) ? Pattern.compile(regex) : null;
+            this.elementPattern = regex != null ? Pattern.compile(regex) : null;
         }
     }
 
@@ -118,7 +118,7 @@ public class PredatoryJournalLoader {
     }
 
     private void handleHTML(Pattern pattern, String body) {
-        Matcher matcher = (pattern != null) ? pattern.matcher(body) : null;
+        Matcher matcher = pattern != null ? pattern.matcher(body) : null;
 
         if (matcher != null) {
             while (matcher.find()) {
