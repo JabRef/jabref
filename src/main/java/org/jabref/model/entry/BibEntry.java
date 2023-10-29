@@ -1182,7 +1182,7 @@ public class BibEntry implements Cloneable {
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
     }
 
-    public void addCrossref(BibEntry crossrefEntry) {
+    public void addCrossref(BibEntry crossrefEntry) {//
         // Adding cross-references
         this.setField(StandardField.CROSSREF, crossrefEntry.getCitationKey().toString());
         // Updating Cells
