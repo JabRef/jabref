@@ -1,0 +1,3 @@
+Issue 10450 url: https://github.com/JabRef/jabref/issues/10450
+JabRef indeed does not have the functionality to let user select one existing database and then
+show the import dialog but instead create a temporary database directly.
