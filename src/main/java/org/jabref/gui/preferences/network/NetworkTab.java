@@ -17,33 +17,20 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
-import org.jabref.gui.Globals;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
-    @FXML private Label remoteLabel;
     @FXML private CheckBox versionCheck;
-    @FXML private CheckBox remoteServer;
-    @FXML private TextField remotePort;
-    @FXML private Button remoteHelp;
-
     @FXML private CheckBox proxyUse;
     @FXML private Label proxyHostnameLabel;
     @FXML private TextField proxyHostname;
@@ -67,9 +54,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
 
-    @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private BibEntryTypesManager entryTypesManager;
-
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
 
@@ -87,14 +71,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
 
         versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
-
-        remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
-        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
-        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
-        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
 
         proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
         proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());
@@ -129,12 +108,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
-
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.proxyHostnameValidationStatus(), proxyHostname);
             validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);

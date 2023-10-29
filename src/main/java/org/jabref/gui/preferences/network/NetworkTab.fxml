@@ -10,7 +10,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
@@ -19,13 +18,6 @@
     <Label styleClass="titleHeader" text="%Network" />
     <CheckBox fx:id="versionCheck" text="%Check for latest version online"/>
     <Label text="%If you encounter an issue or a bug, please check the latest version, whether the issue is still present." wrapText="true"/>
-    <Label styleClass="sectionHeader" text="%Remote operation" />
-    <Label fx:id="remoteLabel" text="%This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For instance, this is useful when you open a file in JabRef from your web browser. Note that this will prevent you from running more than one instance of JabRef at a time." textOverrun="CLIP" wrapText="true" />
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <CheckBox fx:id="remoteServer" text="%Listen for remote operation on port" />
-        <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
-        <Button fx:id="remoteHelp" prefWidth="20.0" />
-    </HBox>
 
     <Label styleClass="sectionHeader" text="%Proxy configuration" />
     <GridPane hgap="10.0" vgap="10.0">

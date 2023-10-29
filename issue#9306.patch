@@ -1,0 +1,590 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 6e5a785389..b7136d7689 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
+ 
+ ### Changed
+ 
++- We changed the location of the 'Open only one instance of JabRef' preference option.[#9306](https://github.com/JabRef/jabref/issues/9306)
+ - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
+ 
+ ### Fixed
+diff --git a/src/main/java/org/jabref/gui/preferences/general/GeneralTab.fxml b/src/main/java/org/jabref/gui/preferences/general/GeneralTab.fxml
+index 4d8d3c265b..81406cdb1f 100644
+--- a/src/main/java/org/jabref/gui/preferences/general/GeneralTab.fxml
++++ b/src/main/java/org/jabref/gui/preferences/general/GeneralTab.fxml
+@@ -4,6 +4,7 @@
+ <?import javafx.scene.control.Button?>
+ <?import javafx.scene.control.CheckBox?>
+ <?import javafx.scene.control.ComboBox?>
++<?import javafx.scene.control.Hyperlink?>
+ <?import javafx.scene.control.Label?>
+ <?import javafx.scene.control.Spinner?>
+ <?import javafx.scene.control.TextField?>
+@@ -13,7 +14,6 @@
+ <?import javafx.scene.layout.HBox?>
+ <?import javafx.scene.layout.VBox?>
+ <?import org.jabref.gui.icon.JabRefIconView?>
+-<?import javafx.scene.control.Hyperlink?>
+ <fx:root spacing="10.0" type="VBox"
+          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+          fx:controller="org.jabref.gui.preferences.general.GeneralTab">
+@@ -52,7 +52,7 @@
+ 
+         <CheckBox fx:id="fontOverride" text="%Override default font settings"
+                   GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+-        <HBox alignment="CENTER_LEFT" spacing="4.0" disable="${!fontOverride.selected}"
++        <HBox alignment="CENTER_LEFT" spacing="4.0"
+               GridPane.rowIndex="4" GridPane.columnIndex="1">
+             <Label text="%Size"/>
+             <Spinner fx:id="fontSize" styleClass="fontsizeSpinner" editable="true"/>
+@@ -70,6 +70,13 @@
+     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
+     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
+ 
++    <Label styleClass="sectionHeader" text="%Single instance" />
++    <HBox alignment="CENTER_LEFT" spacing="10.0">
++        <CheckBox fx:id="remoteServer" text="%Enforce single JabRef instance (and allow remote operations) using port" />
++        <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
++        <Button fx:id="remoteHelp" prefWidth="20.0" />
++    </HBox>
++
+     <Label styleClass="sectionHeader" text="%Libraries"/>
+     <GridPane hgap="10.0" vgap="4.0">
+         <columnConstraints>
+diff --git a/src/main/java/org/jabref/gui/preferences/general/GeneralTab.java b/src/main/java/org/jabref/gui/preferences/general/GeneralTab.java
+index ecd70a04d0..44f4526ef3 100644
+--- a/src/main/java/org/jabref/gui/preferences/general/GeneralTab.java
++++ b/src/main/java/org/jabref/gui/preferences/general/GeneralTab.java
+@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
+ import javafx.scene.control.TextFormatter;
+ import javafx.util.converter.IntegerStringConverter;
+ 
++import org.jabref.gui.Globals;
+ import org.jabref.gui.actions.ActionFactory;
+ import org.jabref.gui.actions.StandardActions;
+ import org.jabref.gui.help.HelpAction;
+@@ -25,10 +26,14 @@ import org.jabref.logic.help.HelpFile;
+ import org.jabref.logic.l10n.Language;
+ import org.jabref.logic.l10n.Localization;
+ import org.jabref.model.database.BibDatabaseMode;
++import org.jabref.model.util.FileUpdateMonitor;
+ 
+ import com.airhacks.afterburner.views.ViewLoader;
+ import com.tobiasdiez.easybind.EasyBind;
+ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
++import jakarta.inject.Inject;
++
++import static org.jabref.gui.Globals.entryTypesManager;
+ 
+ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
+ 
+@@ -49,6 +54,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
+     @FXML private Button autosaveLocalLibrariesHelp;
+     @FXML private CheckBox createBackup;
+     @FXML private TextField backupDirectory;
++    @FXML private CheckBox remoteServer;
++    @FXML private TextField remotePort;
++    @FXML private Button remoteHelp;
++    @Inject private FileUpdateMonitor fileUpdateMonitor;
+ 
+     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+ 
+@@ -74,7 +83,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
+     }
+ 
+     public void initialize() {
+-        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService);
++        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
+ 
+         new ViewModelListCellFactory<Language>()
+                 .withText(Language::getDisplayName)
+@@ -127,10 +136,18 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
+         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+         backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
+ 
++        ActionFactory actionFactory1 = new ActionFactory(Globals.getKeyPrefs());
++        actionFactory1.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
++
+         Platform.runLater(() -> {
++            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
+             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
+             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
+         });
++
++        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
++        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
++        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
+     }
+ 
+     @FXML
+diff --git a/src/main/java/org/jabref/gui/preferences/general/GeneralTabViewModel.java b/src/main/java/org/jabref/gui/preferences/general/GeneralTabViewModel.java
+index 3747072250..e8228dfadd 100644
+--- a/src/main/java/org/jabref/gui/preferences/general/GeneralTabViewModel.java
++++ b/src/main/java/org/jabref/gui/preferences/general/GeneralTabViewModel.java
+@@ -4,6 +4,7 @@ import java.io.IOException;
+ import java.nio.file.Path;
+ import java.util.ArrayList;
+ import java.util.List;
++import java.util.Optional;
+ 
+ import javafx.beans.property.BooleanProperty;
+ import javafx.beans.property.ListProperty;
+@@ -19,18 +20,26 @@ import javafx.collections.FXCollections;
+ import javafx.scene.control.SpinnerValueFactory;
+ 
+ import org.jabref.gui.DialogService;
++import org.jabref.gui.Globals;
+ import org.jabref.gui.desktop.JabRefDesktop;
+ import org.jabref.gui.preferences.PreferenceTabViewModel;
++import org.jabref.gui.remote.CLIMessageHandler;
+ import org.jabref.gui.theme.Theme;
+ import org.jabref.gui.theme.ThemeTypes;
+ import org.jabref.gui.util.DirectoryDialogConfiguration;
+ import org.jabref.gui.util.FileDialogConfiguration;
+ import org.jabref.logic.l10n.Language;
+ import org.jabref.logic.l10n.Localization;
++import org.jabref.logic.net.ssl.TrustStoreManager;
++import org.jabref.logic.remote.RemotePreferences;
++import org.jabref.logic.remote.RemoteUtil;
+ import org.jabref.logic.util.StandardFileType;
+ import org.jabref.model.database.BibDatabaseMode;
++import org.jabref.model.entry.BibEntryTypesManager;
+ import org.jabref.model.strings.StringUtil;
++import org.jabref.model.util.FileUpdateMonitor;
+ import org.jabref.preferences.FilePreferences;
++import org.jabref.preferences.InternalPreferences;
+ import org.jabref.preferences.LibraryPreferences;
+ import org.jabref.preferences.PreferencesService;
+ import org.jabref.preferences.TelemetryPreferences;
+@@ -81,19 +90,32 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+     private final TelemetryPreferences telemetryPreferences;
+     private final LibraryPreferences libraryPreferences;
+     private final FilePreferences filePreferences;
++    private final RemotePreferences remotePreferences;
+ 
+     private final Validator fontSizeValidator;
+     private final Validator customPathToThemeValidator;
+ 
+     private final List<String> restartWarning = new ArrayList<>();
+-
+-    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferences) {
++    private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
++    private final StringProperty remotePortProperty = new SimpleStringProperty("");
++    private final Validator remotePortValidator;
++    private final InternalPreferences internalPreferences;
++    private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
++    private final FileUpdateMonitor fileUpdateMonitor;
++    private final BibEntryTypesManager entryTypesManager;
++    private TrustStoreManager trustStoreManager;
++    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
+         this.dialogService = dialogService;
+         this.preferences = preferences;
+         this.workspacePreferences = preferences.getWorkspacePreferences();
+         this.telemetryPreferences = preferences.getTelemetryPreferences();
+         this.libraryPreferences = preferences.getLibraryPreferences();
+         this.filePreferences = preferences.getFilePreferences();
++        this.remotePreferences = preferences.getRemotePreferences();
++        this.internalPreferences = preferences.getInternalPreferences();
++        this.fileUpdateMonitor = fileUpdateMonitor;
++        this.entryTypesManager = entryTypesManager;
++        this.trustStoreManager = trustStoreManager;
+ 
+         fontSizeValidator = new FunctionBasedValidator<>(
+                 fontSizeProperty,
+@@ -116,6 +138,25 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+                         Localization.lang("General"),
+                         Localization.lang("Visual theme"),
+                         Localization.lang("Please specify a css theme file."))));
++
++        remotePortValidator = new FunctionBasedValidator<>(
++                remotePortProperty,
++                input -> {
++                    try {
++                        int portNumber = Integer.parseInt(remotePortProperty().getValue());
++                        return RemoteUtil.isUserPort(portNumber);
++                    } catch (NumberFormatException ex) {
++                        return false;
++                    }
++                },
++                ValidationMessage.error(String.format("%s > %s %n %n %s",
++                        Localization.lang("Network"),
++                        Localization.lang("Remote operation"),
++                        Localization.lang("You must enter an integer value in the interval 1025-65535"))));
++    }
++
++    public ValidationStatus remotePortValidationStatus() {
++        return remotePortValidator.getValidationStatus();
+     }
+ 
+     @Override
+@@ -125,8 +166,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
+         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
+         switch (workspacePreferences.getTheme().getType()) {
+-            case DEFAULT -> selectedThemeProperty.setValue(ThemeTypes.LIGHT);
+-            case EMBEDDED -> selectedThemeProperty.setValue(ThemeTypes.DARK);
++            case DEFAULT ->
++                    selectedThemeProperty.setValue(ThemeTypes.LIGHT);
++            case EMBEDDED ->
++                    selectedThemeProperty.setValue(ThemeTypes.DARK);
+             case CUSTOM -> {
+                 selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
+                 customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());
+@@ -151,6 +194,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+ 
+         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
+         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
++
++        remoteServerProperty.setValue(remotePreferences.useRemoteServer());
++        remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
+     }
+ 
+     @Override
+@@ -185,6 +231,38 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+ 
+         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
+         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
++
++        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
++            if (remotePreferences.isDifferentPort(newPort)) {
++                remotePreferences.setPort(newPort);
++            }
++        });
++
++        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
++
++        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
++            if (remotePreferences.isDifferentPort(newPort)) {
++                remotePreferences.setPort(newPort);
++            }
++        });
++
++        if (remoteServerProperty.getValue()) {
++            remotePreferences.setUseRemoteServer(true);
++            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
++        } else {
++            remotePreferences.setUseRemoteServer(false);
++            Globals.REMOTE_LISTENER.stop();
++        }
++        trustStoreManager.flush();
++
++        if (remoteServerProperty.getValue()) {
++            remotePreferences.setUseRemoteServer(true);
++            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
++        } else {
++            remotePreferences.setUseRemoteServer(false);
++            Globals.REMOTE_LISTENER.stop();
++        }
++        trustStoreManager.flush();
+     }
+ 
+     public ValidationStatus fontSizeValidationStatus() {
+@@ -199,6 +277,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+     public boolean validateSettings() {
+         CompositeValidator validator = new CompositeValidator();
+ 
++        if (remoteServerProperty.getValue()) {
++            validator.addValidators(remotePortValidator);
++        }
++
+         if (fontOverrideProperty.getValue()) {
+             validator.addValidators(fontSizeValidator);
+         }
+@@ -310,6 +392,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+                      .ifPresent(dir -> backupDirectoryProperty.setValue(dir.toString()));
+     }
+ 
++    public BooleanProperty remoteServerProperty() {
++        return remoteServerProperty;
++    }
++
++    public StringProperty remotePortProperty() {
++        return remotePortProperty;
++    }
++
+     public void openBrowser() {
+         String url = "https://themes.jabref.org";
+         try {
+@@ -318,4 +408,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
+             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
+         }
+     }
++
++    private Optional<Integer> getPortAsInt(String value) {
++        try {
++            return Optional.of(Integer.parseInt(value));
++        } catch (NumberFormatException ex) {
++            return Optional.empty();
++        }
++    }
+ }
+diff --git a/src/main/java/org/jabref/gui/preferences/network/NetworkTab.fxml b/src/main/java/org/jabref/gui/preferences/network/NetworkTab.fxml
+index 41e0349772..0cbe89e75a 100644
+--- a/src/main/java/org/jabref/gui/preferences/network/NetworkTab.fxml
++++ b/src/main/java/org/jabref/gui/preferences/network/NetworkTab.fxml
+@@ -10,7 +10,6 @@
+ <?import javafx.scene.control.TextField?>
+ <?import javafx.scene.layout.ColumnConstraints?>
+ <?import javafx.scene.layout.GridPane?>
+-<?import javafx.scene.layout.HBox?>
+ <?import javafx.scene.layout.RowConstraints?>
+ <?import javafx.scene.layout.VBox?>
+ <?import org.jabref.gui.icon.JabRefIconView?>
+@@ -19,13 +18,6 @@
+     <Label styleClass="titleHeader" text="%Network" />
+     <CheckBox fx:id="versionCheck" text="%Check for latest version online"/>
+     <Label text="%If you encounter an issue or a bug, please check the latest version, whether the issue is still present." wrapText="true"/>
+-    <Label styleClass="sectionHeader" text="%Remote operation" />
+-    <Label fx:id="remoteLabel" text="%This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For instance, this is useful when you open a file in JabRef from your web browser. Note that this will prevent you from running more than one instance of JabRef at a time." textOverrun="CLIP" wrapText="true" />
+-    <HBox alignment="CENTER_LEFT" spacing="10.0">
+-        <CheckBox fx:id="remoteServer" text="%Listen for remote operation on port" />
+-        <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
+-        <Button fx:id="remoteHelp" prefWidth="20.0" />
+-    </HBox>
+ 
+     <Label styleClass="sectionHeader" text="%Proxy configuration" />
+     <GridPane hgap="10.0" vgap="10.0">
+diff --git a/src/main/java/org/jabref/gui/preferences/network/NetworkTab.java b/src/main/java/org/jabref/gui/preferences/network/NetworkTab.java
+index 71e70e5b1f..2b1294f01a 100644
+--- a/src/main/java/org/jabref/gui/preferences/network/NetworkTab.java
++++ b/src/main/java/org/jabref/gui/preferences/network/NetworkTab.java
+@@ -17,33 +17,20 @@ import javafx.scene.control.TextField;
+ import javafx.scene.control.Tooltip;
+ import javafx.scene.input.MouseEvent;
+ 
+-import org.jabref.gui.Globals;
+-import org.jabref.gui.actions.ActionFactory;
+-import org.jabref.gui.actions.StandardActions;
+-import org.jabref.gui.help.HelpAction;
+ import org.jabref.gui.icon.IconTheme;
+ import org.jabref.gui.preferences.AbstractPreferenceTabView;
+ import org.jabref.gui.preferences.PreferencesTab;
+ import org.jabref.gui.util.IconValidationDecorator;
+ import org.jabref.gui.util.ValueTableCellFactory;
+-import org.jabref.logic.help.HelpFile;
+ import org.jabref.logic.l10n.Localization;
+-import org.jabref.model.entry.BibEntryTypesManager;
+-import org.jabref.model.util.FileUpdateMonitor;
+ 
+ import com.airhacks.afterburner.views.ViewLoader;
+ import com.tobiasdiez.easybind.EasyBind;
+ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+-import jakarta.inject.Inject;
+ import org.controlsfx.control.textfield.CustomPasswordField;
+ 
+ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
+-    @FXML private Label remoteLabel;
+     @FXML private CheckBox versionCheck;
+-    @FXML private CheckBox remoteServer;
+-    @FXML private TextField remotePort;
+-    @FXML private Button remoteHelp;
+-
+     @FXML private CheckBox proxyUse;
+     @FXML private Label proxyHostnameLabel;
+     @FXML private TextField proxyHostname;
+@@ -67,9 +54,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
+     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
+     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
+ 
+-    @Inject private FileUpdateMonitor fileUpdateMonitor;
+-    @Inject private BibEntryTypesManager entryTypesManager;
+-
+     private String proxyPasswordText = "";
+     private int proxyPasswordCaretPosition = 0;
+ 
+@@ -87,15 +71,10 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
+     }
+ 
+     public void initialize() {
+-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
++        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
+ 
+         versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
+ 
+-        remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
+-        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
+-        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
+-        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
+-
+         proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
+         proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());
+         proxyHostname.textProperty().bindBidirectional(viewModel.proxyHostnameProperty());
+@@ -129,12 +108,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
+         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
+         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
+ 
+-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
+-
+         validationVisualizer.setDecoration(new IconValidationDecorator());
+         Platform.runLater(() -> {
+-            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
+             validationVisualizer.initVisualization(viewModel.proxyHostnameValidationStatus(), proxyHostname);
+             validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
+             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
+diff --git a/src/main/java/org/jabref/gui/preferences/network/NetworkTabViewModel.java b/src/main/java/org/jabref/gui/preferences/network/NetworkTabViewModel.java
+index 7991e86493..9b5d646c7c 100644
+--- a/src/main/java/org/jabref/gui/preferences/network/NetworkTabViewModel.java
++++ b/src/main/java/org/jabref/gui/preferences/network/NetworkTabViewModel.java
+@@ -19,9 +19,7 @@ import javafx.collections.ListChangeListener;
+ import javafx.stage.FileChooser;
+ 
+ import org.jabref.gui.DialogService;
+-import org.jabref.gui.Globals;
+ import org.jabref.gui.preferences.PreferenceTabViewModel;
+-import org.jabref.gui.remote.CLIMessageHandler;
+ import org.jabref.gui.util.FileDialogConfiguration;
+ import org.jabref.logic.l10n.Localization;
+ import org.jabref.logic.net.ProxyPreferences;
+@@ -29,13 +27,9 @@ import org.jabref.logic.net.ProxyRegisterer;
+ import org.jabref.logic.net.URLDownload;
+ import org.jabref.logic.net.ssl.SSLCertificate;
+ import org.jabref.logic.net.ssl.TrustStoreManager;
+-import org.jabref.logic.remote.RemotePreferences;
+-import org.jabref.logic.remote.RemoteUtil;
+ import org.jabref.logic.util.OS;
+ import org.jabref.logic.util.StandardFileType;
+-import org.jabref.model.entry.BibEntryTypesManager;
+ import org.jabref.model.strings.StringUtil;
+-import org.jabref.model.util.FileUpdateMonitor;
+ import org.jabref.preferences.InternalPreferences;
+ import org.jabref.preferences.PreferencesService;
+ 
+@@ -48,8 +42,6 @@ import kong.unirest.UnirestException;
+ 
+ public class NetworkTabViewModel implements PreferenceTabViewModel {
+     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
+-    private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
+-    private final StringProperty remotePortProperty = new SimpleStringProperty("");
+     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
+     private final StringProperty proxyHostnameProperty = new SimpleStringProperty("");
+     private final StringProperty proxyPortProperty = new SimpleStringProperty("");
+@@ -60,7 +52,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+     private final BooleanProperty passwordPersistAvailable = new SimpleBooleanProperty();
+     private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+ 
+-    private final Validator remotePortValidator;
+     private final Validator proxyHostnameValidator;
+     private final Validator proxyPortValidator;
+     private final Validator proxyUsernameValidator;
+@@ -68,10 +59,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+ 
+     private final DialogService dialogService;
+     private final PreferencesService preferences;
+-    private final FileUpdateMonitor fileUpdateMonitor;
+-    private final BibEntryTypesManager entryTypesManager;
+ 
+-    private final RemotePreferences remotePreferences;
++
+     private final ProxyPreferences proxyPreferences;
+     private final ProxyPreferences backupProxyPreferences;
+     private final InternalPreferences internalPreferences;
+@@ -81,14 +70,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
+ 
+     public NetworkTabViewModel(DialogService dialogService,
+-                               PreferencesService preferences,
+-                               FileUpdateMonitor fileUpdateMonitor,
+-                               BibEntryTypesManager entryTypesManager) {
++                               PreferencesService preferences) {
+         this.dialogService = dialogService;
+         this.preferences = preferences;
+-        this.fileUpdateMonitor = fileUpdateMonitor;
+-        this.entryTypesManager = entryTypesManager;
+-        this.remotePreferences = preferences.getRemotePreferences();
+         this.proxyPreferences = preferences.getProxyPreferences();
+         this.internalPreferences = preferences.getInternalPreferences();
+ 
+@@ -101,21 +85,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+                 proxyPreferences.getPassword(),
+                 proxyPreferences.shouldPersistPassword());
+ 
+-        remotePortValidator = new FunctionBasedValidator<>(
+-                remotePortProperty,
+-                input -> {
+-                    try {
+-                        int portNumber = Integer.parseInt(remotePortProperty().getValue());
+-                        return RemoteUtil.isUserPort(portNumber);
+-                    } catch (NumberFormatException ex) {
+-                        return false;
+-                    }
+-                },
+-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+-                        Localization.lang("Network"),
+-                        Localization.lang("Remote operation"),
+-                        Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+-
+         proxyHostnameValidator = new FunctionBasedValidator<>(
+                 proxyHostnameProperty,
+                 input -> !StringUtil.isNullOrEmpty(input),
+@@ -154,8 +123,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+     @Override
+     public void setValues() {
+         versionCheckProperty.setValue(internalPreferences.isVersionCheckEnabled());
+-        remoteServerProperty.setValue(remotePreferences.useRemoteServer());
+-        remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
+ 
+         setProxyValues();
+         setSSLValues();
+@@ -192,22 +159,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+ 
+     @Override
+     public void storeSettings() {
+-        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
+-
+-        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
+-            if (remotePreferences.isDifferentPort(newPort)) {
+-                remotePreferences.setPort(newPort);
+-            }
+-        });
+-
+-        if (remoteServerProperty.getValue()) {
+-            remotePreferences.setUseRemoteServer(true);
+-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
+-        } else {
+-            remotePreferences.setUseRemoteServer(false);
+-            Globals.REMOTE_LISTENER.stop();
+-        }
+-
+         proxyPreferences.setUseProxy(proxyUseProperty.getValue());
+         proxyPreferences.setHostname(proxyHostnameProperty.getValue().trim());
+         proxyPreferences.setPort(proxyPortProperty.getValue().trim());
+@@ -228,10 +179,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+         }
+     }
+ 
+-    public ValidationStatus remotePortValidationStatus() {
+-        return remotePortValidator.getValidationStatus();
+-    }
+-
+     public ValidationStatus proxyHostnameValidationStatus() {
+         return proxyHostnameValidator.getValidationStatus();
+     }
+@@ -252,10 +199,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+     public boolean validateSettings() {
+         CompositeValidator validator = new CompositeValidator();
+ 
+-        if (remoteServerProperty.getValue()) {
+-            validator.addValidators(remotePortValidator);
+-        }
+-
+         if (proxyUseProperty.getValue()) {
+             validator.addValidators(proxyHostnameValidator);
+             validator.addValidators(proxyPortValidator);
+@@ -325,14 +268,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
+         return versionCheckProperty;
+     }
+ 
+-    public BooleanProperty remoteServerProperty() {
+-        return remoteServerProperty;
+-    }
+-
+-    public StringProperty remotePortProperty() {
+-        return remotePortProperty;
+-    }
+-
+     public BooleanProperty proxyUseProperty() {
+         return proxyUseProperty;
+     }
