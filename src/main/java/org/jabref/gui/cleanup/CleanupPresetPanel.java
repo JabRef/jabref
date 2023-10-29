@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
@@ -34,8 +36,9 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpRenamePDF;
     @FXML private CheckBox cleanUpRenamePDFonlyRelativePaths;
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
-    @FXML private CheckBox cleanUpBiblatex;
-    @FXML private CheckBox cleanUpBibtex;
+    @FXML private RadioButton cleanUpBiblatex;
+    @FXML private RadioButton cleanUpBibtex;
+    @FXML private ToggleGroup conversionToggleGroup;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
