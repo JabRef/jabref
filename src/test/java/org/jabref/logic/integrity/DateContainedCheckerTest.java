@@ -25,6 +25,4 @@ public class DateContainedCheckerTest {
     void booktitleDoesAcceptIfDateIsNotContained() {
         assertEquals(Optional.empty(), checker.checkValue("Service-Oriented Computing, Fifth International Conference, Vienna, Austria, Proceedings"));
     }
-
-
 }
