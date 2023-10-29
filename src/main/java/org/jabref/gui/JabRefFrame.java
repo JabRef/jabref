@@ -298,9 +298,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                             // Extra workaround for CodeArea, which does not inherit from TextInputControl
                             if (!(stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof CodeArea))) {
                                 event.consume();
+                                break;
                             }
                             break;
                         }
+                        break;
                     default:
                 }
             }
