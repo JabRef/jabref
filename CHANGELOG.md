@@ -17,11 +17,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
+- Automatically Set File Links now checks if a user has moved a file to a different location. [#9798 (https://github.com/JabRef/jabref/issues/9798)
 
 ### Fixed
 
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list [#10415](https://github.com/JabRef/jabref/issues/10415).
 - We fixed an issue where in the merge dialog the file field of entries was not correctly merged when the first and second entry both contained values inside the file field [#10572](https://github.com/JabRef/jabref/issues/10572)
+
 
 ### Removed
 
