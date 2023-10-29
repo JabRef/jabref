@@ -26,14 +26,13 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
-
-import static org.jabref.gui.Globals.entryTypesManager;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
@@ -58,6 +57,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

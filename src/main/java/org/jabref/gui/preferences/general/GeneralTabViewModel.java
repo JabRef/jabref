@@ -104,6 +104,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private TrustStoreManager trustStoreManager;
+
     public GeneralTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
