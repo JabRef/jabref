@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -445,18 +446,13 @@ public class LibraryTab extends Tab {
         getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
         bibDatabaseContext.getDatabase().removeEntries(entries);
 
-        // Not delete files when user select cut
         if (!cut) {
-            // Keep track of linked files from selected entries
-            List<LinkedFile> linkedFileList = new ArrayList<>();
+            List<LinkedFile> linkedFileList = entries.stream()
+                                                     .flatMap(entry -> entry.getFiles().stream())
+                                                     .distinct()
+                                                     .toList();
 
-            for (BibEntry entry : entries) {
-                List<LinkedFile> linkedFilesFromEntry = entry.getFiles();
-                linkedFileList.addAll(linkedFilesFromEntry);
-            }
-
-            // Delete files which linked to selected entries when user select deletion
-            if (linkedFileList.size() > 0 && showLinkedFileDeleteConfirmationDialog(linkedFileList)) {
+            if (!linkedFileList.isEmpty() && showLinkedFileDeleteConfirmationDialog(linkedFileList)) {
                 new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, null, null).deleteFileFromDisk(linkedFileList);
             }
         }
@@ -736,25 +732,22 @@ public class LibraryTab extends Tab {
      * Keep track of user preference:
      * if the user prefers always delete attached files, delete the files without displaying the dialog box
      *
-     * @param linkedFileList A list of LinkedFile to be deleted
+     * @param linkedFileList A non-duplicated list of LinkedFile to be deleted
      * @return true if user confirm to delete attached files
      */
     private boolean showLinkedFileDeleteConfirmationDialog(List<LinkedFile> linkedFileList) {
         if (preferencesService.getFilePreferences().alwaysDeleteLinkedFile()) {
             return true;
         } else {
-            Optional<Path> file = linkedFileList.get(0).findIn(bibDatabaseContext, preferencesService.getFilePreferences());
-
-            String title = Localization.lang("Delete attached file");
-            String message = Localization.lang("Delete '%0'", file.get().getFileName().toString());
-            String okButton = Localization.lang("Delete attached file");
-            String cancelButton = Localization.lang("Keep attached file");
-            if (linkedFileList.size() > 1) {
-                title = Localization.lang("Delete attached files");
-                message = Localization.lang("Delete %0 attached files", linkedFileList.size());
-                okButton = Localization.lang("Delete attached files");
-                cancelButton = Localization.lang("Keep attached files");
-            }
+            String title = Localization.lang("Delete attached file(s)");
+            String message = linkedFileList.stream()
+                                           .map(linkedFile -> linkedFile.findIn(bibDatabaseContext, preferencesService.getFilePreferences())
+                                                                        .map(Path::getFileName)
+                                                                        .map(Path::toString)
+                                                                        .orElse(""))
+                                           .collect(Collectors.joining("\n", Localization.lang("Following attached file(s) will be deleted\n\n"), ""));
+            String okButton = Localization.lang("Delete attached files");
+            String cancelButton = Localization.lang("Keep attached files");
 
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                     title,
