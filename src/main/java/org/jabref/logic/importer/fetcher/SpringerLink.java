@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Uses Springer API, see <a href="https://dev.springer.com">https://dev.springer.com</a>
  */
-public class SpringerLink implements FulltextFetcher {
+public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Springer";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
@@ -39,16 +38,6 @@ public class SpringerLink implements FulltextFetcher {
 
     public SpringerLink(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
     }
 
     @Override
@@ -64,7 +53,7 @@ public class SpringerLink implements FulltextFetcher {
         // Available in catalog?
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                                                         .queryString("api_key", getApiKey())
+                                                         .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY))
                                                          .queryString("q", String.format("doi:%s", doi.get().getDOI()))
                                                          .asJson();
             if (jsonResponse.getBody() != null) {
@@ -85,5 +74,10 @@ public class SpringerLink implements FulltextFetcher {
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.PUBLISHER;
+    }
+
+    @Override
+    public String getName() {
+        return FETCHER_NAME;
     }
 }

@@ -118,7 +118,7 @@ public class WebFetchers {
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         set.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
-        set.add(new SemanticScholar());
+        set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
         set.add(new LOBIDFetcher(importerPreferences));
@@ -170,7 +170,7 @@ public class WebFetchers {
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
-        set.add(new SemanticScholar());
+        set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         return set;
     }
@@ -208,7 +208,7 @@ public class WebFetchers {
         // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new CiteSeer());
         fetchers.add(new OpenAccessDoi());
-        fetchers.add(new SemanticScholar());
+        fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
         return fetchers;
     }

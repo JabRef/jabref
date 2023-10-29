@@ -21,9 +21,3 @@
 
 --add-modules
    org.kordamp.ikonli.core,org.kordamp.ikonli.javafx,org.kordamp.ikonli.materialdesign2
-
---add-reads
-   org.kordamp.ikonli.IkonHandler=org.jabref.gui.icon.JabRefIkonHandler
-
---add-reads
-   org.kordamp.ikonli.IkonProvider=org.jabref.gui.icon.JabrefIconProvider
