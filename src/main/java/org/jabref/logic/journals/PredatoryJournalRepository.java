@@ -29,10 +29,10 @@ public class PredatoryJournalRepository {
      * Initializes the internal data based on the predatory journals found in the given MV file
      */
     public PredatoryJournalRepository(Path PJList) {
-        MVMap<String, List<String>> mvFullToPredatoryJournalObject;
+        MVMap<String, List<String>> predatoryJournalsMap;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(PJList.toAbsolutePath().toString()).open()) {
-            mvFullToPredatoryJournalObject = store.openMap("FullToPredatoryJournal");
-            predatoryJournals.putAll(mvFullToPredatoryJournalObject);
+            predatoryJournalsMap = store.openMap("PredatoryJournals");
+            predatoryJournals.putAll(predatoryJournalsMap);
         }
     }
 
@@ -112,5 +112,9 @@ public class PredatoryJournalRepository {
 
     private double magnitude(List<Integer> v) {
         return Math.sqrt(v.stream().mapToDouble(x -> x * x).sum());
+    }
+
+    public Map<String, List<String>> getPredatoryJournals() {
+        return Collections.unmodifiableMap(predatoryJournals);
     }
 }

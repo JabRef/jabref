@@ -5,12 +5,14 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.PredatoryJournalLoader;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -70,6 +72,23 @@ public class JournalListMvGenerator {
                     fullToAbbreviation.putAll(abbreviationMap);
                 }
             }));
+        }
+
+        PredatoryJournalLoader loader = new PredatoryJournalLoader();
+        loader.update();
+
+        Path predatoryJournalMvFile = Path.of("build", "resources", "main", "journals", "predatoryJournal-list.mv");
+
+        Files.createDirectories(predatoryJournalMvFile.getParent());
+
+        try (MVStore store = new MVStore.Builder()
+                .fileName(predatoryJournalMvFile.toString())
+                .compressHigh()
+                .open()) {
+            MVMap<String, List<String>> predatoryJournalsMap = store.openMap("PredatoryJournals");
+            Map<String, List<String>> predatoryJournals = loader.getRepository().getPredatoryJournals();
+
+            predatoryJournalsMap.putAll(predatoryJournals);
         }
     }
 }
