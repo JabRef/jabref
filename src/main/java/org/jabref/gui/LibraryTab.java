@@ -745,7 +745,7 @@ public class LibraryTab extends Tab {
                                                                         .map(Path::getFileName)
                                                                         .map(Path::toString)
                                                                         .orElse(""))
-                                           .collect(Collectors.joining("\n", Localization.lang("Following attached file(s) will be deleted\n\n"), ""));
+                                           .collect(Collectors.joining("\n", Localization.lang("Following attached file(s) will be deleted") + "\n\n", ""));
             String okButton = Localization.lang("Delete attached files");
             String cancelButton = Localization.lang("Keep attached files");
 
