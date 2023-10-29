@@ -95,7 +95,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
 
     private BibEntry xmlItemToBibEntry(Element itemElement) {
         return new BibEntry(getType(itemElement.getElementsByTagName("types").item(0).getChildNodes()))
-                .withField(StandardField.TITLE, itemElement.getElementsByTagName("title").item(0).getTextContent())
+                .withField(StandardField.TITLE, itemElement.getElementsByTagName("title").item(0).getTextContent().replaceAll("\"", ""))
                 .withField(StandardField.AUTHOR, getAuthor(itemElement.getElementsByTagName("enrichedCreators").item(0)))
                 .withField(StandardField.YEAR, itemElement.getElementsByTagName("date").item(0).getChildNodes().item(1).getTextContent().substring(0, 4))
                 .withField(StandardField.JOURNAL, getJournal(itemElement.getElementsByTagName("dc:source")))
