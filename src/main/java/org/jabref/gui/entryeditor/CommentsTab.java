@@ -2,7 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.SequencedSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -57,12 +57,14 @@ public class CommentsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(defaultOwner);
-
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         // As default: Show BibTeX comment field and the user-specific comment field of the default owner
-        Set<Field> comments = new LinkedHashSet<>(Set.of(defaultCommentField, StandardField.COMMENT));
+        SequencedSet<Field> comments = new LinkedHashSet<>();
+        comments.add(StandardField.COMMENT);
+        comments.add(new UserSpecificCommentField(defaultOwner));
 
+        // Include all other comments fields afterwards
+        // The "SequencedSet" ensures that no double entires are made
         comments.addAll(entry.getFields().stream()
                              .filter(field -> field instanceof UserSpecificCommentField ||
                                      field.getName().toLowerCase().contains("comment"))
@@ -79,13 +81,9 @@ public class CommentsTab extends FieldsEditorTab {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
-            if (field instanceof UserSpecificCommentField) {
-                if (field.getName().contains(defaultOwner)) {
-                    editor.getNode().setDisable(false);
-                }
-            } else {
-                editor.getNode().setDisable(!field.getName().equals(StandardField.COMMENT.getName()));
-            }
+            boolean isStandardBibtexComment = (field == StandardField.COMMENT);
+            boolean shouldBeEnabled = isStandardBibtexComment || field.getName().contains(defaultOwner);
+            editor.getNode().setDisable(!shouldBeEnabled);
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 
 import javax.swing.undo.UndoManager;
@@ -103,7 +104,7 @@ class CommentsTabTest {
                 .withField(StandardField.COMMENT, "Standard comment text")
                 .withField(ownerComment, "User-specific comment text");
 
-        Set<Field> fields = commentsTab.determineFieldsToShow(entry);
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
 
         assertEquals(Set.of(StandardField.COMMENT, ownerComment), fields);
     }
@@ -118,7 +119,7 @@ class CommentsTabTest {
                 .withField(ownerComment, "User-specific comment text")
                 .withField(otherUsersComment, "other-user-id comment text");
 
-        Set<Field> fields = commentsTab.determineFieldsToShow(entry);
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
 
         assertEquals(Set.of(StandardField.COMMENT, ownerComment, otherUsersComment), fields);
     }

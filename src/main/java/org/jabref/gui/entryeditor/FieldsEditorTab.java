@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.SequencedSet;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
@@ -107,23 +107,22 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         fields = determineFieldsToShow(entry);
 
-        List<Label> labels = new ArrayList<>();
-        for (Field field : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(
-                    field,
-                    taskExecutor,
-                    dialogService,
-                    journalAbbreviationRepository,
-                    preferences,
-                    databaseContext,
-                    entry.getType(),
-                    suggestionProviders,
-                    undoManager);
-            fieldEditor.bindToEntry(entry);
-
-            editors.put(field, fieldEditor);
-            labels.add(new FieldNameLabel(field));
-        }
+        List<Label> labels = fields.stream()
+                .map(field -> {
+                    FieldEditorFX fieldEditor = FieldEditors.getForField(
+                            field,
+                            taskExecutor,
+                            dialogService,
+                            journalAbbreviationRepository,
+                            preferences,
+                            databaseContext,
+                            entry.getType(),
+                            suggestionProviders,
+                            undoManager);
+                    fieldEditor.bindToEntry(entry);
+                    editors.put(field, fieldEditor);
+                    return (Label) new FieldNameLabel(field);
+                }).toList();
 
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
@@ -218,7 +217,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    protected abstract Set<Field> determineFieldsToShow(BibEntry entry);
+    protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
 
     public Collection<Field> getShownFields() {
         return fields;
