@@ -95,4 +95,20 @@ class PdfMergeMetadataImporterTest {
 
         assertEquals(Collections.singletonList(expected), result);
     }
+
+    @Test
+    void pathShouldBeRelativized() throws Exception {
+        Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        Path workingDir = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
+        List<BibEntry> result = importer.importDatabase(file, workingDir).getDatabase().getEntries();
+
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
+        expected.setField(StandardField.AUTHOR, "1 ");
+        expected.setField(StandardField.TITLE, "Hello World");
+
+        // Expecting relative path
+        expected.setField(StandardField.FILE, ":minimal.pdf:PDF");
+
+        assertEquals(Collections.singletonList(expected), result);
+    }
 }
