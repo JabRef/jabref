@@ -68,9 +68,9 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     }
 
     public boolean isValidExternalFileTypeEntry() {
-        return !(name.getText().trim().equalsIgnoreCase("")
-                || extension.getText().trim().equalsIgnoreCase("")
-                || mimeType.getText().trim().equalsIgnoreCase(""));
+        return !(name.getText().isBlank()
+                || extension.getText().isBlank()
+                || mimeType.getText().isBlank());
     }
 
     @FXML
