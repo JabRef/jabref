@@ -154,6 +154,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
+        this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
     public ValidationStatus remotePortValidationStatus() {
