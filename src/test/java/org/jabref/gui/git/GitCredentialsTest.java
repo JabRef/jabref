@@ -3,6 +3,7 @@ package org.jabref.gui.git;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class GitCredentialsTest {
     @Test
@@ -11,8 +12,8 @@ public class GitCredentialsTest {
         String gitPassword = gitCredentials.getGitPassword();
         String gitUsername = gitCredentials.getGitUsername();
 
-        assertEquals(null, gitUsername);
-        assertEquals(null, gitPassword);
+        assertNull(gitUsername);
+        assertNull(gitPassword);
     }
 
     @Test
@@ -31,7 +32,7 @@ public class GitCredentialsTest {
 
         gitCredentials.setGitPassword("testPassword");
         gitCredentials.setGitUsername("testUsername");
-        
+
         String gitPassword = gitCredentials.getGitPassword();
         String gitUsername = gitCredentials.getGitUsername();
 

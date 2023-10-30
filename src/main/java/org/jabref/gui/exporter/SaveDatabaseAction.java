@@ -18,6 +18,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
@@ -32,6 +34,7 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -245,11 +248,10 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
 
             if (success) {
-                SaveGitDatabaseAction saveGit = new SaveGitDatabaseAction(targetPath, preferences);
-                saveGit.automaticUpdate();
+                this.automaticGitUpdate(targetPath);
             }
             return success;
-        } catch (SaveException ex) {
+        } catch (SaveException | IOException | GitAPIException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
@@ -319,5 +321,16 @@ public class SaveDatabaseAction {
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder);
             }
         }
+    }
+
+    /**
+     * Handle JabRef git integration action. This method is called when the user save the database.
+     */
+    public void automaticGitUpdate(Path filePath) throws IOException, GitAPIException {
+        GitHandler git = new GitHandler(filePath.getParent());
+        git.setGitPreferences(preferences.getGitPreferences());
+        String automaticCommitMsg = "Automatic update via JabRef";
+        git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
+        git.pushCommitsToRemoteRepository();
     }
 }

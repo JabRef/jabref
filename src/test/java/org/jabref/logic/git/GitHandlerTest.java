@@ -23,7 +23,6 @@ import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.http.server.GitServlet;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
@@ -74,7 +73,7 @@ class GitHandlerTest {
     }
 
     @BeforeEach
-    public void setUpGitHandler() throws IOException {
+    public void setUpGitHandler() {
         gitPreferences = new GitPreferences("testUser", "testPassword");
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getGitPreferences()).thenReturn(gitPreferences);
@@ -108,11 +107,11 @@ class GitHandlerTest {
     }
 
     @Test
-    void createCommitWithSingleFileOnCurrentBranch() throws IOException, NoHeadException, GitAPIException {
+    void createCommitWithSingleFileOnCurrentBranch() throws IOException, GitAPIException {
         try (Git git = Git.open(repositoryPath.toFile())) {
             // Create commit
             Files.createFile(Path.of(repositoryPath.toString(), "Test.txt"));
-            assertTrue(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
+            assertTrue(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit"));
 
             AnyObjectId head = git.getRepository().resolve(Constants.HEAD);
             Iterator<RevCommit> log = git.log()
@@ -120,12 +119,12 @@ class GitHandlerTest {
                                          .call().iterator();
             assertEquals("TestCommit", log.next().getFullMessage());
             assertEquals("Initial commit", log.next().getFullMessage());
-            assertFalse(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
+            assertFalse(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit"));
         }
     }
 
     @Test
-    void getCurrentlyCheckedOutBranch() throws IOException {
+    void getCurrentlyCheckedOutBranch() {
         assertEquals("main", gitHandler.getCurrentlyCheckedOutBranch());
     }
 
@@ -153,7 +152,7 @@ class GitHandlerTest {
 
         //Commit
         GitHandler git = new GitHandler(clonedRepPath);
-        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile", false));
+        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile"));
 
         //Push
         gitPreferences = new GitPreferences(username, password);
@@ -162,11 +161,11 @@ class GitHandlerTest {
         git.setGitPreferences(preferences.getGitPreferences());
         git.pushCommitsToRemoteRepository();
 
-        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile", false));
+        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile"));
         server.stop();
     }
 
-    private static final SecurityHandler basicAuth(String username, String password, String realm) {
+    private static SecurityHandler basicAuth(String username, String password) {
 
         HashLoginService l = new HashLoginService();
         UserStore userStore = new UserStore();
@@ -174,8 +173,7 @@ class GitHandlerTest {
         Credential credential = Credential.getCredential(password);
         userStore.addUser(username, credential, roles);
         l.setUserStore(userStore);
-        l.setName(realm);
-        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
+        l.setName("Private!");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);
@@ -207,7 +205,7 @@ class GitHandlerTest {
         });
         Server server = new Server(8080);
         ServletContextHandler context = new ServletContextHandler(server, "/repoTest", ServletContextHandler.SESSIONS);
-        context.setSecurityHandler(basicAuth(username, password, "Private!"));
+        context.setSecurityHandler(basicAuth(username, password));
         context.addServlet(new ServletHolder(gs), "/*");
         server.setHandler(context);
         return server;

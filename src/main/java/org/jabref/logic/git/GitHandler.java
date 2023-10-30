@@ -18,7 +18,6 @@ import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -66,9 +65,7 @@ public class GitHandler {
                     }
                 }
             } catch (GitAPIException | IOException e) {
-                System.out.println(e);
-                System.out.println(e.getMessage());
-                LOGGER.error("Initialization failed");
+                LOGGER.error("Initialization failed", e);
             }
         }
     }
@@ -161,13 +158,12 @@ public class GitHandler {
      * Creates a commit on the currently checked out branch with a single file
      *
      * @param filename The name of the file to commit
-     * @param amend Whether to amend to the last commit (true), or not (false)
      * @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
      * @throws IOException
      * @throws GitAPIException
      * @throws NoWorkTreeException
      */
-    public boolean createCommitWithSingleFileOnCurrentBranch(String filename, String commitMessage, boolean amend) throws IOException, NoWorkTreeException, GitAPIException {
+    public boolean createCommitWithSingleFileOnCurrentBranch(String filename, String commitMessage) throws IOException, NoWorkTreeException, GitAPIException {
         boolean commitCreated = false;
 
         Git git = Git.open(this.repositoryPathAsFile);
@@ -187,7 +183,6 @@ public class GitHandler {
                 removeCommand.call();
             }
             git.commit()
-                .setAmend(amend)
                 .setAllowEmpty(false)
                 .setMessage(commitMessage)
                 .call();
@@ -224,11 +219,11 @@ public class GitHandler {
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository() {
+    public void pushCommitsToRemoteRepository() throws IOException {
         try {
             Git git = Git.open(this.repositoryPathAsFile);
             String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
-            Boolean isSshRemoteRepository = remoteURL != null ? remoteURL.contains("git@") : false;
+            boolean isSshRemoteRepository = remoteURL != null && remoteURL.contains("git@");
 
             git.verifySignature();
 
@@ -243,7 +238,7 @@ public class GitHandler {
                 git.push()
                .setTransportConfigCallback(transportConfigCallback)
                .call();
-            } else if (this.gitPassword.equals("") || this.gitUsername.equals("")) {
+            } else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
                     GitCredentialsDialogView gitCredentialsDialogView = new GitCredentialsDialogView();
 
                     gitCredentialsDialogView.showGitCredentialsDialog();
@@ -261,9 +256,9 @@ public class GitHandler {
                 .setCredentialsProvider(this.credentialsProvider)
                 .call();
             }
-        } catch (IOException | GitAPIException e) {
+        } catch (GitAPIException e) {
             if (e.getMessage().equals("origin: not found.")) {
-                LOGGER.info("No remote repository detected. Push skiped.");
+                LOGGER.info("No remote repository detected. Push skipped.", e);
             } else {
                 LOGGER.info("Failed to push");
                 throw new RuntimeException(e);
@@ -282,7 +277,7 @@ public class GitHandler {
                    .call();
             } catch (GitAPIException e) {
                 if (e.getMessage().equals("origin: not found")) {
-                    LOGGER.info("No remote repository detected. Push skiped.");
+                    LOGGER.info("No remote repository detected. Push skipped.");
                 } else {
                     LOGGER.info("Failed to pull");
                     throw new RuntimeException(e);
@@ -302,24 +297,11 @@ public class GitHandler {
             return git.getRepository().getBranch();
         } catch (IOException ex) {
             LOGGER.info("Failed get current branch");
-            return "";
+            return String.valueOf(Optional.empty());
         }
     }
 
     public void setGitPreferences(GitPreferences gitPreferences) {
         this.gitPreferences = gitPreferences;
-    }
-
-    public void setRemoteUrl(String url) {
-        try {
-            Git git = Git.open(this.repositoryPathAsFile);
-            StoredConfig config = git.getRepository().getConfig();
-            config.setString("remote", "origin", "url", url);
-            config.save();
-        } catch (
-                IOException e) {
-            LOGGER.info("Failed to set git remote url");
-            throw new RuntimeException(e);
-        }
     }
 }

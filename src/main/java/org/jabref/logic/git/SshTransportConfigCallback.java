@@ -12,10 +12,10 @@ import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
 import org.eclipse.jgit.util.FS;
 
 public class SshTransportConfigCallback implements TransportConfigCallback {
-    private Path sshDir = new File(FS.DETECTED.userHome(), "/.ssh").toPath();
-    private SshdSessionFactory sshSessionFactory;
+    private final SshdSessionFactory sshSessionFactory;
 
     public SshTransportConfigCallback() {
+        Path sshDir = new File(FS.DETECTED.userHome(), "/.ssh").toPath();
         this.sshSessionFactory = new CustomSshSessionFactory(sshDir);
     }
 
@@ -25,8 +25,8 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
         sshTransport.setSshSessionFactory(this.sshSessionFactory);
     }
 
-    public final class CustomSshSessionFactory extends SshdSessionFactory {
-        private Path sshDir;
+    public static final class CustomSshSessionFactory extends SshdSessionFactory {
+        private final Path sshDir;
 
         public CustomSshSessionFactory(Path sshDir) {
             this.sshDir = sshDir;
@@ -37,9 +37,8 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
             try {
                 return Files.createDirectories(sshDir).toFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
-            return null;
         }
     }
 }
