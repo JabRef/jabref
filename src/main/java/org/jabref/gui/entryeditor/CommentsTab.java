@@ -116,7 +116,7 @@ public class CommentsTab extends FieldsEditorTab {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
-            boolean isStandardBibtexComment = (field == StandardField.COMMENT);
+            boolean isStandardBibtexComment = field == StandardField.COMMENT;
             boolean isDefaultOwnerComment = field.getName().contains(defaultOwner);
             hasDefaultOwnerField = hasDefaultOwnerField || isDefaultOwnerComment;
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
