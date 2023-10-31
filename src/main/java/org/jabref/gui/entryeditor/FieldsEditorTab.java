@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -47,6 +48,7 @@ import com.tobiasdiez.easybind.EasyBind;
 abstract class FieldsEditorTab extends EntryEditorTab {
     protected final BibDatabaseContext databaseContext;
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
+    protected GridPane gridPane;
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
@@ -59,7 +61,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
-    private GridPane gridPane;
 
     public FieldsEditorTab(boolean compressed,
                            BibDatabaseContext databaseContext,
@@ -107,35 +108,22 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         fields = determineFieldsToShow(entry);
 
-        List<Label> labels = fields.stream()
-                .map(field -> {
-                    FieldEditorFX fieldEditor = FieldEditors.getForField(
-                            field,
-                            taskExecutor,
-                            dialogService,
-                            journalAbbreviationRepository,
-                            preferences,
-                            databaseContext,
-                            entry.getType(),
-                            suggestionProviders,
-                            undoManager);
-                    fieldEditor.bindToEntry(entry);
-                    editors.put(field, fieldEditor);
-                    return (Label) new FieldNameLabel(field);
-                }).toList();
+        List<Label> labels = fields
+                .stream()
+                .map(field -> createLabelAndEditor(entry, field))
+                .toList();
 
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
 
         ColumnConstraints columnDoNotContract = new ColumnConstraints();
         columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
-        int rows;
         if (compressed) {
-            rows = (int) Math.ceil((double) fields.size() / 2);
+            int rows = (int) Math.ceil((double) fields.size() / 2);
 
             addColumn(gridPane, 0, labels.subList(0, rows));
-            addColumn(gridPane, 3, labels.subList(rows, labels.size()));
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
+            addColumn(gridPane, 3, labels.subList(rows, labels.size()));
             addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
 
             columnExpand.setPercentWidth(40);
@@ -153,23 +141,39 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
+    protected Label createLabelAndEditor(BibEntry entry, Field field) {
+        FieldEditorFX fieldEditor = FieldEditors.getForField(
+                field,
+                taskExecutor,
+                dialogService,
+                journalAbbreviationRepository,
+                preferences,
+                databaseContext,
+                entry.getType(),
+                suggestionProviders,
+                undoManager);
+        fieldEditor.bindToEntry(entry);
+        editors.put(field, fieldEditor);
+        return new FieldNameLabel(field);
+    }
+
     private void setRegularRowLayout(GridPane gridPane) {
         double totalWeight = fields.stream()
                                    .mapToDouble(field -> editors.get(field).getWeight())
                                    .sum();
-
-        List<RowConstraints> constraints = new ArrayList<>();
-        for (Field field : fields) {
-            RowConstraints rowExpand = new RowConstraints();
-            rowExpand.setVgrow(Priority.ALWAYS);
-            rowExpand.setValignment(VPos.TOP);
-            rowExpand.setPercentHeight(100 * editors.get(field).getWeight() / totalWeight);
-            constraints.add(rowExpand);
-        }
+        List<RowConstraints> constraints = fields
+                .stream()
+                .map(field -> {
+                    RowConstraints rowExpand = new RowConstraints();
+                    rowExpand.setVgrow(Priority.ALWAYS);
+                    rowExpand.setValignment(VPos.TOP);
+                    rowExpand.setPercentHeight(100 * editors.get(field).getWeight() / totalWeight);
+                    return rowExpand;
+                }).toList();
         gridPane.getRowConstraints().addAll(constraints);
     }
 
-    private void setCompressedRowLayout(GridPane gridPane, int rows) {
+    protected static void setCompressedRowLayout(GridPane gridPane, int rows) {
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
         rowExpand.setValignment(VPos.TOP);
@@ -178,8 +182,11 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         } else {
             rowExpand.setPercentHeight(100 / (double) rows);
         }
+
+        ObservableList<RowConstraints> rowConstraints = gridPane.getRowConstraints();
+        rowConstraints.clear();
         for (int i = 0; i < rows; i++) {
-            gridPane.getRowConstraints().add(rowExpand);
+            rowConstraints.add(rowExpand);
         }
     }
 
@@ -228,7 +235,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
-            // Warp everything in a scroll-pane
+            // Wrap everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);

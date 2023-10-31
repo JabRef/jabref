@@ -1,11 +1,22 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.SequencedSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
+
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -58,32 +69,84 @@ public class CommentsTab extends FieldsEditorTab {
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
-        // As default: Show BibTeX comment field and the user-specific comment field of the default owner
         SequencedSet<Field> comments = new LinkedHashSet<>();
         comments.add(StandardField.COMMENT);
-        comments.add(new UserSpecificCommentField(defaultOwner));
-
-        // Include all other comments fields afterwards
-        // The "SequencedSet" ensures that no double entires are made
         comments.addAll(entry.getFields().stream()
                              .filter(field -> field instanceof UserSpecificCommentField ||
                                      field.getName().toLowerCase().contains("comment"))
-                             .collect(Collectors.toSet()));
-
+                             .sorted(Comparator.comparing(Field::getName))
+                             .collect(Collectors.toCollection(LinkedHashSet::new)));
         return comments;
+    }
+
+    /**
+     * Comment editors: thre times size of button
+     */
+    private void setCompressedRowLayout() {
+        int numberOfComments = gridPane.getRowCount() - 1;
+        double totalWeight = numberOfComments * 3 + 1;
+
+        RowConstraints commentConstraint = new RowConstraints();
+        commentConstraint.setVgrow(Priority.ALWAYS);
+        commentConstraint.setValignment(VPos.TOP);
+        double commentHeightPercent = 3.0 / totalWeight * 100.0;
+        commentConstraint.setPercentHeight(commentHeightPercent);
+
+        RowConstraints buttonConstraint = new RowConstraints();
+        buttonConstraint.setVgrow(Priority.ALWAYS);
+        buttonConstraint.setValignment(VPos.TOP);
+        double addButtonHeightPercent = 1.0 / totalWeight * 100.0;
+        buttonConstraint.setPercentHeight(addButtonHeightPercent);
+
+        ObservableList<RowConstraints> rowConstraints = gridPane.getRowConstraints();
+        rowConstraints.clear();
+        for (int i = 1; i <= numberOfComments; i++) {
+            rowConstraints.add(commentConstraint);
+        }
+        rowConstraints.add(buttonConstraint);
     }
 
     @Override
     protected void setupPanel(BibEntry entry, boolean compressed) {
         super.setupPanel(entry, compressed);
 
+        boolean hasDefaultOwnerField = false;
+
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
             boolean isStandardBibtexComment = (field == StandardField.COMMENT);
-            boolean shouldBeEnabled = isStandardBibtexComment || field.getName().contains(defaultOwner);
+            boolean isDefaultOwnerComment = field.getName().contains(defaultOwner);
+            hasDefaultOwnerField = hasDefaultOwnerField || isDefaultOwnerComment;
+            boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
             editor.getNode().setDisable(!shouldBeEnabled);
+        }
+
+        if (!hasDefaultOwnerField) {
+            BorderPane container = new BorderPane();
+            Button addDefaultOwnerCommentButton = new Button(Localization.lang("Add"));
+            addDefaultOwnerCommentButton.setOnAction(e -> {
+                ObservableList<Node> children = gridPane.getChildren();
+                int rows = gridPane.getRowCount();
+
+                // remove button
+                children.removeLast();
+
+                // add comment field for current user
+                UserSpecificCommentField userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
+                Label label = createLabelAndEditor(entry, userSpecificCommentField);
+                Parent node = editors.get(userSpecificCommentField).getNode();
+                gridPane.addRow(rows - 1, label, node);
+                setCompressedRowLayout(gridPane, rows);
+                node.requestFocus();
+            });
+            // container.setCenter(addDefaultOwnerCommentButton);
+            gridPane.add(addDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
+            // setRegularRowLayout(gridPane);
+            setCompressedRowLayout();
+            // gridPane.getRowConstraints().add(new RowConstraints(addDefaultOwnerCommentButton.getMinHeight()));
+            // setCompressedRowLayout(gridPane, gridPane.getRowCount());
         }
     }
 }
