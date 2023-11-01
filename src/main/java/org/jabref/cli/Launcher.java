@@ -6,11 +6,14 @@ import java.net.Authenticator;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -100,7 +103,15 @@ public class Launcher {
                     System.exit(0);
                 }
 
-                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
+                List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
+                List<String> lastFiles = preferences.getGuiPreferences().getLastFilesOpened();
+                if (!argumentProcessor.isBlank() && preferences.getWorkspacePreferences().shouldOpenLastEdited() && !lastFiles.isEmpty()) {
+                    for (String file : lastFiles) {
+                        uiCommands.add(new UiCommand.OpenDatabaseFromPath(Path.of(file)));
+                    }
+                }
+
+                MainApplication.main(uiCommands, preferences, fileUpdateMonitor, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);

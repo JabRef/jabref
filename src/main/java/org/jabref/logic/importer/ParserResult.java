@@ -26,7 +26,6 @@ public class ParserResult {
     private boolean invalid;
     private boolean toOpenTab;
     private boolean changedOnMigration = false;
-    private BibEntry entryToFocus;
 
     public ParserResult() {
         this(Collections.emptyList());
@@ -98,14 +97,6 @@ public class ParserResult {
 
     public void setPath(Path path) {
         file = path;
-    }
-
-    public Optional<BibEntry> getEntryToFocus() {
-        return Optional.ofNullable(entryToFocus);
-    }
-
-    public void setEntryToFocus(BibEntry bibEntry) {
-        entryToFocus = bibEntry;
     }
 
     /**

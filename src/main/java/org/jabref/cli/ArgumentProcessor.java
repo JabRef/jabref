@@ -16,6 +16,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -64,28 +65,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ArgumentProcessor {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+
+    public enum Mode { INITIAL_START, REMOTE_START }
+
     private final JabRefCLI cli;
 
-    // Written once by processArguments()
-    private List<ParserResult> parserResults = List.of();
-
     private final Mode startupMode;
+
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+
     private boolean noGUINeeded;
+    private final List<UiCommand> uiCommands = new ArrayList<>();
 
     /**
      * First call the constructor, then call {@link #processArguments()}.
-     * Afterward, you can access the {@link #getParserResults()} and other getters.
+     * Afterward, you can access the {@link #getUiCommands()}.
      */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
                              FileUpdateMonitor fileUpdateMonitor,
-                             BibEntryTypesManager entryTypesManager) throws org.apache.commons.cli.ParseException {
+                             BibEntryTypesManager entryTypesManager)
+            throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
@@ -185,11 +189,10 @@ public class ArgumentProcessor {
         }
     }
 
-    public List<ParserResult> getParserResults() {
-        return parserResults;
-    }
-
     public void processArguments() {
+        uiCommands.clear();
+        noGUINeeded = false;
+
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
@@ -197,7 +200,6 @@ public class ArgumentProcessor {
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             JabRefCLI.printUsage(preferencesService);
             noGUINeeded = true;
-            this.parserResults = Collections.emptyList();
             return;
         }
 
@@ -221,7 +223,6 @@ public class ArgumentProcessor {
         if (cli.isExportMatches()) {
             if (!loaded.isEmpty()) {
                 if (!exportMatches(loaded)) {
-                    this.parserResults = Collections.emptyList();
                     return;
                 }
             } else {
@@ -281,7 +282,9 @@ public class ArgumentProcessor {
             jumpToKey(loaded, cli.getJumpToKey());
         }
 
-        this.parserResults = loaded;
+        if (!cli.isBlank() && !loaded.isEmpty()) {
+            uiCommands.add(new UiCommand.OpenDatabases(loaded));
+        }
     }
 
     private void writeMetadataToPdf(List<ParserResult> loaded,
@@ -781,7 +784,7 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             Optional<BibEntry> entry = parserResult.getDatabase().getEntryByCitationKey(citationKey);
             if (entry.isPresent()) {
-                parserResult.setEntryToFocus(entry.get());
+                uiCommands.add(new UiCommand.JumpToEntryKey(parserResult, entry.get()));
                 return;
             }
         }
@@ -796,7 +799,7 @@ public class ArgumentProcessor {
         return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
     }
 
-    public enum Mode {
-        INITIAL_START, REMOTE_START
+    public List<UiCommand> getUiCommands() {
+        return uiCommands;
     }
 }

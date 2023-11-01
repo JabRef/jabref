@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -57,11 +59,15 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -956,6 +962,128 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     public Stage getMainStage() {
         return mainStage;
+    }
+
+    public void handleUiCommands(List<UiCommand> uiCommands) {
+        for (UiCommand uiCommand : uiCommands) {
+            switch (uiCommand) {
+                case UiCommand.OpenDatabaseFromPath command ->
+                        getOpenDatabaseAction().openFile(command.path());
+                case UiCommand.JumpToEntryKey jumpToEntryKey -> {
+                    Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
+                                                                      .filter(tab -> tab.getDatabase()
+                                                                                        .equals(jumpToEntryKey.parserResult()
+                                                                                                              .getDatabase()))
+                                                                      .findFirst();
+                    libraryTab.ifPresent(tab -> {
+                        tab.clearAndSelect(jumpToEntryKey.bibEntry());
+                        showLibraryTab(tab);
+                    });
+                }
+                case UiCommand.OpenDatabases command ->
+                        openDatabases(command.parserResults());
+            }
+        }
+    }
+
+    private void openDatabases(List<ParserResult> parserResults) {
+        final List<ParserResult> toOpenTab = new ArrayList<>();
+
+        // Remove invalid databases
+        List<ParserResult> invalidDatabases = parserResults.stream()
+                                                           .filter(ParserResult::isInvalid)
+                                                           .toList();
+        final List<ParserResult> failed = new ArrayList<>(invalidDatabases);
+        parserResults.removeAll(invalidDatabases);
+
+        // passed file (we take the first one) should be focused
+        Path focusedFile = parserResults.stream()
+                                        .findFirst()
+                                        .flatMap(ParserResult::getPath)
+                                        .orElse(prefs.getGuiPreferences()
+                                                     .getLastFocusedFile())
+                                        .toAbsolutePath();
+
+        // Add all bibDatabases databases to the frame:
+        boolean first = false;
+        for (ParserResult pr : parserResults) {
+            // Define focused tab
+            if (pr.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
+                first = true;
+            }
+
+            if (pr.getDatabase().isShared()) {
+                try {
+                    OpenDatabaseAction.openSharedDatabase(
+                            pr,
+                            this,
+                            dialogService,
+                            prefs,
+                            stateManager,
+                            entryTypesManager,
+                            fileUpdateMonitor,
+                            undoManager,
+                            Globals.TASK_EXECUTOR);
+                } catch (
+                        SQLException |
+                        DatabaseNotSupportedException |
+                        InvalidDBMSConnectionPropertiesException |
+                        NotASharedDatabaseException e) {
+
+                    LOGGER.error("Connection error", e);
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Connection error"),
+                            Localization.lang("A local copy will be opened."),
+                            e);
+                    toOpenTab.add(pr);
+                }
+            } else if (pr.toOpenTab()) {
+                // things to be appended to an opened tab should be done after opening all tabs
+                // add them to the list
+                toOpenTab.add(pr);
+            } else {
+                addTab(pr, first);
+                first = false;
+            }
+        }
+
+        // finally add things to the currently opened tab
+        for (ParserResult parserResult : toOpenTab) {
+            addTab(parserResult, first);
+            first = false;
+        }
+
+        for (ParserResult pr : failed) {
+            String message = Localization.lang("Error opening file '%0'",
+                    pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
+                    pr.getErrorMessage();
+
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+        }
+
+        // Display warnings, if any
+        int tabNumber = 0;
+        for (ParserResult pr : parserResults) {
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, this, tabNumber++);
+        }
+
+        // After adding the databases, go through each and see if
+        // any post open actions need to be done. For instance, checking
+        // if we found new entry types that can be imported, or checking
+        // if the database contents should be modified due to new features
+        // in this version of JabRef.
+        // Note that we have to check whether i does not go over getBasePanelCount().
+        // This is because importToOpen might have been used, which adds to
+        // loadedDatabases, but not to getBasePanelCount()
+
+        for (int i = 0; (i < parserResults.size()) && (i < getBasePanelCount()); i++) {
+            ParserResult pr = parserResults.get(i);
+            LibraryTab libraryTab = getLibraryTabAt(i);
+
+            OpenDatabaseAction.performPostOpenActions(libraryTab, pr);
+        }
+
+        LOGGER.debug("Finished adding panels");
     }
 
     /**
