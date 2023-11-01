@@ -42,10 +42,11 @@ public class CompositeSearchBasedFetcherTest {
     void setUp() {
         importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
+
     @Test
     public void createCompositeFetcherWithNullSet() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new CompositeSearchBasedFetcher(null, importerPreferences,0));
+                () -> new CompositeSearchBasedFetcher(null, importerPreferences, 0));
     }
 
     @Test
