@@ -4,6 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -14,6 +15,7 @@
     <Label styleClass="titleHeader" text="%Web search"/>
 
     <Label styleClass="sectionHeader" text="%General"/>
+    <CheckBox fx:id="enableWebSearch" text="%Enable web search"/>
     <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
@@ -30,7 +32,6 @@
         <Label text="%Grobid URL" />
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <CheckBox fx:id="journalInfoEnabled" text="%Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"/>
 
     <Label styleClass="sectionHeader" text="%Custom API key"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -39,8 +40,12 @@
         <CheckBox fx:id="useCustomApiKey" text="%Custom">
         </CheckBox>
     </HBox>
-    <HBox alignment="CENTER_LEFT" >
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Button fx:id="testCustomApiKey" text="%Check connection" onAction="#checkCustomApiKey"
                 prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <SplitPane fx:id="persistentTooltipWrapper">
+            <CheckBox fx:id="persistApiKeys" text="%Persist api keys between sessions"/>
+        </SplitPane>
     </HBox>
 </fx:root>

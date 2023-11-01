@@ -43,6 +43,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImporters();
+        importers.clear();
         for (CustomImporter importer : importersLogic) {
             importers.add(new ImporterViewModel(importer));
         }

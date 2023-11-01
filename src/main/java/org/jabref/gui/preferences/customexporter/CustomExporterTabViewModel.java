@@ -31,6 +31,7 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         List<TemplateExporter> exportersLogic = preferences.getExportPreferences().getCustomExporters();
+        exporters.clear();
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
         }

@@ -79,12 +79,16 @@ class CompositeIdFetcherTest {
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIsbnId",
                         new BibEntry(StandardEntryType.Book)
-                                .withField(StandardField.TITLE, "Effective Java")
-                                .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
-                                .withField(StandardField.YEAR, "2017")
                                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                                .withField(StandardField.PAGES, "416")
-                                .withField(StandardField.ISBN, "9780134685991"),
+                                .withField(StandardField.TITLE, "Effective Java")
+                                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                                .withField(StandardField.YEAR, "2018")
+                                .withField(StandardField.ISBN, "9780134685991")
+                                .withField(StandardField.NOTE, "Titelzusätze auf dem Umschlag: \"Updated for Java 9. Best practices for ... the Java platform\"")
+                                .withField(StandardField.PAGETOTAL, "392")
+                                .withField(new UnknownField("ppn_gvk"), "100121840X")
+                                .withField(StandardField.EDITION, "Third edition")
+                                .withField(StandardField.ADDRESS, "Boston"),
                         "9780134685991"
                 ),
                 Arguments.arguments(

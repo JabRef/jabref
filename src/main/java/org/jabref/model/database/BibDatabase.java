@@ -80,12 +80,12 @@ public class BibDatabase {
     }
 
     /**
+     * Returns a text with references resolved according to an optionally given database.
+     *
      * @param toResolve maybenull The text to resolve.
      * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
-     * <p>
-     * Returns a text with references resolved according to an optionally given database.
      */
     @Deprecated
     public static String getText(String toResolve, BibDatabase database) {
@@ -115,7 +115,6 @@ public class BibDatabase {
     public List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
         List<BibEntry> entriesSorted = new ArrayList<>(entries);
         entriesSorted.sort(comparator);
-
         return entriesSorted;
     }
 
@@ -176,11 +175,6 @@ public class BibDatabase {
         return result;
     }
 
-    /**
-     * Inserts the entry.
-     *
-     * @param entry entry to insert
-     */
     public synchronized void insertEntry(BibEntry entry) {
         insertEntry(entry, EntriesEventSource.LOCAL);
     }

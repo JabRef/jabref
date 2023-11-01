@@ -23,6 +23,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -30,6 +31,7 @@ import org.jabref.preferences.PreferencesService;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
 
 /**
@@ -45,6 +47,7 @@ public class Launcher {
     private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
+        routeLoggingToSlf4J();
         ARGUMENTS = args;
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
@@ -59,17 +62,21 @@ public class Launcher {
 
         addLogToDisk();
         try {
-            // Init preferences
+            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+            Globals.entryTypesManager = entryTypesManager;
+
+            // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
-            Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations(preferences);
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
+            if (!handleMultipleAppInstances(ARGUMENTS, preferences.getRemotePreferences())) {
                 return;
             }
 
-            // Init rest of preferences
+            Globals.prefs = preferences;
+            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
+
+            // Initialize rest of preferences
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
             initGlobals(preferences);
@@ -80,12 +87,17 @@ public class Launcher {
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                        ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
+                        ARGUMENTS,
+                        ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
-                        fileUpdateMonitor);
+                        fileUpdateMonitor,
+                        entryTypesManager);
+                argumentProcessor.processArguments();
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
-                    return;
+                    // A clean shutdown takes 60s time
+                    // We don't need the clean shutdown here
+                    System.exit(0);
                 }
 
                 MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
@@ -96,6 +108,11 @@ public class Launcher {
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
+    }
+
+    private static void routeLoggingToSlf4J() {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
     }
 
     /**
@@ -129,8 +146,7 @@ public class Launcher {
         LOGGER = LoggerFactory.getLogger(MainApplication.class);
     }
 
-    private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
-        RemotePreferences remotePreferences = preferences.getRemotePreferences();
+    private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
@@ -167,8 +183,6 @@ public class Launcher {
 
     private static void configureSSL(SSLPreferences sslPreferences) {
         TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
-        System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
-        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     }
 
     private static void clearOldSearchIndices() {

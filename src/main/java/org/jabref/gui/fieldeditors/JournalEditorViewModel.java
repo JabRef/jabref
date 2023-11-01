@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
@@ -21,8 +23,9 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             JournalAbbreviationRepository journalAbbreviationRepository,
             FieldCheckers fieldCheckers,
             TaskExecutor taskExecutor,
-            DialogService dialogService) {
-        super(field, suggestionProvider, fieldCheckers);
+            DialogService dialogService,
+            UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

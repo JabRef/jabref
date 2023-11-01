@@ -210,8 +210,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return this.citeCommandProperty;
     }
 
-    // Open console
-
     public BooleanProperty useCustomTerminalProperty() {
         return this.useCustomTerminalProperty;
     }
@@ -228,5 +226,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty customFileBrowserCommandProperty() {
         return this.customFileBrowserCommandProperty;
+    }
+
+    public void resetCiteCommandToDefault() {
+        this.citeCommandProperty.setValue(preferences.getExternalApplicationsPreferences().getDefaultCiteCommand());
     }
 }

@@ -14,7 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -66,7 +67,7 @@ public class ExportToClipboardActionTest {
 
         taskExecutor = new CurrentThreadTaskExecutor();
         when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.observableList(List.of()));
-        when(preferences.getExportConfiguration()).thenReturn(mock(SaveConfiguration.class));
+        when(preferences.getSelfContainedExportConfiguration()).thenReturn(mock(SelfContainedSaveConfiguration.class));
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
     }
@@ -92,6 +93,7 @@ public class ExportToClipboardActionTest {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
         when(preferences.getExportPreferences().getLastExportExtension()).thenReturn("HTML");
+        when(preferences.getSelfContainedExportConfiguration().getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked

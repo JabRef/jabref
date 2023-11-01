@@ -16,6 +16,7 @@ public class PushToApplications {
     public static final String VIM = "Vim";
     public static final String WIN_EDT = "WinEdt";
     public static final String SUBLIME_TEXT = "Sublime Text";
+    public static final String TEXSHOP = "TeXShop";
 
     private static final List<PushToApplication> APPLICATIONS = new ArrayList<>();
 
@@ -34,7 +35,8 @@ public class PushToApplications {
                 new PushToTexmaker(dialogService, preferencesService),
                 new PushToTeXstudio(dialogService, preferencesService),
                 new PushToVim(dialogService, preferencesService),
-                new PushToWinEdt(dialogService, preferencesService)));
+                new PushToWinEdt(dialogService, preferencesService),
+                new PushToTexShop(dialogService, preferencesService)));
 
         return APPLICATIONS;
     }

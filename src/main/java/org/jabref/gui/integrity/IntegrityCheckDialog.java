@@ -1,6 +1,7 @@
 package org.jabref.gui.integrity;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
@@ -15,6 +16,7 @@ import javafx.stage.Modality;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -72,6 +74,11 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getEntry().getCitationKey().orElse("")));
         fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getField().getDisplayName()));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
+
+        new ValueTableCellFactory<IntegrityMessage, String>()
+                .withText(Function.identity())
+                .withTooltip(Function.identity())
+                .install(messageColumn);
 
         tableFilter = TableFilter.forTableView(messagesTable)
                                  .apply();

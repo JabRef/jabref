@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
 public class SortCriterionViewModel {
@@ -16,6 +17,11 @@ public class SortCriterionViewModel {
     public SortCriterionViewModel(SaveOrder.SortCriterion criterion) {
         this.fieldProperty.setValue(criterion.field);
         this.descendingProperty.setValue(criterion.descending);
+    }
+
+    public SortCriterionViewModel() {
+        this.fieldProperty.setValue(StandardField.AUTHOR);
+        this.descendingProperty.setValue(false);
     }
 
     public ObjectProperty<Field> fieldProperty() {

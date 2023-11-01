@@ -45,7 +45,6 @@ Chosen option: "Add a new divider", because comes out best (see below).
 
 * Good, since this gives the user a bit more clarity
 
-
 ### Support via customized entry types: A user can load a customized bib file
 
 * Good, because no code needs to be changed

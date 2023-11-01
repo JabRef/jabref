@@ -29,7 +29,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
 
 concurrency:
-  group: fetcher-tests-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -41,12 +41,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run fetcher tests
         run: ./gradlew fetcherTest

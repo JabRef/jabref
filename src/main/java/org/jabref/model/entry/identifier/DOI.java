@@ -171,6 +171,9 @@ public class DOI implements Identifier {
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
             if (cleanedDOI.startsWith("_") && cleanedDOI.endsWith("_")) {
+                if (cleanedDOI.length() == 1) {
+                    return Optional.empty();
+                }
                 cleanedDOI = cleanedDOI.substring(1, cleanedDOI.length() - 1);
             }
 

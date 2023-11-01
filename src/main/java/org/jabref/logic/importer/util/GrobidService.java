@@ -62,7 +62,7 @@ public class GrobidService {
                 .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
                 .method(Connection.Method.POST)
                 .ignoreContentType(true)
-                .timeout(20000)
+                .timeout(100_000)
                 .execute();
         String httpResponse = response.body();
 

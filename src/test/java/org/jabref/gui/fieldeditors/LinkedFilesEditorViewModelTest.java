@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -33,6 +35,7 @@ class LinkedFilesEditorViewModelTest {
     private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
     private final FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
+    private final UndoManager undoManager = mock(UndoManager.class);
 
     @Test
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
@@ -43,7 +46,7 @@ class LinkedFilesEditorViewModelTest {
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
 
         viewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), bibDatabaseContext,
-                           new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferencesService);
+                           new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferencesService, undoManager);
 
         BibEntry entry = new BibEntry().withCitationKey("test")
             .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");

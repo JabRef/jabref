@@ -238,7 +238,15 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
+            previewPanel = new PreviewPanel(
+                    databaseContext,
+                    dialogService,
+                    preferences.getKeyBindingRepository(),
+                    preferences,
+                    stateManager,
+                    themeManager,
+                    indexingTaskManager,
+                    taskExecutor);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);

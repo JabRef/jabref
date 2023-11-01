@@ -51,7 +51,7 @@ public class AbbreviationsFileViewModel {
 
     public void readAbbreviations() throws IOException {
         if (path.isPresent()) {
-            Collection<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.get());
+            Collection<Abbreviation> abbreviationList = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path.get());
             abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
         } else {
             throw new FileNotFoundException();

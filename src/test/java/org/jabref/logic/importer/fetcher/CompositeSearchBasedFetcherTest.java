@@ -68,7 +68,7 @@ public class CompositeSearchBasedFetcherTest {
     @MethodSource("performSearchParameters")
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
-        ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
+        ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseMode.BIBTEX);
 
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
@@ -100,7 +100,7 @@ public class CompositeSearchBasedFetcherTest {
         List<SearchBasedFetcher> list = List.of(
                 new ArXivFetcher(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
-                new GvkFetcher(),
+                new GvkFetcher(importFormatPreferences),
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new MathSciNet(importFormatPreferences),
                 new ZbMATH(importFormatPreferences),

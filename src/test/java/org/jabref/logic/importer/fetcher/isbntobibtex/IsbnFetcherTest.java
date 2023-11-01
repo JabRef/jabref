@@ -8,6 +8,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -33,10 +34,14 @@ class IsbnFetcherTest {
         bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.TITLE, "Effective Java")
-                .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
-                .withField(StandardField.YEAR, "2017")
-                .withField(StandardField.PAGES, "416")
-                .withField(StandardField.ISBN, "9780134685991");
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.YEAR, "2018")
+                .withField(StandardField.ISBN, "9780134685991")
+                .withField(StandardField.NOTE, "Titelzusätze auf dem Umschlag: \"Updated for Java 9. Best practices for ... the Java platform\"")
+                .withField(StandardField.PAGETOTAL, "392")
+                .withField(new UnknownField("ppn_gvk"), "100121840X")
+                .withField(StandardField.EDITION, "Third edition")
+                .withField(StandardField.ADDRESS, "Boston");
     }
 
     @Test

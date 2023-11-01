@@ -50,7 +50,7 @@ public class MrDLibImporterTest {
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
 
         assertEquals("2006",
-                resultList.get(0).getLatexFreeField(StandardField.YEAR).get());
+                resultList.get(0).getFieldLatexFree(StandardField.YEAR).get());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class MrDLibImporterTest {
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
 
         assertEquals("The protection of rural lands with the spatial development strategy on the case of Hrastnik commune",
-                resultList.get(0).getLatexFreeField(StandardField.TITLE).get());
+                resultList.get(0).getFieldLatexFree(StandardField.TITLE).get());
     }
 
     @Test

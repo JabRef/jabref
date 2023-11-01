@@ -22,11 +22,11 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
     @FXML private ComboBox<T> comboBox;
 
     public OptionEditor(OptionEditorViewModel<T> viewModel) {
-        this.viewModel = viewModel;
-
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        this.viewModel = viewModel;
 
         comboBox.setConverter(viewModel.getStringConverter());
         comboBox.setCellFactory(new ViewModelListCellFactory<T>().withText(viewModel::convertToDisplayText));

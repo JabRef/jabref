@@ -77,21 +77,21 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService.getBibEntryPreferences());
+                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService.getBibEntryPreferences());
+                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
             }
             case IMPORT_CHECK -> {
                 first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), preferencesService.getBibEntryPreferences());
+                        Localization.lang("From import"), preferencesService);
             }
             default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }
@@ -138,7 +138,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             return null;
         });
 
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferencesService.getFilePreferences());
         Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
         borderPane.setRight(helpButton);
 

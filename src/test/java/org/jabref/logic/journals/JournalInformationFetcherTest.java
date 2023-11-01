@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.util.Pair;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.JournalInformationFetcher;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;

@@ -756,7 +756,7 @@ public class BracketedPattern {
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
-                authorList.getAuthor(0).getLastOnly().replaceAll(" ", "");
+                authorList.getAuthor(0).getLastOnly().replace(" ", "");
     }
 
     /**

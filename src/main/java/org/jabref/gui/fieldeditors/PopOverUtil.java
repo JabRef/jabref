@@ -19,7 +19,7 @@ public class PopOverUtil {
 
     public static void showJournalInfo(Button button, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor) {
         Optional<String> optionalIssn = entry.getField(StandardField.ISSN);
-        Optional<String> optionalJournalName = entry.getField(StandardField.JOURNAL);
+        Optional<String> optionalJournalName = entry.getFieldOrAlias(StandardField.JOURNAL);
 
         if (optionalIssn.isPresent() || optionalJournalName.isPresent()) {
             PopOver popOver = new PopOver();

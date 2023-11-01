@@ -15,7 +15,6 @@ import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.BvbFetcher;
 import org.jabref.logic.importer.fetcher.CiteSeer;
-import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
@@ -29,7 +28,7 @@ import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
-import org.jabref.logic.importer.fetcher.IssnFetcher;
+import org.jabref.logic.importer.fetcher.LOBIDFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
@@ -100,7 +99,7 @@ public class WebFetchers {
         SortedSet<SearchBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new INSPIREFetcher(importFormatPreferences));
-        set.add(new GvkFetcher());
+        set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
         set.add(new MedlineFetcher());
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
@@ -111,16 +110,17 @@ public class WebFetchers {
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher(importerPreferences));
         set.add(new CrossRef());
-         set.add(new CiteSeer());
+        set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
-        set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
+        // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         set.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
-        set.add(new SemanticScholar());
+        set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
+        set.add(new LOBIDFetcher(importerPreferences));
         return set;
     }
 
@@ -169,7 +169,7 @@ public class WebFetchers {
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
-        set.add(new SemanticScholar());
+        set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         return set;
     }
@@ -207,7 +207,7 @@ public class WebFetchers {
         // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new CiteSeer());
         fetchers.add(new OpenAccessDoi());
-        fetchers.add(new SemanticScholar());
+        fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
         return fetchers;
     }

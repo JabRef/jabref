@@ -103,7 +103,7 @@ public class GroupDialogViewModel {
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
     private Validator texGroupFilePathValidator;
-    private final CompositeValidator validator = new CompositeValidator();
+    private CompositeValidator validator;
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -127,6 +127,8 @@ public class GroupDialogViewModel {
     }
 
     private void setupValidation() {
+        validator = new CompositeValidator();
+
         nameValidator = new FunctionBasedValidator<>(
                 nameProperty,
                 StringUtil::isNotBlank,
@@ -270,6 +272,10 @@ public class GroupDialogViewModel {
                 validator.removeValidators(texGroupFilePathValidator);
             }
         });
+
+        validator.addValidators(nameValidator,
+                nameContainsDelimiterValidator,
+                sameNameValidator);
     }
 
     /**
@@ -334,6 +340,7 @@ public class GroupDialogViewModel {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
                     char delimiter = ',';
                     char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
+                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
                     // Modify values for delimiters if user provided customized values
                     if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
                         delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
@@ -387,6 +394,7 @@ public class GroupDialogViewModel {
             colorProperty.setValue(IconTheme.getDefaultGroupColor());
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
+            autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
@@ -423,11 +431,13 @@ public class GroupDialogViewModel {
 
                 if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
+                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupKeywordsDelimiterProperty.setValue(group.getKeywordDelimiter().toString());
                     autoGroupKeywordsHierarchicalDelimiterProperty.setValue(group.getKeywordHierarchicalDelimiter().toString());
                     autoGroupKeywordsFieldProperty.setValue(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
+                    autoGroupPersonsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupPersonsFieldProperty.setValue(group.getField().getName());
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
@@ -453,7 +463,7 @@ public class GroupDialogViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.GROUPS, dialogService).execute();
+        new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()).execute();
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

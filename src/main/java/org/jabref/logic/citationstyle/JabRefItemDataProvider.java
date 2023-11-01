@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.integrity.PagesChecker;
@@ -198,5 +199,15 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         return data.stream()
                    .map(entry -> entry.getCitationKey().orElse(""))
                    .toList();
+    }
+
+    public String toJson() {
+        List<BibEntry> entries = bibDatabaseContext.getEntries();
+        this.setData(entries, bibDatabaseContext, entryTypesManager);
+        return entries.stream()
+                      .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
+                      .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
+                      .map(String.class::cast)
+                      .collect(Collectors.joining(",", "[", "]"));
     }
 }

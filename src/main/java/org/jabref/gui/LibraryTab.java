@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -26,10 +28,13 @@ import javafx.util.Duration;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.autosaveandbackup.AutosaveManager;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -39,8 +44,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.autosaveandbackup.AutosaveManager;
-import org.jabref.logic.autosaveandbackup.BackupManager;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -59,6 +63,7 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -86,6 +91,7 @@ public class LibraryTab extends Tab {
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
 
@@ -116,20 +122,28 @@ public class LibraryTab extends Tab {
 
     private BackgroundTask<ParserResult> dataLoadingTask;
 
-    private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+    private final IndexingTaskManager indexingTaskManager;
+    private final TaskExecutor taskExecutor;
 
     public LibraryTab(BibDatabaseContext bibDatabaseContext,
                       JabRefFrame frame,
+                      DialogService dialogService,
                       PreferencesService preferencesService,
                       StateManager stateManager,
-                      FileUpdateMonitor fileUpdateMonitor) {
+                      FileUpdateMonitor fileUpdateMonitor,
+                      BibEntryTypesManager entryTypesManager,
+                      CountingUndoManager undoManager,
+                      TaskExecutor taskExecutor) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.undoManager = frame.getUndoManager();
-        this.dialogService = frame.getDialogService();
+        this.undoManager = undoManager;
+        this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
+        this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
+        this.taskExecutor = taskExecutor;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -287,10 +301,10 @@ public class LibraryTab extends Tab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
-            autosaveManager.registerListener(new AutosaveUiManager(this));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferencesService, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
-            BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+            BackupManager.start(this, bibDatabaseContext, Globals.entryTypesManager, preferencesService);
         }
     }
 
@@ -331,7 +345,7 @@ public class LibraryTab extends Tab {
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
-            toolTipText.append(databasePath.toAbsolutePath().toString());
+            toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
@@ -501,17 +515,19 @@ public class LibraryTab extends Tab {
                 stateManager,
                 Globals.getKeyPrefs(),
                 Globals.getClipboardManager(),
-                Globals.TASK_EXECUTOR,
+                entryTypesManager,
+                taskExecutor,
                 fileUpdateMonitor);
-
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-        mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
-
-        // Update entry editor and preview according to selected entries
-        mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                                                         .stream()
-                                                         .findFirst()
-                                                         .ifPresent(entryEditor::setEntry));
+        // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
+        mainTable.addSelectionListener(event -> {
+            List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
+            stateManager.setSelectedEntries(entries);
+            if (!entries.isEmpty()) {
+                // Update entry editor and preview according to selected entries
+                entryEditor.setEntry(entries.get(0));
+            }
+        });
     }
 
     public void setupMainPanel() {
@@ -652,7 +668,7 @@ public class LibraryTab extends Tab {
      */
 
     public synchronized void markChangedOrUnChanged() {
-        if (getUndoManager().hasChanged()) {
+        if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -765,7 +781,7 @@ public class LibraryTab extends Tab {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,
                 fileUpdateMonitor,
-                Globals.TASK_EXECUTOR,
+                taskExecutor,
                 dialogService,
                 preferencesService,
                 databaseNotificationPane));
@@ -816,27 +832,65 @@ public class LibraryTab extends Tab {
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
-     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link org.jabref.gui.Globals.TASK_EXECUTOR}.
+     * @param dataLoadingTask The task to execute to load the data asynchronously.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
+                                              DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
                                               JabRefFrame frame,
-                                              FileUpdateMonitor fileUpdateMonitor) {
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              CountingUndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, fileUpdateMonitor);
+        LibraryTab newTab = new LibraryTab(
+                context,
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                taskExecutor);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
                        .onSuccess(newTab::onDatabaseLoadingSucceed)
                        .onFailure(newTab::onDatabaseLoadingFailed)
-                       .executeWith(Globals.TASK_EXECUTOR);
+                       .executeWith(taskExecutor);
 
         return newTab;
+    }
+
+    public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
+                                              JabRefFrame frame,
+                                              DialogService dialogService,
+                                              PreferencesService preferencesService,
+                                              StateManager stateManager,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              UndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
+        Objects.requireNonNull(databaseContext);
+
+        LibraryTab libraryTab = new LibraryTab(
+                databaseContext,
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                (CountingUndoManager) undoManager,
+                taskExecutor);
+
+        return libraryTab;
     }
 
     private class GroupTreeListener {

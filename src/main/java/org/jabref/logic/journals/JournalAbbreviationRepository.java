@@ -26,23 +26,42 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
 
+    /**
+     * Initializes the internal data based on the abbreviations found in the given MV file
+     */
     public JournalAbbreviationRepository(Path journalList) {
-        MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
-        MVMap<String, Abbreviation> mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
+        MVMap<String, Abbreviation> mvFullToAbbreviationObject;
+        try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
+            mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
+            mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
+                String abbrevationString = abbreviation.getAbbreviation();
+                String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
+                Abbreviation newAbbreviation = new Abbreviation(
+                        name,
+                        abbrevationString,
+                        shortestUniqueAbbreviation
+                );
+                fullToAbbreviationObject.put(name, newAbbreviation);
+                abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
+                dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
+                shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
+            });
+        }
+    }
 
-        mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
-            String abbrevationString = abbreviation.getAbbreviation();
-            String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
-            Abbreviation newAbbreviation = new Abbreviation(
-                    name,
-                    abbrevationString,
-                    shortestUniqueAbbreviation
-            );
-            fullToAbbreviationObject.put(name, newAbbreviation);
-            abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
-            dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
-            shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
-        });
+    /**
+     * Initializes the repository with demonstration data. Used if no abbreviation file is found.
+     */
+    public JournalAbbreviationRepository() {
+        Abbreviation newAbbreviation = new Abbreviation(
+                "Demonstration",
+                "Demo",
+                "Dem"
+        );
+        fullToAbbreviationObject.put("Demonstration", newAbbreviation);
+        abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
+        dotlessToAbbreviationObject.put("Demo", newAbbreviation);
+        shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -57,10 +76,9 @@ public class JournalAbbreviationRepository {
         if (isExpanded) {
             return false;
         }
-        boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getAbbreviation())
+        return name.equalsIgnoreCase(abbreviation.getAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
-        return isAbbreviated;
     }
 
     /**

@@ -12,15 +12,16 @@ on:
 concurrency:
   group: gource
   cancel-in-progress: true
-  
+
 jobs:
   action:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          show-progress: 'false'
       - name: 'Development history of current build'
         uses: BoundfoxStudios/action-gource@v2
         with:

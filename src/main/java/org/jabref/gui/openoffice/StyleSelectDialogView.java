@@ -15,6 +15,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
@@ -48,6 +49,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
+    @Inject private TaskExecutor taskExecutor;
 
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
@@ -74,11 +76,11 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
+        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewArticle.setEntry(TestEntry.getTestEntry());
         vbox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
+        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 

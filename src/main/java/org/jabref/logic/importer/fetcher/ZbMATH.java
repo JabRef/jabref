@@ -89,7 +89,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             JSONArray result = response.getBody()
                                        .getObject()
                                        .getJSONArray("results");
-            if (result.length() > 0) {
+            if (!result.isEmpty()) {
                 zblid = result.getJSONObject(0)
                               .get("zbl_id")
                               .toString();
