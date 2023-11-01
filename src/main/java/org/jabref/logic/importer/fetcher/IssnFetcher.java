@@ -1,15 +1,15 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.IdFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.integrity.ISSNChecker;
+import org.jabref.logic.journals.JournalInformation;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.ISSN;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,51 +19,30 @@ import org.slf4j.LoggerFactory;
  * The idea is to use the {@link DOAJFetcher} to do a request for a given ISSN number.
  */
 
-public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
+public class IssnFetcher implements EntryBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssnFetcher.class);
-    private final DOAJFetcher doajFetcher;
+    private final JournalInformationFetcher journalInformationFetcher;
     // private final String SEARCH_URL = "https://doaj.org/api/search/journals/";
     private final ISSNChecker issnChecker;
-    private final ImportFormatPreferences importFormatPreferences;
 
-    public IssnFetcher(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
-        this.doajFetcher = new DOAJFetcher(importFormatPreferences);
+    public IssnFetcher() {
+        this.journalInformationFetcher = new JournalInformationFetcher();
         this.issnChecker = new ISSNChecker();
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-
-        Optional<String> checkedId = issnChecker.checkValue(identifier);
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+        Optional<String> checkedId = entry.getField(StandardField.ISSN).flatMap(issnChecker::checkValue);
         if (checkedId.isPresent()) {
-            String queryString = concatenateIssnWithId(identifier);
-            List<BibEntry> bibEntries = doajFetcher.performSearch(queryString);
-            return bibEntries.stream().findFirst();
-        } else {
-            LOGGER.warn("Not a valid ISSN");
-            return Optional.empty();
+            Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(checkedId.get(), "");
+            return journalInformation.map(journalInfo -> new BibEntry().withField(StandardField.JOURNALTITLE, journalInfo.publisher())).stream().toList();
         }
-    }
-
-    @Override
-    public Optional<ISSN> findIdentifier(BibEntry entry) throws FetcherException {
-        // Need to create a getIssn() method in BibEntry that returns an Optional
-        return Optional.empty();
-    }
-
-    @Override
-    public String getIdentifierName() {
-        return getName();
+        return Collections.emptyList();
     }
 
     @Override
     public String getName() {
         return "ISSN";
-    }
-
-    public String concatenateIssnWithId(String identifier) {
-        return "issn:" + identifier;
     }
 }

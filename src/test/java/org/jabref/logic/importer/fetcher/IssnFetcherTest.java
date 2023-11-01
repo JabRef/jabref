@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -27,10 +27,10 @@ class IssnFetcherTest {
         BibEntryPreferences bibEntryPrefs = mock(BibEntryPreferences.class);
         when(importPrefs.bibEntryPreferences()).thenReturn(bibEntryPrefs);
 
-        fetcher = new IssnFetcher(importPrefs);
+        fetcher = new IssnFetcher();
 
         bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE)
-                .withField(StandardField.ISSN, "2579-5341")
+                .withField(StandardField.ISSN, "2193-1801")
                 .withField(StandardField.TITLE, "Query: Jurnal Sistem Informasi")
                 .withField(StandardField.INSTITUTION, "Univesitas Islam Negeri Sumatera Utara, Fakultas Sains dan Teknologi, Program Studi Sistem Informasi")
                 .withField(StandardField.PUBLISHER, "Univesitas Islam Negeri Sumatera Utara")
@@ -39,17 +39,8 @@ class IssnFetcherTest {
 
     @Test
     void performSearchById() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2579-5341");
-        assertEquals(Optional.of(bibEntry), fetchedEntry);
-    }
-
-    @Test
-    void findIdentifier() {
-    }
-
-    @Test
-    void getIdentifierName() {
-        assertEquals("ISSN", fetcher.getIdentifierName());
+        List<BibEntry> fetchedEntry = fetcher.performSearch(bibEntry);
+        assertEquals(List.of(bibEntry), fetchedEntry);
     }
 
     @Test
@@ -57,9 +48,4 @@ class IssnFetcherTest {
         assertEquals("ISSN", fetcher.getName());
     }
 
-    @Test
-    void concatenateIssnWithId() {
-        String modifiedIdentifier = fetcher.concatenateIssnWithId("2579-5341");
-        assertEquals("issn:2579-5341", modifiedIdentifier);
-    }
 }
