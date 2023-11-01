@@ -101,4 +101,9 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     void useFileBrowserSpecialCommandBrowse() {
         viewModel.customFileBrowserBrowse();
     }
+
+    @FXML
+    void resetCiteCommandToDefault() {
+        viewModel.resetCiteCommandToDefault();
+    }
 }

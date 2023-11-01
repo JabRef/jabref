@@ -43,7 +43,7 @@ public class IntegrityCheck {
                 new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)
                 ));
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.addAll(List.of(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))));
+            entryCheckers.add(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8)));
         } else {
             entryCheckers.addAll(List.of(
                     new ASCIICharacterChecker(),

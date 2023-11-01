@@ -78,7 +78,7 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
-    private static final double SCROLL_SPEED = 50;
+    private static final double SCROLL_SPEED_UP = 3.0;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -98,6 +98,10 @@ public class GroupTreeView extends BorderPane {
 
     private Timer scrollTimer;
     private double scrollVelocity = 0;
+    private double scrollableAreaHeight;
+    private double upperBorder;
+    private double lowerBorder;
+    private double baseFactor;
 
     /**
      * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
@@ -144,7 +148,7 @@ public class GroupTreeView extends BorderPane {
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
-        groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
+        groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
 
@@ -182,7 +186,7 @@ public class GroupTreeView extends BorderPane {
         // We try to prevent publishing changes in the search field directly to the search task that takes some time
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
-            LOGGER.debug("Run group search " + searchField.getText());
+            LOGGER.debug("Run group search {}", searchField.getText());
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
@@ -269,6 +273,7 @@ public class GroupTreeView extends BorderPane {
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
+        node.getStyleClass().add("hits");
         if (!group.isRoot()) {
             BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
                     group.anySelectedEntriesMatchedProperty());
@@ -283,10 +288,7 @@ public class GroupTreeView extends BorderPane {
                         text.setText("");
                     }
 
-                    node.getStyleClass().clear();
-
                     if (shouldDisplayGroupCount) {
-                        node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                         Tooltip tooltip = new Tooltip();
                         tooltip.textProperty().bind(group.getHits().asString());
@@ -389,7 +391,6 @@ public class GroupTreeView extends BorderPane {
                 ControlHelper.setDroppingPseudoClasses(row, event);
             }
         }
-        event.consume();
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
@@ -444,9 +445,11 @@ public class GroupTreeView extends BorderPane {
         return node;
     }
 
-    // see http://programmingtipsandtraps.blogspot.com/2015/10/drag-and-drop-in-treetableview-with.html
     private void setupDragScrolling() {
-        scrollTimer = FxTimer.createPeriodic(Duration.ofMillis(20), () ->
+        // see http://programmingtipsandtraps.blogspot.com/2015/10/drag-and-drop-in-treetableview-with.html
+
+        // timer used to implement scrolling
+        scrollTimer = FxTimer.createPeriodic(Duration.ofMillis(100), () ->
                 getVerticalScrollbar().ifPresent(scrollBar -> {
                     double newValue = scrollBar.getValue() + scrollVelocity;
                     newValue = Math.min(newValue, 1d);
@@ -454,18 +457,67 @@ public class GroupTreeView extends BorderPane {
                     scrollBar.setValue(newValue);
                 }));
 
-        groupTree.setOnScroll(event -> scrollTimer.stop());
-        groupTree.setOnDragDone(event -> scrollTimer.stop());
-        groupTree.setOnDragEntered(event -> scrollTimer.stop());
-        groupTree.setOnDragDropped(event -> scrollTimer.stop());
-        groupTree.setOnDragExited(event -> {
-            if (event.getY() > 0) {
-                scrollVelocity = 1.0 / SCROLL_SPEED;
-            } else {
-                scrollVelocity = -1.0 / SCROLL_SPEED;
-            }
+        // Start
+        groupTree.setOnDragEntered(event -> {
+            initScrolling();
             scrollTimer.restart();
         });
+
+        // During dragging
+        groupTree.setOnDragOver(event -> {
+            boolean scrollingUp = event.getY() < upperBorder;
+            boolean scrollingDown = event.getY() > lowerBorder;
+
+            if (!scrollingUp && !scrollingDown) {
+                scrollVelocity = 0;
+                return;
+            }
+
+            double distanceFromNonScrollableInsideArea;
+            if (scrollingUp) {
+                distanceFromNonScrollableInsideArea = scrollableAreaHeight - event.getY();
+            } else {
+                distanceFromNonScrollableInsideArea = scrollableAreaHeight - (groupTree.getHeight() - event.getY());
+            }
+
+            // part "(1+x)" of formula "speed = 20px/s (1+x)" (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
+            // / 10.0 is because of the 100 milliseconds above. (it is 20px per second, 10.0 * 100.0 ms = 1 second)
+            scrollVelocity = (baseFactor * (1.0 + distanceFromNonScrollableInsideArea)) / 10.0;
+            if (scrollingUp) {
+                scrollVelocity = -scrollVelocity;
+            }
+        });
+
+        // Stop
+        groupTree.setOnScroll(event -> scrollTimer.stop());
+        groupTree.setOnDragDone(event -> scrollTimer.stop());
+        groupTree.setOnDragDropped(event -> scrollTimer.stop());
+        groupTree.setOnDragExited(event -> scrollTimer.stop());
+    }
+
+    private void initScrolling() {
+        int numberOfShownGroups = groupTree.getExpandedItemCount();
+
+        if (numberOfShownGroups == 0) {
+            scrollVelocity = 0;
+            return;
+        }
+
+        double heightOfOneNode = groupTree.getChildrenUnmodifiable().get(0).getLayoutBounds().getHeight();
+        // heightOfOneNode is the size of text. We need including surroundings.
+        // We found no way to get this. We can only do a heuristics here.
+        // 2.0 is backed by measurement using the screen ruler utility (https://learn.microsoft.com/en-us/windows/powertoys/screen-ruler)
+        heightOfOneNode = heightOfOneNode * 2.0;
+
+        // At most scroll area is three entries large
+        scrollableAreaHeight = Math.min(heightOfOneNode * 3.0, groupTree.getHeight() / 3.0);
+        upperBorder = scrollableAreaHeight;
+        lowerBorder = groupTree.getHeight() - scrollableAreaHeight;
+
+        // 20 is derived from "speed = 20px/s (1+x)" (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
+        // (1.0 / groupTree.getHeight()) is the factor to convert from px to fraction of total height
+        double totalHeight = heightOfOneNode * numberOfShownGroups;
+        baseFactor = 20.0 * (1.0 / totalHeight);
     }
 
     private Optional<ScrollBar> getVerticalScrollbar() {
@@ -505,6 +557,9 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
@@ -616,6 +671,12 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeSubgroups(group);
                 case GROUP_SUBGROUP_SORT ->
                         viewModel.sortAlphabeticallyRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_REVERSE ->
+                        viewModel.sortReverseAlphabeticallyRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_ENTRIES ->
+                        viewModel.sortEntriesRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_ENTRIES_REVERSE ->
+                        viewModel.sortReverseEntriesRecursive(group.getGroupNode());
                 case GROUP_ENTRIES_ADD ->
                         viewModel.addSelectedEntries(group);
                 case GROUP_ENTRIES_REMOVE ->

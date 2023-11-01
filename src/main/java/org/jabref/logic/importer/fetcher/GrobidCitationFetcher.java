@@ -17,6 +17,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.UncheckedException;
 import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +71,17 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         List<BibEntry> collect;
-        collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                        .map(String::trim)
-                        .filter(str -> !str.isBlank())
-                        .map(Unchecked.function(this::parseUsingGrobid))
-                        .flatMap(Optional::stream)
-                        .collect(Collectors.toList());
+        try {
+            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                            .map(String::trim)
+                            .filter(str -> !str.isBlank())
+                            .map(Unchecked.function(this::parseUsingGrobid))
+                            .flatMap(Optional::stream)
+                            .collect(Collectors.toList());
+        } catch (UncheckedException e) {
+            // This "undoes" Unchecked.function(this::parseUsingGrobid))
+            throw (FetcherException) e.getCause();
+        }
         return collect;
     }
 

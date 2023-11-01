@@ -220,7 +220,7 @@ public class RepecNepImporter extends Importer {
     private String readMultipleLines(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder(this.lastLine.trim());
         readLine(in);
-        while ((this.lastLine != null) && !"".equals(this.lastLine.trim()) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
+        while ((this.lastLine != null) && !this.lastLine.trim().isEmpty() && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
             result.append(this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim());
             readLine(in);
         }
@@ -230,7 +230,7 @@ public class RepecNepImporter extends Importer {
     /**
      * Implements grammar rule "TitleString".
      *
-     * @throws IOException
+     * @throws IOException in case of error
      */
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
@@ -241,13 +241,13 @@ public class RepecNepImporter extends Importer {
     /**
      * Implements grammar rule "Authors"
      *
-     * @throws IOException
+     * @throws IOException in case of error
      */
     private void parseAuthors(BibEntry be, BufferedReader in) throws IOException {
         // read authors and institutions
         List<String> authors = new ArrayList<>();
         StringBuilder institutions = new StringBuilder();
-        while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
+        while ((this.lastLine != null) && !this.lastLine.isEmpty() && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
             // read single author
             String author;
             StringBuilder institution = new StringBuilder();
@@ -278,7 +278,7 @@ public class RepecNepImporter extends Importer {
 
             if (!institution.isEmpty()) {
                 institutions.append(
-                        institutions.length() == 0 ? institution.toString() : " and " + institution.toString());
+                        institutions.isEmpty() ? institution.toString() : " and " + institution.toString());
             }
         }
 
@@ -293,12 +293,12 @@ public class RepecNepImporter extends Importer {
     /**
      * Implements grammar rule "Abstract".
      *
-     * @throws IOException
+     * @throws IOException in case of error
      */
     private void parseAbstract(BibEntry be, BufferedReader in) throws IOException {
         String theabstract = readMultipleLines(in);
 
-        if (!"".equals(theabstract)) {
+        if (!theabstract.isEmpty()) {
             be.setField(StandardField.ABSTRACT, theabstract);
         }
     }
@@ -306,13 +306,12 @@ public class RepecNepImporter extends Importer {
     /**
      * Implements grammar rule "AdditionalFields".
      *
-     * @throws IOException
      */
     private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed, BufferedReader in)
             throws IOException {
 
         // one empty line is possible before fields start
-        if ((this.lastLine != null) && "".equals(this.lastLine.trim())) {
+        if ((this.lastLine != null) && this.lastLine.trim().isEmpty()) {
             readLine(in);
         }
 
@@ -360,7 +359,7 @@ public class RepecNepImporter extends Importer {
      * section, we have a working paper entry we are interested in
      */
     private boolean isStartOfWorkingPaper() {
-        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && "".equals(this.preLine.trim());
+        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.trim().isEmpty();
     }
 
     @Override

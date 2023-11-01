@@ -77,7 +77,7 @@ public class FetchAndMergeEntry {
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
-                                      ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
                                           cleanup.doPostCleanup(fetchedEntry.get());
@@ -169,7 +169,7 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
-                              ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
                               cleanup.doPostCleanup(fetchedEntry.get());
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {

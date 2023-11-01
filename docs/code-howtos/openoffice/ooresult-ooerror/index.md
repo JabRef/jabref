@@ -99,7 +99,7 @@ with an assumption that at any time exactly one of `result` and `error` is prese
 * Since `OOResult` encodes the state `isOK` in `result.isPresent()` (and equivalently in `errror.isEmpty()`), we cannot allow construction of instances where both values are `isEmpty`.\
   In particular, `OOResult.ok(null)` and `OOResult.error(null)` are not allowed: it would make the state `isOK` ambiguous.\
   It would also break the similarity to `Optional` to allow both `isEmpty` and `isOK` to be true.
-*   Not allowing null, has a consequence on `OOResult<Void,E>`\
+* Not allowing null, has a consequence on `OOResult<Void,E>`\
     According to [baeldung.com/java-void-type](https://www.baeldung.com/java-void-type), the only possible value for `Void` is `null` which we excluded.
 
     `OOResult<Void,E>.ok(null)` would look strange: in this case we need `ok()` without arguments.

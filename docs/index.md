@@ -50,8 +50,8 @@ General information about architectural decision records is available at <https:
 
 ## FAQ
 
-*   Q: I get `java: package org.jabref.logic.journals does not exist`.
+* Q: I get `java: package org.jabref.logic.journals does not exist`.
 
-    A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+  A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
-    Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
+  Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).

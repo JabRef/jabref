@@ -90,6 +90,7 @@ public class JabRefDesktop {
             return;
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
+
             link = identifierParser.parse(StandardField.EPRINT)
                                    .flatMap(Identifier::getExternalURI)
                                    .map(URI::toASCIIString)
@@ -97,7 +98,8 @@ public class JabRefDesktop {
 
             if (Objects.equals(link, initialLink)) {
                 Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
-                if (eprintTypeOpt.isEmpty()) {
+                Optional<String> archivePrefixOpt = entry.getField(StandardField.ARCHIVEPREFIX);
+                if (eprintTypeOpt.isEmpty() && archivePrefixOpt.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please set the eprinttype field"));
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", eprintTypeOpt.get()));

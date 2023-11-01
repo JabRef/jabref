@@ -48,8 +48,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run fetcher tests
         run: ./gradlew fetcherTest

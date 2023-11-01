@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -23,11 +25,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @FetcherTest
 public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     private static final String DOI = "10.23919/IFIPNetworking52078.2021.9472772";
+
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
 
     private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Igor Steinmacher and T. Conte and Christoph Treude and M. Gerosa")
@@ -42,7 +47,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @BeforeEach
     void setUp() {
-        fetcher = new SemanticScholar();
+        fetcher = new SemanticScholar(importerPreferences);
         entry = new BibEntry();
     }
 
@@ -56,19 +61,19 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByDOI() throws IOException, FetcherException {
+    void fullTextFindByDOI() throws Exception {
         entry.withField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
-                Optional.of(new URL("https://europepmc.org/articles/pmc4907333?pdf=render")),
+                Optional.of(new URI("https://europepmc.org/articles/pmc4907333?pdf=render").toURL()),
                 fetcher.findFullText(entry)
         );
     }
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByDOIAlternate() throws IOException, FetcherException {
+    void fullTextFindByDOIAlternate() throws Exception {
         assertEquals(
-                Optional.of(new URL("https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf")),
+                Optional.of(new URI("https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf").toURL()),
                 fetcher.findFullText(new BibEntry()
                         .withField(StandardField.DOI, "10.3390/healthcare9020206")));
     }
@@ -91,11 +96,11 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByArXiv() throws IOException, FetcherException {
+    void fullTextFindByArXiv() throws Exception {
         entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
                               .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
-                Optional.of(new URL("https://arxiv.org/pdf/1407.3561.pdf")),
+                Optional.of(new URI("https://arxiv.org/pdf/1407.3561.pdf").toURL()),
                 fetcher.findFullText(entry)
         );
     }
