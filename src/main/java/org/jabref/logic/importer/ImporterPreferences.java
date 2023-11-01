@@ -5,10 +5,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
 import org.jabref.logic.importer.fileformat.CustomImporter;
@@ -23,14 +26,15 @@ public class ImporterPreferences {
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImporters;
     private final BooleanProperty persistCustomKeys;
-
+    private final ListProperty<String> catalogs = new SimpleListProperty<>();
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
-                               boolean persistCustomKeys) {
+                               boolean persistCustomKeys,
+                               ObservableList<String> catalogs) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
@@ -38,6 +42,7 @@ public class ImporterPreferences {
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
+        this.setCatalogs(catalogs);
     }
 
     public boolean areImporterEnabled() {
@@ -119,5 +124,13 @@ public class ImporterPreferences {
                       .filter(FetcherApiKey::shouldUse)
                       .findFirst()
                       .map(FetcherApiKey::getKey);
+    }
+
+    public void setCatalogs(ObservableList<String> catalogs) {
+        this.catalogs.set(catalogs);
+    }
+
+    public ListProperty<String> getCatalogs() {
+        return catalogs;
     }
 }

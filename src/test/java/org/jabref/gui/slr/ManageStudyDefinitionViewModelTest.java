@@ -26,7 +26,7 @@ class ManageStudyDefinitionViewModelTest {
     void setUp() {
         // code taken from org.jabref.logic.importer.WebFetchersTest.setUp
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importerPreferences = mock(ImporterPreferences.class);
+        importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         dialogService = mock(DialogService.class);
     }
 

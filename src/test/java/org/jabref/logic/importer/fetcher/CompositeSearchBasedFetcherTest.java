@@ -20,6 +20,7 @@ import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -36,17 +37,21 @@ import static org.mockito.Mockito.when;
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
-
+    private ImporterPreferences importerPreferences;
+    @BeforeEach
+    void setUp(){
+        importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    }
     @Test
     public void createCompositeFetcherWithNullSet() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new CompositeSearchBasedFetcher(null, 0));
+                () -> new CompositeSearchBasedFetcher(null, importerPreferences ,0));
     }
 
     @Test
     public void performSearchWithoutFetchers() throws Exception {
         Set<SearchBasedFetcher> empty = new HashSet<>();
-        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
+        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, importerPreferences, Integer.MAX_VALUE);
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
@@ -56,7 +61,7 @@ public class CompositeSearchBasedFetcherTest {
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
     public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
-        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
+        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
@@ -67,7 +72,7 @@ public class CompositeSearchBasedFetcherTest {
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
-        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
+        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
         ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseMode.BIBTEX);
 
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");

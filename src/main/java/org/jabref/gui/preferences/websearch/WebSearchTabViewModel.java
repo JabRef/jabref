@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.websearch;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -18,11 +19,16 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.slr.StudyCatalogItem;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -42,6 +48,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
+    private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList();
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
@@ -56,6 +63,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
+    private final ImportFormatPreferences importFormatPreferences;
 
     public WebSearchTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
@@ -64,6 +72,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.grobidPreferences = preferencesService.getGrobidPreferences();
         this.doiPreferences = preferencesService.getDOIPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
     }
 
     @Override
@@ -82,6 +91,15 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
         apikeyPersistProperty.setValue(preferencesService.getImporterPreferences().shouldPersistCustomKeys());
+        catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                   .stream()
+                                   .map(SearchBasedFetcher::getName)
+                                   .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                   .map(name -> {
+                                       boolean enabled = importerPreferences.getCatalogs().contains(name);
+                                       return new StudyCatalogItem(name, enabled);
+                                   })
+                                   .toList());
     }
 
     @Override
@@ -94,10 +112,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
-
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
-
+        importerPreferences.setCatalogs(FXCollections.observableList(catalogs.stream().filter(StudyCatalogItem::isEnabled).map(StudyCatalogItem::getName).collect(Collectors.toList())));
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         preferencesService.getImporterPreferences().getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
@@ -119,6 +136,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty useCustomDOINameProperty() {
         return this.useCustomDOINameProperty;
+    }
+
+    public ObservableList<StudyCatalogItem> getCatalogs() {
+        return catalogs;
     }
 
     public BooleanProperty grobidEnabledProperty() {
@@ -206,5 +227,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         } else {
             dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
         }
+    }
+
+    @Override
+    public boolean validateSettings() {
+        return !(getCatalogs().stream().noneMatch(fetcher -> fetcher.isEnabled()));
     }
 }
