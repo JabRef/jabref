@@ -39,13 +39,13 @@ public class CompositeSearchBasedFetcherTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
     private ImporterPreferences importerPreferences;
     @BeforeEach
-    void setUp(){
+    void setUp() {
         importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
     @Test
     public void createCompositeFetcherWithNullSet() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new CompositeSearchBasedFetcher(null, importerPreferences ,0));
+                () -> new CompositeSearchBasedFetcher(null, importerPreferences,0));
     }
 
     @Test
