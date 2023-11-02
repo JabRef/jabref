@@ -110,6 +110,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         uriBuilder.addParameter("page", String.valueOf(pageNumber));
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
         uriBuilder.addParameter("lang", "en");
+        uriBuilder.addParameter("output", "xml");
 
         LOGGER.debug("URl for query {}", uriBuilder.build().toURL());
 
