@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class ShortenDOIFormatter extends Formatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShortenDOIFormatter.class);
-    private static final Predicate<String> SHORT_DOI_FORMAT = Pattern.compile("10/[a-zA-Z0-9]+").asPredicate();
+    private static final Predicate<String> SHORT_DOI_FORMAT = Pattern.compile("^10/[a-zA-Z0-9]+$").asPredicate();
 
     @Override
     public String getName() {
