@@ -453,7 +453,7 @@ public class LibraryTab extends Tab {
                                                      .toList();
 
             if (!linkedFileList.isEmpty() && showLinkedFileDeleteConfirmationDialog(linkedFileList)) {
-                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, null, null).deleteFileFromDisk(linkedFileList);
+                DeleteFileAction.deleteFileFromDisk(dialogService, preferencesService, bibDatabaseContext, linkedFileList);
             }
         }
 
