@@ -1,10 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
-import java.util.Comparator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
@@ -25,7 +21,6 @@ import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -61,11 +56,9 @@ public class WebSearchPaneViewModel {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        SortedSet<SearchBasedFetcher> allFetchers = new TreeSet<>(new CompositeSearchFirstComparator());
-        allFetchers.addAll(WebFetchers.getSearchBasedFetchers(
+        fetchers.setAll(WebFetchers.getSearchBasedFetchers(
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getImporterPreferences()));
-        fetchers.setAll(allFetchers);
 
         // Choose last-selected fetcher as default
         SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
@@ -180,13 +173,3 @@ public class WebSearchPaneViewModel {
     }
 }
 
-class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
-    @Override
-    public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {
-        if (Objects.equals(s1.getName(), CompositeSearchBasedFetcher.FETCHER_NAME)) {
-            return -1;
-        } else {
-            return s1.getName().compareTo(s2.getName());
-        }
-    }
-}

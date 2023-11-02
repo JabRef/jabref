@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public class ImporterPreferences {
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
                                boolean persistCustomKeys,
-                               ObservableList<String> catalogs) {
+                               List<String> catalogs) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
@@ -42,7 +43,7 @@ public class ImporterPreferences {
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
-        this.setCatalogs(catalogs);
+        this.catalogs.set(FXCollections.observableArrayList(catalogs));
     }
 
     public boolean areImporterEnabled() {

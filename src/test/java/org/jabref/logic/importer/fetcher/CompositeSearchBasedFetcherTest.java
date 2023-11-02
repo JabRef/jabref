@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
+
     private ImporterPreferences importerPreferences;
     @BeforeEach
     void setUp() {

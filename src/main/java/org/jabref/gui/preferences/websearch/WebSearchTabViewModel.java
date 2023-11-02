@@ -231,6 +231,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        return !(getCatalogs().stream().noneMatch(fetcher -> fetcher.isEnabled()));
+        return getCatalogs().stream().anyMatch(StudyCatalogItem::isEnabled);
     }
 }
