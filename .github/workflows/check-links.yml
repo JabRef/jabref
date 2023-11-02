@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  markdown-link-check:
+  lychee:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
