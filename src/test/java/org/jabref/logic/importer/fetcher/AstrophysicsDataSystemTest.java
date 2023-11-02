@@ -103,6 +103,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
                 .withField(StandardField.TITLE, "Multiyear On-Orbit Calibration and Performance of Terra MODIS Reflective Solar Bands")
                 .withField(StandardField.VOLUME, "45")
                 .withField(StandardField.YEAR, "2007")
+                .withField(StandardField.KEYWORDS, "Earth Science")
                 .withField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2007ITGRS..45..879X");
 
         ingersollPollardEntry = new BibEntry(StandardEntryType.Article)
@@ -125,7 +126,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
                 .withField(StandardField.AUTHOR, "Lucey, Paul G. and Blewett, David T. and Jolliff, Bradley L.")
                 .withField(StandardField.DOI, "10.1029/1999JE001117")
                 .withField(StandardField.JOURNAL, "\\jgr")
-                .withField(StandardField.KEYWORDS, "Planetology: Solid Surface Planets: Composition, Planetology: Solid Surface Planets: Remote sensing, Planetology: Solid Surface Planets: Surface materials and properties, Planetology: Solar System Objects: Moon (1221)")
+                .withField(StandardField.KEYWORDS, "Planetology: Solid Surface Planets: Composition, Planetology: Solid Surface Planets: Remote sensing, Planetology: Solid Surface Planets: Surface materials and properties, Planetology: Solar System Objects: Moon (1221), Earth Science")
                 .withField(StandardField.PAGES, "20297-20306")
                 .withField(StandardField.TITLE, "Lunar iron and titanium abundance algorithms based on final processing of Clementine ultraviolet-visible images")
                 .withField(StandardField.VOLUME, "105")
