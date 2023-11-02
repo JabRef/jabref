@@ -304,6 +304,7 @@ jobs:
     steps:
       - name: Check secrets presence
         id: checksecrets
+        if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           if [ "$CODECOV_TOKEN" == "" ]; then
@@ -319,19 +320,21 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
+        if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v3
         with:
           java-version: 21.0.1
           distribution: 'liberica'
           cache: 'gradle'
       - name: Update test coverage metrics
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
         env:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
       - uses: codecov/codecov-action@v3
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
