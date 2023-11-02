@@ -21,12 +21,12 @@ public class JournalInfoOptInDialogHelper {
                             Localization.lang("Preferences"),
                             Localization.lang("Entry editor"))
             );
-            if (enableJournalPopup) {
-                preferences.setEnableJournalPopup(EntryEditorPreferences.JournalPopupEnabled.ENABLED);
-                return true;
-            } else {
-                return false;
-            }
+
+            preferences.setEnableJournalPopup(enableJournalPopup
+                    ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                    : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+
+            return enableJournalPopup;
         }
 
         boolean journalInfoEnabled = dialogService.showConfirmationDialogAndWait(
