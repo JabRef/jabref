@@ -315,6 +315,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
+        if: github.ref == 'refs/heads/main'
         uses: actions/checkout@v4
         with:
           submodules: 'true'
