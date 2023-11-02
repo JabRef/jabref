@@ -122,6 +122,9 @@ public class DeleteFileAction extends SimpleCommand {
     /**
      * Deletes files from disk without asking the user for confirmation, for a list of files
      *
+     * @param dialogService DialogService
+     * @param preferences PreferencesService
+     * @param databaseContext BibDatabaseContext
      * @param filesLinkedToEntry A list of LinkedFile to be deleted
      */
     public static void deleteFileFromDisk(DialogService dialogService, PreferencesService preferences, BibDatabaseContext databaseContext, List<LinkedFile> filesLinkedToEntry) {
