@@ -86,7 +86,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("q", transformedQuery);
-        uriBuilder.addParameter("page", String.valueOf(pageNumber));
+    //    uriBuilder.addParameter("page", String.valueOf(pageNumber));
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
         //uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
