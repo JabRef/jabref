@@ -2,10 +2,11 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
@@ -37,11 +38,11 @@ import org.xml.sax.SAXException;
 /**
  * Fetcher for <a href="https://isidore.science">ISIDORE</a>```
  * Will take in the link to the website or the last six digits that identify the reference
- * Uses <a href="https://isidore.science/api">ISIDORE's API</a>. */
+ * Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
+ */
 public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);
-    private static final int LINKLENGTH = 47;
 
     private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
 
@@ -51,29 +52,6 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     public ISIDOREFetcher() {
         this.factory = DocumentBuilderFactory.newInstance();
-    }
-
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        identifier = identifier.trim();
-
-        if (identifier.length() == 6) {
-            // this allows the user to input only the six-digit code at the end.
-            identifier = "https://isidore.science/document/10670/1." + identifier;
-        } else if (identifier.length() == 8) {
-            // allows the user to put in the eight digits including the "1."
-            identifier = "https://isidore.science/document/10670/" + identifier;
-        }
-
-        if (identifier.startsWith("https://isidore.science/document/10670/1.") && (identifier.length() == LINKLENGTH)) {
-            this.URL = identifier;
-            // change the link to be the correct link for the api.
-            identifier = identifier.replace("/document/", "/resource/content?uri=");
-            identifier = identifier.replace("https://isidore.science/", "https://api.isidore.science/");
-            return new URI(identifier).toURL();
-        } else {
-            // Throw an error if the link does not start with the link above
-            throw new FetcherException("Could not construct url for ISIDORE");
-        }
     }
 
     @Override
@@ -91,25 +69,26 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                     return Collections.emptyList();
                 }
 
-                return Collections.singletonList(xmlItemToBibEntry(document.getDocumentElement()));
+                return parseXMl(entryElement);
             } catch (
                     ParserConfigurationException |
                     IOException |
                     SAXException e) {
-                Unchecked.throwChecked(new FetcherException("Issue with parsing link"));
+                Unchecked.throwChecked(new FetcherException("Issue with parsing link", e));
             }
             return null;
         };
     }
+
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        ISIDOREQueryTransformer  queryTransformer = new ISIDOREQueryTransformer();
+        ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();
         String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("q", transformedQuery);
         uriBuilder.addParameter("page", String.valueOf(pageNumber));
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
-        uriBuilder.addParameter("lang", "en");
+        //uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
 
         LOGGER.debug("URl for query {}", uriBuilder.build().toURL());
@@ -117,6 +96,17 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return uriBuilder.build().toURL();
     }
 
+    private List<BibEntry> parseXMl(Element element) {
+        var list = element.getElementsByTagName("isidore");
+        List<BibEntry> bibEntryList = new ArrayList<>();
+
+        for (int i = 0; i < list.getLength(); i++) {
+            Element elem = (Element) list.item(i);
+            var bibEntry = xmlItemToBibEntry(elem);
+            bibEntryList.add(bibEntry);
+        }
+        return bibEntryList;
+    }
 
     private BibEntry xmlItemToBibEntry(Element itemElement) {
         return new BibEntry(getType(itemElement.getElementsByTagName("types").item(0).getChildNodes()))
@@ -226,5 +216,4 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_ISIDORE);
     }
-
 }

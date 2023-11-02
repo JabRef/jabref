@@ -23,6 +23,23 @@ public class ISIDOREFetcherTest {
         this.fetcher = new ISIDOREFetcher();
     }
 
+
+    @Test
+    public void checkArticleTest() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Investigating day-to-day variability of transit usage on a multimonth scale with smart card data. A case study in Lyon")
+                .withField(StandardField.AUTHOR, "Oscar Egu and Patrick Bonnel")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.JOURNAL, "Travel Behaviour and Society")
+                .withField(StandardField.PUBLISHER, "HAL CCSD, Elsevier")
+                .withField(StandardField.DOI, "10.1016/j.tbs.2019.12.003")
+                .withField(StandardField.URL, "https://isidore.science/document/10670/1.hrzlqd");
+
+        List<BibEntry> actual = fetcher.performSearch("cnqrs");
+
+        assertEquals(List.of(expected), actual);
+    }
+
     @Test
     public void checkArticle() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
