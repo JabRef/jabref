@@ -151,14 +151,12 @@ public abstract class AbstractQueryTransformer {
         String[] split = yearRange.split("-");
         int parsedStartYear = Integer.parseInt(split[0]);
         startYear = parsedStartYear;
-        if (split.length >= 1) {
-            int parsedEndYear = Integer.parseInt(split[1]);
-            if (parsedEndYear >= parsedStartYear) {
-                endYear = parsedEndYear;
-            } else {
-                startYear = parsedEndYear;
-                endYear = parsedStartYear;
-            }
+        int parsedEndYear = Integer.parseInt(split[1]);
+        if (parsedEndYear >= parsedStartYear) {
+            endYear = parsedEndYear;
+        } else {
+            startYear = parsedEndYear;
+            endYear = parsedStartYear;
         }
     }
 
@@ -207,17 +205,23 @@ public abstract class AbstractQueryTransformer {
     }
 
     private Optional<String> transform(QueryNode query) {
-        if (query instanceof BooleanQueryNode) {
-            return transform((BooleanQueryNode) query);
-        } else if (query instanceof FieldQueryNode) {
-            return transform((FieldQueryNode) query);
-        } else if (query instanceof GroupQueryNode) {
-            return transform(((GroupQueryNode) query).getChild());
-        } else if (query instanceof ModifierQueryNode) {
-            return transform((ModifierQueryNode) query);
-        } else {
-            LOGGER.error("Unsupported case when transforming the query:\n {}", query);
-            return Optional.empty();
+        switch (query) {
+            case BooleanQueryNode booleanQueryNode -> {
+                return transform(booleanQueryNode);
+            }
+            case FieldQueryNode fieldQueryNode -> {
+                return transform(fieldQueryNode);
+            }
+            case GroupQueryNode groupQueryNode -> {
+                return transform(groupQueryNode.getChild());
+            }
+            case ModifierQueryNode modifierQueryNode -> {
+                return transform(modifierQueryNode);
+            }
+            case null, default -> {
+                LOGGER.error("Unsupported case when transforming the query:\n {}", query);
+                return Optional.empty();
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -34,9 +34,9 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.1016/j.tbs.2019.12.003")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.hrzlqd");
 
-        Optional<BibEntry> actual = fetcher.performSearchById("https://isidore.science/document/10670/1.hrzlqd");
+        List<BibEntry> actual = fetcher.performSearch("Investigating day-to-day variability of transit usage on a multimonth scale with smart card data. A case study in Lyon");
 
-        assertEquals(Optional.of(expected), actual);
+        assertEquals(List.of(expected), actual);
     }
 
     @Test
@@ -50,9 +50,9 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.3917/popu.1601.0153")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.d2vlam");
 
-        Optional<BibEntry> actual = fetcher.performSearchById("d2vlam");
+        List<BibEntry> actual = fetcher.performSearch("Inequality – What Can Be Done");
 
-        assertEquals(Optional.of(expected), actual);
+        assertEquals(List.of(expected), actual);
     }
 
     @Test
@@ -63,9 +63,9 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.YEAR, "2015")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.m05oth");
 
-        Optional<BibEntry> actual = fetcher.performSearchById("1.m05oth");
+        List<BibEntry> actual = fetcher.performSearch("Mapping English L2 errors : an integrated system and textual approach");
 
-        assertEquals(Optional.of(expected), actual);
+        assertEquals(List.of(expected), actual);
     }
 
     @Test
@@ -78,8 +78,8 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.1016/j.eururo.2018.10.041")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.zm7q2x");
 
-        Optional<BibEntry> actual = fetcher.performSearchById("https://isidore.science/document/10670/1.zm7q2x");
+        List<BibEntry> actual = fetcher.performSearch("Salvage Lymph Node Dissection for Nodal Recurrent Prostate Cancer: A Systematic Review.");
 
-        assertEquals(Optional.of(expected), actual);
+        assertEquals(List.of(expected), actual);
     }
 }

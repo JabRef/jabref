@@ -99,6 +99,7 @@ public class WebFetchers {
     public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         SortedSet<SearchBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new ArXivFetcher(importFormatPreferences));
+        set.add(new ISIDOREFetcher());
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
@@ -146,7 +147,6 @@ public class WebFetchers {
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
-        set.add(new ISIDOREFetcher());
         set.add(new Medra());
         // set.add(new JstorFetcher(importFormatPreferences));
         return set;

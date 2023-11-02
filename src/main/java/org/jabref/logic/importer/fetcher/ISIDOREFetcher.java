@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -14,15 +15,19 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.IdBasedParserFetcher;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.importer.fetcher.transformers.ISIDOREQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jooq.lambda.Unchecked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,20 +38,21 @@ import org.xml.sax.SAXException;
  * Fetcher for <a href="https://isidore.science">ISIDORE</a>```
  * Will take in the link to the website or the last six digits that identify the reference
  * Uses <a href="https://isidore.science/api">ISIDORE's API</a>. */
-public class ISIDOREFetcher implements IdBasedParserFetcher {
+public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);
     private static final int LINKLENGTH = 47;
 
-    private String URL;
-    private Parser parser;
+    private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
 
-    private DocumentBuilderFactory factory;
+    private String URL;
+
+    private final DocumentBuilderFactory factory;
 
     public ISIDOREFetcher() {
         this.factory = DocumentBuilderFactory.newInstance();
-        this.parser = getParser();
     }
 
-    @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         identifier = identifier.trim();
 
@@ -63,7 +69,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
             // change the link to be the correct link for the api.
             identifier = identifier.replace("/document/", "/resource/content?uri=");
             identifier = identifier.replace("https://isidore.science/", "https://api.isidore.science/");
-            return new URL(identifier);
+            return new URI(identifier).toURL();
         } else {
             // Throw an error if the link does not start with the link above
             throw new FetcherException("Could not construct url for ISIDORE");
@@ -95,6 +101,21 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
             return null;
         };
     }
+    @Override
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+        ISIDOREQueryTransformer  queryTransformer = new ISIDOREQueryTransformer();
+        String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
+        URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
+        uriBuilder.addParameter("q", transformedQuery);
+        uriBuilder.addParameter("page", String.valueOf(pageNumber));
+        uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("lang", "en");
+
+        LOGGER.debug("URl for query {}", uriBuilder.build().toURL());
+
+        return uriBuilder.build().toURL();
+    }
+
 
     private BibEntry xmlItemToBibEntry(Element itemElement) {
         return new BibEntry(getType(itemElement.getElementsByTagName("types").item(0).getChildNodes()))
@@ -196,27 +217,13 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
-        IdBasedParserFetcher.super.doPostCleanup(entry);
-    }
-
-    @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return IdBasedParserFetcher.super.performSearchById(identifier);
-    }
-
-    @Override
     public String getName() {
         return "ISIDORE";
     }
 
     @Override
     public Optional<HelpFile> getHelpPage() {
-        return IdBasedParserFetcher.super.getHelpPage();
+        return Optional.of(HelpFile.FETCHER_ISIDORE);
     }
 
-    @Override
-    public URLDownload getUrlDownload(URL url) {
-        return IdBasedParserFetcher.super.getUrlDownload(url);
-    }
 }
