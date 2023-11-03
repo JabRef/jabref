@@ -75,6 +75,16 @@ public class PdfMergeMetadataImporter extends Importer {
         return importDatabase(filePath, null);
     }
 
+    /**
+     * Same as {@link PdfMergeMetadataImporter#importDatabase(Path)}, but this
+     * relativizes the {@code filePath}, if {@code workingDir} is not null
+     * (otherwise no path modification happens).
+     *
+     * @param filePath    the path to the file which should be imported
+     * @param workingDir  one of the directories
+     *                    {@link BibDatabaseContext#getFileDirectories(FilePreferences) mentioned here}
+     *                    set up for this database
+     */
     public ParserResult importDatabase(Path filePath, Path workingDir) throws IOException {
         List<BibEntry> candidates = new ArrayList<>();
 
