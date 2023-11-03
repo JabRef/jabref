@@ -247,6 +247,10 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         }
     }
 
+    /**
+     * build appropriate actions for the right click menu (different from StandardActions)
+     *
+     */
     private enum RightClickMenuActions implements Action {
 
         SHOW_PREFS_RIGHT_CLICK_MENU(Localization.lang("More options..."), IconTheme.JabRefIcons.PREFERENCES);
