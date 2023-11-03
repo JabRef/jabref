@@ -929,11 +929,6 @@ public class LibraryTab extends Tab {
         }
 
         @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
-        }
-
-        @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
