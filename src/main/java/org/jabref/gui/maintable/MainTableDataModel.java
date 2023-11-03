@@ -48,8 +48,9 @@ public class MainTableDataModel {
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(),
+                        stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
-                        (groups, groupViewMode) -> entry -> isMatched(groups, Optional.empty(), entry))
+                        (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
         );
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
