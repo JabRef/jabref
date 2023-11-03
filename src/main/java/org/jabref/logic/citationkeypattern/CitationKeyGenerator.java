@@ -78,7 +78,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
-                           .filter(c -> !DISALLOWED_CHARACTERS.contains(c))
+                           .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
                            .collect(StringBuilder::new,
                                    StringBuilder::appendCodePoint, StringBuilder::append)
                            .toString();
