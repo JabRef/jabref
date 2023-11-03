@@ -10,6 +10,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+- We Added an integration to scite.ai that retrieves 'Smart Citation' tallies for citations that have a DOI. This appears as a tab on the entry editor pane, and can be disabled via a preference check box [#375](https://github.com/koppor/jabref/issues/375)  
+
+### Added
 
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
 - We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
