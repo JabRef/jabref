@@ -1,11 +1,13 @@
 package org.jabref.gui.entryeditor;
 
+import java.net.URL;
+import java.util.Optional;
+import java.util.concurrent.Future;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import kong.unirest.json.JSONObject;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.util.BackgroundTask;
@@ -15,11 +17,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
+import kong.unirest.json.JSONObject;
 import org.tinylog.Logger;
-
-import java.net.URL;
-import java.util.Optional;
-import java.util.concurrent.Future;
 
 public class SciteTabViewModel extends AbstractViewModel {
 
@@ -79,7 +78,6 @@ public class SciteTabViewModel extends AbstractViewModel {
                 status.set(Status.ERROR);
             })
             .executeWith(taskExecutor);
-
     }
 
     private void cancelSearch() {
@@ -90,7 +88,7 @@ public class SciteTabViewModel extends AbstractViewModel {
         status.set(Status.IN_PROGRESS);
         searchTask.cancel(true);
     }
-    
+
     public SciteTallyDTO fetchTallies(DOI doi) {
         try {
             URL url = new URL(BASE_URL + "tallies/" + doi.getDOI());
@@ -210,7 +208,5 @@ public class SciteTabViewModel extends AbstractViewModel {
         public void setCitingPublications(int citingPublications) {
             this.citingPublications = citingPublications;
         }
-
     }
-
 }

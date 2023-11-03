@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import com.tobiasdiez.easybind.EasyBind;
+import java.net.URLEncoder;
 
 import javafx.geometry.HPos;
 import javafx.scene.control.Hyperlink;
@@ -12,15 +12,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.controlsfx.control.HyperlinkLabel;
-
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
-import java.net.URLEncoder;
+import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.HyperlinkLabel;
 
 public class SciteTab extends EntryEditorTab {
 
@@ -120,5 +119,4 @@ public class SciteTab extends EntryEditorTab {
         messageBox.setStyle("-fx-padding: 30 0 0 30;");
         return messageBox;
     }
-
 }
