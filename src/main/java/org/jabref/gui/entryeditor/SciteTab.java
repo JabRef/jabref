@@ -104,7 +104,7 @@ public class SciteTab extends EntryEditorTab {
 
         String url = "https://scite.ai/reports/" + URLEncoder.encode(tallyDTO.getDoi());
         HyperlinkLabel link = new HyperlinkLabel(String.format("See full report at [%s]", url));
-        link.setOnAction((event) -> {
+        link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 var filePreferences = preferencesService.getFilePreferences();
                 try {
