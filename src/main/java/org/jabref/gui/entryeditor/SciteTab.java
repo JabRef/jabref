@@ -1,19 +1,25 @@
 package org.jabref.gui.entryeditor;
 
 import com.tobiasdiez.easybind.EasyBind;
+
 import javafx.geometry.HPos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+
 import org.controlsfx.control.HyperlinkLabel;
+
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
+
 import java.net.URLEncoder;
 
 public class SciteTab extends EntryEditorTab {
