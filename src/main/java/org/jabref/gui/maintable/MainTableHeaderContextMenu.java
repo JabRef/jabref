@@ -2,19 +2,33 @@ package org.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.l10n.Localization;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
     private static final int OUT_OF_BOUNDS = -1;
+    private final JabRefFrame frame;
+    private final TaskExecutor taskExecutor;
     MainTable mainTable;
     MainTableColumnFactory factory;
 
@@ -22,8 +36,10 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Constructor for the right click menu
      *
      */
-    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory) {
+    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory, JabRefFrame frame, TaskExecutor taskExecutor) {
         super();
+        this.frame = frame;
+        this.taskExecutor = taskExecutor;
         this.mainTable = mainTable;
         this.factory = factory;
         constructItems(mainTable);
@@ -66,15 +82,21 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             }
         }
 
-        SeparatorMenuItem separator = new SeparatorMenuItem();
-        this.getItems().add(separator);
+        if (!commonColumns.isEmpty()) {
+            this.getItems().add(new SeparatorMenuItem());
 
-        // Append to the menu the current remaining columns in the common columns.
+            // Append to the menu the current remaining columns in the common columns.
+            for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
+                RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
+                this.getItems().add(itemToAdd);
+            }
 
-        for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
-            RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
-            this.getItems().add(itemToAdd);
         }
+
+        this.getItems().add(new SeparatorMenuItem());
+        ActionFactory actionfactory = new ActionFactory(Globals.getKeyPrefs());
+        MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor));
+        this.getItems().add(showMoreItem);
     }
 
     /**
@@ -110,7 +132,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      */
     @SuppressWarnings("rawtypes")
     private void addColumn(MainTableColumn tableColumn, int index) {
-        if (index <= OUT_OF_BOUNDS || index >= mainTable.getColumns().size()) {
+        if ((index <= OUT_OF_BOUNDS) || (index >= mainTable.getColumns().size())) {
             mainTable.getColumns().add(tableColumn);
         } else {
             mainTable.getColumns().add(index, tableColumn);
@@ -222,6 +244,34 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         public boolean isVisibleInTable() {
             return visibleInTable;
+        }
+    }
+
+    private enum RightClickMenuActions implements Action {
+
+        SHOW_PREFS_RIGHT_CLICK_MENU(Localization.lang("More options..."), IconTheme.JabRefIcons.PREFERENCES);
+
+        private final String text;
+        private final String description;
+        private final Optional<JabRefIcon> icon;
+        private final Optional<KeyBinding> keyBinding;
+
+        RightClickMenuActions(String text, IconTheme.JabRefIcons icon) {
+            this.text = text;
+            this.description = "";
+            this.icon = Optional.of(icon);
+            this.keyBinding = Optional.empty();
+        }
+
+        @Override
+        public String getText() {
+            // TODO Auto-generated method stub
+            return text;
+        }
+
+        @Override
+        public Optional<JabRefIcon> getIcon() {
+            return icon;
         }
     }
 }
