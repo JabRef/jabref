@@ -90,8 +90,7 @@ public class SciteTabViewModel extends AbstractViewModel {
         status.set(Status.IN_PROGRESS);
         searchTask.cancel(true);
     }
-
-
+    
     public SciteTallyDTO fetchTallies(DOI doi) {
         try {
             URL url = new URL(BASE_URL + "tallies/" + doi.getDOI());

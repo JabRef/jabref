@@ -69,9 +69,7 @@ public class SciteTab extends EntryEditorTab {
                     sciteResultsPane.add(getErrorPane(), 0, 0);
                     break;
             }
-
         });
-
     }
 
     @Override
