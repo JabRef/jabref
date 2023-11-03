@@ -27,6 +27,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
+
     @FXML private CheckBox cleanupsEnabled;
     @FXML private TableView<FieldFormatterCleanup> cleanupsList;
     @FXML private TableColumn<FieldFormatterCleanup, Field> fieldColumn;
