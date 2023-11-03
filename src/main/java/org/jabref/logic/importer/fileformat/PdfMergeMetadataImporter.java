@@ -129,11 +129,9 @@ public class PdfMergeMetadataImporter extends Importer {
             }
         }
         if (workingDir != null) {
-            Path relativizedFilePath = workingDir.relativize(filePath);
-            entry.addFile(new LinkedFile("", relativizedFilePath, StandardFileType.PDF.getName()));
-        } else {
-            entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
+            filePath = workingDir.relativize(filePath);
         }
+        entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
         return new ParserResult(List.of(entry));
     }
 
