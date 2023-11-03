@@ -102,13 +102,12 @@ class PdfMergeMetadataImporterTest {
         Path workingDir = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
         List<BibEntry> result = importer.importDatabase(file, workingDir).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
-        expected.setField(StandardField.AUTHOR, "1 ");
-        expected.setField(StandardField.TITLE, "Hello World");
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "1 ")
+                .withField(StandardField.TITLE, "Hello World")
+                // Expecting relative path
+                .withField(StandardField.FILE, ":minimal.pdf:PDF");
 
-        // Expecting relative path
-        expected.setField(StandardField.FILE, ":minimal.pdf:PDF");
-
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 }
