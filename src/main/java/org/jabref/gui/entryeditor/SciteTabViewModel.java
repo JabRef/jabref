@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 
 public class SciteTabViewModel extends AbstractViewModel {
 
+    // The view only has three states - In Progress, found (success) and error
     enum Status {
         IN_PROGRESS,
         FOUND,
@@ -47,6 +48,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     public void bindToEntry(BibEntry entry) {
+        // If a search is already running, cancel it
         cancelSearch();
 
         if (entry == null) {
@@ -55,6 +57,7 @@ public class SciteTabViewModel extends AbstractViewModel {
             return;
         }
 
+        // The scite.ai api requires a DOI
         if (entry.getDOI().isEmpty()) {
             searchError.set("This entry does not have a DOI");
             status.set(Status.ERROR);
@@ -117,6 +120,9 @@ public class SciteTabViewModel extends AbstractViewModel {
         return currentResult;
     }
 
+    /**
+     * Simple DTO object to hold the scite.ai tallies data for a given DOI
+     */
     public static class SciteTallyDTO {
 
         private String doi;
@@ -127,6 +133,12 @@ public class SciteTabViewModel extends AbstractViewModel {
         private int unclassified;
         private int citingPublications;
 
+        /**
+         * Creates a {@link SciteTallyDTO} from a JSONObject (dictionary/map)
+         *
+         * @param jsonObject The JSON object holding the tally values
+         * @return a new {@link SciteTallyDTO}
+         */
         public static SciteTallyDTO fromJSONObject(JSONObject jsonObject) {
             SciteTallyDTO dto = new SciteTallyDTO();
 

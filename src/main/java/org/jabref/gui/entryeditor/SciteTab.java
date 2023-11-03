@@ -20,7 +20,7 @@ public class SciteTab extends EntryEditorTab {
 
     public static final String NAME = "Scite";
 
-    private final GridPane searchPane;
+    private final GridPane sciteResultsPane;
     private final ProgressIndicator progressIndicator;
     private final SciteTabViewModel viewModel;
     private final PreferencesService preferencesService;
@@ -28,40 +28,39 @@ public class SciteTab extends EntryEditorTab {
     public SciteTab(PreferencesService preferencesService, TaskExecutor taskExecutor) {
         this.preferencesService = preferencesService;
         this.viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
-        this.searchPane = new GridPane();
-
+        this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
 
         setText(Localization.lang("Scite"));
         setTooltip(new Tooltip(Localization.lang("Search scite.ai for Smart Citations")));
-        setSearchPane();
+        setSciteResultsPane();
     }
 
-    private void setSearchPane() {
+    private void setSciteResultsPane() {
         progressIndicator.setMaxSize(100, 100);
-        searchPane.add(progressIndicator, 0, 0);
+        sciteResultsPane.add(progressIndicator, 0, 0);
 
         ColumnConstraints column = new ColumnConstraints();
         column.setPercentWidth(100);
         column.setHalignment(HPos.CENTER);
 
-        searchPane.getColumnConstraints().setAll(column);
-        searchPane.setId("scitePane");
-        setContent(searchPane);
+        sciteResultsPane.getColumnConstraints().setAll(column);
+        sciteResultsPane.setId("scitePane");
+        setContent(sciteResultsPane);
 
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
-            searchPane.getChildren().clear();
+            sciteResultsPane.getChildren().clear();
             switch (status) {
                 case IN_PROGRESS:
-                    searchPane.add(progressIndicator, 0, 0);
+                    sciteResultsPane.add(progressIndicator, 0, 0);
                     break;
                 case FOUND:
                     if (viewModel.getCurrentResult().isPresent()) {
-                        searchPane.add(getTalliesPane(viewModel.getCurrentResult().get()), 0, 0);
+                        sciteResultsPane.add(getTalliesPane(viewModel.getCurrentResult().get()), 0, 0);
                     }
                     break;
                 case ERROR:
-                    searchPane.add(getErrorPane(), 0, 0);
+                    sciteResultsPane.add(getErrorPane(), 0, 0);
                     break;
             }
 
