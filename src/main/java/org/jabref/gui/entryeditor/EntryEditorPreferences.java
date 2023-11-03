@@ -47,6 +47,7 @@ public class EntryEditorPreferences {
     private final DoubleProperty dividerPosition;
     private final BooleanProperty autoLinkFiles;
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
+    private final BooleanProperty shouldShowSciteTab;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   Map<String, Set<Field>> defaultEntryEditorTabList,
@@ -58,7 +59,8 @@ public class EntryEditorPreferences {
                                   boolean allowIntegerEditionBibtex,
                                   double dividerPosition,
                                   boolean autolinkFilesEnabled,
-                                  JournalPopupEnabled journalPopupEnabled) {
+                                  JournalPopupEnabled journalPopupEnabled,
+                                  boolean showSciteTab) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
         this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
@@ -71,6 +73,7 @@ public class EntryEditorPreferences {
         this.dividerPosition = new SimpleDoubleProperty(dividerPosition);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
+        this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
@@ -195,5 +198,17 @@ public class EntryEditorPreferences {
 
     public void setEnableJournalPopup(JournalPopupEnabled journalPopupEnabled) {
         this.enablementStatus.set(journalPopupEnabled);
+    }
+
+    public boolean shouldShowSciteTab() {
+        return this.shouldShowSciteTab.get();
+    }
+
+    public BooleanProperty shouldShowLSciteTabProperty() {
+        return this.shouldShowSciteTab;
+    }
+
+    public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
+        this.shouldShowSciteTab.set(shouldShowSciteTab);
     }
 }
