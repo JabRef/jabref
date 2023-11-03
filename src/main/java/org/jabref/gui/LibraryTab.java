@@ -738,25 +738,24 @@ public class LibraryTab extends Tab {
     private boolean showLinkedFileDeleteConfirmationDialog(List<LinkedFile> linkedFileList) {
         if (preferencesService.getFilePreferences().alwaysDeleteLinkedFile()) {
             return true;
-        } else {
-            String title = Localization.lang("Delete attached file(s)");
-            String message = linkedFileList.stream()
-                                           .map(linkedFile -> linkedFile.findIn(bibDatabaseContext, preferencesService.getFilePreferences())
-                                                                        .map(Path::getFileName)
-                                                                        .map(Path::toString)
-                                                                        .orElse(""))
-                                           .collect(Collectors.joining("\n", Localization.lang("Following attached file(s) will be deleted") + "\n\n", ""));
-            String okButton = Localization.lang("Delete attached files");
-            String cancelButton = Localization.lang("Keep attached files");
-
-            return dialogService.showConfirmationDialogWithOptOutAndWait(
-                    title,
-                    message,
-                    okButton,
-                    cancelButton,
-                    Localization.lang("Always delete attached file(s)"),
-                    optOut -> preferencesService.getFilePreferences().setAlwaysDeleteLinkedFile(optOut));
         }
+        String title = Localization.lang("Delete attached file(s)");
+        String message = linkedFileList.stream()
+                                       .map(linkedFile -> linkedFile.findIn(bibDatabaseContext, preferencesService.getFilePreferences())
+                                                                    .map(Path::getFileName)
+                                                                    .map(Path::toString)
+                                                                    .orElse(""))
+                                       .collect(Collectors.joining("\n", Localization.lang("Following attached file(s) will be deleted") + "\n\n", ""));
+        String okButton = Localization.lang("Delete attached files");
+        String cancelButton = Localization.lang("Keep attached files");
+
+        return dialogService.showConfirmationDialogWithOptOutAndWait(
+                title,
+                message,
+                okButton,
+                cancelButton,
+                Localization.lang("Always delete attached file(s)"),
+                optOut -> preferencesService.getFilePreferences().setAlwaysDeleteLinkedFile(optOut));
     }
 
     /**

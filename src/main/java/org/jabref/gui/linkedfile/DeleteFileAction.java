@@ -120,11 +120,8 @@ public class DeleteFileAction extends SimpleCommand {
     }
 
     /**
-     * Deletes files from disk without asking the user for confirmation, for a list of files
+     * Deletes a list of LinkedFile from disk
      *
-     * @param dialogService DialogService
-     * @param preferences PreferencesService
-     * @param databaseContext BibDatabaseContext
      * @param filesLinkedToEntry A list of LinkedFile to be deleted
      */
     public static void deleteFileFromDisk(DialogService dialogService, PreferencesService preferences, BibDatabaseContext databaseContext, List<LinkedFile> filesLinkedToEntry) {
@@ -136,9 +133,6 @@ public class DeleteFileAction extends SimpleCommand {
     /**
      * Helper method to delete the specified file from disk
      *
-     * @param dialogService DialogService
-     * @param preferences PreferencesService
-     * @param databaseContext BibDatabaseContext
      * @param linkedFile The LinkedFile (file which linked to an entry) to be deleted from disk
      */
     private static void deleteFileHelper(DialogService dialogService, PreferencesService preferences, BibDatabaseContext databaseContext, LinkedFile linkedFile) {

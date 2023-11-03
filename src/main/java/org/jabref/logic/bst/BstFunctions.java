@@ -382,7 +382,7 @@ public class BstFunctions {
             throw new BstVMException("Can only perform chr.to.int$ on string with length 1 (line %d)".formatted(ctx.start.getLine()));
         }
 
-        stack.push((int) s.charAt(0));
+        stack.push(s.charAt(0));
     }
 
     /**
