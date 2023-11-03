@@ -29,6 +29,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed search result auto-updates for edits to BibEntries. [#10619](https://github.com/JabRef/jabref/pull/10619)
+
 ## [5.11] – 2023-10-22
 
 ### Added
