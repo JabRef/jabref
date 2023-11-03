@@ -1,19 +1,20 @@
 package org.jabref.gui.entryeditor;
 
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.mockito.Mockito.mock;

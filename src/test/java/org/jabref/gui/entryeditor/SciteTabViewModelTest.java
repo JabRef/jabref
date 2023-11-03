@@ -1,13 +1,16 @@
 package org.jabref.gui.entryeditor;
 
 import kong.unirest.json.JSONObject;
+
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -51,7 +54,6 @@ public class SciteTabViewModelTest {
         Assertions.assertEquals(5, dto.getUnclassified());
         Assertions.assertEquals(6, dto.getCitingPublications());
         Assertions.assertEquals("test_doi", dto.getDoi());
-
     }
 
     @Test
