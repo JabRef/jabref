@@ -300,10 +300,13 @@ tasks.register('generateSource') {
     dependsOn("generateBstGrammarSource",
             "generateSearchGrammarSource",
             "generateCitaviSource",
-            "generateApolloSources"
+            "generateApolloSources",
+            "generateServiceApolloSchema",
+            "generateServiceApolloUsedCoordinates"
+
     )
     group = 'JabRef'
-    description 'Generates all necessary (Java) source files.'
+    description 'Generates all necessasry (Java) source files.'
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
