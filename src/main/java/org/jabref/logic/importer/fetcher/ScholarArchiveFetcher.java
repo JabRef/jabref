@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.FetcherException;
@@ -62,6 +63,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
         download.addHeader("Accept", MediaType.APPLICATION_JSON);
         return download;
     }
+
     /**
      * Gets the list of BibEntry by given Json response from scholar archive fetcher API
      *
@@ -104,10 +106,12 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
             JSONObject biblio = jsonEntry.optJSONObject("biblio");
 
             JSONArray abstracts = jsonEntry.getJSONArray("abstracts");
-            String foundAbstract  = IntStream.range(0, abstracts.length())
-                                             .mapToObj(abstracts::getJSONObject)
-                                             .map(object -> object.optString("body"))
-                                             .findFirst().orElse("");
+            String foundAbstract = IntStream.range(0, abstracts.length())
+                                            .mapToObj(abstracts::getJSONObject)
+                                            .map(object -> object.optString("body"))
+                                            .findFirst().orElse("");
+
+            String url = Optional.ofNullable(jsonEntry.optJSONObject("fulltext")).map(fullText -> fullText.optString("access_url")).orElse("");
 
             // publication type
             String type = biblio.optString("release_type");
@@ -129,6 +133,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
             entry.setField(StandardField.YEAR, String.valueOf(biblio.optInt("release_year")));
             entry.setField(StandardField.VOLUME, String.valueOf(biblio.optInt("volume_int")));
             entry.setField(StandardField.ABSTRACT, foundAbstract);
+            entry.setField(StandardField.URL, url);
 
             String dateString = biblio.optString("date");
             entry.setField(StandardField.DATE, dateString);

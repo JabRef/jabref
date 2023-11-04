@@ -30,7 +30,8 @@ public class ScholarArchiveFetcherTest {
                 .withField(StandardField.JOURNAL, "Proceedings of the twelfth international conference on Information and knowledge management - CIKM '03")
                 .withField(StandardField.PUBLISHER, "ACM Press")
                 .withField(StandardField.TYPE, "paper-conference")
-                .withField(StandardField.YEAR, "2003");
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.URL, "https://web.archive.org/web/20170810164449/http://goanna.cs.rmit.edu.au/~jz/fulltext/cikm03.pdf");
     }
 
     @Test
@@ -42,8 +43,7 @@ public class ScholarArchiveFetcherTest {
     public void performSearchReturnsExpectedResults() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("query");
         fetchedEntries.forEach(s -> s.clearField(StandardField.ABSTRACT));
-
-        assertTrue(fetchedEntries.contains(bibEntry));
+        assertTrue(fetchedEntries.contains(bibEntry), "Found the following entries " + fetchedEntries);
     }
 }
 
