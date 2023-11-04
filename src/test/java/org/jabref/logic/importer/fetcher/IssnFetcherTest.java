@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -29,23 +30,25 @@ class IssnFetcherTest {
 
         fetcher = new IssnFetcher();
 
-        bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE)
-                .withField(StandardField.ISSN, "2193-1801")
-                .withField(StandardField.TITLE, "Query: Jurnal Sistem Informasi")
-                .withField(StandardField.INSTITUTION, "Univesitas Islam Negeri Sumatera Utara, Fakultas Sains dan Teknologi, Program Studi Sistem Informasi")
-                .withField(StandardField.PUBLISHER, "Univesitas Islam Negeri Sumatera Utara")
-                .withField(StandardField.LANGUAGE, "ID");
+        bibEntry = new BibEntry()
+                .withField(StandardField.ISSN, "15454509")
+                .withField(StandardField.JOURNALTITLE, "Annual Review of Biochemistry")
+                .withField(StandardField.PUBLISHER, "Annual Reviews Inc.");
     }
 
     @Test
-    void performSearchById() throws FetcherException {
+    void performSearchByEntry() throws FetcherException {
         List<BibEntry> fetchedEntry = fetcher.performSearch(bibEntry);
         assertEquals(List.of(bibEntry), fetchedEntry);
+    }
+    @Test
+    void performSearchById() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("15454509");
+        assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     void getName() {
         assertEquals("ISSN", fetcher.getName());
     }
-
 }

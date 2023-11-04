@@ -6,37 +6,31 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.integrity.ISSNChecker;
+import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.journals.JournalInformation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Fetcher to generate the BibTex entry from an ISSN.
- * The idea is to use the {@link DOAJFetcher} to do a request for a given ISSN number.
+ * As an ISSN ist just a journal identifier, so we only return journal title and publisher
+ * The idea is to use the {@link JournalInformationFetcher} to do a request for a given ISSN.
  */
 
-public class IssnFetcher implements EntryBasedFetcher {
+public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IssnFetcher.class);
     private final JournalInformationFetcher journalInformationFetcher;
-    // private final String SEARCH_URL = "https://doaj.org/api/search/journals/";
-    private final ISSNChecker issnChecker;
 
     public IssnFetcher() {
         this.journalInformationFetcher = new JournalInformationFetcher();
-        this.issnChecker = new ISSNChecker();
     }
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Optional<String> checkedId = entry.getField(StandardField.ISSN).flatMap(issnChecker::checkValue);
-        if (checkedId.isPresent()) {
-            Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(checkedId.get(), "");
-            return journalInformation.map(journalInfo -> new BibEntry().withField(StandardField.JOURNALTITLE, journalInfo.publisher())).stream().toList();
+        Optional<String> issn = entry.getField(StandardField.ISSN);
+        if (issn.isPresent()) {
+            Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(issn.get(), "");
+            return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, issn.get()) ).stream().toList();
         }
         return Collections.emptyList();
     }
@@ -44,5 +38,15 @@ public class IssnFetcher implements EntryBasedFetcher {
     @Override
     public String getName() {
         return "ISSN";
+    }
+
+    @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(identifier, "");
+        return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, identifier));
+    }
+
+    private BibEntry journalInformationToBibEntry(JournalInformation journalInfo, String issn){
+        return new BibEntry().withField(StandardField.JOURNALTITLE, journalInfo.title()).withField(StandardField.PUBLISHER, journalInfo.publisher()).withField(StandardField.ISSN, issn);
     }
 }

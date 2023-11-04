@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
+    // Uses JabRef Online APIs
     private static final String API_URL = "https://jabref.org/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
