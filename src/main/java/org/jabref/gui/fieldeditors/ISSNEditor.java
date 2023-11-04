@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.Optional;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -8,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.util.TaskExecutor;
@@ -23,11 +26,14 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @FXML private ISSNEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
     @FXML private Button journalInfoButton;
+    @FXML private Button fetchInformationByIdentifierButton;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private StateManager stateManager;
+    private Optional<BibEntry> entry = Optional.empty();
 
     public ISSNEditor(Field field,
                       SuggestionProvider<?> suggestionProvider,
@@ -43,7 +49,9 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 fieldCheckers,
                 taskExecutor,
                 dialogService,
-                undoManager);
+                undoManager,
+                stateManager,
+                preferencesService);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.initContextMenu(new DefaultMenu(textArea));
@@ -57,6 +65,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
+        this.entry = Optional.of(entry);
         viewModel.bindToEntry(entry);
     }
 
@@ -68,6 +77,11 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @Override
     public void requestFocus() {
         textArea.requestFocus();
+    }
+
+    @FXML
+    private void fetchInformationByIdentifier() {
+        entry.ifPresent(viewModel::fetchBibliographyInformation);
     }
 
     @FXML
