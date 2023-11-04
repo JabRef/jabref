@@ -23,7 +23,6 @@ public class ISIDOREFetcherTest {
         this.fetcher = new ISIDOREFetcher();
     }
 
-
     @Test
     public void checkArticleTest() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
@@ -35,7 +34,7 @@ public class ISIDOREFetcherTest {
                 .withField(StandardField.DOI, "10.1016/j.tbs.2019.12.003")
                 .withField(StandardField.URL, "https://isidore.science/document/10670/1.hrzlqd");
 
-        List<BibEntry> actual = fetcher.performSearch("cnqrs");
+        List<BibEntry> actual = fetcher.performSearch("Investigating day-to-day variability of transit usage on a multimonth scale with smart card data. A case study in Lyon");
 
         assertEquals(List.of(expected), actual);
     }
@@ -59,7 +58,7 @@ public class ISIDOREFetcherTest {
     @Test
     public void checkArticle2() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.TITLE, " Anthony B. Atkinson, Inequality – What Can Be Done ? Cambridge (Mass.) Harvard University Press, 2015, XI-384 p. ")
+                .withField(StandardField.TITLE, "Inequality – What Can Be Done ? Cambridge (Mass.) Harvard University Press, 2015, XI-384 p. ")
                 .withField(StandardField.AUTHOR, "Benoît Rapoport")
                 .withField(StandardField.YEAR, "2016")
                 .withField(StandardField.JOURNAL, "Population (édition française)")
@@ -77,8 +76,7 @@ public class ISIDOREFetcherTest {
         BibEntry expected = new BibEntry(StandardEntryType.Thesis)
                 .withField(StandardField.TITLE, "Mapping English L2 errors : an integrated system and textual approach")
                 .withField(StandardField.AUTHOR, "Clive Hamilton")
-                .withField(StandardField.YEAR, "2015")
-                .withField(StandardField.URL, "https://isidore.science/document/10670/1.m05oth");
+                .withField(StandardField.YEAR, "2015");
 
         List<BibEntry> actual = fetcher.performSearch("Mapping English L2 errors : an integrated system and textual approach");
 

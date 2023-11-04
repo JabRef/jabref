@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import org.jabref.model.strings.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ public class ISIDOREQueryTransformer extends  YearRangeByFilteringQueryTransform
 
     @Override
     protected String handleTitle(String title) {
-        return createKeyValuePair("title", title);
+        return createKeyValuePair("title", StringUtil.quoteStringIfSpaceIsContained(title));
     }
 
     @Override

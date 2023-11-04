@@ -19,11 +19,13 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.ISIDOREQueryTransformer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jooq.lambda.Unchecked;
@@ -46,8 +48,6 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
 
-    private String URL;
-
     private final DocumentBuilderFactory factory;
 
     public ISIDOREFetcher() {
@@ -57,7 +57,6 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     @Override
     public Parser getParser() {
         return xmlData -> {
-
             try {
                 DocumentBuilder builder = this.factory.newDocumentBuilder();
                 Document document = builder.parse(xmlData);
@@ -81,12 +80,19 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     }
 
     @Override
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload download = new URLDownload(url);
+        download.addHeader("Accept", MediaType.APPLICATION_XML);
+        return download;
+    }
+
+    @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
         ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();
         String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("q", transformedQuery);
-    //    uriBuilder.addParameter("page", String.valueOf(pageNumber));
+        //    uriBuilder.addParameter("page", String.valueOf(pageNumber));
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
         //uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
@@ -115,8 +121,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 .withField(StandardField.YEAR, itemElement.getElementsByTagName("date").item(0).getChildNodes().item(1).getTextContent().substring(0, 4))
                 .withField(StandardField.JOURNAL, getJournal(itemElement.getElementsByTagName("dc:source")))
                 .withField(StandardField.PUBLISHER, getPublishers(itemElement.getElementsByTagName("publishers").item(0)))
-                .withField(StandardField.DOI, getDOI(itemElement.getElementsByTagName("ore").item(0).getChildNodes()))
-                .withField(StandardField.URL, this.URL);
+                .withField(StandardField.DOI, getDOI(itemElement.getElementsByTagName("ore").item(0).getChildNodes()));
     }
 
     private String getDOI(NodeList list) {
