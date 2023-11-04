@@ -10,10 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     # Run only if PR is inside JabRef's main repository and created by dependabot or by an update workflow
     if: >
-      (github.repository == 'JabRef/jabref') &&
-      ((github.actor == 'dependabot[bot]') ||
-       ((startsWith(github.event.pull_request.title, '[Bot] ') || (startsWith(github.event.pull_request.title, 'Bump '))) &&
-       (github.event.pull_request.head.repo.full_name == 'JabRef/jabref')))
+      (github.repository == 'JabRef/jabref') && 
+      (github.event.pull_request.head.repo.full_name == 'JabRef/jabref') &&
+      (
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') || 
+          startsWith(github.event.pull_request.title, 'Bump ') || 
+          startsWith(github.event.pull_request.title, 'New Crowdin updates')
+        )
+      )
     steps:
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"

@@ -1,9 +1,12 @@
 package org.jabref.gui.preferences.entry;
 
+import java.util.function.UnaryOperator;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -47,6 +50,17 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         this.viewModel = new EntryTabViewModel(preferencesService);
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+
+        // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
+        UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {
+            if (change.getControlNewText().length() <= 1) {
+                return change;
+            }
+            return null; // null means the change is rejected
+        };
+        TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
+
+        keywordSeparator.setTextFormatter(formatter);
 
         resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
         resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());

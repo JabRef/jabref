@@ -28,11 +28,12 @@ Sometimes issues with modularity only arise in the installed version and do not 
 
 1. Open `build.gradle`, under jlink options remove `--strip-debug`
 2. Build using `jpackageImage` (or let the CI build a new version)
-3.  Modify the `build\image\JabRef\runtime\bin\Jabref.bat` file, replace the last line with
+3. Modify the `build\image\JabRef\runtime\bin\Jabref.bat` file, replace the last line with
 
-    ```
+    ```shell
     pushd %DIR% & %JAVA_EXEC% -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -p "%~dp0/../app" -m org.jabref/org.jabref.cli.Launcher  %* & popd
     ```
+
 4. Open your IDE and add a "Remote Debugging Configuration" for `localhost:8000`
 5. Start JabRef by running the above bat file
 6. Connect with your IDE using remote debugging

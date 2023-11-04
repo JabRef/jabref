@@ -25,10 +25,13 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
@@ -49,6 +52,11 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button autosaveLocalLibrariesHelp;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
+    @FXML private CheckBox remoteServer;
+    @FXML private TextField remotePort;
+    @FXML private Button remoteHelp;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -74,7 +82,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -122,15 +130,21 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
         ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferencesService.getFilePreferences()), autosaveLocalLibrariesHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
 
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
         backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
 
         Platform.runLater(() -> {
+            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
         });
+
+        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
+        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
+        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
     }
 
     @FXML

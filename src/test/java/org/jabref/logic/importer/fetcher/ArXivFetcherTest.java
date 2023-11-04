@@ -182,7 +182,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getInputTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
@@ -199,9 +199,9 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
-        assertTrue(result.isEmpty());
+        assertEquals(List.of(), result);
     }
 
     @Test

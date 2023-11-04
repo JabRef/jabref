@@ -52,6 +52,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,72 +175,95 @@ public class ImportHandler {
         return entry;
     }
 
+    /**
+     * Cleans up the given entries and adds them to the library.
+     * There is no automatic download done.
+     */
     public void importEntries(List<BibEntry> entries) {
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
         cleanup.doPostCleanup(entries);
+        importCleanedEntries(entries);
+    }
+
+    public void importCleanedEntries(List<BibEntry> entries) {
         bibDatabaseContext.getDatabase().insertEntries(entries);
-
-        // Set owner/timestamp
-        UpdateField.setAutomaticFields(entries,
-                preferencesService.getOwnerPreferences(),
-                preferencesService.getTimestampPreferences());
-
-        // Generate citation keys
-        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
-            generateKeys(entries);
-        }
-
-        // Add to group
+        generateKeys(entries);
+        setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
-        BibEntry cleanedEntry = cleanup.doPostCleanup(entry);
-        BibEntry entryToInsert = cleanedEntry;
-
-        Optional<BibEntry> existingDuplicateInLibrary = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
+        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
+        Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
         if (existingDuplicateInLibrary.isPresent()) {
-            DuplicateResolverDialog dialog = new DuplicateResolverDialog(existingDuplicateInLibrary.get(), entryToInsert, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-            switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                case KEEP_RIGHT:
-                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    break;
-                case KEEP_BOTH:
-                    break;
-                case KEEP_MERGE:
-                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    entryToInsert = dialog.getMergedEntry();
-                    break;
-                case KEEP_LEFT:
-                case AUTOREMOVE_EXACT:
-                case BREAK:
-                default:
-                   return;
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get());
+            if (duplicateHandledEntry.isEmpty()) {
+                return;
             }
+            entryToInsert = duplicateHandledEntry.get();
         }
-        // Regenerate CiteKey of imported BibEntry
-        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
-            generateKeys(List.of(entryToInsert));
+        importCleanedEntries(List.of(entryToInsert));
+        downloadLinkedFiles(entryToInsert);
+    }
+
+    @VisibleForTesting
+    BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
+        return cleanup.doPostCleanup(entry);
+    }
+
+    public Optional<BibEntry> findDuplicate(BibDatabaseContext bibDatabaseContext, BibEntry entryToCheck) {
+        return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
+    }
+
+    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
+        switch (decisionResult.decision()) {
+            case KEEP_RIGHT:
+                bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                break;
+            case KEEP_BOTH:
+                break;
+            case KEEP_MERGE:
+                bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                return Optional.of(decisionResult.mergedEntry());
+            case KEEP_LEFT:
+            case AUTOREMOVE_EXACT:
+            case BREAK:
+            default:
+                return Optional.empty();
         }
-        bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
+        return Optional.of(originalEntry);
+    }
 
-        // Set owner/timestamp
-        UpdateField.setAutomaticFields(List.of(entryToInsert),
-                                       preferencesService.getOwnerPreferences(),
-                                       preferencesService.getTimestampPreferences());
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
+        DuplicateResolverDialog.DuplicateResolverResult decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
+    }
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+    public void setAutomaticFields(List<BibEntry> entries) {
+        UpdateField.setAutomaticFields(
+                entries,
+                preferencesService.getOwnerPreferences(),
+                preferencesService.getTimestampPreferences()
+        );
+    }
 
+    public void downloadLinkedFiles(BibEntry entry) {
         if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
-                entry.getFiles().stream().filter(LinkedFile::isOnlineLink).forEach(linkedFile ->
-                        new LinkedFileViewModel(
-                                linkedFile,
-                                entry,
-                                bibDatabaseContext,
-                                taskExecutor,
-                                dialogService,
-                                preferencesService).download());
+            entry.getFiles().stream()
+                    .filter(LinkedFile::isOnlineLink)
+                    .forEach(linkedFile ->
+                            new LinkedFileViewModel(
+                                    linkedFile,
+                                    entry,
+                                    bibDatabaseContext,
+                                    taskExecutor,
+                                    dialogService,
+                                    preferencesService
+                            ).download()
+                    );
         }
     }
 
@@ -262,15 +286,15 @@ public class ImportHandler {
      * @param entries entries to generate keys for
      */
     private void generateKeys(List<BibEntry> entries) {
+        if (!preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
+            return;
+        }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
                                                                                      .getKeyPattern()),
                 bibDatabaseContext.getDatabase(),
                 preferencesService.getCitationKeyPatternPreferences());
-
-        for (BibEntry entry : entries) {
-            keyGenerator.generateAndSetKey(entry);
-        }
+        entries.forEach(keyGenerator::generateAndSetKey);
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {
