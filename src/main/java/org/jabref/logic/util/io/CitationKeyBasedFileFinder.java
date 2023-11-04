@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileHelper;
 
 class CitationKeyBasedFileFinder implements FileFinder {
 
@@ -83,7 +82,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
         BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) -> !Files.isDirectory(path)
-                && extensions.contains(FileHelper.getFileExtension(path).orElse(""));
+                && extensions.contains(FileUtil.getFileExtension(path).orElse(""));
 
         Set<Path> result = new HashSet<>();
         for (Path directory : directories) {

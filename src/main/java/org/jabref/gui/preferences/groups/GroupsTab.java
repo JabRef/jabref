@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.groups;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -17,7 +16,6 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
     @FXML private RadioButton groupViewModeUnion;
     @FXML private CheckBox autoAssignGroup;
     @FXML private CheckBox displayGroupCount;
-    @FXML private TextField keywordSeparator;
 
     public GroupsTab() {
         ViewLoader.view(this)
@@ -31,12 +29,11 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
     }
 
     public void initialize() {
-        this.viewModel = new GroupsTabViewModel(dialogService, preferencesService.getGroupsPreferences());
+        this.viewModel = new GroupsTabViewModel(preferencesService.getGroupsPreferences());
 
         groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
         groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
         autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
         displayGroupCount.selectedProperty().bindBidirectional(viewModel.displayGroupCount());
-        keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
     }
 }

@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.UnknownField;
 
 public class FieldsUtil {
 
-    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
+    public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
         @Override
         public String toString(Field object) {
             if (object != null) {
@@ -31,8 +31,8 @@ public class FieldsUtil {
     };
 
     public static String getNameWithType(Field field) {
-        if (field instanceof SpecialField) {
-            return new SpecialFieldViewModel((SpecialField) field, Globals.prefs, Globals.undoManager).getLocalization()
+        if (field instanceof SpecialField specialField) {
+            return new SpecialFieldViewModel(specialField, Globals.prefs, Globals.undoManager).getLocalization()
                     + " (" + Localization.lang("Special") + ")";
         } else if (field instanceof IEEEField) {
             return field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";

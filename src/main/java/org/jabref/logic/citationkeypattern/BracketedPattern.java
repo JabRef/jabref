@@ -39,10 +39,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The BracketedExpressionExpander provides methods to expand bracketed expressions, such as
- * [year]_[author]_[firstpage], using information from a provided BibEntry. The above-mentioned expression would yield
- * 2017_Kitsune_123 when expanded using the BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017},
- * pages={123-6}}".
+ * This class provides methods to expand bracketed expressions, such as
+ * <code>[year]_[author]_[firstpage]</code>, using information from a provided BibEntry. The above-mentioned expression would yield
+ * <code>2017_Kitsune_123</code> when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
+ * pages={123-6}}</code>.
+ * <p>
+ * The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypattern">Customize the citation key generator</a>.
+ * </p>
  */
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
@@ -51,6 +54,7 @@ public class BracketedPattern {
      * The maximum number of characters in the first author's last name.
      */
     private static final int CHARS_OF_FIRST = 5;
+
     /**
      * The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
      * 1} name abbreviations will be displayed, and a + sign will be appended at the end.
@@ -61,18 +65,23 @@ public class BracketedPattern {
      * Matches everything that is not a unicode decimal digit.
      */
     private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile("\\P{Nd}");
+
     /**
      * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
      */
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
+
     /**
      * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
      */
+
     private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
+
     /**
-     * Matches with "dep"/"dip", case insensitive
+     * Matches with "dep"/"dip", case-insensitive
      */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+
     private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private enum Institution {
@@ -85,10 +94,12 @@ public class BracketedPattern {
          * Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
          */
         private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
+
         /**
-         * Matches with "tech", case insensitive
+         * Matches with "tech", case-insensitive
          */
         private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
+
         /**
          * Matches with "dep"/"dip"/"lab", case insensitive
          */
@@ -357,7 +368,7 @@ public class BracketedPattern {
                     case "authEtAl":
                         return authEtal(authorList, "", "EtAl");
                     case "authshort":
-                        return authshort(authorList);
+                        return authShort(authorList);
                 }
 
                 if (pattern.matches("authIni[\\d]+")) {
@@ -400,7 +411,7 @@ public class BracketedPattern {
                     case "edtr.edtr.ea":
                         return authAuthEa(editorList);
                     case "edtrshort":
-                        return authshort(editorList);
+                        return authShort(editorList);
                 }
 
                 if (pattern.matches("edtrIni[\\d]+")) {
@@ -410,7 +421,7 @@ public class BracketedPattern {
                     String[] nums = pattern.substring(4).split("_");
                     return authNofMth(editorList,
                             Integer.parseInt(nums[0]),
-                            Integer.parseInt(nums[1]) - 1);
+                            Integer.parseInt(nums[1]));
                 } else if (pattern.matches("edtr\\d+")) {
                     String fa = firstAuthor(editorList);
                     int num = Integer.parseInt(pattern.substring(4));
@@ -510,7 +521,7 @@ public class BracketedPattern {
      */
     private static AuthorList createAuthorList(String unparsedAuthors) {
         return AuthorList.parse(unparsedAuthors).getAuthors().stream()
-                         .map((author) -> {
+                         .map(author -> {
                              // If the author is an institution, use an institution key instead of the full name
                              String lastName = author.getLast()
                                                      .map(lastPart -> isInstitution(author) ?
@@ -542,9 +553,9 @@ public class BracketedPattern {
     /**
      * Applies modifiers to a label generated based on a field marker.
      *
-     * @param label  The generated label.
-     * @param parts  String array containing the modifiers.
-     * @param offset The number of initial items in the modifiers array to skip.
+     * @param label                The generated label.
+     * @param parts                String array containing the modifiers.
+     * @param offset               The number of initial items in the modifiers array to skip.
      * @param expandBracketContent a function to expand the content in the parentheses.
      * @return The modified label.
      */
@@ -745,7 +756,7 @@ public class BracketedPattern {
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
-                authorList.getAuthor(0).getLastOnly().replaceAll(" ", "");
+                authorList.getAuthor(0).getLastOnly().replace(" ", "");
     }
 
     /**
@@ -777,13 +788,17 @@ public class BracketedPattern {
     }
 
     /**
-     * Gets the last name of all authors/editors
+     * Gets the last name of all authors/editors.
+     * Pattern <code>[authors]</code>.
+     * <p>
+     * <code>and others</code> is converted to <code>EtAl</code>
+     * </p>
      *
      * @param authorList an {@link AuthorList}
-     * @return the sur name of all authors/editors
+     * @return the surname of all authors/editors
      */
-    private static String allAuthors(AuthorList authorList) {
-        return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "");
+    static String allAuthors(AuthorList authorList) {
+        return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "EtAl");
     }
 
     /**
@@ -792,10 +807,17 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the initials of all authors' names
      */
-    private static String authorsAlpha(AuthorList authorList) {
+    static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors = authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS ?
-                authorList.getNumberOfAuthors() : (MAX_ALPHA_AUTHORS - 1);
+        int maxAuthors;
+        final boolean maxAuthorsExceeded;
+        if (authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS) {
+            maxAuthors = authorList.getNumberOfAuthors();
+            maxAuthorsExceeded = false;
+        } else {
+            maxAuthors = MAX_ALPHA_AUTHORS - 1;
+            maxAuthorsExceeded = true;
+        }
 
         if (authorList.getNumberOfAuthors() == 1) {
             String[] firstAuthor = authorList.getAuthor(0).getLastOnly()
@@ -808,8 +830,13 @@ public class BracketedPattern {
             alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
                     Math.min(3, firstAuthor[firstAuthor.length - 1].length()));
         } else {
+            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
+            if (andOthersPresent) {
+                maxAuthors--;
+            }
             List<String> vonAndLastNames = authorList.getAuthors().stream()
-                                                     .limit(maxAuthors).map(Author::getLastOnly)
+                                                     .limit(maxAuthors)
+                                                     .map(Author::getLastOnly)
                                                      .collect(Collectors.toList());
             for (String vonAndLast : vonAndLastNames) {
                 // replace all whitespaces by " "
@@ -820,7 +847,7 @@ public class BracketedPattern {
                     alphaStyle.append(part, 0, 1);
                 }
             }
-            if (authorList.getNumberOfAuthors() > MAX_ALPHA_AUTHORS) {
+            if (andOthersPresent || maxAuthorsExceeded) {
                 alphaStyle.append("+");
             }
         }
@@ -834,15 +861,27 @@ public class BracketedPattern {
      * @param authorList the list of authors
      * @param maxAuthors the maximum number of authors in the string
      * @param delimiter  delimiter separating the last names of the authors
-     * @param suffix     to replace excess authors with
+     * @param suffix     to replace excess authors with. Also used to replace <code>and others</code>.
      * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
      * `maxAuthors` replaced with `suffix`
      */
-    private static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, String suffix) {
-        suffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
+    private static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
+        final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
         return authorList.getAuthors().stream()
-                         .map(Author::getLast).flatMap(Optional::stream)
-                         .limit(maxAuthors).collect(Collectors.joining(delimiter, "", suffix));
+                         .map(author -> {
+                             if (author.equals(Author.OTHERS)) {
+                                 if (suffix.startsWith(delimiter)) {
+                                     return Optional.of(suffix.substring(delimiter.length()));
+                                 } else {
+                                     return Optional.of(suffix);
+                                 }
+                             } else {
+                                 return author.getLast();
+                             }
+                         })
+                         .flatMap(Optional::stream)
+                         .limit(maxAuthors)
+                         .collect(Collectors.joining(delimiter, "", finalSuffix));
     }
 
     /**
@@ -863,7 +902,7 @@ public class BracketedPattern {
      * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
-    private static String oneAuthorPlusInitials(AuthorList authorList) {
+    static String oneAuthorPlusInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -877,46 +916,21 @@ public class BracketedPattern {
         return authorSB.toString();
     }
 
-    /**
-     * auth.auth.ea format:
-     * <ol>
-     * <li>Isaac Newton and James Maxwell and Albert Einstein (1960)</li>
-     * <li>Isaac Newton and James Maxwell (1960)</li>
-     * </ol>
-     * give:
-     * <ol>
-     * <li>Newton.Maxwell.ea</li>
-     * <li>Newton.Maxwell</li>
-     * </ol>
-     */
-    private static String authAuthEa(AuthorList authorList) {
+    static String authAuthEa(AuthorList authorList) {
         return joinAuthorsOnLastName(authorList, 2, ".", ".ea");
     }
 
     /**
-     * auth.etal, authEtAl, ... format:
-     * <ol>
-     * <li>Isaac Newton and James Maxwell and Albert Einstein (1960)</li>
-     * <li>Isaac Newton and James Maxwell (1960)</li>
-     * </ol>
-     * <p>
-     * auth.etal give (delim=".", append=".etal"):
-     * <ol>
-     * <li>Newton.etal</li>
-     * <li>Newton.Maxwell</li>
-     * </ol>
-     * </p>
-     * <p>
-     * authEtAl give (delim="", append="EtAl"):
-     * <ol>
-     * <li>NewtonEtAl</li>
-     * <li>NewtonMaxwell</li>
-     * </ol>
-     * </p>
-     * Note that [authEtAl] equals [authors2]
+     * auth.etal, authEtAl, ... format
      */
-    private static String authEtal(AuthorList authorList, String delim, String append) {
-        if (authorList.getNumberOfAuthors() <= 2) {
+    static String authEtal(AuthorList authorList, String delim, String append) {
+        if (authorList.isEmpty()) {
+            return "";
+        }
+        if ((authorList.getNumberOfAuthors() <= 2)
+                && ((authorList.getNumberOfAuthors() == 1) || !authorList.getAuthor(1).equals(Author.OTHERS))) {
+            // in case 1 or two authors, just name them
+            // exception: If the second author is "and others", then do the appendix handling (in the other branch)
             return joinAuthorsOnLastName(authorList, 2, delim, "");
         } else {
             return authorList.getAuthor(0).getLast().orElse("") + append;
@@ -924,7 +938,8 @@ public class BracketedPattern {
     }
 
     /**
-     * The first N characters of the Mth author's or editor's last name. M starts counting from 1
+     * The first N characters of the Mth author's or editor's last name. M starts counting from 1.
+     * In case the Mth author is {@link Author#OTHERS}, <code>+</code> is returned.
      */
     private static String authNofMth(AuthorList authorList, int n, int m) {
         // have m counting from 0
@@ -934,7 +949,11 @@ public class BracketedPattern {
             return "";
         }
 
-        String lastName = authorList.getAuthor(mminusone).getLast()
+        Author lastAuthor = authorList.getAuthor(mminusone);
+        if (lastAuthor.equals(Author.OTHERS)) {
+            return "+";
+        }
+        String lastName = lastAuthor.getLast()
                                     .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse("");
         return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
@@ -947,21 +966,9 @@ public class BracketedPattern {
     }
 
     /**
-     * authshort format:
-     * <p>
-     * given author names
-     * <ol><li>Isaac Newton and James Maxwell and Albert Einstein and N. Bohr</li>
-     * <li>Isaac Newton and James Maxwell and Albert Einstein</li>
-     * <li>Isaac Newton and James Maxwell</li>
-     * <li>Isaac Newton</li></ol>
-     * yield
-     * <ol><li>NME+</li>
-     * <li>NME</li>
-     * <li>NM</li>
-     * <li>Newton</li></ol></p>
-     * {@author added by Kolja Brix, kbx@users.sourceforge.net}
+     * authshort format
      */
-    private static String authshort(AuthorList authorList) {
+    static String authShort(AuthorList authorList) {
         StringBuilder author = new StringBuilder();
         final int numberOfAuthors = authorList.getNumberOfAuthors();
 
@@ -980,37 +987,32 @@ public class BracketedPattern {
     }
 
     /**
-     * authIniN format:
-     * <p>
-     * Each author gets (N div #authors) chars, the remaining (N mod #authors) chars are equally distributed to the
-     * authors first in the row. If (N < #authors), only the first N authors get mentioned.
-     * <p>
-     * For example if
-     * <ol>
-     * <li> I. Newton and J. Maxwell and A. Einstein and N. Bohr (..) </li>
-     * <li> I. Newton and J. Maxwell and A. Einstein </li>
-     * <li> I. Newton and J. Maxwell </li>
-     * <li> I. Newton </li>
-     * </ol>
-     * authIni4 gives:
-     * <ol>
-     * <li> NMEB </li>
-     * <li> NeME </li>
-     * <li> NeMa </li>
-     * <li> Newt </li>
-     * </ol>
+     * authIniN format
      *
      * @param authorList The authors to format.
      * @param n          The maximum number of characters this string will be long. A negative number or zero will lead
      *                   to "" be returned.
      */
-    private static String authIniN(AuthorList authorList, int n) {
+    static String authIniN(AuthorList authorList, int n) {
         if ((n <= 0) || authorList.isEmpty()) {
             return "";
         }
 
-        StringBuilder author = new StringBuilder();
         final int numberOfAuthors = authorList.getNumberOfAuthors();
+        final boolean lastAuthorIsOthers = authorList.getAuthor(numberOfAuthors - 1).equals(Author.OTHERS);
+        if ((n > 1) && ((n < numberOfAuthors) || lastAuthorIsOthers)) {
+            final int limit = Math.min(n - 1, numberOfAuthors - 1);
+            // special handling if the last author is "Others"
+            // This gets the single char "+" only
+            AuthorList allButOthers = AuthorList.of(
+                    authorList.getAuthors()
+                              .stream()
+                              .limit(limit)
+                              .toList());
+            return authIniN(allButOthers, n - 1) + "+";
+        }
+
+        StringBuilder author = new StringBuilder();
 
         int charsAll = n / numberOfAuthors;
         for (int i = 0; i < numberOfAuthors; i++) {
@@ -1262,7 +1264,7 @@ public class BracketedPattern {
                     // If there are more than 3 parts, only keep the first character of each word
                     final int[] codePoints = tokenParts.stream()
                                                        .filter(Predicate.not(String::isBlank))
-                                                       .mapToInt((s) -> s.codePointAt(0))
+                                                       .mapToInt(s -> s.codePointAt(0))
                                                        .toArray();
                     rest = new String(codePoints, 0, codePoints.length);
                 } else {

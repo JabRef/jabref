@@ -17,9 +17,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
@@ -31,6 +33,7 @@ import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -38,15 +41,18 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +67,7 @@ public class ImportHandler {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final ImportFormatReader importFormatReader;
+    private final TaskExecutor taskExecutor;
 
     public ImportHandler(BibDatabaseContext database,
                          PreferencesService preferencesService,
@@ -69,16 +75,16 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         ImportFormatReader importFormatReader) {
+                         TaskExecutor taskExecutor) {
 
         this.bibDatabaseContext = database;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.importFormatReader = importFormatReader;
+        this.taskExecutor = taskExecutor;
 
-        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
+        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
@@ -169,62 +175,96 @@ public class ImportHandler {
         return entry;
     }
 
+    /**
+     * Cleans up the given entries and adds them to the library.
+     * There is no automatic download done.
+     */
     public void importEntries(List<BibEntry> entries) {
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
         cleanup.doPostCleanup(entries);
+        importCleanedEntries(entries);
+    }
+
+    public void importCleanedEntries(List<BibEntry> entries) {
         bibDatabaseContext.getDatabase().insertEntries(entries);
-
-        // Set owner/timestamp
-        UpdateField.setAutomaticFields(entries,
-                preferencesService.getOwnerPreferences(),
-                preferencesService.getTimestampPreferences());
-
-        // Generate citation keys
-        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
-            generateKeys(entries);
-        }
-
-        // Add to group
+        generateKeys(entries);
+        setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
-        BibEntry cleanedEntry = cleanup.doPostCleanup(entry);
-        BibEntry entryToInsert = cleanedEntry;
-
-        Optional<BibEntry> existingDuplicateInLibrary = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
+        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
+        Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
         if (existingDuplicateInLibrary.isPresent()) {
-            DuplicateResolverDialog dialog = new DuplicateResolverDialog(existingDuplicateInLibrary.get(), entryToInsert, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-            switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                case KEEP_RIGHT:
-                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    break;
-                case KEEP_BOTH:
-                    break;
-                case KEEP_MERGE:
-                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    entryToInsert = dialog.getMergedEntry();
-                    break;
-                case KEEP_LEFT:
-                case AUTOREMOVE_EXACT:
-                case BREAK:
-                default:
-                   return;
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get());
+            if (duplicateHandledEntry.isEmpty()) {
+                return;
             }
+            entryToInsert = duplicateHandledEntry.get();
         }
-        // Regenerate CiteKey of imported BibEntry
-        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
-            generateKeys(List.of(entryToInsert));
+        importCleanedEntries(List.of(entryToInsert));
+        downloadLinkedFiles(entryToInsert);
+    }
+
+    @VisibleForTesting
+    BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
+        return cleanup.doPostCleanup(entry);
+    }
+
+    public Optional<BibEntry> findDuplicate(BibDatabaseContext bibDatabaseContext, BibEntry entryToCheck) {
+        return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
+    }
+
+    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
+        switch (decisionResult.decision()) {
+            case KEEP_RIGHT:
+                bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                break;
+            case KEEP_BOTH:
+                break;
+            case KEEP_MERGE:
+                bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                return Optional.of(decisionResult.mergedEntry());
+            case KEEP_LEFT:
+            case AUTOREMOVE_EXACT:
+            case BREAK:
+            default:
+                return Optional.empty();
         }
-        bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
+        return Optional.of(originalEntry);
+    }
 
-        // Set owner/timestamp
-        UpdateField.setAutomaticFields(List.of(entryToInsert),
-                                       preferencesService.getOwnerPreferences(),
-                                       preferencesService.getTimestampPreferences());
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
+        DuplicateResolverDialog.DuplicateResolverResult decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
+    }
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+    public void setAutomaticFields(List<BibEntry> entries) {
+        UpdateField.setAutomaticFields(
+                entries,
+                preferencesService.getOwnerPreferences(),
+                preferencesService.getTimestampPreferences()
+        );
+    }
+
+    public void downloadLinkedFiles(BibEntry entry) {
+        if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
+            entry.getFiles().stream()
+                    .filter(LinkedFile::isOnlineLink)
+                    .forEach(linkedFile ->
+                            new LinkedFileViewModel(
+                                    linkedFile,
+                                    entry,
+                                    bibDatabaseContext,
+                                    taskExecutor,
+                                    dialogService,
+                                    preferencesService
+                            ).download()
+                    );
+        }
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
@@ -246,19 +286,19 @@ public class ImportHandler {
      * @param entries entries to generate keys for
      */
     private void generateKeys(List<BibEntry> entries) {
+        if (!preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
+            return;
+        }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
                                                                                      .getKeyPattern()),
                 bibDatabaseContext.getDatabase(),
                 preferencesService.getCitationKeyPatternPreferences());
-
-        for (BibEntry entry : entries) {
-            keyGenerator.generateAndSetKey(entry);
-        }
+        entries.forEach(keyGenerator::generateAndSetKey);
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {
-        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
             return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
         } catch (ParseException ex) {
@@ -272,13 +312,19 @@ public class ImportHandler {
             return Collections.emptyList();
         }
 
-        Optional<DOI> doi = DOI.parse(data);
+        Optional<DOI> doi = DOI.findInText(data);
         if (doi.isPresent()) {
             return fetchByDOI(doi.get());
         }
+
         Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
         if (arXiv.isPresent()) {
             return fetchByArXiv(arXiv.get());
+        }
+
+        Optional<ISBN> isbn = ISBN.parse(data);
+        if (isbn.isPresent()) {
+            return fetchByISBN(isbn.get());
         }
 
         return tryImportFormats(data);
@@ -286,15 +332,20 @@ public class ImportHandler {
 
     private List<BibEntry> tryImportFormats(String data) {
         try {
+            ImportFormatReader importFormatReader = new ImportFormatReader(
+                    preferencesService.getImporterPreferences(),
+                    preferencesService.getImportFormatPreferences(),
+                    fileUpdateMonitor);
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport.parserResult.getDatabase().getEntries();
-        } catch (ImportException ignored) {
+            return unknownFormatImport.parserResult().getDatabase().getEntries();
+        } catch (ImportException ex) { // ex is already localized
+            dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return Collections.emptyList();
         }
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info("Found DOI in clipboard");
+        LOGGER.info("Found DOI identifer in clipboard");
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
@@ -302,6 +353,12 @@ public class ImportHandler {
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
         LOGGER.info("Found arxiv identifier in clipboard");
         Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+        return OptionalUtil.toList(entry);
+    }
+
+    private List<BibEntry> fetchByISBN(ISBN isbn) throws FetcherException {
+        LOGGER.info("Found ISBN identifier in clipboard");
+        Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }
 }

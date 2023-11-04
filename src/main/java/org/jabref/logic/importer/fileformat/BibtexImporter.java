@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -54,6 +54,36 @@ public class BibtexImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
+        EncodingResult result = getEncodingResult(filePath);
+
+        // We replace unreadable characters
+        // Unfortunately, no warning will be issued to the user
+        // As this is a very seldom case, we accept that
+        CharsetDecoder decoder = result.encoding().newDecoder();
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+
+        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
+             BufferedReader reader = new BufferedReader(inputStreamReader)) {
+            ParserResult parserResult = this.importDatabase(reader);
+            parserResult.getMetaData().setEncoding(result.encoding());
+            parserResult.getMetaData().setEncodingExplicitlySupplied(result.encodingExplicitlySupplied());
+            parserResult.setPath(filePath);
+            if (parserResult.getMetaData().getMode().isEmpty()) {
+                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
+            }
+            return parserResult;
+        }
+    }
+
+    public static Charset getEncoding(Path filePath) throws IOException {
+        return getEncodingResult(filePath).encoding();
+    }
+
+    /**
+     * Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
+     * If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
+     */
+    private static EncodingResult getEncodingResult(Path filePath) throws IOException {
         // We want to check if there is a JabRef encoding heading in the file, because that would tell us
         // which character encoding is used.
 
@@ -81,29 +111,16 @@ public class BibtexImporter extends Importer {
             encoding = suppliedEncoding.orElse(detectedCharset);
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
+        EncodingResult result = new EncodingResult(encoding, encodingExplicitlySupplied);
+        return result;
+    }
 
-        // We replace unreadable characters
-        // Unfortunately, no warning will be issued to the user
-        // As this is a very seldom case, we accept that
-        CharsetDecoder decoder = encoding.newDecoder();
-        decoder.onMalformedInput(CodingErrorAction.REPLACE);
-
-        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
-             BufferedReader reader = new BufferedReader(inputStreamReader)) {
-            ParserResult parserResult = this.importDatabase(reader);
-            parserResult.getMetaData().setEncoding(encoding);
-            parserResult.getMetaData().setEncodingExplicitlySupplied(encodingExplicitlySupplied);
-            parserResult.setPath(filePath);
-            if (parserResult.getMetaData().getMode().isEmpty()) {
-                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
-            }
-            return parserResult;
-        }
+    private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
     }
 
     /**
      * This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
-     * reader manually to the meta data
+     * reader manually to the metadata
      */
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
@@ -133,26 +150,27 @@ public class BibtexImporter extends Importer {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-
+                // % = char 37, we might have some bom chars in front that we need to skip, so we use index of
+                var percentPos = line.indexOf('%', 0);
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
-                if (!line.startsWith("%")) {
+                if (percentPos == -1) {
                     return Optional.empty();
                 }
 
                 // Only keep the part after %
-                line = line.substring(1).trim();
+                line = line.substring(percentPos + 1).trim();
 
                 if (line.startsWith(BibtexImporter.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(SavePreferences.ENCODING_PREFIX)) {
+                } else if (line.startsWith(SaveConfiguration.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(SavePreferences.ENCODING_PREFIX.length(), atSymbolIndex);
+                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length(), atSymbolIndex);
                     } else {
-                        encoding = line.substring(SavePreferences.ENCODING_PREFIX.length());
+                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length());
                     }
 
                     return Optional.of(Charset.forName(encoding));
@@ -161,8 +179,8 @@ public class BibtexImporter extends Importer {
                     return Optional.empty();
                 }
             }
-        } catch (IOException ignored) {
-            LOGGER.error("Supplied encoding could not be determined", ignored);
+        } catch (IOException e) {
+            LOGGER.error("Supplied encoding could not be determined", e);
         }
         return Optional.empty();
     }

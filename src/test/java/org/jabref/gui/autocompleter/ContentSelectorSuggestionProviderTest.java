@@ -24,7 +24,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.emptyList());
 
         Collection<String> expected = Collections.emptyList();
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
@@ -35,7 +35,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.singletonList("test"));
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
@@ -46,7 +46,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.singletonList("test"));
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("te")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("te"));
 
         assertEquals(expected, result);
     }
@@ -62,7 +62,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.emptyList());
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
@@ -73,14 +73,14 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.singletonList("test"));
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("TE")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("TE"));
 
         assertEquals(expected, result);
     }
 
     @Test
     void completeNullThrowsException() {
-        assertThrows(NullPointerException.class, () -> autoCompleter.provideSuggestions(getRequest((null))));
+        assertThrows(NullPointerException.class, () -> autoCompleter.provideSuggestions(getRequest(null)));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.singletonList("test"));
 
         Collection<String> expected = Collections.emptyList();
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(""));
 
         assertEquals(expected, result);
     }
@@ -105,7 +105,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Collections.singletonList("testb"));
 
         Collection<String> expected = Arrays.asList("testa", "testb");
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
@@ -122,7 +122,7 @@ public class ContentSelectorSuggestionProviderTest {
         autoCompleter = new ContentSelectorSuggestionProvider(suggestionProvider, Arrays.asList("testb", "testa"));
 
         Collection<String> expected = Arrays.asList("testa", "testb", "testc", "testd");
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }

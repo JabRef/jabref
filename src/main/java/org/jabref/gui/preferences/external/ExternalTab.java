@@ -7,11 +7,15 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -23,12 +27,15 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private CheckBox autoOpenAttachedFolders;
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
+    @FXML private Button autolinkExternalHelp;
+
     @FXML private CheckBox useCustomTerminal;
     @FXML private TextField customTerminalCommand;
     @FXML private Button customTerminalBrowse;
     @FXML private CheckBox useCustomFileBrowser;
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;
+    @FXML private TextField kindleEmail;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -68,11 +75,16 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         customFileBrowserCommand.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
         customFileBrowserBrowse.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
 
+        kindleEmail.textProperty().bindBidirectional(viewModel.kindleEmailProperty());
+
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);
             validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
         });
+
+        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferencesService.getFilePreferences()), autolinkExternalHelp);
     }
 
     @FXML
@@ -88,5 +100,10 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML
     void useFileBrowserSpecialCommandBrowse() {
         viewModel.customFileBrowserBrowse();
+    }
+
+    @FXML
+    void resetCiteCommandToDefault() {
+        viewModel.resetCiteCommandToDefault();
     }
 }

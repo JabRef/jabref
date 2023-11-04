@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class CompositeSearchBasedFetcherTest {
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
-        Assertions.assertEquals(result, Collections.EMPTY_LIST);
+        Assertions.assertEquals(result, Collections.emptyList());
     }
 
     @ParameterizedTest(name = "Perform Search on empty query.")
@@ -60,7 +60,7 @@ public class CompositeSearchBasedFetcherTest {
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
-        Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
+        Assertions.assertEquals(queryResult, Collections.emptyList());
     }
 
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
@@ -68,7 +68,7 @@ public class CompositeSearchBasedFetcherTest {
     @MethodSource("performSearchParameters")
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
-        ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
+        ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseMode.BIBTEX);
 
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
@@ -92,17 +92,15 @@ public class CompositeSearchBasedFetcherTest {
      * @return A stream of Arguments wrapping set of fetchers.
      */
     static Stream<Arguments> performSearchParameters() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
-                .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(
                 new ArXivFetcher(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
-                new GvkFetcher(),
+                new GvkFetcher(importFormatPreferences),
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new MathSciNet(importFormatPreferences),
                 new ZbMATH(importFormatPreferences),

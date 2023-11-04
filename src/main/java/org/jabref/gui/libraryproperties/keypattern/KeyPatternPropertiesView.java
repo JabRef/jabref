@@ -47,7 +47,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService), keyPatternHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getFilePreferences()), keyPatternHelp);
     }
 
     @Override
@@ -55,9 +55,9 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
                 bibEntryTypesManager.getAllTypes(databaseContext.getMetaData().getMode()
-                                                                .orElse(preferencesService.getGeneralPreferences()
+                                                                .orElse(preferencesService.getLibraryPreferences()
                                                                                           .getDefaultBibDatabaseMode())),
-                databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getGlobalCitationKeyPattern()));
+                databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern()));
     }
 
     @FXML

@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -38,7 +38,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         this(new OrFields(field), false);
     }
 
-    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+    public FieldComparator(SaveOrder.SortCriterion sortCriterion) {
         this(new OrFields(sortCriterion.field), sortCriterion.descending);
     }
 
@@ -59,13 +59,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (InternalField.TYPE_HEADER.equals(this.fields.getPrimary())) {
+        if (InternalField.TYPE_HEADER == this.fields.getPrimary()) {
             return FieldType.TYPE;
         } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (StandardField.YEAR.equals(this.fields.getPrimary())) {
+        } else if (StandardField.YEAR == this.fields.getPrimary()) {
             return FieldType.YEAR;
-        } else if (StandardField.MONTH.equals(this.fields.getPrimary())) {
+        } else if (StandardField.MONTH == this.fields.getPrimary()) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
@@ -73,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private String getFieldValue(BibEntry entry) {
-        for (Field aField : fields) {
+        for (Field aField : fields.getFields()) {
             Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();
@@ -92,8 +92,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
         } else {
-            // If the field is author or editor, we rearrange names so they are
-            // sorted according to last name.
             f1 = getFieldValue(e1);
             f2 = getFieldValue(e2);
         }
@@ -102,9 +100,9 @@ public class FieldComparator implements Comparator<BibEntry> {
         if ((f1 == null) && (f2 == null)) {
             return 0;
         } else if (f1 == null) {
-            return multiplier;
-        } else if (f2 == null) {
             return -multiplier;
+        } else if (f2 == null) {
+            return +multiplier;
         }
 
         // Now we know that both f1 and f2 are != null

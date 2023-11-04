@@ -21,7 +21,6 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -35,8 +34,8 @@ import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -49,6 +48,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
-    private final FieldWriterPreferences fieldWriterPreferences;
+    private final FieldPreferences fieldPreferences;
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
@@ -72,8 +72,9 @@ public class SourceTab extends EntryEditorTab {
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
 
     private BibEntry previousEntry;
@@ -98,17 +99,26 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext,
+                     CountingUndoManager undoManager,
+                     FieldPreferences fieldPreferences,
+                     ImportFormatPreferences importFormatPreferences,
+                     FileUpdateMonitor fileMonitor,
+                     DialogService dialogService,
+                     StateManager stateManager,
+                     BibEntryTypesManager entryTypesManager,
+                     KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
-        this.fieldWriterPreferences = fieldWriterPreferences;
+        this.fieldPreferences = fieldPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
@@ -129,11 +139,11 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
-        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).write(entry, bibWriter, type);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
 
@@ -225,7 +235,7 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(currentEntry, mode, fieldWriterPreferences));
+                codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
                 highlightSearchPattern();
             } catch (IOException ex) {
@@ -275,7 +285,6 @@ public class SourceTab extends EntryEditorTab {
 
             if (parserResult.hasWarnings()) {
                 // put the warning into as exception text -> it will be displayed to the user
-
                 throw new IllegalStateException(parserResult.getErrorMessage());
             }
 
@@ -307,7 +316,7 @@ public class SourceTab extends EntryEditorTab {
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new FieldWriter(fieldWriterPreferences).write(fieldName, newValue);
+                    new FieldWriter(fieldPreferences).write(fieldName, newValue);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                     outOfFocusEntry.setField(fieldName, newValue);

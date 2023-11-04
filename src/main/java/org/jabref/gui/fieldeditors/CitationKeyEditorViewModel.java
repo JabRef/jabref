@@ -18,8 +18,14 @@ public class CitationKeyEditorViewModel extends AbstractEditorViewModel {
     private final UndoManager undoManager;
     private final DialogService dialogService;
 
-    public CitationKeyEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, PreferencesService preferencesService, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
-        super(field, suggestionProvider, fieldCheckers);
+    public CitationKeyEditorViewModel(Field field,
+                                      SuggestionProvider<?> suggestionProvider,
+                                      FieldCheckers fieldCheckers,
+                                      PreferencesService preferencesService,
+                                      BibDatabaseContext databaseContext,
+                                      UndoManager undoManager,
+                                      DialogService dialogService) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.preferencesService = preferencesService;
         this.databaseContext = databaseContext;
         this.undoManager = undoManager;

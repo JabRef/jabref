@@ -46,7 +46,13 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     private final ActionFactory actionFactory;
     private final PreferencesService preferencesService;
 
-    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService, PreferencesService preferencesService) {
+    public DuplicateResolverDialog(BibEntry one,
+                                   BibEntry two,
+                                   DuplicateResolverType type,
+                                   BibDatabaseContext database,
+                                   StateManager stateManager,
+                                   DialogService dialogService,
+                                   PreferencesService preferencesService) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.database = database;
         this.stateManager = stateManager;
@@ -100,7 +106,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
             getDialogPane().getButtonTypes().stream()
                            .map(getDialogPane()::lookupButton)
-                           .forEach(btn-> ButtonBar.setButtonUniformSize(btn, false));
+                           .forEach(btn -> ButtonBar.setButtonUniformSize(btn, false));
         }
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
@@ -116,6 +122,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         this.setResultConverter(button -> {
             // Updates the window state on button press
             stateManager.setDialogWindowState(getClass().getSimpleName(), new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));
+            threeWayMerge.saveConfiguration();
 
             if (button.equals(first)) {
                 return DuplicateResolverResult.KEEP_LEFT;
@@ -131,7 +138,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             return null;
         });
 
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferencesService.getFilePreferences());
         Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
         borderPane.setRight(helpButton);
 

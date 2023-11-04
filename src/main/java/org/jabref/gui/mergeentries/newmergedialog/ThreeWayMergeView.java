@@ -37,14 +37,18 @@ public class ThreeWayMergeView extends VBox {
     private final ThreeWayMergeViewModel viewModel;
     private final List<FieldRowView> fieldRows = new ArrayList<>();
 
+    private final PreferencesService preferencesService;
+
     private final FieldMergerFactory fieldMergerFactory;
     private final String keywordSeparator;
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
+
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
-        this.fieldMergerFactory = new FieldMergerFactory(preferencesService);
-        this.keywordSeparator = preferencesService.getGroupsPreferences().getKeywordSeparator().toString();
+        this.fieldMergerFactory = new FieldMergerFactory(preferencesService.getBibEntryPreferences());
+        this.keywordSeparator = preferencesService.getBibEntryPreferences().getKeywordSeparator().toString();
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
@@ -74,13 +78,28 @@ public class ThreeWayMergeView extends VBox {
         toolbar.showDiffProperty().addListener(e -> updateDiff());
         toolbar.diffViewProperty().addListener(e -> updateDiff());
         toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
-        this.updateDiff();
+        toolbar.hideEqualFieldsProperty().addListener(e -> showOrHideEqualFields());
+
+        updateDiff();
+        showOrHideEqualFields();
+    }
+
+    private void showOrHideEqualFields() {
+        for (FieldRowView row : fieldRows) {
+            if (toolbar.shouldHideEqualFields()) {
+                if (row.hasEqualLeftAndRightValues()) {
+                    row.hide();
+                }
+            } else {
+                row.show();
+            }
+        }
     }
 
     private void updateDiff() {
-        if (toolbar.isShowDiffEnabled()) {
+        if (toolbar.shouldShowDiffs()) {
             for (FieldRowView row : fieldRows) {
-                if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
+                if ("Groups".equals(row.getFieldNameCell().getText()) && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
                 } else {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod()));
@@ -130,9 +149,9 @@ public class ThreeWayMergeView extends VBox {
 
         FieldRowView fieldRow;
         if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
-            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferencesService, fieldIndex);
         } else {
-            fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+            fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferencesService, fieldIndex);
         }
 
         fieldRows.add(fieldIndex, fieldRow);
@@ -175,5 +194,9 @@ public class ThreeWayMergeView extends VBox {
 
     public BibEntry getRightEntry() {
         return viewModel.getRightEntry();
+    }
+
+    public void saveConfiguration() {
+        toolbar.saveToolbarConfiguration();
     }
 }

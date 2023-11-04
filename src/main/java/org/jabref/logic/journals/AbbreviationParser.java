@@ -2,59 +2,37 @@ package org.jabref.logic.journals;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Reads abbreviation files (CSV format) into a list of Abbreviations.
  */
 public class AbbreviationParser {
+    private static final Character[] DELIMITERS = {';', ','};
+    private static final char NO_DELIMITER = '\0'; // empty char
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationParser.class);
+    // Ensures ordering while preventing duplicates
+    private final LinkedHashSet<Abbreviation> abbreviations = new LinkedHashSet<>();
 
-    private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
-
-    public void readJournalListFromResource(String resourceFileName) {
-        try (InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            readJournalList(reader);
-        } catch (IOException e) {
-            LOGGER.error(String.format("Could not read journal list from file %s", resourceFileName), e);
-        }
-    }
-
-    public void readJournalListFromFile(Path file) throws IOException {
-        readJournalListFromFile(file, StandardCharsets.UTF_8);
-    }
-
-    public void readJournalListFromFile(Path file, Charset encoding) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(file, encoding)) {
-            readJournalList(reader);
-        }
-    }
-
-    /**
+    /*
      * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
-     * formatted as: "Full Journal Name;Abbr. Journal Name;[Shortest Unique Abbreviation]"
+     * formatted as: "Full Journal Name,Abbr. Journal Name[,Shortest Unique Abbreviation]"
+     * Tries to detect the delimiter, if comma or semicolon is used to ensure backwards compatibility
      *
-     * @param reader a given file into a Reader object
+     * @param file Path the given file
      */
-    private void readJournalList(Reader reader) throws IOException {
-        try (CSVParser csvParser = new CSVParser(reader, AbbreviationFormat.getCSVFormat())) {
+    void readJournalListFromFile(Path file) throws IOException {
+        char delimiter = detectDelimiter(file);
+
+        try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), AbbreviationFormat.getCSVFormatWithDelimiter(delimiter))) {
             for (CSVRecord csvRecord : csvParser) {
                 String name = csvRecord.size() > 0 ? csvRecord.get(0) : "";
                 String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : "";
@@ -65,12 +43,27 @@ public class AbbreviationParser {
                     return;
                 }
 
-                abbreviations.add(new Abbreviation(name, abbreviation, shortestUniqueAbbreviation));
+                Abbreviation abbreviationToAdd = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
+                abbreviations.add(abbreviationToAdd);
             }
         }
     }
 
-    public List<Abbreviation> getAbbreviations() {
-        return new LinkedList<>(abbreviations);
+    private char detectDelimiter(Path file) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            String line = reader.readLine();
+
+            if (line == null) {
+                return NO_DELIMITER;
+            }
+            return Arrays.stream(DELIMITERS)
+                         .filter(s -> line.contains(s.toString()))
+                         .findFirst()
+                         .orElse(NO_DELIMITER);
+        }
+    }
+
+    public Collection<Abbreviation> getAbbreviations() {
+        return abbreviations;
     }
 }

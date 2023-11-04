@@ -18,17 +18,21 @@ import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
+ * Represents everything related to a BIB file.
+ *
+ * <p> The entries are stored in BibDatabase, the other data in MetaData
  * and the options relevant for this file in Defaults.
+ * </p>
+ * <p>
+ *     To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
@@ -150,7 +154,7 @@ public class BibDatabaseContext {
         List<Path> fileDirs = new ArrayList<>();
 
         // 1. Metadata user-specific directory
-        metaData.getUserFileDirectory(preferences.getUser())
+        metaData.getUserFileDirectory(preferences.getUserAndHost())
                 .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
 
         // 2. Metadata general directory
@@ -233,28 +237,19 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
-    /**
-     * check if the database has any empty entries
-     *
-     * @return true if the database has any empty entries; otherwise false
-     */
-    public boolean hasEmptyEntries() {
-        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
-    }
-
-    public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
-    }
-
     public Path getFulltextIndexPath() {
-        Path appData = getFulltextIndexBasePath();
+        Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
         }
 
-        return appData.resolve("unsaved");
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        return indexPath;
     }
 
     @Override

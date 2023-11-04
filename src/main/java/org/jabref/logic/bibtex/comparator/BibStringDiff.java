@@ -57,7 +57,7 @@ public class BibStringDiff {
 
             Optional<BibtexString> match = newDatabase
                     .getStringValues().stream()
-                    .filter(test -> test.getName().equals(original.getName()))
+                    .filter(test -> test.getContent().equals(original.getContent()))
                     .findAny();
             if (match.isPresent()) {
                 // We have found a string with the same content. It cannot have the same

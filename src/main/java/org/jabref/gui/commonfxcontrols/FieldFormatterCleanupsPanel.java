@@ -87,7 +87,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
         new ViewModelListCellFactory<Field>()
                 .withText(Field::getDisplayName)
                 .install(addableFields);
-        addableFields.setConverter(FieldsUtil.fieldStringConverter);
+        addableFields.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addableFields.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.ENTER) {
                 addableFormatters.requestFocus();

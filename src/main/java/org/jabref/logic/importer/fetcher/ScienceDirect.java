@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -140,7 +139,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                                                         .header("X-ELS-APIKey", this.getApiKey())
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(API_KEY))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 
@@ -165,15 +164,5 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     @Override
     public String getName() {
         return FETCHER_NAME;
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
     }
 }

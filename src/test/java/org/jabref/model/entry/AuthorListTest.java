@@ -1213,4 +1213,16 @@ public class AuthorListTest {
         AuthorList secondAuthorList = AuthorList.of(new Author("B", null, null, null, null));
         assertNotEquals(firstAuthorList.hashCode(), secondAuthorList.hashCode());
     }
+
+    @Test
+    public void getAsLastFirstFirstLastNamesWithAndEmptyAuthor() {
+        assertEquals("",
+                EMPTY_AUTHOR.getAsLastFirstFirstLastNamesWithAnd(true));
+    }
+
+    @Test
+    public void getAsLastFirstFirstLastNamesWithAndMultipleAuthors() {
+        assertEquals("al-Khw{\\={a}}rizm{\\={i}}, M. and C. B{\\\"o}hm and K. G{\\\"{o}}del",
+                THREE_AUTHORS_WITH_LATEX.getAsLastFirstFirstLastNamesWithAnd(true));
+    }
 }

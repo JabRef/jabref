@@ -9,20 +9,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.preferences.PreferencesService;
 
-import static org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
-import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
+import static org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
+import static org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 
 public class MainTableFieldValueFormatter {
     private final DisplayStyle displayStyle;
     private final AbbreviationStyle abbreviationStyle;
     private final BibDatabase bibDatabase;
 
-    public MainTableFieldValueFormatter(PreferencesService preferences, BibDatabaseContext bibDatabaseContext) {
-        MainTableNameFormatPreferences nameFormatPreferences = preferences.getMainTableNameFormatPreferences();
-        this.displayStyle = nameFormatPreferences.getDisplayStyle();
-        this.abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
+    public MainTableFieldValueFormatter(NameDisplayPreferences nameDisplayPreferences, BibDatabaseContext bibDatabaseContext) {
+        this.displayStyle = nameDisplayPreferences.getDisplayStyle();
+        this.abbreviationStyle = nameDisplayPreferences.getAbbreviationStyle();
         this.bibDatabase = bibDatabaseContext.getDatabase();
     }
 
@@ -35,7 +33,7 @@ public class MainTableFieldValueFormatter {
      * @return The formatted name field.
      */
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
-        for (Field field : fields) {
+        for (Field field : fields.getFields()) {
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES) && (displayStyle != DisplayStyle.AS_IS)) {
                 Optional<String> name = entry.getResolvedFieldOrAlias(field, bibDatabase);
 

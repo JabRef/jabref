@@ -95,7 +95,7 @@ public final class Word {
     public void toUpperFirst() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0) ?
+                chars[i] = i == 0 ?
                         Character.toUpperCase(chars[i]) :
                         Character.toLowerCase(chars[i]);
             }
@@ -105,7 +105,7 @@ public final class Word {
     public void toUpperFirstIgnoreHyphen() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0 || (DASHES.contains(chars[i - 1]))) ?
+                chars[i] = i == 0 || (DASHES.contains(chars[i - 1])) ?
                         Character.toUpperCase(chars[i]) :
                         Character.toLowerCase(chars[i]);
             }
@@ -115,7 +115,7 @@ public final class Word {
     public void toUpperFirstTitle() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i))) ?
+                chars[i] = i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i)) ?
                         Character.toUpperCase(chars[i]) :
                         Character.toLowerCase(chars[i]);
             }
@@ -128,17 +128,13 @@ public final class Word {
                 word += chars[i];
                 i++;
             }
-        if (CONJUNCTIONS.contains(word)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !CONJUNCTIONS.contains(word);
     }
 
     public void stripConsonants() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0 || DASHES.contains(chars[i - 1])) ?
+                chars[i] = i == 0 || DASHES.contains(chars[i - 1]) ?
                         Character.toUpperCase(chars[i]) :
                         Character.toLowerCase(chars[i]);
             }

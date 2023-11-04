@@ -45,7 +45,7 @@ public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelIt
 
     @FXML
     private void initialize() {
-        viewModel = new CitationKeyPatternPanelViewModel(preferences);
+        viewModel = new CitationKeyPatternPanelViewModel(preferences.getCitationKeyPatternPreferences());
 
         this.setEditable(true);
 

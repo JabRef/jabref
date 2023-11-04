@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
@@ -33,17 +33,20 @@ public class CopyMoreAction extends SimpleCommand {
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final PreferencesService preferencesService;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     public CopyMoreAction(StandardActions action,
                           DialogService dialogService,
                           StateManager stateManager,
                           ClipBoardManager clipBoardManager,
-                          PreferencesService preferencesService) {
+                          PreferencesService preferencesService,
+                          JournalAbbreviationRepository abbreviationRepository) {
         this.action = action;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.preferencesService = preferencesService;
+        this.abbreviationRepository = abbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -192,7 +195,7 @@ public class CopyMoreAction extends SimpleCommand {
         StringReader layoutString = new StringReader("\\citationkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
         Layout layout;
         try {
-            layout = new LayoutHelper(layoutString, preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository)).getLayoutFromText();
+            layout = new LayoutHelper(layoutString, preferencesService.getLayoutFormatterPreferences(), abbreviationRepository).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Could not get layout.", e);
             return;

@@ -66,14 +66,6 @@ public class CustomImporterTest {
     }
 
     @Test
-    public void testCompareToGreater() throws Exception {
-        CustomImporter bibtexmlImporter = asCustomImporter(new BibTeXMLImporter());
-        CustomImporter ovidImporter = asCustomImporter(new OvidImporter());
-
-        assertTrue(ovidImporter.compareTo(bibtexmlImporter) > 0);
-    }
-
-    @Test
     public void testCompareToEven() throws Exception {
         assertEquals(0, importer.compareTo(asCustomImporter(new CopacImporter())));
     }

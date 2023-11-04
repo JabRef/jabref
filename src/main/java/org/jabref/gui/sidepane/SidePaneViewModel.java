@@ -15,9 +15,13 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SidePanePreferences;
 
@@ -34,19 +38,27 @@ public class SidePaneViewModel extends AbstractViewModel {
     private final SidePaneContentFactory sidePaneContentFactory;
     private final DialogService dialogService;
 
-    public SidePaneViewModel(PreferencesService preferencesService,
+    public SidePaneViewModel(LibraryTabContainer tabContainer,
+                             PreferencesService preferencesService,
+                             JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
                              DialogService dialogService,
+                             FileUpdateMonitor fileUpdateMonitor,
+                             BibEntryTypesManager entryTypesManager,
                              UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.sidePaneContentFactory = new SidePaneContentFactory(
+                tabContainer,
                 preferencesService,
+                abbreviationRepository,
                 taskExecutor,
                 dialogService,
                 stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
                 undoManager);
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);

@@ -1,0 +1,652 @@
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+            <PMID Version="1">29872490</PMID>
+            <DateRevised>
+                <Year>2019</Year>
+                <Month>11</Month>
+                <Day>20</Day>
+            </DateRevised>
+            <Article PubModel="Electronic-eCollection">
+                <Journal>
+                    <ISSN IssnType="Electronic">1949-2553</ISSN>
+                    <JournalIssue CitedMedium="Internet">
+                        <Volume>9</Volume>
+                        <Issue>37</Issue>
+                        <PubDate>
+                            <Year>2018</Year>
+                            <Month>May</Month>
+                            <Day>15</Day>
+                        </PubDate>
+                    </JournalIssue>
+                    <Title>Oncotarget</Title>
+                    <ISOAbbreviation>Oncotarget</ISOAbbreviation>
+                </Journal>
+                <ArticleTitle>Genome-wide significant risk factors on chromosome 19 and the
+                    <i>APOE</i> locus.
+                </ArticleTitle>
+                <Pagination>
+                    <StartPage>24590</StartPage>
+                    <EndPage>24600</EndPage>
+                    <MedlinePgn>24590-24600</MedlinePgn>
+                </Pagination>
+                <ELocationID EIdType="doi" ValidYN="Y">10.18632/oncotarget.25083</ELocationID>
+                <Abstract>
+                    <AbstractText>The apolipoprotein E (
+                        <i>APOE</i>) gene on chromosome 19q13.32, was the first, and remains the strongest, genetic risk factor for Alzheimer's disease (AD). Additional signals associated with AD have been located in chromosome 19, including
+                        <i>ABCA7</i> (19p13.3) and
+                        <i>CD33 (</i>19q13.41). The
+                        <i>ABCA7</i> gene has been replicated in most populations. However, the contribution to AD of other signals close to
+                        <i>APOE</i> gene remains controversial. Possible explanations for inconsistency between reports include long range linkage disequilibrium (LRLD). We analysed the contribution of
+                        <i>ABCA7</i> and
+                        <i>CD33</i> loci to AD risk and explore LRLD patterns across
+                        <i>APOE</i> region. To evaluate AD risk conferred by
+                        <i>ABCA7</i> rs4147929:G&gt;A and
+                        <i>CD33</i> rs3865444:C&gt;A, we used a large Spanish population (1796 AD cases, 2642 controls). The
+                        <i>ABCA7</i> rs4147929:G&gt;A SNP effect was nominally replicated in the Spanish cohort and reached genome-wide significance after meta-analysis (odds ratio (OR)=1.15, 95% confidence interval (95% CI)=1.12-1.19;
+                        <i>P</i> = 1.60 x 10
+                        <sup>-19</sup>).
+                        <i>CD33</i> rs3865444:C&gt;A was not associated with AD in the dataset. The meta-analysis was also negative (OR=0.98, 95% CI=0.93-1.04;
+                        <i>P</i>=0.48). After exploring LRLD patterns between
+                        <i>APOE</i> and
+                        <i>CD33</i> in several datasets, we found significant LD (D' &gt;0.20;
+                        <i>P</i> &lt;0.030) between
+                        <i>APOE</i>-&#x190;2 and
+                        <i>CD33</i> rs3865444C&gt;A in two of five datasets, suggesting the presence of a non-universal long range interaction between these loci affecting to some populations. In conclusion, we provide here evidence of genetic association of the
+                        <i>ABCA7</i> locus in the Spanish population and also propose a plausible explanation for the controversy on the contribution of
+                        <i>CD33</i> to AD susceptibility.
+                    </AbstractText>
+                </Abstract>
+                <AuthorList CompleteYN="Y">
+                    <Author ValidYN="Y">
+                        <LastName>Moreno-Grau</LastName>
+                        <ForeName>Sonia</ForeName>
+                        <Initials>S</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Hern&#xe1;ndez</LastName>
+                        <ForeName>Isabel</ForeName>
+                        <Initials>I</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Heilmann-Heimbach</LastName>
+                        <ForeName>Stefanie</ForeName>
+                        <Initials>S</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Institute of Human Genetics, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Genomics, Life &amp; Brain Center, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Ruiz</LastName>
+                        <ForeName>Susana</ForeName>
+                        <Initials>S</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Rosende-Roca</LastName>
+                        <ForeName>Mait&#xe9;e</ForeName>
+                        <Initials>M</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Maule&#xf3;n</LastName>
+                        <ForeName>Ana</ForeName>
+                        <Initials>A</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Vargas</LastName>
+                        <ForeName>Liliana</ForeName>
+                        <Initials>L</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Rodr&#xed;guez-G&#xf3;mez</LastName>
+                        <ForeName>Octavio</ForeName>
+                        <Initials>O</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Alegret</LastName>
+                        <ForeName>Montserrat</ForeName>
+                        <Initials>M</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Espinosa</LastName>
+                        <ForeName>Ana</ForeName>
+                        <Initials>A</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Ortega</LastName>
+                        <ForeName>Gemma</ForeName>
+                        <Initials>G</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Aguilera</LastName>
+                        <ForeName>Nuria</ForeName>
+                        <Initials>N</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Abdelnour</LastName>
+                        <ForeName>Carla</ForeName>
+                        <Initials>C</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Neuroimaging Initiative</LastName>
+                        <ForeName>Alzheimer's Disease</ForeName>
+                        <Initials>AD</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Institute of Human Genetics, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Genomics, Life &amp; Brain Center, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Psychiatry and Psychotherapy, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>German Center for Neurodegenerative Diseases, DZNE, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Psychiatry and Psychotherapy, University of Cologne, Cologne, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Memory Unit, University Hospital La Paz-Cantoblanco, Madrid, Spain.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Dementia Unit, University Hospital Virgen de la Arrixaca, Murcia, Spain.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Centro de Investigaci&#xf3;n Biom&#xe9;dica en Red de Diabetes y Enfermedades Metab&#xf3;licas Asociadas, CIBERDEM, Spain, Hospital Cl&#xed;nico San Carlos, Madrid, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Gil</LastName>
+                        <ForeName>Silvia</ForeName>
+                        <Initials>S</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Maier</LastName>
+                        <ForeName>Wolfgang</ForeName>
+                        <Initials>W</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Psychiatry and Psychotherapy, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>German Center for Neurodegenerative Diseases, DZNE, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Sotolongo-Grau</LastName>
+                        <ForeName>Oscar</ForeName>
+                        <Initials>O</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>T&#xe1;rraga</LastName>
+                        <ForeName>Llu&#xed;s</ForeName>
+                        <Initials>L</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Ramirez</LastName>
+                        <ForeName>Alfredo</ForeName>
+                        <Initials>A</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Institute of Human Genetics, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Psychiatry and Psychotherapy, University of Bonn, Bonn, Germany.</Affiliation>
+                        </AffiliationInfo>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Psychiatry and Psychotherapy, University of Cologne, Cologne, Germany.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>L&#xf3;pez-Arrrieta</LastName>
+                        <ForeName>Jes&#xfa;s</ForeName>
+                        <Initials>J</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Memory Unit, University Hospital La Paz-Cantoblanco, Madrid, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Ant&#xfa;nez</LastName>
+                        <ForeName>Carmen</ForeName>
+                        <Initials>C</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Dementia Unit, University Hospital Virgen de la Arrixaca, Murcia, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Serrano-R&#xed;os</LastName>
+                        <ForeName>Manuel</ForeName>
+                        <Initials>M</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Centro de Investigaci&#xf3;n Biom&#xe9;dica en Red de Diabetes y Enfermedades Metab&#xf3;licas Asociadas, CIBERDEM, Spain, Hospital Cl&#xed;nico San Carlos, Madrid, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Boada</LastName>
+                        <ForeName>Merc&#xe8;</ForeName>
+                        <Initials>M</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Ruiz</LastName>
+                        <ForeName>Agust&#xed;n</ForeName>
+                        <Initials>A</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Research Center and Memory Clinic of Fundaci&#xf3; ACE, Institut Catal&#xe0; de Neuroci&#xe8;ncies Aplicades, Univesitat Internacional de Catalunya, Barcelona, Spain.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                </AuthorList>
+                <Language>eng</Language>
+                <GrantList CompleteYN="Y">
+                    <Grant>
+                        <GrantID>U01 AG024904</GrantID>
+                        <Acronym>AG</Acronym>
+                        <Agency>NIA NIH HHS</Agency>
+                        <Country>United States</Country>
+                    </Grant>
+                </GrantList>
+                <PublicationTypeList>
+                    <PublicationType UI="D016428">Journal Article</PublicationType>
+                </PublicationTypeList>
+                <ArticleDate DateType="Electronic">
+                    <Year>2018</Year>
+                    <Month>05</Month>
+                    <Day>15</Day>
+                </ArticleDate>
+            </Article>
+            <MedlineJournalInfo>
+                <Country>United States</Country>
+                <MedlineTA>Oncotarget</MedlineTA>
+                <NlmUniqueID>101532965</NlmUniqueID>
+                <ISSNLinking>1949-2553</ISSNLinking>
+            </MedlineJournalInfo>
+            <KeywordList Owner="NOTNLM">
+                <Keyword MajorTopicYN="N">ABCA7</Keyword>
+                <Keyword MajorTopicYN="N">APOE</Keyword>
+                <Keyword MajorTopicYN="N">CD33</Keyword>
+                <Keyword MajorTopicYN="N">Gerotarget</Keyword>
+                <Keyword MajorTopicYN="N">late onset Alzheimer&#x2019;s disease</Keyword>
+                <Keyword MajorTopicYN="N">linkage disequilibrium</Keyword>
+            </KeywordList>
+            <CoiStatement>CONFLICTS OF INTEREST None. The authors declare that they have no competing interest.</CoiStatement>
+        </MedlineCitation>
+        <PubmedData>
+            <History>
+                <PubMedPubDate PubStatus="received">
+                    <Year>2017</Year>
+                    <Month>12</Month>
+                    <Day>13</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="accepted">
+                    <Year>2018</Year>
+                    <Month>3</Month>
+                    <Day>22</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="entrez">
+                    <Year>2018</Year>
+                    <Month>6</Month>
+                    <Day>7</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="pubmed">
+                    <Year>2018</Year>
+                    <Month>6</Month>
+                    <Day>7</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="medline">
+                    <Year>2018</Year>
+                    <Month>6</Month>
+                    <Day>7</Day>
+                    <Hour>6</Hour>
+                    <Minute>1</Minute>
+                </PubMedPubDate>
+            </History>
+            <PublicationStatus>epublish</PublicationStatus>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">29872490</ArticleId>
+                <ArticleId IdType="pmc">PMC5973862</ArticleId>
+                <ArticleId IdType="doi">10.18632/oncotarget.25083</ArticleId>
+                <ArticleId IdType="pii">25083</ArticleId>
+            </ArticleIdList>
+            <ReferenceList>
+                <Reference>
+                    <Citation>Moreno-Grau S, Ruiz A. Genome research in pre-dementia stages of Alzheimer&#x2019;s disease. Expert Rev Mol Med. 2016;18:e11.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">27237222</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Corder E, Saunders A. Gene dose of apolipoprotein E type 4 allele and the risk of Alzheimer&#x2019;s disease in late onset families. Science. 1993;8:41&#x2013;3.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">8346443</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Corder EH, Saunders AM, Risch NJ, Strittmatter WJ, Schmechel DE, Gaskell PC, Rimmler JB, Locke PA, Conneally PM, Schmader KE. Protective effect of apolipoprotein E type 2 allele for late onset Alzheimer disease. Nat Genet. 1994;7:180&#x2013;4.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">7920638</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Roses AD, Lutz MW, Amrine-Madsen H, Saunders AM, Crenshaw DG, Sundseth SS, Huentelman MJ, Welsh-Bohmer KA, Reiman EM. A TOMM40 variable-length polymorphism predicts the age of late-onset Alzheimer&#x2019;s disease. Pharmacogenomics J. 2010;10:375&#x2013;84.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC2946560</ArticleId>
+                        <ArticleId IdType="pubmed">20029386</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Seshadri S, Fitzpatrick AL, Ikram MA, DeStefano AL, Gudnason V, Boada M, Bis JC, Smith AV, Carassquillo MM, Lambert JC, Harold D, Schrijvers EM, Ramirez-Lorca R, et al. Genome-wide analysis of genetic loci associated with Alzheimer disease. JAMA. 2010;303:1832&#x2013;40.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC2989531</ArticleId>
+                        <ArticleId IdType="pubmed">20460622</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Hollingworth P, Harold D, Sims R, Gerrish A, Lambert JC, Carrasquillo MM, Abraham R, Hamshere ML, Pahwa JS, Moskvina V, Dowzell K, Jones N, Stretton A, et al. Common variants at ABCA7, MS4A6A/MS4A4E, EPHA1, CD33 and CD2AP are associated with Alzheimer&#x2019;s disease. Nat Genet. 2011;43:429&#x2013;35.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3084173</ArticleId>
+                        <ArticleId IdType="pubmed">21460840</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Cruchaga C, Karch CM, Jin SC, Benitez BA, Cai Y, Guerreiro R, Harari O, Norton J, Budde J, Bertelsen S, Jeng AT, Cooper B, Skorupa T, et al. Rare coding variants in the phospholipase D3 gene confer risk for Alzheimer &#x2019; s disease. Nature. 2014;505:550&#x2013;4.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC4050701</ArticleId>
+                        <ArticleId IdType="pubmed">24336208</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Naj AC, Jun G, Beecham GW, Wang LS, Vardarajan BN, Buros J, Gallins PJ, Buxbaum JD, Jarvik GP, Crane PK, Larson EB, Bird TD, Boeve BF, et al. Common variants at MS4A4/MS4A6E, CD2AP, CD33 and EPHA1 are associated with late-onset Alzheimer&#x2019;s disease. Nat Genet. 2011;43:436&#x2013;41.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3090745</ArticleId>
+                        <ArticleId IdType="pubmed">21460841</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Lambert JC, Ibrahim-Verbaas CA, Harold D, Naj AC, Sims R, Bellenguez C, DeStafano AL, Bis JC, Beecham GW, Grenier-Boley B, Russo G, Thorton-Wells TA, Jones N, et al. Meta-analysis of 74,046 individuals identifies 11 new susceptibility loci for Alzheimer&#x2019;s disease. Nat Genet. 2013;45:1452&#x2013;8.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3896259</ArticleId>
+                        <ArticleId IdType="pubmed">24162737</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Reitz C, Jun G, Naj A, Rajbhandary R, Vardarajan BN, Wang LS, Valladares O, Lin CF, Larson EB, Graff-Radford NR, Evans D, De Jager PL, Crane PK, et al. Variants in the ATP-binding cassette transporter (ABCA7), apolipoprotein E &#x3b5;4,and the risk of late-onset Alzheimer disease in African Americans. JAMA. 2013;309:1483&#x2013;92.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3667653</ArticleId>
+                        <ArticleId IdType="pubmed">23571587</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Chouraki V, Seshadri S. Genetics of Alzheimer&#x2019;s disease. Adv Genet. 2014;87:245&#x2013;94.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">25311924</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Heilmann S, Drichel D, Clarimon J, Fern&#xe1;ndez V, Lacour A, Wagner H, Thelen M, Hern&#xe1;ndez I, Fortea J, Alegret M, Blesa R, Maule&#xf3;n A, Roca MR, et al. PLD3 in non-familial Alzheimer&#x2019;s disease. Nature. 2015;520:E3&#x2013;5.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">25832411</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Carrasquillo MM, Belbin O, Hunter TA, Ma L, Bisceglio GD, Zou F, Crook JE, Pankratz VS, Sando SB, Aasly JO, Barcikowska M, Wszolek ZK, Dickson DW, et al. Replication of EPHA1 and CD33 associations with late-onset Alzheimer&#x2019;s disease: a multi-centre case-control study. Mol Neurodegener. 2011;6:54.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3157442</ArticleId>
+                        <ArticleId IdType="pubmed">21798052</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Sakae N, Liu CC, Shinohara M, Frisch-Daiello J, Ma L, Yamazaki Y, Tachibana M, Younkin L, Kurti A, Carrasquillo MM, Zou F, Sevlever D, Bisceglio G, et al. ABCA7 Deficiency Accelerates Amyloid-&#x3b2; Generation and Alzheimer&#x2019;s Neuronal Pathology. J Neurosci. 2016;36:3848&#x2013;59.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC4812140</ArticleId>
+                        <ArticleId IdType="pubmed">27030769</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Jehle AW, Gardai SJ, Li S, Linsel-Nitschke P, Morimoto K, Janssen WJ, Vandivier RW, Wang N, Greenberg S, Dale BM, Qin C, Henson PM, Tall AR. ATP-binding cassette transporter A7 enhances phagocytosis of apoptotic cells and associated ERK signaling in macrophages. J Cell Biol. 2006;174:547&#x2013;56.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC2064260</ArticleId>
+                        <ArticleId IdType="pubmed">16908670</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Kim WS, Li H, Ruberu K, Chan S, Elliott DA, Low JK, Cheng D, Karl T, Garner B. Deletion of Abca7 increases cerebral amyloid-&#x3b2; accumulation in the J20 mouse model of Alzheimer&#x2019;s disease. J Neurosci. 2013;33:4387&#x2013;94.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC6704948</ArticleId>
+                        <ArticleId IdType="pubmed">23467355</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Bradshaw EM, Chibnik LB, Keenan BT, Ottoboni L, Raj T, Tang A, Rosenkrantz LL, Imboywa S, Lee M, Von Korff A, Morris MC, Evans DA, Johnson K, et al. CD33 Alzheimer&#x2019;s disease locus: altered monocyte function and amyloid biology. Nat Neurosci. 2013;16:848&#x2013;50.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3703870</ArticleId>
+                        <ArticleId IdType="pubmed">23708142</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Cruchaga C, Nowotny P, Kauwe JSK, Ridge PG, Mayo K, Bertelsen S, Hinrichs A, Fagan AM, Holtzman DM, Morris JC, Goate AM. Association and expression analyses with single-nucleotide polymorphisms in TOMM40 in Alzheimer disease. Arch Neurol. 2011;68:1013&#x2013;9.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3204798</ArticleId>
+                        <ArticleId IdType="pubmed">21825236</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Mueller JC. Linkage disequilibrium for different scales and applications. Brief Bioinform. 2004;5:355&#x2013;64.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">15606972</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Ardlie KG, Kruglyak L, Seielstad M. Patterns of Linkage Disequilibrium in the Human Genome. Nat Rev Genet. 2002;3:299&#x2013;309.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">11967554</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Campbell CD, Ogburn EL, Lunetta KL, Lyon HN, Freedman ML, Groop LC, Altshuler D, Ardlie KG, Hirschhorn JN. Demonstrating stratification in a European American population. Nat Genet. 2005;37:868&#x2013;72.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">16041375</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Dawson E, Abecasis GR, Bumpstead S, Chen Y, Hunt S, Beare DM, Pabial J, Dibling T, Tinsley E, Kirby S, Carter D, Papaspyridonos M, Livingstone S, et al. A first-generation linkage disequilibrium map of human chromosome 22. Nature. 2002;418:544&#x2013;8.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">12110843</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Beckmann JS, Estivill X, Antonarakis SE. Copy number variants and genetic traits: closer to the resolution of phenotypic to genotypic variability. Nat Rev Genet. 2007;8:639&#x2013;46.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">17637735</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Ant&#xfa;nez C, Boada M, Gonz&#xe1;lez-P&#xe9;rez A, Gay&#xe1;n J, Ram&#xed;rez-Lorca R, Mar&#xed;n J, Hern&#xe1;ndez I, Moreno-Rey C, Mor&#xf3;n FJ, L&#xf3;pez-Arrieta J, Maule&#xf3;n A, Rosende-Roca M, Noguera-Perea F, et al. The membrane-spanning 4-domains, subfamily A (MS4A) gene cluster contains a common variant associated with Alzheimer&#x2019;s disease. Genome Med. 2011;3:33.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3219074</ArticleId>
+                        <ArticleId IdType="pubmed">21627779</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Ruiz A, Heilmann S, Becker T, Hern&#xe1;ndez I, Wagner H, Thelen M, Maule&#xf3;n A, Rosende-Roca M, Bellenguez C, Bis JC, Harold D, Gerrish A, Sims R, et al. Follow-up of loci from the International Genomics of Alzheimer&#x2019;s Disease Project identifies TRIP4 as a novel susceptibility gene. Transl Psychiatry. 2014;4:e358.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3944635</ArticleId>
+                        <ArticleId IdType="pubmed">24495969</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Calero O, Hortig&#xfc;ela R, Bullido M, Calero M. Apolipoprotein E genotyping method by Real Time PCR, a fast and cost-effective alternative to the TaqMan&#xae; and FRET assays. J Neurosci Methods. 2009;183:238&#x2013;40.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">19583979</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Purcell S, Neale B, Todd-Brown K, Thomas L, Ferreira MA, Bender D, Maller J, Sklar P, de Bakker PI, Daly MJ, Sham PC. PLINK: a tool set for whole-genome association and population-based linkage analyses. Am J Hum Genet. 2007;81:559&#x2013;75.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC1950838</ArticleId>
+                        <ArticleId IdType="pubmed">17701901</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Kjeldsen EW, Tybj&#xe6;rg-Hansen A, Nordestgaard BG, Frikke-Schmidt R. ABCA7and risk of dementia and vascular disease in the Danish population. Ann Clin Transl Neurol. 2018;5:41&#x2013;51.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC5771325</ArticleId>
+                        <ArticleId IdType="pubmed">29376091</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Moreno DJ, Ruiz S, R&#xed;os &#xc1;, Lopera F, Ostos H, Via M, Bedoya G. Association of GWAS Top Genes With Late-Onset Alzheimer&#x2019;s Disease in Colombian Population. Am J Alzheimers Dis Other Demen. 2017;32:27&#x2013;35.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">28084078</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Zhang DF, Li J, Wu H, Cui Y, Bi R, Zhou HJ, Wang HZ, Zhang C, Wang D, Kong QP, Li T, Fang Y, Jiang T, et al. CFH Variants Affect Structural and Functional Brain Changes and Genetic Risk of Alzheimer&#x2019;s Disease. Neuropsychopharmacology. 2015;41:1034&#x2013;1035.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC4748428</ArticleId>
+                        <ArticleId IdType="pubmed">26243271</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Jiao B, Liu X, Zhou L, Wang MH, Zhou Y, Xiao T, Zhang W, Sun R, Waye MM, Tang B, Shen L. Polygenic Analysis of Late-Onset Alzheimer&#x2019;s Disease from Mainland China. PLoS One. 2015;10:e0144898.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC4683047</ArticleId>
+                        <ArticleId IdType="pubmed">26680604</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Mao YF, Guo ZY, Pu JL, Chen YX, Zhang BR. Association of CD33 and MS4A cluster variants with Alzheimer&#x2019;s disease in East Asian Populations. Neurosci Lett. 2015;609:235&#x2013;239.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">26455864</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Ebbert MT, Ridge PG, Wilson AR, Sharp AR, Bailey M, Norton MC, Tschanz JT, Munger RG, Corcoran CD, Kauwe JSK. Population-based Analysis of Alzheimer&#x2019;s Disease Risk Alleles Implicates Genetic Interactions. Biol Psychiatry. 2014;75:732&#x2013;7.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3867586</ArticleId>
+                        <ArticleId IdType="pubmed">23954108</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Omoumi A, Fok A, Greenwood T, Sadovnick AD, Feldman HH, Hsiung GY. Evaluation of late-onset Alzheimer disease genetic susceptibility risks in a Canadian population. Neurobiol Aging. 2014;35:936.e5-12.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">24176626</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Tan L, Yu JT, Zhang W, Wu ZC, Zhang Q, Liu QY, Wang W, Wang HF, Ma XY, Cui WZ. Association of GWAS-linked loci with late-onset Alzheimer&#x2019;s disease in a northern Han Chinese population. Alzheimers Dement. 2013;9:546&#x2013;53.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">23232270</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Chung SJ, Lee JH, Kim SY, You S, Kim MJ, Lee JY, Koh J. Association of GWAS top hits with late-onset Alzheimer disease in Korean population. Alzheimer Dis Assoc Disord. 2013;27:250&#x2013;7.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">22975751</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Deng YL, Liu LH, Wang Y, Tang HD, Ren RJ, Xu W, Ma JF, Wang LL, Zhuang JP, Wang G, Chen SD. The prevalence of CD33 and MS4A6A variant in Chinese Han population with Alzheimer&#x2019;s disease. Hum Genet. 2012;131:1245&#x2013;9.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">22382309</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Logue MW. A Comprehensive Genetic Association Study of Alzheimer Disease in African Americans. Arch Neurol. 2011;68:1569.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3356921</ArticleId>
+                        <ArticleId IdType="pubmed">22159054</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Miyashita A, Koike A, Jun G, Wang LS, Takahashi S, Matsubara E, Kawarabayashi T, Shoji M, Tomita N, Arai H, Asada T, Harigaya Y, Ikeda M, et al. SORL1 is genetically associated with late-onset Alzheimer&#x2019;s disease in Japanese, Koreans and Caucasians. PLoS One. 2013;8:e58618.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3614978</ArticleId>
+                        <ArticleId IdType="pubmed">23565137</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Weiner M, Aisen P, Jack C, Jr, Jaugust W, Trojanowski J, Shaw L, Saykin AJ, Morris JC, Cairns N, Laurel A, Toga A, Green R, Walter S, et al. The Alzheimer&#x2019;s disease neuroinmaging iniciative: Progress report and future plans. Alzheimers Dement. 2010;6:202&#x2013;11.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC2927112</ArticleId>
+                        <ArticleId IdType="pubmed">20451868</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Li H, Wetten S, Li L, St Jean PL, Upmanyu R, Surh L, Hosford D, Barnes MR, Briley JD, Borrie M, Coletta N, Delisle R, Dhalla D, et al. Candidate single-nucleotide polymorphisms from a genomewide association study of Alzheimer disease. Arch Neurol. 2008;65:45&#x2013;53.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pubmed">17998437</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Wijsman EM, Pankratz ND, Choi Y, Rothstein JH, Faber KM, Cheng R, Lee JH, Bird TD, Bennett DA, Diaz-Arrastia R, Goate AM, Farlow M, Ghetti B, et al. Genome-wide association of familial late-onset Alzheimer&#x2019;s disease replicates BIN1 and CLU and nominates CUGBP2 in interaction with APOE. PLoS Genet. 2011;7:e1001308.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC3040659</ArticleId>
+                        <ArticleId IdType="pubmed">21379329</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+                <Reference>
+                    <Citation>Zhang Q, Calus MP, Guldbrandtsen B, Lund MS, Sahana G. Estimation of inbreeding using pedigree, 50k SNP chip genotypes and full sequence data in three cattle breeds. BMC Genet. 2015;16:88.</Citation>
+                    <ArticleIdList>
+                        <ArticleId IdType="pmc">PMC4509611</ArticleId>
+                        <ArticleId IdType="pubmed">26195126</ArticleId>
+                    </ArticleIdList>
+                </Reference>
+            </ReferenceList>
+        </PubmedData>
+    </PubmedArticle>
+</PubmedArticleSet>

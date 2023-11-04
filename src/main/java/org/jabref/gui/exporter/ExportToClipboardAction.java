@@ -14,6 +14,7 @@ import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -46,23 +47,20 @@ public class ExportToClipboardAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final List<BibEntry> entries = new ArrayList<>();
-    private final ExporterFactory exporterFactory;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferences;
     private final StateManager stateManager;
 
     public ExportToClipboardAction(DialogService dialogService,
-                                   ExporterFactory exporterFactory,
                                    StateManager stateManager,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor,
-                                   PreferencesService prefs) {
+                                   PreferencesService preferencesService) {
         this.dialogService = dialogService;
-        this.exporterFactory = exporterFactory;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
-        this.preferences = prefs;
+        this.preferences = preferencesService;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -75,6 +73,9 @@ public class ExportToClipboardAction extends SimpleCommand {
             return;
         }
 
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                preferences,
+                Globals.entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))
@@ -82,7 +83,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                                          .filter(exporter -> exporter.getName().equals(preferences.getImportExportPreferences().getLastExportExtension()))
+                                          .filter(exporter -> exporter.getName().equals(preferences.getExportPreferences().getLastExportExtension()))
                                           .findAny()
                                           .orElse(null);
 
@@ -100,15 +101,12 @@ public class ExportToClipboardAction extends SimpleCommand {
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {
-        // Set the global variable for this database's file directory before exporting,
-        // so formatters can resolve linked files correctly.
-        // (This is an ugly hack!)
-        preferences.storeFileDirForDatabase(stateManager.getActiveDatabase()
-                                                        .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
-                                                        .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory())));
+        List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
+                                                    .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
+                                                    .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Add chosen export type to last used preference, to become default
-        preferences.getImportExportPreferences().setLastExportExtension(exporter.getName());
+        preferences.getExportPreferences().setLastExportExtension(exporter.getName());
 
         Path tmp = null;
         try {
@@ -119,8 +117,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             entries.addAll(stateManager.getSelectedEntries());
 
             // Write to file:
-            exporter.export(stateManager.getActiveDatabase().get(), tmp,
-                    entries);
+            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries, fileDirForDatabase, Globals.journalAbbreviationRepository);
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(Files.readString(tmp), exporter.getFileType());

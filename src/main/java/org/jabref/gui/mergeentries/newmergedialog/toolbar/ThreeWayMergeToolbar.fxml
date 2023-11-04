@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
@@ -42,6 +43,7 @@
                </toggleGroup>
             </RadioButton>
             <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
+            <CheckBox fx:id="onlyShowChangedFieldsCheck" text="%Only show changed fields"></CheckBox>
          </items>
       </ToolBar>
    </children>

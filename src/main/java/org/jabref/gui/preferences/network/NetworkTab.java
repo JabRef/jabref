@@ -10,21 +10,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
-import org.jabref.gui.Globals;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -33,11 +30,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
-    @FXML private Label remoteLabel;
-    @FXML private CheckBox remoteServer;
-    @FXML private TextField remotePort;
-    @FXML private Button remoteHelp;
-
+    @FXML private CheckBox versionCheck;
     @FXML private CheckBox proxyUse;
     @FXML private Label proxyHostnameLabel;
     @FXML private TextField proxyHostname;
@@ -48,8 +41,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TextField proxyUsername;
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
-    @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
+    @FXML private CheckBox proxyPersistPassword;
+    @FXML private SplitPane persistentTooltipWrapper; // The disabled persistPassword control does not show tooltips
 
     @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
@@ -59,7 +53,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certValidTo;
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
-
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -80,10 +73,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     public void initialize() {
         this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
 
-        remoteLabel.setVisible(preferencesService.getGeneralPreferences().shouldShowAdvancedHints());
-        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
-        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
-        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
+        versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
 
         proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
         proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());
@@ -102,19 +92,24 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPasswordLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
         proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
-        proxyAttentionLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyPersistPassword.selectedProperty().bindBidirectional(viewModel.proxyPersistPasswordProperty());
+        proxyPersistPassword.disableProperty().bind(
+                proxyCustomAndAuthentication.and(viewModel.passwordPersistAvailable()).not());
+        EasyBind.subscribe(viewModel.passwordPersistAvailable(), available -> {
+            if (!available) {
+                persistentTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
+            } else {
+                persistentTooltipWrapper.setTooltip(null);
+            }
+        });
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService), remoteHelp);
-
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.proxyHostnameValidationStatus(), proxyHostname);
             validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
@@ -155,7 +150,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     private void proxyPasswordMask(MouseEvent event) {
-        if (!proxyPasswordText.equals("")) {
+        if (!"".equals(proxyPasswordText)) {
             proxyPassword.setText(proxyPasswordText);
             proxyPassword.positionCaret(proxyPasswordCaretPosition);
             proxyPassword.setPromptText("");

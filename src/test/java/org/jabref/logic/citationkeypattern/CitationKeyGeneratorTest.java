@@ -1,6 +1,7 @@
 package org.jabref.logic.citationkeypattern;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -8,11 +9,13 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
@@ -20,15 +23,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+/**
+ * Tests whole citation key patterns such as <code>[authorsAlpha][year]</code>.
+ * The concrete patterns such as <code>authorsAlpha</code> should better be tested at {@link BracketedPatternTest}.
+ *
+ * Concurrent execution leads to issues on GitHub actions.
+ */
 class CitationKeyGeneratorTest {
 
     private static final BibEntry AUTHOR_EMPTY = createABibEntryAuthor("");
 
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = "Isaac Newton";
-    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = createABibEntryAuthor("Isaac Newton");
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = createABibEntryAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
+
     private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2 = createABibEntryAuthor("Isaac Newton and James Maxwell");
+
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = "Isaac Newton and James Maxwell and Albert Einstein";
-    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = createABibEntryAuthor("Isaac Newton and James Maxwell and Albert Einstein");
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = createABibEntryAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
+
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3 = "Isaac Newton and James Maxwell and others";
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3 = createABibEntryAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3);
 
     private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1 = createABibEntryAuthor("Wil van der Aalst");
     private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2 = createABibEntryAuthor("Wil van der Aalst and Tammo van Lessen");
@@ -63,7 +77,6 @@ class CitationKeyGeneratorTest {
     private static final String AUTHAUTHEA = "[auth.auth.ea]";
 
     private static ImportFormatPreferences importFormatPreferences;
-    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
@@ -89,6 +102,7 @@ class CitationKeyGeneratorTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
+                "",
                 ',');
 
         return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
@@ -97,7 +111,7 @@ class CitationKeyGeneratorTest {
     @Test
     void testAndInAuthorName() throws ParseException {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         assertEquals("Holland",
                 CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -121,7 +135,7 @@ class CitationKeyGeneratorTest {
     @Test
     void testAndAuthorNames() throws ParseException {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
-        Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences, fileMonitor);
+        Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[authors3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -146,208 +160,50 @@ class CitationKeyGeneratorTest {
     @Test
     void testSpecialLatexCharacterInAuthorName() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences, fileMonitor);
+                "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
         assertEquals("Popovicova",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
-    /**
-     * Test for https://sourceforge.net/forum/message.php?msg_id=4498555 Test the Labelmaker and all kind of accents Á á
-     * Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
-     */
-    @Test
-    void testMakeLabelAndCheckLegalKeys() throws ParseException {
+    @ParameterizedTest(name = "bibtexString={0}, expectedResult={1}")
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            # see https://sourceforge.net/forum/message.php?msg_id=4498555
+            "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", "Koe",
 
-        Optional<BibEntry> entry0 = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences, fileMonitor);
-        assertEquals("Koe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+            # Accent ague: Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
+            "@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}", "Aoe",
+            "@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}", "Eoe",
+            "@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}", "Ioe",
+            "@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}", "Loe",
+            "@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}", "Noe",
+            "@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}", "Ooe",
+            "@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}", "Roe",
+            "@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}", "Soe",
+            "@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}", "Uoe",
+            "@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}", "Yoe",
+            "@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}", "Zoe",
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Aoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+            # Accent grave: À È Ì Ò Ù
+            "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", "Aoe",
+            "@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}", "Eoe",
+            "@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}", "Ioe",
+            "@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}", "Ooe",
+            "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Eoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+            # Special cases
+            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "AlK",
+            "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
+            "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
+            """
+    )
+    void testMakeLabelAndCheckLegalKeys(String bibtexString, String expectedResult) throws ParseException {
+        Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
+        String citationKey = generateKey(bibEntry.orElse(null), "[auth3]", new BibDatabase());
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Ioe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+        String cleanedKey = CitationKeyGenerator.cleanKey(citationKey, DEFAULT_UNWANTED_CHARACTERS);
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Loe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Noe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Ooe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Roe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Soe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Uoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Yoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Zoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-    }
-
-    /**
-     * Test the Labelmaker and with accent grave Chars to test: "ÀÈÌÒÙ";
-     */
-    @Test
-    void testMakeLabelAndCheckLegalKeysAccentGrave() throws ParseException {
-        Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Aoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Eoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Ioe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Ooe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Uoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("AlK",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("DAl",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}",
-                importFormatPreferences, fileMonitor);
-        assertEquals("Arn",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
-                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
-    }
-
-    /**
-     * Tests if cleanKey replaces Non-ASCII chars. There are quite a few chars that should be replaced. Perhaps there is
-     * a better method than the current.
-     *
-     * @see CitationKeyGenerator#cleanKey(String, String)
-     */
-    @Test
-    void testCheckLegalKey() {
-        // not tested/ not in hashmap UNICODE_CHARS:
-        // Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
-        // " Ǣ ǣ ǖ ǘ ǚ ǜ   " +
-        // "Đ đ   Ů ů  " +
-        // "Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
-        String accents = "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ";
-        String expectedResult = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "ÄäËëÏïÖöÜüŸÿ";
-        expectedResult = "AeaeEeIiOeoeUeueYy";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ";
-        expectedResult = "CcGgKkLlNnRrSsTt";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ";
-        expectedResult = "AaEeGgIiOoUu";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ċ ċ Ė ė Ġ ġ İ ı Ż ż";
-        expectedResult = "CcEeGgIiZz";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ą ą Ę ę Į į Ǫ ǫ Ų ų";
-        expectedResult = "AaEeIiOoUu"; // O or Q? o or q?
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ";
-        expectedResult = "AaEeIiOoUuYy";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž";
-        expectedResult = "AaCcDdEeIiLlNnOoRrSsTtUuZz";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        expectedResult = "AaEeIiNnOoUuYy";
-        accents = "ÃãẼẽĨĩÑñÕõŨũỸỹ";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        accents = "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ";
-        expectedResult = "DdHhLlLlMmNnRrRrSsTt";
-        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
-
-        String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    "
-                + "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ"
-                + " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   " + "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ"
-                + "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   " + "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   "
-                + "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ";
-        String expectedResults = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy"
-                + "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt" + "AaCcDdEeIiLlNnOoRrSsTtUuZz" + "AaEeIiOoUuYy" + "AaEeGgIiOoUu"
-                + "CcEeGgIiZzAaEeIiOoUu" + "DdHhLlLlMmNnRrRrSsTt";
-        assertEquals(expectedResults, CitationKeyGenerator.cleanKey(totest, DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals(expectedResult, cleanedKey);
     }
 
     @Test
@@ -364,10 +220,52 @@ class CitationKeyGeneratorTest {
     @Test
     void testUniversity() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences, fileMonitor);
+                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
         assertEquals("UniLinkoeping",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    /**
+     * Tests if cleanKey replaces Non-ASCII chars. There are quite a few chars that should be replaced. Perhaps there is
+     * a better method than the current.
+     * <p>
+     * not tested/ not in hashmap UNICODE_CHARS:
+     * {@code
+     * Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
+     *  Ǣ ǣ ǖ ǘ ǚ ǜ
+     * Đ đ   Ů ů
+     * Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
+     * }
+     *
+     * @see CitationKeyGenerator#cleanKey(String, String)
+     */
+    @ParameterizedTest(name = "accents={0}, expectedResult={1}")
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy",
+            "ÄäËëÏïÖöÜüŸÿ", "AeaeEeIiOeoeUeueYy",
+            "ÅåŮů", "AaaaUu",
+            "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "CcGgKkLlNnRrSsTt",
+            "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ", "AaEeGgIiOoUu",
+            "Ċ ċ Ė ė Ġ ġ İ ı Ż ż", "CcEeGgIiZz",
+            "Ą ą Ę ę Į į Ǫ ǫ Ų ų", "AaEeIiOoUu", # O or Q? o or q?
+            "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ", "AaEeIiOoUuYy",
+            "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž", "AaCcDdEeIiLlNnOoRrSsTtUuZz",
+            "ÃãẼẽĨĩÑñÕõŨũỸỹ", "AaEeIiNnOoUuYy",
+            "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ", "DdHhLlLlMmNnRrRrSsTt",
+            "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy",
+            "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt",
+            " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   ", "AaCcDdEeIiLlNnOoRrSsTtUuZz",
+            "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ", "AaEeIiOoUuYy",
+            "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   ", "AaEeGgIiOoUu",
+            "Ả ả Ẻ ẻ Ỉ ỉ Ỏ ỏ Ủ ủ Ỷ ỷ", "AaEeIiOoUuYy",
+            "Ḛ ḛ Ḭ ḭ Ṵ ṵ", "EeIiUu",
+            "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   ", "CcEeGgIiZzAaEeIiOoUu",
+            "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ", "DdHhLlLlMmNnRrRrSsTt"
+            """
+    )
+    void testCheckLegalKey(String accents, String expectedResult) {
+        assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
@@ -390,7 +288,7 @@ class CitationKeyGeneratorTest {
     void testDepartment() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         assertEquals("UniLinkoepingEE",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -416,7 +314,7 @@ class CitationKeyGeneratorTest {
     void testSchool() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         assertEquals("UniLinkoepingCE",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -426,7 +324,7 @@ class CitationKeyGeneratorTest {
     void generateKeyAbbreviateCorporateAuthorDepartmentWithoutAcademicInstitute() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{null, author={{Department of Localhost NullGenerators}}}",
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         assertEquals("DLN",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -436,7 +334,7 @@ class CitationKeyGeneratorTest {
     void generateKeyAbbreviateCorporateAuthorSchoolWithoutAcademicInstitute() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{null, author={{The School of Null}}}",
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         assertEquals("SchoolNull",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -461,7 +359,7 @@ class CitationKeyGeneratorTest {
     @Test
     void testInstituteOfTechnology() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences, fileMonitor);
+                "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
         assertEquals("MIT",
                 CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
@@ -485,12 +383,12 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testAuthIniN() {
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"));
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"));
-        assertEquals("NeME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"));
-        assertEquals("NeMa", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"));
-        assertEquals("Newt", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"));
         assertEquals("", generateKey(AUTHOR_EMPTY, "[authIni4]"));
+        assertEquals("Newt", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"));
+        assertEquals("NeMa", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"));
+        assertEquals("NeME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"));
+        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"));
+        assertEquals("NME+", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"));
 
         assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]"));
         assertEquals("", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]"));
@@ -541,7 +439,7 @@ class CitationKeyGeneratorTest {
     @Test
     void testAuthShort() {
         // tests taken from the comments
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHSHORT));
+        assertEquals("NME+", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHSHORT));
         assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHSHORT));
         assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHSHORT));
         assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHSHORT));
@@ -605,19 +503,23 @@ class CitationKeyGeneratorTest {
         assertEquals("NewtonMaxwellEinstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORS));
     }
 
-    /**
-     * Tests [authorsAlpha]
-     */
-    @Test
-    void authorsAlpha() {
-        assertEquals("New", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA));
-        assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA));
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA));
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA));
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA));
+    static Stream<Arguments> testAuthorsAlpha() {
+        return Stream.of(
+                Arguments.of("New", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA),
+                Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA),
+                Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA),
+                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA),
+                Arguments.of("NME+", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA),
+                Arguments.of("vdAal", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA),
+                Arguments.of("vdAvL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA),
+                Arguments.of("NM+", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3, AUTHORSALPHA)
+        );
+    }
 
-        assertEquals("vdAal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA));
-        assertEquals("vdAvL", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA));
+    @ParameterizedTest
+    @MethodSource
+    void testAuthorsAlpha(String expected, BibEntry entry, String pattern) {
+        assertEquals(expected, generateKey(entry, pattern));
     }
 
     /**
@@ -1121,6 +1023,7 @@ class CitationKeyGeneratorTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
+                "",
                 ',');
 
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
@@ -1147,5 +1050,12 @@ class CitationKeyGeneratorTest {
         BibEntry entry = createABibEntryAuthor("Michiel van den Brekel");
         entry.setField(StandardField.YEAR, "2021");
         assertEquals("Brekel2021", generateKey(entry, "[auth][year]"));
+    }
+
+    @Test
+    void generateKeyCorrectKeyWithAndOthersAtTheEnd() {
+        BibEntry entry = createABibEntryAuthor("Alexander Artemenko and others");
+        entry.setField(StandardField.YEAR, "2019");
+        assertEquals("Artemenko2019", generateKey(entry, "[auth][year]"));
     }
 }

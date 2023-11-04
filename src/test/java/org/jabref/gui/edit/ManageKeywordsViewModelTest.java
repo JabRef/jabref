@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.BibEntryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 
 public class ManageKeywordsViewModelTest {
 
-    private final PreferencesService preferences = mock(PreferencesService.class);
+    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
     private ManageKeywordsViewModel keywordsViewModel;
 
     @BeforeEach
@@ -51,10 +51,9 @@ public class ManageKeywordsViewModelTest {
 
         List<BibEntry> entries = List.of(entryOne, entryTwo);
 
-        char delimiter = ',';
-        when(preferences.getKeywordDelimiter()).thenReturn(delimiter);
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
-        keywordsViewModel = new ManageKeywordsViewModel(preferences, entries);
+        keywordsViewModel = new ManageKeywordsViewModel(bibEntryPreferences, entries);
     }
 
     @Test

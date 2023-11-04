@@ -37,12 +37,12 @@ public class LogEventViewModel {
     public JabRefIcon getIcon() {
         switch (logEvent.getLevel()) {
             case ERROR:
-                return (IconTheme.JabRefIcons.INTEGRITY_FAIL);
+                return IconTheme.JabRefIcons.INTEGRITY_FAIL;
             case WARN:
-                return (IconTheme.JabRefIcons.INTEGRITY_WARN);
+                return IconTheme.JabRefIcons.INTEGRITY_WARN;
             case INFO:
             default:
-                return (IconTheme.JabRefIcons.INTEGRITY_INFO);
+                return IconTheme.JabRefIcons.INTEGRITY_INFO;
         }
     }
 

@@ -208,21 +208,21 @@
                             </VBox>
                         </ScrollPane>
                     </Tab>
-                    <Tab text="%Databases">
+                    <Tab text="%Catalogs">
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="slr-tab">
                             <VBox spacing="20.0">
-                                <Label text="%Select Databases:"/>
+                                <Label text="%Select Catalogs:"/>
                                 <HBox alignment="CENTER_LEFT">
                                     <TableView
-                                            fx:id="databaseTable"
+                                            fx:id="catalogTable"
                                             HBox.hgrow="ALWAYS"
                                             editable="true">
                                         <columns>
                                             <TableColumn
-                                                    fx:id="databaseEnabledColumn"
+                                                    fx:id="catalogEnabledColumn"
                                                     text="%Enabled"
                                                     maxWidth="80.0"
                                                     prefWidth="80.0"
@@ -230,8 +230,8 @@
                                                     reorderable="false"
                                                     resizable="false"/>
                                             <TableColumn
-                                                    fx:id="databaseColumn"
-                                                    text="%Database"/>
+                                                    fx:id="catalogColumn"
+                                                    text="%Catalog"/>
                                         </columns>
                                         <columnResizePolicy>
                                             <TableView

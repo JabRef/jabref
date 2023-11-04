@@ -29,7 +29,7 @@ public class BibEntryTypeBuilder {
     }
 
     public BibEntryTypeBuilder withImportantFields(Set<BibField> newFields) {
-        return withImportantFields(newFields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new)));
+        return withImportantFields(newFields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     public BibEntryTypeBuilder withImportantFields(Collection<Field> newFields) {
@@ -75,8 +75,9 @@ public class BibEntryTypeBuilder {
     public BibEntryType build() {
         // Treat required fields as important ones
         Stream<BibField> requiredAsImportant = requiredFields.stream()
-                                                             .flatMap(Set::stream)
-                                                             .map(field -> new BibField(field, FieldPriority.IMPORTANT));
+                .map(OrFields::getFields)
+                .flatMap(Set::stream)
+                .map(field -> new BibField(field, FieldPriority.IMPORTANT));
         Set<BibField> allFields = Stream.concat(fields.stream(), requiredAsImportant).collect(Collectors.toCollection(LinkedHashSet::new));
         return new BibEntryType(type, allFields, requiredFields);
     }

@@ -11,22 +11,22 @@ grand_parent: Code Howtos
   a `(problem)`: pageInfo strings are conceptually associated with citations, but the implementation associates them to citation groups.\
   The number of available pageInfo slots changes during`[click:Merge]` and `[click:Separate]` while the number of citations remains fixed.
   * The proposed solution was to change the association.
-    *   Not only reference marks (citation groups) need unique identifiers, but also citations.\
-        Possible encoding for reference mark names:\
-        `JR_cite{type}_{number1}_{citationKey1},{number2}_{citationKey2}`\
-        where `{type}` encodes the citation type (for the group), `{citationKey1}` is made unique by choosing an appropriate number for `{number1}`\
-        This would allow `JR_cite_{number1}_{citationKey1}` to be used as a property name for storing the pageInfo.
+    * Not only reference marks (citation groups) need unique identifiers, but also citations.\
+      Possible encoding for reference mark names:\
+      `JR_cite{type}_{number1}_{citationKey1},{number2}_{citationKey2}`\
+      where `{type}` encodes the citation type (for the group), `{citationKey1}` is made unique by choosing an appropriate number for `{number1}`\
+      This would allow `JR_cite_{number1}_{citationKey1}` to be used as a property name for storing the pageInfo.
 
-        Changes required to
+      Changes required to
 
-        * reference mark search, name generation and parsing
-        * name generation and parsing for properties storing pageInfo values
-        * in-memory representation
-          * JabRef 5.2 does not collect pageInfo values, accesses only when needed.\
-            So it would be change to code accessing them.
-          * The proposed representation does collect, to allow separation of getting from the document and processing
-        * insertion of pageInfo into citation markers: JabRef 5.2 injects a single pageInfo before the closing parenthesis, now we need to handle several values
-        * `[click:Manage citations]` should work on citations, not citation groups.
+      * reference mark search, name generation and parsing
+      * name generation and parsing for properties storing pageInfo values
+      * in-memory representation
+        * JabRef 5.2 does not collect pageInfo values, accesses only when needed.\
+          So it would be change to code accessing them.
+        * The proposed representation does collect, to allow separation of getting from the document and processing
+      * insertion of pageInfo into citation markers: JabRef 5.2 injects a single pageInfo before the closing parenthesis, now we need to handle several values
+      * `[click:Manage citations]` should work on citations, not citation groups.
 
 ## Backend
 

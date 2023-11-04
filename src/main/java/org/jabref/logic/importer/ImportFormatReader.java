@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CffImporter;
@@ -36,7 +35,6 @@ import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ImportFormatReader {
@@ -49,18 +47,22 @@ public class ImportFormatReader {
      */
     private final List<Importer> formats = new ArrayList<>();
 
-    private ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public void resetImportFormats(ImporterPreferences importerPreferences,
-                                   ImportFormatPreferences newImportFormatPreferences,
-                                   FileUpdateMonitor fileMonitor) {
-        this.importFormatPreferences = newImportFormatPreferences;
+    public ImportFormatReader(ImporterPreferences importerPreferences,
+                              ImportFormatPreferences importFormatPreferences,
+                              FileUpdateMonitor fileUpdateMonitor) {
+        this.importerPreferences = importerPreferences;
+        this.importFormatPreferences = importFormatPreferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        reset();
+    }
 
-        formats.clear();
-
-        formats.add(new BibTeXMLImporter());
+    public void reset() {
         formats.add(new CopacImporter());
-        formats.add(new EndnoteImporter(importFormatPreferences));
+        formats.add(new EndnoteImporter());
         formats.add(new EndnoteXmlImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
@@ -71,22 +73,22 @@ public class ImportFormatReader {
         formats.add(new OvidImporter());
         formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
         formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
-        formats.add(new PdfContentImporter(importFormatPreferences));
+        formats.add(new PdfContentImporter());
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             formats.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        formats.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
+        formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
         formats.add(new CffImporter());
         formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
+        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());
 
         // Get custom import formats
-        formats.addAll(importerPreferences.getCustomImportList());
+        formats.addAll(importerPreferences.getCustomImporters());
     }
 
     /**
@@ -123,8 +125,7 @@ public class ImportFormatReader {
 
     /**
      * All importers.
-     * <p>
-     * <p>
+     *
      * Elements are sorted by name.
      * </p>
      *
@@ -134,40 +135,7 @@ public class ImportFormatReader {
         return new TreeSet<>(this.formats);
     }
 
-    /**
-     * Human readable list of all known import formats (name and CLI Id).
-     * <p>
-     * <p>List is sorted by importer name.</p>
-     *
-     * @return human readable list of all known import formats
-     */
-    public String getImportFormatList() {
-        StringBuilder sb = new StringBuilder();
-
-        for (Importer imFo : getImportFormats()) {
-            int pad = Math.max(0, 14 - imFo.getName().length());
-            sb.append("  ");
-            sb.append(imFo.getName());
-
-            sb.append(StringUtil.repeatSpaces(pad));
-
-            sb.append(" : ");
-            sb.append(imFo.getId());
-            sb.append('\n');
-        }
-
-        return sb.toString();
-    }
-
-    public static class UnknownFormatImport {
-
-        public final String format;
-        public final ParserResult parserResult;
-
-        public UnknownFormatImport(String format, ParserResult parserResult) {
-            this.format = format;
-            this.parserResult = parserResult;
-        }
+    public record UnknownFormatImport(String format, ParserResult parserResult) {
     }
 
     /**

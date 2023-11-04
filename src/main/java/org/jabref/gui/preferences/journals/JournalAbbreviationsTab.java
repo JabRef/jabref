@@ -73,7 +73,11 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML
     private void initialize() {
-        viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
+        viewModel = new JournalAbbreviationsTabViewModel(
+                preferencesService.getJournalAbbreviationPreferences(),
+                dialogService,
+                taskExecutor,
+                abbreviationRepository);
 
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
@@ -127,9 +131,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
         progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
-            filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm));
-        });
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) ->
+                filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm)));
 
         useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
     }
@@ -145,9 +148,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
-                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> {
-                    addAbbreviationActions();
-                }),
+                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> addAbbreviationActions()),
                 new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
         );
     }

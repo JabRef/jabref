@@ -18,6 +18,7 @@ import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -48,10 +49,12 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
         entry = new BibEntry();
     }

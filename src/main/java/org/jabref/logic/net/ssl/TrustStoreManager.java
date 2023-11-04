@@ -1,11 +1,12 @@
 package org.jabref.logic.net.ssl;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -18,10 +19,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TrustStoreManager {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);
     private static final String STORE_PASSWORD = "changeit";
 
@@ -61,7 +69,7 @@ public class TrustStoreManager {
         }
     }
 
-    public boolean isCertificateExist(String alias) {
+    public boolean certificateExists(String alias) {
         Objects.requireNonNull(alias);
         try {
             return store.isCertificateEntry(alias);
@@ -91,7 +99,7 @@ public class TrustStoreManager {
 
     public void flush() {
         try {
-            store.store(new FileOutputStream(storePath.toFile()), STORE_PASSWORD.toCharArray());
+            store.store(Files.newOutputStream(storePath), STORE_PASSWORD.toCharArray());
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             LOGGER.warn("Error while flushing trust store", e);
         }
@@ -139,15 +147,99 @@ public class TrustStoreManager {
     public static void createTruststoreFileIfNotExist(Path storePath) {
         try {
             LOGGER.debug("Trust store path: {}", storePath.toAbsolutePath());
-            Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
-            Files.createDirectories(storePath.getParent());
             if (Files.notExists(storePath)) {
+                Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
+                Files.createDirectories(storePath.getParent());
                 Files.copy(storeResourcePath, storePath);
+            }
+
+            try {
+                configureTrustStore(storePath);
+            } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
+                LOGGER.error("Error configuring trust store {}", storePath, e);
             }
         } catch (IOException e) {
             LOGGER.warn("Bad truststore path", e);
         } catch (URISyntaxException e) {
             LOGGER.warn("Bad resource path", e);
         }
+    }
+
+    // based on https://stackoverflow.com/a/62586564/3450689
+    private static void configureTrustStore(Path myStorePath) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
+        CertificateException, IOException {
+        X509TrustManager jreTrustManager = getJreTrustManager();
+        X509TrustManager myTrustManager = getJabRefTrustManager(myStorePath);
+
+        X509TrustManager mergedTrustManager = createMergedTrustManager(jreTrustManager, myTrustManager);
+        setSystemTrustManager(mergedTrustManager);
+    }
+
+    private static X509TrustManager getJreTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
+        return findDefaultTrustManager(null);
+    }
+
+    private static X509TrustManager getJabRefTrustManager(Path myStorePath) throws KeyStoreException, IOException,
+        NoSuchAlgorithmException, CertificateException {
+        // Adapt to load your keystore
+        try (InputStream myKeys = Files.newInputStream(myStorePath)) {
+            KeyStore myTrustStore = KeyStore.getInstance("jks");
+            myTrustStore.load(myKeys, STORE_PASSWORD.toCharArray());
+
+            return findDefaultTrustManager(myTrustStore);
+        }
+    }
+
+    private static X509TrustManager findDefaultTrustManager(KeyStore keyStore)
+        throws NoSuchAlgorithmException, KeyStoreException {
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keyStore); // If keyStore is null, tmf will be initialized with the default trust store
+
+        for (TrustManager tm : tmf.getTrustManagers()) {
+            if (tm instanceof X509TrustManager manager) {
+                return manager;
+            }
+        }
+        return null;
+    }
+
+    private static X509TrustManager createMergedTrustManager(X509TrustManager jreTrustManager,
+                                                             X509TrustManager customTrustManager) {
+        return new X509TrustManager() {
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                // If you're planning to use client-cert auth,
+                // merge results from "defaultTm" and "myTm".
+                return jreTrustManager.getAcceptedIssuers();
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                try {
+                    customTrustManager.checkServerTrusted(chain, authType);
+                } catch (CertificateException e) {
+                    // This will throw another CertificateException if this fails too.
+                    jreTrustManager.checkServerTrusted(chain, authType);
+                }
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                // If you're planning to use client-cert auth,
+                // do the same as checking the server.
+                jreTrustManager.checkClientTrusted(chain, authType);
+            }
+        };
+    }
+
+    private static void setSystemTrustManager(X509TrustManager mergedTrustManager)
+        throws NoSuchAlgorithmException, KeyManagementException {
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[] {mergedTrustManager}, null);
+
+        // You don't have to set this as the default context,
+        // it depends on the library you're using.
+        SSLContext.setDefault(sslContext);
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 }

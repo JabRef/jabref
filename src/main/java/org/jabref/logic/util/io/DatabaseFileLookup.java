@@ -26,6 +26,8 @@ public class DatabaseFileLookup {
 
     private final List<Path> possibleFilePaths;
 
+    private final Path pathOfDatabase;
+
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      */
@@ -37,6 +39,7 @@ public class DatabaseFileLookup {
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));
         }
+        this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(""));
     }
 
     /**
@@ -65,5 +68,12 @@ public class DatabaseFileLookup {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
+    }
+
+    /**
+     * @return "" if the path does not exist
+     */
+    public Path getPathOfDatabase() {
+        return pathOfDatabase;
     }
 }

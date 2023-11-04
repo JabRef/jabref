@@ -16,7 +16,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
@@ -29,11 +28,13 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
@@ -53,12 +54,21 @@ public class DuplicateSearch extends SimpleCommand {
     private final StateManager stateManager;
 
     private final PreferencesService prefs;
+    private final BibEntryTypesManager entryTypesManager;
+    private final TaskExecutor taskExecutor;
 
-    public DuplicateSearch(JabRefFrame frame, DialogService dialogService, StateManager stateManager, PreferencesService prefs) {
+    public DuplicateSearch(JabRefFrame frame,
+                           DialogService dialogService,
+                           StateManager stateManager,
+                           PreferencesService prefs,
+                           BibEntryTypesManager entryTypesManager,
+                           TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.prefs = prefs;
+        this.entryTypesManager = entryTypesManager;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -83,12 +93,12 @@ public class DuplicateSearch extends SimpleCommand {
         JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
-                      .executeWith(Globals.TASK_EXECUTOR);
+                      .executeWith(taskExecutor);
     }
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
-        for (int i = 0; (i < (entries.size() - 1)); i++) {
-            for (int j = i + 1; (j < entries.size()); j++) {
+        for (int i = 0; i < (entries.size() - 1); i++) {
+            for (int j = i + 1; j < entries.size(); j++) {
                 if (Thread.interrupted()) {
                     return;
                 }
@@ -96,7 +106,7 @@ public class DuplicateSearch extends SimpleCommand {
                 BibEntry first = entries.get(i);
                 BibEntry second = entries.get(j);
 
-                if (new DuplicateCheck(Globals.entryTypesManager).isDuplicate(first, second, databaseMode)) {
+                if (new DuplicateCheck(entryTypesManager).isDuplicate(first, second, databaseMode)) {
                     duplicates.add(Arrays.asList(first, second));
                     duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
                 }

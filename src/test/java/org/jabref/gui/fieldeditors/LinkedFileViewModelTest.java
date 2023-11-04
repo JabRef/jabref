@@ -259,7 +259,7 @@ class LinkedFileViewModelTest {
         List<LinkedFile> linkedFiles = entry.getFiles();
 
         for (LinkedFile file: linkedFiles) {
-            if (file.getLink().equalsIgnoreCase("Misc/asdf.html")) {
+            if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
                 assertEquals("URL", file.getFileType());
                 return;
             }
@@ -330,6 +330,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
+    @FetcherTest
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
@@ -345,7 +346,7 @@ class LinkedFileViewModelTest {
         // Loop through downloaded files to check for filetype='pdf'
         List<LinkedFile> linkedFiles = entry.getFiles();
         for (LinkedFile files : linkedFiles) {
-            if (files.getLink().equalsIgnoreCase("Misc/asdf.pdf")) {
+            if ("Misc/asdf.pdf".equalsIgnoreCase(files.getLink())) {
                 assertEquals("pdf", files.getFileType().toLowerCase());
                 return;
             }

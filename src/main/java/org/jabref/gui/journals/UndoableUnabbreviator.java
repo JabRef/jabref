@@ -36,7 +36,7 @@ public class UndoableUnabbreviator {
             return true;
         }
 
-        String text = entry.getField(field).get();
+        String text = entry.getFieldLatexFree(field).get();
         String origText = text;
         if (database != null) {
             text = database.resolveForStrings(text);
@@ -50,7 +50,7 @@ public class UndoableUnabbreviator {
             return false; // Cannot unabbreviate unabbreviated name.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get(); // Must be here.
+        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
         String newText = abbreviation.getName();
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
@@ -58,7 +58,7 @@ public class UndoableUnabbreviator {
     }
 
     public boolean restoreFromFJournal(BibEntry entry, Field field, CompoundEdit ce) {
-        if ((!StandardField.JOURNAL.equals(field) && !StandardField.JOURNALTITLE.equals(field)) || !entry.hasField(AMSField.FJOURNAL)) {
+        if ((StandardField.JOURNAL != field && StandardField.JOURNALTITLE != field) || !entry.hasField(AMSField.FJOURNAL)) {
             return false;
         }
 

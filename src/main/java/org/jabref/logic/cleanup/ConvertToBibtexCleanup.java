@@ -31,12 +31,12 @@ public class ConvertToBibtexCleanup implements CleanupJob {
                 date.getMonth().flatMap(month -> entry.setField(StandardField.MONTH, month.getJabRefFormat())).ifPresent(changes::add);
             }
 
-            if (changes.size() > 0) {
+            if (!changes.isEmpty()) {
                 entry.clearField(StandardField.DATE).ifPresent(changes::add);
             }
         });
 
-        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
+        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.entrySet()) {
             Field oldField = alias.getValue();
             Field newField = alias.getKey();
             entry.getField(oldField).ifPresent(oldValue -> {

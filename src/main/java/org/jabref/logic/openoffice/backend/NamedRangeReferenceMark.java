@@ -96,9 +96,9 @@ class NamedRangeReferenceMark implements NamedRange {
 
         final String left = NamedRangeReferenceMark.REFERENCE_MARK_LEFT_BRACKET;
         final String right = NamedRangeReferenceMark.REFERENCE_MARK_RIGHT_BRACKET;
-        String bracketedContent = (withoutBrackets
+        String bracketedContent = withoutBrackets
                 ? ""
-                : left + right);
+                : left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
 
@@ -133,8 +133,8 @@ class NamedRangeReferenceMark implements NamedRange {
             throws
             NoDocumentException,
             WrappedTargetException {
-        return (UnoReferenceMark.getAnchor(doc, refMarkName)
-                                .map(e -> new NamedRangeReferenceMark(refMarkName)));
+        return UnoReferenceMark.getAnchor(doc, refMarkName)
+                                .map(e -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /**
@@ -403,19 +403,19 @@ class NamedRangeReferenceMark implements NamedRange {
         final int fullTextLength = fullText.length();
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
-        final int contentLength = (fullTextLength - (leftLength + rightLength));
+        final int contentLength = fullTextLength - (leftLength + rightLength);
         if (contentLength < 0) {
             String msg = String.format("cleanFillCursor: length(%s) < 0", name);
             throw new IllegalStateException(msg);
         }
 
-        boolean removeRight = ((contentLength >= 1)
+        boolean removeRight = (contentLength >= 1)
                 || ((contentLength == 0) && removeBracketsFromEmpty)
-                || alwaysRemoveBrackets);
+                || alwaysRemoveBrackets;
 
-        boolean removeLeft = ((contentLength >= 2)
+        boolean removeLeft = (contentLength >= 2)
                 || ((contentLength == 0) && removeBracketsFromEmpty)
-                || alwaysRemoveBrackets);
+                || alwaysRemoveBrackets;
 
         if (removeRight) {
             XTextCursor omega = full.getText().createTextCursorByRange(full);

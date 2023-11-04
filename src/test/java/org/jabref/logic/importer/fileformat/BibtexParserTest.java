@@ -12,12 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
@@ -51,61 +53,58 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+ * <p>
+ * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
+ */
 class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
-    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        parser = new BibtexParser(importFormatPreferences);
     }
 
     @Test
     void parseWithNullThrowsNullPointerException() throws Exception {
         Executable toBeTested = () -> parser.parse(null);
-
         assertThrows(NullPointerException.class, toBeTested);
     }
 
     @Test
     void fromStringRecognizesEntry() throws ParseException {
-        List<BibEntry> parsed = parser
+        List<BibEntry> result = parser
                 .parseEntries("@article{test,author={Ed von Test}}");
-
-        BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Article);
-        expected.setCitationKey("test");
-        expected.setField(StandardField.AUTHOR, "Ed von Test");
-
-        assertEquals(List.of(expected), parsed);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result);
     }
 
     @Test
     void fromStringReturnsEmptyListFromEmptyString() throws ParseException {
         Collection<BibEntry> parsed = parser.parseEntries("");
-
-        assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
 
@@ -113,8 +112,6 @@ class BibtexParserTest {
     void fromStringReturnsEmptyListIfNoEntryRecognized() throws ParseException {
         Collection<BibEntry> parsed = parser
                 .parseEntries("@@article@@{{{{{{}");
-
-        assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
 
@@ -125,14 +122,11 @@ class BibtexParserTest {
                         @article{canh05,  author = {Crowston, K. and Annabi, H.},
                           title = {Title A}}
                         """,
-                importFormatPreferences, fileMonitor);
-
-        BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Article);
-        expected.setCitationKey("canh05");
-        expected.setField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.");
-        expected.setField(StandardField.TITLE, "Title A");
-
+                importFormatPreferences);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("canh05")
+                .withField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.")
+                .withField(StandardField.TITLE, "Title A");
         assertEquals(Optional.of(expected), parsed);
     }
 
@@ -142,23 +136,20 @@ class BibtexParserTest {
                         @article{canh05, author = {Crowston, K. and Annabi, H.},
                             title = {Title A}}
                         @inProceedings{foo,  author={Norton Bar}}""",
-                importFormatPreferences, fileMonitor);
-
+                importFormatPreferences);
         assertTrue(parsed.get().getCitationKey().equals(Optional.of("canh05"))
                 || parsed.get().getCitationKey().equals(Optional.of("foo")));
     }
 
     @Test
     void singleFromStringReturnsEmptyFromEmptyString() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences, fileMonitor);
-
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
     void singleFromStringReturnsEmptyIfNoEntryRecognized() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences, fileMonitor);
-
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }
 
@@ -166,132 +157,89 @@ class BibtexParserTest {
     void parseRecognizesEntry() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={Ed von Test}}"));
-
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
-    void parseQuotedEntries() throws IOException {
+    void parseRecognizesFieldValuesInQuotationMarks() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author=\"Ed von Test\"}"));
-
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryOnlyWithKey() throws IOException {
         ParserResult result = parser.parse(new StringReader("@article{test}"));
-
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
-    void parseRecognizesEntryWithWhitespaceAtBegining() throws IOException {
+    void parseRecognizesEntryWithWhitespaceAtBeginning() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader(" @article{test,author={Ed von Test}}"));
-
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withUserComments(" ")
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryWithWhitespace() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article { test,author={Ed von Test}}"));
-
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryWithNewlines() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article\n{\ntest,author={Ed von Test}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryWithUnknownType() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@unknown{test,author={Ed von Test}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(new UnknownEntryType("unknown"), entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(new UnknownEntryType("unknown"))
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryWithVeryLongType() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@thisIsALongStringToTestMaybeItIsToLongWhoKnowsNOTme{test,author={Ed von Test}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(new UnknownEntryType("thisisalongstringtotestmaybeitistolongwhoknowsnotme"), entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(new UnknownEntryType("thisisalongstringtotestmaybeitistolongwhoknowsnotme"))
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryInParenthesis() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article(test,author={Ed von Test})"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -301,57 +249,42 @@ class BibtexParserTest {
                 isbn2 = {1234567890123456789},
                 small = 1234,
                 }"""));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("canh05"), entry.getCitationKey());
-        assertEquals(Optional.of("1234567890123456789"), entry.getField(StandardField.ISBN));
-        assertEquals(Optional.of("1234567890123456789"), entry.getField(new UnknownField("isbn2")));
-        assertEquals(Optional.of("1234"), entry.getField(new UnknownField("small")));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("canh05")
+                .withField(StandardField.ISBN, "1234567890123456789")
+                .withField(new UnknownField("isbn2"), "1234567890123456789")
+                .withField(new UnknownField("small"), "1234");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesCitationKeyWithSpecialCharacters() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{te_st:with-special(characters),author={Ed von Test}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("te_st:with-special(characters)"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("te_st:with-special(characters)")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryWhereLastFieldIsFinishedWithComma() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={Ed von Test},}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesEntryWithAtInField() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={Ed von T@st}}"));
-
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-
-        BibEntry expected = new BibEntry(StandardEntryType.Article).withField(InternalField.KEY_FIELD, "test")
-                                                                   .withField(StandardField.AUTHOR, "Ed von T@st");
-
-        assertEquals(List.of(expected), parsed);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(InternalField.KEY_FIELD, "test")
+                .withField(StandardField.AUTHOR, "Ed von T@st");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -373,28 +306,20 @@ class BibtexParserTest {
 
     @Test
     void parseRecognizesMultipleEntries() throws IOException {
-        List<BibEntry> expected = new ArrayList<>();
-        BibEntry firstEntry = new BibEntry();
-        firstEntry.setType(StandardEntryType.Article);
-        firstEntry.setCitationKey("canh05");
-        firstEntry.setField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.");
-        firstEntry.setField(StandardField.TITLE, "Title A");
-        expected.add(firstEntry);
-
-        BibEntry secondEntry = new BibEntry();
-        secondEntry.setType(StandardEntryType.InProceedings);
-        secondEntry.setCitationKey("foo");
-        secondEntry.setField(StandardField.AUTHOR, "Norton Bar");
-        expected.add(secondEntry);
-
         ParserResult result = parser.parse(
                 new StringReader("""
                         @article{canh05,  author = {Crowston, K. and Annabi, H.},
                           title = {Title A}}
                         @inProceedings{foo,  author={Norton Bar}}"""));
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-
-        assertEquals(expected, parsed);
+        List<BibEntry> expected = List.of(
+                new BibEntry(StandardEntryType.Article)
+                        .withCitationKey("canh05")
+                        .withField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.")
+                        .withField(StandardField.TITLE, "Title A"),
+                new BibEntry(StandardEntryType.InProceedings)
+                        .withCitationKey("foo")
+                        .withField(StandardField.AUTHOR, "Norton Bar"));
+        assertEquals(expected, result.getDatabase().getEntries());
     }
 
     @Test
@@ -402,82 +327,52 @@ class BibtexParserTest {
         String firstEntry = "@article{canh05," + "  author = {Crowston, K. and Annabi, H.}," + OS.NEWLINE
                 + "  title = {Title A}}" + OS.NEWLINE;
         String secondEntry = "@inProceedings{foo," + "  author={Norton Bar}}";
-
-        ParserResult result = parser
-                .parse(new StringReader(firstEntry + secondEntry));
-
-        for (BibEntry entry : result.getDatabase().getEntries()) {
-            if (entry.getCitationKey().equals(Optional.of("canh05"))) {
-                assertEquals(firstEntry, entry.getParsedSerialization());
-            } else {
-                assertEquals(secondEntry, entry.getParsedSerialization());
-            }
-        }
+        List<BibEntry> parsedEntries = parser.parse(new StringReader(firstEntry + secondEntry))
+                                             .getDatabase().getEntries();
+        assertEquals(firstEntry, parsedEntries.get(0).getParsedSerialization());
+        assertEquals(secondEntry, parsedEntries.get(1).getParsedSerialization());
     }
 
     @Test
     void parseRecognizesMultipleEntriesOnSameLine() throws IOException {
-        List<BibEntry> expected = new ArrayList<>();
-        BibEntry firstEntry = new BibEntry();
-        firstEntry.setType(StandardEntryType.Article);
-        firstEntry.setCitationKey("canh05");
-        expected.add(firstEntry);
-
-        BibEntry secondEntry = new BibEntry();
-        secondEntry.setType(StandardEntryType.InProceedings);
-        secondEntry.setCitationKey("foo");
-        expected.add(secondEntry);
-
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05}" + "@inProceedings{foo}"));
-        List<BibEntry> parsed = result.getDatabase().getEntries();
-
-        assertEquals(expected, parsed);
+        List<BibEntry> expected = List.of(
+                new BibEntry(StandardEntryType.Article)
+                        .withCitationKey("canh05"),
+                new BibEntry(StandardEntryType.InProceedings)
+                        .withCitationKey("foo"));
+        assertEquals(expected, result.getDatabase().getEntries());
     }
 
     @Test
     void parseCombinesMultipleAuthorFields() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@article{test,author={Ed von Test},author={Second Author},author={Third Author}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test and Second Author and Third Author"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test and Second Author and Third Author");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseCombinesMultipleEditorFields() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@article{test,editor={Ed von Test},editor={Second Author},editor={Third Author}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test and Second Author and Third Author"), entry.getField(StandardField.EDITOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.EDITOR, "Ed von Test and Second Author and Third Author");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseCombinesMultipleKeywordsFields() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@article{test,Keywords={Test},Keywords={Second Keyword},Keywords={Third Keyword}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Test, Second Keyword, Third Keyword"), entry.getField(StandardField.KEYWORDS));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.KEYWORDS, "Test, Second Keyword, Third Keyword");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -548,78 +443,68 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesFieldValuesInQuotationMarks() throws IOException {
-        ParserResult result = parser
-                .parse(new StringReader("@article{test,author=\"Ed von Test\"}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
-    }
-
-    @Test
     void parseRecognizesNumbersWithoutBracketsOrQuotationMarks() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,year = 2005}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.YEAR, "2005");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesUppercaseFields() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,AUTHOR={Ed von Test}}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseRecognizesAbsoluteFile() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,file = {D:\\Documents\\literature\\Tansel-PRL2006.pdf}}"));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.FILE, "D:\\Documents\\literature\\Tansel-PRL2006.pdf");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
 
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
+    @Test
+    void parseRecognizesFinalSlashAsSlash() throws Exception {
+        ParserResult result = parser
+                .parse(new StringReader("""
+                        @misc{,
+                          test = {wired\\},
+                        }
+                        """));
+        assertEquals(
+                List.of(new BibEntry()
+                        .withField(new UnknownField("test"), "wired\\")),
+                result.getDatabase().getEntries()
+        );
+    }
 
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("D:\\Documents\\literature\\Tansel-PRL2006.pdf"), entry.getField(StandardField.FILE));
+    /**
+     * JabRef's heuristics is not able to parse this special case.
+     */
+    @Test
+    void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws Exception {
+        ParserResult parserResult = parser.parse(new StringReader("@misc{, test = {wired\\}}"));
+        // In case JabRef was more relaxed, `assertFalse` would be provided here.
+        assertTrue(parserResult.hasWarnings());
     }
 
     @Test
     void parseRecognizesDateFieldWithConcatenation() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,date = {1-4~} # nov}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-        BibEntry entry = parsed.iterator().next();
-
-        assertEquals(1, parsed.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("1-4~#nov#"), entry.getField(StandardField.DATE));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.DATE, "1-4~#nov#");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -647,35 +532,25 @@ class BibtexParserTest {
                         This was created with JabRef 2.1 beta 2.
                         Encoding: Cp1252
                         """));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-
-        assertEquals(0, parsed.size());
+        assertEquals(List.of(), result.getDatabase().getEntries());
     }
 
     @Test
     void parseNotWarnsAboutEntryWithoutCitationKey() throws IOException {
-        BibEntry expected = new BibEntry();
-        expected.setField(StandardField.AUTHOR, "Ed von Test");
-        expected.setType(StandardEntryType.Article);
-
         ParserResult result = parser
                 .parse(new StringReader("@article{,author={Ed von Test}}"));
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-
         assertFalse(result.hasWarnings());
-        assertEquals(List.of(expected), parsed);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ed von Test");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
     void parseIgnoresAndWarnsAboutEntryWithUnmatchedOpenBracket() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={author missing bracket}"));
-
-        Collection<BibEntry> parsed = result.getDatabase().getEntries();
-
-        assertEquals(0, parsed.size());
         assertTrue(result.hasWarnings());
+        assertEquals(List.of(), result.getDatabase().getEntries());
     }
 
     @Test
@@ -947,7 +822,7 @@ class BibtexParserTest {
         BibtexString first = iterator.next();
         BibtexString second = iterator.next();
         // Sort them because we can't be sure about the order
-        if (first.getName().equals("adieu")) {
+        if ("adieu".equals(first.getName())) {
             BibtexString tmp = first;
             first = second;
             second = tmp;
@@ -1129,9 +1004,9 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
-                .thenReturn(List.of(StandardField.FILE));
-        BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
+                FXCollections.observableArrayList(List.of(StandardField.FILE)));
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
 
@@ -1247,7 +1122,7 @@ class BibtexParserTest {
     void parseRemovesEncodingLineAndSeparatorInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser.parse(
-                new StringReader(SavePreferences.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
+                new StringReader(SaveConfiguration.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1447,12 +1322,12 @@ class BibtexParserTest {
                 new StringReader(
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"));
 
-        Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
+        Optional<SaveOrder> saveOrderConfig = result.getMetaData().getSaveOrder();
 
-        assertEquals(new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED, List.of(
-                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))),
+        assertEquals(new SaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(
+                        new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrder.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrder.SortCriterion(StandardField.ABSTRACT, false))),
                 saveOrderConfig.get());
     }
 
@@ -1511,20 +1386,20 @@ class BibtexParserTest {
     @Test
     void integrationTestTexGroup() throws Exception {
         ParserResult result = parser.parse(new StringReader(
-             "@comment{jabref-meta: grouping:" + OS.NEWLINE
-                     + "0 AllEntriesGroup:;" + OS.NEWLINE
-                     + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;"
-                     + "}" + OS.NEWLINE
-           + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
-           + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
-           + "@Comment{jabref-meta: fileDirectory-"
-                     + System.getProperty("user.name") + "-"
-                     + InetAddress.getLocalHost().getHostName()
-                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
-           + "@Comment{jabref-meta: fileDirectoryLatex-"
-                     + System.getProperty("user.name") + "-"
-                     + InetAddress.getLocalHost().getHostName()
-                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                "@comment{jabref-meta: grouping:" + OS.NEWLINE
+                        + "0 AllEntriesGroup:;" + OS.NEWLINE
+                        + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;"
+                        + "}" + OS.NEWLINE
+                        + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
+                        + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                        + "@Comment{jabref-meta: fileDirectory-"
+                        + System.getProperty("user.name") + "-"
+                        + InetAddress.getLocalHost().getHostName()
+                        + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                        + "@Comment{jabref-meta: fileDirectoryLatex-"
+                        + System.getProperty("user.name") + "-"
+                        + InetAddress.getLocalHost().getHostName()
+                        + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
         ));
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
@@ -1620,11 +1495,34 @@ class BibtexParserTest {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}"
                         + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
-                         + "@comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}"));
+                        + "@comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}"));
 
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
         assertEquals("D:\\Latex", result.getMetaData().getLatexFileDirectory("defaultOwner-user").get().toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            // single backslash kept
+            "C:\\temp\\test",
+            "\\\\servername\\path\\to\\file",
+            "//servername/path/to/file",
+            "."})
+    void fileDirectoriesUnmodified(String directory) throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@comment{jabref-meta: fileDirectory:" + directory + "}"));
+        assertEquals(directory, result.getMetaData().getDefaultFileDirectory().get());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "C:\\temp\\test, C:\\\\temp\\\\test",
+            "\\\\servername\\path\\to\\file, \\\\\\\\servername\\\\path\\\\to\\\\file"})
+    void fileDirectoryWithDoubleEscapeIsRead(String expected, String provided) throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@comment{jabref-meta: fileDirectory: " + provided + "}"));
+        assertEquals(expected, result.getMetaData().getDefaultFileDirectory().get());
     }
 
     @Test
@@ -1706,10 +1604,10 @@ class BibtexParserTest {
         BibEntry expected = new BibEntry();
         expected.setType(StandardEntryType.Article);
         expected.setCitationKey("test");
-        expected.setField(StandardField.AUTHOR, SavePreferences.ENCODING_PREFIX);
+        expected.setField(StandardField.AUTHOR, SaveConfiguration.ENCODING_PREFIX);
 
         List<BibEntry> parsed = parser
-                .parseEntries("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
+                .parseEntries("@article{test,author={" + SaveConfiguration.ENCODING_PREFIX + "}}");
 
         assertEquals(List.of(expected), parsed);
     }
@@ -1826,6 +1724,13 @@ class BibtexParserTest {
 
     @Test
     void parseYearWithMonthString() throws Exception {
+        Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = feb }");
+
+        assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
+    }
+
+    @Test
+    void parseYearWithIllFormattedMonthString() throws Exception {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }");
 
         assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
@@ -1927,12 +1832,12 @@ class BibtexParserTest {
     @Test
     void parseDuplicateKeywordsWithOnlyOneEntry() throws ParseException {
         Optional<BibEntry> result = parser.parseSingleEntry("@Article{,\n"
-            + "Keywords={asdf,asdf,asdf},\n"
-            + "}\n"
-            + "");
+                + "Keywords={asdf,asdf,asdf},\n"
+                + "}\n"
+                + "");
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+                .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
 
         assertEquals(Optional.of(expectedEntry), result);
     }
@@ -1940,21 +1845,21 @@ class BibtexParserTest {
     @Test
     void parseDuplicateKeywordsWithTwoEntries() throws Exception {
         BibEntry expectedEntryFirst = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.KEYWORDS, "bbb")
-            .withCitationKey("Test2017");
+                .withField(StandardField.KEYWORDS, "bbb")
+                .withCitationKey("Test2017");
 
         BibEntry expectedEntrySecond = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+                .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
 
         String entries = """
-            @Article{Test2017,
-              keywords = {bbb},
-            }
+                @Article{Test2017,
+                  keywords = {bbb},
+                }
 
-            @Article{,
-              keywords = {asdf,asdf,asdf},
-            },
-            """;
+                @Article{,
+                  keywords = {asdf,asdf,asdf},
+                },
+                """;
         ParserResult result = parser.parse(new StringReader(entries));
         assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
     }

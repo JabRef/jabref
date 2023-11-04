@@ -1,7 +1,6 @@
 package org.jabref.model.entry.field;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +30,7 @@ public enum IEEEField implements Field {
         this.properties = EnumSet.of(first, rest);
     }
 
-    public static <T> Optional<IEEEField> fromName(String name) {
+    public static Optional<IEEEField> fromName(String name) {
         return Arrays.stream(IEEEField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
@@ -49,6 +48,6 @@ public enum IEEEField implements Field {
 
     @Override
     public Set<FieldProperty> getProperties() {
-        return Collections.unmodifiableSet(properties);
+        return properties;
     }
 }

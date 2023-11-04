@@ -2,6 +2,7 @@ package org.jabref.logic.util.io;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,16 +19,29 @@ public class AutoLinkPreferences {
     private final ObjectProperty<CitationKeyDependency> citationKeyDependency;
     private final StringProperty regularExpression;
     private final BooleanProperty askAutoNamingPdfs;
-    private final SimpleObjectProperty<Character> keywordDelimiter;
+    private final ReadOnlyObjectProperty<Character> keywordSeparator;
 
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
                                boolean askAutoNamingPdfs,
-                               Character keywordDelimiter) {
+                               ObjectProperty<Character> keywordSeparatorProperty) {
         this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
-        this.keywordDelimiter = new SimpleObjectProperty<>(keywordDelimiter);
+        this.keywordSeparator = keywordSeparatorProperty;
+    }
+
+    /**
+     * For testing purpose
+     */
+    public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
+                               String regularExpression,
+                               boolean askAutoNamingPdfs,
+                               Character keywordSeparator) {
+        this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
+        this.regularExpression = new SimpleStringProperty(regularExpression);
+        this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
+        this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
     }
 
     public CitationKeyDependency getCitationKeyDependency() {
@@ -66,15 +80,7 @@ public class AutoLinkPreferences {
         this.askAutoNamingPdfs.set(askAutoNamingPdfs);
     }
 
-    public Character getKeywordDelimiter() {
-        return keywordDelimiter.getValue();
-    }
-
-    public SimpleObjectProperty<Character> keywordDelimiterProperty() {
-        return keywordDelimiter;
-    }
-
-    public void setKeywordDelimiter(Character keywordDelimiter) {
-        this.keywordDelimiter.set(keywordDelimiter);
+    public Character getKeywordSeparator() {
+        return keywordSeparator.getValue();
     }
 }

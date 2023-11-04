@@ -1,5 +1,6 @@
 package org.jabref.logic.layout.format;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
@@ -10,17 +11,14 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class FileLinkTest {
 
-    private FileLinkPreferences prefs;
     private ParamLayoutFormatter fileLinkLayoutFormatter;
 
     @BeforeEach
     public void setUp() throws Exception {
-        prefs = mock(FileLinkPreferences.class);
-        fileLinkLayoutFormatter = new FileLink(prefs);
+        fileLinkLayoutFormatter = new FileLink(Collections.emptyList(), "");
     }
 
     @ParameterizedTest

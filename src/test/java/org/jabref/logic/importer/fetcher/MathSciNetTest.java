@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,6 +13,7 @@ import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,9 +28,9 @@ class MathSciNetTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
-                mock(FieldContentFormatterPreferences.class));
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
         fetcher = new MathSciNet(importFormatPreferences);
 
         ratiuEntry = new BibEntry();
@@ -43,7 +43,7 @@ class MathSciNetTest {
         ratiuEntry.setField(StandardField.YEAR, "2016");
         ratiuEntry.setField(StandardField.NUMBER, "3");
         ratiuEntry.setField(StandardField.PAGES, "571--589");
-        ratiuEntry.setField(StandardField.ISSN, "1422-6928");
+        ratiuEntry.setField(StandardField.ISSN, "1422-6928,1422-6952");
         ratiuEntry.setField(StandardField.KEYWORDS, "76A15 (35A01 35A02 35K61 82D30)");
         ratiuEntry.setField(StandardField.MR_NUMBER, "3537908");
         ratiuEntry.setField(StandardField.DOI, "10.1007/s00021-016-0250-0");

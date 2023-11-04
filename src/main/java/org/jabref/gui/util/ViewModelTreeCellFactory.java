@@ -18,7 +18,6 @@ import org.jabref.gui.icon.JabRefIcon;
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
  *
- * @param <S> view model
  * @param <T> cell value
  */
 public class ViewModelTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
@@ -70,7 +69,7 @@ public class ViewModelTreeCellFactory<T> implements Callback<TreeView<T>, TreeCe
         StringConverter<TreeItem<T>> converter = new StringConverter<TreeItem<T>>() {
             @Override
             public String toString(TreeItem<T> treeItem) {
-                return (treeItem == null || treeItem.getValue() == null || toText == null) ?
+                return treeItem == null || treeItem.getValue() == null || toText == null ?
                         "" : toText.call(treeItem.getValue());
             }
 

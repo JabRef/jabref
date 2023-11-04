@@ -19,21 +19,21 @@ public class FieldWriter {
     private static final char FIELD_END = '}';
 
     private final boolean neverFailOnHashes;
-    private final FieldWriterPreferences preferences;
+    private final FieldPreferences preferences;
     private final FieldContentFormatter formatter;
 
-    public FieldWriter(FieldWriterPreferences preferences) {
+    public FieldWriter(FieldPreferences preferences) {
         this(true, preferences);
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences preferences) {
+    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
 
-        formatter = new FieldContentFormatter(preferences.getFieldContentFormatterPreferences());
+        formatter = new FieldContentFormatter(preferences);
     }
 
-    public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs) {
+    public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
         return new FieldWriter(true, prefs);
     }
 
@@ -58,11 +58,11 @@ public class FieldWriter {
         }
 
         // Then we throw an exception if the error criteria are met.
-        if (!(right == 0) && (left == 0)) {
+        if (right != 0 && (left == 0)) {
             LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
-        if (!(right == 0) && (right < left)) {
+        if (right != 0 && (right < left)) {
             LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
@@ -166,9 +166,9 @@ public class FieldWriter {
     }
 
     private boolean shouldResolveStrings(Field field) {
-        if (preferences.isResolveStrings()) {
+        if (preferences.shouldResolveStrings()) {
             // Resolve strings for the list of fields only
-            return preferences.getResolveStringsForFields().contains(field);
+            return preferences.getResolvableFields().contains(field);
         }
         return false;
     }

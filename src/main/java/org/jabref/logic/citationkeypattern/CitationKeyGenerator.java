@@ -1,7 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,14 +21,23 @@ import org.slf4j.LoggerFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class CitationKeyGenerator extends BracketedPattern {
-    /*
+    /**
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
-    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^+";
+
+    /**
+     * List of unwanted characters. These will be removed at the end.
+     * Note that <code>+</code> is a wanted character to indicate "et al." in authorsAlpha.
+     * Example: "ABC+". See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
+     */
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
+
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
+
     private final AbstractCitationKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
@@ -46,29 +54,6 @@ public class CitationKeyGenerator extends BracketedPattern {
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
-    }
-
-    @Deprecated
-    static String generateKey(BibEntry entry, String pattern) {
-        return generateKey(entry, pattern, new BibDatabase());
-    }
-
-    @Deprecated
-    static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
-        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
-        keyPattern.setDefaultValue("[" + pattern + "]");
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
-                ',');
-
-        return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
     }
 
     /**

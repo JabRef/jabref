@@ -51,7 +51,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
         // Remove button bar at bottom, but add close button to keep the dialog closable by clicking the "x" window symbol
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        getDialogPane().getChildren().removeIf(node -> node instanceof ButtonBar);
+        getDialogPane().getChildren().removeIf(ButtonBar.class::isInstance);
     }
 
     @FXML

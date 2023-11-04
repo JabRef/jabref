@@ -12,12 +12,7 @@ import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class OpenDatabase {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
 
     private OpenDatabase() {
     }
@@ -31,13 +26,12 @@ public class OpenDatabase {
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen);
-
-        performLoadDatabaseMigrations(result, importFormatPreferences.getKeywordSeparator());
-
+        performLoadDatabaseMigrations(result, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
         return result;
     }
 
-    private static void performLoadDatabaseMigrations(ParserResult parserResult, Character keywordDelimited) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult,
+                                                      Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),

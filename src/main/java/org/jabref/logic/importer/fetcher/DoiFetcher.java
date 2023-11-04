@@ -28,7 +28,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
 import com.google.common.util.concurrent.RateLimiter;
@@ -85,14 +84,14 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             Optional<String> agency;
             if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
                 double waitingTime = 0.0;
-                if (agency.get().equalsIgnoreCase("datacite")) {
+                if ("datacite".equalsIgnoreCase(agency.get())) {
                     waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();
-                } else if (agency.get().equalsIgnoreCase("crossref")) {
+                } else if ("crossref".equalsIgnoreCase(agency.get())) {
                     waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();
                 } // mEDRA does not explicit an API rating
 
                 LOGGER.trace(String.format("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter",
-                        Thread.currentThread().getId(), identifier, waitingTime));
+                        Thread.currentThread().threadId(), identifier, waitingTime));
             }
         } catch (IOException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);
@@ -143,11 +142,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 }
 
                 // BibTeX entry
-                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
+                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
-                if (agency.isPresent() && agency.get().equalsIgnoreCase("crossref")) {
+                if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
                     updateCrossrefAPIRate(openConnection);
                 }
 
@@ -159,8 +158,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     }
                 }
 
-                if (openConnection instanceof HttpURLConnection) {
-                    ((HttpURLConnection) openConnection).disconnect();
+                if (openConnection instanceof HttpURLConnection connection) {
+                    connection.disconnect();
                 }
                 return fetchedEntry;
             } else {

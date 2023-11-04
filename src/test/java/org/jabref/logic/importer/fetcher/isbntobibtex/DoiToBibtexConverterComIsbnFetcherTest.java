@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+@Disabled("Page https://doi-to-bibtex-converter.herokuapp.com is down")
 @FetcherTest
 public class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherTest {
 

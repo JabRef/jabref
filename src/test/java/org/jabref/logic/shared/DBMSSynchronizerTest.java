@@ -53,7 +53,7 @@ public class DBMSSynchronizerTest {
     @BeforeEach
     public void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
+        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
@@ -148,6 +148,7 @@ public class DBMSSynchronizerTest {
 
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
+        actualMap.remove("VersionDBStructure");
 
         assertEquals(expectedMap, actualMap);
     }

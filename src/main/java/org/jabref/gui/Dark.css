@@ -36,7 +36,7 @@
 
     -fx-dark-text-color: black;
     -fx-mid-text-color: #7d8591;
-    -fx-light-text-color: #9aa3af;
+    -fx-light-text-color: #e5e7ea;
     -jr-separator: #333744;
     -fx-outer-border: #424758;
 
@@ -68,11 +68,13 @@
 }
 
 .addition {
-    -rtfx-background-color: -jr-green;
+    -fx-text-background-color: black;
+    -rtfx-background-color: #FDAF56;
 }
 
 .deletion {
-    -rtfx-background-color: -jr-red;
+    -fx-text-background-color: black;
+    -rtfx-background-color: #FFEECC;
 }
 
 #previewBody {

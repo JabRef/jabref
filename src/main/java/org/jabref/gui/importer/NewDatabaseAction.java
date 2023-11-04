@@ -27,7 +27,7 @@ public class NewDatabaseAction extends SimpleCommand {
     @Override
     public void execute() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode());
+        bibDatabaseContext.setMode(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
         jabRefFrame.addTab(bibDatabaseContext, true);
     }
 }

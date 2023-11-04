@@ -1,9 +1,9 @@
 repository: JabRef/jabref
 title: "Developer Documentation"
-remote_theme: just-the-docs/just-the-docs@v0.4.0.rc3
+remote_theme: just-the-docs/just-the-docs@v0.5.0
 color_scheme: light
 
-exclude: [CNAME, README.md, mkdocs-custom.css]
+exclude: [_config.yml, .dockerignore, .gitignore, CNAME, Dockerfile, Gemfile, Gemfile.lock, README.md, mkdocs-custom.css]
 
 # Hint by https://github.com/just-the-docs/just-the-docs/issues/374#issuecomment-680273258
 # Theme read from https://github.com/StylishThemes/Syntax-Themes/blob/master/pygments/css-github/
@@ -62,3 +62,10 @@ callouts:
   warning:
     title: Warning
     color: red
+
+mermaid:
+  # Version of mermaid library
+  # Pick an available version from https://cdn.jsdelivr.net/npm/mermaid/
+  version: "9.4.3"
+
+enable_copy_code_button: true

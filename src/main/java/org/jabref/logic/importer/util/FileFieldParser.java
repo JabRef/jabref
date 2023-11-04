@@ -18,10 +18,15 @@ public class FileFieldParser {
     private final String value;
 
     private StringBuilder charactersOfCurrentElement;
+
     private boolean windowsPath;
 
     public FileFieldParser(String value) {
-        this.value = value;
+        if (value == null) {
+            this.value = null;
+        } else {
+            this.value = value.replace("$\\backslash$", "\\");
+        }
     }
 
     /**
@@ -145,7 +150,7 @@ public class FileFieldParser {
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
                 field = new LinkedFile(entry.get(0), new URL(entry.get(1)), entry.get(2));
-            } catch (MalformedURLException ignored) {
+            } catch (MalformedURLException e) {
                 // in case the URL is malformed, store it nevertheless
                 field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
             }
@@ -163,6 +168,8 @@ public class FileFieldParser {
                     Path path = Path.of(pathStr);
                     field = new LinkedFile(entry.get(0), path, entry.get(2));
                 } catch (InvalidPathException e) {
+                    // Ignored
+                    LOGGER.debug("Invalid path object, continueing with string", e);
                     field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
                 }
             }

@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -19,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -79,12 +79,16 @@ class CompositeIdFetcherTest {
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIsbnId",
                         new BibEntry(StandardEntryType.Book)
-                                .withField(StandardField.TITLE, "Effective Java")
-                                .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
-                                .withField(StandardField.YEAR, "2017")
                                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                                .withField(StandardField.PAGES, "416")
-                                .withField(StandardField.ISBN, "9780134685991"),
+                                .withField(StandardField.TITLE, "Effective Java")
+                                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                                .withField(StandardField.YEAR, "2018")
+                                .withField(StandardField.ISBN, "9780134685991")
+                                .withField(StandardField.NOTE, "Titelzusätze auf dem Umschlag: \"Updated for Java 9. Best practices for ... the Java platform\"")
+                                .withField(StandardField.PAGETOTAL, "392")
+                                .withField(new UnknownField("ppn_gvk"), "100121840X")
+                                .withField(StandardField.EDITION, "Third edition")
+                                .withField(StandardField.ADDRESS, "Boston"),
                         "9780134685991"
                 ),
                 Arguments.arguments(
@@ -104,11 +108,9 @@ class CompositeIdFetcherTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         // Needed for ArXiv Fetcher keyword processing
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         compositeIdFetcher = new CompositeIdFetcher(importFormatPreferences);
     }
 

@@ -6,10 +6,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
+import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class WebFetchersTest {
 
@@ -44,8 +44,6 @@ class WebFetchersTest {
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);
-        FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
     }
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
@@ -55,7 +53,7 @@ class WebFetchersTest {
                          try {
                              return Class.forName(classPath);
                          } catch (ClassNotFoundException e) {
-                             LOGGER.error("Some of the ignored classes were not found {}", e);
+                             LOGGER.error("Some of the ignored classes were not found", e);
                              return null;
                          }
                      }).filter(Objects::nonNull).collect(Collectors.toSet());
@@ -78,11 +76,12 @@ class WebFetchersTest {
             // Remove special ISBN fetcher since we don't want to expose them to the user
             expected.remove(OpenLibraryIsbnFetcher.class);
             expected.remove(EbookDeIsbnFetcher.class);
+            expected.remove(GvkFetcher.class);
             expected.remove(DoiToBibtexConverterComIsbnFetcher.class);
-
             // Remove the following, because they don't work at the moment
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
+            expected.remove(CollectionOfComputerScienceBibliographiesFetcher.class);
 
             assertEquals(expected, getClasses(idFetchers));
         }
@@ -122,6 +121,7 @@ class WebFetchersTest {
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
+            expected.remove(CollectionOfComputerScienceBibliographiesFetcher.class);
 
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);

@@ -4,13 +4,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
-import javafx.scene.control.Tooltip;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
@@ -47,9 +44,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
         Menu submenu = new Menu(Localization.lang("Change case"));
 
         for (final Formatter caseChanger : Formatters.getCaseChangers()) {
-            CustomMenuItem menuItem = new CustomMenuItem(new Label(caseChanger.getName()));
-            Tooltip toolTip = new Tooltip(caseChanger.getDescription());
-            Tooltip.install(menuItem.getContent(), toolTip);
+            MenuItem menuItem = new MenuItem(caseChanger.getName());
             EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
             menuItem.setOnAction(event ->
                     textInputControl.textProperty().set(caseChanger.format(textInputControl.textProperty().get())));
@@ -63,9 +58,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
         Menu submenu = new Menu(Localization.lang("Convert"));
 
         for (Formatter converter : Formatters.getConverters()) {
-            CustomMenuItem menuItem = new CustomMenuItem(new Label(converter.getName()));
-            Tooltip toolTip = new Tooltip(converter.getDescription());
-            Tooltip.install(menuItem.getContent(), toolTip);
+            MenuItem menuItem = new MenuItem(converter.getName());
             EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
             menuItem.setOnAction(event ->
                     textInputControl.textProperty().set(converter.format(textInputControl.textProperty().get())));

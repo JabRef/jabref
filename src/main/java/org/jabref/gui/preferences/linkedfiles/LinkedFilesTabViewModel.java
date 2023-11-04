@@ -53,21 +53,21 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
-                input -> {
+                mainDirectoryPath -> {
+                    ValidationMessage error = ValidationMessage.error(
+                            Localization.lang("Main file directory '%0' not found.\nCheck the tab \"Linked files\".", mainDirectoryPath)
+                    );
                     try {
-                        Path path = Path.of(mainFileDirectoryProperty.getValue());
-                        return (Files.exists(path) && Files.isDirectory(path));
+                        Path path = Path.of(mainDirectoryPath);
+                        if (!(Files.exists(path) && Files.isDirectory(path))) {
+                            return error;
+                        }
                     } catch (InvalidPathException ex) {
-                        return false;
+                        return error;
                     }
-                },
-                ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
-                        Localization.lang("File"),
-                        Localization.lang("External file links"),
-                        Localization.lang("Main file directory"),
-                        Localization.lang("Directory not found")
-                        )
-                )
+                    // main directory is valid
+                    return null;
+                }
         );
     }
 
@@ -98,7 +98,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
-        filePreferences.setDownloadLinkedFiles(filePreferences.shouldDownloadLinkedFiles()); // set in ImportEntriesViewModel
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
 
         // Autolink preferences
@@ -120,7 +119,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         ValidationStatus validationStatus = mainFileDirValidationStatus();
-        if (!validationStatus.isValid()) {
+        if (!validationStatus.isValid() && useMainFileDirectoryProperty().get()) {
             validationStatus.getHighestMessage().ifPresent(message ->
                     dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;

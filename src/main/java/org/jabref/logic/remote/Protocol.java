@@ -10,13 +10,17 @@ import java.nio.charset.StandardCharsets;
 
 import javafx.util.Pair;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @implNote The first byte of every message identifies its type as a {@link RemoteMessage}.
  * Every message is terminated with '\0'.
  */
 public class Protocol implements AutoCloseable {
-
     public static final String IDENTIFIER = "jabref";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
     private final Socket socket;
     private final ObjectOutputStream out;
@@ -81,20 +85,20 @@ public class Protocol implements AutoCloseable {
     public void close() {
         try {
             in.close();
-        } catch (IOException ignored) {
-            // Ignored
+        } catch (IOException e) {
+            LOGGER.warn("Input stream not closed", e);
         }
 
         try {
             out.close();
-        } catch (IOException ignored) {
-            // Ignored
+        } catch (IOException e) {
+            LOGGER.warn("Output stream not closed", e);
         }
 
         try {
             socket.close();
-        } catch (IOException ignored) {
-            // Ignored
+        } catch (IOException e) {
+            LOGGER.warn("Socket not closed", e);
         }
     }
 }

@@ -35,7 +35,7 @@ public class UnlinkedPDFFileFilter implements DirectoryStream.Filter<Path> {
         if (Files.isDirectory(pathname)) {
             return true;
         } else {
-            return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname);
+            return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname) && !lookup.getPathOfDatabase().equals(pathname);
         }
     }
 }

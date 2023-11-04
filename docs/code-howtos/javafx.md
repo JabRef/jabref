@@ -128,7 +128,7 @@ public class AboutDialogView extends BaseDialog<Void>
 @Inject private DialogService dialogService;
 ```
 
-*   It is convenient to load the FXML-view directly from the controller class.
+* It is convenient to load the FXML-view directly from the controller class.
 
     The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
 
@@ -201,7 +201,6 @@ JabRef makes heavy use of Properties and Bindings. These are wrappers around Obs
 * [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 * [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
-* [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
 * [JavaFX Documentation project](https://fxdocs.github.io/docs/html5/index.html): Collected information on JavaFX in a central place
 * [FXExperience](http://fxexperience.com) JavaFX Links of the week
 * [Foojay](https://foojay.io) Java and JavaFX tutorials

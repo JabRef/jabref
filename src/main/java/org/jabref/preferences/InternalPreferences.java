@@ -1,6 +1,10 @@
 package org.jabref.preferences;
 
+import java.nio.file.Path;
+
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -10,13 +14,21 @@ import org.jabref.logic.util.Version;
 public class InternalPreferences {
 
     private final ObjectProperty<Version> ignoredVersion;
-    private final ObjectProperty<Character> keywordSeparator;
-    private final StringProperty user;
+    private final BooleanProperty versionCheckEnabled;
+    private final ObjectProperty<Path> lastPreferencesExportPath;
+    private final StringProperty userAndHost;
+    private final BooleanProperty memoryStickMode;
 
-    public InternalPreferences(Version ignoredVersion, Character keywordSeparator, String user) {
+    public InternalPreferences(Version ignoredVersion,
+                               boolean versionCheck,
+                               Path exportPath,
+                               String userAndHost,
+                               boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
-        this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
-        this.user = new SimpleStringProperty(user);
+        this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
+        this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
+        this.userAndHost = new SimpleStringProperty(userAndHost);
+        this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
     }
 
     public Version getIgnoredVersion() {
@@ -31,19 +43,43 @@ public class InternalPreferences {
         this.ignoredVersion.set(ignoredVersion);
     }
 
-    public Character getKeywordSeparator() {
-        return keywordSeparator.get();
+    public boolean isVersionCheckEnabled() {
+        return versionCheckEnabled.get();
     }
 
-    public ObjectProperty<Character> keywordSeparatorProperty() {
-        return keywordSeparator;
+    public BooleanProperty versionCheckEnabledProperty() {
+        return versionCheckEnabled;
     }
 
-    public void setKeywordSeparator(Character keywordSeparator) {
-        this.keywordSeparator.set(keywordSeparator);
+    public void setVersionCheckEnabled(boolean versionCheckEnabled) {
+        this.versionCheckEnabled.set(versionCheckEnabled);
     }
 
-    public String getUser() {
-        return user.get();
+    public Path getLastPreferencesExportPath() {
+        return lastPreferencesExportPath.get();
+    }
+
+    public ObjectProperty<Path> lastPreferencesExportPathProperty() {
+        return lastPreferencesExportPath;
+    }
+
+    public void setLastPreferencesExportPath(Path lastPreferencesExportPath) {
+        this.lastPreferencesExportPath.set(lastPreferencesExportPath);
+    }
+
+    public String getUserAndHost() {
+        return userAndHost.get();
+    }
+
+    public boolean isMemoryStickMode() {
+        return memoryStickMode.get();
+    }
+
+    public BooleanProperty memoryStickModeProperty() {
+        return memoryStickMode;
+    }
+
+    public void setMemoryStickMode(boolean memoryStickMode) {
+        this.memoryStickMode.set(memoryStickMode);
     }
 }

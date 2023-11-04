@@ -25,6 +25,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -52,10 +53,24 @@ public abstract class DBMSProcessor {
      * Scans the database for required tables.
      *
      * @return <code>true</code> if the structure matches the requirements, <code>false</code> if not.
-     * @throws SQLException
+     * @throws SQLException in case of error
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        return checkTableAvailability("ENTRY", "FIELD", "METADATA");
+        boolean databasePassesIntegrityCheck = false;
+        DBMSType type = this.connectionProperties.getType();
+        Map<String, String> metadata = getSharedMetaData();
+        if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
+            String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
+            if (metadataVersion != null) {
+                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, "").replace(";", ""));
+                if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
+                    databasePassesIntegrityCheck = true;
+                }
+            }
+        } else {
+            databasePassesIntegrityCheck = checkTableAvailability("ENTRY", "FIELD", "METADATA");
+        }
+        return databasePassesIntegrityCheck;
     }
 
     /**
@@ -80,7 +95,7 @@ public abstract class DBMSProcessor {
      * @param tableNames Table names to be checked
      * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
      */
-    private boolean checkTableAvailability(String... tableNames) throws SQLException {
+    protected boolean checkTableAvailability(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {
             requiredTables.add(name.toUpperCase(Locale.ENGLISH));
@@ -101,7 +116,7 @@ public abstract class DBMSProcessor {
      * Creates and sets up the needed tables and columns according to the database type and performs a check whether the
      * needed tables are present.
      *
-     * @throws SQLException
+     * @throws SQLException in case of error
      */
     public void setupSharedDatabase() throws SQLException {
         setUp();
@@ -115,7 +130,7 @@ public abstract class DBMSProcessor {
     /**
      * Creates and sets up the needed tables and columns according to the database type.
      *
-     * @throws SQLException
+     * @throws SQLException in case of error
      */
     protected abstract void setUp() throws SQLException;
 
@@ -129,6 +144,10 @@ public abstract class DBMSProcessor {
      * @return Correctly escaped expression
      */
     abstract String escape(String expression);
+
+    abstract String escape_Table(String expression);
+
+    abstract Integer getCURRENT_VERSION_DB_STRUCT();
 
     /**
      * For use in test only. Inserts the BibEntry into the shared database.
@@ -161,17 +180,15 @@ public abstract class DBMSProcessor {
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append("(")
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
         // Number of commas is bibEntries.size() - 1
-        for (int i = 0; i < (bibEntries.size() - 1); i++) {
-            insertIntoEntryQuery.append(", (?)");
-        }
+        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, (bibEntries.size() - 1))));
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[] {"SHARED_ID"})) {
+                new String[]{"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -204,17 +221,16 @@ public abstract class DBMSProcessor {
         List<Integer> localIds = bibEntries.stream()
                                            .map(BibEntry::getSharedBibEntryData)
                                            .map(SharedBibEntryData::getSharedID)
-                                           .filter((id) -> id != -1)
-                                           .collect(Collectors.toList());
+                                           .filter(id -> id != -1)
+                                           .toList();
         if (localIds.isEmpty()) {
             return bibEntries;
         }
         try {
-            StringBuilder selectQuery = new StringBuilder()
-                    .append("SELECT * FROM ")
-                    .append(escape("ENTRY"));
+            String selectQuery = "SELECT * FROM " +
+                    escape_Table("ENTRY");
 
-            try (ResultSet resultSet = connection.createStatement().executeQuery(selectQuery.toString())) {
+            try (ResultSet resultSet = connection.createStatement().executeQuery(selectQuery)) {
                 while (resultSet.next()) {
                     int id = resultSet.getInt("SHARED_ID");
                     remoteIds.add(id);
@@ -223,7 +239,7 @@ public abstract class DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
-        return bibEntries.stream().filter((entry) ->
+        return bibEntries.stream().filter(entry ->
                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
                          .collect(Collectors.toList());
     }
@@ -242,7 +258,7 @@ public abstract class DBMSProcessor {
 
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT INTO ")
-                    .append(escape("FIELD"))
+                    .append(escape_Table("FIELD"))
                     .append("(")
                     .append(escape("ENTRY_SHARED_ID"))
                     .append(", ")
@@ -260,9 +276,7 @@ public abstract class DBMSProcessor {
             }
 
             // Number of commas is fields.size() - 1
-            for (int i = 0; i < (numFields - 1); i++) {
-                insertFieldQuery.append(", (?, ?, ?)");
-            }
+            insertFieldQuery.append(", (?, ?, ?)".repeat(Math.max(0, (numFields - 1))));
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
                 int fieldsCompleted = 0;
                 for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
@@ -285,7 +299,7 @@ public abstract class DBMSProcessor {
      * Updates the whole {@link BibEntry} on shared database.
      *
      * @param localBibEntry {@link BibEntry} affected by changes
-     * @throws SQLException
+     * @throws SQLException in case of error
      */
     public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         connection.setAutoCommit(false); // disable auto commit due to transaction
@@ -293,7 +307,7 @@ public abstract class DBMSProcessor {
         try {
             Optional<BibEntry> sharedEntryOptional = getSharedEntry(localBibEntry.getSharedBibEntryData().getSharedID());
 
-            if (!sharedEntryOptional.isPresent()) {
+            if (sharedEntryOptional.isEmpty()) {
                 return;
             }
 
@@ -308,20 +322,19 @@ public abstract class DBMSProcessor {
                 insertOrUpdateFields(localBibEntry);
 
                 // updating entry type
-                StringBuilder updateEntryTypeQuery = new StringBuilder()
-                        .append("UPDATE ")
-                        .append(escape("ENTRY"))
-                        .append(" SET ")
-                        .append(escape("TYPE"))
-                        .append(" = ?, ")
-                        .append(escape("VERSION"))
-                        .append(" = ")
-                        .append(escape("VERSION"))
-                        .append(" + 1 WHERE ")
-                        .append(escape("SHARED_ID"))
-                        .append(" = ?");
+                String updateEntryTypeQuery = "UPDATE " +
+                        escape_Table("ENTRY") +
+                        " SET " +
+                        escape("TYPE") +
+                        " = ?, " +
+                        escape("VERSION") +
+                        " = " +
+                        escape("VERSION") +
+                        " + 1 WHERE " +
+                        escape("SHARED_ID") +
+                        " = ?";
 
-                try (PreparedStatement preparedUpdateEntryTypeStatement = connection.prepareStatement(updateEntryTypeQuery.toString())) {
+                try (PreparedStatement preparedUpdateEntryTypeStatement = connection.prepareStatement(updateEntryTypeQuery)) {
                     preparedUpdateEntryTypeStatement.setString(1, localBibEntry.getType().getName());
                     preparedUpdateEntryTypeStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedID());
                     preparedUpdateEntryTypeStatement.executeUpdate();
@@ -346,17 +359,16 @@ public abstract class DBMSProcessor {
         Set<Field> nullFields = new HashSet<>(sharedBibEntry.getFields());
         nullFields.removeAll(localBibEntry.getFields());
         for (Field nullField : nullFields) {
-            StringBuilder deleteFieldQuery = new StringBuilder()
-                    .append("DELETE FROM ")
-                    .append(escape("FIELD"))
-                    .append(" WHERE ")
-                    .append(escape("NAME"))
-                    .append(" = ? AND ")
-                    .append(escape("ENTRY_SHARED_ID"))
-                    .append(" = ?");
+            String deleteFieldQuery = "DELETE FROM " +
+                    escape_Table("FIELD") +
+                    " WHERE " +
+                    escape("NAME") +
+                    " = ? AND " +
+                    escape("ENTRY_SHARED_ID") +
+                    " = ?";
 
             try (PreparedStatement preparedDeleteFieldStatement = connection
-                    .prepareStatement(deleteFieldQuery.toString())) {
+                    .prepareStatement(deleteFieldQuery)) {
                 preparedDeleteFieldStatement.setString(1, nullField.getName());
                 preparedDeleteFieldStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedID());
                 preparedDeleteFieldStatement.executeUpdate();
@@ -377,54 +389,51 @@ public abstract class DBMSProcessor {
                 value = valueOptional.get();
             }
 
-            StringBuilder selectFieldQuery = new StringBuilder()
-                    .append("SELECT * FROM ")
-                    .append(escape("FIELD"))
-                    .append(" WHERE ")
-                    .append(escape("NAME"))
-                    .append(" = ? AND ")
-                    .append(escape("ENTRY_SHARED_ID"))
-                    .append(" = ?");
+            String selectFieldQuery = "SELECT * FROM " +
+                    escape_Table("FIELD") +
+                    " WHERE " +
+                    escape("NAME") +
+                    " = ? AND " +
+                    escape("ENTRY_SHARED_ID") +
+                    " = ?";
 
             try (PreparedStatement preparedSelectFieldStatement = connection
-                    .prepareStatement(selectFieldQuery.toString())) {
+                    .prepareStatement(selectFieldQuery)) {
                 preparedSelectFieldStatement.setString(1, field.getName());
                 preparedSelectFieldStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedID());
 
                 try (ResultSet selectFieldResultSet = preparedSelectFieldStatement.executeQuery()) {
                     if (selectFieldResultSet.next()) { // check if field already exists
-                        StringBuilder updateFieldQuery = new StringBuilder()
-                                .append("UPDATE ")
-                                .append(escape("FIELD"))
-                                .append(" SET ")
-                                .append(escape("VALUE"))
-                                .append(" = ? WHERE ")
-                                .append(escape("NAME"))
-                                .append(" = ? AND ")
-                                .append(escape("ENTRY_SHARED_ID"))
-                                .append(" = ?");
+                        String updateFieldQuery = "UPDATE " +
+                                escape_Table("FIELD") +
+                                " SET " +
+                                escape("VALUE") +
+                                " = ? WHERE " +
+                                escape("NAME") +
+                                " = ? AND " +
+                                escape("ENTRY_SHARED_ID") +
+                                " = ?";
 
                         try (PreparedStatement preparedUpdateFieldStatement = connection
-                                .prepareStatement(updateFieldQuery.toString())) {
+                                .prepareStatement(updateFieldQuery)) {
                             preparedUpdateFieldStatement.setString(1, value);
                             preparedUpdateFieldStatement.setString(2, field.getName());
                             preparedUpdateFieldStatement.setInt(3, localBibEntry.getSharedBibEntryData().getSharedID());
                             preparedUpdateFieldStatement.executeUpdate();
                         }
                     } else {
-                        StringBuilder insertFieldQuery = new StringBuilder()
-                                .append("INSERT INTO ")
-                                .append(escape("FIELD"))
-                                .append("(")
-                                .append(escape("ENTRY_SHARED_ID"))
-                                .append(", ")
-                                .append(escape("NAME"))
-                                .append(", ")
-                                .append(escape("VALUE"))
-                                .append(") VALUES(?, ?, ?)");
+                        String insertFieldQuery = "INSERT INTO " +
+                                escape_Table("FIELD") +
+                                "(" +
+                                escape("ENTRY_SHARED_ID") +
+                                ", " +
+                                escape("NAME") +
+                                ", " +
+                                escape("VALUE") +
+                                ") VALUES(?, ?, ?)";
 
                         try (PreparedStatement preparedFieldStatement = connection
-                                .prepareStatement(insertFieldQuery.toString())) {
+                                .prepareStatement(insertFieldQuery)) {
                             preparedFieldStatement.setInt(1, localBibEntry.getSharedBibEntryData().getSharedID());
                             preparedFieldStatement.setString(2, field.getName());
                             preparedFieldStatement.setString(3, value);
@@ -448,7 +457,7 @@ public abstract class DBMSProcessor {
         }
         StringBuilder query = new StringBuilder()
                 .append("DELETE FROM ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append(" WHERE ")
                 .append(escape("SHARED_ID"))
                 .append(" IN (");
@@ -506,19 +515,19 @@ public abstract class DBMSProcessor {
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT ")
-             .append(escape("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
-             .append(escape("ENTRY")).append(".").append(escape("TYPE")).append(", ")
-             .append(escape("ENTRY")).append(".").append(escape("VERSION")).append(", ")
+             .append(escape_Table("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
+             .append(escape_Table("ENTRY")).append(".").append(escape("TYPE")).append(", ")
+             .append(escape_Table("ENTRY")).append(".").append(escape("VERSION")).append(", ")
              .append("F.").append(escape("ENTRY_SHARED_ID")).append(", ")
              .append("F.").append(escape("NAME")).append(", ")
              .append("F.").append(escape("VALUE"))
              .append(" FROM ")
-             .append(escape("ENTRY"))
+             .append(escape_Table("ENTRY"))
              // Handle special case if entry does not have any fields (yet)
              .append(" left outer join ")
-             .append(escape("FIELD"))
+             .append(escape_Table("FIELD"))
              .append(" F on ")
-             .append(escape("ENTRY")).append(".").append(escape("SHARED_ID"))
+             .append(escape_Table("ENTRY")).append(".").append(escape("SHARED_ID"))
              .append(" = F.").append(escape("ENTRY_SHARED_ID"));
 
         if (!sharedIDs.isEmpty()) {
@@ -552,13 +561,13 @@ public abstract class DBMSProcessor {
 
                     // In all cases, we set the field value of the newly created BibEntry object
                     String value = selectEntryResultSet.getString("VALUE");
-                    if (value != null) {
+                    if (value != null && bibEntry != null) {
                         bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntriesEventSource.SHARED);
                     }
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Executed >{}<", query.toString());
+            LOGGER.error("Executed >{}<", query);
             LOGGER.error("SQL Error", e);
             return Collections.emptyList();
         }
@@ -575,13 +584,12 @@ public abstract class DBMSProcessor {
      */
     public Map<Integer, Integer> getSharedIDVersionMapping() {
         Map<Integer, Integer> sharedIDVersionMapping = new HashMap<>();
-        StringBuilder selectEntryQuery = new StringBuilder()
-                .append("SELECT * FROM ")
-                .append(escape("ENTRY"))
-                .append(" ORDER BY ")
-                .append(escape("SHARED_ID"));
+        String selectEntryQuery = "SELECT * FROM " +
+                escape_Table("ENTRY") +
+                " ORDER BY " +
+                escape("SHARED_ID");
 
-        try (ResultSet selectEntryResultSet = connection.createStatement().executeQuery(selectEntryQuery.toString())) {
+        try (ResultSet selectEntryResultSet = connection.createStatement().executeQuery(selectEntryQuery)) {
             while (selectEntryResultSet.next()) {
                 sharedIDVersionMapping.put(selectEntryResultSet.getInt("SHARED_ID"), selectEntryResultSet.getInt("VERSION"));
             }
@@ -598,7 +606,7 @@ public abstract class DBMSProcessor {
     public Map<String, String> getSharedMetaData() {
         Map<String, String> data = new HashMap<>();
 
-        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM " + escape("METADATA"))) {
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM " + escape_Table("METADATA"))) {
             while (resultSet.next()) {
                 data.put(resultSet.getString("KEY"), resultSet.getString("VALUE"));
             }
@@ -617,7 +625,7 @@ public abstract class DBMSProcessor {
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
         StringBuilder updateQuery = new StringBuilder()
                 .append("UPDATE ")
-                .append(escape("METADATA"))
+                .append(escape_Table("METADATA"))
                 .append(" SET ")
                 .append(escape("VALUE"))
                 .append(" = ? ")
@@ -627,7 +635,7 @@ public abstract class DBMSProcessor {
 
         StringBuilder insertQuery = new StringBuilder()
                 .append("INSERT INTO ")
-                .append(escape("METADATA"))
+                .append(escape_Table("METADATA"))
                 .append("(")
                 .append(escape("KEY"))
                 .append(", ")

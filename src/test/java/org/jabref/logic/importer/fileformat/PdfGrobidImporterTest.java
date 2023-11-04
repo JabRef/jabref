@@ -35,8 +35,8 @@ public class PdfGrobidImporterTest {
         when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getGrobidPreferences()).thenReturn(grobidPreferences);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
         importer = new PdfGrobidImporter(importFormatPreferences);
     }

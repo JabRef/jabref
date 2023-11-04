@@ -56,6 +56,6 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
         }));
 
         tvResult.setItems(viewModel.copyFilesResultListProperty());
-        tvResult.setColumnResizePolicy((param) -> true);
+        tvResult.setColumnResizePolicy(param -> true);
     }
 }

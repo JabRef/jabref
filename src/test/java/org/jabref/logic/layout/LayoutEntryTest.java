@@ -3,6 +3,7 @@ package org.jabref.logic.layout;
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -62,7 +63,7 @@ public class LayoutEntryTest {
 
     public String layout(String layoutFile, BibEntry entry) throws IOException {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, mock(LayoutFormatterPreferences.class)).getLayoutFromText();
+        Layout layout = new LayoutHelper(sr, mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
         return layout.doLayout(entry, null);
     }

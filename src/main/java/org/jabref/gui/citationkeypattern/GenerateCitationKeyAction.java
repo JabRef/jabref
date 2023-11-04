@@ -54,7 +54,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         checkOverwriteKeysChosen();
 
         if (!this.isCanceled) {
-            BackgroundTask backgroundTask = this.generateKeysInBackground();
+            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground();
             backgroundTask.showToUser(true);
             backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
             backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
@@ -71,8 +71,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     Localization.lang("Overwrite keys"),
                     Localization.lang("Cancel"),
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.storeCitationKeyPatternPreferences(
-                            preferencesService.getCitationKeyPatternPreferences().withWarnBeforeOverwriteCiteKey(!optOut)));
+                    optOut -> preferencesService.getCitationKeyPatternPreferences().setWarnBeforeOverwriteCiteKey(!optOut));
         } else {
             // Always overwrite keys by default
             return true;
@@ -94,8 +93,8 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    private BackgroundTask generateKeysInBackground() {
-        return new BackgroundTask<Void>() {
+    private BackgroundTask<Void> generateKeysInBackground() {
+        return new BackgroundTask<>() {
             private NamedCompound compound;
 
             @Override

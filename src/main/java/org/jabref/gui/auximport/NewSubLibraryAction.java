@@ -11,6 +11,8 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 /**
  * The action concerned with generate a new (sub-)database from latex AUX file.
+ *
+ * A new library is created by {@link org.jabref.gui.importer.NewDatabaseAction}
  */
 public class NewSubLibraryAction extends SimpleCommand {
 

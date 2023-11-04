@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -35,8 +37,8 @@ class PdfMergeMetadataImporterTest {
         when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
-        when(importFormatPreferences.getGrobidPreferences()).thenReturn(grobidPreferences);
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
         importer = new PdfMergeMetadataImporter(importFormatPreferences);
     }

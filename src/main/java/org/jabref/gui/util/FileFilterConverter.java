@@ -27,7 +27,8 @@ public class FileFilterConverter {
     }
 
     public static FileChooser.ExtensionFilter toExtensionFilter(FileType fileType) {
-        String description = Localization.lang("%0 file", fileType.toString());
+        String fileList = String.join(", ", fileType.getExtensionsWithAsteriskAndDot());
+        String description = Localization.lang("%0 file (%1)", fileType.getName(), fileList);
         return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());
     }
 

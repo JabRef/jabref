@@ -44,7 +44,7 @@ public abstract class AbstractQueryTransformer {
                              .map(this::transform)
                              .flatMap(Optional::stream)
                              .collect(Collectors.joining(delimiter, "(", ")"));
-        if (result.equals("()")) {
+        if ("()".equals(result)) {
             return Optional.empty();
         }
         return Optional.of(result);

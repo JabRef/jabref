@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.preferences.JabRefPreferences;
@@ -21,23 +21,23 @@ class CustomEntryTypePreferenceMigration {
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
 
-    private static JabRefPreferences prefs = Globals.prefs;
-
     private CustomEntryTypePreferenceMigration() {
     }
 
-    static void upgradeStoredBibEntryTypes(BibDatabaseMode defaultBibDatabaseMode) {
+    static void upgradeStoredBibEntryTypes(BibDatabaseMode defaultBibDatabaseMode,
+                                           JabRefPreferences preferences,
+                                           BibEntryTypesManager entryTypesManager) {
         List<BibEntryType> storedOldTypes = new ArrayList<>();
 
         int number = 0;
         Optional<BibEntryType> type;
-        while ((type = getBibEntryType(number)).isPresent()) {
-            Globals.entryTypesManager.addCustomOrModifiedType(type.get(), defaultBibDatabaseMode);
+        while ((type = getBibEntryType(number, preferences)).isPresent()) {
+            entryTypesManager.addCustomOrModifiedType(type.get(), defaultBibDatabaseMode);
             storedOldTypes.add(type.get());
             number++;
         }
 
-        prefs.storeCustomEntryTypes(Globals.entryTypesManager);
+        preferences.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
     /**
@@ -45,15 +45,15 @@ class CustomEntryTypePreferenceMigration {
      * <p>
      * (old implementation which has been copied)
      */
-    private static Optional<BibEntryType> getBibEntryType(int number) {
+    private static Optional<BibEntryType> getBibEntryType(int number, JabRefPreferences preferences) {
         String nr = String.valueOf(number);
-        String name = prefs.get(CUSTOM_TYPE_NAME + nr);
+        String name = preferences.get(CUSTOM_TYPE_NAME + nr);
         if (name == null) {
             return Optional.empty();
         }
-        List<String> req = prefs.getStringList(CUSTOM_TYPE_REQ + nr);
-        List<String> opt = prefs.getStringList(CUSTOM_TYPE_OPT + nr);
-        List<String> priOpt = prefs.getStringList(CUSTOM_TYPE_PRIOPT + nr);
+        List<String> req = preferences.getStringList(CUSTOM_TYPE_REQ + nr);
+        List<String> opt = preferences.getStringList(CUSTOM_TYPE_OPT + nr);
+        List<String> priOpt = preferences.getStringList(CUSTOM_TYPE_PRIOPT + nr);
 
         BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
                 .withType(EntryTypeFactory.parse(name))

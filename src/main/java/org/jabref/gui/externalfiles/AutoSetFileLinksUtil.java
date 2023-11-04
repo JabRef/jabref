@@ -23,7 +23,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -127,7 +126,7 @@ public class AutoSetFileLinksUtil {
                                              });
 
             if (!fileAlreadyLinked) {
-                Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
+                Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
                                                             .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 

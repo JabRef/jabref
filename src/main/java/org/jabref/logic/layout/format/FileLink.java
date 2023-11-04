@@ -14,11 +14,13 @@ import org.jabref.model.entry.LinkedFile;
  */
 public class FileLink implements ParamLayoutFormatter {
 
-    private final FileLinkPreferences prefs;
+    private final List<Path> fileDirectories;
+    private final String mainFileDirectory;
     private String fileType;
 
-    public FileLink(FileLinkPreferences fileLinkPreferences) {
-        this.prefs = fileLinkPreferences;
+    public FileLink(List<Path> fileDirectories, String mainFileDirectory) {
+        this.fileDirectories = fileDirectories;
+        this.mainFileDirectory = mainFileDirectory;
     }
 
     @Override
@@ -50,14 +52,10 @@ public class FileLink implements ParamLayoutFormatter {
         }
 
         List<Path> dirs;
-        // We need to resolve the file directory from the database's metadata,
-        // but that is not available from a formatter. Therefore, as an
-        // ugly hack, the export routine has set a global variable before
-        // starting the export, which contains the database's file directory:
-        if (prefs.getFileDirForDatabase() == null) {
-            dirs = Collections.singletonList(Path.of(prefs.getMainFileDirectory()));
+        if (fileDirectories.isEmpty()) {
+            dirs = Collections.singletonList(Path.of(mainFileDirectory));
         } else {
-            dirs = prefs.getFileDirForDatabase();
+            dirs = fileDirectories;
         }
 
         return link.findIn(dirs)

@@ -20,6 +20,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -42,8 +43,8 @@ class DBMSProcessorTest {
     @BeforeEach
     public void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType));
+        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
         TestManager.clearTables(this.dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }
@@ -90,7 +91,7 @@ class DBMSProcessorTest {
             }
         }
 
-        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
+        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
@@ -308,6 +309,7 @@ class DBMSProcessorTest {
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;", dbmsConnection, dbmsProcessor);
+        insertMetaData("VersionDBStructure", "1", dbmsConnection, dbmsProcessor);
 
         Map<String, String> expectedMetaData = getMetaDataExample();
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
@@ -332,6 +334,7 @@ class DBMSProcessorTest {
         expectedMetaData.put("protectedFlag", "true;");
         expectedMetaData.put("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;");
         expectedMetaData.put("saveOrderConfig", "specified;author;false;title;false;year;true;");
+        expectedMetaData.put("VersionDBStructure", "1");
 
         return expectedMetaData;
     }
@@ -415,15 +418,15 @@ class DBMSProcessorTest {
         }
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
                                                                     .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
-                                                                            (bibEntry) -> bibEntry.getFieldMap().entrySet().stream()
-                                                                                                  .collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue))));
+                                                                            bibEntry -> bibEntry.getFieldMap().entrySet().stream()
+                                                                                                  .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
 
     private ResultSet selectFrom(String table, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
         try {
-            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape(table, dbmsProcessor));
+            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape_Table(table, dbmsProcessor));
         } catch (SQLException e) {
             fail(e.getMessage());
             return null;
@@ -433,17 +436,19 @@ class DBMSProcessorTest {
     // Oracle does not support multiple tuple insertion in one INSERT INTO command.
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
-        try {
-            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape("METADATA", dbmsProcessor) + "("
+        Assertions.assertDoesNotThrow(() -> {
+            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA", dbmsProcessor) + "("
                     + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        });
     }
 
     private static String escape(String expression, DBMSProcessor dbmsProcessor) {
         return dbmsProcessor.escape(expression);
+    }
+
+    private static String escape_Table(String expression, DBMSProcessor dbmsProcessor) {
+        return dbmsProcessor.escape_Table(expression);
     }
 
     private static String escapeValue(String value) {

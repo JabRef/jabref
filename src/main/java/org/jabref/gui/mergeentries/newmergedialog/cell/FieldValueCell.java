@@ -26,6 +26,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -46,10 +47,11 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
+    private final PreferencesService preferencesService;
+
+    private final ActionFactory factory;
+
     private final StyleClassedTextArea label = new StyleClassedTextArea();
-
-    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-
     private final VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<>(label);
     HBox labelBox = new HBox(scrollPane);
 
@@ -57,14 +59,20 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private final HBox actionsContainer = new HBox();
     private final FieldValueCellViewModel viewModel;
 
-    public FieldValueCell(String text, int rowIndex) {
+    public FieldValueCell(String text, int rowIndex, PreferencesService preferencesService) {
         super(text, rowIndex);
-        viewModel = new FieldValueCellViewModel(text);
+
+        this.preferencesService = preferencesService;
+        this.factory = new ActionFactory(Globals.getKeyPrefs());
+        this.viewModel = new FieldValueCellViewModel(text);
+
         EasyBind.listen(viewModel.selectedProperty(), (observable, old, isSelected) -> {
             pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected);
             getToggleGroup().selectToggle(FieldValueCell.this);
         });
+
         viewModel.fieldValueProperty().bind(textProperty());
+
         initialize();
     }
 
@@ -123,7 +131,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
         copyIcon.getStyleClass().add("action-icon");
 
-        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(Globals.prefs, getText()));
+        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(preferencesService, getText()));
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);
@@ -136,7 +144,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         Node openLinkIcon = IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode();
         openLinkIcon.getStyleClass().add("action-icon");
 
-        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText()));
+        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), preferencesService.getFilePreferences()));
         openLinkButton.setGraphic(openLinkIcon);
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         openLinkButton.setMaxHeight(Double.MAX_VALUE);
@@ -153,9 +161,9 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     private void preventTextSelectionViaMouseEvents() {
         label.addEventFilter(MouseEvent.ANY, e -> {
-            if (e.getEventType() == MouseEvent.MOUSE_DRAGGED ||
-                    e.getEventType() == MouseEvent.DRAG_DETECTED ||
-                    e.getEventType() == MouseEvent.MOUSE_ENTERED) {
+            if ((e.getEventType() == MouseEvent.MOUSE_DRAGGED) ||
+                    (e.getEventType() == MouseEvent.DRAG_DETECTED) ||
+                    (e.getEventType() == MouseEvent.MOUSE_ENTERED)) {
                 e.consume();
             } else if (e.getEventType() == MouseEvent.MOUSE_PRESSED) {
                 if (e.getClickCount() > 1) {

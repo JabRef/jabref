@@ -77,11 +77,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
                 switch (event) {
                     case XMLStreamConstants.START_ELEMENT:
-                        if (streamReader.getName().toString().equals("Count")) {
+                        if ("Count".equals(streamReader.getName().toString())) {
                             firstOccurrenceOfCount = true;
                         }
 
-                        if (streamReader.getName().toString().equals("IdList")) {
+                        if ("IdList".equals(streamReader.getName().toString())) {
                             fetchIDs = true;
                         }
                         break;
@@ -99,7 +99,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
                     case XMLStreamConstants.END_ELEMENT:
                         // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-                        if (streamReader.getName().toString().equals("IdList")) {
+                        if ("IdList".equals(streamReader.getName().toString())) {
                             break fetchLoop;
                         }
                 }

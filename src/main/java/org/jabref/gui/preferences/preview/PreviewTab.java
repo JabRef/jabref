@@ -131,6 +131,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
         availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
+        availableListView.setOnMouseClicked(this::mouseClickedAvailable);
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setPreviewLayout(newValue));
@@ -145,6 +146,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
         chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
+        chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setPreviewLayout(newValue));
@@ -154,7 +156,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
@@ -274,5 +276,19 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     public void resetDefaultButtonAction() {
         viewModel.resetDefaultLayout();
+    }
+
+    private void mouseClickedAvailable(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            viewModel.addToChosen();
+            event.consume();
+        }
+    }
+
+    private void mouseClickedChosen(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            viewModel.removeFromChosen();
+            event.consume();
+        }
     }
 }

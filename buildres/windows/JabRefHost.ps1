@@ -38,10 +38,9 @@ try {
     [IO.File]::WriteAllLines($tempfile, $messageText)
     $output = & $jabRefExe -importToOpen $tempfile *>&1
     Remove-Item $tempfile
-    # For debugging: uncomment the following lines to get the output of JabRef be displayed as a popup
-    #$output = "$messageText"
+    # For debugging: uncomment the following lines to get the output of JabRef be displayed as a popup 
     #$wshell = New-Object -ComObject Wscript.Shell
-    #$wshell.Popup($output,0,"JabRef", 0x0 + 0x30)
+    #$wshell.Popup("Input: $messageText; Output: $output", 0, "JabRef", 0x0 + 0x30)
     return Respond @{message="ok"; output="$output"}
 } 
 catch {

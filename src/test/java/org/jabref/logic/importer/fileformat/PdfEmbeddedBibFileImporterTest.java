@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -21,12 +23,11 @@ import static org.mockito.Mockito.when;
 class PdfEmbeddedBibFileImporterTest {
 
     private PdfEmbeddedBibFileImporter importer;
-    private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() {
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
     }
 

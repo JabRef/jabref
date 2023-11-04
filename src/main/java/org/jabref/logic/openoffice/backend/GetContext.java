@@ -19,7 +19,6 @@ public class GetContext {
      * <p>
      * The actual context may be smaller than requested.
      *
-     * @param cursor
      * @param charBefore Number of characters requested.
      * @param charAfter  Number of characters requested.
      * @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
@@ -67,9 +66,9 @@ public class GetContext {
 
         String result = cursor.getString();
         if (htmlMarkup) {
-            result = (result.substring(0, addedBefore)
+            result = result.substring(0, addedBefore)
                     + "<b>" + citPart + "</b>"
-                    + result.substring(lengthWithBefore));
+                    + result.substring(lengthWithBefore);
         }
         return result.trim();
     }

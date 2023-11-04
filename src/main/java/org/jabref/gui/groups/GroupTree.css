@@ -18,11 +18,11 @@
 }
 
 .numberColumn > .hits {
-    -fx-font-size: 85%;
+    -fx-font-size: 0.75em;
     -fx-background-color: -jr-group-hits-bg;
     -fx-padding: 0.4em 0.4em 0.4em 0.4em;
     -fx-background-insets: 0;
-    -fx-background-radius: 0.8em;
+    -fx-background-radius: 0.7em;
 }
 
 .numberColumn > .hits .text {

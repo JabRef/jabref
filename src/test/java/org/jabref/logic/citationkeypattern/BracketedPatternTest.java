@@ -3,6 +3,7 @@ package org.jabref.logic.citationkeypattern;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
@@ -10,14 +11,21 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
+ */
+@Execution(ExecutionMode.CONCURRENT)
 class BracketedPatternTest {
 
     private BibEntry bibentry;
@@ -46,6 +54,265 @@ class BracketedPatternTest {
 
         database = new BibDatabase();
         database.insertEntry(dbentry);
+    }
+
+    static Stream<Arguments> allAuthors() {
+        return Stream.of(
+                Arguments.of("ArtemenkoEtAl", "Alexander Artemenko and others"),
+                Arguments.of("AachenEtAl", "Aachen and others"),
+                Arguments.of("AachenBerlinEtAl", "Aachen and Berlin and others"),
+                Arguments.of("AachenBerlinChemnitzEtAl", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("AachenBerlinChemnitzDüsseldorf", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("AachenBerlinChemnitzDüsseldorfEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("AachenBerlinChemnitzDüsseldorfEssen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("AachenBerlinChemnitzDüsseldorfEssenEtAl", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void allAuthors(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.allAuthors(list));
+    }
+
+    static Stream<Arguments> authorsAlpha() {
+        return Stream.of(
+                Arguments.of("A+", "Alexander Artemenko and others"),
+                Arguments.of("A+", "Aachen and others"),
+                Arguments.of("AB+", "Aachen and Berlin and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authorsAlpha(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authorsAlpha(list));
+    }
+
+    /**
+     * Tests [authorIni]
+     */
+    static Stream<Arguments> oneAuthorPlusInitials() {
+        return Stream.of(
+                Arguments.of("Aalst", "Wil van der Aalst"),
+                Arguments.of("AalstL", "Wil van der Aalst and Tammo van Lessen"),
+                Arguments.of("Newto", "I. Newton"),
+                Arguments.of("NewtoM", "I. Newton and J. Maxwell"),
+                Arguments.of("NewtoME", "I. Newton and J. Maxwell and A. Einstein"),
+                Arguments.of("NewtoMEB", "I. Newton and J. Maxwell and A. Einstein and N. Bohr"),
+                Arguments.of("NewtoMEBU", "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown"),
+                Arguments.of("Aache+", "Aachen and others"),
+                Arguments.of("AacheB", "Aachen and Berlin"),
+                Arguments.of("AacheB+", "Aachen and Berlin and others"),
+                Arguments.of("AacheBC", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("AacheBC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("AacheBCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("AacheBCD+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("AacheBCDE", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void oneAuthorPlusInitials(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.oneAuthorPlusInitials(list));
+    }
+
+    static Stream<Arguments> authShort() {
+        return Stream.of(
+                Arguments.of("Newton", "Isaac Newton"),
+                Arguments.of("NM", "Isaac Newton and James Maxwell"),
+                Arguments.of("NME", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("NME+", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("Aachen", "Aachen"),
+                Arguments.of("A+", "Aachen and others"),
+                Arguments.of("AB", "Aachen and Berlin"),
+                Arguments.of("AB+", "Aachen and Berlin and others"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authIni1(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 1));
+    }
+
+    static Stream<Arguments> authIni1() {
+        return Stream.of(
+                Arguments.of("N", "Isaac Newton"),
+                Arguments.of("N", "Isaac Newton and James Maxwell"),
+                Arguments.of("N", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("N", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("A", "Aachen"),
+                Arguments.of("A", "Aachen and others"),
+                Arguments.of("A", "Aachen and Berlin"),
+                Arguments.of("A", "Aachen and Berlin and others"),
+                Arguments.of("A", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("A", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authIni2(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 2));
+    }
+
+    static Stream<Arguments> authIni2() {
+        return Stream.of(
+                Arguments.of("Ne", "Isaac Newton"),
+                Arguments.of("NM", "Isaac Newton and James Maxwell"),
+                Arguments.of("N+", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("N+", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("Aa", "Aachen"),
+                Arguments.of("A+", "Aachen and others"),
+                Arguments.of("AB", "Aachen and Berlin"),
+                Arguments.of("A+", "Aachen and Berlin and others"),
+                Arguments.of("A+", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("D+", "John Doe and Donald Smith and Will Wonder"),
+                Arguments.of("A+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authIni4(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 4));
+    }
+
+    static Stream<Arguments> authIni4() {
+        return Stream.of(
+                Arguments.of("Newt", "Isaac Newton"),
+                Arguments.of("NeMa", "Isaac Newton and James Maxwell"),
+                Arguments.of("NeME", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("NMEB", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("Aach", "Aachen"),
+                Arguments.of("Aac+", "Aachen and others"),
+                Arguments.of("AaBe", "Aachen and Berlin"),
+                Arguments.of("AaB+", "Aachen and Berlin and others"),
+                Arguments.of("AaBC", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authEtAlDotDotEal(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authEtal(list, ".", ".etal"));
+    }
+
+    static Stream<Arguments> authEtAlDotDotEal() {
+        return Stream.of(
+                Arguments.of("Newton", "Isaac Newton"),
+                Arguments.of("Newton.Maxwell", "Isaac Newton and James Maxwell"),
+                Arguments.of("Newton.etal", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("Newton.etal", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("Aachen", "Aachen"),
+                Arguments.of("Aachen.etal", "Aachen and others"),
+                Arguments.of("Aachen.Berlin", "Aachen and Berlin"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and others"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("Aachen.etal", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authAuthEa(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authAuthEa(list));
+    }
+
+    static Stream<Arguments> authAuthEa() {
+        return Stream.of(
+                Arguments.of("Newton", "Isaac Newton"),
+                Arguments.of("Newton.Maxwell", "Isaac Newton and James Maxwell"),
+                Arguments.of("Newton.Maxwell.ea", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("Newton.Maxwell.ea", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("Aachen", "Aachen"),
+                Arguments.of("Aachen.ea", "Aachen and others"),
+                Arguments.of("Aachen.Berlin", "Aachen and Berlin"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and others"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("Aachen.Berlin.ea", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authShort(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authShort(list));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'Newton', '[auth]', 'Isaac Newton'",
+            "'Newton', '[authFirstFull]', 'Isaac Newton'",
+            "'I', '[authForeIni]', 'Isaac Newton'",
+            "'Newton', '[auth.etal]', 'Isaac Newton'",
+            "'Newton', '[authEtAl]', 'Isaac Newton'",
+            "'Newton', '[auth.auth.ea]', 'Isaac Newton'",
+            "'Newton', '[authors]', 'Isaac Newton'",
+            "'Newton', '[authors2]', 'Isaac Newton'",
+            "'Ne', '[authIni2]', 'Isaac Newton'",
+            "'New', '[auth3]', 'Isaac Newton'",
+            "'New', '[auth3_1]', 'Isaac Newton'",
+            "'Newton', '[authshort]', 'Isaac Newton'",
+            "'New', '[authorsAlpha]', 'Isaac Newton'",
+            "'Newton', '[authorLast]', 'Isaac Newton'",
+            "'I', '[authorLastForeIni]', 'Isaac Newton'",
+
+            "'Agency', '[authors]', 'European Union Aviation Safety Agency'",
+            "'EUASA', '[authors]', '{European Union Aviation Safety Agency}'"
+    })
+    void testAuthorFieldMarkers(String expectedCitationKey, String pattern, String author) {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, author);
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
+        assertEquals(expectedCitationKey, bracketedPattern.expand(bibEntry));
+    }
+
+    private static Stream<Arguments> expandBracketsWithFallback() {
+        return Stream.of(
+                Arguments.of("auth", "[title:(auth)]"),
+                Arguments.of("auth2021", "[title:(auth[YEAR])]"),
+                Arguments.of("not2021", "[title:(not[YEAR])]"),
+                Arguments.of("", "[title:([YEAR)]"),
+                Arguments.of(")]", "[title:(YEAR])]"),
+                Arguments.of("2105.02891", "[title:([EPRINT:([YEAR])])]"),
+                Arguments.of("2021", "[title:([auth:([YEAR])])]")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource()
+    void expandBracketsWithFallback(String expandResult, String pattern) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021").withField(StandardField.EPRINT, "2105.02891");
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
+
+        assertEquals(expandResult, bracketedPattern.expand(bibEntry));
     }
 
     @Test
@@ -348,18 +615,19 @@ class BracketedPatternTest {
 
     @Test
     void expandBracketsWithTestCasesFromRegExpBasedFileFinder() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("HipKro03");
-        entry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
-        entry.setField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
-        entry.setField(StandardField.JOURNAL, "Organization Science");
-        entry.setField(StandardField.YEAR, "2003");
-        entry.setField(StandardField.VOLUME, "14");
-        entry.setField(StandardField.PAGES, "209--223");
-        entry.setField(StandardField.NUMBER, "2");
-        entry.setField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
-        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
-        entry.setField(StandardField.ISSN, "1526-5455");
-        entry.setField(StandardField.PUBLISHER, "INFORMS");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("HipKro03")
+                .withField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh")
+                .withField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science")
+                .withField(StandardField.JOURNAL, "Organization Science")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.VOLUME, "14")
+                .withField(StandardField.PAGES, "209--223")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA")
+                .withField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992")
+                .withField(StandardField.ISSN, "1526-5455")
+                .withField(StandardField.PUBLISHER, "INFORMS");
 
         BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
@@ -394,24 +662,25 @@ class BracketedPatternTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideArgumentsForFallback")
-    void expandBracketsWithFallback(String expandResult, String pattern) {
-        BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.YEAR, "2021").withField(StandardField.EPRINT, "2105.02891");
+    @CsvSource({
+            "'Newton', '[edtr]', 'Isaac Newton'",
+            "'I', '[edtrForeIni]', 'Isaac Newton'",
+            "'Newton', '[editors]', 'Isaac Newton'",
+            "'Ne', '[edtrIni2]', 'Isaac Newton'",
+            "'New', '[edtr3]', 'Isaac Newton'",
+            "'Newton', '[edtr7]', 'Isaac Newton'",
+            "'New', '[edtr3_1]', 'Isaac Newton'",
+            "'Newton.Maxwell', '[edtr.edtr.ea]', 'Isaac Newton and James Maxwell'",
+            "'Newton', '[edtrshort]', 'Isaac Newton'",
+            "'Newton', '[editorLast]', 'Isaac Newton'",
+            "'I', '[editorLastForeIni]', 'Isaac Newton'",
+
+            "'EUASA', '[editors]', '{European Union Aviation Safety Agency}'"
+    })
+
+    void testEditorFieldMarkers(String expectedCitationKey, String pattern, String editor) {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.EDITOR, editor);
         BracketedPattern bracketedPattern = new BracketedPattern(pattern);
-
-        assertEquals(expandResult, bracketedPattern.expand(bibEntry));
-    }
-
-    private static Stream<Arguments> provideArgumentsForFallback() {
-        return Stream.of(
-                Arguments.of("auth", "[title:(auth)]"),
-                Arguments.of("auth2021", "[title:(auth[YEAR])]"),
-                Arguments.of("not2021", "[title:(not[YEAR])]"),
-                Arguments.of("", "[title:([YEAR)]"),
-                Arguments.of(")]", "[title:(YEAR])]"),
-                Arguments.of("2105.02891", "[title:([EPRINT:([YEAR])])]"),
-                Arguments.of("2021", "[title:([auth:([YEAR])])]")
-        );
+        assertEquals(expectedCitationKey, bracketedPattern.expand(bibEntry));
     }
 }

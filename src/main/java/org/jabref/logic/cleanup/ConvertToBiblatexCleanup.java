@@ -21,7 +21,7 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
-        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
+        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.entrySet()) {
             Field oldField = alias.getKey();
             Field newField = alias.getValue();
             entry.getField(oldField).ifPresent(oldValue -> {

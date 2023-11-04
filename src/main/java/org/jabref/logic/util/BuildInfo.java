@@ -64,7 +64,7 @@ public final class BuildInfo {
                                 // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gradle
                                 .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
                                 .orElse("");
-        if (!result.equals("")) {
+        if (!"".equals(result)) {
             return result;
         }
         return defaultValue;

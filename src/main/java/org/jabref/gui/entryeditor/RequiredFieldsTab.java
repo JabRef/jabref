@@ -28,6 +28,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
 
+    public static final String NAME = "Required fields";
     private final BibEntryTypesManager entryTypesManager;
 
     public RequiredFieldsTab(BibDatabaseContext databaseContext,
@@ -44,7 +45,6 @@ public class RequiredFieldsTab extends FieldsEditorTab {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService,
                 preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
-
         setText(Localization.lang("Required fields"));
         setTooltip(new Tooltip(Localization.lang("Show required fields")));
         setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
@@ -56,7 +56,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
         Set<Field> fields = new LinkedHashSet<>();
         if (entryType.isPresent()) {
             for (OrFields orFields : entryType.get().getRequiredFields()) {
-                fields.addAll(orFields);
+                fields.addAll(orFields.getFields());
             }
             // Add the edit field for Bibtex-key.
             fields.add(InternalField.KEY_FIELD);

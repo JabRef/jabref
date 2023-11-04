@@ -10,10 +10,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.PreferencesService;
 
 public class CitationKeyPatternPanelViewModel {
 
@@ -37,10 +37,10 @@ public class CitationKeyPatternPanelViewModel {
     private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    private final PreferencesService preferences;
+    private final CitationKeyPatternPreferences keyPatternPreferences;
 
-    public CitationKeyPatternPanelViewModel(PreferencesService preferences) {
-        this.preferences = preferences;
+    public CitationKeyPatternPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
+        this.keyPatternPreferences = keyPatternPreferences;
     }
 
     public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
@@ -69,12 +69,12 @@ public class CitationKeyPatternPanelViewModel {
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
-        item.setPattern(preferences.getDefaultsDefaultCitationKeyPattern());
+        item.setPattern(keyPatternPreferences.getDefaultPattern());
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern(preferences.getDefaultsDefaultCitationKeyPattern());
+        defaultItemProperty.getValue().setPattern(keyPatternPreferences.getDefaultPattern());
     }
 
     public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {

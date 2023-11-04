@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,14 +55,18 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @BeforeAll
     static void setUp() {
-        importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         // Used during DOI fetch process
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
-                new FieldContentFormatterPreferences(
-                        Arrays.stream("pdf;ps;url;doi;file;isbn;issn".split(";"))
-                              .map(fieldName -> StandardField.fromName(fieldName).isPresent() ? StandardField.fromName(fieldName).get() : new UnknownField(fieldName))
-                              .collect(Collectors.toList())));
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
+                FXCollections.observableArrayList(List.of(
+                        StandardField.PDF,
+                        StandardField.PS,
+                        StandardField.URL,
+                        StandardField.DOI,
+                        StandardField.FILE,
+                        StandardField.ISBN,
+                        StandardField.ISSN)));
     }
 
     @BeforeEach
@@ -104,6 +110,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.DOI, "10.48550/ARXIV.1811.10364");
 
         // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
+        // FixMe: Test this BibEntry
         completePaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
@@ -175,7 +182,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getInputTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
@@ -192,9 +199,9 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
-        assertTrue(result.isEmpty());
+        assertEquals(List.of(), result);
     }
 
     @Test

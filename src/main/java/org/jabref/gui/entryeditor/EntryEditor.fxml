@@ -48,6 +48,14 @@
                     <Tooltip text="%Generate citation key"/>
                 </tooltip>
             </Button>
+            <Button styleClass="icon-button,narrow" onAction="#generateCleanupButton">
+                <graphic>
+                    <JabRefIconView glyph="CLEANUP_ENTRIES"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Cleanup entry"/>
+                </tooltip>
+            </Button>
             <Button fx:id="fetcherButton" styleClass="icon-button,narrow">
                 <graphic>
                     <JabRefIconView glyph="REFRESH"/>

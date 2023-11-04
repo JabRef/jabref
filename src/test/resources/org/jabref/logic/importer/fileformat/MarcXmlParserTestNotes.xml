@@ -1,0 +1,122 @@
+<zs:searchRetrieveResponse>
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <record>
+                    <leader>01672nma a2200349 c 4500</leader>
+                    <controlfield tag="001">BV049029767</controlfield>
+                    <controlfield tag="003">DE-604</controlfield>
+                    <controlfield tag="005">00000000000000.0</controlfield>
+                    <controlfield tag="007">cr|uuu---uuuuu</controlfield>
+                    <controlfield tag="008">230702s2023 |||| o||u| ||||||fre d</controlfield>
+                    <datafield tag="040" ind1=" " ind2=" ">
+                        <subfield code="a">DE-604</subfield>
+                        <subfield code="b">ger</subfield>
+                        <subfield code="e">rda</subfield>
+                    </datafield>
+                    <datafield tag="100" ind1="1" ind2=" ">
+                        <subfield code="a">Sarda, Marie-Anne</subfield>
+                        <subfield code="e">Verfasser</subfield>
+                        <subfield code="0">(DE-588)174386958</subfield>
+                        <subfield code="4">aut</subfield>
+                    </datafield>
+                    <datafield tag="245" ind1="1" ind2="0">
+                        <subfield code="a">Livres de secrets, traités de teinture, journaux de laboratoire ou carnets de notes</subfield>
+                        <subfield code="b">quelles sources pour l'étude de la couleur dans le textile? = Books of secrets, dyeing treatises, laboratory journals or notebooks : what sources can be used for studying colour in textiles?</subfield>
+                        <subfield code="c">Marie-Anne Sarda et Caroline Eude-Devaux</subfield>
+                    </datafield>
+                    <datafield tag="246" ind1="1" ind2="1">
+                        <subfield code="a">Books of secrets, dyeing treatises, laboratory journals or notebooks</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="c">26 juin 2023</subfield>
+                    </datafield>
+                    <datafield tag="300" ind1=" " ind2=" ">
+                        <subfield code="a">Online-Ressource (26 Seiten)</subfield>
+                        <subfield code="b">14 Illustrationen</subfield>
+                    </datafield>
+                    <datafield tag="546" ind1=" " ind2=" ">
+                        <subfield code="a">Text französisch. - Zusammenfassung in englischer Sprache</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Eude-Devaux, Caroline</subfield>
+                        <subfield code="e">Verfasser</subfield>
+                        <subfield code="0">(DE-588)1230640940</subfield>
+                        <subfield code="4">aut</subfield>
+                    </datafield>
+                    <datafield tag="024" ind1="7" ind2=" ">
+                        <subfield code="a">10.4000/insitu.38769</subfield>
+                        <subfield code="2">doi</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(OCoLC)1389175862</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(DE-599)BVBBV049029767</subfield>
+                    </datafield>
+                    <datafield tag="041" ind1="0" ind2=" ">
+                        <subfield code="a">fre</subfield>
+                    </datafield>
+                    <datafield tag="049" ind1=" " ind2=" ">
+                        <subfield code="a">DE-Y3</subfield>
+                        <subfield code="a">DE-255</subfield>
+                        <subfield code="a">DE-Y7</subfield>
+                        <subfield code="a">DE-Y2</subfield>
+                    </datafield>
+                    <datafield tag="336" ind1=" " ind2=" ">
+                        <subfield code="b">txt</subfield>
+                        <subfield code="2">rdacontent</subfield>
+                    </datafield>
+                    <datafield tag="337" ind1=" " ind2=" ">
+                        <subfield code="b">c</subfield>
+                        <subfield code="2">rdamedia</subfield>
+                    </datafield>
+                    <datafield tag="338" ind1=" " ind2=" ">
+                        <subfield code="b">cr</subfield>
+                        <subfield code="2">rdacarrier</subfield>
+                    </datafield>
+                    <datafield tag="773" ind1="1" ind2="8">
+                        <subfield code="g">volume:50</subfield>
+                        <subfield code="g">year:2023</subfield>
+                    </datafield>
+                    <datafield tag="773" ind1="0" ind2="8">
+                        <subfield code="t">In situ</subfield>
+                        <subfield code="d">Paris, 2023</subfield>
+                        <subfield code="g">50 (2023)</subfield>
+                        <subfield code="w">(DE-604)BV017789122</subfield>
+                        <subfield code="x">1630-7305</subfield>
+                        <subfield code="o">(DE-600)2132615-0</subfield>
+                    </datafield>
+                    <datafield tag="856" ind1="4" ind2="0">
+                        <subfield code="q">application/pdf</subfield>
+                        <subfield code="u">https://journals.openedition.org/insitu/pdf/38769</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="z">kostenfrei</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="856" ind1="4" ind2="0">
+                        <subfield code="u">https://doi.org/10.4000/insitu.38769</subfield>
+                        <subfield code="x">Resolving-System</subfield>
+                        <subfield code="z">kostenfrei</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="856" ind1="4" ind2="0">
+                        <subfield code="u">https://journals.openedition.org/insitu/38769</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="z">kostenfrei</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="941" ind1=" " ind2=" ">
+                        <subfield code="b">50</subfield>
+                        <subfield code="j">2023</subfield>
+                    </datafield>
+                </record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

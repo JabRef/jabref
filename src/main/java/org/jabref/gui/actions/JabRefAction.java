@@ -4,7 +4,7 @@ import java.util.Map;
 
 import javafx.beans.binding.Bindings;
 
-import org.jabref.gui.Globals;
+import org.jabref.gui.Telemetry;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
@@ -47,8 +47,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
 
         disabledProperty().bind(command.executableProperty().not());
 
-        if (command instanceof SimpleCommand) {
-            SimpleCommand ourCommand = (SimpleCommand) command;
+        if (command instanceof SimpleCommand ourCommand) {
             longTextProperty().bind(Bindings.concat(action.getDescription(), ourCommand.statusMessageProperty()));
         }
     }
@@ -71,12 +70,12 @@ class JabRefAction extends org.controlsfx.control.action.Action {
     }
 
     private void trackExecute(String actionName) {
-        Globals.getTelemetryClient()
-               .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName));
+        Telemetry.getTelemetryClient()
+                 .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName));
     }
 
     private void trackUserActionSource(String actionName, Sources source) {
-        Globals.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(
+        Telemetry.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(
                 actionName,
                 Map.of("Source", source.toString()),
                 Map.of()));

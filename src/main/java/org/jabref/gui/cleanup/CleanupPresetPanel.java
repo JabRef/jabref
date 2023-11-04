@@ -27,6 +27,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private Label cleanupRenamePDFLabel;
     @FXML private CheckBox cleanUpDOI;
     @FXML private CheckBox cleanUpEprint;
+    @FXML private CheckBox cleanUpURL;
     @FXML private CheckBox cleanUpISSN;
     @FXML private CheckBox cleanUpMovePDF;
     @FXML private CheckBox cleanUpMakePathsRelative;
@@ -100,6 +101,7 @@ public class CleanupPresetPanel extends VBox {
     private void updateDisplay(CleanupPreferences preset) {
         cleanUpDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
         cleanUpEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
+        cleanUpURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
         if (!cleanUpMovePDF.isDisabled()) {
             cleanUpMovePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
         }
@@ -128,6 +130,9 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpEprint.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);
+        }
+        if (cleanUpURL.isSelected()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
         }
         if (cleanUpISSN.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);

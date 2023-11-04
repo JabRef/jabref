@@ -64,6 +64,12 @@ public class KeywordListTest {
     }
 
     @Test
+    public void parseTakeDelimiterNotRegexWhite() throws Exception {
+        assertEquals(new KeywordList("keywordOne keywordTwo", "keywordThree"),
+                KeywordList.parse("keywordOne keywordTwoskeywordThree", 's'));
+    }
+
+    @Test
     public void parseWordsWithBracketsReturnsOneKeyword() throws Exception {
         assertEquals(new KeywordList("[a] keyword"), KeywordList.parse("[a] keyword", ','));
     }

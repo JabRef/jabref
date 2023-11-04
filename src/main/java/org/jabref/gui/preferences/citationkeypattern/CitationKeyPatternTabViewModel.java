@@ -10,13 +10,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
-import org.jabref.preferences.PreferencesService;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
@@ -36,28 +34,24 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new CitationKeyPatternPanelItemModel(new CitationKeyPatternPanelViewModel.DefaultEntryType(), ""));
 
-    private final DialogService dialogService;
-    private final PreferencesService preferences;
-    private final CitationKeyPatternPreferences initialCitationKeyPatternPreferences;
+    private final CitationKeyPatternPreferences keyPatternPreferences;
 
-    public CitationKeyPatternTabViewModel(DialogService dialogService, PreferencesService preferences) {
-        this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.initialCitationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
+    public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
+        this.keyPatternPreferences = keyPatternPreferences;
     }
 
     @Override
     public void setValues() {
-        overwriteAllowProperty.setValue(!initialCitationKeyPatternPreferences.shouldAvoidOverwriteCiteKey());
-        overwriteWarningProperty.setValue(initialCitationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
-        generateOnSaveProperty.setValue(initialCitationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
+        overwriteAllowProperty.setValue(!keyPatternPreferences.shouldAvoidOverwriteCiteKey());
+        overwriteWarningProperty.setValue(keyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
+        generateOnSaveProperty.setValue(keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
 
-        if (initialCitationKeyPatternPreferences.getKeySuffix()
+        if (keyPatternPreferences.getKeySuffix()
                 == CitationKeyPatternPreferences.KeySuffix.ALWAYS) {
             letterAlwaysAddProperty.setValue(true);
             letterStartAProperty.setValue(false);
             letterStartBProperty.setValue(false);
-        } else if (initialCitationKeyPatternPreferences.getKeySuffix()
+        } else if (keyPatternPreferences.getKeySuffix()
                 == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A) {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(true);
@@ -68,15 +62,15 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
             letterStartBProperty.setValue(true);
         }
 
-        keyPatternRegexProperty.setValue(initialCitationKeyPatternPreferences.getKeyPatternRegex());
-        keyPatternReplacementProperty.setValue(initialCitationKeyPatternPreferences.getKeyPatternReplacement());
-        unwantedCharactersProperty.setValue(initialCitationKeyPatternPreferences.getUnwantedCharacters());
+        keyPatternRegexProperty.setValue(keyPatternPreferences.getKeyPatternRegex());
+        keyPatternReplacementProperty.setValue(keyPatternPreferences.getKeyPatternReplacement());
+        unwantedCharactersProperty.setValue(keyPatternPreferences.getUnwantedCharacters());
     }
 
     @Override
     public void storeSettings() {
         GlobalCitationKeyPattern newKeyPattern =
-                new GlobalCitationKeyPattern(initialCitationKeyPatternPreferences.getKeyPattern().getDefaultValue());
+                new GlobalCitationKeyPattern(keyPatternPreferences.getKeyPattern().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!item.getEntryType().getName().equals("default")) {
@@ -100,16 +94,14 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
         }
 
-        preferences.storeCitationKeyPatternPreferences(new CitationKeyPatternPreferences(
-                !overwriteAllowProperty.getValue(),
-                overwriteWarningProperty.getValue(),
-                generateOnSaveProperty.getValue(),
-                keySuffix,
-                keyPatternRegexProperty.getValue(),
-                keyPatternReplacementProperty.getValue(),
-                unwantedCharactersProperty.getValue(),
-                newKeyPattern,
-                initialCitationKeyPatternPreferences.getKeywordDelimiter()));
+        keyPatternPreferences.setAvoidOverwriteCiteKey(!overwriteAllowProperty.getValue());
+        keyPatternPreferences.setWarnBeforeOverwriteCiteKey(overwriteWarningProperty.getValue());
+        keyPatternPreferences.setGenerateCiteKeysBeforeSaving(generateOnSaveProperty.getValue());
+        keyPatternPreferences.setKeySuffix(keySuffix);
+        keyPatternPreferences.setKeyPatternRegex(keyPatternRegexProperty.getValue());
+        keyPatternPreferences.setKeyPatternReplacement(keyPatternReplacementProperty.getValue());
+        keyPatternPreferences.setUnwantedCharacters(unwantedCharactersProperty.getValue());
+        keyPatternPreferences.setKeyPattern(newKeyPattern);
     }
 
     public BooleanProperty overwriteAllowProperty() {

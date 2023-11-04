@@ -200,7 +200,9 @@ public class DOITest {
                 Arguments.of("10/ab123", DOI.findInText("other stuff doi.org/ab123 end").get().getDOI()),
                 Arguments.of("10/76543", DOI.findInText("other stuff www.doi.org/76543 end").get().getDOI()),
                 Arguments.of("10/abcde", DOI.findInText("other stuff https://www.doi.org/abcde end").get().getDOI()),
-                Arguments.of("10/abcde", DOI.findInText("other stuff https://doi.org/abcde end").get().getDOI())
+                Arguments.of("10/abcde", DOI.findInText("other stuff https://doi.org/abcde end").get().getDOI()),
+                Arguments.of("10.5220/0010404301780189", DOI.findInText("https://www.scitepress.org/Link.aspx?doi=10.5220/0010404301780189").get().getDOI()),
+                Arguments.of("10.5220/0010404301780189", DOI.findInText("10.5220/0010404301780189").get().getDOI())
         );
     }
 
@@ -262,6 +264,13 @@ public class DOITest {
     @Test
     public void rejectInvalidDirectoryIndicatorInShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("20/abcd"));
+    }
+
+    @Test
+    public void emptyOrUndescoreOnlyReturnsEmpty() {
+       assertEquals(Optional.empty(), DOI.parse("_"));
+       assertEquals(Optional.empty(), DOI.parse("\t_"));
+       assertEquals(Optional.empty(), DOI.parse("___"));
     }
 
     @Test

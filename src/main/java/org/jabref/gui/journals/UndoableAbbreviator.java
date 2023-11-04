@@ -55,7 +55,7 @@ public class UndoableAbbreviator {
         }
 
         // Store full name into fjournal but only if it exists
-        if (useFJournalField && (StandardField.JOURNAL.equals(fieldName) || StandardField.JOURNALTITLE.equals(fieldName))) {
+        if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
             entry.setField(AMSField.FJOURNAL, abbreviation.getName());
             ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
         }
@@ -69,8 +69,8 @@ public class UndoableAbbreviator {
         switch (abbreviationType) {
             case DEFAULT:
                 return text.getAbbreviation();
-            case MEDLINE:
-                return text.getMedlineAbbreviation();
+            case DOTLESS:
+                return text.getDotlessAbbreviation();
             case SHORTEST_UNIQUE:
                 return text.getShortestUniqueAbbreviation();
             default:

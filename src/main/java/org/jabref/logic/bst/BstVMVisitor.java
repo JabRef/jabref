@@ -1,13 +1,13 @@
 package org.jabref.logic.bst;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
@@ -73,7 +73,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitReadCommand(BstParser.ReadCommandContext ctx) {
-        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
+        FieldWriter fieldWriter = new FieldWriter(new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList()));
         for (BstEntry e : bstVMContext.entries()) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
@@ -253,7 +253,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 }
             } catch (BstVMException e) {
                 bstVMContext.path().ifPresentOrElse(
-                        (path) -> LOGGER.error("{} ({})", e.getMessage(), path),
+                        path -> LOGGER.error("{} ({})", e.getMessage(), path),
                         () -> LOGGER.error(e.getMessage()));
                 throw e;
             }

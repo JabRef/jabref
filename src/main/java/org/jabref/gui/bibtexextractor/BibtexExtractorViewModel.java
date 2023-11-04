@@ -10,13 +10,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.Telemetry;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -43,8 +42,7 @@ public class BibtexExtractorViewModel {
                                     FileUpdateMonitor fileUpdateMonitor,
                                     TaskExecutor taskExecutor,
                                     UndoManager undoManager,
-                                    StateManager stateManager,
-                                    ImportFormatReader importFormatReader) {
+                                    StateManager stateManager) {
 
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -56,7 +54,7 @@ public class BibtexExtractorViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader);
+                taskExecutor);
     }
 
     public StringProperty inputTextProperty() {
@@ -81,7 +79,7 @@ public class BibtexExtractorViewModel {
         GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
-                      .onFailure((e) -> {
+                      .onFailure(e -> {
                           if (e instanceof FetcherException) {
                               String msg = Localization.lang("There are connection issues with a JabRef server. Detailed information: %0",
                                       e.getMessage());
@@ -102,6 +100,6 @@ public class BibtexExtractorViewModel {
     private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(eventMessage, properties, new HashMap<>()));
+        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent(eventMessage, properties, new HashMap<>()));
     }
 }

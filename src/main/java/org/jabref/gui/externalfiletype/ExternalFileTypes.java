@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
@@ -112,7 +112,7 @@ public class ExternalFileTypes {
 
     public static Optional<ExternalFileType> getExternalFileTypeByFile(Path file, FilePreferences filePreferences) {
         final String filePath = file.toString();
-        final Optional<String> extension = FileHelper.getFileExtension(filePath);
+        final Optional<String> extension = FileUtil.getFileExtension(filePath);
         return extension.flatMap(ext -> getExternalFileTypeByExt(ext, filePreferences));
     }
 
@@ -128,7 +128,7 @@ public class ExternalFileTypes {
             }
 
             // No type could be found from mime type. Try based on the extension:
-            return FileHelper.getFileExtension(linkedFile.getLink())
+            return FileUtil.getFileExtension(linkedFile.getLink())
                              .flatMap(extension -> getExternalFileTypeByExt(extension, filePreferences));
         } else {
             return type;

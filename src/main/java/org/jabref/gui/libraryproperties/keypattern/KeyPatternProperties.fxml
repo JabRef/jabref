@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel?>
 <fx:root spacing="10.0" type="VBox"
@@ -11,7 +12,7 @@
          fx:controller="org.jabref.gui.libraryproperties.keypattern.KeyPatternPropertiesView">
     <HBox>
         <Label styleClass="sectionHeader" text="%Key patterns"/>
-        <HBox HBox.hgrow="ALWAYS"/>
+        <Region HBox.hgrow="ALWAYS"/>
         <Button fx:id="keyPatternHelp" prefWidth="20.0"/>
     </HBox>
     <Label text="%( Note: Press return to commit changes in the table! )"/>

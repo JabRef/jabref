@@ -177,8 +177,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     private Exception convertToException(Throwable throwable) {
-        if (throwable instanceof Exception) {
-            return (Exception) throwable;
+        if (throwable instanceof Exception exception) {
+            return exception;
         } else {
             return new Exception(throwable);
         }

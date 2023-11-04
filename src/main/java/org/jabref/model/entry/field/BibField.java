@@ -2,23 +2,7 @@ package org.jabref.model.entry.field;
 
 import java.util.Objects;
 
-public class BibField implements Comparable<BibField> {
-
-    private final FieldPriority priority;
-    private final Field field;
-
-    public BibField(Field field, FieldPriority priority) {
-        this.priority = priority;
-        this.field = field;
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    public FieldPriority getPriority() {
-        return priority;
-    }
+public record BibField(Field field, FieldPriority priority) implements Comparable<BibField> {
 
     @Override
     public boolean equals(Object o) {
@@ -40,7 +24,7 @@ public class BibField implements Comparable<BibField> {
     @Override
     public String toString() {
         return "BibField{" +
-                "field=" + field.getName() +
+                "field=" + field.getDisplayName() +
                 ", priority=" + priority +
                 '}';
     }

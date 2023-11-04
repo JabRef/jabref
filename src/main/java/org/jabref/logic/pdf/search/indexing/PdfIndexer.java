@@ -109,7 +109,7 @@ public class PdfIndexer {
             this.databaseContext = databaseContext;
         }
         if (!entry.getFiles().isEmpty()) {
-            writeToIndex(entry, linkedFile);
+            addToIndex(entry, linkedFile);
         }
     }
 
@@ -164,33 +164,22 @@ public class PdfIndexer {
     }
 
     /**
-     * Writes all files linked to an entry to the index if the files are not yet in the index or the files on the fs are
-     * newer than the one in the index.
-     *
-     * @param entry the entry associated with the file
-     */
-    private void writeToIndex(BibEntry entry) {
-        for (LinkedFile linkedFile : entry.getFiles()) {
-            writeToIndex(entry, linkedFile);
-        }
-    }
-
-    /**
      * Writes the file to the index if the file is not yet in the index or the file on the fs is newer than the one in
      * the index.
      *
      * @param entry the entry associated with the file
      * @param linkedFile the file to write to the index
      */
-    private void writeToIndex(BibEntry entry, LinkedFile linkedFile) {
+    private void addToIndex(BibEntry entry, LinkedFile linkedFile) {
         if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
             return;
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
-            LOGGER.warn("Could not find {}", linkedFile.getLink());
+            LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
+        LOGGER.debug("Adding {} to index", linkedFile.getLink());
         try {
             // Check if a document with this path is already in the index
             try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {

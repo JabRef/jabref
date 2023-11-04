@@ -10,8 +10,6 @@ public class MoveGroupChange {
     private int newChildIndex;
 
     /**
-     * @param oldParent
-     * @param oldChildIndex
      * @param newParent     The new parent node to which the node will be moved.
      * @param newChildIndex The child index at newParent to which the node will be moved.
      */

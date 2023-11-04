@@ -23,7 +23,6 @@ import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -40,11 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for finding PDF URLs for entries on IEEE
- * Will first look for URLs of the type https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&]arnumber=...
- * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page
+ * Class for finding PDF URLs for entries on IEEE.
+ * Will first look for URLs of the type <code>https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;]arnumber=...</code>.
+ * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
  *
- * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
+ * @see <a href="https://developer.ieee.org/docs">API documentation</a>
  */
 public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
@@ -214,7 +213,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                     boolean addEntry;
                     // In case entry has no year, add it
                     // In case an entry has a year, check if its in the year range
@@ -250,13 +249,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
+        return importerPreferences.getApiKey(getName()).orElse(API_KEY);
     }
 
     @Override

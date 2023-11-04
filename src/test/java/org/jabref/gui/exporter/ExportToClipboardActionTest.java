@@ -14,23 +14,18 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.GeneralPreferences;
-import org.jabref.preferences.ImportExportPreferences;
+import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -52,11 +47,9 @@ public class ExportToClipboardActionTest {
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final PreferencesService preferences = spy(PreferencesService.class);
-    private final ImportExportPreferences importExportPrefs = mock(ImportExportPreferences.class);
+    private final PreferencesService preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
     private final StateManager stateManager = mock(StateManager.class);
 
-    private ExporterFactory exporterFactory;
     private TaskExecutor taskExecutor;
     private ObservableList<BibEntry> selectedEntries;
 
@@ -73,13 +66,10 @@ public class ExportToClipboardActionTest {
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
 
         taskExecutor = new CurrentThreadTaskExecutor();
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-        exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
-        exportToClipboardAction = new ExportToClipboardAction(dialogService, exporterFactory, stateManager, clipBoardManager, taskExecutor, preferences);
+        when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.observableList(List.of()));
+        when(preferences.getSelfContainedExportConfiguration()).thenReturn(mock(SelfContainedSaveConfiguration.class));
+        when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
+        exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
     }
 
     @Test
@@ -98,20 +88,24 @@ public class ExportToClipboardActionTest {
             }
         };
 
-        when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
-        when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
-        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        LibraryPreferences libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(preferences.getGeneralPreferences()).thenReturn(generalPreferences);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+        when(preferences.getExportPreferences().getLastExportExtension()).thenReturn("HTML");
+        when(preferences.getSelfContainedExportConfiguration().getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked
         when(databaseContext.getFileDirectories(preferences.getFilePreferences())).thenReturn(new ArrayList<>(List.of(Path.of("path"))));
         when(databaseContext.getMetaData()).thenReturn(new MetaData());
         when(dialogService.showChoiceDialogAndWait(
-                eq(Localization.lang("Export")), eq(Localization.lang("Select export format")),
-                eq(Localization.lang("Export")), any(Exporter.class), anyCollection())).thenReturn(Optional.of(selectedExporter));
+                eq(Localization.lang("Export")),
+                eq(Localization.lang("Select export format")),
+                eq(Localization.lang("Export")),
+                any(Exporter.class),
+                anyCollection())
+        ).thenReturn(Optional.of(selectedExporter));
 
         exportToClipboardAction.execute();
         verify(dialogService, times(1)).showChoiceDialogAndWait(

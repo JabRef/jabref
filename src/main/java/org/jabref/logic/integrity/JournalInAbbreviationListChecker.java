@@ -22,7 +22,7 @@ public class JournalInAbbreviationListChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> value = entry.getField(field);
+        Optional<String> value = entry.getFieldOrAliasLatexFree(field);
         if (value.isEmpty()) {
             return Collections.emptyList();
         }

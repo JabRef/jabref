@@ -98,8 +98,8 @@ public class UnoReferenceMark {
             throws
             NoDocumentException,
             WrappedTargetException {
-        return (UnoReferenceMark.getAsTextContent(doc, name)
-                                .map(XTextContent::getAnchor));
+        return UnoReferenceMark.getAsTextContent(doc, name)
+                                .map(XTextContent::getAnchor);
     }
 
     /**

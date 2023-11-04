@@ -1,0 +1,88 @@
+<zs:searchRetrieveResponse>
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <record>
+                    <leader>01080nam a2200265 ca4500</leader>
+                    <controlfield tag="001">BV049029404</controlfield>
+                    <controlfield tag="003">DE-604</controlfield>
+                    <controlfield tag="005">00000000000000.0</controlfield>
+                    <controlfield tag="007">t</controlfield>
+                    <controlfield tag="008">230630m1988uuuu |||| 10||| eng d</controlfield>
+                    <datafield tag="020" ind1=" " ind2=" ">
+                        <subfield code="a">1851662529</subfield>
+                        <subfield code="9">1-85166-252-9</subfield>
+                    </datafield>
+                    <datafield tag="020" ind1=" " ind2=" ">
+                        <subfield code="a">0912053208</subfield>
+                        <subfield code="9">0-912053-20-8</subfield>
+                    </datafield>
+                    <datafield tag="040" ind1=" " ind2=" ">
+                        <subfield code="a">DE-604</subfield>
+                        <subfield code="b">ger</subfield>
+                    </datafield>
+                    <datafield tag="111" ind1="2" ind2=" ">
+                        <subfield code="a">International Congress on Experimental Mechanics</subfield>
+                        <subfield code="n">6</subfield>
+                        <subfield code="d">1988</subfield>
+                        <subfield code="c">Portland, Or.</subfield>
+                        <subfield code="j">Verfasser</subfield>
+                        <subfield code="0">(DE-588)5022525-X</subfield>
+                        <subfield code="4">aut</subfield>
+                    </datafield>
+                    <datafield tag="245" ind1="1" ind2="0">
+                        <subfield code="a">VI International Congress on Experimental Mechanics</subfield>
+                        <subfield code="b">[proceedings of the VI International Congress on Experimental Mechanics ... held on June 5 - 10, 1988 in Portland, Oregon, U.S.A.]</subfield>
+                        <subfield code="c">ed. by Frank Adams ...</subfield>
+                    </datafield>
+                    <datafield tag="246" ind1="1" ind2="3">
+                        <subfield code="a">Sixth International Congress on Experimental Mechanics</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="a">London</subfield>
+                        <subfield code="b">Elsevier [u.a.]</subfield>
+                        <subfield code="c">1988</subfield>
+                    </datafield>
+                    <datafield tag="655" ind1=" " ind2="7">
+                        <subfield code="0">(DE-588)1071861417</subfield>
+                        <subfield code="a">Konferenzschrift</subfield>
+                        <subfield code="2">gnd-content</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Adams, Frank</subfield>
+                        <subfield code="4">edt</subfield>
+                    </datafield>
+                    <datafield tag="710" ind1="2" ind2=" ">
+                        <subfield code="a">Society for Experimental Mechanics (USA)</subfield>
+                        <subfield code="e">Sonstige</subfield>
+                        <subfield code="0">(DE-588)308357-3</subfield>
+                        <subfield code="4">oth</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(DE-599)GBV037240986</subfield>
+                    </datafield>
+                    <datafield tag="041" ind1="0" ind2=" ">
+                        <subfield code="a">eng</subfield>
+                    </datafield>
+                    <datafield tag="336" ind1=" " ind2=" ">
+                        <subfield code="b">txt</subfield>
+                        <subfield code="2">rdacontent</subfield>
+                    </datafield>
+                    <datafield tag="337" ind1=" " ind2=" ">
+                        <subfield code="b">n</subfield>
+                        <subfield code="2">rdamedia</subfield>
+                    </datafield>
+                    <datafield tag="338" ind1=" " ind2=" ">
+                        <subfield code="b">nc</subfield>
+                        <subfield code="2">rdacarrier</subfield>
+                    </datafield>
+                </record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

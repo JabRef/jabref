@@ -2,20 +2,20 @@ package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.BibEntryPreferences;
 
 public class FieldMergerFactory {
-    private final PreferencesService preferencesService;
+    private final BibEntryPreferences bibEntryPreferences;
 
-    public FieldMergerFactory(PreferencesService preferencesService) {
-        this.preferencesService = preferencesService;
+    public FieldMergerFactory(BibEntryPreferences bibEntryPreferences) {
+        this.bibEntryPreferences = bibEntryPreferences;
     }
 
     public FieldMerger create(Field field) {
         if (field == StandardField.GROUPS) {
             return new GroupMerger();
         } else if (field == StandardField.KEYWORDS) {
-            return new KeywordMerger(preferencesService);
+            return new KeywordMerger(bibEntryPreferences);
         } else if (field == StandardField.COMMENT) {
             return new CommentMerger();
         } else if (field == StandardField.FILE) {

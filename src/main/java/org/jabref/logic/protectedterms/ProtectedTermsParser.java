@@ -50,7 +50,7 @@ public class ProtectedTermsParser {
             return;
         }
         try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-            this.terms.addAll(lines.map(this::setDescription).filter(line -> line != null).collect(Collectors.toList()));
+            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).collect(Collectors.toList()));
         } catch (IOException e) {
             LOGGER.warn("Could not read terms from file {}", path, e);
         }
@@ -59,7 +59,6 @@ public class ProtectedTermsParser {
     /**
      * Parse the description that starts after the # but don't include it in the terms
      *
-     * @param line
      * @return line or null if the line contains the description
      */
     private String setDescription(String line) {

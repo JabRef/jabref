@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @FetcherTest
 @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
 public class DOABFetcherTest {
-    private DOABFetcher fetcher = new DOABFetcher();
+    private final DOABFetcher fetcher = new DOABFetcher();
 
     @Test
     public void testGetName() {
@@ -35,7 +35,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.TITLE, "I Open Fire")
                                 .withField(StandardField.DOI, "10.21983/P3.0086.1.00")
                                 .withField(StandardField.PAGES, "56")
-                                .withField(StandardField.YEAR, "2014")
+                                .withField(StandardField.DATE, "2014")
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/25535")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/34739")
                                 .withField(StandardField.LANGUAGE, "English")
@@ -51,7 +51,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.SUBTITLE, "Examining usage and dissemination")
                                 .withField(StandardField.DOI, "10.26530/OAPEN_1004809")
                                 .withField(StandardField.PAGES, "234")
-                                .withField(StandardField.YEAR, "2019")
+                                .withField(StandardField.DATE, "2019")
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/25287")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/26303")
                                 .withField(StandardField.LANGUAGE, "English")
@@ -66,7 +66,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.TITLE, "Four Kingdom Motifs before and beyond the Book of Daniel")
                                 .withField(StandardField.DOI, "10.1163/9789004443280")
                                 .withField(StandardField.PAGES, "354")
-                                .withField(StandardField.YEAR, "2020")
+                                .withField(StandardField.DATE, "2020")
                                 .withField(StandardField.URL, "https://library.oapen.org/handle/20.500.12657/48312")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/68086")
                                 .withField(StandardField.LANGUAGE, "English")
@@ -80,7 +80,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.TITLE, "UAV Sensors for Environmental Monitoring")
                                 .withField(StandardField.DOI, "10.3390/books978-3-03842-754-4")
                                 .withField(StandardField.PAGES, "670")
-                                .withField(StandardField.YEAR, "2018")
+                                .withField(StandardField.DATE, "2018")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/39793")
                                 .withField(StandardField.LANGUAGE, "English")
                                 .withField(StandardField.KEYWORDS, "UAV sensors, Environmental Monitoring, drones, unmanned aerial vehicles")
@@ -93,7 +93,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.TITLE, "The symbiosis between information system project complexity and information system project success")
                                 .withField(StandardField.DOI, "10.4102/aosis.2017.itpsc45")
                                 .withField(StandardField.PAGES, "184")
-                                .withField(StandardField.YEAR, "2017")
+                                .withField(StandardField.DATE, "2017")
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/30652")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/38792")
                                 .withField(StandardField.LANGUAGE, "English")
@@ -109,7 +109,7 @@ public class DOABFetcherTest {
     public void testPerformSearch(BibEntry expected, String query) throws FetcherException {
         List<BibEntry> entries = fetcher.performSearch(query);
         // We must not contain abstracts in our code base; thus we remove the abstracts from the fetched results
-        entries.stream().forEach(entry -> entry.clearField(StandardField.ABSTRACT));
+        entries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(List.of(expected), entries);
     }
 }

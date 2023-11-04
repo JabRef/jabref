@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -44,17 +44,21 @@ public class FetchAndMergeEntry {
     public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
     private final DialogService dialogService;
-    private final TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
     private final BibDatabaseContext bibDatabaseContext;
+    private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
-    private final LibraryTab libraryTab;
 
-    public FetchAndMergeEntry(LibraryTab libraryTab, TaskExecutor taskExecutor, PreferencesService preferencesService, DialogService dialogService) {
-        this.libraryTab = libraryTab;
-        this.bibDatabaseContext = libraryTab.getBibDatabaseContext();
+    public FetchAndMergeEntry(BibDatabaseContext bibDatabaseContext,
+                              TaskExecutor taskExecutor,
+                              PreferencesService preferencesService,
+                              DialogService dialogService,
+                              UndoManager undoManager) {
+        this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.undoManager = undoManager;
     }
 
     public void fetchAndMerge(BibEntry entry) {
@@ -69,15 +73,15 @@ public class FetchAndMergeEntry {
         for (Field field : fields) {
             Optional<String> fieldContent = entry.getField(field);
             if (fieldContent.isPresent()) {
-                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, Globals.prefs.getImportFormatPreferences());
+                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferencesService.getImportFormatPreferences());
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
-                                      ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
                                           cleanup.doPostCleanup(fetchedEntry.get());
-                                          showMergeDialog(entry, fetchedEntry.get(), fetcher.get(), preferencesService);
+                                          showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
                                       } else {
                                           dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
                                       }
@@ -89,7 +93,7 @@ public class FetchAndMergeEntry {
                                       } else if (exception instanceof FetcherServerException) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Server not available"));
                                       } else {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occured %0", exception.getMessage()));
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occurred %0", exception.getMessage()));
                                       }
                                   })
                                   .executeWith(taskExecutor);
@@ -100,7 +104,7 @@ public class FetchAndMergeEntry {
         }
     }
 
-    private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher, PreferencesService preferencesService) {
+    private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
         MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferencesService);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
@@ -151,7 +155,7 @@ public class FetchAndMergeEntry {
 
             if (edited) {
                 ce.end();
-                libraryTab.getUndoManager().addEdit(ce);
+                undoManager.addEdit(ce);
                 dialogService.notify(Localization.lang("Updated entry with info from %0", fetcher.getName()));
             } else {
                 dialogService.notify(Localization.lang("No information added"));
@@ -165,9 +169,9 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
-                              ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
+                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
                               cleanup.doPostCleanup(fetchedEntry.get());
-                              showMergeDialog(entry, fetchedEntry.get(), fetcher, preferencesService);
+                              showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {
                               dialogService.notify(Localization.lang("Could not find any bibliographic information."));
                           }

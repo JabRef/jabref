@@ -7,6 +7,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -15,6 +16,7 @@ import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -33,6 +35,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
+    @Inject private TaskExecutor taskExecutor;
 
     private GlobalSearchResultDialogViewModel viewModel;
 
@@ -50,14 +53,19 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager, themeManager);
+        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
-        resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
+        resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
         resultsTable.getSelectionModel().selectFirst();
+
+        if (resultsTable.getSelectionModel().getSelectedItem() != null) {
+            previewViewer.setEntry(resultsTable.getSelectionModel().getSelectedItem().getEntry());
+        }
+
         resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
@@ -75,6 +83,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
                     : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+            getDialogPane().setPrefHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
+            getDialogPane().setPrefWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
+            preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
         });
     }
 }

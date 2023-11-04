@@ -25,21 +25,27 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
+ * <p>
  * Importer for the ISI Web of Science, INSPEC and Medline format.
+ * </p>
  * <p>
  * Documentation about ISI WOS format:
- * <p>
  * <ul>
+ *
  * <li>https://web.archive.org/web/20131031052339/http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
  * <p>
  * <ul>
  * <li>Deal with capitalization correctly</li>
  * </ul>
+ * </p>
  */
 public class IsiImporter extends Importer {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsiImporter.class);
     private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
@@ -91,7 +97,7 @@ public class IsiImporter extends Importer {
     }
 
     public static void processSubSup(Map<Field, String> map) {
-        Field[] subsup = {StandardField.TITLE, StandardField.ABSTRACT, StandardField.REVIEW, new UnknownField("notes")};
+        Field[] subsup = {StandardField.TITLE, StandardField.ABSTRACT, StandardField.COMMENT, new UnknownField("notes")};
 
         for (Field aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -197,95 +203,102 @@ public class IsiImporter extends Importer {
                 }
                 value = value.trim();
 
-                if ("PT".equals(beg)) {
-                    if (value.startsWith("J")) {
-                        PT = "article";
-                    } else {
-                        PT = value;
+                switch (beg) {
+                    case "PT" -> {
+                        if (value.startsWith("J")) {
+                            PT = "article";
+                        } else {
+                            PT = value;
+                        }
+                        type = StandardEntryType.Article; // make all of them PT?
                     }
-                    type = StandardEntryType.Article; // make all of them PT?
-                } else if ("TY".equals(beg)) {
-                    if ("JOUR".equals(value)) {
-                        type = StandardEntryType.Article;
-                    } else if ("CONF".equals(value)) {
-                        type = StandardEntryType.InProceedings;
+                    case "TY" -> {
+                        if ("JOUR".equals(value)) {
+                            type = StandardEntryType.Article;
+                        } else if ("CONF".equals(value)) {
+                            type = StandardEntryType.InProceedings;
+                        }
                     }
-                } else if ("JO".equals(beg)) {
-                    hm.put(StandardField.BOOKTITLE, value);
-                } else if ("AU".equals(beg)) {
-                    String author = IsiImporter.isiAuthorsConvert(EOL_PATTERN.matcher(value).replaceAll(" and "));
+                    case "JO" ->
+                            hm.put(StandardField.BOOKTITLE, value);
+                    case "AU" -> {
+                        String author = IsiImporter.isiAuthorsConvert(EOL_PATTERN.matcher(value).replaceAll(" and "));
 
-                    // if there is already someone there then append with "and"
-                    if (hm.get(StandardField.AUTHOR) != null) {
-                        author = hm.get(StandardField.AUTHOR) + " and " + author;
+                        // if there is already someone there then append with "and"
+                        if (hm.get(StandardField.AUTHOR) != null) {
+                            author = hm.get(StandardField.AUTHOR) + " and " + author;
+                        }
+                        hm.put(StandardField.AUTHOR, author);
                     }
+                    case "TI" ->
+                            hm.put(StandardField.TITLE, EOL_PATTERN.matcher(value).replaceAll(" "));
+                    case "SO", "JA" ->
+                            hm.put(StandardField.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
+                    case "ID", "KW" -> {
+                        value = EOL_PATTERN.matcher(value).replaceAll(" ");
+                        String existingKeywords = hm.get(StandardField.KEYWORDS);
+                        if ((existingKeywords == null) || existingKeywords.contains(value)) {
+                            existingKeywords = value;
+                        } else {
+                            existingKeywords += ", " + value;
+                        }
+                        hm.put(StandardField.KEYWORDS, existingKeywords);
+                    }
+                    case "AB" ->
+                            hm.put(StandardField.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
+                    case "BP", "BR", "SP" ->
+                            pages = value;
+                    case "EP" -> {
+                        int detpos = value.indexOf(' ');
 
-                    hm.put(StandardField.AUTHOR, author);
-                } else if ("TI".equals(beg)) {
-                    hm.put(StandardField.TITLE, EOL_PATTERN.matcher(value).replaceAll(" "));
-                } else if ("SO".equals(beg) || "JA".equals(beg)) {
-                    hm.put(StandardField.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
-                } else if ("ID".equals(beg) || "KW".equals(beg)) {
-                    value = EOL_PATTERN.matcher(value).replaceAll(" ");
-                    String existingKeywords = hm.get(StandardField.KEYWORDS);
-                    if ((existingKeywords == null) || existingKeywords.contains(value)) {
-                        existingKeywords = value;
-                    } else {
-                        existingKeywords += ", " + value;
+                        // tweak for IEEE Explore
+                        if ((detpos != -1) && !value.substring(0, detpos).trim().isEmpty()) {
+                            value = value.substring(0, detpos);
+                        }
+                        pages = pages + "--" + value;
                     }
-                    hm.put(StandardField.KEYWORDS, existingKeywords);
-                } else if ("AB".equals(beg)) {
-                    hm.put(StandardField.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
-                } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
-                    pages = value;
-                } else if ("EP".equals(beg)) {
-                    int detpos = value.indexOf(' ');
-
-                    // tweak for IEEE Explore
-                    if ((detpos != -1) && !value.substring(0, detpos).trim().isEmpty()) {
-                        value = value.substring(0, detpos);
+                    case "PS" ->
+                            pages = IsiImporter.parsePages(value);
+                    case "AR" ->
+                            pages = value;
+                    case "IS" ->
+                            hm.put(StandardField.NUMBER, value);
+                    case "PY" ->
+                            hm.put(StandardField.YEAR, value);
+                    case "VL" ->
+                            hm.put(StandardField.VOLUME, value);
+                    case "PU" ->
+                            hm.put(StandardField.PUBLISHER, value);
+                    case "DI" ->
+                            hm.put(StandardField.DOI, value);
+                    case "PD" -> {
+                        String month = IsiImporter.parseMonth(value);
+                        if (month != null) {
+                            hm.put(StandardField.MONTH, month);
+                        }
                     }
-
-                    pages = pages + "--" + value;
-                } else if ("PS".equals(beg)) {
-                    pages = IsiImporter.parsePages(value);
-                } else if ("AR".equals(beg)) {
-                    pages = value;
-                } else if ("IS".equals(beg)) {
-                    hm.put(StandardField.NUMBER, value);
-                } else if ("PY".equals(beg)) {
-                    hm.put(StandardField.YEAR, value);
-                } else if ("VL".equals(beg)) {
-                    hm.put(StandardField.VOLUME, value);
-                } else if ("PU".equals(beg)) {
-                    hm.put(StandardField.PUBLISHER, value);
-                } else if ("DI".equals(beg)) {
-                    hm.put(StandardField.DOI, value);
-                } else if ("PD".equals(beg)) {
-                    String month = IsiImporter.parseMonth(value);
-                    if (month != null) {
-                        hm.put(StandardField.MONTH, month);
+                    case "DT" -> {
+                        if ("Review".equals(value)) {
+                            type = StandardEntryType.Article; // set "Review" in Note/Comment?
+                        } else if (value.startsWith("Article") || value.startsWith("Journal") || "article".equals(PT)) {
+                            type = StandardEntryType.Article;
+                        } else {
+                            type = BibEntry.DEFAULT_TYPE;
+                        }
                     }
-                } else if ("DT".equals(beg)) {
-                    if ("Review".equals(value)) {
-                        type = StandardEntryType.Article; // set "Review" in Note/Comment?
-                    } else if (value.startsWith("Article") || value.startsWith("Journal") || "article".equals(PT)) {
-                        type = StandardEntryType.Article;
-                    } else {
-                        type = BibEntry.DEFAULT_TYPE;
+                    case "CR" ->
+                            hm.put(new UnknownField("CitedReferences"), EOL_PATTERN.matcher(value).replaceAll(" ; ").trim());
+                    default -> {
+                        // Preserve all other entries except
+                        if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {
+                            continue;
+                        }
+                        hm.put(FieldFactory.parseField(type, beg), value);
                     }
-                } else if ("CR".equals(beg)) {
-                    hm.put(new UnknownField("CitedReferences"), EOL_PATTERN.matcher(value).replaceAll(" ; ").trim());
-                } else {
-                    // Preserve all other entries except
-                    if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {
-                        continue;
-                    }
-                    hm.put(FieldFactory.parseField(type, beg), value);
                 }
             }
 
-            if (!"".equals(pages)) {
+            if (!pages.isEmpty()) {
                 hm.put(StandardField.PAGES, pages);
             }
 
@@ -298,14 +311,14 @@ public class IsiImporter extends Importer {
             // id assumes an existing database so don't
 
             // Remove empty fields:
-            List<Object> toRemove = new ArrayList<>();
+            List<Field> toRemove = new ArrayList<>();
             for (Map.Entry<Field, String> field : hm.entrySet()) {
                 String content = field.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(field.getKey());
                 }
             }
-            for (Object aToRemove : toRemove) {
+            for (Field aToRemove : toRemove) {
                 hm.remove(aToRemove);
             }
 
@@ -344,8 +357,9 @@ public class IsiImporter extends Importer {
                 if (month.isPresent()) {
                     return month.get().getJabRefFormat();
                 }
-            } catch (NumberFormatException ignored) {
-                // Ignored
+            } catch (NumberFormatException e) {
+                LOGGER.info("The import file in ISI format cannot parse part of the content in PD into integers " +
+                        "(If there is no month or PD displayed in the imported entity, this may be the reason)", e);
             }
         }
         return null;
@@ -354,7 +368,7 @@ public class IsiImporter extends Importer {
     /**
      * Will expand ISI first names.
      * <p>
-     * Fixed bug from: http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
+     * Fixed bug from: <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306">...</a>
      */
     public static String isiAuthorConvert(String author) {
         String[] s = author.split(",");

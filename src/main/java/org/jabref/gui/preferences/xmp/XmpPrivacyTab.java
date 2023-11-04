@@ -86,7 +86,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
                 .install(addFieldName);
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
-        addFieldName.setConverter(FieldsUtil.fieldStringConverter);
+        addFieldName.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addFieldName.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 viewModel.addField();

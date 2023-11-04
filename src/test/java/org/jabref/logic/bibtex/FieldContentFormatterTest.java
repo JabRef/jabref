@@ -15,9 +15,11 @@ class FieldContentFormatterTest {
     private FieldContentFormatter parser;
 
     @BeforeEach
-    void setUp() throws Exception {
-        FieldContentFormatterPreferences preferences = new FieldContentFormatterPreferences(Collections.emptyList());
-        parser = new FieldContentFormatter(preferences);
+    void setUp() {
+        parser = new FieldContentFormatter(new FieldPreferences(
+                false,
+                Collections.emptyList(),
+                Collections.emptyList()));
     }
 
     @Test

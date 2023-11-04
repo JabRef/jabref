@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.Telemetry;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
@@ -74,6 +74,6 @@ public class NewEntryAction extends SimpleCommand {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", type.getName());
 
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
+        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
     }
 }

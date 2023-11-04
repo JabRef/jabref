@@ -7,14 +7,16 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
  */
-public class ArXivIdentifier implements Identifier {
+public class ArXivIdentifier extends EprintIdentifier {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
     private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
     private final String identifier;
@@ -36,7 +38,7 @@ public class ArXivIdentifier implements Identifier {
     }
 
     public static Optional<ArXivIdentifier> parse(String value) {
-        String identifier = value.replaceAll(" ", "");
+        String identifier = value.replace(" ", "");
         Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
         Matcher identifierMatcher = identifierPattern.matcher(identifier);
         if (identifierMatcher.matches()) {
@@ -73,6 +75,22 @@ public class ArXivIdentifier implements Identifier {
         }
     }
 
+    /**
+     * ArXiV articles are assigned DOIs automatically, which starts with a DOI prefix '10.48550/' followed by the ArXiV
+     * ID (replacing the colon with a period).
+     *<p>
+     * For more information:
+     * <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">
+     *     new-arxiv-articles-are-now-automatically-assigned-dois</a>
+     * */
+    public Optional<DOI> inferDOI() {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
+
+        return DOI.parse("10.48550/arxiv." + identifier);
+    }
+
     @Override
     public String toString() {
         return "ArXivIdentifier{" +
@@ -98,11 +116,6 @@ public class ArXivIdentifier implements Identifier {
     @Override
     public int hashCode() {
         return Objects.hash(identifier, classification);
-    }
-
-    @Override
-    public Field getDefaultField() {
-        return StandardField.EPRINT;
     }
 
     @Override

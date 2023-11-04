@@ -29,19 +29,24 @@ import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import com.tobiasdiez.easybind.optional.OptionalWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
-    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
+    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
+    public static final String VERSION_DB_STRUCT = "VersionDBStructure";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String FILE_DIRECTORY = "fileDirectory";
+    public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String REMOTE_SETTINGS = "remote";
@@ -50,6 +55,8 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
+
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -57,7 +64,7 @@ public class MetaData {
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
-    private SaveOrderConfig saveOrderConfig;
+    private SaveOrder saveOrder;
     private String defaultCiteKeyPattern;
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;
@@ -67,6 +74,7 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
+    private String versionDBStructure;
     private RemoteSettings remoteSettings;
 
     /**
@@ -76,12 +84,12 @@ public class MetaData {
         // Do nothing
     }
 
-    public Optional<SaveOrderConfig> getSaveOrderConfig() {
-        return Optional.ofNullable(saveOrderConfig);
+    public Optional<SaveOrder> getSaveOrder() {
+        return Optional.ofNullable(saveOrder);
     }
 
-    public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        this.saveOrderConfig = saveOrderConfig;
+    public void setSaveOrder(SaveOrder saveOrder) {
+        this.saveOrder = saveOrder;
         postChange();
     }
 
@@ -208,6 +216,15 @@ public class MetaData {
         postChange();
     }
 
+    public Optional<String> getVersionDBStructure() {
+        return Optional.ofNullable(versionDBStructure);
+    }
+
+    public void setVersionDBStructure(String version) {
+        versionDBStructure = Objects.requireNonNull(version).trim();
+        postChange();
+    }
+
     public Optional<String> getUserFileDirectory(String user) {
         return Optional.ofNullable(userFileDirectory.get(user));
     }
@@ -256,8 +273,8 @@ public class MetaData {
         postChange();
     }
 
-    public void clearSaveOrderConfig() {
-        saveOrderConfig = null;
+    public void clearSaveOrder() {
+        saveOrder = null;
         postChange();
     }
 
@@ -370,7 +387,7 @@ public class MetaData {
                 && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
-                && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
+                && Objects.equals(saveOrder, metaData.saveOrder)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
                 && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
@@ -378,17 +395,18 @@ public class MetaData {
                 && Objects.equals(saveActions, metaData.saveActions)
                 && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
-                && Objects.equals(contentSelectors, metaData.contentSelectors);
+                && Objects.equals(contentSelectors, metaData.contentSelectors)
+                && Objects.equals(versionDBStructure, metaData.versionDBStructure);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrderConfig, citeKeyPatterns, userFileDirectory,
-                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors);
+        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
+                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrderConfig + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 }

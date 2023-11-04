@@ -3,7 +3,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.HBox?>
@@ -27,15 +26,12 @@
         </columnResizePolicy>
     </TreeTableView>
 
-    <HBox spacing="4" alignment="CENTER_RIGHT">
-        <MenuButton fx:id="presetsButton" text="%Presets"/>
-        <Button prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow" onAction="#resetBindings">
+    <HBox spacing="10.0" alignment="CENTER_RIGHT">
+        <MenuButton fx:id="presetsButton" text="%Presets" styleClass="button"/>
+        <Button text="%Reset all" onAction="#resetBindings">
             <graphic>
                 <JabRefIconView glyph="REFRESH"/>
             </graphic>
-            <tooltip>
-                <Tooltip text="%Reset Bindings"/>
-            </tooltip>
         </Button>
     </HBox>
 </fx:root>

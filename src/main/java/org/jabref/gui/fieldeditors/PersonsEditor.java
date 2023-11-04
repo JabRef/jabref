@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -21,10 +23,11 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
     public PersonsEditor(final Field field,
                          final SuggestionProvider<?> suggestionProvider,
-                         final PreferencesService preferences,
+                         final PreferencesService preferencesService,
                          final FieldCheckers fieldCheckers,
-                         final boolean isMultiLine) {
-        this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
+                         final boolean isMultiLine,
+                         final UndoManager undoManager) {
+        this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferencesService.getAutoCompletePreferences(), fieldCheckers, undoManager);
 
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
 
@@ -35,7 +38,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
         AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
+        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
     @Override

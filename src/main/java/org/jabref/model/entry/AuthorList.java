@@ -1,6 +1,8 @@
 package org.jabref.model.entry;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Function;
@@ -115,7 +117,7 @@ import org.jabref.logic.importer.AuthorListParser;
 @AllowedToUseLogic("because it needs access to AuthorList parser")
 public class AuthorList {
 
-    private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
+    private static final Map<String, AuthorList> AUTHOR_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
     private final List<Author> authors;
     private AuthorList latexFreeAuthors;
 
@@ -361,7 +363,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), (auth) -> auth.getLastFirst(abbreviate), oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), auth -> auth.getLastFirst(abbreviate), oxfordComma);
     }
 
     @Override

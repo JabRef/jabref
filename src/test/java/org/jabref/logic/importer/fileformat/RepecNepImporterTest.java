@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -24,8 +25,9 @@ public class RepecNepImporterTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
         testImporter = new RepecNepImporter(importFormatPreferences);
     }
 

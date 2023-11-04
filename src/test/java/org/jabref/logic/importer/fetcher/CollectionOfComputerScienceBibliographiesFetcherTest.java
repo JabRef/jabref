@@ -20,6 +20,7 @@ import org.jabref.testutils.category.FetcherTest;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/259")
 @FetcherTest
 class CollectionOfComputerScienceBibliographiesFetcherTest {
     private CollectionOfComputerScienceBibliographiesFetcher fetcher;
@@ -34,7 +36,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         fetcher = new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences);
     }
 

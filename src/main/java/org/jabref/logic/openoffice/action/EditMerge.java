@@ -59,9 +59,9 @@ public class EditMerge {
             for (JoinableGroupData joinableGroupData : joinableGroups) {
                 List<CitationGroup> groups = joinableGroupData.group;
 
-                List<Citation> newCitations = (groups.stream()
+                List<Citation> newCitations = groups.stream()
                                                      .flatMap(group -> group.citationsInStorageOrder.stream())
-                                                     .collect(Collectors.toList()));
+                                                     .collect(Collectors.toList());
 
                 CitationType citationType = groups.get(0).citationType;
                 List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
@@ -179,14 +179,14 @@ public class EditMerge {
 
             // Sanity check: the current range should start later than the previous.
             int textOrder = UnoTextRange.compareStarts(state.prevRange, currentRange);
-            if (textOrder != (-1)) {
+            if (textOrder != -1) {
                 String msg =
                         String.format("MergeCitationGroups:"
                                         + " \"%s\" supposed to be followed by \"%s\","
                                         + " but %s",
                                 state.prevRange.getString(),
                                 currentRange.getString(),
-                                ((textOrder == 0)
+                                (textOrder == 0
                                         ? "they start at the same position"
                                         : "the start of the latter precedes the start of the first"));
                 LOGGER.warn(msg);
@@ -214,7 +214,7 @@ public class EditMerge {
         XTextRange rangeStart = currentRange.getStart();
         boolean couldExpand = true;
         XTextCursor thisCharCursor =
-                (currentRange.getText().createTextCursorByRange(state.cursorBetween.getEnd()));
+                currentRange.getText().createTextCursorByRange(state.cursorBetween.getEnd());
 
         while (couldExpand && (UnoTextRange.compareEnds(state.cursorBetween, rangeStart) < 0)) {
             //
@@ -264,8 +264,8 @@ public class EditMerge {
 
         // If new group, create currentGroupCursor
         if (isNewGroup) {
-            state.currentGroupCursor = (currentRange.getText()
-                                                    .createTextCursorByRange(currentRange.getStart()));
+            state.currentGroupCursor = currentRange.getText()
+                                                    .createTextCursorByRange(currentRange.getStart());
         }
 
         // include currentRange in currentGroupCursor
@@ -298,8 +298,8 @@ public class EditMerge {
         ScanState state = new ScanState();
 
         for (CitationGroup group : groups) {
-            XTextRange currentRange = (frontend.getMarkRange(doc, group)
-                                               .orElseThrow(IllegalStateException::new));
+            XTextRange currentRange = frontend.getMarkRange(doc, group)
+                                               .orElseThrow(IllegalStateException::new);
 
             /*
              * Decide if we add group to the group. False when the group is empty.
@@ -311,7 +311,7 @@ public class EditMerge {
              *
              * Can it start a new group?
              */
-            boolean canStartGroup = (group.citationType == CitationType.AUTHORYEAR_PAR);
+            boolean canStartGroup = group.citationType == CitationType.AUTHORYEAR_PAR;
 
             if (!addToGroup) {
                 // close currentGroup

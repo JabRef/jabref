@@ -19,7 +19,9 @@ By using JabRef as training object in exercises and labs, students can level-up 
    There, new functionality is categorized in small, medium, and large effort.
    Moreover, categorization on the main focus (UI, logic, or both),
    implementation effort, testing effort, and "issue understanding effort".
-   The latter category is important, because some issues are "quick wins" and others need thorough thinking.   
+   The latter category is important, because some issues are "quick wins" and others need thorough thinking.
+
+
    In general, all issues of JabRef are free to take.
    Be aware that the difficulty of bugs and feature vary.
    For the brave, the [Bug Board](https://github.com/orgs/JabRef/projects/7) or the [Feature Board](https://github.com/JabRef/jabref/projects/6) provide other issue sources.
@@ -106,7 +108,7 @@ Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/compute
 
 #### University of Stuttgart, Germany
 
-Course "Softwarepraktikum" as part of the [BSc Informatik](https://www.f05.uni-stuttgart.de/informatik/interessierte/bachelor/informatik/)
+Course "Softwarepraktikum" as part of the [BSc Informatik](https://www.uni-stuttgart.de/studium/bachelor/informatik-b.sc./)
 
 * Summary: A group of three students experienced the full software engineering process within one semester. They worked part-time for the project.
 * Successfully run in 2012
@@ -150,3 +152,5 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 ## References
 
 [1](teaching.md#a1): [@ayaankazerouni](https://github.com/ayaankazerouni): [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f) [2](teaching.md#a2): Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.
+
+<!-- markdownlint-disable-file MD012 -->

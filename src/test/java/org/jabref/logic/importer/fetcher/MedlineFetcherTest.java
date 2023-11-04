@@ -59,7 +59,7 @@ public class MedlineFetcherTest {
                 .withField(StandardField.AUTHOR, "Endharti, Agustina Tri and Wulandari, Adisti and Listyana, Anik and Norahmawati, Eviana and Permana, Sofy")
                 .withField(new UnknownField("country"), "England")
                 .withField(StandardField.DOI, "10.1186/s12906-016-1345-0")
-                .withField(new UnknownField("pii"), "10.1186/s12906-016-1345-0")
+                .withField(new UnknownField("pii"), "374")
                 .withField(new UnknownField("pmc"), "PMC5037598")
                 .withField(StandardField.ISSN, "1472-6882")
                 .withField(new UnknownField("issn-linking"), "1472-6882")

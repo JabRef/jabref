@@ -54,6 +54,10 @@ public class OpenUrlAction extends SimpleCommand {
                 link = entry.getField(StandardField.URI);
                 field = StandardField.URI;
             }
+            if (entry.hasField(StandardField.ISBN)) {
+                link = entry.getField(StandardField.ISBN);
+                field = StandardField.ISBN;
+            }
             if (entry.hasField(StandardField.DOI)) {
                 link = entry.getField(StandardField.DOI);
                 field = StandardField.DOI;
@@ -68,7 +72,7 @@ public class OpenUrlAction extends SimpleCommand {
                     if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
                         JabRefDesktop.openCustomDoi(link.get(), preferences, dialogService);
                     } else {
-                        JabRefDesktop.openExternalViewer(databaseContext, preferences, link.get(), field);
+                        JabRefDesktop.openExternalViewer(databaseContext, preferences, link.get(), field, dialogService, entry);
                     }
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);

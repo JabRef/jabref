@@ -1,8 +1,8 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
-import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -14,12 +14,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
@@ -27,6 +26,7 @@ import org.jabref.testutils.category.GUITest;
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
@@ -51,12 +51,21 @@ class SourceTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
-                .thenReturn(mock(FieldContentFormatterPreferences.class));
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
 
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), fieldWriterPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
+        sourceTab = new SourceTab(
+                new BibDatabaseContext(),
+                new CountingUndoManager(),
+                fieldPreferences,
+                importFormatPreferences,
+                new DummyFileUpdateMonitor(),
+                mock(DialogService.class),
+                stateManager,
+                mock(BibEntryTypesManager.class),
+                keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
@@ -75,7 +84,7 @@ class SourceTabTest {
     }
 
     @Test
-    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) throws Exception {
+    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) {
         BibEntry entry = new BibEntry();
         entry.setField(new UnknownField("test"), "testvalue");
 

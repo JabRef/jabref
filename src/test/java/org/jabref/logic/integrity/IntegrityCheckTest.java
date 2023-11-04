@@ -146,17 +146,16 @@ class IntegrityCheckTest {
     }
 
     private BibDatabaseContext createContext(Field field, String value, EntryType type) {
-        BibEntry entry = new BibEntry();
-        entry.setField(field, value);
-        entry.setType(type);
+        BibEntry entry = new BibEntry(type)
+                .withField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
         return new BibDatabaseContext(bibDatabase);
     }
 
     private BibDatabaseContext createContext(Field field, String value, MetaData metaData) {
-        BibEntry entry = new BibEntry();
-        entry.setField(field, value);
+        BibEntry entry = new BibEntry()
+                .withField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
         return new BibDatabaseContext(bibDatabase, metaData);
@@ -189,7 +188,6 @@ class IntegrityCheckTest {
     }
 
     private CitationKeyPatternPreferences createCitationKeyPatternPreferences() {
-        final GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
         return new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -198,7 +196,8 @@ class IntegrityCheckTest {
                 "",
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
+                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                "",
                 ',');
     }
 

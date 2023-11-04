@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -8,7 +9,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
 public class MetaDataDiff {
-    public enum Difference {
+    public enum DifferenceType {
         PROTECTED,
         GROUPS_ALTERED,
         ENCODING,
@@ -21,6 +22,9 @@ public class MetaDataDiff {
         MODE,
         GENERAL_FILE_DIRECTORY,
         CONTENT_SELECTOR
+    }
+
+    public record Difference(DifferenceType differenceType, Object originalObject, Object newObject) {
     }
 
     private final Optional<GroupDiff> groupDiff;
@@ -41,48 +45,31 @@ public class MetaDataDiff {
         }
     }
 
-    /**
-     * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
-     */
-    public EnumSet<Difference> getDifferences(PreferencesService preferences) {
-        EnumSet<Difference> changes = EnumSet.noneOf(Difference.class);
+    private void addToListIfDiff(List<Difference> changes, DifferenceType differenceType, Object originalObject, Object newObject) {
+        if (!Objects.equals(originalObject, newObject)) {
+            changes.add(new Difference(differenceType, originalObject, newObject));
+        }
+    }
 
-        if (originalMetaData.isProtected() != newMetaData.isProtected()) {
-            changes.add(Difference.PROTECTED);
-        }
-        if (!Objects.equals(originalMetaData.getGroups(), newMetaData.getGroups())) {
-            changes.add(Difference.GROUPS_ALTERED);
-        }
-        if (!Objects.equals(originalMetaData.getEncoding(), newMetaData.getEncoding())) {
-            changes.add(Difference.ENCODING);
-        }
-        if (!Objects.equals(originalMetaData.getSaveOrderConfig(), newMetaData.getSaveOrderConfig())) {
-            changes.add(Difference.SAVE_SORT_ORDER);
-        }
-        if (!Objects.equals(originalMetaData.getCiteKeyPattern(preferences.getGlobalCitationKeyPattern()), newMetaData.getCiteKeyPattern(preferences.getGlobalCitationKeyPattern()))) {
-            changes.add(Difference.KEY_PATTERNS);
-        }
-        if (!Objects.equals(originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories())) {
-            changes.add(Difference.USER_FILE_DIRECTORY);
-        }
-        if (!Objects.equals(originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories())) {
-            changes.add(Difference.LATEX_FILE_DIRECTORY);
-        }
-        if (!Objects.equals(originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern())) {
-            changes.add(Difference.DEFAULT_KEY_PATTERN);
-        }
-        if (!Objects.equals(originalMetaData.getSaveActions(), newMetaData.getSaveActions())) {
-            changes.add(Difference.SAVE_ACTIONS);
-        }
-        if (!originalMetaData.getMode().equals(newMetaData.getMode())) {
-            changes.add(Difference.MODE);
-        }
-        if (!Objects.equals(originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory())) {
-            changes.add(Difference.GENERAL_FILE_DIRECTORY);
-        }
-        if (!Objects.equals(originalMetaData.getContentSelectors(), newMetaData.getContentSelectors())) {
-            changes.add(Difference.CONTENT_SELECTOR);
-        }
+    /**
+     * Should be kept in sync with {@link MetaData#equals(Object)}
+     */
+    public List<Difference> getDifferences(PreferencesService preferences) {
+        List<Difference> changes = new ArrayList<>();
+        addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());
+        addToListIfDiff(changes, DifferenceType.GROUPS_ALTERED, originalMetaData.getGroups(), newMetaData.getGroups());
+        addToListIfDiff(changes, DifferenceType.ENCODING, originalMetaData.getEncoding(), newMetaData.getEncoding());
+        addToListIfDiff(changes, DifferenceType.SAVE_SORT_ORDER, originalMetaData.getSaveOrder(), newMetaData.getSaveOrder());
+        addToListIfDiff(changes, DifferenceType.KEY_PATTERNS,
+                originalMetaData.getCiteKeyPattern(preferences.getCitationKeyPatternPreferences().getKeyPattern()),
+                newMetaData.getCiteKeyPattern(preferences.getCitationKeyPatternPreferences().getKeyPattern()));
+        addToListIfDiff(changes, DifferenceType.USER_FILE_DIRECTORY, originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories());
+        addToListIfDiff(changes, DifferenceType.LATEX_FILE_DIRECTORY, originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories());
+        addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
+        addToListIfDiff(changes, DifferenceType.SAVE_ACTIONS, originalMetaData.getSaveActions(), newMetaData.getSaveActions());
+        addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
+        addToListIfDiff(changes, DifferenceType.GENERAL_FILE_DIRECTORY, originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory());
+        addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());
         return changes;
     }
 
