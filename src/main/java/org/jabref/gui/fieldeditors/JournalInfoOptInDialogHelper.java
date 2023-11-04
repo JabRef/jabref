@@ -19,7 +19,7 @@ public class JournalInfoOptInDialogHelper {
                     Localization.lang("Enable Journal Information Fetching?"),
                     Localization.lang("Would you like to enable fetching of journal information? This can be changed later in %0 > %1.",
                             Localization.lang("Preferences"),
-                            Localization.lang("Entry editor"))
+                            Localization.lang("Entry editor")), Localization.lang("Enable"), Localization.lang("Keep disabled")
             );
 
             preferences.setEnableJournalPopup(enableJournalPopup
