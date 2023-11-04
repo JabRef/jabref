@@ -22,16 +22,16 @@ public class JabRefOnlineServiceTest {
     @Test
     void getChangesSinceCheckpoint() {
         var changes = new JabRefOnlineService().getChanges(
-                                                           "ckn4oul7100004cv7y3t94n8j",
-                                                           Optional.of(new SyncCheckpoint(ZonedDateTime.of(2022, 10, 1, 0, 0, 0, 0, ZoneId.of("Z")), "1")));
+                "ckn4oul7100004cv7y3t94n8j",
+                Optional.of(new SyncCheckpoint(ZonedDateTime.of(2022, 10, 1, 0, 0, 0, 0, ZoneId.of("Z")), "1")));
         expect.serializer("json").toMatchSnapshot(changes);
     }
 
     @Test
     void getAllChanges() {
         var changes = new JabRefOnlineService().getChanges(
-                                                           "ckn4oul7100004cv7y3t94n8j",
-                                                           Optional.empty());
+                "ckn4oul7100004cv7y3t94n8j",
+                Optional.empty());
         expect.serializer("json").toMatchSnapshot(changes);
     }
 

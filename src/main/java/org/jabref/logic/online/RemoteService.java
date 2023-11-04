@@ -26,7 +26,7 @@ public class RemoteService {
 
     /**
      * Performs the initial sync of the given database with the remote server.
-     * 
+     * <p>
      * It first binds the local database to the remote account, then it triggers a complete sync (pull/merge/push cycle).
      */
     public void initialSync(BibDatabaseContext database) {
@@ -50,7 +50,7 @@ public class RemoteService {
 
     /**
      * Performs a sync of the given database with the remote server.
-     * 
+     * <p>
      * It starts a pull/merge/push cycle, by first pulling the remote changes.
      * If there are no conflicts, the local changes are pushed to the remote server.
      * If there are conflicts, this method stops after pulling the remote changes and gives the user the chance to resolve the conflicts.
@@ -94,7 +94,7 @@ public class RemoteService {
      * - the list of entries that are marked dirty.
      * - the list of entries that are new.
      * - the list of entries that have been deleted.
-     * 
+     * <p>
      * TODO: Trigger this by saving the database
      */
     public void push(BibDatabaseContext database) {
@@ -107,8 +107,8 @@ public class RemoteService {
                                                   .collect(Collectors.toList());
             if (!dirtyEntries.isEmpty()) {
                 var result = communicationService.updateEntries(client, dirtyEntries.stream()
-                                                                                             .map(entry -> transformer.toDocument(entry))
-                                                                                             .collect(Collectors.toList()));
+                                                                                    .map(entry -> transformer.toDocument(entry))
+                                                                                    .collect(Collectors.toList()));
                 Streams.forEachPair(dirtyEntries.stream(), result.stream(), (entry, update) -> {
                     var revision = entry.getRevision().get();
                     // TODO: Implement
@@ -125,8 +125,8 @@ public class RemoteService {
             }
 
             List<BibEntry> newEntries = database.getDatabase().getEntries().stream()
-                                            .filter(entry -> entry.getRevision().isEmpty())
-                                            .collect(Collectors.toList());
+                                                .filter(entry -> entry.getRevision().isEmpty())
+                                                .collect(Collectors.toList());
             if (!newEntries.isEmpty()) {
                 var acceptedAdditions = communicationService.createEntries(client, newEntries.stream()
                                                                                              .map(entry -> transformer.toDocument(entry))

@@ -15,8 +15,8 @@ public class JabRefOnlineService implements RemoteCommunicationService {
 
     public JabRefOnlineService() {
         apolloClient = new ApolloClient.Builder()
-                                                 .serverUrl("https://dev.www.jabref.org/api")
-                                                 .build();
+                .serverUrl("https://dev.www.jabref.org/api")
+                .build();
     }
 
     @Override
