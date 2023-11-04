@@ -79,7 +79,7 @@ class WebFetchersTest {
             expected.remove(EbookDeIsbnFetcher.class);
             expected.remove(GvkFetcher.class);
             expected.remove(DoiToBibtexConverterComIsbnFetcher.class);
-            //Remove special ISSN fetcher only suitable for journal lookup
+            // Remove special ISSN fetcher only suitable for journal lookup
             expected.remove(IssnFetcher.class);
             // Remove the following, because they don't work at the moment
             expected.remove(JstorFetcher.class);
