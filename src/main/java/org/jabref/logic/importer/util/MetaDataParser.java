@@ -124,7 +124,7 @@ public class MetaDataParser {
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (entry.getKey().equals(MetaData.REMOTE_SETTINGS)) {
-                metaData.setRemoteSettings(new Gson().fromJson(getSingleItem(value), RemoteSettings.class));
+                metaData.setRemoteSettings(new Gson().fromJson(getSingleItem(values), RemoteSettings.class));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
