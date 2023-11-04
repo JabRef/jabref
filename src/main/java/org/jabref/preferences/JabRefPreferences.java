@@ -1791,6 +1791,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(EMAIL_SUBJECT),
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
                 get(CITE_COMMAND),
+                (String) defaults.get(CITE_COMMAND),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION), // mind the !
                 get(CONSOLE_COMMAND),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !

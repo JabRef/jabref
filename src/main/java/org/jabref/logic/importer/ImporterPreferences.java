@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
@@ -110,5 +111,13 @@ public class ImporterPreferences {
 
     public void setPersistCustomKeys(boolean persistCustomKeys) {
         this.persistCustomKeys.set(persistCustomKeys);
+    }
+
+    public Optional<String> getApiKey(String name) {
+        return apiKeys.stream()
+                      .filter(key -> key.getName().equalsIgnoreCase(name))
+                      .filter(FetcherApiKey::shouldUse)
+                      .findFirst()
+                      .map(FetcherApiKey::getKey);
     }
 }

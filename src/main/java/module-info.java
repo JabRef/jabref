@@ -42,7 +42,7 @@ open module org.jabref {
     // Logging
     requires org.slf4j;
     requires jul.to.slf4j;
-    requires org.apache.logging.slf4j;
+    requires org.apache.logging.log4j.to.slf4j;
     requires org.tinylog.api;
     requires org.tinylog.api.slf4j;
     requires org.tinylog.impl;
@@ -88,7 +88,7 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
 
     // Apache Commons and other (similar) helper libraries
-    requires commons.cli;
+    requires org.apache.commons.cli;
     requires org.apache.commons.csv;
     requires org.apache.commons.lang3;
     requires com.google.common;
