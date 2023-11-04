@@ -69,7 +69,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.gui.git.GitPreferences;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -380,6 +380,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String GIT_USERNAME = "gitUsername";
     private static final String GIT_PASSWORD = "gitPassword";
 
+    private static final String GIT_AUTOCOMMIT = "autoCommit";
+    private static final String GIT_AUTOSYNC = "autoSync";
+
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
@@ -662,6 +665,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
+
+        defaults.put(GIT_AUTOCOMMIT, Boolean.TRUE);
+        defaults.put(GIT_AUTOSYNC, Boolean.TRUE);
 
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {
@@ -2809,11 +2815,15 @@ public class JabRefPreferences implements PreferencesService {
 
         gitPreferences = new GitPreferences(
             get(GIT_USERNAME),
-            get(GIT_PASSWORD)
+            get(GIT_PASSWORD),
+                getBoolean(GIT_AUTOCOMMIT),
+                getBoolean(GIT_AUTOSYNC)
         );
 
         EasyBind.listen(gitPreferences.getUsernameProperty(), (obs, oldValue, newValue) -> put(GIT_USERNAME, newValue));
         EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) -> put(GIT_PASSWORD, newValue));
+        EasyBind.listen(gitPreferences.getAutoCommitProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_AUTOCOMMIT, newValue));
+        EasyBind.listen(gitPreferences.getAutoSyncProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_AUTOSYNC, newValue));
 
         return gitPreferences;
     }

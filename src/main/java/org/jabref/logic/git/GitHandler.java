@@ -7,10 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.git.GitCredentialsDialogView;
-import org.jabref.gui.git.GitPreferences;
-import org.jabref.logic.util.io.FileUtil;
-
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -21,6 +17,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.jabref.logic.util.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +29,9 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    String gitUsername;
+    String gitPassword;
+    CredentialsProvider credentialsProvider;
     private GitPreferences gitPreferences;
 
     /**
@@ -45,6 +42,9 @@ public class GitHandler {
     public GitHandler(Path repositoryPath) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
+        this.gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
+        this.gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(this.gitUsername, this.gitPassword);
 
         if (!isGitRepository()) {
             try {
@@ -62,6 +62,45 @@ public class GitHandler {
                            .setAllowEmpty(true)
                            .setMessage(initialCommit)
                            .call();
+                    }
+                }
+            } catch (GitAPIException | IOException e) {
+                LOGGER.error("Initialization failed", e);
+            }
+        }
+    }
+
+    public GitHandler(Path repositoryPath, GitPreferences gitPreferences) {
+        this.gitPreferences = gitPreferences;
+        if (gitPreferences.getUsername() != null && gitPreferences.getPassword() != null) {
+            this.gitUsername = gitPreferences.getUsername();
+            this.gitPassword = gitPreferences.getPassword();
+        } else {
+            this.gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
+            this.gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+        }
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(this.gitUsername, this.gitPassword);
+
+        this.repositoryPath = repositoryPath;
+        this.repositoryPathAsFile = this.repositoryPath.toFile();
+
+
+        if (!isGitRepository()) {
+            try {
+                Git.init()
+                        .setDirectory(repositoryPathAsFile)
+                        .setInitialBranch("main")
+                        .call();
+                setupGitIgnore();
+                String initialCommit = "Initial commit";
+                if (!createCommitOnCurrentBranch(initialCommit, false)) {
+                    // Maybe, setupGitIgnore failed and did not add something
+                    // Then, we create an empty commit
+                    try (Git git = Git.open(repositoryPathAsFile)) {
+                        git.commit()
+                                .setAllowEmpty(true)
+                                .setMessage(initialCommit)
+                                .call();
                     }
                 }
             } catch (GitAPIException | IOException e) {
@@ -227,31 +266,14 @@ public class GitHandler {
 
             git.verifySignature();
 
-            if (this.gitPreferences.getUsername() != null && this.gitPreferences.getPassword() != null) {
-                this.gitUsername = this.gitPreferences.getUsername();
-                this.gitPassword = this.gitPreferences.getPassword();
-                this.credentialsProvider = new UsernamePasswordCredentialsProvider(this.gitUsername, this.gitPassword);
-            }
-
             if (isSshRemoteRepository) {
                 TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
                 git.push()
                .setTransportConfigCallback(transportConfigCallback)
                .call();
-            } else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
-                    GitCredentialsDialogView gitCredentialsDialogView = new GitCredentialsDialogView();
-
-                    gitCredentialsDialogView.showGitCredentialsDialog();
-
-                    this.credentialsProvider = new UsernamePasswordCredentialsProvider(
-                        gitCredentialsDialogView.getGitUsername(),
-                        gitCredentialsDialogView.getGitPassword()
-                    );
-
-                    git.push()
-                    .setCredentialsProvider(this.credentialsProvider)
-                    .call();
-            } else {
+            }else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
+                throw new IOException("No git credentials");
+            }  else {
                 git.push()
                 .setCredentialsProvider(this.credentialsProvider)
                 .call();
@@ -270,11 +292,20 @@ public class GitHandler {
      * Pulls all commits made to the branch that is tracked by the currently checked out branch.
      * If pulling to remote fails, it fails silently.
      */
-    public void pullOnCurrentBranch() {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
+    public void pullOnCurrentBranch() throws IOException {
+        Git git = Git.open(this.repositoryPathAsFile);
+
+        String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
+        boolean isSshRemoteRepository = remoteURL != null && remoteURL.contains("git@");
+
+        git.verifySignature();
+
+        if (isSshRemoteRepository) {
             try {
+                TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
                 git.pull()
-                   .call();
+                .setTransportConfigCallback(transportConfigCallback)
+                .call();
             } catch (GitAPIException e) {
                 if (e.getMessage().equals("origin: not found")) {
                     LOGGER.info("No remote repository detected. Push skipped.");
@@ -283,9 +314,23 @@ public class GitHandler {
                     throw new RuntimeException(e);
                 }
             }
-        } catch (IOException ex) {
-            LOGGER.info("Failed pulling git repository");
+        } else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
+            throw new IOException("No git credentials");
+        } else {
+            try {
+                git.pull()
+                .setCredentialsProvider(this.credentialsProvider).call();
+            } catch (GitAPIException e) {
+                if (e.getMessage().equals("origin: not found")) {
+                    LOGGER.info("No remote repository detected. Push skipped.");
+                } else {
+                    LOGGER.info("Failed to pull");
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+
     }
 
     /**
@@ -301,7 +346,9 @@ public class GitHandler {
         }
     }
 
-    public void setGitPreferences(GitPreferences gitPreferences) {
-        this.gitPreferences = gitPreferences;
+    public void setCredentialsProvider(CredentialsProvider credentialsProvider) {
+        this.credentialsProvider = credentialsProvider;
+        this.gitUsername = "credentialsProvider";
+        this.gitPassword = "credentialsProvider";
     }
 }

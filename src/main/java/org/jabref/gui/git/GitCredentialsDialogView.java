@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.git.GitCredential;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -22,7 +23,7 @@ public class GitCredentialsDialogView extends BaseDialog<Void> {
     @FXML private TextArea textAreaVersions;
     private DialogService dialogService;
     private DialogPane pane;
-    
+
     private ButtonType acceptButton;
     private ButtonType cancelButton;
     private TextField inputGitUsername;
@@ -46,16 +47,16 @@ public class GitCredentialsDialogView extends BaseDialog<Void> {
         vBox.getChildren().add(this.inputGitPassword);
 
         this.pane.setContent(vBox);
-        
+
     }
 
     public void showGitCredentialsDialog() {
         dialogService.showCustomDialogAndWait(Localization.lang("Git credentials"), this.pane, this.acceptButton, this.cancelButton);
     }
 
-    public GitCredentials getCredentials() {
+    public GitCredential getCredentials() {
         dialogService.showCustomDialogAndWait(Localization.lang("Git credentials"), this.pane, this.acceptButton, this.cancelButton);
-        GitCredentials gitCredentials = new GitCredentials(this.inputGitUsername.getText(), this.inputGitPassword.getText());
+        GitCredential gitCredentials = new GitCredential(this.inputGitUsername.getText(), this.inputGitPassword.getText());
 
         return gitCredentials;
     }

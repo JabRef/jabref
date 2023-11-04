@@ -1,38 +1,92 @@
 package org.jabref.logic.git;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class GitPreferences {
-    private final StringProperty username = new SimpleStringProperty();
-    private final StringProperty password = new SimpleStringProperty();
+    private StringProperty username;
+    private StringProperty password;
+    private BooleanProperty autoCommit;
 
-    public GitPreferences(String username, String password) {
-        this.username.setValue(username);
-        this.password.set(password);
+    private BooleanProperty autoSync;
+
+    public GitPreferences(String username, String password, Boolean autoCommit, Boolean autoSync) {
+        this.username = new SimpleStringProperty(username);
+        this.password = new SimpleStringProperty(password);
+        this.autoCommit = new SimpleBooleanProperty(autoCommit);
+        this.autoSync = new SimpleBooleanProperty(autoSync);
+    }
+
+    public GitPreferences(StringProperty username, StringProperty password, BooleanProperty autoCommit, BooleanProperty autoSync) {
+        this.username = username;
+        this.password = password;
+        this.autoCommit = autoCommit;
+        this.autoSync = autoSync;
+    }
+
+    public StringProperty getUsernameProperty() {
+        return this.username;
+    }
+
+    public Boolean getAutoCommit() {
+        return this.autoCommit.get();
+    }
+
+    public BooleanProperty getAutoCommitProperty() {
+        return this.autoCommit;
+    }
+
+    public Boolean getAutoSync() {
+        return this.autoSync.get();
+    }
+
+    public BooleanProperty getAutoSyncProperty() {
+        return this.autoSync;
+    }
+
+    public void setAutoCommit(Boolean autoCommit) {
+        this.autoCommit = new SimpleBooleanProperty(autoCommit);
+    }
+
+    public void setAutoCommitProperty(BooleanProperty autoCommit) {
+        this.autoCommit = autoCommit;
+    }
+
+    public void setAutoSync(Boolean autoSync) {
+        this.autoSync = new SimpleBooleanProperty(autoSync);
+    }
+
+    public void setAutoSyncProperty(BooleanProperty autoSync) {
+        this.autoSync = autoSync;
     }
 
     public String getUsername() {
-        return username.toString();
+        return this.username.get();
     }
 
-    public StringProperty usernameProperty() {
-        return username;
+    public StringProperty getPasswordProperty() {
+        return this.password;
     }
 
-    public void setUsername(String username) {
-        this.username.set(username);
+    public String getPassword() {
+        return this.password.get();
     }
 
-    public final String getPassword() {
-        return password.getValue();
-    }
-
-    public StringProperty passwordProperty() {
-        return password;
+    public void setPassword(StringProperty password) {
+        this.password = password;
     }
 
     public void setPassword(String password) {
-        this.password.set(password);
+        this.password = new SimpleStringProperty(password);
+    }
+
+    public void setUsername(StringProperty username) {
+        this.username = username;
+    }
+
+    public void setUsername(String username) {
+        this.username = new SimpleStringProperty(username);
     }
 }

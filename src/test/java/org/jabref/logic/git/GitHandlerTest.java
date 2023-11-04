@@ -28,7 +28,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.jabref.gui.git.GitPreferences;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.preferences.PreferencesService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -74,11 +74,10 @@ class GitHandlerTest {
 
     @BeforeEach
     public void setUpGitHandler() {
-        gitPreferences = new GitPreferences("testUser", "testPassword");
+        gitPreferences = new GitPreferences("testUser", "testPassword", true, true);
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getGitPreferences()).thenReturn(gitPreferences);
-        gitHandler = new GitHandler(repositoryPath);
-        gitHandler.setGitPreferences(preferences.getGitPreferences());
+        gitHandler = new GitHandler(repositoryPath, preferences.getGitPreferences());
     }
 
     @Test
@@ -155,7 +154,7 @@ class GitHandlerTest {
         assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile"));
 
         //Push
-        gitPreferences = new GitPreferences(username, password);
+        gitPreferences = new GitPreferences(username, password, true, true);
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getGitPreferences()).thenReturn(gitPreferences);
         git.setGitPreferences(preferences.getGitPreferences());

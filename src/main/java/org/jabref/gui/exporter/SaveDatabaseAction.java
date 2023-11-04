@@ -20,10 +20,12 @@ import javafx.scene.text.Text;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.git.GitCredentialsDialogView;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
@@ -327,10 +329,32 @@ public class SaveDatabaseAction {
      * Handle JabRef git integration action. This method is called when the user save the database.
      */
     public void automaticGitUpdate(Path filePath) throws IOException, GitAPIException {
-        GitHandler git = new GitHandler(filePath.getParent());
-        git.setGitPreferences(preferences.getGitPreferences());
-        String automaticCommitMsg = "Automatic update via JabRef";
-        git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
-        git.pushCommitsToRemoteRepository();
+        GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
+        if (preferences.getGitPreferences().getAutoCommit()) {
+            String automaticCommitMsg = "Automatic update via JabRef";
+            git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
+        }
+        if (preferences.getGitPreferences().getAutoSync()) {
+            try {
+                git.pullOnCurrentBranch();
+            } catch (IOException ex) {
+                if (ex.getMessage().equals("No git credentials")) {
+                    GitCredentialsDialogView gitCredentialsDialogView = new GitCredentialsDialogView();
+
+                    gitCredentialsDialogView.showGitCredentialsDialog();
+
+                    UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(
+                            gitCredentialsDialogView.getGitUsername(),
+                            gitCredentialsDialogView.getGitPassword()
+                    );
+
+                    git.setCredentialsProvider(credentialsProvider);
+                    git.pullOnCurrentBranch();
+                } else {
+                    throw new IOException(ex.getMessage());
+                }
+            }
+            git.pushCommitsToRemoteRepository();
+        }
     }
 }

@@ -2,21 +2,27 @@ package org.jabref.gui.preferences.git;
 
 import java.util.List;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.git.GitPreferences;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 
 public class GitTabViewModel implements PreferenceTabViewModel {
 
     private StringProperty username = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
+    private BooleanProperty autoCommit = new SimpleBooleanProperty();
+
+    private BooleanProperty autoSync = new SimpleBooleanProperty();
     private GitPreferences gitPreferences;
 
     public GitTabViewModel(GitPreferences gitPreferences) {
         this.gitPreferences = gitPreferences;
-
+        this.autoCommit = gitPreferences.getAutoCommitProperty();
+        this.autoSync = gitPreferences.getAutoSyncProperty();
         this.username = gitPreferences.getUsernameProperty();
         this.password = gitPreferences.getPasswordProperty();
     }
@@ -25,6 +31,8 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         this.username.setValue(this.gitPreferences.getUsername());
         this.password.setValue(this.gitPreferences.getPassword());
+        this.autoCommit.setValue(this.gitPreferences.getAutoCommit());
+        this.autoCommit.setValue(this.gitPreferences.getAutoSync());
     }
 
     @Override
@@ -55,5 +63,21 @@ public class GitTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty getPasswordProperty() {
         return this.password;
+    }
+
+    public Boolean getAutoCommit() {
+        return this.autoCommit.get();
+    }
+
+    public BooleanProperty getAutoCommitProperty() {
+        return this.autoCommit;
+    }
+
+    public Boolean getAutoSync() {
+        return this.autoSync.get();
+    }
+
+    public BooleanProperty getAutoSyncProperty() {
+        return this.autoSync;
     }
 }
