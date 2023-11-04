@@ -22,6 +22,7 @@ class IssnFetcherTest {
 
     private IssnFetcher fetcher;
     private BibEntry bibEntry;
+
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importPrefs = mock(ImportFormatPreferences.class);
@@ -41,6 +42,7 @@ class IssnFetcherTest {
         List<BibEntry> fetchedEntry = fetcher.performSearch(bibEntry);
         assertEquals(List.of(bibEntry), fetchedEntry);
     }
+
     @Test
     void performSearchById() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("15454509");

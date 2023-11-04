@@ -25,6 +25,6 @@ public class ISSNChecker implements ValueChecker {
         if (!issn.isValidChecksum()) {
             return Optional.of(Localization.lang("incorrect control digit"));
         }
-        return Optional.of(issnString);
+        return Optional.empty();
     }
 }

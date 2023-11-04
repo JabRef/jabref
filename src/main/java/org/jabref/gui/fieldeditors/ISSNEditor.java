@@ -83,6 +83,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     private void fetchInformationByIdentifier() {
         entry.ifPresent(viewModel::fetchBibliographyInformation);
     }
+
     @FXML
     private void showJournalInfo() {
         if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getEntryEditorPreferences())) {

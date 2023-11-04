@@ -30,7 +30,7 @@ public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         Optional<String> issn = entry.getField(StandardField.ISSN);
         if (issn.isPresent()) {
             Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(issn.get(), "");
-            return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, issn.get()) ).stream().toList();
+            return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, issn.get())).stream().toList();
         }
         return Collections.emptyList();
     }
@@ -46,7 +46,7 @@ public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, identifier));
     }
 
-    private BibEntry journalInformationToBibEntry(JournalInformation journalInfo, String issn){
+    private BibEntry journalInformationToBibEntry(JournalInformation journalInfo, String issn) {
         return new BibEntry().withField(StandardField.JOURNALTITLE, journalInfo.title()).withField(StandardField.PUBLISHER, journalInfo.publisher()).withField(StandardField.ISSN, issn);
     }
 }
