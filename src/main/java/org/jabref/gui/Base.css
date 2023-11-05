@@ -1447,3 +1447,8 @@ We want to have a look that matches our icons in the tool-bar */
 .table-column .rotated > .label {
     -fx-content-display: graphic-only;
 }
+
+.customGenerateButton {
+    -fx-padding: 0.5em 2em;
+    -fx-min-width: 10em;
+}

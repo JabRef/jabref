@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
+    // Uses JabRef Online APIs
     private static final String API_URL = "https://jabref.org/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
@@ -90,7 +91,7 @@ public class JournalInformationFetcher implements WebFetcher {
         try {
             if (responseJsonObject.has("errors")) {
                 JSONArray errors = responseJsonObject.optJSONArray("errors");
-                if (errors != null && errors.length() > 0) {
+                if (errors != null && !errors.isEmpty()) {
                     JSONObject error = errors.getJSONObject(0);
                     String errorMessage = error.optString("message", "");
                     LOGGER.error("Error accessing catalog: {}", errorMessage);
