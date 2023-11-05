@@ -78,7 +78,7 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
                 .install(fileTypesTableIconColumn);
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, Boolean>()
                 .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
-                .withOnMouseClickedEvent((type, none) -> event -> viewModel.edit(type))
+                .withOnMouseClickedEvent((type, none) -> event -> editType(type))
                 .install(fileTypesTableEditColumn);
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, Boolean>()
                 .withGraphic(none -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
@@ -86,14 +86,21 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
                 .install(fileTypesTableDeleteColumn);
     }
 
+    private void editType(ExternalFileTypeItemViewModel type){
+        if(viewModel.edit(type)){
+            fileTypesTable.getSelectionModel().selectLast();
+            fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);
+        }
+    }
+
     @FXML
     private void addNewType() {
-        int fileTypeCount = fileTypesTable.getItems().size();
         if (viewModel.addNewType()) {
             fileTypesTable.getSelectionModel().selectLast();
             fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);
         }
     }
+
 
     @FXML
     private void resetToDefault() {

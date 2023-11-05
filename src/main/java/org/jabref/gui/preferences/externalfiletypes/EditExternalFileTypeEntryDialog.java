@@ -33,15 +33,10 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     private final NativeDesktop nativeDesktop = OS.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
-
     private final ExternalFileTypeItemViewModel item;
-
-    private final boolean isNewItem;
     private EditExternalFileTypeViewModel viewModel;
 
     public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
-        this.isNewItem = item.extensionProperty().get().equals("");
-
         this.item = item;
 
         this.setTitle(dialogTitle);
@@ -51,26 +46,13 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         final Button btOk = (Button) this.getDialogPane().lookupButton(ButtonType.OK);
-        btOk.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!isValidExternalFileTypeEntry()) {
-                event.consume();
-            }
-        });
 
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
-            } else {
-                name.setText("");
             }
             return null;
         });
-    }
-
-    public boolean isValidExternalFileTypeEntry() {
-        return !(name.getText().isBlank()
-                || extension.getText().isBlank()
-                || mimeType.getText().isBlank());
     }
 
     @FXML
@@ -83,13 +65,12 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         customApplication.selectedProperty().bindBidirectional(viewModel.customApplicationSelectedProperty());
         selectedApplication.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
         btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
-
         extension.textProperty().bindBidirectional(viewModel.extensionProperty());
-        extension.setEditable(isNewItem);
         name.textProperty().bindBidirectional(viewModel.nameProperty());
         mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());
         selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());
     }
+
 
     @FXML
     private void openFileChooser(ActionEvent event) {
