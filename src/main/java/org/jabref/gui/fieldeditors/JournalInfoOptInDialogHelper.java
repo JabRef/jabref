@@ -15,12 +15,18 @@ public class JournalInfoOptInDialogHelper {
         }
 
         if (preferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.DISABLED) {
-            dialogService.notify(
-                    Localization.lang("Please enable journal information fetching in %0 > %1",
+            boolean enableJournalPopup = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Enable Journal Information Fetching?"),
+                    Localization.lang("Would you like to enable fetching of journal information? This can be changed later in %0 > %1.",
                             Localization.lang("Preferences"),
-                            Localization.lang("Web search"))
+                            Localization.lang("Entry editor")), Localization.lang("Enable"), Localization.lang("Keep disabled")
             );
-            return false;
+
+            preferences.setEnableJournalPopup(enableJournalPopup
+                    ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                    : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+
+            return enableJournalPopup;
         }
 
         boolean journalInfoEnabled = dialogService.showConfirmationDialogAndWait(
