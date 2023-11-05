@@ -2831,7 +2831,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (obs, oldValue, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
-        EasyBind.listen(importerPreferences.getCatalogs(), (obs, oldValue, newValue) -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
+        EasyBind.listen(importerPreferences.catalogsProperty(), (obs, oldValue, newValue) -> putStringList(SEARCH_CATALOGS, importerPreferences.catalogsProperty()));
 
         return importerPreferences;
     }

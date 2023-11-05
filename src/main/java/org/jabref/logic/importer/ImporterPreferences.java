@@ -27,7 +27,7 @@ public class ImporterPreferences {
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImporters;
     private final BooleanProperty persistCustomKeys;
-    private final ListProperty<String> catalogs = new SimpleListProperty<>();
+    private final ListProperty<String> catalogs;
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
@@ -43,7 +43,7 @@ public class ImporterPreferences {
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
-        this.catalogs.set(FXCollections.observableArrayList(catalogs));
+        this.catalogs = new SimpleListProperty<>(FXCollections.observableArrayList(catalogs));
     }
 
     public boolean areImporterEnabled() {
@@ -131,7 +131,14 @@ public class ImporterPreferences {
         this.catalogs.set(catalogs);
     }
 
-    public ListProperty<String> getCatalogs() {
+    public ObservableList<String> getCatalogs() {
+        if (catalogs.get() == null) {
+            catalogs.set(FXCollections.observableArrayList());
+        }
+        return catalogs.get();
+    }
+
+    public ListProperty<String> catalogsProperty() {
         return catalogs;
     }
 }

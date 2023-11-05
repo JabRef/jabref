@@ -20,7 +20,6 @@ import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,11 +37,7 @@ public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
 
-    private ImporterPreferences importerPreferences;
-    @BeforeEach
-    void setUp() {
-        importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    }
+    private ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     @Test
     public void createCompositeFetcherWithNullSet() {

@@ -22,7 +22,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We replaced "SearchAll" in Web Search by "Search Selected". [#10556](https://github.com/JabRef/jabref/issues/10556)
 - Short DOI formatter now checks, if the value is already formatted. If so, it returns the value instead of calling the ShortDOIService again. [#10589](https://github.com/JabRef/jabref/issues/10589)
 
-
 ### Fixed
 
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list. [#10415](https://github.com/JabRef/jabref/issues/10415)
