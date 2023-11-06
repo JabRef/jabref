@@ -24,6 +24,7 @@ import org.controlsfx.control.HyperlinkLabel;
 public class SciteTab extends EntryEditorTab {
 
     public static final String NAME = "Scite";
+    public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
 
     private final GridPane sciteResultsPane;
     private final ProgressIndicator progressIndicator;
@@ -102,7 +103,7 @@ public class SciteTab extends EntryEditorTab {
             tallyDTO.citingPublications()
         ));
 
-        String url = "https://scite.ai/reports/" + URLEncoder.encode(tallyDTO.doi());
+        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallyDTO.doi());
         HyperlinkLabel link = new HyperlinkLabel(String.format("See full report at [%s]", url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
