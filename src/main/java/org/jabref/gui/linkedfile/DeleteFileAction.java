@@ -9,7 +9,6 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
@@ -93,18 +92,22 @@ public class DeleteFileAction extends SimpleCommand {
     /**
      * Deletes the files from the entry and optionally from disk.
      *
-     * @param toBeDeleted the files to be deleted
+     * @param toBeDeleted    the files to be deleted
      * @param deleteFromDisk if true, the files are deleted from disk, otherwise they are only removed from the entry
      */
     private void deleteFiles(List<LinkedFileViewModel> toBeDeleted, boolean deleteFromDisk) {
         for (LinkedFileViewModel fileViewModel : toBeDeleted) {
             if (fileViewModel.getFile().isOnlineLink()) {
-                viewModel.removeFileLink(fileViewModel);
+                if (viewModel != null) {
+                    viewModel.removeFileLink(fileViewModel);
+                }
             } else {
                 if (deleteFromDisk) {
                     deleteFileFromDisk(fileViewModel);
                 }
-                viewModel.getFiles().remove(fileViewModel);
+                if (viewModel != null) {
+                    viewModel.getFiles().remove(fileViewModel);
+                }
             }
         }
     }
