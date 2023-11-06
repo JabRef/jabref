@@ -736,7 +736,7 @@ public class LibraryTab extends Tab {
      * @return true if user confirm to delete attached files
      */
     private boolean showLinkedFileDeleteConfirmationDialog(List<LinkedFile> linkedFileList) {
-        if (preferencesService.getFilePreferences().alwaysDeleteLinkedFile()) {
+        if (preferencesService.getFilePreferences().confirmDeleteLinkedFile()) {
             return true;
         }
         String title = Localization.lang("Delete attached file(s)");
@@ -755,7 +755,8 @@ public class LibraryTab extends Tab {
                 okButton,
                 cancelButton,
                 Localization.lang("Always delete attached file(s)"),
-                optOut -> preferencesService.getFilePreferences().setAlwaysDeleteLinkedFile(optOut));
+                // false => confirm delete
+                optOut -> preferencesService.getFilePreferences().confirmDeleteLinkedFile(!optOut));
     }
 
     /**

@@ -184,15 +184,15 @@ public class FilePreferences {
         return this.backupDirectory.getValue();
     }
 
-    public boolean alwaysDeleteLinkedFile() {
+    public boolean confirmDeleteLinkedFile() {
         return confirmDeleteLinkedFile.get();
     }
 
-    public BooleanProperty alwaysDeleteLinkedFileProperty() {
+    public BooleanProperty confirmDeleteLinkedFileProperty() {
         return confirmDeleteLinkedFile;
     }
 
-    public void setAlwaysDeleteLinkedFile(boolean confirmLinkedFileDelete) {
+    public void confirmDeleteLinkedFile(boolean confirmLinkedFileDelete) {
         this.confirmDeleteLinkedFile.set(confirmLinkedFileDelete);
     }
 }
