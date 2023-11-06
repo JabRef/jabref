@@ -72,9 +72,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
     @Override
     public Parser getParser() {
         return inputStream -> {
-            // Read the API response.
             JSONObject response = JsonReader.toJsonObject(inputStream);
-            // Parse the JSON response into a list of BibEntry objects.
             List<BibEntry> entries = new ArrayList<>();
             if (response.has("results")) {
                 JSONArray results = response.getJSONArray("results");
@@ -89,11 +87,6 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
         };
     }
 
-    /**
-     * Gets he name of fetcher
-     *
-     * @return The fetcher name
-     */
     @Override
     public String getName() {
         return FETCHER_NAME;
