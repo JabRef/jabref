@@ -1,0 +1,35 @@
+name: Check external href links in the documentation
+
+on:
+  push:
+    paths:
+      - '.github/workflows/check-links.yml'
+      - '**/*.md'
+  schedule:
+    # Run on the first of each month at 9:00 AM (See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07)
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref }}"
+  cancel-in-progress: true
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Restore lychee cache
+        uses: actions/cache@v3
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v1.8.0
+        with:
+          fail: true
+          args: --max-concurrency 1 --cache --no-progress --exclude-all-private './**/*.md'
