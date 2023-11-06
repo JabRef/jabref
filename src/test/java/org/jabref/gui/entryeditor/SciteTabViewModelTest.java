@@ -43,15 +43,15 @@ public class SciteTabViewModelTest {
         jsonObject.put("citingPublications", 6);
         jsonObject.put("doi", "test_doi");
 
-        var dto = SciteTabViewModel.SciteTallyDTO.fromJSONObject(jsonObject);
+        var dto = SciteTallyDTO.fromJSONObject(jsonObject);
 
-        Assertions.assertEquals(1, dto.getTotal());
-        Assertions.assertEquals(2, dto.getSupporting());
-        Assertions.assertEquals(3, dto.getContradicting());
-        Assertions.assertEquals(4, dto.getMentioning());
-        Assertions.assertEquals(5, dto.getUnclassified());
-        Assertions.assertEquals(6, dto.getCitingPublications());
-        Assertions.assertEquals("test_doi", dto.getDoi());
+        Assertions.assertEquals(1, dto.total());
+        Assertions.assertEquals(2, dto.supporting());
+        Assertions.assertEquals(3, dto.contradicting());
+        Assertions.assertEquals(4, dto.mentioning());
+        Assertions.assertEquals(5, dto.unclassified());
+        Assertions.assertEquals(6, dto.citingPublications());
+        Assertions.assertEquals("test_doi", dto.doi());
     }
 
     @Test
@@ -59,6 +59,6 @@ public class SciteTabViewModelTest {
         var viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
         DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
         var actual = viewModel.fetchTallies(doi);
-        Assertions.assertTrue(doi.getDOI().equalsIgnoreCase(actual.getDoi()));
+        Assertions.assertTrue(doi.getDOI().equalsIgnoreCase(actual.doi()));
     }
 }

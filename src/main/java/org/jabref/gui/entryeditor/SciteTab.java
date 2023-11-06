@@ -83,26 +83,26 @@ public class SciteTab extends EntryEditorTab {
 
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
-        titleLabel.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;-fx-text-fill: -fx-accent;");
+        titleLabel.getStyleClass().add("scite-error-label");
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.setStyle("-fx-padding: 30 0 0 30;");
+        errorMessageBox.getStyleClass().add("scite-error-box");
         return errorMessageBox;
     }
 
-    private VBox getTalliesPane(SciteTabViewModel.SciteTallyDTO tallyDTO) {
-        Label titleLabel = new Label(Localization.lang("Tallies for") + " " + tallyDTO.getDoi());
-        titleLabel.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;");
+    private VBox getTalliesPane(SciteTallyDTO tallyDTO) {
+        Label titleLabel = new Label(Localization.lang("Tallies for") + " " + tallyDTO.doi());
+        titleLabel.getStyleClass().add("scite-tallies-label");
         Text message = new Text(String.format("Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d",
-            tallyDTO.getTotal(),
-            tallyDTO.getSupporting(),
-            tallyDTO.getContradicting(),
-            tallyDTO.getMentioning(),
-            tallyDTO.getUnclassified(),
-            tallyDTO.getCitingPublications()
+            tallyDTO.total(),
+            tallyDTO.supporting(),
+            tallyDTO.contradicting(),
+            tallyDTO.mentioning(),
+            tallyDTO.unclassified(),
+            tallyDTO.citingPublications()
         ));
 
-        String url = "https://scite.ai/reports/" + URLEncoder.encode(tallyDTO.getDoi());
+        String url = "https://scite.ai/reports/" + URLEncoder.encode(tallyDTO.doi());
         HyperlinkLabel link = new HyperlinkLabel(String.format("See full report at [%s]", url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
