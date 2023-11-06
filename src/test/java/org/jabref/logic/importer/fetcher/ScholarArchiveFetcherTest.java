@@ -42,7 +42,7 @@ public class ScholarArchiveFetcherTest {
     @Test
     public void performSearchReturnsExpectedResults() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("query");
-        fetchedEntries.forEach(s -> s.clearField(StandardField.ABSTRACT));
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertTrue(fetchedEntries.contains(bibEntry), "Found the following entries " + fetchedEntries);
     }
 }
