@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
@@ -55,7 +56,7 @@ public class SciteTabViewModelTest {
     }
 
     @Test
-    void testFetchTallies() {
+    void testFetchTallies() throws FetcherException {
         var viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
         DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
         var actual = viewModel.fetchTallies(doi);

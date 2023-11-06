@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -12,6 +14,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
@@ -89,7 +92,7 @@ public class SciteTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    public SciteTallyDTO fetchTallies(DOI doi) {
+    public SciteTallyDTO fetchTallies(DOI doi) throws FetcherException {
         try {
             URL url = new URL(BASE_URL + "tallies/" + doi.getDOI());
             URLDownload download = new URLDownload(url);
@@ -104,8 +107,10 @@ public class SciteTabViewModel extends AbstractViewModel {
             }
 
             return SciteTallyDTO.fromJSONObject(tallies);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (MalformedURLException ex) {
+            throw new FetcherException("Malformed url for DOI", ex);
+        } catch (IOException ioex) {
+            throw new FetcherException("Failed to retrieve tallies for DOI - IO Exception", ioex);
         }
     }
 
