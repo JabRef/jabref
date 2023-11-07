@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list. [#10415](https://github.com/JabRef/jabref/issues/10415)
 - We fixed an issue where in the merge dialog the file field of entries was not correctly merged when the first and second entry both contained values inside the file field. [#10572](https://github.com/JabRef/jabref/issues/10572)
 - We fixed some small inconsistencies in the user interface. [#10507](https://github.com/JabRef/jabref/issues/10507) [#10458](https://github.com/JabRef/jabref/issues/10458)
+- We fixed issues in the external file type dialog, e.g., duplicate entries in the case of a language switch. [#10271](https://github.com/JabRef/jabref/issues/10271)
 
 ### Removed
 
@@ -81,7 +82,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where there was a failure to access the url link for "eprint" for the ArXiv entry.[#10474](https://github.com/JabRef/jabref/issues/10474)
 - We fixed an issue where it was not possible to connect to a shared database once a group with entries was added or other metadata modified [#10336](https://github.com/JabRef/jabref/issues/10336)
 - We fixed an issue where middle-button paste in X not always worked [#7905](https://github.com/JabRef/jabref/issues/7905)
-- We fixed issues in the external file type dialog, e.g., duplicate entries in the case of a language switch. [#10271](https://github.com/JabRef/jabref/issues/10271)
 
 ## [5.10] – 2023-09-02
 

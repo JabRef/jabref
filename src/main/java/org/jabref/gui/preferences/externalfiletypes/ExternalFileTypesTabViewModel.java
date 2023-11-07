@@ -63,8 +63,9 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         ExternalFileTypeItemViewModel item = new ExternalFileTypeItemViewModel();
         showEditDialog(item, Localization.lang("Add new file type"));
 
-        if (!isValidExternalFileType(item))
+        if (!isValidExternalFileType(item)) {
             return false;
+        }
 
         fileTypes.add(item);
         return true;
@@ -82,8 +83,9 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         ExternalFileTypeItemViewModel typeToModify = new ExternalFileTypeItemViewModel(type.toExternalFileType());
         showEditDialog(typeToModify, Localization.lang("Edit file type"));
 
-        if (!isValidExternalFileType(typeToModify))
+        if (!isValidExternalFileType(typeToModify)) {
             return false;
+        }
 
         fileTypes.remove(type);
         fileTypes.add(typeToModify);
@@ -93,20 +95,22 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     public void remove(ExternalFileTypeItemViewModel type) {
         fileTypes.remove(type);
     }
-    public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item){
+
+    public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item) {
         // Check that there are no empty strings.
         if (item.getName().isEmpty() || item.extensionProperty().get().isEmpty() || item.mimetypeProperty().get().isEmpty()) {
             LOGGER.info("One of the fields is empty or invalid!");
             return false;
         }
 
-        //check extension need to be unique
+        // check extension need to be unique in the list
         String newExt = item.extensionProperty().get();
-        for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes)
+        for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
             if (newExt.equalsIgnoreCase(fileTypeItem.extensionProperty().get())) {
                 LOGGER.info("File Extension exists already!");
                 return false;
             }
+        }
 
         return true;
     }

@@ -27,62 +27,59 @@ public class ExternalFileTypesTabViewModelTest {
     private ExternalFileTypeItemViewModelDTO externalFileTypeItemViewModel = new ExternalFileTypeItemViewModelDTO();
    @BeforeEach
    void setUp() {
-       //arrange
+       // arrange
        externalFileTypeItemViewModel.setup();
    }
 
     @Test
-    public void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue(){
-        //action,  assert
+    public void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue() {
+        // action,  assert
         assertTrue(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
     }
 
    @Test
-   public void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse(){
-
-       //arrange
+   public void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse() {
+       // arrange
        externalFileTypeItemViewModel.setupWithoutName();
-       //action,  assert
+       // action,  assert
        assertFalse(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
    }
 
    @Test
-    public void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful(){
-
-       //arrange
-       ArgumentCaptor<ExternalFileTypeItemViewModel> worldCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
+   public void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
+       // arrange
+       ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
        doAnswer(mocked -> {
-           ExternalFileTypeItemViewModel capturedWorld = worldCaptor.getValue();
-           externalFileTypeItemViewModel.clone(capturedWorld);
+           ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
+           externalFileTypeItemViewModel.clone(capturedItem);
            return null;
-       }).when(externalFileTypesTabViewModel).showEditDialog(worldCaptor.capture(),any());
+       }).when(externalFileTypesTabViewModel).showEditDialog(itemCaptor.capture(), any());
 
-       //action
+       // action
        externalFileTypesTabViewModel.addNewType();
 
-       //assert
+       // assert
        ObservableList<ExternalFileTypeItemViewModel> actualFileTypes = externalFileTypesTabViewModel.getFileTypes();
-       assertEquals(actualFileTypes.size(),1);
+       assertEquals(actualFileTypes.size(), 1);
        assertTrue(externalFileTypeItemViewModel.isSameValue(actualFileTypes.getFirst()));
    }
 
     @Test
-    public void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed(){
-
-        //arrange
+    public void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed() {
+        // arrange
         externalFileTypeItemViewModel.setupWithoutName();
-        ArgumentCaptor<ExternalFileTypeItemViewModel> worldCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
+        ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
         doAnswer(mocked -> {
-            ExternalFileTypeItemViewModel capturedWorld = worldCaptor.getValue();
-            externalFileTypeItemViewModel.clone(capturedWorld);
+            ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
+            externalFileTypeItemViewModel.clone(capturedItem);
             return null;
-        }).when(externalFileTypesTabViewModel).showEditDialog(worldCaptor.capture(),any());
+        }).when(externalFileTypesTabViewModel).showEditDialog(itemCaptor.capture(), any());
 
-        //action
+        // action
         externalFileTypesTabViewModel.addNewType();
 
-        //assert
+        // assert
         ObservableList<ExternalFileTypeItemViewModel> emptyFileTypes = externalFileTypesTabViewModel.getFileTypes();
-        assertEquals(emptyFileTypes.size(),0);
+        assertEquals(emptyFileTypes.size(), 0);
     }
 }
