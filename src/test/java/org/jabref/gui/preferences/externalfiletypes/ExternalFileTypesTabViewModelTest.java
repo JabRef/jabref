@@ -24,7 +24,7 @@ public class ExternalFileTypesTabViewModelTest {
     private DialogService dialogService = mock(DialogService.class);
     @Spy
     private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(filePreferences, dialogService));
-    private ExternalFileTypeItemViewModelDTO externalFileTypeItemViewModel = new ExternalFileTypeItemViewModelDTO();
+    private ExternalFileTypeItemViewModelTestData externalFileTypeItemViewModel = new ExternalFileTypeItemViewModelTestData();
    @BeforeEach
    void setUp() {
        // arrange
