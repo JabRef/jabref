@@ -71,7 +71,6 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());
     }
 
-
     @FXML
     private void openFileChooser(ActionEvent event) {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString()));
