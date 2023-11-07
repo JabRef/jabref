@@ -26,14 +26,9 @@ public class ExternalFileTypeItemViewModelTestData {
     }
 
     public boolean isSameValue(ExternalFileTypeItemViewModel item) {
-        if (!item.getName().equals(externalFileTypeItemViewModel.getName())
-            || !item.extensionProperty().get().equals(externalFileTypeItemViewModel.extensionProperty().get())
-            || !item.mimetypeProperty().get().equals(externalFileTypeItemViewModel.mimetypeProperty().get())
-            || !item.applicationProperty().get().equals(externalFileTypeItemViewModel.applicationProperty().get())
-        ) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(!item.getName().equals(externalFileTypeItemViewModel.getName())
+                || !item.extensionProperty().get().equals(externalFileTypeItemViewModel.extensionProperty().get())
+                || !item.mimetypeProperty().get().equals(externalFileTypeItemViewModel.mimetypeProperty().get())
+                || !item.applicationProperty().get().equals(externalFileTypeItemViewModel.applicationProperty().get()));
     }
 }
