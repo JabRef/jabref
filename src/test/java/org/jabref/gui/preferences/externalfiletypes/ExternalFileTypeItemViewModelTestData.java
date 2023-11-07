@@ -1,7 +1,4 @@
 package org.jabref.gui.preferences.externalfiletypes;
-
-import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypeItemViewModel;
-
 public class ExternalFileTypeItemViewModelTestData {
     private ExternalFileTypeItemViewModel externalFileTypeItemViewModel = new ExternalFileTypeItemViewModel();
 
