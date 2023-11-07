@@ -110,7 +110,9 @@ public enum KeyBinding {
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
     CLEAR_READ_STATUS("Clear read status", Localization.lang("Clear read status"), "", KeyBindingCategory.EDIT),
     READ("Set read status to read", Localization.lang("Set read status to read"), "", KeyBindingCategory.EDIT),
-    SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT);
+    SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT),
+    RELEVANT("Set relevant", Localization.lang("Set relevant"), "", KeyBindingCategory.EDIT),
+    IRRELEVANT("Set irrelevant", Localization.lang("Set irrelevant"), "", KeyBindingCategory.EDIT);
 
     private final String constant;
     private final String localization;
