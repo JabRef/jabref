@@ -86,8 +86,8 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
                 .install(fileTypesTableDeleteColumn);
     }
 
-    private void editType(ExternalFileTypeItemViewModel type){
-        if(viewModel.edit(type)){
+    private void editType(ExternalFileTypeItemViewModel type) {
+        if (viewModel.edit(type)) {
             fileTypesTable.getSelectionModel().selectLast();
             fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);
         }
@@ -100,7 +100,6 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
             fileTypesTable.scrollTo(viewModel.getFileTypes().size() - 1);
         }
     }
-
 
     @FXML
     private void resetToDefault() {
