@@ -74,7 +74,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         return fileTypes;
     }
 
-    private void showEditDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
+    protected void showEditDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
         dialogService.showCustomDialogAndWait(new EditExternalFileTypeEntryDialog(item, dialogTitle));
     }
 

@@ -1,67 +1,88 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
-import java.util.Set;
-
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.StandardExternalFileType;
+import org.jabref.gui.DialogService;
 import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Spy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
 
 public class ExternalFileTypesTabViewModelTest {
-    private static final Set<ExternalFileType> TEST_LIST = Set.of(
-            StandardExternalFileType.MARKDOWN,
-            StandardExternalFileType.PDF,
-            StandardExternalFileType.URL,
-            StandardExternalFileType.JPG,
-            StandardExternalFileType.TXT);
 
-    private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = mock(ExternalFileTypesTabViewModel.class);
     private FilePreferences filePreferences = mock(FilePreferences.class);
-    private ObservableList<ExternalFileTypeItemViewModel> fileTypes = FXCollections.observableArrayList();
-
-    @BeforeEach
-    void setUp() {
-        // Arrange
-        when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(TEST_LIST));
-        fileTypes.addAll(filePreferences.getExternalFileTypes().stream().map(ExternalFileTypeItemViewModel::new).toList());
-    }
+    private DialogService dialogService = mock(DialogService.class);
+    @Spy
+    private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(filePreferences, dialogService));
+    private ExternalFileTypeItemViewModelDTO externalFileTypeItemViewModel = new ExternalFileTypeItemViewModelDTO();
+   @BeforeEach
+   void setUp() {
+       //arrange
+       externalFileTypeItemViewModel.setup();
+   }
 
     @Test
-    public void addNewTypeSuccess() {
-        // Arrange
-        doAnswer(invocation -> {
-            ExternalFileTypeItemViewModel item = new ExternalFileTypeItemViewModel();
-            fileTypes.add(item);
+    public void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue(){
+        //action,  assert
+        assertTrue(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
+    }
+
+   @Test
+   public void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse(){
+
+       //arrange
+       externalFileTypeItemViewModel.setupWithoutName();
+       //action,  assert
+       assertFalse(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
+   }
+
+   @Test
+    public void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful(){
+
+       //arrange
+       ArgumentCaptor<ExternalFileTypeItemViewModel> worldCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
+       doAnswer(mocked -> {
+           ExternalFileTypeItemViewModel capturedWorld = worldCaptor.getValue();
+           externalFileTypeItemViewModel.clone(capturedWorld);
+           return null;
+       }).when(externalFileTypesTabViewModel).showEditDialog(worldCaptor.capture(),any());
+
+       //action
+       externalFileTypesTabViewModel.addNewType();
+
+       //assert
+       ObservableList<ExternalFileTypeItemViewModel> actualFileTypes = externalFileTypesTabViewModel.getFileTypes();
+       assertEquals(actualFileTypes.size(),1);
+       assertTrue(externalFileTypeItemViewModel.isSameValue(actualFileTypes.getFirst()));
+   }
+
+    @Test
+    public void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed(){
+
+        //arrange
+        externalFileTypeItemViewModel.setupWithoutName();
+        ArgumentCaptor<ExternalFileTypeItemViewModel> worldCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
+        doAnswer(mocked -> {
+            ExternalFileTypeItemViewModel capturedWorld = worldCaptor.getValue();
+            externalFileTypeItemViewModel.clone(capturedWorld);
             return null;
-        }).when(externalFileTypesTabViewModel).addNewType();
+        }).when(externalFileTypesTabViewModel).showEditDialog(worldCaptor.capture(),any());
 
-        // Action
+        //action
         externalFileTypesTabViewModel.addNewType();
 
-        // Assert
-        assertEquals(fileTypes.size(), 6);
-    }
-
-    @Test
-    public void addNewTypeFailed() {
-        // Arrange
-        doNothing().when(externalFileTypesTabViewModel).addNewType();
-
-        // Action
-        externalFileTypesTabViewModel.addNewType();
-
-        // Assert
-        assertEquals(fileTypes.size(), 5);
+        //assert
+        ObservableList<ExternalFileTypeItemViewModel> emptyFileTypes = externalFileTypesTabViewModel.getFileTypes();
+        assertEquals(emptyFileTypes.size(),0);
     }
 }
