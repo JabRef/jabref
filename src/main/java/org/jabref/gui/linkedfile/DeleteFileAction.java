@@ -30,25 +30,30 @@ public class DeleteFileAction extends SimpleCommand {
     private final PreferencesService preferences;
     private final BibDatabaseContext databaseContext;
     private final LinkedFilesEditorViewModel viewModel;
-    private final ListView<LinkedFileViewModel> listView;
+    private final List<LinkedFileViewModel> linkedFiles;
 
     public DeleteFileAction(DialogService dialogService,
                             PreferencesService preferences,
                             BibDatabaseContext databaseContext,
                             LinkedFilesEditorViewModel viewModel,
-                            ListView<LinkedFileViewModel> listView) {
+                            List<LinkedFileViewModel> linkedFiles) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.viewModel = viewModel;
-        this.listView = listView;
+        this.linkedFiles = List.copyOf(linkedFiles)
+    }
+
+    public DeleteFileAction(DialogService dialogService,
+                            PreferencesService preferences,
+                            BibDatabaseContext databaseContext,
+                            List<LinkedFileViewModel> linkedFiles) {
+        this(dialogService, preferences, databaseContext, null, linkedFiles);
     }
 
     @Override
     public void execute() {
-        List<LinkedFileViewModel> toBeDeleted = List.copyOf(listView.getSelectionModel().getSelectedItems());
-
-        if (toBeDeleted.isEmpty()) {
+        if (linkedFiles.isEmpty()) {
             dialogService.notify(Localization.lang("This operation requires selected linked files."));
             return;
         }
@@ -56,35 +61,36 @@ public class DeleteFileAction extends SimpleCommand {
         String dialogTitle;
         String dialogContent;
 
-        if (toBeDeleted.size() != 1) {
-            dialogTitle = Localization.lang("Delete %0 files", toBeDeleted.size());
+        if (linkedFiles.size() != 1) {
+            dialogTitle = Localization.lang("Delete %0 files", linkedFiles.size());
             dialogContent = Localization.lang("Delete %0 files permanently from disk, or just remove the files from the entry? " +
-                    "Pressing Delete will delete the files permanently from disk.", toBeDeleted.size());
+                    "Pressing Delete will delete the files permanently from disk.", linkedFiles.size());
         } else {
-            Optional<Path> file = toBeDeleted.get(0).getFile().findIn(databaseContext, preferences.getFilePreferences());
+            Optional<Path> file = linkedFiles.get(0).getFile().findIn(databaseContext, preferences.getFilePreferences());
 
             if (file.isPresent()) {
                 dialogTitle = Localization.lang("Delete '%0'", file.get().getFileName().toString());
                 dialogContent = Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? " +
                         "Pressing Delete will delete the file permanently from disk.", file.get().toString());
             } else {
-                dialogService.notify(Localization.lang("Error accessing file '%0'.", toBeDeleted.get(0).getFile().getLink()));
+                dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFiles.get(0).getFile().getLink()));
                 return;
             }
         }
 
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonBar.ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION,
                 dialogTitle, dialogContent, removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
             if (buttonType.get().equals(removeFromEntry)) {
-                deleteFiles(toBeDeleted, false);
+                deleteFiles(linkedFiles, false);
             }
 
             if (buttonType.get().equals(deleteFromEntry)) {
-                deleteFiles(toBeDeleted, true);
+                deleteFiles(linkedFiles, true);
             }
         }
     }
@@ -103,7 +109,7 @@ public class DeleteFileAction extends SimpleCommand {
                 }
             } else {
                 if (deleteFromDisk) {
-                    deleteFileFromDisk(fileViewModel);
+                    deleteFileHelper(databaseContext, fileViewModel.getFile());
                 }
                 if (viewModel != null) {
                     viewModel.getFiles().remove(fileViewModel);
@@ -113,32 +119,11 @@ public class DeleteFileAction extends SimpleCommand {
     }
 
     /**
-     * Deletes the file from disk without asking the user for confirmation.
-     *
-     * @param fileViewModel the file to be deleted
-     */
-    public void deleteFileFromDisk(LinkedFileViewModel fileViewModel) {
-        LinkedFile linkedFile = fileViewModel.getFile();
-        deleteFileHelper(dialogService, preferences, databaseContext, linkedFile);
-    }
-
-    /**
-     * Deletes a list of LinkedFile from disk
-     *
-     * @param filesLinkedToEntry A list of LinkedFile to be deleted
-     */
-    public static void deleteFileFromDisk(DialogService dialogService, PreferencesService preferences, BibDatabaseContext databaseContext, List<LinkedFile> filesLinkedToEntry) {
-        for (LinkedFile linkedFile : filesLinkedToEntry) {
-            deleteFileHelper(dialogService, preferences, databaseContext, linkedFile);
-        }
-    }
-
-    /**
      * Helper method to delete the specified file from disk
      *
      * @param linkedFile The LinkedFile (file which linked to an entry) to be deleted from disk
      */
-    private static void deleteFileHelper(DialogService dialogService, PreferencesService preferences, BibDatabaseContext databaseContext, LinkedFile linkedFile) {
+    private void deleteFileHelper(BibDatabaseContext databaseContext, LinkedFile linkedFile) {
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {

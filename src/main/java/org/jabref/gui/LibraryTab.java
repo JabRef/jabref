@@ -34,6 +34,7 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -453,7 +454,8 @@ public class LibraryTab extends Tab {
                                                      .toList();
 
             if (!linkedFileList.isEmpty() && showLinkedFileDeleteConfirmationDialog(linkedFileList)) {
-                DeleteFileAction.deleteFileFromDisk(dialogService, preferencesService, bibDatabaseContext, linkedFileList);
+                List<LinkedFileViewModel> viewModels = linkedFileList.
+                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, linkedFileList);
             }
         }
 
