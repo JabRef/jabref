@@ -101,7 +101,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "20.0.2"
+    version = "21.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -179,7 +179,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j'
     }
 
-    implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation 'org.controlsfx:controlsfx:11.2.0'
 
     implementation 'org.jsoup:jsoup:1.16.2'
     implementation 'com.konghq:unirest-java:3.14.5'
