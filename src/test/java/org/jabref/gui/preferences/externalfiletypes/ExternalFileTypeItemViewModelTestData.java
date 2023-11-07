@@ -1,4 +1,4 @@
-package org.jabref.model;
+package org.jabref.gui.preferences.externalfiletypes;
 
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypeItemViewModel;
 
