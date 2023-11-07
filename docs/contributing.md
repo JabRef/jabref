@@ -18,7 +18,7 @@ We welcome contributions to JabRef and encourage you to follow the GitHub workfl
    1. Fork the JabRef into your GitHub account.
    2. Clone your forked repository on your local machine.
 2. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-3. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/getting-into-the-code/code-howtos) if you have questions about your implementation.
+3. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
 4. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
 5. In case your pull request is not yet complete or not yet ready for review, create a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
 
@@ -78,7 +78,7 @@ Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFr
 
 Add the above snippet to the English translation file located at `src/main/resources/l10n/JabRef_en.properties`. [Crowdin](https://crowdin.com/project/jabref) will automatically pick up the new string and add it to the other translations.
 
-You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`. Find more information in the [JabRef developer docs](https://devdocs.jabref.org/getting-into-the-code/code-howtos#using-localization-correctly).
+You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`. Find more information in the [JabRef developer docs](code-howtos/localization.md).
 
 #### When adding a library
 

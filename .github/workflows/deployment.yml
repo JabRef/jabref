@@ -224,6 +224,13 @@ jobs:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn
           path: build/distribution
+      - name: Upload to GitHub workflow artifacts store
+        if: (steps.checksecrets.outputs.secretspresent != 'YES')
+        uses: actions/upload-artifact@v3
+        with:
+          # tbn = to-be-notarized
+          name: JabRef-${{ matrix.os }}
+          path: build/distribution
   announce:
     name: Comment on pull request
     runs-on: ubuntu-latest
@@ -242,7 +249,7 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Comment PR
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |

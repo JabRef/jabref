@@ -1,8 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -25,10 +23,9 @@ public class FileMerger implements FieldMerger {
         } else {
             List<LinkedFile> linkedFilesA = FileFieldParser.parse(filesA);
             List<LinkedFile> linkedFilesB = FileFieldParser.parse(filesB);
-            // TODO: If one of the linked files list is empty then the its string value is malformed.
-            return Stream.concat(linkedFilesA.stream(), linkedFilesB.stream())
-                         .map(FileFieldWriter::getStringRepresentation)
-                         .collect(Collectors.joining());
+
+            linkedFilesA.addAll(linkedFilesB);
+            return FileFieldWriter.getStringRepresentation(linkedFilesA);
         }
     }
 }
