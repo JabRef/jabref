@@ -756,7 +756,7 @@ public class LibraryTab extends Tab {
                 message,
                 okButton,
                 cancelButton,
-                Localization.lang("Always delete attached file(s)"),
+                Localization.lang("Show confirmation dialog when deleting files"),
                 // false => confirm delete
                 optOut -> preferencesService.getFilePreferences().confirmDeleteLinkedFile(!optOut));
     }
