@@ -9,12 +9,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-### Minimum Requirements
-
-- Linux: GTK 3.8
-- Linux: GLIBC_2.34 [#10088](https://github.com/JabRef/jabref/issues/10088)
-- macOS: 11
-
 ### Added
 
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
@@ -27,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The two previews in the change resolver dialog now have their scrollbars synchronized. [#9576](https://github.com/JabRef/jabref/issues/9576).
 - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
 - Short DOI formatter now checks, if the value is already formatted. If so, it returns the value instead of calling the ShortDOIService again. [#10589](https://github.com/JabRef/jabref/issues/10589)
+- We upgraded to JavaFX 21.0.1. [10627](https://github.com/JabRef/jabref/pull/10627). As a consequence JabRef requires now macOS 11 or later and GTK 3.8 or later on Linux
 
 ### Fixed
 
