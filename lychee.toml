@@ -1,0 +1,1 @@
+exclude_path = ["build/", "buildres/abbrv.jabref.org", "out/", "src/main/resources/csl-locales", "src/main/resources/csl-styles"]
