@@ -117,7 +117,7 @@ public class SciteTab extends EntryEditorTab {
         });
 
         VBox messageBox = new VBox(30, titleLabel, message, link);
-        messageBox.setStyle("-fx-padding: 30 0 0 30;");
+        messageBox.getStyleClass().add("scite-message-box");
         return messageBox;
     }
 }
