@@ -9,6 +9,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+### Minimum Requirements
+
+- Linux: GTK 3.8
+- Linux: GLIBC_2.34 [#10088](https://github.com/JabRef/jabref/issues/10088)
+- MacOS: 11
+
 ### Added
 
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
