@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -28,6 +29,8 @@ public class SciteTabTest {
     private PreferencesService preferencesService;
     @Mock
     private TaskExecutor taskExecutor;
+    @Mock
+    private DialogService dialogService;
 
     @BeforeEach
     void setUp() {
@@ -44,20 +47,20 @@ public class SciteTabTest {
 
     @Test
     public void testShouldShow() {
-        var tab = new SciteTab(preferencesService, taskExecutor);
+        var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         boolean shouldShow = tab.shouldShow(null);
         Assertions.assertTrue(shouldShow);
     }
 
     @Test
     public void testBindNullEntry() {
-        var tab = new SciteTab(preferencesService, taskExecutor);
+        var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         tab.bindToEntry(null);
     }
 
     @Test
     public void testBindEntry() {
-        var tab = new SciteTab(preferencesService, taskExecutor);
+        var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         var entry = new BibEntry()
                 .withField(StandardField.DOI, SAMPLE_DOI);
 

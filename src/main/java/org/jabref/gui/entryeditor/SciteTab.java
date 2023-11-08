@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 import javafx.geometry.HPos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -42,7 +40,7 @@ public class SciteTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
-        setText(Localization.lang("Scite"));
+        setText(NAME);
         setTooltip(new Tooltip(Localization.lang("Search scite.ai for Smart Citations")));
         setSciteResultsPane();
     }

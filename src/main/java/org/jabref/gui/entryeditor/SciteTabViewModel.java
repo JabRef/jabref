@@ -15,6 +15,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
@@ -58,14 +59,14 @@ public class SciteTabViewModel extends AbstractViewModel {
         cancelSearch();
 
         if (entry == null) {
-            searchError.set("Null Entry!");
+            searchError.set(Localization.lang("No active entry"));
             status.set(Status.ERROR);
             return;
         }
 
         // The scite.ai api requires a DOI
         if (entry.getDOI().isEmpty()) {
-            searchError.set("This entry does not have a DOI");
+            searchError.set(Localization.lang("This entry does not have a DOI"));
             status.set(Status.ERROR);
             return;
         }
@@ -101,9 +102,9 @@ public class SciteTabViewModel extends AbstractViewModel {
             JSONObject tallies = new JSONObject(response);
             if (tallies.has("detail")) {
                 String message = tallies.getString("detail");
-                throw new RuntimeException(message);
+                throw new FetcherException(message);
             } else if (!tallies.has("total")) {
-                throw new RuntimeException("Unexpected result data!");
+                throw new FetcherException("Unexpected result data!");
             }
 
             return SciteTallyDTO.fromJSONObject(tallies);
