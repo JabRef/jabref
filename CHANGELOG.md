@@ -13,7 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - Linux: GTK 3.8
 - Linux: GLIBC_2.34 [#10088](https://github.com/JabRef/jabref/issues/10088)
-- MacOS: 11
+- macOS: 11
 
 ### Added
 
