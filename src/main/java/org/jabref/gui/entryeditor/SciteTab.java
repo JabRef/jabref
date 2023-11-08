@@ -1,8 +1,11 @@
 package org.jabref.gui.entryeditor;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 
 import javafx.geometry.HPos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -12,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -30,13 +34,14 @@ public class SciteTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
     private final SciteTabViewModel viewModel;
     private final PreferencesService preferencesService;
+    private final DialogService dialogService;
 
-    public SciteTab(PreferencesService preferencesService, TaskExecutor taskExecutor) {
+    public SciteTab(PreferencesService preferencesService, TaskExecutor taskExecutor, DialogService dialogService) {
         this.preferencesService = preferencesService;
         this.viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
+        this.dialogService = dialogService;
         this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
-
         setText(Localization.lang("Scite"));
         setTooltip(new Tooltip(Localization.lang("Search scite.ai for Smart Citations")));
         setSciteResultsPane();
@@ -110,8 +115,13 @@ public class SciteTab extends EntryEditorTab {
                 var filePreferences = preferencesService.getFilePreferences();
                 try {
                     JabRefDesktop.openBrowser(url, filePreferences);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                } catch (IOException ioex) {
+                    // Can't throw a checked exception from here, so display a message to the user instead.
+                    dialogService.showErrorDialogAndWait(
+                    "An error occurred opening web browser",
+                "JabRef was unable to open a web browser for link:\n\n" + url + "\n\nError Message:\n\n" + ioex.getMessage(),
+                        ioex
+                    );
                 }
             }
         });

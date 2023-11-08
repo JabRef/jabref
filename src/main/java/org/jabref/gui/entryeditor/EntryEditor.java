@@ -303,7 +303,7 @@ public class EntryEditor extends BorderPane {
 
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
 
-        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor));
+        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
 
         return entryEditorTabs;
     }
