@@ -100,5 +100,41 @@ class SpecialFieldsToSeparateFieldsTest {
                 )
         );
     }
+
+    @ParameterizedTest
+    @MethodSource("provideRelevanceFieldPairs")
+    public void migrateRelevanceField(String fieldInKeywords, BibEntry expected) {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeywords);
+
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
+
+        assertEquals(expected, entry);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIrrelevanceFieldPairs")
+    public void migrateIrrelevanceField(String fieldInKeywords, BibEntry expected) {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeywords);
+
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
+
+        assertEquals(expected, entry);
+    }
+
+    private static Stream<Arguments> provideRelevanceFieldPairs() {
+        return Stream.of(
+                Arguments.of(
+                        SpecialField.RELEVANCE, "relevant", new BibEntry().withField(SpecialField.RELEVANCE, "relevant")
+                )
+        );
+    }
+
+    private static Stream<Arguments> provideIrrelevanceFieldPairs() {
+        return Stream.of(
+                Arguments.of(
+                        SpecialField.RELEVANCE, "irrelevant", new BibEntry().withField(SpecialField.RELEVANCE, "irrelevant")
+                )
+        );
+    }
 }
 
