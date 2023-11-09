@@ -234,7 +234,9 @@ public class WebFetchers {
     }
 }
 
-// Place "Search Selected" to the first of the set
+/**
+ *  Places "Search Selected" to the first of the set
+ */
 class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
     @Override
     public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {

@@ -39,6 +39,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import kong.unirest.UnirestException;
+
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
@@ -114,7 +116,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
-        importerPreferences.setCatalogs(FXCollections.observableList(catalogs.stream().filter(StudyCatalogItem::isEnabled).map(StudyCatalogItem::getName).collect(Collectors.toList())));
+        importerPreferences.setCatalogs(
+                FXCollections.observableList(catalogs.stream()
+                                                     .filter(StudyCatalogItem::isEnabled)
+                                                     .map(StudyCatalogItem::getName)
+                                                     .collect(Collectors.toList())));
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         preferencesService.getImporterPreferences().getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
@@ -215,7 +221,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                 keyValid = (statusCode >= 200) && (statusCode < 300);
 
                 URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
-            } catch (IOException | kong.unirest.UnirestException e) {
+            } catch (IOException | UnirestException e) {
                 keyValid = false;
             }
         } else {

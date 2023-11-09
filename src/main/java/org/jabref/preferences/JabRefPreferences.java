@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
@@ -2822,7 +2821,7 @@ public class JabRefPreferences implements PreferencesService {
                 getCustomImportFormats(),
                 getFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
-                FXCollections.observableList(getStringList(SEARCH_CATALOGS)));
+                getStringList(SEARCH_CATALOGS));
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
@@ -2831,7 +2830,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (obs, oldValue, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
-        EasyBind.listen(importerPreferences.catalogsProperty(), (obs, oldValue, newValue) -> putStringList(SEARCH_CATALOGS, importerPreferences.catalogsProperty()));
+        importerPreferences.getCatalogs().addListener((InvalidationListener) c -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
 
         return importerPreferences;
     }

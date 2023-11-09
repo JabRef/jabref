@@ -30,10 +30,10 @@
     <Label styleClass="sectionHeader" text="%Catalogues used for 'Search Selected'"/>
     <TableView
             fx:id="catalogTable"
-            HBox.hgrow="ALWAYS"
+            VBox.vgrow="ALWAYS"
             editable="true">
         <columns>
-            <TableColumn
+            <TableColumn minWidth="90" prefWidth="70"
                     fx:id="catalogEnabledColumn"
                     text="%Enabled"
                     />
