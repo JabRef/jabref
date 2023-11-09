@@ -90,7 +90,7 @@ public class SciteTab extends EntryEditorTab {
         return errorMessageBox;
     }
 
-    private VBox getTalliesPane(SciteTallyDTO tallyDTO) {
+    private VBox getTalliesPane(SciteTallyModel tallyDTO) {
         Label titleLabel = new Label(Localization.lang("Tallies for") + " " + tallyDTO.doi());
         titleLabel.getStyleClass().add("scite-tallies-label");
         Text message = new Text(String.format("Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d",

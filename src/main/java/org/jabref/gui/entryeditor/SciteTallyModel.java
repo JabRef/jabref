@@ -3,9 +3,9 @@ package org.jabref.gui.entryeditor;
 import kong.unirest.json.JSONObject;
 
 /**
- * Simple DTO object to hold the scite.ai tallies data for a given DOI
+ * Simple model object to hold the scite.ai tallies data for a given DOI
  */
-public record SciteTallyDTO(
+public record SciteTallyModel(
         String doi,
         int total,
         int supporting,
@@ -15,13 +15,13 @@ public record SciteTallyDTO(
         int citingPublications) {
 
     /**
-     * Creates a {@link SciteTallyDTO} from a JSONObject (dictionary/map)
+     * Creates a {@link SciteTallyModel} from a JSONObject (dictionary/map)
      *
      * @param jsonObject The JSON object holding the tally values
-     * @return a new {@link SciteTallyDTO}
+     * @return a new {@link SciteTallyModel}
      */
-    public static SciteTallyDTO fromJSONObject(JSONObject jsonObject) {
-        return new SciteTallyDTO(
+    public static SciteTallyModel fromJSONObject(JSONObject jsonObject) {
+        return new SciteTallyModel(
                 jsonObject.getString("doi"),
                 jsonObject.getInt("total"),
                 jsonObject.getInt("supporting"),

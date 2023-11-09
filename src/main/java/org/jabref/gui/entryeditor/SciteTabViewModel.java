@@ -27,14 +27,12 @@ import kong.unirest.json.JSONObject;
 import org.tinylog.Logger;
 
 public class SciteTabViewModel extends AbstractViewModel {
-
     private static final String BASE_URL = "https://api.scite.ai/";
-
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
-    private Optional<SciteTallyDTO> currentResult = Optional.empty();
+    private Optional<SciteTallyModel> currentResult = Optional.empty();
 
     private Future<?> searchTask;
 
@@ -67,16 +65,16 @@ public class SciteTabViewModel extends AbstractViewModel {
         }
 
         searchTask = BackgroundTask.wrap(() -> fetchTallies(entry.getDOI().get()))
-            .onRunning(() -> status.set(SciteStatus.IN_PROGRESS))
-            .onSuccess(result -> {
-                currentResult = Optional.of(result);
-                status.set(SciteStatus.FOUND);
-            })
-            .onFailure(error -> {
-                searchError.set(error.getMessage());
-                status.set(SciteStatus.ERROR);
-            })
-            .executeWith(taskExecutor);
+                                   .onRunning(() -> status.set(SciteStatus.IN_PROGRESS))
+                                   .onSuccess(result -> {
+                                       currentResult = Optional.of(result);
+                                       status.set(SciteStatus.FOUND);
+                                   })
+                                   .onFailure(error -> {
+                                       searchError.set(error.getMessage());
+                                       status.set(SciteStatus.ERROR);
+                                   })
+                                   .executeWith(taskExecutor);
     }
 
     private void cancelSearch() {
@@ -88,7 +86,7 @@ public class SciteTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    public SciteTallyDTO fetchTallies(DOI doi) throws FetcherException {
+    public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
         try {
             URL url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
             URLDownload download = new URLDownload(url);
@@ -101,8 +99,8 @@ public class SciteTabViewModel extends AbstractViewModel {
             } else if (!tallies.has("total")) {
                 throw new FetcherException("Unexpected result data!");
             }
-            return SciteTallyDTO.fromJSONObject(tallies);
-        } catch (MalformedURLException |  URISyntaxException ex) {
+            return SciteTallyModel.fromJSONObject(tallies);
+        } catch (MalformedURLException | URISyntaxException ex) {
             throw new FetcherException("Malformed url for DOs", ex);
         } catch (IOException ioex) {
             throw new FetcherException("Failed to retrieve tallies for DOI - IO Exception", ioex);
@@ -117,7 +115,7 @@ public class SciteTabViewModel extends AbstractViewModel {
         return searchError;
     }
 
-    public Optional<SciteTallyDTO> getCurrentResult() {
+    public Optional<SciteTallyModel> getCurrentResult() {
         return currentResult;
     }
 }

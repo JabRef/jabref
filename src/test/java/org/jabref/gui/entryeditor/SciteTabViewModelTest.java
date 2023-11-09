@@ -44,7 +44,7 @@ public class SciteTabViewModelTest {
         jsonObject.put("citingPublications", 6);
         jsonObject.put("doi", "test_doi");
 
-        var dto = SciteTallyDTO.fromJSONObject(jsonObject);
+        var dto = SciteTallyModel.fromJSONObject(jsonObject);
 
         assertEquals(1, dto.total());
         assertEquals(2, dto.supporting());
