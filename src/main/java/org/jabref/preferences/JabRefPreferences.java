@@ -328,6 +328,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEND_OS_DATA = "sendOSData";
     public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
+    public static final String SHOW_SCITE_TAB = "showSciteTab";
 
     /**
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
@@ -640,6 +641,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
+        defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
         defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
         defaults.put(SEND_OS_DATA, Boolean.FALSE);
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
@@ -1449,7 +1451,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT),
                 getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)));
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
+                getBoolean(SHOW_SCITE_TAB));
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (obs, oldValue, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -1462,6 +1465,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (obs, oldValue, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
+        EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
 
         return entryEditorPreferences;
     }
