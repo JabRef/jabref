@@ -17,7 +17,7 @@ Did you know that [IntelliJ allows for reformatting selected code](https://www.j
 
 ## Show variable values in IntelliJ
 
-1. Go to a test case (example: [`org.jabref.model.entry.BibEntryTest#settingTypeToNullThrowsException`](https://github.com/JabRef/jabref/blob/refine-intellij-howto/src/test/java/org/jabref/model/entry/BibEntryTest.java#L52-L52)
+1. Go to a test case (example: [`org.jabref.model.entry.BibEntryTest#settingTypeToNullThrowsException`](https://github.com/JabRef/jabref/blob/main/src/test/java/org/jabref/model/entry/BibEntryTest.java#L52-L52)
 2. Set the breakpoint to the first line
 3. Execute the test
 4. Go to the settings of the debugger and activate "Show Variable Values in Editor" and "Show Method Return Values"
