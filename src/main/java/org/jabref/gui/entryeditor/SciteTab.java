@@ -109,7 +109,7 @@ public class SciteTab extends EntryEditorTab {
     }
 
     private VBox getMessageBox(String url, Label titleLabel, Text message) {
-        HyperlinkLabel link = new HyperlinkLabel(String.format(Localization.lang("See full report at [%s]"), url));
+        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("See full report at [%0]", url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 var filePreferences = preferencesService.getFilePreferences();

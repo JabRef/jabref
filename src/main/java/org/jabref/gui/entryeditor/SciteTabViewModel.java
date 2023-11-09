@@ -27,6 +27,16 @@ import kong.unirest.json.JSONObject;
 import org.tinylog.Logger;
 
 public class SciteTabViewModel extends AbstractViewModel {
+
+    /**
+     * Status enum for Scite tab
+     */
+    public enum SciteStatus {
+        IN_PROGRESS,
+        FOUND,
+        ERROR
+    }
+
     private static final String BASE_URL = "https://api.scite.ai/";
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
