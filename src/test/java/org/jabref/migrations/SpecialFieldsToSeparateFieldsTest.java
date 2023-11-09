@@ -124,7 +124,7 @@ class SpecialFieldsToSeparateFieldsTest {
     private static Stream<Arguments> provideRelevanceFieldPairs() {
         return Stream.of(
                 Arguments.of(
-                        SpecialField.RELEVANCE, "relevant", new BibEntry().withField(SpecialField.RELEVANCE, "relevant")
+                        "relevant", new BibEntry().withField(SpecialField.RELEVANCE, "relevant").withField(SpecialField.RELEVANCE, "relevant")
                 )
         );
     }
@@ -132,7 +132,7 @@ class SpecialFieldsToSeparateFieldsTest {
     private static Stream<Arguments> provideIrrelevanceFieldPairs() {
         return Stream.of(
                 Arguments.of(
-                        SpecialField.RELEVANCE, "irrelevant", new BibEntry().withField(SpecialField.RELEVANCE, "irrelevant")
+                        "irrelevant", new BibEntry().withField(SpecialField.RELEVANCE, "relevant").withField(SpecialField.RELEVANCE, "irrelevant")
                 )
         );
     }
