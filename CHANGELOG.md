@@ -19,7 +19,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a link "Get more themes..." in the preferences to that points to [themes.jabref.org](https://themes.jabref.org) allowing the user to download new themes. [#10243](https://github.com/JabRef/jabref/issues/10243)
 - We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
-- We added a new menu for relevant and irrelevant entries [#10620] (https://github.com/JabRef/jabref/issues/10431)
 
 ### Changed
 
@@ -38,7 +37,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was possible to create a group with no name or with a group separator inside the name [#9776](https://github.com/JabRef/jabref/issues/9776)
 - Biblatex's `journaltitle` is now also respected for showing the journal information. [#10397](https://github.com/JabRef/jabref/issues/10397)
 - JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
-- We fixed an issue where relevance star icon was showing upon hovering through files [#10620] (https://github.com/JabRef/jabref/issues/10431)
 
 ### Removed
 
