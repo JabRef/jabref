@@ -145,7 +145,6 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-
         Globals.getThemeManager().installCss(scene);
 
         // Handle TextEditor key bindings
