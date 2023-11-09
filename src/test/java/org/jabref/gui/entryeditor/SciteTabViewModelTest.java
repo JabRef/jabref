@@ -1,23 +1,23 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Optional;
+
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.testutils.category.GUITest;
 
 import kong.unirest.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@GUITest
 public class SciteTabViewModelTest {
 
     @Mock
@@ -27,7 +27,7 @@ public class SciteTabViewModelTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
         when(preferencesService.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
@@ -46,20 +46,20 @@ public class SciteTabViewModelTest {
 
         var dto = SciteTallyDTO.fromJSONObject(jsonObject);
 
-        Assertions.assertEquals(1, dto.total());
-        Assertions.assertEquals(2, dto.supporting());
-        Assertions.assertEquals(3, dto.contradicting());
-        Assertions.assertEquals(4, dto.mentioning());
-        Assertions.assertEquals(5, dto.unclassified());
-        Assertions.assertEquals(6, dto.citingPublications());
-        Assertions.assertEquals("test_doi", dto.doi());
+        assertEquals(1, dto.total());
+        assertEquals(2, dto.supporting());
+        assertEquals(3, dto.contradicting());
+        assertEquals(4, dto.mentioning());
+        assertEquals(5, dto.unclassified());
+        assertEquals(6, dto.citingPublications());
+        assertEquals("test_doi", dto.doi());
     }
 
     @Test
     void testFetchTallies() throws FetcherException {
         var viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
         DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
-        var actual = viewModel.fetchTallies(doi);
-        Assertions.assertTrue(doi.getDOI().equalsIgnoreCase(actual.doi()));
+        var actual = DOI.parse(viewModel.fetchTallies(doi).doi());
+        assertEquals(Optional.of(doi), actual);
     }
 }

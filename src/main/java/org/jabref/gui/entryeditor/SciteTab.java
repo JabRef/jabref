@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javafx.geometry.HPos;
 import javafx.scene.control.Hyperlink;
@@ -60,17 +61,12 @@ public class SciteTab extends EntryEditorTab {
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
             sciteResultsPane.getChildren().clear();
             switch (status) {
-                case IN_PROGRESS:
-                    sciteResultsPane.add(progressIndicator, 0, 0);
-                    break;
-                case FOUND:
-                    if (viewModel.getCurrentResult().isPresent()) {
-                        sciteResultsPane.add(getTalliesPane(viewModel.getCurrentResult().get()), 0, 0);
-                    }
-                    break;
-                case ERROR:
-                    sciteResultsPane.add(getErrorPane(), 0, 0);
-                    break;
+                case IN_PROGRESS ->
+                        sciteResultsPane.add(progressIndicator, 0, 0);
+                case FOUND ->
+                        viewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
+                case ERROR ->
+                        sciteResultsPane.add(getErrorPane(), 0, 0);
             }
         });
     }
@@ -106,8 +102,14 @@ public class SciteTab extends EntryEditorTab {
             tallyDTO.citingPublications()
         ));
 
-        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallyDTO.doi());
-        HyperlinkLabel link = new HyperlinkLabel(String.format("See full report at [%s]", url));
+        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallyDTO.doi(), StandardCharsets.UTF_8);
+        VBox messageBox = getMessageBox(url, titleLabel, message);
+        messageBox.getStyleClass().add("scite-message-box");
+        return messageBox;
+    }
+
+    private VBox getMessageBox(String url, Label titleLabel, Text message) {
+        HyperlinkLabel link = new HyperlinkLabel(String.format(Localization.lang("See full report at [%s]"), url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 var filePreferences = preferencesService.getFilePreferences();
@@ -124,8 +126,6 @@ public class SciteTab extends EntryEditorTab {
             }
         });
 
-        VBox messageBox = new VBox(30, titleLabel, message, link);
-        messageBox.getStyleClass().add("scite-message-box");
-        return messageBox;
+        return new VBox(30, titleLabel, message, link);
     }
 }

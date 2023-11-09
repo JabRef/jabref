@@ -21,7 +21,7 @@ public record SciteTallyDTO(
      * @return a new {@link SciteTallyDTO}
      */
     public static SciteTallyDTO fromJSONObject(JSONObject jsonObject) {
-        SciteTallyDTO dto = new SciteTallyDTO(
+        return new SciteTallyDTO(
                 jsonObject.getString("doi"),
                 jsonObject.getInt("total"),
                 jsonObject.getInt("supporting"),
@@ -30,6 +30,5 @@ public record SciteTallyDTO(
                 jsonObject.getInt("unclassified"),
                 jsonObject.getInt("citingPublications")
         );
-        return dto;
     }
 }

@@ -34,7 +34,7 @@ public class SciteTabTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
         when(preferencesService.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);

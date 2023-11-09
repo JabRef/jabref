@@ -2,6 +2,8 @@ package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -26,18 +28,11 @@ import org.tinylog.Logger;
 
 public class SciteTabViewModel extends AbstractViewModel {
 
-    // The view only has three states - In Progress, found (success) and error
-    enum Status {
-        IN_PROGRESS,
-        FOUND,
-        ERROR
-    }
-
     private static final String BASE_URL = "https://api.scite.ai/";
 
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
-    private final ObjectProperty<Status> status;
+    private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
     private Optional<SciteTallyDTO> currentResult = Optional.empty();
 
@@ -46,7 +41,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     public SciteTabViewModel(PreferencesService preferencesService, TaskExecutor taskExecutor) {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
-        this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
+        this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
     }
 
@@ -60,26 +55,26 @@ public class SciteTabViewModel extends AbstractViewModel {
 
         if (entry == null) {
             searchError.set(Localization.lang("No active entry"));
-            status.set(Status.ERROR);
+            status.set(SciteStatus.ERROR);
             return;
         }
 
         // The scite.ai api requires a DOI
         if (entry.getDOI().isEmpty()) {
             searchError.set(Localization.lang("This entry does not have a DOI"));
-            status.set(Status.ERROR);
+            status.set(SciteStatus.ERROR);
             return;
         }
 
         searchTask = BackgroundTask.wrap(() -> fetchTallies(entry.getDOI().get()))
-            .onRunning(() -> status.set(Status.IN_PROGRESS))
+            .onRunning(() -> status.set(SciteStatus.IN_PROGRESS))
             .onSuccess(result -> {
                 currentResult = Optional.of(result);
-                status.set(Status.FOUND);
+                status.set(SciteStatus.FOUND);
             })
             .onFailure(error -> {
                 searchError.set(error.getMessage());
-                status.set(Status.ERROR);
+                status.set(SciteStatus.ERROR);
             })
             .executeWith(taskExecutor);
     }
@@ -89,13 +84,13 @@ public class SciteTabViewModel extends AbstractViewModel {
             return;
         }
 
-        status.set(Status.IN_PROGRESS);
+        status.set(SciteStatus.IN_PROGRESS);
         searchTask.cancel(true);
     }
 
     public SciteTallyDTO fetchTallies(DOI doi) throws FetcherException {
         try {
-            URL url = new URL(BASE_URL + "tallies/" + doi.getDOI());
+            URL url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
             URLDownload download = new URLDownload(url);
             String response = download.asString();
             Logger.debug("Response {}", response);
@@ -106,16 +101,15 @@ public class SciteTabViewModel extends AbstractViewModel {
             } else if (!tallies.has("total")) {
                 throw new FetcherException("Unexpected result data!");
             }
-
             return SciteTallyDTO.fromJSONObject(tallies);
-        } catch (MalformedURLException ex) {
-            throw new FetcherException("Malformed url for DOI", ex);
+        } catch (MalformedURLException |  URISyntaxException ex) {
+            throw new FetcherException("Malformed url for DOs", ex);
         } catch (IOException ioex) {
             throw new FetcherException("Failed to retrieve tallies for DOI - IO Exception", ioex);
         }
     }
 
-    public ObjectProperty<Status> statusProperty() {
+    public ObjectProperty<SciteStatus> statusProperty() {
         return status;
     }
 
