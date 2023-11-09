@@ -16,40 +16,32 @@ public class WorkspacePreferences {
     private final IntegerProperty mainFontSize;
     private final IntegerProperty defaultFontSize;
     private final ObjectProperty<Theme> theme;
+    private final BooleanProperty themeSyncOs;
     private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
-    private final BooleanProperty automaticThemeDetectionFlag;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
                                 int mainFontSize,
                                 int defaultFontSize,
                                 Theme theme,
+                                boolean themeSyncOs,
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
-                                boolean confirmDelete,
-                                boolean automaticThemeDetectionFlag) {
+                                boolean confirmDelete) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
+        this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-        this.automaticThemeDetectionFlag = new SimpleBooleanProperty(automaticThemeDetectionFlag);
-    }
-
-    public BooleanProperty automaticThemeDetectionFlag() {
-        return automaticThemeDetectionFlag;
-    }
-
-    public void setAutomaticThemeDetectionFlag(boolean newValue) {
-        this.automaticThemeDetectionFlag.setValue(newValue);
     }
 
     public Language getLanguage() {
@@ -102,6 +94,18 @@ public class WorkspacePreferences {
 
     public ObjectProperty<Theme> themeProperty() {
         return theme;
+    }
+
+    public boolean shouldThemeSyncOs() {
+        return themeSyncOs.get();
+    }
+
+    public BooleanProperty themeSyncOsProperty() {
+        return themeSyncOs;
+    }
+
+    public void setThemeSyncOs(boolean themeSyncOs) {
+        this.themeSyncOs.set(themeSyncOs);
     }
 
     public boolean shouldOpenLastEdited() {

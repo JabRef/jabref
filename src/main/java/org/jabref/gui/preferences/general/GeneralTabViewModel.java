@@ -36,7 +36,6 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 import org.jabref.preferences.WorkspacePreferences;
 
-import com.jthemedetecor.OsThemeDetector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -56,7 +55,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
 
-    private final BooleanProperty flagWhenAutomaticButtonSelected = new SimpleBooleanProperty();
+    private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
 
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
@@ -129,23 +128,16 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         switch (workspacePreferences.getTheme().getType()) {
-            case DEFAULT -> {
-                selectedThemeProperty.setValue(ThemeTypes.LIGHT);
-                if (workspacePreferences.automaticThemeDetectionFlag().getValue()) {
-                    selectedThemeProperty.setValue(ThemeTypes.SYNC);
-                }
-            }
-            case EMBEDDED -> {
-                selectedThemeProperty.setValue(ThemeTypes.DARK);
-                if (workspacePreferences.automaticThemeDetectionFlag().getValue()) {
-                    selectedThemeProperty.setValue(ThemeTypes.SYNC);
-                }
-            }
+            case DEFAULT ->
+                    selectedThemeProperty.setValue(ThemeTypes.LIGHT);
+            case EMBEDDED ->
+                    selectedThemeProperty.setValue(ThemeTypes.DARK);
             case CUSTOM -> {
                 selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
                 customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());
             }
         }
+        themeSyncOsProperty.setValue(workspacePreferences.shouldThemeSyncOs());
 
         fontOverrideProperty.setValue(workspacePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(workspacePreferences.getMainFontSize()));
@@ -180,21 +172,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
         switch (selectedThemeProperty.get()) {
-            case LIGHT -> {
-                workspacePreferences.setTheme(Theme.light());
-                workspacePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
-            }
-            case DARK -> {
-                workspacePreferences.setTheme(Theme.dark());
-                workspacePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
-            }
-            case SYNC -> {
-                workspacePreferences.setTheme(detectOSThemePreference());
-                flagWhenAutomaticButtonSelected.setValue(true);
-                workspacePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
-            }
+            case LIGHT ->
+                    workspacePreferences.setTheme(Theme.light());
+            case DARK ->
+                    workspacePreferences.setTheme(Theme.dark());
             case CUSTOM -> workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
+        workspacePreferences.setThemeSyncOs(themeSyncOsProperty.getValue());
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
@@ -210,16 +194,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
-    }
-
-    public Theme detectOSThemePreference() {
-        final OsThemeDetector detector = OsThemeDetector.getDetector();
-        final boolean isDarkThemeUsed = detector.isDark();
-        if (isDarkThemeUsed) {
-            return Theme.dark();
-        } else {
-            return Theme.light();
-        }
     }
 
     public ValidationStatus fontSizeValidationStatus() {
@@ -270,6 +244,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<ThemeTypes> selectedThemeProperty() {
         return this.selectedThemeProperty;
+    }
+
+    public BooleanProperty themeSyncOsProperty() {
+        return this.themeSyncOsProperty;
     }
 
     public StringProperty customPathToThemeProperty() {

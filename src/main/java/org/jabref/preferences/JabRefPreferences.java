@@ -153,7 +153,8 @@ public class JabRefPreferences implements PreferencesService {
      * There are more default parameters in this map which belong to separate preference classes.
      */
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
-    public static final String FX_THEME = "fxTheme";
+    public static final String THEME = "fxTheme";
+    public static final String THEME_SYNC_OS = "themeSyncOs";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
@@ -416,9 +417,6 @@ public class JabRefPreferences implements PreferencesService {
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
-
-    // System default theme / Auto detect theme constant
-    private static final String AUTOMATIC_THEME_DETECTION = "automaticThemeDetection";
 
     // Indexes for Strings within stored custom export entries
     private static final int EXPORTER_NAME_INDEX = 0;
@@ -789,9 +787,8 @@ public class JabRefPreferences implements PreferencesService {
                         "</font>__NEWLINE__");
 
         // set default theme
-        defaults.put(FX_THEME, Theme.BASE_CSS);
-        // Set automatic theme detection OFF.
-        defaults.put(AUTOMATIC_THEME_DETECTION, Boolean.FALSE);
+        defaults.put(THEME, Theme.BASE_CSS);
+        defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         setLanguageDependentDefaultValues();
     }
 
@@ -2088,12 +2085,12 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(FX_THEME)),
+                new Theme(get(THEME)),
+                getBoolean(THEME_SYNC_OS),
                 getBoolean(OPEN_LAST_EDITED),
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(CONFIRM_DELETE),
-                getBoolean(AUTOMATIC_THEME_DETECTION));
+                getBoolean(CONFIRM_DELETE));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -2104,12 +2101,12 @@ public class JabRefPreferences implements PreferencesService {
         });
         EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
         EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (obs, oldValue, newValue) -> putBoolean(THEME_SYNC_OS, newValue));
         EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(workspacePreferences.automaticThemeDetectionFlag(), (obs, oldValue, newValue) -> putBoolean(AUTOMATIC_THEME_DETECTION, newValue));
         return workspacePreferences;
     }
 

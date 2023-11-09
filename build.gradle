@@ -180,6 +180,7 @@ dependencies {
     }
 
     implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
 
     implementation 'org.jsoup:jsoup:1.16.1'
     implementation 'com.konghq:unirest-java:3.14.5'
@@ -257,8 +258,6 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
-
-    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
 }
 
 clean {
