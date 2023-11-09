@@ -37,6 +37,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<ThemeTypes> theme;
+    @FXML private CheckBox themeSyncOs;
     @FXML private TextField customThemePath;
     @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
@@ -104,6 +105,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
+        themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
         EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
             boolean isCustomTheme = theme == ThemeTypes.CUSTOM;

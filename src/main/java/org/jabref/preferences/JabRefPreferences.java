@@ -153,7 +153,8 @@ public class JabRefPreferences implements PreferencesService {
      * There are more default parameters in this map which belong to separate preference classes.
      */
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
-    public static final String FX_THEME = "fxTheme";
+    public static final String THEME = "fxTheme";
+    public static final String THEME_SYNC_OS = "themeSyncOs";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
@@ -786,7 +787,8 @@ public class JabRefPreferences implements PreferencesService {
                         "</font>__NEWLINE__");
 
         // set default theme
-        defaults.put(FX_THEME, Theme.BASE_CSS);
+        defaults.put(THEME, Theme.BASE_CSS);
+        defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         setLanguageDependentDefaultValues();
     }
 
@@ -2083,7 +2085,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(FX_THEME)),
+                new Theme(get(THEME)),
+                getBoolean(THEME_SYNC_OS),
                 getBoolean(OPEN_LAST_EDITED),
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
@@ -2098,12 +2101,12 @@ public class JabRefPreferences implements PreferencesService {
         });
         EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
         EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (obs, oldValue, newValue) -> putBoolean(THEME_SYNC_OS, newValue));
         EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-
         return workspacePreferences;
     }
 
