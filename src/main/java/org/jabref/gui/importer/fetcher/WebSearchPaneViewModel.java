@@ -172,4 +172,3 @@ public class WebSearchPaneViewModel {
         return searchQueryValidator.getValidationStatus();
     }
 }
-
