@@ -37,8 +37,8 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
     public EntryEditorTab() {
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
