@@ -73,6 +73,13 @@
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
 
+    <Label styleClass="sectionHeader" text="%Single instance" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="remoteServer" text="%Enforce single JabRef instance (and allow remote operations) using port" />
+        <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
+        <Button fx:id="remoteHelp" prefWidth="20.0" />
+    </HBox>
+
     <Label styleClass="sectionHeader" text="%Libraries"/>
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>

@@ -88,7 +88,7 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
 
     // Apache Commons and other (similar) helper libraries
-    requires commons.cli;
+    requires org.apache.commons.cli;
     requires org.apache.commons.csv;
     requires org.apache.commons.lang3;
     requires com.google.common;

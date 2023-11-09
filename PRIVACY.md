@@ -46,7 +46,7 @@ These third-party services are the following:
 | [arXiv.org](https://arxiv.org/)                                                                                 | <https://info.arxiv.org/help/policies/privacy_policy.html> |
 | [Bibliotheksverbund Bayern](https://www.bib-bvb.de/)                                                            | <https://www.bib-bvb.de/web/guest/datenschutzerklaerung-bvb-homepage> |
 | [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/)                                           | <https://www.si.edu/Privacy> |
-| [Collection of Computer Science Bibliographies](http://liinwww.ira.uka.de/)                                     | **currently unavailable**, offline  |
+| [Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)                                     | **currently unavailable**, offline  |
 | [CrossRef](https://www.crossref.org/)                                                                           | <https://www.crossref.org/operations-and-sustainability/privacy/> |
 | [dblp](https://dblp.uni-trier.de/)                                                                              | <https://dblp.uni-trier.de/db/about/privacy.html> |
 | [Directory of Open Access Books](https://www.doabooks.org/)                                                     | <https://www.doabooks.org/en/resources/accessibility> |
@@ -62,7 +62,7 @@ These third-party services are the following:
 | [Library of Congress](https://lccn.loc.gov/)                                                                    | <https://www.loc.gov/legal/> |
 | [National Library of Medicine](https://www.ncbi.nlm.nih.gov/)                                                   | <https://www.nlm.nih.gov/web_policies.html> |
 | [MathSciNet](http://www.ams.org/mathscinet)                                                                     | <https://www.ams.org/about-us/privacy> |
-| [mEDRA](https://medra.org/)                                                                                     | <https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
+| [mEDRA](https://www.medra.org/)                                                                                     | <https://<https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
 | [Mr. DLib](https://mr-dlib.org/) [1]                                                                            | <https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy> |
 | [Openlibrary](https://openlibrary.org)                                                                          | <https://archive.org/about/terms.php> |
 | [ResearchGate](https://www.researchgate.net/)                                                                   | <https://www.researchgate.net/privacy-policy> |
