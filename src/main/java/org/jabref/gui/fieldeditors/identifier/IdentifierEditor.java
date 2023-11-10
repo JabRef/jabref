@@ -46,7 +46,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
-    private Optional<BibEntry> entry;
+    private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
                             SuggestionProvider<?> suggestionProvider,
@@ -96,6 +96,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
+        this.entry = Optional.of(entry);
         viewModel.bindToEntry(entry);
     }
 

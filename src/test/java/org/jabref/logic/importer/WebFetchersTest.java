@@ -44,7 +44,7 @@ class WebFetchersTest {
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importerPreferences = mock(ImporterPreferences.class);
+        importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {

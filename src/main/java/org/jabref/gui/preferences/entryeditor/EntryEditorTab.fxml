@@ -34,6 +34,7 @@
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
     <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
     <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
+    <CheckBox fx:id="enableSciteTab" text="%Show 'Scite' tab"/>
 
     <Label styleClass="sectionHeader" text="%Custom editor tabs"/>
     <HBox>
