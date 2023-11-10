@@ -48,6 +48,7 @@ public class TestArchitectureTest {
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.shared.TestManager")
                  .and().doNotHaveFullyQualifiedName("org.jabref.model.search.rules.MockSearchMatcher")
                  .and().doNotHaveFullyQualifiedName("org.jabref.model.TreeNodeTestData")
+                 .and().doNotHaveFullyQualifiedName("org.jabref.model.ExternalFileTypesTabViewModelTestData")
                  .and().doNotHaveFullyQualifiedName("org.jabref.performance.BibtexEntryGenerator")
                  .and().doNotHaveFullyQualifiedName("org.jabref.support.DisabledOnCIServer")
                  .and().doNotHaveFullyQualifiedName("org.jabref.support.CIServerCondition")
