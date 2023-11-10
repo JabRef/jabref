@@ -1,11 +1,7 @@
 package org.jabref.logic.integrity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
@@ -14,28 +10,21 @@ import org.jabref.model.entry.field.Field;
 
 public class PredatoryJournalChecker implements EntryChecker {
 
+    public static final double SIMILARITY_SCORE = 0.95;
     private final PredatoryJournalRepository predatoryJournalRepository;
-    private final Set<String> fieldNames;
+    private final List<Field> fieldNames;
 
     public PredatoryJournalChecker(PredatoryJournalRepository predatoryJournalRepository, List<Field> fieldsToCheck) {
         this.predatoryJournalRepository = Objects.requireNonNull(predatoryJournalRepository);
-        this.fieldNames = fieldsToCheck.stream().map(Field::getName).collect(Collectors.toSet());
+        this.fieldNames = fieldsToCheck;
     }
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        List<IntegrityMessage> results = new ArrayList<>();
-
-        List<Map.Entry<Field, String>> entries = entry.getFieldMap().entrySet().stream()
-                                                      .filter(field -> fieldNames.contains(field.getKey().getName()))
-                                                      .filter(field -> predatoryJournalRepository.isKnownName(field.getValue(), 0.95))
-                                                      .toList();
-
-        for (var mapEntry : entries) {
-            results.add(new IntegrityMessage(Localization.lang("Match found in predatory journal %0",
-                    mapEntry.getValue()), entry, mapEntry.getKey()));
-        }
-
-        return results;
+        return entry.getFieldMap().entrySet().stream()
+                    .filter(field -> fieldNames.contains(field.getKey()))
+                    .filter(field -> predatoryJournalRepository.isKnownName(field.getValue(), SIMILARITY_SCORE))
+                    .map(field -> new IntegrityMessage(Localization.lang("Predatory journal %0 found", field.getValue()), entry, field.getKey()))
+                    .toList();
     }
 }

@@ -1,18 +1,15 @@
 package org.jabref.logic.journals;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
+import info.debatty.java.stringsimilarity.Cosine;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
@@ -23,14 +20,15 @@ import org.slf4j.LoggerFactory;
  */
 public class PredatoryJournalRepository {
     private final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalRepository.class);
-    private final Map<String, List<String>> predatoryJournals = new HashMap<>();
+    private final Map<String, PredatoryJournalInformation> predatoryJournals = new HashMap<>();
+    private final Cosine COSINE_METRIC = new Cosine();
 
     /**
      * Initializes the internal data based on the predatory journals found in the given MV file
      */
-    public PredatoryJournalRepository(Path PJList) {
-        MVMap<String, List<String>> predatoryJournalsMap;
-        try (MVStore store = new MVStore.Builder().readOnly().fileName(PJList.toAbsolutePath().toString()).open()) {
+    public PredatoryJournalRepository(Path pjlist) {
+        MVMap<String, PredatoryJournalInformation> predatoryJournalsMap;
+        try (MVStore store = new MVStore.Builder().readOnly().fileName(pjlist.toAbsolutePath().toString()).open()) {
             predatoryJournalsMap = store.openMap("PredatoryJournals");
             predatoryJournals.putAll(predatoryJournalsMap);
         }
@@ -40,7 +38,7 @@ public class PredatoryJournalRepository {
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public PredatoryJournalRepository() {
-        predatoryJournals.put("Demo", List.of("Demo", "Demo"));
+        predatoryJournals.put("Demo", new PredatoryJournalInformation("Demo", "Demo",""));
     }
 
     /**
@@ -55,7 +53,7 @@ public class PredatoryJournalRepository {
         }
 
         var matches = predatoryJournals.keySet().stream()
-                                       .filter(key -> cosineSimilarity(key, journal) > similarityScore)
+                                       .filter(key -> COSINE_METRIC.distance(key.toLowerCase(Locale.ROOT), journal.toLowerCase(Locale.ROOT)) > similarityScore)
                                        .collect(Collectors.toList());
 
         LOGGER.info("matches: " + String.join(", ", matches));
@@ -63,7 +61,7 @@ public class PredatoryJournalRepository {
     }
 
     public void addToPredatoryJournals(String name, String abbr, String url) {
-        predatoryJournals.put(decode(name), List.of(decode(abbr), url));
+        predatoryJournals.put(decode(name), new PredatoryJournalInformation(decode((name)),decode(abbr), url));
     }
 
     private String decode(String s) {
@@ -75,46 +73,7 @@ public class PredatoryJournalRepository {
                        .replace("&#8211;", "-");
     }
 
-    private double cosineSimilarity(String a, String b) {
-        List<String> a_bigrams = getBigrams(a);
-        List<String> b_bigrams = getBigrams(b);
-        Set<String> union = getUnion(a_bigrams, b_bigrams);
-
-        Map<String, Integer> a_freqs = countNgramFrequency(a_bigrams, union);
-        Map<String, Integer> b_freqs = countNgramFrequency(b_bigrams, union);
-
-        List<Integer> av = new ArrayList<>(a_freqs.values());
-        List<Integer> bv = new ArrayList<>(b_freqs.values());
-
-        return dotProduct(av, bv) / (magnitude(av) * magnitude(bv));
-    }
-
-    private static List<String> getBigrams(String s) {
-        String cleanStr = s.toLowerCase().replace(" ", "");
-        return IntStream.range(0, cleanStr.length() - 1)
-                        .mapToObj(i -> cleanStr.substring(i, i + 2))
-                        .collect(Collectors.toList());
-    }
-
-    private Map<String, Integer> countNgramFrequency(List<String> ngrams, Set<String> union) {
-        return union.stream().collect(Collectors.toMap(n -> n, n -> Collections.frequency(ngrams, n)));
-    }
-
-    private Set<String> getUnion(List<String> a, List<String> b) {
-        return Stream.concat(a.stream(), b.stream()).collect(Collectors.toSet());
-    }
-
-    private double dotProduct(List<Integer> av, List<Integer> bv) {
-        return IntStream.range(0, Math.min(av.size(), bv.size()))
-                        .mapToDouble(i -> av.get(i) * bv.get(i))
-                        .sum();
-    }
-
-    private double magnitude(List<Integer> v) {
-        return Math.sqrt(v.stream().mapToDouble(x -> x * x).sum());
-    }
-
-    public Map<String, List<String>> getPredatoryJournals() {
+    public Map<String, PredatoryJournalInformation> getPredatoryJournals() {
         return Collections.unmodifiableMap(predatoryJournals);
     }
 }

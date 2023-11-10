@@ -326,6 +326,17 @@ tasks.register("generateJournalListMV", JavaExec) {
         !file("build/resources/main/journals/journal-list.mv").exists()
     }
 }
+
+tasks.register("generatePreadatoryJournalistMV", JavaExec) {
+        group = "JabRef"
+        description = "Load predatory journal information from online sources to a H2 MVStore"
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = "org.jabref.cli.PredatoryJournalListMvGenerator"
+        onlyIf {
+            !file("build/resources/main/journals/journal-list.mv").exists()
+        }
+}
+
 jar.dependsOn "generateJournalListMV"
 compileTestJava.dependsOn "generateJournalListMV"
 

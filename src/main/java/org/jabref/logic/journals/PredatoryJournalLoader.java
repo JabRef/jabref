@@ -5,12 +5,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,16 +29,25 @@ import org.slf4j.LoggerFactory;
 
 public class PredatoryJournalLoader {
     private static class PJSource {
-        URL url = null;
-        final Pattern elementPattern;
+        URL url;
+        Optional<Pattern> elementPattern;
 
         PJSource(String url, String regex) {
             try {
-                this.url = new URL(url);
-            } catch (MalformedURLException ex) {
-                LOGGER.error("Malformed URL has occurred in PJSource", ex);
+                this.url = new URI(url).toURL();
+            } catch (MalformedURLException | URISyntaxException ex) {
+               throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
             }
-            this.elementPattern = regex != null ? Pattern.compile(regex) : null;
+            this.elementPattern = Optional.of(Pattern.compile(regex));
+        }
+
+        PJSource(String url) {
+            try {
+                this.url = new URI(url).toURL();
+            } catch (MalformedURLException | URISyntaxException ex) {
+                throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
+            }
+            this.elementPattern = Optional.empty();
         }
     }
 
@@ -45,10 +57,8 @@ public class PredatoryJournalLoader {
     private static final Pattern PATTERN_ABBR = Pattern.compile("(?<=\\()[^ ]*(?=\\))");
     private static final List<String> LINK_ELEMENTS = new ArrayList<>();
     private static final List<PJSource> PREDATORY_SOURCES = List.of(
-            new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
-                    null),
-            new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv",
-                    null),
+            new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv"),
+            new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv"),
             new PJSource("https://beallslist.net/",
                     "<li>.*?</li>"),
             new PJSource("https://beallslist.net/standalone-journals/",
@@ -56,10 +66,11 @@ public class PredatoryJournalLoader {
             new PJSource("https://beallslist.net/hijacked-journals/",
                     "<tr>.*?</tr>")
     );
-    private PredatoryJournalRepository repository = new PredatoryJournalRepository();
+    private final List<PredatoryJournalInformation> predatoryJournalInformations = new ArrayList<>();
 
     public static PredatoryJournalRepository loadRepository() {
-        PredatoryJournalLoader loader = new PredatoryJournalLoader();
+         PredatoryJournalRepository repository = new PredatoryJournalRepository();
+
         // Initialize with built-in list
         try (InputStream resourceAsStream = PredatoryJournalRepository.class.getResourceAsStream("/journals/predatoryJournal-list.mv")) {
             if (resourceAsStream == null) {
@@ -74,16 +85,16 @@ public class PredatoryJournalLoader {
                 Files.createDirectories(appDataDir); // Ensure the directory exists
                 Path predatoryJournalListPath = appDataDir.resolve("predatoryJournal-list.mv");
                 Files.copy(resourceAsStream, predatoryJournalListPath, StandardCopyOption.REPLACE_EXISTING);
-                loader.repository = new PredatoryJournalRepository(predatoryJournalListPath);
+                repository = new PredatoryJournalRepository(predatoryJournalListPath);
             }
         } catch (IOException e) {
             LOGGER.error("Error while copying predatory journal list", e);
-            return null;
+            return repository;
         }
-        return loader.repository;
+        return repository;
     }
 
-    public void update() {
+    public void loadFromOnlineSources() {
         // populates linkElements (and predatoryJournals if CSV)
         PREDATORY_SOURCES.forEach(this::crawl);
         // adds cleaned HTML to predatoryJournals
@@ -101,9 +112,11 @@ public class PredatoryJournalLoader {
             } else if (source.url.getPath().contains(".csv")) {
                 handleCSV(new InputStreamReader(download.asInputStream()));
             } else {
-                handleHTML(source.elementPattern, download.asString());
+                if (source.elementPattern.isPresent()) {
+                    handleHTML(source.elementPattern.get(), download.asString());
+                }
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             LOGGER.error("Could not crawl source {}", source.url, ex);
         }
     }
@@ -113,17 +126,14 @@ public class PredatoryJournalLoader {
 
         for (CSVRecord csvRecord : csvParser) {
             // changes column order from CSV (source: url, name, abbr)
-            repository.addToPredatoryJournals(csvRecord.get(1), csvRecord.get(2), csvRecord.get(0));
+            predatoryJournalInformations.add(new PredatoryJournalInformation(csvRecord.get(1), csvRecord.get(2), csvRecord.get(0)));
         }
     }
 
     private void handleHTML(Pattern pattern, String body) {
-        Matcher matcher = pattern != null ? pattern.matcher(body) : null;
-
-        if (matcher != null) {
-            while (matcher.find()) {
-                LINK_ELEMENTS.add(matcher.group());
-            }
+        Matcher matcher = pattern.matcher(body);
+        while (matcher.find()) {
+            LINK_ELEMENTS.add(matcher.group());
         }
     }
 
@@ -135,11 +145,12 @@ public class PredatoryJournalLoader {
         // using `if` gets only first link in element, `while` gets all, but this may not be desirable
         // e.g. this way only the hijacked journals are recorded and not the authentic originals
         if (m_name.find() && m_url.find()) {
-            repository.addToPredatoryJournals(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group());
+            predatoryJournalInformations.add(new PredatoryJournalInformation(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group()));
         }
     }
 
-    public PredatoryJournalRepository getRepository() {
-        return repository;
+    public List<PredatoryJournalInformation> getPredatoryJournalInformations() {
+        return predatoryJournalInformations;
     }
+
 }
