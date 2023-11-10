@@ -2,6 +2,7 @@ package org.jabref.logic.importer;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -102,7 +103,7 @@ public class WebFetchers {
      * @return sorted set containing search based fetchers
      */
     public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        SortedSet<SearchBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        SortedSet<SearchBasedFetcher> set = new TreeSet<>(new CompositeSearchFirstComparator());
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
@@ -119,7 +120,7 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
-        set.add(new CompositeSearchBasedFetcher(set, 30));
+        set.add(new CompositeSearchBasedFetcher(set, importerPreferences, 30));
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         set.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
@@ -230,5 +231,19 @@ public class WebFetchers {
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         return fetchers;
+    }
+}
+
+/**
+ *  Places "Search Selected" to the first of the set
+ */
+class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
+    @Override
+    public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {
+        if (Objects.equals(s1.getName(), CompositeSearchBasedFetcher.FETCHER_NAME)) {
+            return -1;
+        } else {
+            return s1.getName().compareTo(s2.getName());
+        }
     }
 }

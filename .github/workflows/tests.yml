@@ -182,8 +182,8 @@ jobs:
           cat heylogs.txt
 
           # exit 1 in case of error
-          # We have 2 "valid" issues in CHANGELOG.md
-          grep -q "2 problems" heylogs.txt || exit 1
+          # We have 1 "valid" issue in CHANGELOG.md
+          grep -q "1 problem" heylogs.txt || exit 1
       - name: Add comment on pull request
         if: ${{ failure() }}
         uses: thollander/actions-comment-pull-request@v2
