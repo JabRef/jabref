@@ -22,51 +22,45 @@ public class ExternalFileTypesTabViewModelTest {
 
     private FilePreferences filePreferences = mock(FilePreferences.class);
     private DialogService dialogService = mock(DialogService.class);
+
     @Spy
     private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(filePreferences, dialogService));
     private ExternalFileTypeItemViewModelTestData externalFileTypeItemViewModel = new ExternalFileTypeItemViewModelTestData();
-   @BeforeEach
-   void setUp() {
-       // arrange
-       externalFileTypeItemViewModel.setup();
-   }
+
+    @BeforeEach
+    void setUp() {
+        externalFileTypeItemViewModel.setup();
+    }
 
     @Test
     public void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue() {
-        // action,  assert
         assertTrue(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
     }
 
-   @Test
-   public void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse() {
-       // arrange
-       externalFileTypeItemViewModel.setupWithoutName();
-       // action,  assert
-       assertFalse(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
-   }
+    @Test
+    public void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse() {
+        externalFileTypeItemViewModel.setupWithoutName();
+        assertFalse(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel.get()));
+    }
 
-   @Test
-   public void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
-       // arrange
-       ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
-       doAnswer(mocked -> {
-           ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
-           externalFileTypeItemViewModel.clone(capturedItem);
-           return null;
-       }).when(externalFileTypesTabViewModel).showEditDialog(itemCaptor.capture(), any());
+    @Test
+    public void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
+        ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
+        doAnswer(mocked -> {
+            ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
+            externalFileTypeItemViewModel.clone(capturedItem);
+            return null;
+        }).when(externalFileTypesTabViewModel).showEditDialog(itemCaptor.capture(), any());
 
-       // action
-       externalFileTypesTabViewModel.addNewType();
+        externalFileTypesTabViewModel.addNewType();
 
-       // assert
-       ObservableList<ExternalFileTypeItemViewModel> actualFileTypes = externalFileTypesTabViewModel.getFileTypes();
-       assertEquals(actualFileTypes.size(), 1);
-       assertTrue(externalFileTypeItemViewModel.isSameValue(actualFileTypes.getFirst()));
-   }
+        ObservableList<ExternalFileTypeItemViewModel> actualFileTypes = externalFileTypesTabViewModel.getFileTypes();
+        assertEquals(actualFileTypes.size(), 1);
+        assertTrue(externalFileTypeItemViewModel.isSameValue(actualFileTypes.getFirst()));
+    }
 
     @Test
     public void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed() {
-        // arrange
         externalFileTypeItemViewModel.setupWithoutName();
         ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
         doAnswer(mocked -> {
@@ -75,10 +69,8 @@ public class ExternalFileTypesTabViewModelTest {
             return null;
         }).when(externalFileTypesTabViewModel).showEditDialog(itemCaptor.capture(), any());
 
-        // action
         externalFileTypesTabViewModel.addNewType();
 
-        // assert
         ObservableList<ExternalFileTypeItemViewModel> emptyFileTypes = externalFileTypesTabViewModel.getFileTypes();
         assertEquals(emptyFileTypes.size(), 0);
     }
