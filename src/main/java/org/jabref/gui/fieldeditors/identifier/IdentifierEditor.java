@@ -23,12 +23,15 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+
+import static org.jabref.model.entry.field.StandardField.DOI;
+import static org.jabref.model.entry.field.StandardField.EPRINT;
+import static org.jabref.model.entry.field.StandardField.ISBN;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
@@ -43,7 +46,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
-    private Optional<BibEntry> entry;
+    private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
                             SuggestionProvider<?> suggestionProvider,
@@ -53,14 +56,18 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         // but we need the injected vars to create the viewmodels.
         Injector.registerExistingAndInject(this);
 
-        if (StandardField.DOI == field) {
-            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
-        } else if (StandardField.ISBN == field) {
-            this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
-        } else if (StandardField.EPRINT == field) {
-            this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
-        } else {
-            throw new IllegalStateException(String.format("Unable to instantiate a view model for identifier field editor '%s'", field.getDisplayName()));
+        switch (field) {
+            case DOI ->
+                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
+            case ISBN ->
+                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
+            case EPRINT ->
+                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
+
+            case null, default -> {
+                assert field != null;
+                throw new IllegalStateException(String.format("Unable to instantiate a view model for identifier field editor '%s'", field.getDisplayName()));
+            }
         }
 
         ViewLoader.view(this)
@@ -74,7 +81,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
-        if (field.equals(StandardField.DOI)) {
+        if (field.equals(DOI)) {
             textArea.initContextMenu(EditorMenus.getDOIMenu(textArea, dialogService, preferencesService));
         } else {
             textArea.initContextMenu(new DefaultMenu(textArea));

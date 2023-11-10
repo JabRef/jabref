@@ -21,10 +21,11 @@
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+            <ColumnConstraints hgrow="NEVER"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
         </columnConstraints>
         <Label styleClass="sectionHeader" text="%Appearance"
-               GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+               GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
         <Label text="%Language"
                GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <ComboBox fx:id="language" prefWidth="200.0"
@@ -32,10 +33,12 @@
 
         <Label text="%Visual theme"
                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="theme" prefWidth="200.0"
+        <ComboBox fx:id="theme" prefWidth="200.0" disable="${themeSyncOs.selected}"
                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-        <HBox alignment="CENTER_LEFT" spacing="4.0"
-              GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2">
+        <CheckBox fx:id="themeSyncOs" text="%Use System Preference"
+                  GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+        <HBox alignment="CENTER_LEFT" spacing="4.0" disable="${themeSyncOs.selected}"
+              GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="3">
             <TextField fx:id="customThemePath" HBox.hgrow="ALWAYS"/>
             <Button fx:id="customThemeBrowse" onAction="#importTheme" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
                 <graphic>
