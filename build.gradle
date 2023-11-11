@@ -333,7 +333,7 @@ tasks.register("generatePredatoryJournalListMV", JavaExec) {
         classpath = sourceSets.main.runtimeClasspath
         mainClass = "org.jabref.cli.PredatoryJournalListMvGenerator"
         onlyIf {
-            !file("build/resources/main/journals/journal-list.mv").exists()
+            !file("build/resources/main/journals/predatoryJournal-list.mv").exists()
         }
 }
 

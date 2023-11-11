@@ -39,7 +39,7 @@ class PredatoryJournalCheckerTest {
     void journalIsPredatory() {
         String journalName = "European International Journal of Science and Technology";
         entry.setField(StandardField.JOURNAL, journalName);
-        assertEquals(List.of(new IntegrityMessage("Match found in predatory journal " + journalName,
+        assertEquals(List.of(new IntegrityMessage("Predatory journal + journalName + found" + journalName,
                 entry, StandardField.JOURNAL)), checker.check(entry));
     }
 
@@ -47,7 +47,7 @@ class PredatoryJournalCheckerTest {
     void journalIsPredatoryCaseInsensitive() {
         String journalName = "european international journal of science and technology";
         entry.setField(StandardField.JOURNAL, journalName);
-        assertEquals(List.of(new IntegrityMessage("Match found in predatory journal " + journalName,
+        assertEquals(List.of(new IntegrityMessage("Predatory journal + journalName + found",
                 entry, StandardField.JOURNAL)), checker.check(entry));
     }
 
@@ -55,7 +55,7 @@ class PredatoryJournalCheckerTest {
     void journalIsPredatoryExtraCharacters() {
         String journalName = "European International Journal, of Science and Technology";
         entry.setField(StandardField.JOURNAL, journalName);
-        assertEquals(List.of(new IntegrityMessage("Match found in predatory journal " + journalName,
+        assertEquals(List.of(new IntegrityMessage("Predatory journal" + journalName + "found",
                 entry, StandardField.JOURNAL)), checker.check(entry));
     }
 
@@ -63,7 +63,7 @@ class PredatoryJournalCheckerTest {
     void publisherIsPredatory() {
         String publisherName = "Academia Scholarly Journals";
         entry.setField(StandardField.PUBLISHER, publisherName);
-        assertEquals(List.of(new IntegrityMessage("Match found in predatory journal " + publisherName,
+        assertEquals(List.of(new IntegrityMessage("Predatory journal" + publisherName + "found",
                 entry, StandardField.PUBLISHER)), checker.check(entry));
     }
 
@@ -71,7 +71,7 @@ class PredatoryJournalCheckerTest {
     void bookTitleIsPredatory() {
         String bookTitle = "Biosciences International";
         entry.setField(StandardField.BOOKTITLE, bookTitle);
-        assertEquals(List.of(new IntegrityMessage("Match found in predatory journal " + bookTitle,
+        assertEquals(List.of(new IntegrityMessage("Predatory journal" + bookTitle + "found",
                 entry, StandardField.BOOKTITLE)), checker.check(entry));
     }
 }

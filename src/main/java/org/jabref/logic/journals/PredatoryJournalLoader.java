@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
+import org.jabref.model.strings.StringUtil;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.csv.CSVFormat;
@@ -89,7 +90,8 @@ public class PredatoryJournalLoader {
                 Files.copy(resourceAsStream, predatoryJournalListPath, StandardCopyOption.REPLACE_EXISTING);
                 repository = new PredatoryJournalRepository(predatoryJournalListPath);
             }
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             LOGGER.error("Error while copying predatory journal list", e);
             return repository;
         }
@@ -124,11 +126,19 @@ public class PredatoryJournalLoader {
     }
 
     private void handleCSV(Reader reader) throws IOException {
-        CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL);
+        CSVFormat format = CSVFormat.EXCEL.builder().setSkipHeaderRecord(true).build();
+        CSVParser csvParser = new CSVParser(reader, format);
 
         for (CSVRecord csvRecord : csvParser) {
+            String name = csvRecord.get(1);
+            String abbr = csvRecord.get(2);
+            String url = csvRecord.get(0);
+
+            if (StringUtil.isNullOrEmpty(name) && !(StringUtil.isNullOrEmpty(abbr))) {
+                name = abbr;
+            }
             // changes column order from CSV (source: url, name, abbr)
-            predatoryJournalInformations.add(new PredatoryJournalInformation(csvRecord.get(1), csvRecord.get(2), csvRecord.get(0)));
+            predatoryJournalInformations.add(new PredatoryJournalInformation(name, abbr, url));
         }
     }
 
@@ -147,7 +157,17 @@ public class PredatoryJournalLoader {
         // using `if` gets only first link in element, `while` gets all, but this may not be desirable
         // e.g. this way only the hijacked journals are recorded and not the authentic originals
         if (m_name.find() && m_url.find()) {
-            predatoryJournalInformations.add(new PredatoryJournalInformation(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group()));
+            String name = m_name.group();
+            if (name != null) {
+                name = name.replace("\u200B", ""); //zero width space
+            }
+            String abbr = m_abbr.find() ? m_abbr.group() : "";
+            String url = m_url.group();
+
+            if (StringUtil.isNullOrEmpty(name) && !(abbr.isEmpty())) {
+                name = abbr;
+            }
+            predatoryJournalInformations.add(new PredatoryJournalInformation(name, abbr, url));
         }
     }
 
