@@ -10,7 +10,6 @@ import org.jabref.model.entry.field.Field;
 
 public class PredatoryJournalChecker implements EntryChecker {
 
-    public static final double SIMILARITY_SCORE = 0.95;
     private final PredatoryJournalRepository predatoryJournalRepository;
     private final List<Field> fieldNames;
 
@@ -23,7 +22,7 @@ public class PredatoryJournalChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         return entry.getFieldMap().entrySet().stream()
                     .filter(field -> fieldNames.contains(field.getKey()))
-                    .filter(field -> predatoryJournalRepository.isKnownName(field.getValue(), SIMILARITY_SCORE))
+                    .filter(field -> predatoryJournalRepository.isKnownName(field.getValue()))
                     .map(field -> new IntegrityMessage(Localization.lang("Predatory journal %0 found", field.getValue()), entry, field.getKey()))
                     .toList();
     }

@@ -1,7 +1,6 @@
 package org.jabref.logic.journals;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -9,7 +8,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import info.debatty.java.stringsimilarity.Cosine;
+import org.jabref.logic.util.strings.StringSimilarity;
+
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class PredatoryJournalRepository {
     private final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalRepository.class);
     private final Map<String, PredatoryJournalInformation> predatoryJournals = new HashMap<>();
-    private final Cosine COSINE_METRIC = new Cosine();
+    private final StringSimilarity match = new StringSimilarity();
 
     /**
      * Initializes the internal data based on the predatory journals found in the given MV file
@@ -44,7 +44,7 @@ public class PredatoryJournalRepository {
     /**
      * Returns true if the given journal name is contained in the list in its full form
      */
-    public boolean isKnownName(String journalName, double similarityScore) {
+    public boolean isKnownName(String journalName) {
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         if (predatoryJournals.containsKey(journal)) {
@@ -53,15 +53,11 @@ public class PredatoryJournalRepository {
         }
 
         var matches = predatoryJournals.keySet().stream()
-                                       .filter(key -> COSINE_METRIC.distance(key.toLowerCase(Locale.ROOT), journal.toLowerCase(Locale.ROOT)) > similarityScore)
+                                       .filter(key -> match.isSimilar(journal.toLowerCase(Locale.ROOT), key.toLowerCase(Locale.ROOT)))
                                        .collect(Collectors.toList());
 
         LOGGER.info("matches: " + String.join(", ", matches));
         return !matches.isEmpty();
-    }
-
-    public void addToPredatoryJournals(String name, String abbr, String url) {
-        predatoryJournals.put(decode(name), new PredatoryJournalInformation(decode(name), decode(abbr), url));
     }
 
     private String decode(String s) {
@@ -73,7 +69,4 @@ public class PredatoryJournalRepository {
                        .replace("&#8211;", "-");
     }
 
-    public Map<String, PredatoryJournalInformation> getPredatoryJournals() {
-        return Collections.unmodifiableMap(predatoryJournals);
-    }
 }

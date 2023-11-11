@@ -27,7 +27,10 @@ public class PredatoryJournalListMvGenerator {
         try (MVStore store = new MVStore.Builder()
                 .fileName(predatoryJournalMvFile.toString())
                 .compressHigh()
-                .backgroundExceptionHandler((t, e) -> System.err.println("Exception occurred in Thread " + t + "with exception " + e))
+                .backgroundExceptionHandler((t, e) -> {
+                    System.err.println("Exception occurred in Thread " + t + "with exception " + e);
+                    e.printStackTrace();
+                })
                 .open()) {
             MVMap<String, PredatoryJournalInformation> predatoryJournalsMap = store.openMap("PredatoryJournals");
             Set<PredatoryJournalInformation> predatoryJournals = loader.getPredatoryJournalInformations();
