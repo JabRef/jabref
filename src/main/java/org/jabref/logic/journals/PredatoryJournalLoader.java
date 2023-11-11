@@ -38,7 +38,9 @@ public class PredatoryJournalLoader {
         PJSource(String url, String regex) {
             try {
                 this.url = new URI(url).toURL();
-            } catch (MalformedURLException | URISyntaxException ex) {
+            } catch (
+                    MalformedURLException |
+                    URISyntaxException ex) {
                 throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
             }
             this.elementPattern = Optional.of(Pattern.compile(regex));
@@ -47,7 +49,9 @@ public class PredatoryJournalLoader {
         PJSource(String url) {
             try {
                 this.url = new URI(url).toURL();
-            } catch (MalformedURLException | URISyntaxException ex) {
+            } catch (
+                    MalformedURLException |
+                    URISyntaxException ex) {
                 throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
             }
             this.elementPattern = Optional.empty();
@@ -120,7 +124,8 @@ public class PredatoryJournalLoader {
                     handleHTML(source.elementPattern.get(), download.asString());
                 }
             }
-        } catch (IOException ex) {
+        } catch (
+                IOException ex) {
             LOGGER.error("Could not crawl source {}", source.url, ex);
         }
     }
@@ -134,8 +139,12 @@ public class PredatoryJournalLoader {
             String abbr = csvRecord.get(2);
             String url = csvRecord.get(0);
 
-            if (StringUtil.isNullOrEmpty(name) && !(StringUtil.isNullOrEmpty(abbr))) {
-                name = abbr;
+            if (StringUtil.isNullOrEmpty(name)) {
+                if (!abbr.isEmpty()) {
+                    name = abbr;
+                } else {
+                    continue;
+                }
             }
             // changes column order from CSV (source: url, name, abbr)
             predatoryJournalInformations.add(new PredatoryJournalInformation(name, abbr, url));
@@ -164,8 +173,12 @@ public class PredatoryJournalLoader {
             String abbr = m_abbr.find() ? m_abbr.group() : "";
             String url = m_url.group();
 
-            if (StringUtil.isNullOrEmpty(name) && !(abbr.isEmpty())) {
-                name = abbr;
+            if (StringUtil.isNullOrEmpty(name)) {
+                if (!abbr.isEmpty()) {
+                    name = abbr;
+                } else {
+                    return;
+                }
             }
             predatoryJournalInformations.add(new PredatoryJournalInformation(name, abbr, url));
         }
