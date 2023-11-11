@@ -168,7 +168,7 @@ public class PredatoryJournalLoader {
         if (m_name.find() && m_url.find()) {
             String name = m_name.group();
             if (name != null) {
-                name = name.replace("\u200B", ""); //zero width space
+                name = name.replace("\u200B", ""); // zero width space
             }
             String abbr = m_abbr.find() ? m_abbr.group() : "";
             String url = m_url.group();
