@@ -3,7 +3,7 @@ package org.jabref.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -15,6 +15,8 @@ import org.h2.mvstore.MVStore;
 
 public class PredatoryJournalListMvGenerator {
     public static void main(String[] args) throws IOException {
+        boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
+
         PredatoryJournalLoader loader = new PredatoryJournalLoader();
         loader.loadFromOnlineSources();
 
@@ -27,9 +29,16 @@ public class PredatoryJournalListMvGenerator {
                 .compressHigh()
                 .open()) {
             MVMap<String, PredatoryJournalInformation> predatoryJournalsMap = store.openMap("PredatoryJournals");
-            List<PredatoryJournalInformation> predatoryJournals = loader.getPredatoryJournalInformations();
+            Set<PredatoryJournalInformation> predatoryJournals = loader.getPredatoryJournalInformations();
 
-            var resultMap = predatoryJournals.stream().collect(Collectors.toMap(PredatoryJournalInformation::name, Function.identity()));
+            var resultMap = predatoryJournals.stream().collect(Collectors.toMap(PredatoryJournalInformation::name, Function.identity(),
+                    (predatoryJournalInformation, predatoryJournalInformation2) -> {
+                        if (verbose) {
+                            System.out.println("Double entry " + predatoryJournalInformation.name());
+                        }
+                        return predatoryJournalInformation2;
+                    }));
+
             predatoryJournalsMap.putAll(resultMap);
         }
     }

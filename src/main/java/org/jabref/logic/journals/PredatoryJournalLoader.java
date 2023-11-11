@@ -12,8 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -149,7 +151,7 @@ public class PredatoryJournalLoader {
         }
     }
 
-    public List<PredatoryJournalInformation> getPredatoryJournalInformations() {
-        return predatoryJournalInformations;
+    public Set<PredatoryJournalInformation> getPredatoryJournalInformations() {
+        return new HashSet<>(predatoryJournalInformations);
     }
 }
