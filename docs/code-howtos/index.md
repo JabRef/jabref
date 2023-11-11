@@ -5,7 +5,7 @@ has_children: true
 # Code Howtos
 
 This page provides some development support in the form of howtos.
-See also [High Level Documentation](../getting-into-thecode/high-level-documentation.md).
+See also [High Level Documentation](../getting-into-the-code/high-level-documentation.md).
 
 ## Generic code how tos
 

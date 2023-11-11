@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Fetch or search from PubMed <a href="http://www.ncbi.nlm.nih.gov/sites/entrez/">www.ncbi.nlm.nih.gov</a>
  * The MedlineFetcher fetches the entries from the PubMed database.
- * See <a href="https://docs.jabref.org/import-export/medlineris">docs.jabref.org</a> for a detailed documentation of the available fields.
+ * See <a href="https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed">docs.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);

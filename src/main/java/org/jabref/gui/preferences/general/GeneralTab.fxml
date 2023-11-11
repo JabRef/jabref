@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
@@ -13,7 +14,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<?import javafx.scene.control.Hyperlink?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.general.GeneralTab">
@@ -21,10 +21,11 @@
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+            <ColumnConstraints hgrow="NEVER"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
         </columnConstraints>
         <Label styleClass="sectionHeader" text="%Appearance"
-               GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+               GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
         <Label text="%Language"
                GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <ComboBox fx:id="language" prefWidth="200.0"
@@ -32,10 +33,12 @@
 
         <Label text="%Visual theme"
                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="theme" prefWidth="200.0"
+        <ComboBox fx:id="theme" prefWidth="200.0" disable="${themeSyncOs.selected}"
                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-        <HBox alignment="CENTER_LEFT" spacing="4.0"
-              GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2">
+        <CheckBox fx:id="themeSyncOs" text="%Use System Preference"
+                  GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+        <HBox alignment="CENTER_LEFT" spacing="4.0" disable="${themeSyncOs.selected}"
+              GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="3">
             <TextField fx:id="customThemePath" HBox.hgrow="ALWAYS"/>
             <Button fx:id="customThemeBrowse" onAction="#importTheme" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
                 <graphic>
@@ -69,6 +72,13 @@
               text="%Warn about unresolved duplicates when closing inspection window"/>
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
+
+    <Label styleClass="sectionHeader" text="%Single instance" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="remoteServer" text="%Enforce single JabRef instance (and allow remote operations) using port" />
+        <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
+        <Button fx:id="remoteHelp" prefWidth="20.0" />
+    </HBox>
 
     <Label styleClass="sectionHeader" text="%Libraries"/>
     <GridPane hgap="10.0" vgap="4.0">

@@ -65,6 +65,8 @@ public class FieldEditors {
             return new JournalEditor(field, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.ISSN)) {
+            return new ISSNEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.GROUPS) {
@@ -97,8 +99,6 @@ public class FieldEditors {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
-        } else if (field == StandardField.ISSN) {
-            return new ISSNEditor(field, suggestionProvider, fieldCheckers);
         } else {
             // default
             return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
