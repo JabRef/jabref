@@ -38,7 +38,7 @@ public class PredatoryJournalRepository {
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public PredatoryJournalRepository() {
-        predatoryJournals.put("Demo", new PredatoryJournalInformation("Demo", "Demo",""));
+        predatoryJournals.put("Demo", new PredatoryJournalInformation("Demo", "Demo", ""));
     }
 
     /**
@@ -61,7 +61,7 @@ public class PredatoryJournalRepository {
     }
 
     public void addToPredatoryJournals(String name, String abbr, String url) {
-        predatoryJournals.put(decode(name), new PredatoryJournalInformation(decode((name)),decode(abbr), url));
+        predatoryJournals.put(decode(name), new PredatoryJournalInformation(decode((name)), decode(abbr), url));
     }
 
     private String decode(String s) {

@@ -36,7 +36,7 @@ public class PredatoryJournalLoader {
             try {
                 this.url = new URI(url).toURL();
             } catch (MalformedURLException | URISyntaxException ex) {
-               throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
+                throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
             }
             this.elementPattern = Optional.of(Pattern.compile(regex));
         }
@@ -69,7 +69,7 @@ public class PredatoryJournalLoader {
     private final List<PredatoryJournalInformation> predatoryJournalInformations = new ArrayList<>();
 
     public static PredatoryJournalRepository loadRepository() {
-         PredatoryJournalRepository repository = new PredatoryJournalRepository();
+        PredatoryJournalRepository repository = new PredatoryJournalRepository();
 
         // Initialize with built-in list
         try (InputStream resourceAsStream = PredatoryJournalRepository.class.getResourceAsStream("/journals/predatoryJournal-list.mv")) {
@@ -152,5 +152,4 @@ public class PredatoryJournalLoader {
     public List<PredatoryJournalInformation> getPredatoryJournalInformations() {
         return predatoryJournalInformations;
     }
-
 }
