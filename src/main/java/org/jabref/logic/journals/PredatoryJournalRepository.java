@@ -61,7 +61,7 @@ public class PredatoryJournalRepository {
     }
 
     public void addToPredatoryJournals(String name, String abbr, String url) {
-        predatoryJournals.put(decode(name), new PredatoryJournalInformation(decode((name)), decode(abbr), url));
+        predatoryJournals.put(decode(name), new PredatoryJournalInformation(decode(name), decode(abbr), url));
     }
 
     private String decode(String s) {
