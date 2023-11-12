@@ -16,9 +16,9 @@ This page lists some software we consider useful.
 
 Here, we collect some helpful git hints
 
-* [https://github.com/blog/2019-how-to-undo-almost-anything-with-git](https://github.com/blog/2019-how-to-undo-almost-anything-with-git)
-* [https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md](https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md)
-* awesome hints and tools regarding git: [https://github.com/dictcp/awesome-git](https://github.com/dictcp/awesome-git)
+* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
+* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
+* awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
 
 ### Rebase everything as one commit on main
 
