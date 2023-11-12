@@ -8,7 +8,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,29 +15,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PredatoryJournalCheckerTest {
 
     static PredatoryJournalChecker checker;
-    BibEntry entry;
 
     @BeforeAll
     static void initChecker() {
         checker = new PredatoryJournalChecker(PredatoryJournalLoader.loadRepository(),
                 List.of(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE));
     }
-
-    @BeforeEach
-    void initEntry() {
-        entry = new BibEntry();
-    }
-
+    
     @Test
     void journalIsNotPredatory() {
-        entry.setField(StandardField.JOURNAL, "IEEE Software");
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "IEEE Software");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
     void journalIsPredatory() {
         String journalName = "European International Journal of Science and Technology";
-        entry.setField(StandardField.JOURNAL, journalName);
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, journalName);
         assertEquals(List.of(new IntegrityMessage("Predatory journal %s found".formatted(journalName),
                 entry, StandardField.JOURNAL)), checker.check(entry));
     }
@@ -46,7 +39,7 @@ class PredatoryJournalCheckerTest {
     @Test
     void journalIsPredatoryCaseInsensitive() {
         String journalName = "european international journal of science and technology";
-        entry.setField(StandardField.JOURNAL, journalName);
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, journalName);
         assertEquals(List.of(new IntegrityMessage("Predatory journal %s found".formatted(journalName),
                 entry, StandardField.JOURNAL)), checker.check(entry));
     }
@@ -54,7 +47,7 @@ class PredatoryJournalCheckerTest {
     @Test
     void journalIsPredatoryExtraCharacters() {
         String journalName = "European International Journal, of Science and Technology";
-        entry.setField(StandardField.JOURNAL, journalName);
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, journalName);
         assertEquals(List.of(new IntegrityMessage("Predatory journal %s found".formatted(journalName),
                 entry, StandardField.JOURNAL)), checker.check(entry));
     }
@@ -62,7 +55,7 @@ class PredatoryJournalCheckerTest {
     @Test
     void publisherIsPredatory() {
         String publisherName = "Academia Scholarly Journals";
-        entry.setField(StandardField.PUBLISHER, publisherName);
+        BibEntry entry = new BibEntry().withField(StandardField.PUBLISHER, publisherName);
         assertEquals(List.of(new IntegrityMessage("Predatory journal %s found".formatted(publisherName),
                 entry, StandardField.PUBLISHER)), checker.check(entry));
     }
@@ -70,7 +63,7 @@ class PredatoryJournalCheckerTest {
     @Test
     void bookTitleIsPredatory() {
         String bookTitle = "Biosciences International";
-        entry.setField(StandardField.BOOKTITLE, bookTitle);
+        BibEntry entry = new BibEntry().withField(StandardField.BOOKTITLE, bookTitle);
         assertEquals(List.of(new IntegrityMessage("Predatory journal %s found".formatted(bookTitle),
                 entry, StandardField.BOOKTITLE)), checker.check(entry));
     }
