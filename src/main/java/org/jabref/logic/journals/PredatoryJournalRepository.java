@@ -68,5 +68,4 @@ public class PredatoryJournalRepository {
                        .replace("&#8217;", "'")
                        .replace("&#8211;", "-");
     }
-
 }
