@@ -55,10 +55,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
      */
     public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
-        Field[] singleFields = {StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH};
+        List<Field> singleFields = List.of(StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH);
 
         // Fields that are accessible in the journal part of the BibJson object
-        Field[] journalSingleFields = {StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME};
+        List<Field> journalSingleFields = List.of(StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
 
@@ -155,13 +155,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         return entry;
     }
 
-    public static URIBuilder addPath(URIBuilder base, String subPath) {
+    public static void addPath(URIBuilder base, String subPath) {
         // slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
-        if (StringUtil.isBlank(subPath) || "/".equals(subPath)) {
-            return base;
-        } else {
+        if (!StringUtil.isBlank(subPath) && !"/".equals(subPath)) {
             base.setPath(appendSegmentToPath(base.getPath(), subPath));
-            return base;
         }
     }
 

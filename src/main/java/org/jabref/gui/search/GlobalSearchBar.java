@@ -201,7 +201,7 @@ public class GlobalSearchBar extends HBox {
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
-        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::performSearch);
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::updateSearchQuery);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),
@@ -238,7 +238,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.REGULAR_EXPRESSION, regularExpressionButton.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
@@ -246,7 +246,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         fulltextButton.setSelected(searchPreferences.isFulltext());
@@ -254,7 +254,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(fulltextButton);
         fulltextButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.FULLTEXT, fulltextButton.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
@@ -262,7 +262,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(keepSearchString);
         keepSearchString.setOnAction(evt -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.KEEP_SEARCH_STRING, keepSearchString.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
@@ -271,7 +271,7 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton.setOnAction(evt -> {
             globalSearchActive.setValue(true);
             globalSearchResultDialog = new GlobalSearchResultDialog(undoManager);
-            performSearch();
+            updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
         });
@@ -298,9 +298,9 @@ public class GlobalSearchBar extends HBox {
         searchField.selectAll();
     }
 
-    public void performSearch() {
+    public void updateSearchQuery() {
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
-        LOGGER.debug("Run search {}", searchField.getText());
+        LOGGER.debug("Updated search query: {}", searchField.getText());
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {

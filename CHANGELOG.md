@@ -11,23 +11,33 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a scite.ai tab in the entry editor that retrieves 'Smart Citation' tallies for citations that have a DOI. [koppor#375](https://github.com/koppor/jabref/issues/375)  
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
 - We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
+- We added the option to use System Preference for Light/Dark Theme [#8729](https://github.com/JabRef/jabref/issues/8729).
+- We added [scholar.archive.org](https://scholar.archive.org/) as a new fetcher. [#10498](https://github.com/JabRef/jabref/issues/10498)
 
 ### Changed
 
 - We moved the location of the 'Open only one instance of JabRef' preference option from "Network" to "General". [#9306](https://github.com/JabRef/jabref/issues/9306)
 - The two previews in the change resolver dialog now have their scrollbars synchronized. [#9576](https://github.com/JabRef/jabref/issues/9576).
 - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
+- We replaced "SearchAll" in Web Search by "Search Selected". [#10556](https://github.com/JabRef/jabref/issues/10556)
 - Short DOI formatter now checks, if the value is already formatted. If so, it returns the value instead of calling the ShortDOIService again. [#10589](https://github.com/JabRef/jabref/issues/10589)
+- We upgraded to JavaFX 21.0.1. As a consequence JabRef requires now macOS 11 or later and GTK 3.8 or later on Linux [10627](https://github.com/JabRef/jabref/pull/10627).
 
 ### Fixed
 
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list. [#10415](https://github.com/JabRef/jabref/issues/10415)
 - We fixed an issue where in the merge dialog the file field of entries was not correctly merged when the first and second entry both contained values inside the file field. [#10572](https://github.com/JabRef/jabref/issues/10572)
-- We fixed some small inconsistencies in the user interface. [#10507](https://github.com/JabRef/jabref/issues/10507)
+- We fixed some small inconsistencies in the user interface. [#10507](https://github.com/JabRef/jabref/issues/10507) [#10458](https://github.com/JabRef/jabref/issues/10458)
 
 ### Removed
+
+- We removed duplicate filtering and sorting operations in the MainTable when editing BibEntries. [#10619](https://github.com/JabRef/jabref/pull/10619)
+
+
+
 
 ## [5.11] – 2023-10-22
 
@@ -92,7 +102,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Attach file from URL" to right-click context menu to download and store a file with the reference library. [#9646](https://github.com/JabRef/jabref/issues/9646)
 - We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
 - We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641)
-- We added support for more biblatex date formats for parsing dates. [#2753](https://github.com/JabRef/issues/2753)
+- We added support for more biblatex date formats for parsing dates. [#2753](https://github.com/JabRef/jabref/issues/2753)
 - We added support for multiple languages for exporting to and importing references from MS Office. [#9699](https://github.com/JabRef/jabref/issues/9699)
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
 - We added the option to automatically download online files when a new entry is created from an existing ID (e.g., DOI). The option can be disabled in the preferences under "Import and Export". [#9756](https://github.com/JabRef/jabref/issues/9756)
@@ -686,7 +696,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with toggle of special fields does not work for sorted entries [#7016](https://github.com/JabRef/jabref/issues/7016)
 - We fixed an issue with the default path of external application. [#7641](https://github.com/JabRef/jabref/issues/7641)
 - We fixed an issue where urls must be embedded in a style tag when importing EndNote style Xml files. Now it can parse url with or without a style tag. [#6199](https://github.com/JabRef/jabref/issues/6199)
-- We fixed an issue where the article title with colon fails to download the arXiv link (pdf file). [#7660](https://github.com/JabRef/issues/7660)
+- We fixed an issue where the article title with colon fails to download the arXiv link (pdf file). [#7660](https://github.com/JabRef/jabref/issues/7660)
 - We fixed an issue where the keybinding for delete entry did not work on the main table [7580](https://github.com/JabRef/jabref/pull/7580)
 - We fixed an issue where the RFC fetcher is not compatible with the draft [7305](https://github.com/JabRef/jabref/issues/7305)
 - We fixed an issue where duplicate files (both file names and contents are the same) is downloaded and add to linked files [#6197](https://github.com/JabRef/jabref/issues/6197)
@@ -788,7 +798,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a new fetcher to enable users to search mEDRA DOIs [#6602](https://github.com/JabRef/jabref/issues/6602)
-- We added a new fetcher to enable users to search "[Collection of Computer Science Bibliographies](https://liinwww.ira.uka.de/bibliography/index.html)". [#6638](https://github.com/JabRef/jabref/issues/6638)
+- We added a new fetcher to enable users to search "[Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)". [#6638](https://github.com/JabRef/jabref/issues/6638)
 - We added default values for delimiters in Add Subgroup window [#6624](https://github.com/JabRef/jabref/issues/6624)
 - We improved responsiveness of general fields specification dialog window. [#6604](https://github.com/JabRef/jabref/issues/6604)
 - We added support for importing ris file and load DOI [#6530](https://github.com/JabRef/jabref/issues/6530)
@@ -881,7 +891,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue about duplicated group color indicators [#6175](https://github.com/JabRef/jabref/issues/6175)
 - We fixed an issue where entries with the entry type Misc from an imported aux file would not be saved correctly to the bib file on disk [#6405](https://github.com/JabRef/jabref/issues/6405)
 - We fixed an issue where percent sign ('%') was not formatted properly by the HTML formatter [#6753](https://github.com/JabRef/jabref/issues/6753)
-- We fixed an issue with the [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database/ads) fetcher where `\textbackslash` appeared at the end of the abstract.
+- We fixed an issue with the [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/add-entry-using-an-id#sao-nasa-a-ds) fetcher where `\textbackslash` appeared at the end of the abstract.
 - We fixed an issue with the Science Direct fetcher where PDFs could not be downloaded. Fixes [#5860](https://github.com/JabRef/jabref/issues/5860)
 - We fixed an issue with the Library of Congress importer.
 - We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
@@ -891,7 +901,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the option of the "enforce legal key". [#6295](https://github.com/JabRef/jabref/issues/6295)
 - We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
-- We removed the option to configure whether a `.bib.bak` file should be generated upon save. It is now always enabled. Documentation at <https://docs.jabref.org/general/autosave>. [#6092](https://github.com/JabRef/jabref/issues/6092)
+- We removed the option to configure whether a `.bib.bak` file should be generated upon save. It is now always enabled. Documentation at <https://docs.jabref.org/advanced/autosave>. [#6092](https://github.com/JabRef/jabref/issues/6092)
 - We removed the built-in list of IEEE journal abbreviations using BibTeX strings. If you still want to use them, you have to download them separately from <https://abbrv.jabref.org>.
 
 ## [5.0] – 2020-03-06
@@ -1021,7 +1031,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - We removed some obsolete notifications. [#5555](https://github.com/JabRef/jabref/issues/5555)
-- We removed an internal step in the [ISBN-to-BibTeX fetcher](https://docs.jabref.org/import-using-publication-identifiers/isbntobibtex): The [ISBN to BibTeX Converter](https://manas.tungare.name/software/isbn-to-bibtex) by [@manastungare](https://github.com/manastungare) is not used anymore, because it is offline: "people using this tool have not been generating enough sales for Amazon."
+- We removed an internal step in the [ISBN-to-BibTeX fetcher](https://docs.jabref.org/collect/add-entry-using-an-id#isbn): The [ISBN to BibTeX Converter](https://manas.tungare.name/software/isbn-to-bibtex) by [@manastungare](https://github.com/manastungare) is not used anymore, because it is offline: "people using this tool have not been generating enough sales for Amazon."
 - We removed the option to control the default drag and drop behaviour. You can use the modifier keys (like CtrL or Alt) instead.
 
 ## [5.0-alpha] – 2019-08-25
@@ -1054,7 +1064,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Change default icon for groups to a circle because a colored version of the old icon was hard to distinguish from its black counterpart.
 - In the main table, the context menu appears now when you press the "context menu" button on the keyboard. [feature request in the forum](https://discourse.jabref.org/t/how-to-enable-keyboard-context-key-windows)
 - We added icons to the group side panel to quickly switch between `union` and `intersection` group view mode. [#3269](https://github.com/JabRef/jabref/issues/3269).
-- We use `https` for [fetching from most online bibliographic database](https://docs.jabref.org/import-using-online-bibliographic-database).
+- We use `https` for [fetching from most online bibliographic database](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
 - We changed the default keyboard shortcuts for moving between entries when the entry editor is active to ̀<kbd>alt</kbd> + <kbd>up/down</kbd>.
 - Opening a new file now prompts the directory of the currently selected file, instead of the directory of the last opened file.
 - Window state is saved on close and restored on start.

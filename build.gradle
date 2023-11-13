@@ -101,7 +101,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "20.0.2"
+    version = "21.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -172,16 +172,17 @@ dependencies {
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
-    implementation 'org.fxmisc.flowless:flowless:0.7.1'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.84.0') {
+    implementation 'org.fxmisc.flowless:flowless:0.7.2'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.90.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
 
-    implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation 'org.controlsfx:controlsfx:11.2.0'
+    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
 
-    implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'org.jsoup:jsoup:1.16.2'
     implementation 'com.konghq:unirest-java:3.14.5'
 
     implementation 'org.slf4j:slf4j-api:2.0.9'
@@ -234,15 +235,15 @@ dependencies {
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.163'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
+    testImplementation 'io.github.classgraph:classgraph:4.8.164'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.1'
 
-    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.mockito:mockito-core:5.7.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.1.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.1.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.2.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.2.0'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
