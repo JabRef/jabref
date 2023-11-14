@@ -26,7 +26,7 @@ class ManageStudyDefinitionViewModelTest {
     void setUp() {
         // code taken from org.jabref.logic.importer.WebFetchersTest.setUp
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importerPreferences = mock(ImporterPreferences.class);
+        importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         dialogService = mock(DialogService.class);
     }
 
@@ -51,6 +51,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("Medline/PubMed", false),
                 new StudyCatalogItem("ResearchGate", false),
                 new StudyCatalogItem("SAO/NASA ADS", false),
+                new StudyCatalogItem("ScholarArchive", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", true),
                 new StudyCatalogItem("zbMATH", false)
@@ -59,21 +60,7 @@ class ManageStudyDefinitionViewModelTest {
 
     @Test
     public void studyConstructorFillsDatabasesCorrectly(@TempDir Path tempDir) {
-        List<StudyDatabase> databases = List.of(
-                new StudyDatabase("ACM Portal", true));
-        Study study = new Study(
-                List.of("Name"),
-                "title",
-                List.of("Q1"),
-                List.of(),
-                databases
-        );
-        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(
-                study,
-                tempDir,
-                importFormatPreferences,
-                importerPreferences,
-                dialogService);
+        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = getManageStudyDefinitionViewModel(tempDir);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
@@ -92,9 +79,28 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("Medline/PubMed", false),
                 new StudyCatalogItem("ResearchGate", false),
                 new StudyCatalogItem("SAO/NASA ADS", false),
+                new StudyCatalogItem("ScholarArchive", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", false),
                 new StudyCatalogItem("zbMATH", false)
         ), manageStudyDefinitionViewModel.getCatalogs());
+    }
+
+    private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
+        List<StudyDatabase> databases = List.of(
+                new StudyDatabase("ACM Portal", true));
+        Study study = new Study(
+                List.of("Name"),
+                "title",
+                List.of("Q1"),
+                List.of(),
+                databases
+        );
+        return new ManageStudyDefinitionViewModel(
+                study,
+                tempDir,
+                importFormatPreferences,
+                importerPreferences,
+                dialogService);
     }
 }
