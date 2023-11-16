@@ -156,6 +156,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      com.jthemedetecor.OsThemeDetector
+Project: jSystemThemeDetector
+URL:     https://github.com/Dansoftowner/jSystemThemeDetector
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.konghq.unirest
 Project: Unirest for Java
 URL:     https://github.com/Kong/unirest-java

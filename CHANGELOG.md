@@ -12,23 +12,34 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a popup, as well as a preferences setting item, so users can choose whether to delete files linked to selected entries when they delete entries. [#10509](https://github.com/JabRef/jabref/issues/10509)
+- We added a scite.ai tab in the entry editor that retrieves 'Smart Citation' tallies for citations that have a DOI. [koppor#375](https://github.com/koppor/jabref/issues/375)  
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
 - We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
+- We added the option to use System Preference for Light/Dark Theme [#8729](https://github.com/JabRef/jabref/issues/8729).
+- We added [scholar.archive.org](https://scholar.archive.org/) as a new fetcher. [#10498](https://github.com/JabRef/jabref/issues/10498)
 
 ### Changed
 
 - We moved the location of the 'Open only one instance of JabRef' preference option from "Network" to "General". [#9306](https://github.com/JabRef/jabref/issues/9306)
 - The two previews in the change resolver dialog now have their scrollbars synchronized. [#9576](https://github.com/JabRef/jabref/issues/9576).
 - We changed the setting of the keyword separator to accept a single character only. [#177](https://github.com/koppor/jabref/issues/177)
+- We replaced "SearchAll" in Web Search by "Search Selected". [#10556](https://github.com/JabRef/jabref/issues/10556)
 - Short DOI formatter now checks, if the value is already formatted. If so, it returns the value instead of calling the ShortDOIService again. [#10589](https://github.com/JabRef/jabref/issues/10589)
+- We upgraded to JavaFX 21.0.1. As a consequence JabRef requires now macOS 11 or later and GTK 3.8 or later on Linux [10627](https://github.com/JabRef/jabref/pull/10627).
 
 ### Fixed
 
 - We fixed an issue where the added protected term has unwanted leading and trailing whitespaces, where the formatted text has unwanted empty brackets and where the word at the cursor in the textbox can be added to the list. [#10415](https://github.com/JabRef/jabref/issues/10415)
 - We fixed an issue where in the merge dialog the file field of entries was not correctly merged when the first and second entry both contained values inside the file field. [#10572](https://github.com/JabRef/jabref/issues/10572)
 - We fixed some small inconsistencies in the user interface. [#10507](https://github.com/JabRef/jabref/issues/10507) [#10458](https://github.com/JabRef/jabref/issues/10458)
+- We fixed the issue where the Hayagriva YAML exporter would not include a parent field for the publisher/series. [#10596](https://github.com/JabRef/jabref/issues/10596)
 
 ### Removed
+
+- We removed duplicate filtering and sorting operations in the MainTable when editing BibEntries. [#10619](https://github.com/JabRef/jabref/pull/10619)
+
+
+
 
 ## [5.11] – 2023-10-22
 
