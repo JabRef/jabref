@@ -152,7 +152,7 @@ jobs:
 
               You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "Markdown".
           comment_tag: markdown
-  changelog-non-frozen:
+  changelog:
     name: CHANGELOG.md
     runs-on: ubuntu-latest
     steps:
@@ -161,22 +161,16 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
-          fetch-depth: 0
       - name: Lint CHANGELOG.md
         run: |
           # Install jbang
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           export PATH=$PATH:$HOME/.jbang/bin
 
-          # ensure that refs are available
-          BRANCH=`git rev-parse HEAD`
-          git checkout main
-
           # run heylogs verification
-          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check CHANGELOG.md --gitdiff main...$BRANCH > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.7.2:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
-          sed -i 's/consistent-separator/consistent-separator (ignored)/' heylogs.txt
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
 
           cat heylogs.txt
@@ -184,6 +178,26 @@ jobs:
           # exit 1 in case of error
           # We have 1 "valid" issue in CHANGELOG.md
           grep -q "1 problem" heylogs.txt || exit 1
+  changelog-unreleased-only:
+    name: CHANGELOG.md - only unreleased touched
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+          fetch-depth: 0
+      - name: Install clparse
+        run: |
+          curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          sudo mv clparse /usr/local/bin/clparse
+      - name: Check CHANGELOG.md diff
+        run: |
+          diff \
+            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
       - name: Add comment on pull request
         if: ${{ failure() }}
         uses: thollander/actions-comment-pull-request@v2
@@ -191,11 +205,7 @@ jobs:
           message: >
               While the PR was in progress, JabRef released a new version.
               You have to merge `upstream/main` and move your entry in `CHANGELOG.md` to section `## [Unreleased]`.
-
-
-              It might also be that another CHANGELOG.md issue arose.
-              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "CHANGELOG.md".
-          comment_tag: changelog
+          comment_tag: changelog-unreleased-only
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
