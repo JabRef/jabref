@@ -85,7 +85,8 @@ recipeList:
   #  - org.openrewrite.staticanalysis.UnnecessaryCloseInTryWithResources
   # Does not work
   #  - org.openrewrite.staticanalysis.UnnecessaryExplicitTypeArguments
-  - org.openrewrite.staticanalysis.UnnecessaryParentheses
+  # Contradicts Prettier-Java
+  #  - org.openrewrite.staticanalysis.UnnecessaryParentheses
   # Does not work
   #  - org.openrewrite.staticanalysis.UnnecessaryPrimitiveAnnotations
   # Removes too much throws
