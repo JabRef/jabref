@@ -2,16 +2,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.40")
-    }
-}
-
 plugins {
     id 'application'
 
