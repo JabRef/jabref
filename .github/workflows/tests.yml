@@ -29,15 +29,15 @@ jobs:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v7
       - name: Checkout source
         uses: actions/checkout@v4
         with:
           submodules: 'true'
           show-progress: 'false'
-          ref: ${{ steps.branch-name.outputs.current_branch }}
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v7
+      - run: git checkout ${{ steps.branch-name.outputs.current_branch }}
       - name: Install prettier-plugin-java
         run: npm install
       - name: Prettify code
