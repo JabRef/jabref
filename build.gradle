@@ -32,8 +32,6 @@ plugins {
 // Enable following for debugging
 // gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.
 
-apply plugin: 'io.spring.javaformat'
-
 apply plugin: XjcPlugin
 
 apply from: 'eclipse.gradle'
