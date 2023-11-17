@@ -35,7 +35,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           submodules: 'true'
           show-progress: 'false'
       - name: Checkout source (no-PR)
@@ -52,6 +52,7 @@ jobs:
           prettier_options: --write **/*.java
           prettier_plugins: "prettier-plugin-java"
           clean_node_folder: false
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
