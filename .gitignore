@@ -1,6 +1,3 @@
-package.json
-package-lock.json
-
 # no generated files in version control
 src/main/gen/
 src/main/generated/
