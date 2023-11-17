@@ -35,7 +35,6 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
           submodules: 'true'
           show-progress: 'false'
       - name: Checkout source (no-PR)
