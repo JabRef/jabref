@@ -35,7 +35,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install prettier-plugin-java
-        run: npm install prettier prettier-plugin-java --save-dev
+        run: npm install
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
         with:
