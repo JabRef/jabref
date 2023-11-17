@@ -45,7 +45,16 @@ jobs:
           show-progress: 'false'
       - name: Install prettier-plugin-java
         run: npm install
-      - name: Prettify code
+      - name: Check code style (using prettier-java)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        uses: creyD/prettier_action@v4.3
+        with:
+          prettier_options: --check **/*.java
+          prettier_plugins: "prettier-plugin-java"
+          clean_node_folder: false
+          dry: true
+      - name: Reformat code (using prettier-java)
+       if: "!(github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)"
         uses: creyD/prettier_action@v4.3
         with:
           prettier_options: --write **/*.java
