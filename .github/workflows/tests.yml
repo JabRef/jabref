@@ -38,7 +38,7 @@ jobs:
         uses: creyD/prettier_action@v4.3
         with:
           prettier_options: --write **/*.java
-          prettier_plugins: "@prettier/plugin-java"
+          prettier_plugins: "prettier-plugin-java"
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
