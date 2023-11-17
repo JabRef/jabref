@@ -41,6 +41,7 @@ jobs:
         with:
           prettier_options: --write **/*.java
           prettier_plugins: "prettier-plugin-java"
+          clean_node_folder: false
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
