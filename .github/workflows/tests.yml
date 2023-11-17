@@ -34,6 +34,10 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.3
+        with:
+          prettier_options: --write **/*.{java}
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
