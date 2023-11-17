@@ -29,16 +29,19 @@ jobs:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
+      - name: Checkout source (PR)
+        if: github.event_name == 'pull_request'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ github.head_ref }}
           submodules: 'true'
           show-progress: 'false'
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v7
-      - run: git checkout ${{ steps.branch-name.outputs.current_branch }}
+      - name: Checkout source (no-PR)
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install prettier-plugin-java
         run: npm install
       - name: Prettify code
