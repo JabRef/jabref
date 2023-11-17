@@ -1,10 +1,9 @@
 package org.jabref.model.entry.identifier;
 
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
 public class MathSciNetIdTest {
 

@@ -8,6 +8,7 @@ import java.util.function.Function;
  * error cannot be null
  */
 public class OOVoidResult<E> {
+
     private final Optional<E> error;
 
     private OOVoidResult(Optional<E> error) {
@@ -49,4 +50,3 @@ public class OOVoidResult<E> {
         }
     }
 }
-

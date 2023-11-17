@@ -1,8 +1,8 @@
 package org.jabref.gui.maintable;
 
+import com.tobiasdiez.easybind.EasyBind;
 import java.util.List;
 import java.util.Optional;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -24,34 +23,60 @@ import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-
 public class MainTableDataModel {
+
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
-    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
+    private final ObjectProperty<
+        MainTableFieldValueFormatter
+    > fieldValueFormatter;
     private final GroupsPreferences groupsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
+    public MainTableDataModel(
+        BibDatabaseContext context,
+        PreferencesService preferencesService,
+        StateManager stateManager
+    ) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
-        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
+        this.nameDisplayPreferences =
+            preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
-        this.fieldValueFormatter = new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+        this.fieldValueFormatter =
+            new SimpleObjectProperty<>(
+                new MainTableFieldValueFormatter(
+                    nameDisplayPreferences,
+                    bibDatabaseContext
+                )
+            );
 
-        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
+        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(
+            context.getDatabase().getEntries()
+        );
+        ObservableList<BibEntryTableViewModel> entriesViewModel =
+            EasyBind.mapBacked(
+                allEntries,
+                entry ->
+                    new BibEntryTableViewModel(
+                        entry,
+                        bibDatabaseContext,
+                        fieldValueFormatter
+                    )
+            );
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(),
-                        stateManager.activeSearchQueryProperty(),
-                        groupsPreferences.groupViewModeProperty(),
-                        (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
-        );
+        entriesFiltered
+            .predicateProperty()
+            .bind(
+                EasyBind.combine(
+                    stateManager.activeGroupProperty(),
+                    stateManager.activeSearchQueryProperty(),
+                    groupsPreferences.groupViewModeProperty(),
+                    (groups, query, groupViewMode) ->
+                        entry -> isMatched(groups, query, entry)
+                )
+            );
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
@@ -60,31 +85,47 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
-    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
+    private boolean isMatched(
+        ObservableList<GroupTreeNode> groups,
+        Optional<SearchQuery> query,
+        BibEntryTableViewModel entry
+    ) {
+        return (
+            isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry)
+        );
     }
 
-    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
+    private boolean isMatchedBySearch(
+        Optional<SearchQuery> query,
+        BibEntryTableViewModel entry
+    ) {
+        return query
+            .map(matcher -> matcher.isMatch(entry.getEntry()))
+            .orElse(true);
     }
 
-    private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
+    private boolean isMatchedByGroup(
+        ObservableList<GroupTreeNode> groups,
+        BibEntryTableViewModel entry
+    ) {
         return createGroupMatcher(groups)
-                .map(matcher -> matcher.isMatch(entry.getEntry()))
-                .orElse(true);
+            .map(matcher -> matcher.isMatch(entry.getEntry()))
+            .orElse(true);
     }
 
-    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
+    private Optional<MatcherSet> createGroupMatcher(
+        List<GroupTreeNode> selectedGroups
+    ) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, show all entries
             return Optional.empty();
         }
 
         final MatcherSet searchRules = MatcherSets.build(
-                groupsPreferences.getGroupViewMode() == GroupViewMode.INTERSECTION
-                        ? MatcherSets.MatcherType.AND
-                        : MatcherSets.MatcherType.OR);
+            groupsPreferences.getGroupViewMode() == GroupViewMode.INTERSECTION
+                ? MatcherSets.MatcherType.AND
+                : MatcherSets.MatcherType.OR
+        );
 
         for (GroupTreeNode node : selectedGroups) {
             searchRules.addRule(node.getSearchMatcher());
@@ -97,6 +138,11 @@ public class MainTableDataModel {
     }
 
     public void refresh() {
-        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+        this.fieldValueFormatter.setValue(
+                new MainTableFieldValueFormatter(
+                    nameDisplayPreferences,
+                    bibDatabaseContext
+                )
+            );
     }
 }

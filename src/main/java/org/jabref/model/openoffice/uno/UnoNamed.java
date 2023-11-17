@@ -8,8 +8,7 @@ import com.sun.star.text.XTextRange;
 
 public class UnoNamed {
 
-    private UnoNamed() {
-    }
+    private UnoNamed() {}
 
     /**
      * Insert a new instance of a service at the provided cursor position.
@@ -22,15 +21,16 @@ public class UnoNamed {
      * @param absorb  ReferenceMark, Bookmark and TextSection can incorporate a text range. If absorb is true, the text in the range becomes part of the thing. If absorb is false, the thing is inserted at the end of the range.
      * @return The XNamed interface, in case we need to check the actual name.
      */
-    static XNamed insertNamedTextContent(XTextDocument doc,
-                                         String service,
-                                         String name,
-                                         XTextRange range,
-                                         boolean absorb)
-            throws
-            CreationException {
-
-        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, doc).get();
+    static XNamed insertNamedTextContent(
+        XTextDocument doc,
+        String service,
+        String name,
+        XTextRange range,
+        boolean absorb
+    ) throws CreationException {
+        XMultiServiceFactory msf = UnoCast
+            .cast(XMultiServiceFactory.class, doc)
+            .get();
 
         Object xObject;
         try {
@@ -39,13 +39,19 @@ public class UnoNamed {
             throw new CreationException(e.getMessage());
         }
 
-        XNamed xNamed = UnoCast.cast(XNamed.class, xObject)
-                                .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed"));
+        XNamed xNamed = UnoCast
+            .cast(XNamed.class, xObject)
+            .orElseThrow(() ->
+                new IllegalArgumentException("Service is not an XNamed")
+            );
         xNamed.setName(name);
 
         // get XTextContent interface
-        XTextContent xTextContent = UnoCast.cast(XTextContent.class, xObject)
-                                            .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent"));
+        XTextContent xTextContent = UnoCast
+            .cast(XTextContent.class, xObject)
+            .orElseThrow(() ->
+                new IllegalArgumentException("Service is not an XTextContent")
+            );
         range.getText().insertTextContent(range, xTextContent, absorb);
         return xNamed;
     }

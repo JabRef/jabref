@@ -1,15 +1,13 @@
 package org.jabref.logic.integrity;
 
-import java.util.Optional;
-
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.util.Optional;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MonthCheckerTest {
 
@@ -68,7 +66,10 @@ public class MonthCheckerTest {
 
     @Test
     void bibLaTexDoesNotAcceptFullInput() {
-        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("January"));
+        assertNotEquals(
+            Optional.empty(),
+            checkerBiblatex.checkValue("January")
+        );
     }
 
     @Test

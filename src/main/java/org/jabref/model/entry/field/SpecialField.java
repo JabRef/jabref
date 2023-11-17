@@ -7,44 +7,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.jabref.model.entry.KeywordList;
 
 public enum SpecialField implements Field {
+    PRINTED("printed", SpecialFieldValue.PRINTED),
 
-    PRINTED("printed",
-            SpecialFieldValue.PRINTED
+    PRIORITY(
+        "priority",
+        SpecialFieldValue.CLEAR_PRIORITY,
+        SpecialFieldValue.PRIORITY_HIGH,
+        SpecialFieldValue.PRIORITY_MEDIUM,
+        SpecialFieldValue.PRIORITY_LOW
     ),
 
-    PRIORITY("priority",
-            SpecialFieldValue.CLEAR_PRIORITY,
-            SpecialFieldValue.PRIORITY_HIGH,
-            SpecialFieldValue.PRIORITY_MEDIUM,
-            SpecialFieldValue.PRIORITY_LOW
+    QUALITY("qualityassured", SpecialFieldValue.QUALITY_ASSURED),
+
+    RANKING(
+        "ranking",
+        SpecialFieldValue.CLEAR_RANK,
+        SpecialFieldValue.RANK_1,
+        SpecialFieldValue.RANK_2,
+        SpecialFieldValue.RANK_3,
+        SpecialFieldValue.RANK_4,
+        SpecialFieldValue.RANK_5
     ),
 
-    QUALITY("qualityassured",
-            SpecialFieldValue.QUALITY_ASSURED
+    READ_STATUS(
+        "readstatus",
+        SpecialFieldValue.CLEAR_READ_STATUS,
+        SpecialFieldValue.READ,
+        SpecialFieldValue.SKIMMED
     ),
 
-    RANKING("ranking",
-            SpecialFieldValue.CLEAR_RANK,
-            SpecialFieldValue.RANK_1,
-            SpecialFieldValue.RANK_2,
-            SpecialFieldValue.RANK_3,
-            SpecialFieldValue.RANK_4,
-            SpecialFieldValue.RANK_5
-    ),
-
-    READ_STATUS("readstatus",
-            SpecialFieldValue.CLEAR_READ_STATUS,
-            SpecialFieldValue.READ,
-            SpecialFieldValue.SKIMMED
-    ),
-
-    RELEVANCE("relevance",
-            SpecialFieldValue.RELEVANT
-    );
+    RELEVANCE("relevance", SpecialFieldValue.RELEVANT);
 
     private final List<SpecialFieldValue> values;
     private final KeywordList keywords;
@@ -59,7 +54,9 @@ public enum SpecialField implements Field {
         for (SpecialFieldValue value : values) {
             this.values.add(value);
             value.getKeyword().ifPresent(keywords::add);
-            value.getFieldValue().ifPresent(fieldValue -> map.put(fieldValue, value));
+            value
+                .getFieldValue()
+                .ifPresent(fieldValue -> map.put(fieldValue, value));
         }
     }
 
@@ -72,9 +69,10 @@ public enum SpecialField implements Field {
     }
 
     public static Optional<SpecialField> fromName(String name) {
-        return Arrays.stream(SpecialField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Arrays
+            .stream(SpecialField.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     public boolean isSingleValueField() {

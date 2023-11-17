@@ -2,28 +2,41 @@ package org.jabref.gui.preferences.network;
 
 import java.time.LocalDate;
 import java.util.Optional;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.net.ssl.SSLCertificate;
 
 public class CustomCertificateViewModel extends AbstractViewModel {
-    private final StringProperty serialNumberProperty = new SimpleStringProperty("");
+
+    private final StringProperty serialNumberProperty =
+        new SimpleStringProperty("");
     private final StringProperty issuerProperty = new SimpleStringProperty("");
-    private final ObjectProperty<LocalDate> validFromProperty = new SimpleObjectProperty<>();
-    private final ObjectProperty<LocalDate> validToProperty = new SimpleObjectProperty<>();
-    private final StringProperty signatureAlgorithmProperty = new SimpleStringProperty("");
+    private final ObjectProperty<LocalDate> validFromProperty =
+        new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDate> validToProperty =
+        new SimpleObjectProperty<>();
+    private final StringProperty signatureAlgorithmProperty =
+        new SimpleStringProperty("");
     private final StringProperty versionProperty = new SimpleStringProperty("");
-    private final StringProperty thumbprintProperty = new SimpleStringProperty("");
+    private final StringProperty thumbprintProperty = new SimpleStringProperty(
+        ""
+    );
     private final StringProperty pathProperty = new SimpleStringProperty("");
 
-    public CustomCertificateViewModel(String thumbprint, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String sigAlgorithm, String version) {
+    public CustomCertificateViewModel(
+        String thumbprint,
+        String serialNumber,
+        String issuer,
+        LocalDate validFrom,
+        LocalDate validTo,
+        String sigAlgorithm,
+        String version
+    ) {
         serialNumberProperty.setValue(serialNumber);
         issuerProperty.setValue(issuer);
         validFromProperty.setValue(validFrom);
@@ -78,7 +91,9 @@ public class CustomCertificateViewModel extends AbstractViewModel {
     }
 
     public Optional<String> getPath() {
-        if (pathProperty.getValue() == null || pathProperty.getValue().isEmpty()) {
+        if (
+            pathProperty.getValue() == null || pathProperty.getValue().isEmpty()
+        ) {
             return Optional.empty();
         } else {
             return Optional.of(pathProperty.getValue());
@@ -102,14 +117,17 @@ public class CustomCertificateViewModel extends AbstractViewModel {
         return signatureAlgorithmProperty.getValue();
     }
 
-    public static CustomCertificateViewModel fromSSLCertificate(SSLCertificate sslCertificate) {
+    public static CustomCertificateViewModel fromSSLCertificate(
+        SSLCertificate sslCertificate
+    ) {
         return new CustomCertificateViewModel(
-                sslCertificate.getSHA256Thumbprint(),
-                sslCertificate.getSerialNumber(),
-                sslCertificate.getIssuer(),
-                sslCertificate.getValidFrom(),
-                sslCertificate.getValidTo(),
-                sslCertificate.getSignatureAlgorithm(),
-                sslCertificate.getVersion().toString());
+            sslCertificate.getSHA256Thumbprint(),
+            sslCertificate.getSerialNumber(),
+            sslCertificate.getIssuer(),
+            sslCertificate.getValidFrom(),
+            sslCertificate.getValidTo(),
+            sslCertificate.getSignatureAlgorithm(),
+            sslCertificate.getVersion().toString()
+        );
     }
 }

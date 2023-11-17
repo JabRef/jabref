@@ -1,7 +1,6 @@
 package org.jabref.logic.bibtex;
 
 import org.jabref.model.entry.field.Field;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,9 @@ public class FieldWriter {
     // See also ADR-0024
     public static final char BIBTEX_STRING_START_END_SYMBOL = '#';
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        FieldWriter.class
+    );
 
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
@@ -26,7 +27,10 @@ public class FieldWriter {
         this(true, preferences);
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
+    private FieldWriter(
+        boolean neverFailOnHashes,
+        FieldPreferences preferences
+    ) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
 
@@ -37,7 +41,8 @@ public class FieldWriter {
         return new FieldWriter(true, prefs);
     }
 
-    private static void checkBraces(String text) throws InvalidFieldValueException {
+    private static void checkBraces(String text)
+        throws InvalidFieldValueException {
         int left = 0;
         int right = 0;
 
@@ -59,16 +64,30 @@ public class FieldWriter {
 
         // Then we throw an exception if the error criteria are met.
         if (right != 0 && (left == 0)) {
-            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
+            LOGGER.error(
+                "Unescaped '}' character without opening bracket ends string prematurely. Field value: {}",
+                text
+            );
+            throw new InvalidFieldValueException(
+                "Unescaped '}' character without opening bracket ends string prematurely. Field value: " +
+                text
+            );
         }
         if (right != 0 && (right < left)) {
-            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
+            LOGGER.error(
+                "Unescaped '}' character without opening bracket ends string prematurely. Field value: {}",
+                text
+            );
+            throw new InvalidFieldValueException(
+                "Unescaped '}' character without opening bracket ends string prematurely. Field value: " +
+                text
+            );
         }
         if (left != right) {
             LOGGER.error("Braces don't match. Field value: {}", text);
-            throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
+            throw new InvalidFieldValueException(
+                "Braces don't match. Field value: " + text
+            );
         }
     }
 
@@ -80,7 +99,8 @@ public class FieldWriter {
      * @return a formatted string suitable for output
      * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
-    public String write(Field field, String content) throws InvalidFieldValueException {
+    public String write(Field field, String content)
+        throws InvalidFieldValueException {
         if (content == null) {
             return FIELD_START + String.valueOf(FIELD_END);
         }
@@ -97,7 +117,8 @@ public class FieldWriter {
      * <p>
      * For instance, <code>#jan# - #feb#</code> gets  <code>jan #{ - } # feb</code> (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
      */
-    private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
+    private String formatAndResolveStrings(String content, Field field)
+        throws InvalidFieldValueException {
         checkBraces(content);
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -125,21 +146,30 @@ public class FieldWriter {
                 pos1 = content.length(); // No more occurrences found.
                 pos2 = -1;
             } else {
-                pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
+                pos2 =
+                    content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
                 if (pos2 == -1) {
                     if (neverFailOnHashes) {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     } else {
-                        LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
-                                + "In JabRef, use pairs of # characters to indicate a string. "
-                                + "Note that the entry causing the problem has been selected. Field value: {}",
-                                BIBTEX_STRING_START_END_SYMBOL,
-                                BIBTEX_STRING_START_END_SYMBOL,
-                                content);
+                        LOGGER.error(
+                            "The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. " +
+                            "In JabRef, use pairs of # characters to indicate a string. " +
+                            "Note that the entry causing the problem has been selected. Field value: {}",
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            content
+                        );
                         throw new InvalidFieldValueException(
-                                "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
-                                        + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                        + "Note that the entry causing the problem has been selected. Field value: " + content);
+                            "The character " +
+                            BIBTEX_STRING_START_END_SYMBOL +
+                            " is not allowed in BibTeX strings unless escaped as in '\\" +
+                            BIBTEX_STRING_START_END_SYMBOL +
+                            "'.\n" +
+                            "In JabRef, use pairs of # characters to indicate a string.\n" +
+                            "Note that the entry causing the problem has been selected. Field value: " +
+                            content
+                        );
                     }
                 }
             }
@@ -151,8 +181,14 @@ public class FieldWriter {
                 // We check that the string label is not empty. That means
                 // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
-                writeStringLabel(stringBuilder, content, pos1 + 1, pos2, pos1 == pivot,
-                        (pos2 + 1) == content.length());
+                writeStringLabel(
+                    stringBuilder,
+                    content,
+                    pos1 + 1,
+                    pos2,
+                    pos1 == pivot,
+                    (pos2 + 1) == content.length()
+                );
             }
 
             if (pos2 > -1) {
@@ -173,10 +209,13 @@ public class FieldWriter {
         return false;
     }
 
-    private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
+    private String formatWithoutResolvingStrings(String content, Field field)
+        throws InvalidFieldValueException {
         checkBraces(content);
 
-        StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
+        StringBuilder stringBuilder = new StringBuilder(
+            String.valueOf(FIELD_START)
+        );
         stringBuilder.append(formatter.format(content, field));
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
@@ -186,7 +225,12 @@ public class FieldWriter {
      * @param stringBuilder the StringBuilder to append the text to
      * @param text          the text to append
      */
-    private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
+    private void writeText(
+        StringBuilder stringBuilder,
+        String text,
+        int startPos,
+        int endPos
+    ) {
         stringBuilder.append(FIELD_START);
         stringBuilder.append(text, startPos, endPos);
         stringBuilder.append(FIELD_END);
@@ -200,8 +244,18 @@ public class FieldWriter {
      * @param isFirst       true if the label to write is the first one to write
      * @param isLast        true if the label to write is the last one to write
      */
-    private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
-        String line = (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");
+    private void writeStringLabel(
+        StringBuilder stringBuilder,
+        String text,
+        int startPos,
+        int endPos,
+        boolean isFirst,
+        boolean isLast
+    ) {
+        String line =
+            (isFirst ? "" : " # ") +
+            text.substring(startPos, endPos) +
+            (isLast ? "" : " # ");
         stringBuilder.append(line);
     }
 }

@@ -3,6 +3,7 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 
 public class ReplaceWithEscapedDoubleQuotes implements LayoutFormatter {
+
     @Override
     public String format(String fieldText) {
         StringBuilder builder = new StringBuilder(fieldText.length());

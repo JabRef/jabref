@@ -17,7 +17,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -43,7 +42,6 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +65,10 @@ import org.slf4j.LoggerFactory;
  * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
 public class BibtexParser implements Parser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BibtexParser.class
+    );
 
     private static final Integer LOOKAHEAD = 1024;
     private final FieldContentFormatter fieldContentFormatter;
@@ -81,9 +82,16 @@ public class BibtexParser implements Parser {
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
 
-    public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
-        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        this.fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
+    public BibtexParser(
+        ImportFormatPreferences importFormatPreferences,
+        FileUpdateMonitor fileMonitor
+    ) {
+        this.importFormatPreferences =
+            Objects.requireNonNull(importFormatPreferences);
+        this.fieldContentFormatter =
+            new FieldContentFormatter(
+                importFormatPreferences.fieldPreferences()
+            );
         this.metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -98,8 +106,12 @@ public class BibtexParser implements Parser {
      *
      * @return An {@code Optional<BibEntry>. Optional.empty()} if non was found or an error occurred.
      */
-    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
+    public static Optional<BibEntry> singleFromString(
+        String bibtexString,
+        ImportFormatPreferences importFormatPreferences
+    ) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences)
+            .parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }
@@ -107,7 +119,8 @@ public class BibtexParser implements Parser {
     }
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream)
+        throws ParseException {
         Reader reader;
         try {
             reader = Importer.getReader(inputStream);
@@ -117,7 +130,8 @@ public class BibtexParser implements Parser {
         }
     }
 
-    public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
+    public Optional<BibEntry> parseSingleEntry(String bibtexString)
+        throws ParseException {
         return parseEntries(bibtexString).stream().findFirst();
     }
 
@@ -155,7 +169,11 @@ public class BibtexParser implements Parser {
             currentChar = pushbackReader.read();
             stringWriter.append((char) currentChar);
             i++;
-        } while ((i < BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
+        } while (
+            (i < BibtexParser.LOOKAHEAD) &&
+            (currentChar != '\r') &&
+            (currentChar != '\n')
+        );
         if (currentChar == '\r') {
             newLineSeparator = "\r\n";
         } else if (currentChar == '\n') {
@@ -228,9 +246,14 @@ public class BibtexParser implements Parser {
         }
 
         try {
-            parserResult.setMetaData(metaDataParser.parse(
+            parserResult.setMetaData(
+                metaDataParser.parse(
                     meta,
-                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
+                    importFormatPreferences
+                        .bibEntryPreferences()
+                        .getKeywordSeparator()
+                )
+            );
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -245,8 +268,14 @@ public class BibtexParser implements Parser {
     private void checkEpilog() {
         // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
         // regex looks for something like 'identifier = blabla ,'
-        if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
-            parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
+        if (
+            !parserResult.hasWarnings() &&
+            Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()
+        ) {
+            parserResult.addWarning(
+                "following BibTex fragment has not been parsed:\n" +
+                database.getEpilog()
+            );
         }
     }
 
@@ -263,19 +292,26 @@ public class BibtexParser implements Parser {
             // remove first newline
             // this is appended by JabRef during writing automatically
             if (commentsAndEntryTypeDefinition.startsWith("\r\n")) {
-                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(2);
+                commentsAndEntryTypeDefinition =
+                    commentsAndEntryTypeDefinition.substring(2);
             } else if (commentsAndEntryTypeDefinition.startsWith("\n")) {
-                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(1);
+                commentsAndEntryTypeDefinition =
+                    commentsAndEntryTypeDefinition.substring(1);
             }
 
             BibEntry entry = parseEntry(type);
             // store comments collected without type definition
             entry.setCommentsBeforeEntry(
-                    commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@')));
+                commentsAndEntryTypeDefinition.substring(
+                    0,
+                    commentsAndEntryTypeDefinition.lastIndexOf('@')
+                )
+            );
 
             // store complete parsed serialization (comments, type definition + type contents)
 
-            String parsedSerialization = commentsAndEntryTypeDefinition + dumpTextReadSoFarToString();
+            String parsedSerialization =
+                commentsAndEntryTypeDefinition + dumpTextReadSoFarToString();
             entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);
@@ -284,8 +320,14 @@ public class BibtexParser implements Parser {
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
 
             LOGGER.warn("Could not parse entry", ex);
-            parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
-                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry."));
+            parserResult.addWarning(
+                Localization.lang("Error occurred when parsing entry") +
+                ": '" +
+                ex.getMessage() +
+                "'. " +
+                "\n\n" +
+                Localization.lang("JabRef skipped the entry.")
+            );
         }
     }
 
@@ -302,7 +344,14 @@ public class BibtexParser implements Parser {
         }
 
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
-        if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
+        if (
+            comment
+                .substring(
+                    0,
+                    Math.min(comment.length(), MetaData.META_FLAG.length())
+                )
+                .equals(MetaData.META_FLAG)
+        ) {
             if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
@@ -319,15 +368,29 @@ public class BibtexParser implements Parser {
                     dumpTextReadSoFarToString();
                 }
             }
-        } else if (comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length()))
-                          .equals(MetaData.ENTRYTYPE_FLAG)) {
+        } else if (
+            comment
+                .substring(
+                    0,
+                    Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length())
+                )
+                .equals(MetaData.ENTRYTYPE_FLAG)
+        ) {
             // A custom entry type can also be stored in a
             // "@comment"
-            Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);
+            Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(
+                comment
+            );
             if (typ.isPresent()) {
                 entryTypes.add(typ.get());
             } else {
-                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " + comment);
+                parserResult.addWarning(
+                    Localization.lang(
+                        "Ill-formed entrytype comment in BIB file"
+                    ) +
+                    ": " +
+                    comment
+                );
             }
 
             // custom entry types are always re-written by JabRef and not stored in the file
@@ -341,7 +404,11 @@ public class BibtexParser implements Parser {
         try {
             database.addString(bibtexString);
         } catch (KeyCollisionException ex) {
-            parserResult.addWarning(Localization.lang("Duplicate string name") + ": " + bibtexString.getName());
+            parserResult.addWarning(
+                Localization.lang("Duplicate string name") +
+                ": " +
+                bibtexString.getName()
+            );
         }
     }
 
@@ -387,9 +454,11 @@ public class BibtexParser implements Parser {
             runningIndex++;
         }
         // strip empty lines
-        while ((runningIndex < indexOfAt) &&
-                ((context.charAt(runningIndex) == '\r') ||
-                        (context.charAt(runningIndex) == '\n'))) {
+        while (
+            (runningIndex < indexOfAt) &&
+            ((context.charAt(runningIndex) == '\r') ||
+                (context.charAt(runningIndex) == '\n'))
+        ) {
             runningIndex++;
         }
         return context.substring(runningIndex);
@@ -507,9 +576,7 @@ public class BibtexParser implements Parser {
         char character2 = (char) read();
         unread(character2);
         unread(character1);
-        return new char[] {
-                character1, character2
-        };
+        return new char[] { character1, character2 };
     }
 
     private int read() throws IOException {
@@ -603,7 +670,9 @@ public class BibtexParser implements Parser {
     }
 
     private void parseField(BibEntry entry) throws IOException {
-        Field field = FieldFactory.parseField(parseTextToken().toLowerCase(Locale.ROOT));
+        Field field = FieldFactory.parseField(
+            parseTextToken().toLowerCase(Locale.ROOT)
+        );
 
         skipWhitespace();
         consume('=');
@@ -619,11 +688,21 @@ public class BibtexParser implements Parser {
                 // at least one online database exports bibtex likes to do that, making
                 // it inconvenient
                 // for users if JabRef did not accept it.
-                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
-                    entry.setField(field, entry.getField(field).get() + " and " + content);
+                if (
+                    field.getProperties().contains(FieldProperty.PERSON_NAMES)
+                ) {
+                    entry.setField(
+                        field,
+                        entry.getField(field).get() + " and " + content
+                    );
                 } else if (StandardField.KEYWORDS == field) {
                     // multiple keywords fields should be combined to one
-                    entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                    entry.addKeyword(
+                        content,
+                        importFormatPreferences
+                            .bibEntryPreferences()
+                            .getKeywordSeparator()
+                    );
                 }
             } else {
                 entry.setField(field, content);
@@ -636,9 +715,15 @@ public class BibtexParser implements Parser {
         StringBuilder value = new StringBuilder();
         int character;
 
-        while (((character = peek()) != ',') && (character != '}') && (character != ')')) {
+        while (
+            ((character = peek()) != ',') &&
+            (character != '}') &&
+            (character != ')')
+        ) {
             if (eof) {
-                throw new IOException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException(
+                    "Error in line " + line + ": EOF in mid-string"
+                );
             }
             if (character == '"') {
                 StringBuilder text = parseQuotedFieldExactly();
@@ -660,10 +745,18 @@ public class BibtexParser implements Parser {
             } else {
                 String textToken = parseTextToken();
                 if (textToken.isEmpty()) {
-                    throw new IOException("Error in line " + line + " or above: "
-                            + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
+                    throw new IOException(
+                        "Error in line " +
+                        line +
+                        " or above: " +
+                        "Empty text token.\nThis could be caused " +
+                        "by a missing comma between two fields."
+                    );
                 }
-                value.append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL).append(textToken).append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL);
+                value
+                    .append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL)
+                    .append(textToken)
+                    .append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL);
             }
             skipWhitespace();
         }
@@ -683,7 +776,10 @@ public class BibtexParser implements Parser {
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) character) || (":-_*+./'".indexOf(character) >= 0)) {
+            if (
+                Character.isLetterOrDigit((char) character) ||
+                (":-_*+./'".indexOf(character) >= 0)
+            ) {
                 token.append((char) character);
             } else {
                 unread(character);
@@ -708,8 +804,12 @@ public class BibtexParser implements Parser {
             currentChar = (char) read();
             key.append(currentChar);
             lookaheadUsed++;
-        } while ((currentChar != ',') && (currentChar != '\n') && (currentChar != '=')
-                && (lookaheadUsed < BibtexParser.LOOKAHEAD));
+        } while (
+            (currentChar != ',') &&
+            (currentChar != '\n') &&
+            (currentChar != '=') &&
+            (lookaheadUsed < BibtexParser.LOOKAHEAD)
+        );
 
         // Consumed a char too much, back into reader and remove from key:
         unread(currentChar);
@@ -749,23 +849,34 @@ public class BibtexParser implements Parser {
                         // Finished, now reverse newKey and remove whitespaces:
                         key = newKey.reverse();
                         parserResult.addWarning(
-                                Localization.lang("Line %0: Found corrupted citation key %1.", String.valueOf(line), key.toString()));
+                            Localization.lang(
+                                "Line %0: Found corrupted citation key %1.",
+                                String.valueOf(line),
+                                key.toString()
+                            )
+                        );
                     }
                 }
                 break;
-
             case ',':
                 parserResult.addWarning(
-                        Localization.lang("Line %0: Found corrupted citation key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
+                    Localization.lang(
+                        "Line %0: Found corrupted citation key %1 (contains whitespaces).",
+                        String.valueOf(line),
+                        key.toString()
+                    )
+                );
                 break;
-
             case '\n':
                 parserResult.addWarning(
-                        Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).", String.valueOf(line), key.toString()));
+                    Localization.lang(
+                        "Line %0: Found corrupted citation key %1 (comma missing).",
+                        String.valueOf(line),
+                        key.toString()
+                    )
+                );
                 break;
-
             default:
-
                 // No more lookahead, give up:
                 unreadBuffer(key);
                 return "";
@@ -816,8 +927,12 @@ public class BibtexParser implements Parser {
                 return token.toString();
             }
 
-            if (!Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
-                    || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
+            if (
+                !Character.isWhitespace((char) character) &&
+                (Character.isLetterOrDigit((char) character) ||
+                    (character == ':') ||
+                    ("#{}~,=\uFFFD".indexOf(character) == -1))
+            ) {
                 token.append((char) character);
             } else {
                 if (Character.isWhitespace((char) character)) {
@@ -835,8 +950,15 @@ public class BibtexParser implements Parser {
                     // the entry lacked a comma signifying the end of the key.
                     return token.toString();
                 } else {
-                    throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
-                            + "allowed in citation keys.");
+                    throw new IOException(
+                        "Error in line " +
+                        line +
+                        ":" +
+                        "Character '" +
+                        (char) character +
+                        "' is not " +
+                        "allowed in citation keys."
+                    );
                 }
             }
         }
@@ -852,7 +974,9 @@ public class BibtexParser implements Parser {
         while (!((isClosingBracketNext()) && (brackets == 0))) {
             int character = read();
             if (isEOFCharacter(character)) {
-                throw new IOException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException(
+                    "Error in line " + line + ": EOF in mid-string"
+                );
             } else if ((character == '{') || (character == '(')) {
                 brackets++;
             } else if ((character == '}') || (character == ')')) {
@@ -867,7 +991,10 @@ public class BibtexParser implements Parser {
             if (Character.isWhitespace((char) character)) {
                 String whitespacesReduced = skipAndRecordWhitespace(character);
 
-                if (!(whitespacesReduced.isEmpty()) && !"\n\t".equals(whitespacesReduced)) { // &&
+                if (
+                    !(whitespacesReduced.isEmpty()) &&
+                    !"\n\t".equals(whitespacesReduced)
+                ) { // &&
                     whitespacesReduced = whitespacesReduced.replace("\t", ""); // Remove tabulators.
                     value.append(whitespacesReduced);
                 } else {
@@ -921,7 +1048,11 @@ public class BibtexParser implements Parser {
                     // Check for "\},\n" - Example context: `  path = {c:\temp\},\n`
                     // On Windows, it could be "\},\r\n", thus we rely in OS.NEWLINE.charAt(0) (which returns '\r' or '\n').
                     //   In all cases, we should check for '\n' as the file could be encoded with Linux line endings on Windows.
-                    if ((nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'))) {
+                    if (
+                        (nextTwoCharacters[0] == ',') &&
+                        ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) ||
+                            (nextTwoCharacters[1] == '\n'))
+                    ) {
                         // We hit '\}\r` or `\}\n`
                         // Heuristics: Unwanted escaping of }
                         //
@@ -943,7 +1074,9 @@ public class BibtexParser implements Parser {
             if (isClosingBracket && (brackets == 0)) {
                 return value;
             } else if (isEOFCharacter(character)) {
-                throw new IOException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException(
+                    "Error in line " + line + ": EOF in mid-string"
+                );
             } else if ((character == '{') && (!isEscapeSymbol(lastCharacter))) {
                 brackets++;
             } else if (isClosingBracket) {
@@ -970,7 +1103,9 @@ public class BibtexParser implements Parser {
         while (!((peek() == '"') && (brackets == 0))) {
             int j = read();
             if (isEOFCharacter(j)) {
-                throw new IOException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException(
+                    "Error in line " + line + ": EOF in mid-string"
+                );
             } else if (j == '{') {
                 brackets++;
             } else if (j == '}') {
@@ -989,7 +1124,13 @@ public class BibtexParser implements Parser {
 
         if (character != expected) {
             throw new IOException(
-                    "Error in line " + line + ": Expected " + expected + " but received " + (char) character);
+                "Error in line " +
+                line +
+                ": Expected " +
+                expected +
+                " but received " +
+                (char) character
+            );
         }
     }
 
@@ -997,7 +1138,9 @@ public class BibtexParser implements Parser {
         int character;
         do {
             character = read();
-        } while ((character != expected) && (character != -1) && (character != 65535));
+        } while (
+            (character != expected) && (character != -1) && (character != 65535)
+        );
 
         if (isEOFCharacter(character)) {
             eof = true;
@@ -1007,14 +1150,23 @@ public class BibtexParser implements Parser {
         return character == expected;
     }
 
-    private void consume(char firstOption, char secondOption) throws IOException {
+    private void consume(char firstOption, char secondOption)
+        throws IOException {
         // Consumes one of the two, doesn't care which appears.
 
         int character = read();
 
         if ((character != firstOption) && (character != secondOption)) {
-            throw new IOException("Error in line " + line + ": Expected " + firstOption + " or " + secondOption
-                    + " but received " + (char) character);
+            throw new IOException(
+                "Error in line " +
+                line +
+                ": Expected " +
+                firstOption +
+                " or " +
+                secondOption +
+                " but received " +
+                (char) character
+            );
         }
     }
 }

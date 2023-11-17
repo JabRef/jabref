@@ -1,10 +1,11 @@
 package org.jabref.logic.msbib;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
+
 public class MsBibMappingTest {
+
     @Test
     public void testGetLanguage() {
         String lang = MSBibMapping.getLanguage(1609);

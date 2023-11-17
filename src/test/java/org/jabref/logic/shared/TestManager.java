@@ -13,40 +13,100 @@ public class TestManager {
      * Determine the DBMSType to test from the environment variable "DMBS". In case that variable is not set, use "PostgreSQL" as default
      */
     public static DBMSType getDBMSTypeTestParameter() {
-        return DBMSType.fromString(System.getenv("DBMS")).orElse(DBMSType.POSTGRESQL);
+        return DBMSType
+            .fromString(System.getenv("DBMS"))
+            .orElse(DBMSType.POSTGRESQL);
     }
 
-    public static void clearTables(DBMSConnection dbmsConnection) throws SQLException {
+    public static void clearTables(DBMSConnection dbmsConnection)
+        throws SQLException {
         Objects.requireNonNull(dbmsConnection);
         DBMSType dbmsType = dbmsConnection.getProperties().getType();
 
         if (dbmsType == DBMSType.MYSQL) {
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `JABREF_FIELD`");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `JABREF_ENTRY`");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `JABREF_METADATA`");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP TABLE IF EXISTS `JABREF_FIELD`");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP TABLE IF EXISTS `JABREF_ENTRY`");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP TABLE IF EXISTS `JABREF_METADATA`");
         } else if (dbmsType == DBMSType.POSTGRESQL) {
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS jabref.\"FIELD\"");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS jabref.\"ENTRY\"");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS jabref.\"METADATA\"");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP SCHEMA IF EXISTS jabref");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP TABLE IF EXISTS jabref.\"FIELD\"");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP TABLE IF EXISTS jabref.\"ENTRY\"");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP TABLE IF EXISTS jabref.\"METADATA\"");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate("DROP SCHEMA IF EXISTS jabref");
         } else if (dbmsType == DBMSType.ORACLE) {
-            dbmsConnection.getConnection().createStatement()
-                          .executeUpdate("BEGIN\n"
-                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
-                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
-            dbmsConnection.getConnection().createStatement()
-                          .executeUpdate("BEGIN\n"
-                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"ENTRY\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
-                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
-            dbmsConnection.getConnection().createStatement()
-                          .executeUpdate("BEGIN\n"
-                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"METADATA\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
-                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
-            dbmsConnection.getConnection().createStatement()
-                          // Sequence does not exist has a different error code than table does not exist
-                          .executeUpdate("BEGIN\n"
-                                  + "EXECUTE IMMEDIATE 'DROP SEQUENCE \"ENTRY_SEQ\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
-                                  + "IF SQLCODE != -2289 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate(
+                    "BEGIN\n" +
+                    "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n" +
+                    "EXCEPTION\n" +
+                    "WHEN OTHERS THEN\n" +
+                    "IF SQLCODE != -942 THEN\n" +
+                    "RAISE;\n" +
+                    "END IF;\n" +
+                    "END;\n"
+                );
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate(
+                    "BEGIN\n" +
+                    "EXECUTE IMMEDIATE 'DROP TABLE \"ENTRY\"';\n" +
+                    "EXCEPTION\n" +
+                    "WHEN OTHERS THEN\n" +
+                    "IF SQLCODE != -942 THEN\n" +
+                    "RAISE;\n" +
+                    "END IF;\n" +
+                    "END;\n"
+                );
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                .executeUpdate(
+                    "BEGIN\n" +
+                    "EXECUTE IMMEDIATE 'DROP TABLE \"METADATA\"';\n" +
+                    "EXCEPTION\n" +
+                    "WHEN OTHERS THEN\n" +
+                    "IF SQLCODE != -942 THEN\n" +
+                    "RAISE;\n" +
+                    "END IF;\n" +
+                    "END;\n"
+                );
+            dbmsConnection
+                .getConnection()
+                .createStatement()
+                // Sequence does not exist has a different error code than table does not exist
+                .executeUpdate(
+                    "BEGIN\n" +
+                    "EXECUTE IMMEDIATE 'DROP SEQUENCE \"ENTRY_SEQ\"';\n" +
+                    "EXCEPTION\n" +
+                    "WHEN OTHERS THEN\n" +
+                    "IF SQLCODE != -2289 THEN\n" +
+                    "RAISE;\n" +
+                    "END IF;\n" +
+                    "END;\n"
+                );
         }
     }
 }

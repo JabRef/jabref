@@ -9,10 +9,11 @@ import org.slf4j.LoggerFactory;
  */
 public class GetContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        GetContext.class
+    );
 
-    private GetContext() {
-    }
+    private GetContext() {}
 
     /**
      * Get the text belonging to cursor with up to charBefore and charAfter characters of context.
@@ -23,11 +24,12 @@ public class GetContext {
      * @param charAfter  Number of characters requested.
      * @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
      */
-    public static String getCursorStringWithContext(XTextCursor cursor,
-                                                    int charBefore,
-                                                    int charAfter,
-                                                    boolean htmlMarkup) {
-
+    public static String getCursorStringWithContext(
+        XTextCursor cursor,
+        int charBefore,
+        int charAfter,
+        boolean htmlMarkup
+    ) {
         String citPart = cursor.getString();
 
         // extend cursor range left
@@ -37,8 +39,10 @@ public class GetContext {
                 cursor.goLeft((short) 1, true);
                 // If we are close to charBefore and see a space, then cut here. Might avoid cutting
                 // a word in half.
-                if ((i >= (charBefore - flex))
-                        && Character.isWhitespace(cursor.getString().charAt(0))) {
+                if (
+                    (i >= (charBefore - flex)) &&
+                    Character.isWhitespace(cursor.getString().charAt(0))
+                ) {
                     break;
                 }
             } catch (IndexOutOfBoundsException ex) {
@@ -55,7 +59,11 @@ public class GetContext {
                 cursor.goRight((short) 1, true);
                 if (i >= ((charAfter + lengthWithBefore) - flex)) {
                     String strNow = cursor.getString();
-                    if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
+                    if (
+                        Character.isWhitespace(
+                            strNow.charAt(strNow.length() - 1)
+                        )
+                    ) {
                         break;
                     }
                 }
@@ -66,9 +74,12 @@ public class GetContext {
 
         String result = cursor.getString();
         if (htmlMarkup) {
-            result = result.substring(0, addedBefore)
-                    + "<b>" + citPart + "</b>"
-                    + result.substring(lengthWithBefore);
+            result =
+                result.substring(0, addedBefore) +
+                "<b>" +
+                citPart +
+                "</b>" +
+                result.substring(lengthWithBefore);
         }
         return result.trim();
     }

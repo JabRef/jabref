@@ -2,9 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
 import javafx.concurrent.Task;
-
 import org.jabref.logic.util.DelayTaskThrottler;
 
 /**
@@ -14,7 +12,6 @@ import org.jabref.logic.util.DelayTaskThrottler;
  * use, scheduling, thread pooling, etc.
  */
 public interface TaskExecutor {
-
     /**
      * Runs the given task and returns a Future representing that task.
      *

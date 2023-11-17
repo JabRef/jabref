@@ -1,21 +1,19 @@
 package org.jabref.gui.desktop.os;
 
+import com.sun.jna.platform.win32.KnownFolders;
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
+import com.sun.jna.platform.win32.Win32Exception;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-
 import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.preferences.FilePreferences;
-
-import com.sun.jna.platform.win32.KnownFolders;
-import com.sun.jna.platform.win32.Shell32Util;
-import com.sun.jna.platform.win32.ShlObj;
-import com.sun.jna.platform.win32.Win32Exception;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -29,11 +27,24 @@ public class Windows extends NativeDesktop {
     private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
     @Override
-    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, filePreferences);
+    public void openFile(
+        String filePath,
+        String fileType,
+        FilePreferences filePreferences
+    ) throws IOException {
+        Optional<ExternalFileType> type =
+            ExternalFileTypes.getExternalFileTypeByExt(
+                fileType,
+                filePreferences
+            );
 
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            openFileWithApplication(filePath, type.get().getOpenWithApplication());
+        if (
+            type.isPresent() && !type.get().getOpenWithApplication().isEmpty()
+        ) {
+            openFileWithApplication(
+                filePath,
+                type.get().getOpenWithApplication()
+            );
         } else {
             // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath + "\"";
@@ -61,12 +72,22 @@ public class Windows extends NativeDesktop {
         return "";
     }
 
-    private String getProgramPath(String programName, String directoryName, String progFiles) {
+    private String getProgramPath(
+        String programName,
+        String directoryName,
+        String progFiles
+    ) {
         Path programPath;
         if ((directoryName != null) && !directoryName.isEmpty()) {
-            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION);
+            programPath =
+                Path.of(
+                    progFiles,
+                    directoryName,
+                    programName + DEFAULT_EXECUTABLE_EXTENSION
+                );
         } else {
-            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);
+            programPath =
+                Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);
         }
         if (Files.exists(programPath)) {
             return programPath.toString();
@@ -88,30 +109,45 @@ public class Windows extends NativeDesktop {
     public Path getDefaultFileChooserDirectory() {
         try {
             try {
-                return Path.of(Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents));
+                return Path.of(
+                    Shell32Util.getKnownFolderPath(
+                        KnownFolders.FOLDERID_Documents
+                    )
+                );
             } catch (UnsatisfiedLinkError e) {
                 // Windows Vista or earlier
-                return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
+                return Path.of(
+                    Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS)
+                );
             }
         } catch (Win32Exception e) {
             // needs to be non-static because of org.jabref.cli.Launcher.addLogToDisk
-            LoggerFactory.getLogger(Windows.class).error("Error accessing folder", e);
+            LoggerFactory
+                .getLogger(Windows.class)
+                .error("Error accessing folder", e);
             return Path.of(System.getProperty("user.home"));
         }
     }
 
     @Override
-    public void openFileWithApplication(String filePath, String application) throws IOException {
-        new ProcessBuilder(Path.of(application).toString(), Path.of(filePath).toString()).start();
+    public void openFileWithApplication(String filePath, String application)
+        throws IOException {
+        new ProcessBuilder(
+            Path.of(application).toString(),
+            Path.of(filePath).toString()
+        )
+            .start();
     }
 
     @Override
     public void openFolderAndSelectFile(Path filePath) throws IOException {
-        new ProcessBuilder("explorer.exe", "/select,", filePath.toString()).start();
+        new ProcessBuilder("explorer.exe", "/select,", filePath.toString())
+            .start();
     }
 
     @Override
-    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService)
+        throws IOException {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(new File(absolutePath));
         process.start();

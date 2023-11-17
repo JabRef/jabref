@@ -11,7 +11,11 @@ public class OpenBrowserAction extends SimpleCommand {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
 
-    public OpenBrowserAction(String urlToOpen, DialogService dialogService, FilePreferences filePreferences) {
+    public OpenBrowserAction(
+        String urlToOpen,
+        DialogService dialogService,
+        FilePreferences filePreferences
+    ) {
         this.urlToOpen = urlToOpen;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
@@ -19,6 +23,10 @@ public class OpenBrowserAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        JabRefDesktop.openBrowserShowPopup(urlToOpen, dialogService, filePreferences);
+        JabRefDesktop.openBrowserShowPopup(
+            urlToOpen,
+            dialogService,
+            filePreferences
+        );
     }
 }

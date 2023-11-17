@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
-
-import org.jabref.model.entry.BibEntry;
-
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
+import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,12 +16,14 @@ import org.slf4j.LoggerFactory;
  */
 public class XmpUtilShared {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        XmpUtilShared.class
+    );
 
-    private XmpUtilShared() {
-    }
+    private XmpUtilShared() {}
 
-    protected static XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
+    protected static XMPMetadata parseXmpMetadata(InputStream is)
+        throws IOException {
         XMPMetadata meta;
         try {
             DomXmpParser parser = new DomXmpParser();
@@ -45,15 +45,22 @@ public class XmpUtilShared {
      * @param path the path to the PDF.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
+    public static boolean hasMetadata(
+        Path path,
+        XmpPreferences xmpPreferences
+    ) {
         try {
-            List<BibEntry> bibEntries = new XmpUtilReader().readXmp(path, xmpPreferences);
+            List<BibEntry> bibEntries = new XmpUtilReader()
+                .readXmp(path, xmpPreferences);
             return !bibEntries.isEmpty();
         } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {
-            XmpUtilShared.LOGGER.debug("No metadata was found. Path: {}", path.toString());
+            XmpUtilShared.LOGGER.debug(
+                "No metadata was found. Path: {}",
+                path.toString()
+            );
             return false;
         }
     }

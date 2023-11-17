@@ -7,12 +7,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 
 public class FileNameUniqueness {
-    private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile("(.*) \\(\\d+\\)");
+
+    private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile(
+        "(.*) \\(\\d+\\)"
+    );
 
     /**
      * Returns a file name such that it does not match any existing files in targetDirectory
@@ -21,8 +23,13 @@ public class FileNameUniqueness {
      * @param fileName        Suggested name for the file
      * @return a file name such that it does not match any existing files in targetDirectory
      */
-    public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
-        Optional<String> extensionOptional = FileUtil.getFileExtension(fileName);
+    public static String getNonOverWritingFileName(
+        Path targetDirectory,
+        String fileName
+    ) {
+        Optional<String> extensionOptional = FileUtil.getFileExtension(
+            fileName
+        );
 
         // the suffix include the '.' , if extension is present Eg: ".pdf"
         String extensionSuffix;
@@ -30,7 +37,8 @@ public class FileNameUniqueness {
 
         if (extensionOptional.isPresent()) {
             extensionSuffix = '.' + extensionOptional.get();
-            fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+            fileNameWithoutExtension =
+                fileName.substring(0, fileName.lastIndexOf('.'));
         } else {
             extensionSuffix = "";
             fileNameWithoutExtension = fileName;
@@ -40,9 +48,12 @@ public class FileNameUniqueness {
 
         int counter = 1;
         while (Files.exists(targetDirectory.resolve(newFileName))) {
-            newFileName = fileNameWithoutExtension +
-                    " (" + counter + ")" +
-                    extensionSuffix;
+            newFileName =
+                fileNameWithoutExtension +
+                " (" +
+                counter +
+                ")" +
+                extensionSuffix;
             counter++;
         }
 
@@ -60,17 +71,25 @@ public class FileNameUniqueness {
      *         false when there is no "similar" file name or the content is different from that of files with "similar" name
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
-    public static boolean isDuplicatedFile(Path directory, Path fileName, DialogService dialogService) throws IOException {
-
+    public static boolean isDuplicatedFile(
+        Path directory,
+        Path fileName,
+        DialogService dialogService
+    ) throws IOException {
         Objects.requireNonNull(directory);
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(dialogService);
 
         String extensionSuffix = FileUtil.getFileExtension(fileName).orElse("");
-        extensionSuffix = "".equals(extensionSuffix) ? extensionSuffix : "." + extensionSuffix;
+        extensionSuffix =
+            "".equals(extensionSuffix)
+                ? extensionSuffix
+                : "." + extensionSuffix;
         String newFilename = FileUtil.getBaseName(fileName) + extensionSuffix;
 
-        String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));
+        String fileNameWithoutDuplicated = eraseDuplicateMarks(
+            FileUtil.getBaseName(fileName)
+        );
         String originalFileName = fileNameWithoutDuplicated + extensionSuffix;
 
         if (newFilename.equals(originalFileName)) {
@@ -82,18 +101,38 @@ public class FileNameUniqueness {
         int counter = 1;
 
         while (Files.exists(originalFile)) {
-            if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {
+            if (
+                com.google.common.io.Files.equal(
+                    originalFile.toFile(),
+                    duplicateFile.toFile()
+                )
+            ) {
                 if (duplicateFile.toFile().delete()) {
-                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
+                    dialogService.notify(
+                        Localization.lang(
+                            "File '%1' is a duplicate of '%0'. Keeping '%0'",
+                            originalFileName,
+                            fileName
+                        )
+                    );
                 } else {
-                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping both due to deletion error", originalFileName, fileName));
+                    dialogService.notify(
+                        Localization.lang(
+                            "File '%1' is a duplicate of '%0'. Keeping both due to deletion error",
+                            originalFileName,
+                            fileName
+                        )
+                    );
                 }
                 return true;
             }
 
-            originalFileName = fileNameWithoutDuplicated +
-                    " (" + counter + ")"
-                    + extensionSuffix;
+            originalFileName =
+                fileNameWithoutDuplicated +
+                " (" +
+                counter +
+                ")" +
+                extensionSuffix;
             counter++;
 
             if (newFilename.equals(originalFileName)) {
@@ -115,6 +154,8 @@ public class FileNameUniqueness {
      */
     public static String eraseDuplicateMarks(String fileName) {
         Matcher m = DUPLICATE_MARK_PATTERN.matcher(fileName);
-        return m.find() ? fileName.substring(0, fileName.lastIndexOf('(') - 1) : fileName;
+        return m.find()
+            ? fileName.substring(0, fileName.lastIndexOf('(') - 1)
+            : fileName;
     }
 }

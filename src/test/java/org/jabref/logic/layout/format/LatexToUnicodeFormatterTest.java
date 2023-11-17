@@ -1,9 +1,9 @@
 package org.jabref.logic.layout.format;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LatexToUnicodeFormatterTest {
 
@@ -28,7 +28,10 @@ class LatexToUnicodeFormatterTest {
     @Test
     void testFormatTextit() {
         // See #1464
-        assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
+        assertEquals(
+            "\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61",
+            formatter.format("\\textit{text}")
+        );
     }
 
     @Test
@@ -43,7 +46,10 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void testEquationsMoreComplicatedFormatting() {
-        assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+        assertEquals(
+            "A 32 mA ΣΔ-modulator",
+            formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator")
+        );
     }
 
     @Test
@@ -99,7 +105,9 @@ class LatexToUnicodeFormatterTest {
         assertEquals("ḩ", formatter.format("{\\c{h}}"));
     }
 
-    @Disabled("This is not a standard LaTeX command. It is debatable why we should convert this.")
+    @Disabled(
+        "This is not a standard LaTeX command. It is debatable why we should convert this."
+    )
     @Test
     void testCombiningAccentsCase2() {
         assertEquals("a͍", formatter.format("\\spreadlips{a}"));
@@ -155,12 +163,18 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void testPreservationOfSingleUnderscore() {
-        assertEquals("Lorem ipsum_lorem ipsum", formatter.format("Lorem ipsum_lorem ipsum"));
+        assertEquals(
+            "Lorem ipsum_lorem ipsum",
+            formatter.format("Lorem ipsum_lorem ipsum")
+        );
     }
 
     @Test
     void testConversionOfUnderscoreWithBraces() {
-        assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
+        assertEquals(
+            "Lorem ipsum_(lorem ipsum)",
+            formatter.format("Lorem ipsum_{lorem ipsum}")
+        );
     }
 
     @Test

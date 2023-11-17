@@ -70,9 +70,10 @@ public enum InternalField implements Field {
             return Optional.of(InternalField.KEY_FIELD);
         }
 
-        return Arrays.stream(InternalField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Arrays
+            .stream(InternalField.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     @Override

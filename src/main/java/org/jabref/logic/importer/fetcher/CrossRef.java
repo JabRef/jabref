@@ -8,7 +8,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
@@ -31,22 +35,22 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.OptionalUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-
 /**
  * A class for fetching DOIs from CrossRef
  * <p>
  * See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
  */
-public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
+public class CrossRef
+    implements
+        IdParserFetcher<DOI>,
+        EntryBasedParserFetcher,
+        SearchBasedParserFetcher,
+        IdBasedParserFetcher {
 
     private static final String API_URL = "https://api.crossref.org/works";
 
-    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
+    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER =
+        new RemoveBracesFormatter();
 
     @Override
     public String getName() {
@@ -54,27 +58,44 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForEntry(BibEntry entry)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        entry.getFieldLatexFree(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
-        entry.getFieldLatexFree(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
-        entry.getFieldLatexFree(StandardField.YEAR).ifPresent(year ->
+        entry
+            .getFieldLatexFree(StandardField.TITLE)
+            .ifPresent(title ->
+                uriBuilder.addParameter("query.bibliographic", title)
+            );
+        entry
+            .getFieldLatexFree(StandardField.AUTHOR)
+            .ifPresent(author -> uriBuilder.addParameter("query.author", author)
+            );
+        entry
+            .getFieldLatexFree(StandardField.YEAR)
+            .ifPresent(year ->
                 uriBuilder.addParameter("filter", "from-pub-date:" + year)
-        );
+            );
         uriBuilder.addParameter("rows", "20"); // = API default
         uriBuilder.addParameter("offset", "0"); // start at beginning
         return uriBuilder.build().toURL();
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter(
+            "query",
+            new DefaultQueryTransformer()
+                .transformLuceneQuery(luceneQuery)
+                .orElse("")
+        );
         return uriBuilder.build().toURL();
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
         return uriBuilder.build().toURL();
     }
@@ -113,8 +134,16 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public void doPostCleanup(BibEntry entry) {
         // Sometimes the fetched entry returns the title also in the subtitle field; in this case only keep the title field
-        if (entry.getField(StandardField.TITLE).equals(entry.getField(StandardField.SUBTITLE))) {
-            new FieldFormatterCleanup(StandardField.SUBTITLE, new ClearFormatter()).cleanup(entry);
+        if (
+            entry
+                .getField(StandardField.TITLE)
+                .equals(entry.getField(StandardField.SUBTITLE))
+        ) {
+            new FieldFormatterCleanup(
+                StandardField.SUBTITLE,
+                new ClearFormatter()
+            )
+                .cleanup(entry);
         }
     }
 
@@ -122,31 +151,66 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         try {
             BibEntry entry = new BibEntry();
             entry.setType(convertType(item.getString("type")));
-            entry.setField(StandardField.TITLE,
-                    Optional.ofNullable(item.optJSONArray("title"))
-                            .map(array -> array.optString(0)).orElse(""));
-            entry.setField(StandardField.SUBTITLE,
-                    Optional.ofNullable(item.optJSONArray("subtitle"))
-                            .map(array -> array.optString(0)).orElse(""));
-            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")));
-            entry.setField(StandardField.YEAR,
-                    Optional.ofNullable(item.optJSONObject("published-print"))
-                            .map(array -> array.optJSONArray("date-parts"))
-                            .map(array -> array.optJSONArray(0))
-                            .map(array -> array.optInt(0))
-                            .map(year -> Integer.toString(year)).orElse("")
+            entry.setField(
+                StandardField.TITLE,
+                Optional
+                    .ofNullable(item.optJSONArray("title"))
+                    .map(array -> array.optString(0))
+                    .orElse("")
+            );
+            entry.setField(
+                StandardField.SUBTITLE,
+                Optional
+                    .ofNullable(item.optJSONArray("subtitle"))
+                    .map(array -> array.optString(0))
+                    .orElse("")
+            );
+            entry.setField(
+                StandardField.AUTHOR,
+                toAuthors(item.optJSONArray("author"))
+            );
+            entry.setField(
+                StandardField.YEAR,
+                Optional
+                    .ofNullable(item.optJSONObject("published-print"))
+                    .map(array -> array.optJSONArray("date-parts"))
+                    .map(array -> array.optJSONArray(0))
+                    .map(array -> array.optInt(0))
+                    .map(year -> Integer.toString(year))
+                    .orElse("")
             );
             entry.setField(StandardField.DOI, item.getString("DOI"));
-            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
-            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
+            entry.setField(
+                StandardField.JOURNAL,
+                item.optString("container-title")
+            );
+            entry.setField(
+                StandardField.PUBLISHER,
+                item.optString("publisher")
+            );
             entry.setField(StandardField.NUMBER, item.optString("issue"));
-            entry.setField(StandardField.KEYWORDS, Optional.ofNullable(item.optJSONArray("subject")).map(this::getKeywords).orElse(""));
+            entry.setField(
+                StandardField.KEYWORDS,
+                Optional
+                    .ofNullable(item.optJSONArray("subject"))
+                    .map(this::getKeywords)
+                    .orElse("")
+            );
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
-            entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
+            entry.setField(
+                StandardField.ISSN,
+                Optional
+                    .ofNullable(item.optJSONArray("ISSN"))
+                    .map(array -> array.getString(0))
+                    .orElse("")
+            );
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException("CrossRef API JSON format has changed", exception);
+            throw new ParseException(
+                "CrossRef API JSON format has changed",
+                exception
+            );
         }
     }
 
@@ -156,39 +220,74 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         }
 
         // input: list of {"given":"A.","family":"Riel","affiliation":[]}
-        return IntStream.range(0, authors.length())
-                        .mapToObj(authors::getJSONObject)
-                        .map(author -> new Author(
-                                author.optString("given", ""), "", "",
-                                author.optString("family", ""), ""))
-                        .collect(AuthorList.collect())
-                        .getAsFirstLastNamesWithAnd();
+        return IntStream
+            .range(0, authors.length())
+            .mapToObj(authors::getJSONObject)
+            .map(author ->
+                new Author(
+                    author.optString("given", ""),
+                    "",
+                    "",
+                    author.optString("family", ""),
+                    ""
+                )
+            )
+            .collect(AuthorList.collect())
+            .getAsFirstLastNamesWithAnd();
     }
 
     private EntryType convertType(String type) {
-        return "journal-article".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
+        return "journal-article".equals(type)
+            ? StandardEntryType.Article
+            : StandardEntryType.Misc;
     }
 
     @Override
-    public Optional<DOI> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException {
-
-        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getFieldLatexFree(StandardField.TITLE).orElse(""));
+    public Optional<DOI> extractIdentifier(
+        BibEntry inputEntry,
+        List<BibEntry> fetchedEntries
+    ) throws FetcherException {
+        final String entryTitle = REMOVE_BRACES_FORMATTER.format(
+            inputEntry.getFieldLatexFree(StandardField.TITLE).orElse("")
+        );
         final StringSimilarity stringSimilarity = new StringSimilarity();
 
         for (BibEntry fetchedEntry : fetchedEntries) {
             // currently only title-based comparison
             // title
-            Optional<String> dataTitle = fetchedEntry.getField(StandardField.TITLE);
+            Optional<String> dataTitle = fetchedEntry.getField(
+                StandardField.TITLE
+            );
 
-            if (OptionalUtil.isPresentAnd(dataTitle, title -> stringSimilarity.isSimilar(entryTitle, title))) {
+            if (
+                OptionalUtil.isPresentAnd(
+                    dataTitle,
+                    title -> stringSimilarity.isSimilar(entryTitle, title)
+                )
+            ) {
                 return fetchedEntry.getDOI();
             }
 
             // subtitle
             // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
-            Optional<String> dataSubtitle = fetchedEntry.getField(StandardField.SUBTITLE);
-            Optional<String> dataWithSubTitle = OptionalUtil.combine(dataTitle, dataSubtitle, (title, subtitle) -> title + " " + subtitle);
-            if (OptionalUtil.isPresentAnd(dataWithSubTitle, titleWithSubtitle -> stringSimilarity.isSimilar(entryTitle, titleWithSubtitle))) {
+            Optional<String> dataSubtitle = fetchedEntry.getField(
+                StandardField.SUBTITLE
+            );
+            Optional<String> dataWithSubTitle = OptionalUtil.combine(
+                dataTitle,
+                dataSubtitle,
+                (title, subtitle) -> title + " " + subtitle
+            );
+            if (
+                OptionalUtil.isPresentAnd(
+                    dataWithSubTitle,
+                    titleWithSubtitle ->
+                        stringSimilarity.isSimilar(
+                            entryTitle,
+                            titleWithSubtitle
+                        )
+                )
+            ) {
                 return fetchedEntry.getDOI();
             }
         }
@@ -205,7 +304,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         StringBuilder keywords = new StringBuilder();
 
         for (int i = 0; i < jsonArray.length(); i++) {
-        keywords.append(jsonArray.getString(i));
+            keywords.append(jsonArray.getString(i));
             if (i != jsonArray.length() - 1) {
                 keywords.append(", ");
             }

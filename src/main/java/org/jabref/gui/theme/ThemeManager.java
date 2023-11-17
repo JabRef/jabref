@@ -1,5 +1,7 @@
 package org.jabref.gui.theme;
 
+import com.jthemedetecor.OsThemeDetector;
+import com.tobiasdiez.easybind.EasyBind;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -10,17 +12,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
-
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
-
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
-
-import com.jthemedetecor.OsThemeDetector;
-import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +36,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        ThemeManager.class
+    );
 
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -49,13 +48,18 @@ public class ThemeManager {
     private Theme theme;
 
     private Scene mainWindowScene;
-    private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<WebEngine> webEngines = Collections.newSetFromMap(
+        new WeakHashMap<>()
+    );
     private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
-    public ThemeManager(WorkspacePreferences workspacePreferences,
-                        FileUpdateMonitor fileUpdateMonitor,
-                        Consumer<Runnable> updateRunner) {
-        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
+    public ThemeManager(
+        WorkspacePreferences workspacePreferences,
+        FileUpdateMonitor fileUpdateMonitor,
+        Consumer<Runnable> updateRunner
+    ) {
+        this.workspacePreferences =
+            Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
@@ -67,15 +71,29 @@ public class ThemeManager {
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        EasyBind.subscribe(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
-        EasyBind.subscribe(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
-        EasyBind.subscribe(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
-        EasyBind.subscribe(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
+        EasyBind.subscribe(
+            workspacePreferences.themeProperty(),
+            theme -> updateThemeSettings()
+        );
+        EasyBind.subscribe(
+            workspacePreferences.themeSyncOsProperty(),
+            theme -> updateThemeSettings()
+        );
+        EasyBind.subscribe(
+            workspacePreferences.shouldOverrideDefaultFontSizeProperty(),
+            should -> updateFontSettings()
+        );
+        EasyBind.subscribe(
+            workspacePreferences.mainFontSizeProperty(),
+            size -> updateFontSettings()
+        );
         detector.registerListener(isDark -> updateThemeSettings());
     }
 
     private void updateThemeSettings() {
-        Theme newTheme = Objects.requireNonNull(workspacePreferences.getTheme());
+        Theme newTheme = Objects.requireNonNull(
+            workspacePreferences.getTheme()
+        );
 
         if (workspacePreferences.themeSyncOsProperty().getValue()) {
             if (detector.isDark()) {
@@ -88,38 +106,63 @@ public class ThemeManager {
         if (newTheme.equals(theme)) {
             LOGGER.info("Not updating theme because it hasn't changed");
         } else {
-            theme.getAdditionalStylesheet().ifPresent(this::removeStylesheetFromWatchList);
+            theme
+                .getAdditionalStylesheet()
+                .ifPresent(this::removeStylesheetFromWatchList);
         }
 
         this.theme = newTheme;
-        LOGGER.info("Theme set to {} with base css {}", newTheme, baseStyleSheet);
+        LOGGER.info(
+            "Theme set to {} with base css {}",
+            newTheme,
+            baseStyleSheet
+        );
 
-        this.theme.getAdditionalStylesheet().ifPresent(
-                styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
+        this.theme.getAdditionalStylesheet()
+            .ifPresent(styleSheet ->
+                addStylesheetToWatchlist(
+                    styleSheet,
+                    this::additionalCssLiveUpdate
+                )
+            );
 
         additionalCssLiveUpdate();
     }
 
     private void updateFontSettings() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> getMainWindowScene().ifPresent(this::updateFontStyle)));
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+            updateRunner.accept(() ->
+                getMainWindowScene().ifPresent(this::updateFontStyle)
+            )
+        );
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
         Path oldPath = styleSheet.getWatchPath();
         if (oldPath != null) {
-            fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
+            fileUpdateMonitor.removeListener(
+                oldPath,
+                this::additionalCssLiveUpdate
+            );
             LOGGER.info("No longer watch css {} for live updates", oldPath);
         }
     }
 
-    private void addStylesheetToWatchlist(StyleSheet styleSheet, FileUpdateListener updateMethod) {
+    private void addStylesheetToWatchlist(
+        StyleSheet styleSheet,
+        FileUpdateListener updateMethod
+    ) {
         Path watchPath = styleSheet.getWatchPath();
         if (watchPath != null) {
             try {
                 fileUpdateMonitor.addListenerForFile(watchPath, updateMethod);
                 LOGGER.info("Watching css {} for live updates", watchPath);
             } catch (IOException e) {
-                LOGGER.warn("Cannot watch css path {} for live updates", watchPath, e);
+                LOGGER.warn(
+                    "Cannot watch css path {} for live updates",
+                    watchPath,
+                    e
+                );
             }
         }
     }
@@ -132,56 +175,84 @@ public class ThemeManager {
             LOGGER.debug("Updating base CSS for main window scene");
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(this::updateBaseCss));
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+            updateRunner.accept(this::updateBaseCss)
+        );
     }
 
     private void additionalCssLiveUpdate() {
-        final String newStyleSheetLocation = this.theme.getAdditionalStylesheet().map(styleSheet -> {
-            styleSheet.reload();
-            return styleSheet.getWebEngineStylesheet();
-        }).orElse("");
+        final String newStyleSheetLocation =
+            this.theme.getAdditionalStylesheet()
+                .map(styleSheet -> {
+                    styleSheet.reload();
+                    return styleSheet.getWebEngineStylesheet();
+                })
+                .orElse("");
 
-        LOGGER.debug("Updating additional CSS for main window scene and {} web engines", webEngines.size());
+        LOGGER.debug(
+            "Updating additional CSS for main window scene and {} web engines",
+            webEngines.size()
+        );
 
         DefaultTaskExecutor.runInJavaFXThread(() ->
-                updateRunner.accept(() -> {
-                    updateAdditionalCss();
+            updateRunner.accept(() -> {
+                updateAdditionalCss();
 
-                    webEngines.forEach(webEngine -> {
-                        // force refresh by unloading style sheet, if the location hasn't changed
-                        if (newStyleSheetLocation.equals(webEngine.getUserStyleSheetLocation())) {
-                            webEngine.setUserStyleSheetLocation(null);
-                        }
-                        webEngine.setUserStyleSheetLocation(newStyleSheetLocation);
-                    });
-                })
+                webEngines.forEach(webEngine -> {
+                    // force refresh by unloading style sheet, if the location hasn't changed
+                    if (
+                        newStyleSheetLocation.equals(
+                            webEngine.getUserStyleSheetLocation()
+                        )
+                    ) {
+                        webEngine.setUserStyleSheetLocation(null);
+                    }
+                    webEngine.setUserStyleSheetLocation(newStyleSheetLocation);
+                });
+            })
         );
     }
 
     private void updateBaseCss() {
-        getMainWindowScene().ifPresent(scene -> {
-            List<String> stylesheets = scene.getStylesheets();
-            if (!stylesheets.isEmpty()) {
-                stylesheets.remove(0);
-            }
+        getMainWindowScene()
+            .ifPresent(scene -> {
+                List<String> stylesheets = scene.getStylesheets();
+                if (!stylesheets.isEmpty()) {
+                    stylesheets.remove(0);
+                }
 
-            stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
-        });
+                stylesheets.add(
+                    0,
+                    baseStyleSheet.getSceneStylesheet().toExternalForm()
+                );
+            });
     }
 
     private void updateAdditionalCss() {
-        getMainWindowScene().ifPresent(scene -> scene.getStylesheets().setAll(List.of(
-                baseStyleSheet.getSceneStylesheet().toExternalForm(),
-                theme.getAdditionalStylesheet().map(styleSheet -> {
-                         URL stylesheetUrl = styleSheet.getSceneStylesheet();
-                         if (stylesheetUrl != null) {
-                             return stylesheetUrl.toExternalForm();
-                         } else {
-                             return "";
-                         }
-                     })
-                     .orElse("")
-        )));
+        getMainWindowScene()
+            .ifPresent(scene ->
+                scene
+                    .getStylesheets()
+                    .setAll(
+                        List.of(
+                            baseStyleSheet
+                                .getSceneStylesheet()
+                                .toExternalForm(),
+                            theme
+                                .getAdditionalStylesheet()
+                                .map(styleSheet -> {
+                                    URL stylesheetUrl =
+                                        styleSheet.getSceneStylesheet();
+                                    if (stylesheetUrl != null) {
+                                        return stylesheetUrl.toExternalForm();
+                                    } else {
+                                        return "";
+                                    }
+                                })
+                                .orElse("")
+                        )
+                    )
+            );
     }
 
     /**
@@ -208,8 +279,13 @@ public class ThemeManager {
     public void installCss(WebEngine webEngine) {
         updateRunner.accept(() -> {
             if (this.webEngines.add(webEngine)) {
-                webEngine.setUserStyleSheetLocation(this.theme.getAdditionalStylesheet().isPresent() ?
-                        this.theme.getAdditionalStylesheet().get().getWebEngineStylesheet() : "");
+                webEngine.setUserStyleSheetLocation(
+                    this.theme.getAdditionalStylesheet().isPresent()
+                        ? this.theme.getAdditionalStylesheet()
+                            .get()
+                            .getWebEngineStylesheet()
+                        : ""
+                );
             }
         });
     }
@@ -222,9 +298,21 @@ public class ThemeManager {
      */
     public void updateFontStyle(Scene scene) {
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
-            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
+            scene
+                .getRoot()
+                .setStyle(
+                    "-fx-font-size: " +
+                    workspacePreferences.getMainFontSize() +
+                    "pt;"
+                );
         } else {
-            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getDefaultFontSize() + "pt;");
+            scene
+                .getRoot()
+                .setStyle(
+                    "-fx-font-size: " +
+                    workspacePreferences.getDefaultFontSize() +
+                    "pt;"
+                );
         }
     }
 

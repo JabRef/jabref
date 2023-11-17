@@ -6,7 +6,6 @@ import java.util.Optional;
  * This is what we need to produce normalized author-year citation markers.
  */
 public interface CitationMarkerNormEntry {
-
     /**
      * Citation key. This is what we usually get from the document.
      * <p>

@@ -14,7 +14,6 @@ import org.kordamp.ikonli.Ikon;
  * @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
  */
 public enum JabRefMaterialDesignIcon implements Ikon {
-
     TEX_STUDIO("jab-texstudio", '\ue900'),
     TEX_MAKER("jab-textmaker", '\ue901'),
     EMACS("jab-emacs", '\ue902'),
@@ -41,13 +40,17 @@ public enum JabRefMaterialDesignIcon implements Ikon {
         this.code = code;
     }
 
-    public static JabRefMaterialDesignIcon findByDescription(String description) {
+    public static JabRefMaterialDesignIcon findByDescription(
+        String description
+    ) {
         for (JabRefMaterialDesignIcon font : values()) {
             if (font.getDescription().equals(description)) {
                 return font;
             }
         }
-        throw new IllegalArgumentException("Icon description '" + description + "' is invalid!");
+        throw new IllegalArgumentException(
+            "Icon description '" + description + "' is invalid!"
+        );
     }
 
     @Override

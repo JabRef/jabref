@@ -1,8 +1,8 @@
 package org.jabref.http.dto;
 
+import com.google.common.base.MoreObjects;
 import java.io.IOException;
 import java.io.StringWriter;
-
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -11,8 +11,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.SharedBibEntryData;
-
-import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,22 +22,48 @@ import org.slf4j.LoggerFactory;
  * @param citationKey the citation key (duplicated from BibEntry to ease processing by the client)
  * @param bibtex the BibEntry as BibTeX string (see ADR-0027 for more information, why we don't use a HashMap / JSON)
  */
-public record BibEntryDTO(SharedBibEntryData sharingMetadata, String userComments, String citationKey, String bibtex) implements Comparable<BibEntryDTO> {
+public record BibEntryDTO(
+    SharedBibEntryData sharingMetadata,
+    String userComments,
+    String citationKey,
+    String bibtex
+)
+    implements Comparable<BibEntryDTO> {
+    public static final Logger LOGGER = LoggerFactory.getLogger(
+        BibEntryDTO.class
+    );
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(BibEntryDTO.class);
-
-    public BibEntryDTO(BibEntry bibEntry, BibDatabaseMode bibDatabaseMode, FieldPreferences fieldWriterPreferences, BibEntryTypesManager bibEntryTypesManager) {
-        this(bibEntry.getSharedBibEntryData(),
-                bibEntry.getUserComments(),
-                bibEntry.getCitationKey().orElse(""),
-                convertToString(bibEntry, bibDatabaseMode, fieldWriterPreferences, bibEntryTypesManager)
+    public BibEntryDTO(
+        BibEntry bibEntry,
+        BibDatabaseMode bibDatabaseMode,
+        FieldPreferences fieldWriterPreferences,
+        BibEntryTypesManager bibEntryTypesManager
+    ) {
+        this(
+            bibEntry.getSharedBibEntryData(),
+            bibEntry.getUserComments(),
+            bibEntry.getCitationKey().orElse(""),
+            convertToString(
+                bibEntry,
+                bibDatabaseMode,
+                fieldWriterPreferences,
+                bibEntryTypesManager
+            )
         );
     }
 
-    private static String convertToString(BibEntry entry, BibDatabaseMode bibDatabaseMode, FieldPreferences fieldWriterPreferences, BibEntryTypesManager bibEntryTypesManager) {
+    private static String convertToString(
+        BibEntry entry,
+        BibDatabaseMode bibDatabaseMode,
+        FieldPreferences fieldWriterPreferences,
+        BibEntryTypesManager bibEntryTypesManager
+    ) {
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), bibEntryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
+            new FieldWriter(fieldWriterPreferences),
+            bibEntryTypesManager
+        );
         try {
             bibtexEntryWriter.write(entry, bibWriter, bibDatabaseMode);
         } catch (IOException e) {
@@ -61,11 +85,12 @@ public record BibEntryDTO(SharedBibEntryData sharingMetadata, String userComment
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                          .add("sharingMetadata", sharingMetadata)
-                          .add("userComments", userComments)
-                          .add("citationkey", citationKey)
-                          .add("bibtex", bibtex)
-                          .toString();
+        return MoreObjects
+            .toStringHelper(this)
+            .add("sharingMetadata", sharingMetadata)
+            .add("userComments", userComments)
+            .add("citationkey", citationKey)
+            .add("bibtex", bibtex)
+            .toString();
     }
 }

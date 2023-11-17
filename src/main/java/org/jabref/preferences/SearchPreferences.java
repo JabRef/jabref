@@ -1,7 +1,6 @@
 package org.jabref.preferences;
 
 import java.util.EnumSet;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -10,7 +9,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
@@ -20,14 +18,25 @@ public class SearchPreferences {
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    private final DoubleProperty searchWindowHeight = new SimpleDoubleProperty();
+    private final DoubleProperty searchWindowHeight =
+        new SimpleDoubleProperty();
     private final DoubleProperty searchWindowWidth = new SimpleDoubleProperty();
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth) {
+    public SearchPreferences(
+        SearchDisplayMode searchDisplayMode,
+        boolean isCaseSensitive,
+        boolean isRegularExpression,
+        boolean isFulltext,
+        boolean isKeepSearchString,
+        boolean keepWindowOnTop,
+        double searchWindowHeight,
+        double searchWindowWidth
+    ) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
-        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
+        searchFlags =
+            FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
         if (isCaseSensitive) {
             searchFlags.add(SearchFlags.CASE_SENSITIVE);
         }
@@ -45,7 +54,11 @@ public class SearchPreferences {
         this.setSearchWindowWidth(searchWindowWidth);
     }
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
+    public SearchPreferences(
+        SearchDisplayMode searchDisplayMode,
+        EnumSet<SearchFlags> searchFlags,
+        boolean keepWindowOnTop
+    ) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 

@@ -3,12 +3,9 @@ package org.jabref.gui.bibtexextractor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.Telemetry;
@@ -22,39 +19,45 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BibtexExtractorViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BibtexExtractorViewModel.class
+    );
 
-    private final StringProperty inputTextProperty = new SimpleStringProperty("");
+    private final StringProperty inputTextProperty = new SimpleStringProperty(
+        ""
+    );
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
     private final ImportHandler importHandler;
 
-    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
-                                    DialogService dialogService,
-                                    PreferencesService preferencesService,
-                                    FileUpdateMonitor fileUpdateMonitor,
-                                    TaskExecutor taskExecutor,
-                                    UndoManager undoManager,
-                                    StateManager stateManager) {
-
+    public BibtexExtractorViewModel(
+        BibDatabaseContext bibdatabaseContext,
+        DialogService dialogService,
+        PreferencesService preferencesService,
+        FileUpdateMonitor fileUpdateMonitor,
+        TaskExecutor taskExecutor,
+        UndoManager undoManager,
+        StateManager stateManager
+    ) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
-        this.importHandler = new ImportHandler(
+        this.importHandler =
+            new ImportHandler(
                 bibdatabaseContext,
                 preferencesService,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor
+            );
     }
 
     public StringProperty inputTextProperty() {
@@ -70,36 +73,64 @@ public class BibtexExtractorViewModel {
     }
 
     private void parseUsingBibtexExtractor() {
-        BibEntry parsedEntry = new BibtexExtractor().extract(inputTextProperty.getValue());
+        BibEntry parsedEntry = new BibtexExtractor()
+            .extract(inputTextProperty.getValue());
         importHandler.importEntries(List.of(parsedEntry));
         trackNewEntry(parsedEntry, "ParseWithBibTeXExtractor");
     }
 
     private void parseUsingGrobid() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
-        BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
-                      .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
-                      .onFailure(e -> {
-                          if (e instanceof FetcherException) {
-                              String msg = Localization.lang("There are connection issues with a JabRef server. Detailed information: %0",
-                                      e.getMessage());
-                              dialogService.notify(msg);
-                          } else {
-                              LOGGER.warn("Missing exception handling.", e);
-                          }
-                      })
-                      .onSuccess(parsedEntries -> {
-                          dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
-                          importHandler.importEntries(parsedEntries);
-                          for (BibEntry bibEntry : parsedEntries) {
-                              trackNewEntry(bibEntry, "ParseWithGrobid");
-                          }
-                      }).executeWith(taskExecutor);
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(
+            preferencesService.getGrobidPreferences(),
+            preferencesService.getImportFormatPreferences()
+        );
+        BackgroundTask
+            .wrap(() ->
+                grobidCitationFetcher.performSearch(
+                    inputTextProperty.getValue()
+                )
+            )
+            .onRunning(() ->
+                dialogService.notify(
+                    Localization.lang("Your text is being parsed...")
+                )
+            )
+            .onFailure(e -> {
+                if (e instanceof FetcherException) {
+                    String msg = Localization.lang(
+                        "There are connection issues with a JabRef server. Detailed information: %0",
+                        e.getMessage()
+                    );
+                    dialogService.notify(msg);
+                } else {
+                    LOGGER.warn("Missing exception handling.", e);
+                }
+            })
+            .onSuccess(parsedEntries -> {
+                dialogService.notify(
+                    Localization.lang(
+                        "%0 entries were parsed from your query.",
+                        String.valueOf(parsedEntries.size())
+                    )
+                );
+                importHandler.importEntries(parsedEntries);
+                for (BibEntry bibEntry : parsedEntries) {
+                    trackNewEntry(bibEntry, "ParseWithGrobid");
+                }
+            })
+            .executeWith(taskExecutor);
     }
 
     private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
         Map<String, String> properties = new HashMap<>();
-        properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
-        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent(eventMessage, properties, new HashMap<>()));
+        properties.put(
+            "EntryType",
+            bibEntry.typeProperty().getValue().getName()
+        );
+        Telemetry
+            .getTelemetryClient()
+            .ifPresent(client ->
+                client.trackEvent(eventMessage, properties, new HashMap<>())
+            );
     }
 }

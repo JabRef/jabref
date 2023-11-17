@@ -1,10 +1,9 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.jabref.logic.layout.LayoutFormatter;
+import org.junit.jupiter.api.Test;
 
 public class AuthorAndsCommaReplacerTest {
 
@@ -19,14 +18,21 @@ public class AuthorAndsCommaReplacerTest {
         assertEquals("", a.format(""));
 
         // Single Names don't change
-        assertEquals("Someone, Van Something", a.format("Someone, Van Something"));
+        assertEquals(
+            "Someone, Van Something",
+            a.format("Someone, Van Something")
+        );
 
         // Two names just an &
-        assertEquals("John von Neumann & Peter Black Brown",
-                a.format("John von Neumann and Peter Black Brown"));
+        assertEquals(
+            "John von Neumann & Peter Black Brown",
+            a.format("John von Neumann and Peter Black Brown")
+        );
 
         // Three names put a comma:
-        assertEquals("von Neumann, John, Smith, John & Black Brown, Peter",
-                a.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+        assertEquals(
+            "von Neumann, John, Smith, John & Black Brown, Peter",
+            a.format("von Neumann, John and Smith, John and Black Brown, Peter")
+        );
     }
 }

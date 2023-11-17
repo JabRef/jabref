@@ -3,7 +3,6 @@ package org.jabref.model.openoffice.style;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -13,7 +12,8 @@ import org.jabref.model.openoffice.ootext.OOText;
  * <p>
  * They contain backreferences to the corresponding citations in {@code where}. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
  */
-public class CitedKey implements
+public class CitedKey
+    implements
         ComparableCitedKey,
         CitationMarkerNormEntry,
         CitationMarkerNumericBibEntry {
@@ -24,7 +24,7 @@ public class CitedKey implements
     private Optional<CitationLookupResult> db;
     private Optional<Integer> number; // For Numbered citation styles.
     private Optional<String> uniqueLetter; // For AuthorYear citation styles.
-    private Optional<OOText> normCitMarker;  // For AuthorYear citation styles.
+    private Optional<OOText> normCitMarker; // For AuthorYear citation styles.
 
     CitedKey(String citationKey, CitationPath path, Citation citation) {
         this.citationKey = citationKey;
@@ -101,13 +101,19 @@ public class CitedKey implements
 
         // Check consistency
         if (!cit.getLookupResult().equals(this.db)) {
-            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.db");
+            throw new IllegalStateException(
+                "CitedKey.addPath: mismatch on cit.db"
+            );
         }
         if (!cit.getNumber().equals(this.number)) {
-            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.number");
+            throw new IllegalStateException(
+                "CitedKey.addPath: mismatch on cit.number"
+            );
         }
         if (!cit.getUniqueLetter().equals(this.uniqueLetter)) {
-            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.uniqueLetter");
+            throw new IllegalStateException(
+                "CitedKey.addPath: mismatch on cit.uniqueLetter"
+            );
         }
     }
 
@@ -119,7 +125,11 @@ public class CitedKey implements
     }
 
     void distributeLookupResult(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(where, Citation::setLookupResult, db);
+        citationGroups.distributeToCitations(
+            where,
+            Citation::setLookupResult,
+            db
+        );
     }
 
     /*
@@ -127,10 +137,18 @@ public class CitedKey implements
      */
 
     void distributeNumber(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(where, Citation::setNumber, number);
+        citationGroups.distributeToCitations(
+            where,
+            Citation::setNumber,
+            number
+        );
     }
 
     void distributeUniqueLetter(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);
+        citationGroups.distributeToCitations(
+            where,
+            Citation::setUniqueLetter,
+            uniqueLetter
+        );
     }
 }

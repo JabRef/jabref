@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import kong.unirest.Unirest;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -17,8 +18,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
-import kong.unirest.Unirest;
-
 /**
  * @deprecated try to use {@link StateManager} and {@link org.jabref.preferences.PreferencesService}
  */
@@ -31,14 +30,17 @@ public class Globals {
      */
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
-    public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
+    public static final RemoteListenerServerManager REMOTE_LISTENER =
+        new RemoteListenerServerManager();
 
     /**
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
 
-    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
+    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(
+        stateManager
+    );
 
     /**
      * Each test case initializes this field if required
@@ -68,8 +70,7 @@ public class Globals {
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
 
-    private Globals() {
-    }
+    private Globals() {}
 
     // Key binding preferences
     public static synchronized KeyBindingRepository getKeyPrefs() {
@@ -88,10 +89,12 @@ public class Globals {
 
     public static synchronized ThemeManager getThemeManager() {
         if (themeManager == null) {
-            themeManager = new ThemeManager(
+            themeManager =
+                new ThemeManager(
                     prefs.getWorkspacePreferences(),
                     getFileUpdateMonitor(),
-                    Runnable::run);
+                    Runnable::run
+                );
         }
         return themeManager;
     }
@@ -99,7 +102,10 @@ public class Globals {
     public static synchronized FileUpdateMonitor getFileUpdateMonitor() {
         if (fileUpdateMonitor == null) {
             fileUpdateMonitor = new DefaultFileUpdateMonitor();
-            JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(
+                fileUpdateMonitor,
+                "FileUpdateMonitor"
+            );
         }
         return fileUpdateMonitor;
     }
@@ -107,12 +113,19 @@ public class Globals {
     // Background tasks
     public static void startBackgroundTasks() {
         // TODO Currently deactivated due to incompatibilities in XML
-      /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
+        /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             Telemetry.start(prefs.getTelemetryPreferences());
         } */
         RemotePreferences remotePreferences = prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(
+                new CLIMessageHandler(
+                    prefs,
+                    fileUpdateMonitor,
+                    entryTypesManager
+                ),
+                remotePreferences.getPort()
+            );
         }
     }
 

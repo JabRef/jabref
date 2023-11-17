@@ -1,9 +1,9 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
 
 public class RemoveWhitespaceTest {
 
@@ -29,6 +29,9 @@ public class RemoveWhitespaceTest {
 
     @Test
     public void testNewLineCombo() {
-        assertEquals("abcd EFG", new RemoveWhitespace().format("abcd\r E\nFG\r\n"));
+        assertEquals(
+            "abcd EFG",
+            new RemoveWhitespace().format("abcd\r E\nFG\r\n")
+        );
     }
 }

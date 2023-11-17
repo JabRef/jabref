@@ -1,7 +1,7 @@
 package org.jabref.gui.sidepane;
 
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.scene.control.Button;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.groups.GroupModeViewModel;
@@ -10,34 +10,51 @@ import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
-import com.tobiasdiez.easybind.EasyBind;
-
 public class GroupsSidePaneComponent extends SidePaneComponent {
+
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
-    private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
+    private final Button intersectionUnionToggle =
+        IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
 
-    public GroupsSidePaneComponent(SimpleCommand closeCommand,
-                                   SimpleCommand moveUpCommand,
-                                   SimpleCommand moveDownCommand,
-                                   SidePaneContentFactory contentFactory,
-                                   GroupsPreferences groupsPreferences,
-                                   DialogService dialogService) {
-        super(SidePaneType.GROUPS, closeCommand, moveUpCommand, moveDownCommand, contentFactory);
+    public GroupsSidePaneComponent(
+        SimpleCommand closeCommand,
+        SimpleCommand moveUpCommand,
+        SimpleCommand moveDownCommand,
+        SidePaneContentFactory contentFactory,
+        GroupsPreferences groupsPreferences,
+        DialogService dialogService
+    ) {
+        super(
+            SidePaneType.GROUPS,
+            closeCommand,
+            moveUpCommand,
+            moveDownCommand,
+            contentFactory
+        );
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
         setupIntersectionUnionToggle();
 
-        EasyBind.subscribe(groupsPreferences.groupViewModeProperty(), mode -> {
-            GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
-            intersectionUnionToggle.setGraphic(modeViewModel.getUnionIntersectionGraphic());
-            intersectionUnionToggle.setTooltip(modeViewModel.getUnionIntersectionTooltip());
-        });
+        EasyBind.subscribe(
+            groupsPreferences.groupViewModeProperty(),
+            mode -> {
+                GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
+                intersectionUnionToggle.setGraphic(
+                    modeViewModel.getUnionIntersectionGraphic()
+                );
+                intersectionUnionToggle.setTooltip(
+                    modeViewModel.getUnionIntersectionTooltip()
+                );
+            }
+        );
     }
 
     private void setupIntersectionUnionToggle() {
         addExtraButtonToHeader(intersectionUnionToggle, 0);
-        intersectionUnionToggle.setOnAction(event -> new ToggleUnionIntersectionAction().execute());
+        intersectionUnionToggle.setOnAction(event ->
+            new ToggleUnionIntersectionAction().execute()
+        );
     }
 
     private class ToggleUnionIntersectionAction extends SimpleCommand {
@@ -48,10 +65,14 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
 
             if (mode == GroupViewMode.UNION) {
                 groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION);
-                dialogService.notify(Localization.lang("Group view mode set to intersection"));
+                dialogService.notify(
+                    Localization.lang("Group view mode set to intersection")
+                );
             } else if (mode == GroupViewMode.INTERSECTION) {
                 groupsPreferences.setGroupViewMode(GroupViewMode.UNION);
-                dialogService.notify(Localization.lang("Group view mode set to union"));
+                dialogService.notify(
+                    Localization.lang("Group view mode set to union")
+                );
             }
         }
     }

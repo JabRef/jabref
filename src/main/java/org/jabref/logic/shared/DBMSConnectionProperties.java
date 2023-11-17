@@ -5,10 +5,8 @@ import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,9 @@ import org.slf4j.LoggerFactory;
  */
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnectionProperties.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DBMSConnectionProperties.class
+    );
 
     private DBMSType type;
     private String host;
@@ -37,25 +37,42 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
      */
     public DBMSConnectionProperties(SharedDatabasePreferences prefs) {
         if (prefs.getType().isPresent()) {
-            Optional<DBMSType> dbmsType = DBMSType.fromString(prefs.getType().get());
+            Optional<DBMSType> dbmsType = DBMSType.fromString(
+                prefs.getType().get()
+            );
             if (dbmsType.isPresent()) {
                 this.type = dbmsType.get();
             }
         }
 
         prefs.getHost().ifPresent(theHost -> this.host = theHost);
-        prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
+        prefs
+            .getPort()
+            .ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
-        prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
-        prefs.getServerTimezone().ifPresent(theServerTimezone -> this.serverTimezone = theServerTimezone);
+        prefs
+            .getKeyStoreFile()
+            .ifPresent(theKeystore -> this.keyStore = theKeystore);
+        prefs
+            .getServerTimezone()
+            .ifPresent(theServerTimezone ->
+                this.serverTimezone = theServerTimezone
+            );
         this.useSSL = prefs.isUseSSL();
 
         if (prefs.getUser().isPresent()) {
             this.user = prefs.getUser().get();
             if (prefs.getPassword().isPresent()) {
                 try {
-                    this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
-                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+                    this.password =
+                        new Password(
+                            prefs.getPassword().get().toCharArray(),
+                            prefs.getUser().get()
+                        )
+                            .decrypt();
+                } catch (
+                    UnsupportedEncodingException | GeneralSecurityException e
+                ) {
                     LOGGER.error("Could not decrypt password", e);
                 }
             }
@@ -67,8 +84,18 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         }
     }
 
-    DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
-                             String password, boolean useSSL, boolean allowPublicKeyRetrieval, String serverTimezone, String keyStore) {
+    DBMSConnectionProperties(
+        DBMSType type,
+        String host,
+        int port,
+        String database,
+        String user,
+        String password,
+        boolean useSSL,
+        boolean allowPublicKeyRetrieval,
+        String serverTimezone,
+        String keyStore
+    ) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -146,7 +173,10 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             props.setProperty("useSSL", Boolean.toString(useSSL));
         }
         if (allowPublicKeyRetrieval) {
-            props.setProperty("allowPublicKeyRetrieval", Boolean.toString(allowPublicKeyRetrieval));
+            props.setProperty(
+                "allowPublicKeyRetrieval",
+                Boolean.toString(allowPublicKeyRetrieval)
+            );
         }
         return props;
     }
@@ -169,14 +199,19 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             return false;
         }
         DBMSConnectionProperties properties = (DBMSConnectionProperties) obj;
-        return Objects.equals(type, properties.getType())
-                && this.host.equalsIgnoreCase(properties.getHost())
-                && Objects.equals(port, properties.getPort())
-                && Objects.equals(database, properties.getDatabase())
-                && Objects.equals(user, properties.getUser())
-                && Objects.equals(useSSL, properties.isUseSSL())
-                && Objects.equals(allowPublicKeyRetrieval, properties.isAllowPublicKeyRetrieval())
-                && Objects.equals(serverTimezone, properties.getServerTimezone());
+        return (
+            Objects.equals(type, properties.getType()) &&
+            this.host.equalsIgnoreCase(properties.getHost()) &&
+            Objects.equals(port, properties.getPort()) &&
+            Objects.equals(database, properties.getDatabase()) &&
+            Objects.equals(user, properties.getUser()) &&
+            Objects.equals(useSSL, properties.isUseSSL()) &&
+            Objects.equals(
+                allowPublicKeyRetrieval,
+                properties.isAllowPublicKeyRetrieval()
+            ) &&
+            Objects.equals(serverTimezone, properties.getServerTimezone())
+        );
     }
 
     @Override
@@ -186,11 +221,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     @Override
     public boolean isValid() {
-        return Objects.nonNull(type)
-                && Objects.nonNull(host)
-                && Objects.nonNull(port)
-                && Objects.nonNull(database)
-                && Objects.nonNull(user)
-                && Objects.nonNull(password);
+        return (
+            Objects.nonNull(type) &&
+            Objects.nonNull(host) &&
+            Objects.nonNull(port) &&
+            Objects.nonNull(database) &&
+            Objects.nonNull(user) &&
+            Objects.nonNull(password)
+        );
     }
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -24,13 +23,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AutoSetFileLinksUtil {
 
     public static class LinkFilesResult {
+
         private final List<BibEntry> changedEntries = new ArrayList<>();
         private final List<IOException> fileExceptions = new ArrayList<>();
 
@@ -51,22 +50,39 @@ public class AutoSetFileLinksUtil {
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        AutoSetFileLinksUtil.class
+    );
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
     private final FilePreferences filePreferences;
 
-    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
-        this(databaseContext.getFileDirectories(filePreferences), filePreferences, autoLinkPreferences);
+    public AutoSetFileLinksUtil(
+        BibDatabaseContext databaseContext,
+        FilePreferences filePreferences,
+        AutoLinkPreferences autoLinkPreferences
+    ) {
+        this(
+            databaseContext.getFileDirectories(filePreferences),
+            filePreferences,
+            autoLinkPreferences
+        );
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
+    private AutoSetFileLinksUtil(
+        List<Path> directories,
+        FilePreferences filePreferences,
+        AutoLinkPreferences autoLinkPreferences
+    ) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
         this.filePreferences = filePreferences;
     }
 
-    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
+    public LinkFilesResult linkAssociatedFiles(
+        List<BibEntry> entries,
+        NamedCompound ce
+    ) {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
@@ -84,9 +100,18 @@ public class AutoSetFileLinksUtil {
 
                 for (LinkedFile linkedFile : linkedFiles) {
                     // store undo information
-                    String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
-                    String oldVal = entry.getField(StandardField.FILE).orElse(null);
-                    UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
+                    String newVal = FileFieldWriter.getStringRepresentation(
+                        linkedFile
+                    );
+                    String oldVal = entry
+                        .getField(StandardField.FILE)
+                        .orElse(null);
+                    UndoableFieldChange fieldChange = new UndoableFieldChange(
+                        entry,
+                        StandardField.FILE,
+                        oldVal,
+                        newVal
+                    );
                     ce.addEdit(fieldChange);
                     changed = true;
 
@@ -103,36 +128,65 @@ public class AutoSetFileLinksUtil {
         return result;
     }
 
-    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
+    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry)
+        throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        List<String> extensions = filePreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+        List<String> extensions = filePreferences
+            .getExternalFileTypes()
+            .stream()
+            .map(ExternalFileType::getExtension)
+            .collect(Collectors.toList());
 
         // Run the search operation
-        FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
-        List<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
+        FileFinder fileFinder = FileFinders.constructFromConfiguration(
+            autoLinkPreferences
+        );
+        List<Path> result = fileFinder.findAssociatedFiles(
+            entry,
+            directories,
+            extensions
+        );
 
         // Collect the found files that are not yet linked
         for (Path foundFile : result) {
-            boolean fileAlreadyLinked = entry.getFiles().stream()
-                                             .map(file -> file.findIn(directories))
-                                             .anyMatch(file -> {
-                                                 try {
-                                                     return file.isPresent() && Files.isSameFile(file.get(), foundFile);
-                                                 } catch (IOException e) {
-                                                     LOGGER.error("Problem with isSameFile", e);
-                                                 }
-                                                 return false;
-                                             });
+            boolean fileAlreadyLinked = entry
+                .getFiles()
+                .stream()
+                .map(file -> file.findIn(directories))
+                .anyMatch(file -> {
+                    try {
+                        return (
+                            file.isPresent() &&
+                            Files.isSameFile(file.get(), foundFile)
+                        );
+                    } catch (IOException e) {
+                        LOGGER.error("Problem with isSameFile", e);
+                    }
+                    return false;
+                });
 
             if (!fileAlreadyLinked) {
-                Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
-                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
-                                                            .orElse(Optional.of(new UnknownExternalFileType("")));
+                Optional<ExternalFileType> type = FileUtil
+                    .getFileExtension(foundFile)
+                    .map(extension ->
+                        ExternalFileTypes.getExternalFileTypeByExt(
+                            extension,
+                            filePreferences
+                        )
+                    )
+                    .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
-                Path relativeFilePath = FileUtil.relativize(foundFile, directories);
-                LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
+                Path relativeFilePath = FileUtil.relativize(
+                    foundFile,
+                    directories
+                );
+                LinkedFile linkedFile = new LinkedFile(
+                    "",
+                    relativeFilePath,
+                    strType
+                );
                 linkedFiles.add(linkedFile);
             }
         }

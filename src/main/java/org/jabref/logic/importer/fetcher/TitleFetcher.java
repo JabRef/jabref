@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
-
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -31,7 +30,8 @@ public class TitleFetcher implements IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier)
+        throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
@@ -39,7 +39,9 @@ public class TitleFetcher implements IdBasedFetcher {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, identifier);
 
-        Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entry);
+        Optional<DOI> doi = WebFetchers
+            .getIdFetcherForIdentifier(DOI.class)
+            .findIdentifier(entry);
         if (doi.isEmpty()) {
             return Optional.empty();
         }

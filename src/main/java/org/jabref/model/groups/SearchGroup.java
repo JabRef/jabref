@@ -2,11 +2,9 @@ package org.jabref.model.groups;
 
 import java.util.EnumSet;
 import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,10 +14,17 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchGroup extends AbstractGroup {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        SearchGroup.class
+    );
     private final GroupSearchQuery query;
 
-    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
+    public SearchGroup(
+        String name,
+        GroupHierarchyType context,
+        String searchExpression,
+        EnumSet<SearchFlags> searchFlags
+    ) {
         super(name, context);
         this.query = new GroupSearchQuery(searchExpression, searchFlags);
     }
@@ -37,10 +42,18 @@ public class SearchGroup extends AbstractGroup {
             return false;
         }
         SearchGroup other = (SearchGroup) o;
-        return Objects.equals(getName(), other.getName())
-               && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
-               && Objects.equals(getSearchExpression(), other.getSearchExpression())
-               && Objects.equals(getSearchFlags(), other.getSearchFlags());
+        return (
+            Objects.equals(getName(), other.getName()) &&
+            Objects.equals(
+                getHierarchicalContext(),
+                other.getHierarchicalContext()
+            ) &&
+            Objects.equals(
+                getSearchExpression(),
+                other.getSearchExpression()
+            ) &&
+            Objects.equals(getSearchFlags(), other.getSearchFlags())
+        );
     }
 
     @Override
@@ -55,19 +68,45 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
+            return new SearchGroup(
+                getName(),
+                getHierarchicalContext(),
+                getSearchExpression(),
+                getSearchFlags()
+            );
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
-            LOGGER.error("Internal error in SearchGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues", t);
+            LOGGER.error(
+                "Internal error in SearchGroup.deepCopy(). " +
+                "Please report this on https://github.com/JabRef/jabref/issues",
+                t
+            );
             return null;
         }
     }
 
     @Override
     public String toString() {
-        return "SearchGroup [query=" + query + ", name=" + name + ", searchFlags=" + getSearchFlags() + ",  context=" + context + ", color=" + color + ", isExpanded=" + isExpanded + ", description=" + description + ", iconName=" + iconName + "]";
+        return (
+            "SearchGroup [query=" +
+            query +
+            ", name=" +
+            name +
+            ", searchFlags=" +
+            getSearchFlags() +
+            ",  context=" +
+            context +
+            ", color=" +
+            color +
+            ", isExpanded=" +
+            isExpanded +
+            ", description=" +
+            description +
+            ", iconName=" +
+            iconName +
+            "]"
+        );
     }
 
     @Override
@@ -77,6 +116,11 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
+        return Objects.hash(
+            getName(),
+            getHierarchicalContext(),
+            getSearchExpression(),
+            getSearchFlags()
+        );
     }
 }

@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.casechanger;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -43,7 +42,8 @@ public class UnprotectTermsFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Removes all balanced {} braces around words.");
+            "Removes all balanced {} braces around words."
+        );
     }
 
     @Override

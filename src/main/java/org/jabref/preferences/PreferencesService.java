@@ -3,7 +3,6 @@ package org.jabref.preferences;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
-
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -33,12 +32,10 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
-
 import org.jvnet.hk2.annotations.Contract;
 
 @Contract
 public interface PreferencesService {
-
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;
@@ -80,7 +77,9 @@ public interface PreferencesService {
 
     BibEntryTypesManager getCustomEntryTypesRepository();
 
-    void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
+    void storeCustomEntryTypesRepository(
+        BibEntryTypesManager entryTypesManager
+    );
 
     CleanupPreferences getCleanupPreferences();
 

@@ -1,21 +1,19 @@
 package org.jabref.logic.util.io;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class CitationKeyBasedFileFinderTest {
 
@@ -33,7 +31,9 @@ class CitationKeyBasedFileFinderTest {
 
         rootDir = temporaryFolder;
 
-        Path subDir = Files.createDirectory(rootDir.resolve("Organization Science"));
+        Path subDir = Files.createDirectory(
+            rootDir.resolve("Organization Science")
+        );
         pdfsDir = Files.createDirectory(rootDir.resolve("pdfs"));
 
         Files.createFile(subDir.resolve("HipKro03 - Hello.pdf"));
@@ -53,7 +53,9 @@ class CitationKeyBasedFileFinderTest {
         Files.createFile(dirTest.resolve("foo.dat"));
 
         graphicsDir = Files.createDirectory(rootDir.resolve("graphicsDir"));
-        Path graphicsSubDir = Files.createDirectories(graphicsDir.resolve("subDir"));
+        Path graphicsSubDir = Files.createDirectories(
+            graphicsDir.resolve("subDir")
+        );
 
         jpgFile = Files.createFile(graphicsSubDir.resolve("HipKro03 test.jpg"));
         Files.createFile(graphicsSubDir.resolve("HipKro03 test.png"));
@@ -65,64 +67,103 @@ class CitationKeyBasedFileFinderTest {
         List<Path> dirs = Arrays.asList(graphicsDir, pdfsDir);
         FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
-        List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        List<Path> results = fileFinder.findAssociatedFiles(
+            entry,
+            dirs,
+            extensions
+        );
 
         assertEquals(Arrays.asList(jpgFile, pdfFile), results);
     }
 
     @Test
-    void findAssociatedFilesIgnoresFilesStartingWithKeyButContinueWithText() throws Exception {
+    void findAssociatedFilesIgnoresFilesStartingWithKeyButContinueWithText()
+        throws Exception {
         Files.createFile(pdfsDir.resolve("HipKro03a - Hello second paper.pdf"));
         FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
-        List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+        List<Path> results = fileFinder.findAssociatedFiles(
+            entry,
+            Collections.singletonList(pdfsDir),
+            Collections.singletonList("pdf")
+        );
 
         assertEquals(Collections.singletonList(pdfFile), results);
     }
 
     @Test
     void findAssociatedFilesFindsFilesStartingWithKey() throws Exception {
-        Path secondPdfFile = Files.createFile(pdfsDir.resolve("HipKro03_Hello second paper.pdf"));
+        Path secondPdfFile = Files.createFile(
+            pdfsDir.resolve("HipKro03_Hello second paper.pdf")
+        );
         FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
-        List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+        List<Path> results = fileFinder.findAssociatedFiles(
+            entry,
+            Collections.singletonList(pdfsDir),
+            Collections.singletonList("pdf")
+        );
 
         assertEquals(Arrays.asList(secondPdfFile, pdfFile), results);
     }
 
     @Test
-    void findAssociatedFilesInNonExistingDirectoryFindsNothing() throws Exception {
+    void findAssociatedFilesInNonExistingDirectoryFindsNothing()
+        throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
-        List<Path> dirs = Collections.singletonList(rootDir.resolve("asdfasdf/asdfasdf"));
-        CitationKeyBasedFileFinder fileFinder = new CitationKeyBasedFileFinder(false);
+        List<Path> dirs = Collections.singletonList(
+            rootDir.resolve("asdfasdf/asdfasdf")
+        );
+        CitationKeyBasedFileFinder fileFinder = new CitationKeyBasedFileFinder(
+            false
+        );
 
-        List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        List<Path> results = fileFinder.findAssociatedFiles(
+            entry,
+            dirs,
+            extensions
+        );
 
         assertEquals(Collections.emptyList(), results);
     }
 
     @Test
-    void findAssociatedFilesWithUnsafeCharactersStartWithSearch() throws Exception {
-        BibEntry entryWithUnsafeCitationKey = new BibEntry(StandardEntryType.Article);
+    void findAssociatedFilesWithUnsafeCharactersStartWithSearch()
+        throws Exception {
+        BibEntry entryWithUnsafeCitationKey = new BibEntry(
+            StandardEntryType.Article
+        );
         entryWithUnsafeCitationKey.setCitationKey("?test");
 
         Path testFile = Files.createFile(pdfsDir.resolve("_test_file.pdf"));
         FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
-        List<Path> results = fileFinder.findAssociatedFiles(entryWithUnsafeCitationKey, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+        List<Path> results = fileFinder.findAssociatedFiles(
+            entryWithUnsafeCitationKey,
+            Collections.singletonList(pdfsDir),
+            Collections.singletonList("pdf")
+        );
 
         assertEquals(Collections.singletonList(testFile), results);
     }
 
     @Test
     void findAssociatedFilesWithUnsafeCharactersExactSearch() throws Exception {
-        BibEntry entryWithUnsafeCitationKey = new BibEntry(StandardEntryType.Article);
+        BibEntry entryWithUnsafeCitationKey = new BibEntry(
+            StandardEntryType.Article
+        );
         entryWithUnsafeCitationKey.setCitationKey("test:test/*test?");
 
-        Path testFile = Files.createFile(pdfsDir.resolve("test_test__test_.pdf"));
+        Path testFile = Files.createFile(
+            pdfsDir.resolve("test_test__test_.pdf")
+        );
         FileFinder fileFinder = new CitationKeyBasedFileFinder(true);
 
-        List<Path> results = fileFinder.findAssociatedFiles(entryWithUnsafeCitationKey, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+        List<Path> results = fileFinder.findAssociatedFiles(
+            entryWithUnsafeCitationKey,
+            Collections.singletonList(pdfsDir),
+            Collections.singletonList("pdf")
+        );
 
         assertNotEquals(Collections.singletonList(testFile), results);
     }

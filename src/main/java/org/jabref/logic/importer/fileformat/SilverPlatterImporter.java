@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -25,7 +24,9 @@ import org.jabref.model.entry.types.StandardEntryType;
  */
 public class SilverPlatterImporter extends Importer {
 
-    private static final Pattern START_PATTERN = Pattern.compile("Record.*INSPEC.*");
+    private static final Pattern START_PATTERN = Pattern.compile(
+        "Record.*INSPEC.*"
+    );
 
     @Override
     public String getName() {
@@ -43,7 +44,8 @@ public class SilverPlatterImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         // This format is very similar to Inspec, so we have a two-fold strategy:
         // If we see the flag signaling that it is an Inspec file, return false.
         // This flag should appear above the first entry and prevent us from
@@ -62,7 +64,8 @@ public class SilverPlatterImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         boolean isChapter = false;
         String str;
@@ -90,24 +93,37 @@ public class SilverPlatterImporter extends Importer {
                 String f3 = field.substring(0, 2);
                 String frest = field.substring(5);
                 switch (f3) {
-                    case "TI" ->
-                            h.put(StandardField.TITLE, frest);
+                    case "TI" -> h.put(StandardField.TITLE, frest);
                     case "AU" -> {
                         if (frest.trim().endsWith("(ed)")) {
                             String ed = frest.trim();
                             ed = ed.substring(0, ed.length() - 4);
-                            h.put(StandardField.EDITOR,
-                                    AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
+                            h.put(
+                                StandardField.EDITOR,
+                                AuthorList.fixAuthorLastNameFirst(
+                                    ed.replace(",-", ", ").replace(";", " and ")
+                                )
+                            );
                         } else {
-                            h.put(StandardField.AUTHOR,
-                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                            h.put(
+                                StandardField.AUTHOR,
+                                AuthorList.fixAuthorLastNameFirst(
+                                    frest
+                                        .replace(",-", ", ")
+                                        .replace(";", " and ")
+                                )
+                            );
                         }
                     }
-                    case "AB" ->
-                            h.put(StandardField.ABSTRACT, frest);
+                    case "AB" -> h.put(StandardField.ABSTRACT, frest);
                     case "DE" -> {
-                        String kw = frest.replace("-;", ",").toLowerCase(Locale.ROOT);
-                        h.put(StandardField.KEYWORDS, kw.substring(0, kw.length() - 1));
+                        String kw = frest
+                            .replace("-;", ",")
+                            .toLowerCase(Locale.ROOT);
+                        h.put(
+                            StandardField.KEYWORDS,
+                            kw.substring(0, kw.length() - 1)
+                        );
                     }
                     case "SO" -> {
                         int m = frest.indexOf('.');
@@ -126,8 +142,19 @@ public class SilverPlatterImporter extends Importer {
                                 if (m >= 0) {
                                     String pg = frest.substring(m + 1).trim();
                                     h.put(StandardField.PAGES, pg);
-                                    h.put(StandardField.VOLUME, frest.substring(1, issueIndex).trim());
-                                    h.put(StandardField.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
+                                    h.put(
+                                        StandardField.VOLUME,
+                                        frest.substring(1, issueIndex).trim()
+                                    );
+                                    h.put(
+                                        StandardField.ISSUE,
+                                        frest
+                                            .substring(
+                                                issueIndex + 1,
+                                                endIssueIndex
+                                            )
+                                            .trim()
+                                    );
                                 }
                             }
                         }
@@ -136,7 +163,10 @@ public class SilverPlatterImporter extends Importer {
                         int m = frest.indexOf(':');
                         if (m >= 0) {
                             String jr = frest.substring(0, m);
-                            h.put(StandardField.PUBLISHER, jr.replace("-", " ").trim());
+                            h.put(
+                                StandardField.PUBLISHER,
+                                jr.replace("-", " ").trim()
+                            );
                             frest = frest.substring(m);
                             m = frest.indexOf(", ");
                             if ((m + 2) < frest.length()) {
@@ -144,31 +174,37 @@ public class SilverPlatterImporter extends Importer {
                                 try {
                                     Integer.parseInt(yr);
                                     h.put(StandardField.YEAR, yr);
-                                } catch (
-                                        NumberFormatException ex) {
+                                } catch (NumberFormatException ex) {
                                     // Let's assume that this wasn't a number, since it
                                     // couldn't be parsed as an integer.
                                 }
                             }
                         }
                     }
-                    case "AF" ->
-                            h.put(StandardField.SCHOOL, frest.trim());
+                    case "AF" -> h.put(StandardField.SCHOOL, frest.trim());
                     case "DT" -> {
                         frest = frest.trim();
                         if ("Monograph".equals(frest)) {
                             type = StandardEntryType.Book;
                         } else if (frest.startsWith("Dissertation")) {
                             type = StandardEntryType.PhdThesis;
-                        } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
+                        } else if (
+                            frest
+                                .toLowerCase(Locale.ROOT)
+                                .contains(StandardField.JOURNAL.getName())
+                        ) {
                             type = StandardEntryType.Article;
-                        } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
+                        } else if (
+                            "Contribution".equals(frest) ||
+                            "Chapter".equals(frest)
+                        ) {
                             type = StandardEntryType.InCollection;
                             // This entry type contains page numbers and booktitle in the
                             // title field.
                             isChapter = true;
                         } else {
-                            type = EntryTypeFactory.parse(frest.replace(" ", ""));
+                            type =
+                                EntryTypeFactory.parse(frest.replace(" ", ""));
                         }
                     }
                 }

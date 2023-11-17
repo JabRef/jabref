@@ -8,19 +8,18 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.logic.l10n.Localization;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileNodeViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileNodeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        FileNodeViewModel.class
+    );
     private final Path path;
     private final ObservableList<FileNodeViewModel> children;
     private int fileCount;
@@ -52,11 +51,13 @@ public class FileNodeViewModel {
      */
     public static String formatDateTime(FileTime fileTime) {
         LocalDateTime localDateTime = fileTime
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
 
-        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        return localDateTime.format(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        );
     }
 
     /**
@@ -64,8 +65,14 @@ public class FileNodeViewModel {
      */
     public String getDisplayText() {
         if (path.toFile().isDirectory()) {
-            return String.format("%s (%s %s)", path.getFileName(), fileCount,
-                    fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
+            return String.format(
+                "%s (%s %s)",
+                path.getFileName(),
+                fileCount,
+                fileCount == 1
+                    ? Localization.lang("file")
+                    : Localization.lang("files")
+            );
         }
         return path.getFileName().toString();
     }
@@ -76,8 +83,14 @@ public class FileNodeViewModel {
      */
     public String getDisplayTextWithEditDate() {
         if (path.toFile().isDirectory()) {
-            return String.format("%s (%s %s)", path.getFileName(), fileCount,
-                    fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
+            return String.format(
+                "%s (%s %s)",
+                path.getFileName(),
+                fileCount,
+                fileCount == 1
+                    ? Localization.lang("file")
+                    : Localization.lang("files")
+            );
         }
         FileTime lastEditedTime = null;
         try {
@@ -85,15 +98,22 @@ public class FileNodeViewModel {
         } catch (IOException e) {
             LOGGER.error("Exception Caught", e);
         }
-        return String.format("%s (%s: %s)", path.getFileName().toString(), Localization.lang("last edited"), formatDateTime(lastEditedTime));
+        return String.format(
+            "%s (%s: %s)",
+            path.getFileName().toString(),
+            Localization.lang("last edited"),
+            formatDateTime(lastEditedTime)
+        );
     }
 
     @Override
     public String toString() {
-        return String.format("FileNodeViewModel{path=%s, children=%s, fileCount=%s}",
-                this.path,
-                this.children,
-                this.fileCount);
+        return String.format(
+            "FileNodeViewModel{path=%s, children=%s, fileCount=%s}",
+            this.path,
+            this.children,
+            this.fileCount
+        );
     }
 
     @Override
@@ -110,6 +130,10 @@ public class FileNodeViewModel {
             return false;
         }
         FileNodeViewModel other = (FileNodeViewModel) obj;
-        return Objects.equals(children, other.children) && (fileCount == other.fileCount) && Objects.equals(path, other.path);
+        return (
+            Objects.equals(children, other.children) &&
+            (fileCount == other.fileCount) &&
+            Objects.equals(path, other.path)
+        );
     }
 }

@@ -1,11 +1,11 @@
 package org.jabref.logic.formatter.minifier;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
 public class TruncateFormatter extends Formatter {
+
     private final int TRUNCATE_AFTER;
     private final String KEY;
 

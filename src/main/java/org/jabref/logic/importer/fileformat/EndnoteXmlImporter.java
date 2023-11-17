@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
+import com.google.common.base.Joiner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,12 +15,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -36,8 +35,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
-
-import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +45,9 @@ import org.slf4j.LoggerFactory;
  */
 public class EndnoteXmlImporter extends Importer implements Parser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        EndnoteXmlImporter.class
+    );
     private final ImportFormatPreferences preferences;
     private final XMLInputFactory xmlInputFactory;
 
@@ -87,7 +86,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
@@ -101,20 +101,23 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
+    public ParserResult importDatabase(BufferedReader input)
+        throws IOException {
         Objects.requireNonNull(input);
 
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(
+                input
+            );
 
             while (reader.hasNext()) {
                 reader.next();
                 if (isStartXMLEvent(reader)) {
                     String elementName = reader.getName().getLocalPart();
                     if ("record".equals(elementName)) {
-                         parseRecord(reader, bibItems, elementName);
+                        parseRecord(reader, bibItems, elementName);
                     }
                 }
             }
@@ -125,9 +128,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return new ParserResult(bibItems);
     }
 
-    private void parseRecord(XMLStreamReader reader, List<BibEntry> bibItems, String startElement)
-        throws XMLStreamException {
-
+    private void parseRecord(
+        XMLStreamReader reader,
+        List<BibEntry> bibItems,
+        String startElement
+    ) throws XMLStreamException {
         Map<Field, String> fields = new HashMap<>();
         EntryType entryType = StandardEntryType.Article;
 
@@ -150,50 +155,101 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         handleTitles(reader, fields, elementName);
                     }
                     case "pages" -> {
-                        parseStyleContent(reader, fields, StandardField.PAGES, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.PAGES,
+                            elementName
+                        );
                     }
                     case "volume" -> {
-                        parseStyleContent(reader, fields, StandardField.VOLUME, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.VOLUME,
+                            elementName
+                        );
                     }
                     case "number" -> {
-                        parseStyleContent(reader, fields, StandardField.NUMBER, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.NUMBER,
+                            elementName
+                        );
                     }
                     case "dates" -> {
                         parseYear(reader, fields);
                     }
                     case "notes" -> {
-                        parseStyleContent(reader, fields, StandardField.NOTE, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.NOTE,
+                            elementName
+                        );
                     }
                     case "urls" -> {
-                       handleUrlList(reader, fields, linkedFiles);
+                        handleUrlList(reader, fields, linkedFiles);
                     }
                     case "keywords" -> {
                         handleKeywordsList(reader, keywordList, elementName);
                     }
                     case "abstract" -> {
-                        parseStyleContent(reader, fields, StandardField.ABSTRACT, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.ABSTRACT,
+                            elementName
+                        );
                     }
                     case "isbn" -> {
-                        parseStyleContent(reader, fields, StandardField.ISBN, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.ISBN,
+                            elementName
+                        );
                     }
                     case "electronic-resource-num" -> {
-                        parseStyleContent(reader, fields, StandardField.DOI, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.DOI,
+                            elementName
+                        );
                     }
                     case "publisher" -> {
-                        parseStyleContent(reader, fields, StandardField.PUBLISHER, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.PUBLISHER,
+                            elementName
+                        );
                     }
                     case "label" -> {
-                        parseStyleContent(reader, fields, new UnknownField("endnote-label"), elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            new UnknownField("endnote-label"),
+                            elementName
+                        );
                     }
                 }
             }
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+            if (
+                isEndXMLEvent(reader) &&
+                reader.getName().getLocalPart().equals(startElement)
+            ) {
                 break;
             }
         }
 
         BibEntry entry = new BibEntry(entryType);
-        entry.putKeywords(keywordList, preferences.bibEntryPreferences().getKeywordSeparator());
+        entry.putKeywords(
+            keywordList,
+            preferences.bibEntryPreferences().getKeywordSeparator()
+        );
 
         entry.setField(fields);
         entry.setFiles(linkedFiles);
@@ -212,7 +268,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         };
     }
 
-    private void handleAuthorList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+    private void handleAuthorList(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        String startElement
+    ) throws XMLStreamException {
         List<String> authorNames = new ArrayList<>();
 
         while (reader.hasNext()) {
@@ -226,15 +286,18 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+            if (
+                isEndXMLEvent(reader) &&
+                reader.getName().getLocalPart().equals(startElement)
+            ) {
                 break;
             }
         }
         fields.put(StandardField.AUTHOR, join(authorNames, " and "));
     }
 
-    private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
-
+    private void parseAuthor(XMLStreamReader reader, List<String> authorNames)
+        throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -249,13 +312,21 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "author".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "author".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parseStyleContent(XMLStreamReader reader, Map<Field, String> fields, Field field, String elementName) throws XMLStreamException {
+    private void parseStyleContent(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        Field field,
+        String elementName
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -263,23 +334,42 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 if ("style".equals(tag)) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        if ("abstract".equals(elementName) || "electronic-resource-num".equals(elementName) || "notes".equals(elementName)) {
-                            putIfValueNotNull(fields, field, reader.getText().trim());
-                        } else if ("isbn".equals(elementName) || "secondary-title".equals(elementName)) {
-                            putIfValueNotNull(fields, field, clean(reader.getText()));
+                        if (
+                            "abstract".equals(elementName) ||
+                            "electronic-resource-num".equals(elementName) ||
+                            "notes".equals(elementName)
+                        ) {
+                            putIfValueNotNull(
+                                fields,
+                                field,
+                                reader.getText().trim()
+                            );
+                        } else if (
+                            "isbn".equals(elementName) ||
+                            "secondary-title".equals(elementName)
+                        ) {
+                            putIfValueNotNull(
+                                fields,
+                                field,
+                                clean(reader.getText())
+                            );
                         } else {
                             putIfValueNotNull(fields, field, reader.getText());
                         }
                     }
                 }
             }
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(elementName)) {
+            if (
+                isEndXMLEvent(reader) &&
+                reader.getName().getLocalPart().equals(elementName)
+            ) {
                 break;
             }
         }
     }
 
-    private void parseYear(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseYear(XMLStreamReader reader, Map<Field, String> fields)
+        throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -288,20 +378,30 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "style" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.YEAR, reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                StandardField.YEAR,
+                                reader.getText()
+                            );
                         }
                     }
                 }
             }
 
-            if (isEndXMLEvent(reader) && "year".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "year".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void handleKeywordsList(XMLStreamReader reader, KeywordList keywordList, String startElement) throws XMLStreamException {
-
+    private void handleKeywordsList(
+        XMLStreamReader reader,
+        KeywordList keywordList,
+        String startElement
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -312,14 +412,17 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     }
                 }
             }
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+            if (
+                isEndXMLEvent(reader) &&
+                reader.getName().getLocalPart().equals(startElement)
+            ) {
                 break;
             }
         }
     }
 
-    private void parseKeyword(XMLStreamReader reader, KeywordList keywordList) throws XMLStreamException {
-
+    private void parseKeyword(XMLStreamReader reader, KeywordList keywordList)
+        throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -336,14 +439,20 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "keyword".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "keyword".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void handleTitles(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
-
+    private void handleTitles(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        String startElement
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -359,30 +468,54 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                     reader.next();
                                     if (isCharacterXMLEvent(reader)) {
                                         if (reader.getText() != null) {
-                                            titleStyleContent.add((reader.getText()));
+                                            titleStyleContent.add(
+                                                (reader.getText())
+                                            );
                                         }
                                     }
                                 }
                             }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(elementName)) {
+                            if (
+                                isEndXMLEvent(reader) &&
+                                reader
+                                    .getName()
+                                    .getLocalPart()
+                                    .equals(elementName)
+                            ) {
                                 break;
                             }
                         }
-                        putIfValueNotNull(fields, StandardField.TITLE, clean(join(titleStyleContent, "")));
+                        putIfValueNotNull(
+                            fields,
+                            StandardField.TITLE,
+                            clean(join(titleStyleContent, ""))
+                        );
                     }
                     case "secondary-title" -> {
-                        parseStyleContent(reader, fields, StandardField.JOURNAL, elementName);
+                        parseStyleContent(
+                            reader,
+                            fields,
+                            StandardField.JOURNAL,
+                            elementName
+                        );
                     }
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+            if (
+                isEndXMLEvent(reader) &&
+                reader.getName().getLocalPart().equals(startElement)
+            ) {
                 break;
             }
         }
     }
 
-    private void handleUrlList(XMLStreamReader reader, Map<Field, String> fields, List<LinkedFile> linkedFiles) throws XMLStreamException {
+    private void handleUrlList(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        List<LinkedFile> linkedFiles
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -397,14 +530,19 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "urls".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "urls".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parseRelatedUrls(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
-
+    private void parseRelatedUrls(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -412,7 +550,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 if ("style".equals(elementName)) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        putIfValueNotNull(fields, StandardField.URL, reader.getText());
+                        putIfValueNotNull(
+                            fields,
+                            StandardField.URL,
+                            reader.getText()
+                        );
                     }
                 }
             } else if (isCharacterXMLEvent(reader)) {
@@ -422,14 +564,20 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "related-urls".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "related-urls".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parsePdfUrls(XMLStreamReader reader, Map<Field, String> fields, List<LinkedFile> linkedFiles) throws XMLStreamException {
-
+    private void parsePdfUrls(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        List<LinkedFile> linkedFiles
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -442,10 +590,17 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             reader.next();
                             if (isCharacterXMLEvent(reader)) {
                                 try {
-                                    linkedFiles.add(new LinkedFile(new URL(reader.getText()), "PDF"));
-                                } catch (
-                                        MalformedURLException e) {
-                                    LOGGER.info("Unable to parse {}", reader.getText());
+                                    linkedFiles.add(
+                                        new LinkedFile(
+                                            new URL(reader.getText()),
+                                            "PDF"
+                                        )
+                                    );
+                                } catch (MalformedURLException e) {
+                                    LOGGER.info(
+                                        "Unable to parse {}",
+                                        reader.getText()
+                                    );
                                 }
                             }
                         }
@@ -454,25 +609,34 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
             if (isCharacterXMLEvent(reader)) {
                 try {
-                    linkedFiles.add(new LinkedFile(new URL(reader.getText()), "PDF"));
-                } catch (
-                        MalformedURLException e) {
+                    linkedFiles.add(
+                        new LinkedFile(new URL(reader.getText()), "PDF")
+                    );
+                } catch (MalformedURLException e) {
                     LOGGER.info("Unable to parse {}", reader.getText());
                 }
             }
-            if (isEndXMLEvent(reader) && "pdf-urls".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "pdf-urls".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
     private String clean(String input) {
-        return StringUtil.unifyLineBreaks(input, " ")
-                         .trim()
-                         .replaceAll(" +", " ");
+        return StringUtil
+            .unifyLineBreaks(input, " ")
+            .trim()
+            .replaceAll(" +", " ");
     }
 
-    private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
+    private void putIfValueNotNull(
+        Map<Field, String> fields,
+        Field field,
+        String value
+    ) {
         if (value != null) {
             fields.put(field, value);
         }
@@ -491,18 +655,19 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream)
+        throws ParseException {
         try {
             return importDatabase(
-                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
+                new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8)
+                )
+            )
+                .getDatabase()
+                .getEntries();
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
         return Collections.emptyList();
     }
 }
-
-
-
-
-

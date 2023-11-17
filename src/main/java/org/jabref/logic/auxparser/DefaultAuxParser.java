@@ -10,11 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +28,17 @@ import org.slf4j.LoggerFactory;
  * BibTeX citation: \citation{x,y,z} Biblatex citation: \abx@aux@cite{x,y,z} Nested AUX files: \@input{x}
  */
 public class DefaultAuxParser implements AuxParser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
 
-    private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)(\\{\\d+\\})?\\{(?<citationkey>.+)\\}");
-    private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DefaultAuxParser.class
+    );
+
+    private static final Pattern CITE_PATTERN = Pattern.compile(
+        "\\\\(citation|abx@aux@cite)(\\{\\d+\\})?\\{(?<citationkey>.+)\\}"
+    );
+    private static final Pattern INPUT_PATTERN = Pattern.compile(
+        "\\\\@input\\{(.+)\\}"
+    );
 
     private final BibDatabase masterDatabase;
 
@@ -83,7 +88,12 @@ public class DefaultAuxParser implements AuxParser {
         return result;
     }
 
-    private void matchNestedAux(Path baseAuxFile, AuxParserResult result, List<Path> fileList, String line) {
+    private void matchNestedAux(
+        Path baseAuxFile,
+        AuxParserResult result,
+        List<Path> fileList,
+        String line
+    ) {
         Matcher inputMatch = INPUT_PATTERN.matcher(line);
 
         while (inputMatch.find()) {
@@ -126,8 +136,15 @@ public class DefaultAuxParser implements AuxParser {
         List<BibEntry> entriesToInsert = new ArrayList<>();
 
         for (String key : result.getUniqueKeys()) {
-            if (!result.getGeneratedBibDatabase().getEntryByCitationKey(key).isPresent()) {
-                Optional<BibEntry> entry = masterDatabase.getEntryByCitationKey(key);
+            if (
+                !result
+                    .getGeneratedBibDatabase()
+                    .getEntryByCitationKey(key)
+                    .isPresent()
+            ) {
+                Optional<BibEntry> entry = masterDatabase.getEntryByCitationKey(
+                    key
+                );
                 if (entry.isPresent()) {
                     entriesToInsert.add(entry.get());
                 } else {
@@ -141,7 +158,11 @@ public class DefaultAuxParser implements AuxParser {
         // Copy database definitions
         if (result.getGeneratedBibDatabase().hasEntries()) {
             result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
-            result.insertStrings(masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries()));
+            result.insertStrings(
+                masterDatabase.getUsedStrings(
+                    result.getGeneratedBibDatabase().getEntries()
+                )
+            );
         }
     }
 
@@ -151,23 +172,34 @@ public class DefaultAuxParser implements AuxParser {
      * @param entries Entries to check for CrossRefs
      * @param result AUX file
      */
-    private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
+    private void resolveCrossReferences(
+        List<BibEntry> entries,
+        AuxParserResult result
+    ) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
         for (BibEntry entry : entries) {
-            entry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
-                if (!result.getGeneratedBibDatabase().getEntryByCitationKey(crossref).isPresent()) {
-                    Optional<BibEntry> refEntry = masterDatabase.getEntryByCitationKey(crossref);
+            entry
+                .getField(StandardField.CROSSREF)
+                .ifPresent(crossref -> {
+                    if (
+                        !result
+                            .getGeneratedBibDatabase()
+                            .getEntryByCitationKey(crossref)
+                            .isPresent()
+                    ) {
+                        Optional<BibEntry> refEntry =
+                            masterDatabase.getEntryByCitationKey(crossref);
 
-                    if (refEntry.isPresent()) {
-                        if (!entriesToInsert.contains(refEntry.get())) {
-                            entriesToInsert.add(refEntry.get());
-                            result.increaseCrossRefEntriesCounter();
+                        if (refEntry.isPresent()) {
+                            if (!entriesToInsert.contains(refEntry.get())) {
+                                entriesToInsert.add(refEntry.get());
+                                result.increaseCrossRefEntriesCounter();
+                            }
+                        } else {
+                            result.getUnresolvedKeys().add(crossref);
                         }
-                    } else {
-                        result.getUnresolvedKeys().add(crossref);
                     }
-                }
-            });
+                });
         }
         insertEntries(entriesToInsert, result);
     }

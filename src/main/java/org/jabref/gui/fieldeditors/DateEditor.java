@@ -1,13 +1,12 @@
 package org.jabref.gui.fieldeditors;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import java.time.format.DateTimeFormatter;
-
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -15,28 +14,48 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
-
 public class DateEditor extends HBox implements FieldEditorFX {
 
-    @FXML private DateEditorViewModel viewModel;
-    @FXML private TemporalAccessorPicker datePicker;
+    @FXML
+    private DateEditorViewModel viewModel;
 
-    @Inject private UndoManager undoManager;
-    @Inject private PreferencesService preferencesService;
+    @FXML
+    private TemporalAccessorPicker datePicker;
 
-    public DateEditor(Field field, DateTimeFormatter dateFormatter, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+    @Inject
+    private UndoManager undoManager;
 
-        this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
+    @Inject
+    private PreferencesService preferencesService;
+
+    public DateEditor(
+        Field field,
+        DateTimeFormatter dateFormatter,
+        SuggestionProvider<?> suggestionProvider,
+        FieldCheckers fieldCheckers
+    ) {
+        ViewLoader.view(this).root(this).load();
+
+        this.viewModel =
+            new DateEditorViewModel(
+                field,
+                suggestionProvider,
+                dateFormatter,
+                fieldCheckers,
+                undoManager
+            );
 
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
-        datePicker.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
+        datePicker
+            .getEditor()
+            .textProperty()
+            .bindBidirectional(viewModel.textProperty());
 
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), datePicker.getEditor());
+        new EditorValidator(preferencesService)
+            .configureValidation(
+                viewModel.getFieldValidator().getValidationStatus(),
+                datePicker.getEditor()
+            );
     }
 
     public DateEditorViewModel getViewModel() {

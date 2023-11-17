@@ -1,9 +1,13 @@
 package org.jabref.logic.importer.fetcher.isbntobibtex;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -11,15 +15,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 @FetcherTest
 class IsbnFetcherTest {
@@ -29,15 +27,22 @@ class IsbnFetcherTest {
 
     @BeforeEach
     void setUp() {
-        fetcher = new IsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher =
+            new IsbnFetcher(
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
+            );
 
-        bibEntry = new BibEntry(StandardEntryType.Book)
+        bibEntry =
+            new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.TITLE, "Effective Java")
                 .withField(StandardField.PUBLISHER, "Addison-Wesley")
                 .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.ISBN, "9780134685991")
-                .withField(StandardField.NOTE, "Titelzusätze auf dem Umschlag: \"Updated for Java 9. Best practices for ... the Java platform\"")
+                .withField(
+                    StandardField.NOTE,
+                    "Titelzusätze auf dem Umschlag: \"Updated for Java 9. Best practices for ... the Java platform\""
+                )
                 .withField(StandardField.PAGETOTAL, "392")
                 .withField(new UnknownField("ppn_gvk"), "100121840X")
                 .withField(StandardField.EDITION, "Third edition")
@@ -51,13 +56,17 @@ class IsbnFetcherTest {
 
     @Test
     void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
+            "0134685997"
+        );
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
+            "9780134685991"
+        );
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -69,22 +78,32 @@ class IsbnFetcherTest {
 
     @Test
     void searchByIdThrowsExceptionForShortInvalidISBN() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("123456789")
+        );
     }
 
     @Test
     void searchByIdThrowsExceptionForLongInvalidISB() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("012345678910")
+        );
     }
 
     @Test
     void searchByIdThrowsExceptionForInvalidISBN() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("jabref-4-ever")
+        );
     }
 
     @Test
     void searchByEntryWithISBNSuccessful() throws FetcherException {
-        BibEntry input = new BibEntry().withField(StandardField.ISBN, "0134685997");
+        BibEntry input = new BibEntry()
+            .withField(StandardField.ISBN, "0134685997");
 
         List<BibEntry> fetchedEntry = fetcher.performSearch(input);
         assertEquals(Collections.singletonList(bibEntry), fetchedEntry);
@@ -95,8 +114,11 @@ class IsbnFetcherTest {
      * not available on ebook.de. The fetcher should something as it falls back to OttoBib
      */
     @Test
-    void searchForIsbnAvailableAtOttoBibButNonOnEbookDe() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
+    void searchForIsbnAvailableAtOttoBibButNonOnEbookDe()
+        throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
+            "3728128155"
+        );
         assertNotEquals(Optional.empty(), fetchedEntry);
     }
 }

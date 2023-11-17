@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.logic.util.io.FileUtil;
@@ -185,7 +184,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         int piv = 1; // counter for relevant iterations
         for (LinkedFile flEntry : fileList) {
             // Use this entry if we don't discriminate on types, or if the type fits:
-            if ((fileType == null) || flEntry.getFileType().equalsIgnoreCase(fileType)) {
+            if (
+                (fileType == null) ||
+                flEntry.getFileType().equalsIgnoreCase(fileType)
+            ) {
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
                         case STRING:
@@ -197,19 +199,22 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         case FILE_PATH:
                             List<Path> dirs;
                             if (fileDirectories.isEmpty()) {
-                                dirs = Collections.singletonList(Path.of(mainFileDirectory));
+                                dirs =
+                                    Collections.singletonList(
+                                        Path.of(mainFileDirectory)
+                                    );
                             } else {
                                 dirs = fileDirectories;
                             }
 
-                            String pathString = flEntry.findIn(dirs)
-                                                       .map(path -> path.toAbsolutePath().toString())
-                                                       .orElse(flEntry.getLink());
+                            String pathString = flEntry
+                                .findIn(dirs)
+                                .map(path -> path.toAbsolutePath().toString())
+                                .orElse(flEntry.getLink());
 
                             sb.append(replaceStrings(pathString));
                             break;
                         case RELATIVE_FILE_PATH:
-
                             /*
                              * Stumbled over this while investigating
                              *
@@ -219,8 +224,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                             break;
                         case FILE_EXTENSION:
-                            FileUtil.getFileExtension(flEntry.getLink())
-                                      .ifPresent(extension -> sb.append(replaceStrings(extension)));
+                            FileUtil
+                                .getFileExtension(flEntry.getLink())
+                                .ifPresent(extension ->
+                                    sb.append(replaceStrings(extension))
+                                );
                             break;
                         case FILE_TYPE:
                             sb.append(replaceStrings(flEntry.getFileType()));
@@ -242,7 +250,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private String replaceStrings(String text) {
         String result = text;
-        for (Map.Entry<String, String> stringStringEntry : replacements.entrySet()) {
+        for (Map.Entry<
+            String,
+            String
+        > stringStringEntry : replacements.entrySet()) {
             String to = stringStringEntry.getValue();
             result = result.replaceAll(stringStringEntry.getKey(), to);
         }

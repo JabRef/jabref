@@ -20,40 +20,31 @@ public class NoSelectionModel<T> extends MultipleSelectionModel<T> {
     }
 
     @Override
-    public void selectIndices(int index, int... indices) {
-    }
+    public void selectIndices(int index, int... indices) {}
 
     @Override
-    public void selectAll() {
-    }
+    public void selectAll() {}
 
     @Override
-    public void selectFirst() {
-    }
+    public void selectFirst() {}
 
     @Override
-    public void selectLast() {
-    }
+    public void selectLast() {}
 
     @Override
-    public void clearAndSelect(int index) {
-    }
+    public void clearAndSelect(int index) {}
 
     @Override
-    public void select(int index) {
-    }
+    public void select(int index) {}
 
     @Override
-    public void select(T obj) {
-    }
+    public void select(T obj) {}
 
     @Override
-    public void clearSelection(int index) {
-    }
+    public void clearSelection(int index) {}
 
     @Override
-    public void clearSelection() {
-    }
+    public void clearSelection() {}
 
     @Override
     public boolean isSelected(int index) {
@@ -66,10 +57,8 @@ public class NoSelectionModel<T> extends MultipleSelectionModel<T> {
     }
 
     @Override
-    public void selectPrevious() {
-    }
+    public void selectPrevious() {}
 
     @Override
-    public void selectNext() {
-    }
+    public void selectNext() {}
 }

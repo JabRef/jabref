@@ -1,7 +1,6 @@
 package org.jabref.model;
 
 import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -15,7 +14,12 @@ public class FieldChange {
     private final String oldValue;
     private final String newValue;
 
-    public FieldChange(BibEntry entry, Field field, String oldValue, String newValue) {
+    public FieldChange(
+        BibEntry entry,
+        Field field,
+        String oldValue,
+        String newValue
+    ) {
         this.entry = Objects.requireNonNull(entry);
         this.field = Objects.requireNonNull(field);
         this.oldValue = oldValue;
@@ -81,7 +85,16 @@ public class FieldChange {
 
     @Override
     public String toString() {
-        return "FieldChange [entry=" + entry.getCitationKey().orElse("") + ", field=" + field + ", oldValue="
-                + oldValue + ", newValue=" + newValue + "]";
+        return (
+            "FieldChange [entry=" +
+            entry.getCitationKey().orElse("") +
+            ", field=" +
+            field +
+            ", oldValue=" +
+            oldValue +
+            ", newValue=" +
+            newValue +
+            "]"
+        );
     }
 }

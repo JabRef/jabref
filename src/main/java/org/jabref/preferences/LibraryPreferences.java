@@ -4,7 +4,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
 import org.jabref.model.database.BibDatabaseMode;
 
 public class LibraryPreferences {
@@ -13,11 +12,15 @@ public class LibraryPreferences {
     private final BooleanProperty alwaysReformatOnSave;
     private final BooleanProperty autoSave;
 
-    public LibraryPreferences(BibDatabaseMode defaultBibDatabaseMode,
-                              boolean alwaysReformatOnSave,
-                              boolean autoSave) {
-        this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
-        this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
+    public LibraryPreferences(
+        BibDatabaseMode defaultBibDatabaseMode,
+        boolean alwaysReformatOnSave,
+        boolean autoSave
+    ) {
+        this.defaultBibDatabaseMode =
+            new SimpleObjectProperty<>(defaultBibDatabaseMode);
+        this.alwaysReformatOnSave =
+            new SimpleBooleanProperty(alwaysReformatOnSave);
         this.autoSave = new SimpleBooleanProperty(autoSave);
     }
 
@@ -29,7 +32,9 @@ public class LibraryPreferences {
         return defaultBibDatabaseMode;
     }
 
-    public void setDefaultBibDatabaseMode(BibDatabaseMode defaultBibDatabaseMode) {
+    public void setDefaultBibDatabaseMode(
+        BibDatabaseMode defaultBibDatabaseMode
+    ) {
         this.defaultBibDatabaseMode.set(defaultBibDatabaseMode);
     }
 

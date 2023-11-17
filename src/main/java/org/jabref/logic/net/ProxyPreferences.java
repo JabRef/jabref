@@ -1,7 +1,6 @@
 package org.jabref.logic.net;
 
 import java.util.Objects;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,13 +16,15 @@ public class ProxyPreferences {
     private final StringProperty password;
     private final BooleanProperty persistPassword;
 
-    public ProxyPreferences(Boolean useProxy,
-                            String hostname,
-                            String port,
-                            Boolean useAuthentication,
-                            String username,
-                            String password,
-                            boolean persistPassword) {
+    public ProxyPreferences(
+        Boolean useProxy,
+        String hostname,
+        String port,
+        Boolean useAuthentication,
+        String username,
+        String password,
+        boolean persistPassword
+    ) {
         this.useProxy = new SimpleBooleanProperty(useProxy);
         this.hostname = new SimpleStringProperty(hostname);
         this.port = new SimpleStringProperty(port);
@@ -128,24 +129,33 @@ public class ProxyPreferences {
         }
 
         ProxyPreferences other = (ProxyPreferences) o;
-        return Objects.equals(useProxy.getValue(), other.useProxy.getValue())
-                && Objects.equals(hostname.getValue(), other.hostname.getValue())
-                && Objects.equals(port.getValue(), other.port.getValue())
-                && Objects.equals(useAuthentication.getValue(), other.useAuthentication.getValue())
-                && Objects.equals(username.getValue(), other.username.getValue())
-                && Objects.equals(password.getValue(), other.password.getValue())
-                && Objects.equals(persistPassword.getValue(), other.persistPassword.getValue());
+        return (
+            Objects.equals(useProxy.getValue(), other.useProxy.getValue()) &&
+            Objects.equals(hostname.getValue(), other.hostname.getValue()) &&
+            Objects.equals(port.getValue(), other.port.getValue()) &&
+            Objects.equals(
+                useAuthentication.getValue(),
+                other.useAuthentication.getValue()
+            ) &&
+            Objects.equals(username.getValue(), other.username.getValue()) &&
+            Objects.equals(password.getValue(), other.password.getValue()) &&
+            Objects.equals(
+                persistPassword.getValue(),
+                other.persistPassword.getValue()
+            )
+        );
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                useProxy.getValue(),
-                hostname.getValue(),
-                port.getValue(),
-                useAuthentication.getValue(),
-                username.getValue(),
-                password.getValue(),
-                persistPassword.getValue());
+            useProxy.getValue(),
+            hostname.getValue(),
+            port.getValue(),
+            useAuthentication.getValue(),
+            username.getValue(),
+            password.getValue(),
+            persistPassword.getValue()
+        );
     }
 }

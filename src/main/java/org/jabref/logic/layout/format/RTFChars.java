@@ -4,7 +4,6 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
 import org.jabref.model.strings.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,9 @@ import org.slf4j.LoggerFactory;
  */
 public class RTFChars implements LayoutFormatter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutFormatter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        LayoutFormatter.class
+    );
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
@@ -47,15 +48,20 @@ public class RTFChars implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c)
-                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (
+                Character.isLetter(c) ||
+                StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))
+            ) {
                 escaped = false;
                 if (incommand) {
                     // Else we are in a command, and should not keep the letter.
                     currentCommand.append(c);
-                    testCharCom:
-                    if ((currentCommand.length() == 1)
-                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                    testCharCom:if (
+                        (currentCommand.length() == 1) &&
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
+                            currentCommand.toString()
+                        )
+                    ) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (field.length() - 1)) {
@@ -87,8 +93,10 @@ public class RTFChars implements LayoutFormatter {
                     sb.append(c);
                 }
             } else {
-                testContent:
-                if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
+                testContent:if (
+                    !incommand ||
+                    (!Character.isWhitespace(c) && (c != '{') && (c != '}'))
+                ) {
                     sb.append(c);
                 } else {
                     assert incommand;
@@ -116,16 +124,25 @@ public class RTFChars implements LayoutFormatter {
                         break testContent;
                     }
 
-                    if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
+                    if (
+                        ((c == '{') || (c == ' ')) &&
+                        (currentCommand.length() > 0)
+                    ) {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.
-                        if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)
-                                || "it".equals(command)) {
+                        if (
+                            "em".equals(command) ||
+                            "emph".equals(command) ||
+                            "textit".equals(command) ||
+                            "it".equals(command)
+                        ) {
                             StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\i ").append(part.s).append('}');
-                        } else if ("textbf".equals(command) || "bf".equals(command)) {
+                        } else if (
+                            "textbf".equals(command) || "bf".equals(command)
+                        ) {
                             StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
@@ -152,12 +169,19 @@ public class RTFChars implements LayoutFormatter {
             if (c < 128) {
                 sb.append(c);
             } else {
-                sb.append("\\u").append((long) c).append(transformSpecialCharacter(c));
+                sb
+                    .append("\\u")
+                    .append((long) c)
+                    .append(transformSpecialCharacter(c));
             }
         }
 
-        return sb.toString().replace("---", "{\\emdash}").replace("--", "{\\endash}").replace("``", "{\\ldblquote}")
-                 .replace("''", "{\\rdblquote}");
+        return sb
+            .toString()
+            .replace("---", "{\\emdash}")
+            .replace("--", "{\\endash}")
+            .replace("``", "{\\ldblquote}")
+            .replace("''", "{\\rdblquote}");
     }
 
     /**
@@ -166,13 +190,16 @@ public class RTFChars implements LayoutFormatter {
      * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
      * @return a tuple of number of added characters and the extracted part
      */
-    private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
+    private StringInt getPart(
+        String text,
+        int i,
+        boolean commandNestedInBraces
+    ) {
         char c;
         int count = 0;
         int icount = i;
         StringBuilder part = new StringBuilder();
-        loop:
-        while ((count >= 0) && (icount < text.length())) {
+        loop:while ((count >= 0) && (icount < text.length())) {
             icount++;
             c = text.charAt(icount);
             switch (c) {
@@ -205,16 +232,24 @@ public class RTFChars implements LayoutFormatter {
      * @return returns the basic character of the given unicode
      */
     private String transformSpecialCharacter(long c) {
-        if (((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)) {
+        if (
+            ((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)
+        ) {
             return "A";
         }
-        if (((224 <= c) && (c <= 229)) || (c == 257) || (c == 259) || (c == 261)) {
+        if (
+            ((224 <= c) && (c <= 229)) || (c == 257) || (c == 259) || (c == 261)
+        ) {
             return "a";
         }
-        if ((199 == c) || (262 == c) || (264 == c) || (266 == c) || (268 == c)) {
+        if (
+            (199 == c) || (262 == c) || (264 == c) || (266 == c) || (268 == c)
+        ) {
             return "C";
         }
-        if ((231 == c) || (263 == c) || (265 == c) || (267 == c) || (269 == c)) {
+        if (
+            (231 == c) || (263 == c) || (265 == c) || (267 == c) || (269 == c)
+        ) {
             return "c";
         }
         if ((208 == c) || (272 == c)) {
@@ -223,16 +258,34 @@ public class RTFChars implements LayoutFormatter {
         if ((240 == c) || (273 == c)) {
             return "d";
         }
-        if (((200 <= c) && (c <= 203)) || (274 == c) || (276 == c) || (278 == c) || (280 == c) || (282 == c)) {
+        if (
+            ((200 <= c) && (c <= 203)) ||
+            (274 == c) ||
+            (276 == c) ||
+            (278 == c) ||
+            (280 == c) ||
+            (282 == c)
+        ) {
             return "E";
         }
-        if (((232 <= c) && (c <= 235)) || (275 == c) || (277 == c) || (279 == c) || (281 == c) || (283 == c)) {
+        if (
+            ((232 <= c) && (c <= 235)) ||
+            (275 == c) ||
+            (277 == c) ||
+            (279 == c) ||
+            (281 == c) ||
+            (283 == c)
+        ) {
             return "e";
         }
-        if (((284 == c) || (286 == c)) || (288 == c) || (290 == c) || (330 == c)) {
+        if (
+            ((284 == c) || (286 == c)) || (288 == c) || (290 == c) || (330 == c)
+        ) {
             return "G";
         }
-        if ((285 == c) || (287 == c) || (289 == c) || (291 == c) || (331 == c)) {
+        if (
+            (285 == c) || (287 == c) || (289 == c) || (291 == c) || (331 == c)
+        ) {
             return "g";
         }
         if ((292 == c) || (294 == c)) {
@@ -241,10 +294,23 @@ public class RTFChars implements LayoutFormatter {
         if ((293 == c) || (295 == c)) {
             return "h";
         }
-        if (((204 <= c) && (c <= 207)) || (296 == c) || (298 == c) || (300 == c) || (302 == c) || (304 == c)) {
+        if (
+            ((204 <= c) && (c <= 207)) ||
+            (296 == c) ||
+            (298 == c) ||
+            (300 == c) ||
+            (302 == c) ||
+            (304 == c)
+        ) {
             return "I";
         }
-        if (((236 <= c) && (c <= 239)) || (297 == c) || (299 == c) || (301 == c) || (303 == c)) {
+        if (
+            ((236 <= c) && (c <= 239)) ||
+            (297 == c) ||
+            (299 == c) ||
+            (301 == c) ||
+            (303 == c)
+        ) {
             return "i";
         }
         if (308 == c) {
@@ -271,10 +337,14 @@ public class RTFChars implements LayoutFormatter {
         if ((241 == c) || (324 == c) || (326 == c) || (328 == c)) {
             return "n";
         }
-        if (((210 <= c) && (c <= 214)) || (c == 216) || (332 == c) || (334 == c)) {
+        if (
+            ((210 <= c) && (c <= 214)) || (c == 216) || (332 == c) || (334 == c)
+        ) {
             return "O";
         }
-        if (((242 <= c) && (c <= 248) && (247 != c)) || (333 == c) || (335 == c)) {
+        if (
+            ((242 <= c) && (c <= 248) && (247 != c)) || (333 == c) || (335 == c)
+        ) {
             return "o";
         }
         if ((340 == c) || (342 == c) || (344 == c)) {
@@ -295,10 +365,24 @@ public class RTFChars implements LayoutFormatter {
         if ((355 == c) || (359 == c)) {
             return "t";
         }
-        if (((217 <= c) && (c <= 220)) || (360 == c) || (362 == c) || (364 == c) || (366 == c) || (370 == c)) {
+        if (
+            ((217 <= c) && (c <= 220)) ||
+            (360 == c) ||
+            (362 == c) ||
+            (364 == c) ||
+            (366 == c) ||
+            (370 == c)
+        ) {
             return "U";
         }
-        if (((249 <= c) && (c <= 251)) || (361 == c) || (363 == c) || (365 == c) || (367 == c) || (371 == c)) {
+        if (
+            ((249 <= c) && (c <= 251)) ||
+            (361 == c) ||
+            (363 == c) ||
+            (365 == c) ||
+            (367 == c) ||
+            (371 == c)
+        ) {
             return "u";
         }
         if (372 == c) {

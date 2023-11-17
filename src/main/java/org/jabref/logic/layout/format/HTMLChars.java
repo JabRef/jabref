@@ -2,7 +2,6 @@ package org.jabref.logic.layout.format;
 
 import java.util.Map;
 import java.util.Objects;
-
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.strings.StringUtil;
@@ -12,16 +11,18 @@ import org.jabref.model.strings.StringUtil;
  */
 public class HTMLChars implements LayoutFormatter {
 
-    private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
+    private static final Map<String, String> HTML_CHARS =
+        HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
 
     @Override
     public String format(String inField) {
         int i;
-        String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
-                              .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
-                              .replace("\n", "<br>") // Replace single line breaks with <br>
-                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+        String field = inField
+            .replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
+            .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+            .replace("\n", "<br>") // Replace single line breaks with <br>
+            .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+            .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -47,16 +48,22 @@ public class HTMLChars implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (
+                Character.isLetter(c) ||
+                StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))
+            ) {
                 escaped = false;
 
                 if (!incommand) {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom:
-                    if ((currentCommand.length() == 1)
-                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                    testCharCom:if (
+                        (currentCommand.length() == 1) &&
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
+                            currentCommand.toString()
+                        )
+                    ) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (field.length() - 1)) {
@@ -76,7 +83,9 @@ public class HTMLChars implements LayoutFormatter {
                         }
                         String result = HTML_CHARS.get(command + commandBody);
 
-                        sb.append(Objects.requireNonNullElse(result, commandBody));
+                        sb.append(
+                            Objects.requireNonNullElse(result, commandBody)
+                        );
 
                         incommand = false;
                         escaped = false;
@@ -89,14 +98,18 @@ public class HTMLChars implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            sb.append(Objects.requireNonNullElse(result, command));
+                            sb.append(
+                                Objects.requireNonNullElse(result, command)
+                            );
                         }
                     }
                 }
             } else {
                 if (!incommand) {
                     sb.append(c);
-                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
+                } else if (
+                    Character.isWhitespace(c) || (c == '{') || (c == '}')
+                ) {
                     String command = currentCommand.toString();
 
                     // Test if we are dealing with a formatting
@@ -106,7 +119,14 @@ public class HTMLChars implements LayoutFormatter {
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
                         i += part.length();
-                        sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
+                        sb
+                            .append('<')
+                            .append(tag)
+                            .append('>')
+                            .append(part)
+                            .append("</")
+                            .append(tag)
+                            .append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
                         i += argument.length();

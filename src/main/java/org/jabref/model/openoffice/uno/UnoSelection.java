@@ -1,12 +1,11 @@
 package org.jabref.model.openoffice.uno;
 
-import java.util.Objects;
-import java.util.Optional;
-
 import com.sun.star.frame.XController;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.view.XSelectionSupplier;
+import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,24 +14,36 @@ import org.slf4j.LoggerFactory;
  */
 public class UnoSelection {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UnoSelection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        UnoSelection.class
+    );
 
-    private UnoSelection() {
-    }
+    private UnoSelection() {}
 
-    private static Optional<XSelectionSupplier> getSelectionSupplier(XTextDocument doc) {
+    private static Optional<XSelectionSupplier> getSelectionSupplier(
+        XTextDocument doc
+    ) {
         if (doc == null) {
             LOGGER.warn("UnoSelection.getSelectionSupplier: doc is null");
             return Optional.empty();
         }
-        Optional<XController> controller = UnoTextDocument.getCurrentController(doc);
+        Optional<XController> controller = UnoTextDocument.getCurrentController(
+            doc
+        );
         if (controller.isEmpty()) {
-            LOGGER.warn("UnoSelection.getSelectionSupplier: getCurrentController(doc) returned empty");
+            LOGGER.warn(
+                "UnoSelection.getSelectionSupplier: getCurrentController(doc) returned empty"
+            );
             return Optional.empty();
         }
-        Optional<XSelectionSupplier> supplier = UnoCast.cast(XSelectionSupplier.class, controller.get());
+        Optional<XSelectionSupplier> supplier = UnoCast.cast(
+            XSelectionSupplier.class,
+            controller.get()
+        );
         if (supplier.isEmpty()) {
-            LOGGER.warn("UnoSelection.getSelectionSupplier: cast to XSelectionSupplier returned empty");
+            LOGGER.warn(
+                "UnoSelection.getSelectionSupplier: cast to XSelectionSupplier returned empty"
+            );
             return Optional.empty();
         }
         return supplier;
@@ -56,7 +67,9 @@ public class UnoSelection {
      * <p>
      * With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: "SwXTextGraphicObject" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextGraphicObject"
      */
-    public static Optional<XServiceInfo> getSelectionAsXServiceInfo(XTextDocument doc) {
+    public static Optional<XServiceInfo> getSelectionAsXServiceInfo(
+        XTextDocument doc
+    ) {
         Objects.requireNonNull(doc);
         Optional<XSelectionSupplier> supplier = getSelectionSupplier(doc);
         if (supplier.isEmpty()) {
@@ -67,7 +80,10 @@ public class UnoSelection {
         if (selection == null) {
             return Optional.empty();
         }
-        Optional<XServiceInfo> result = UnoCast.cast(XServiceInfo.class, selection);
+        Optional<XServiceInfo> result = UnoCast.cast(
+            XServiceInfo.class,
+            selection
+        );
         if (result.isEmpty()) {
             LOGGER.warn("cast to XServiceInfo returned empty");
             return Optional.empty();

@@ -1,14 +1,12 @@
 package org.jabref.gui.undo;
 
+import com.google.common.eventbus.EventBus;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
-
-import com.google.common.eventbus.EventBus;
 
 public class CountingUndoManager extends UndoManager {
 
@@ -59,14 +57,26 @@ public class CountingUndoManager extends UndoManager {
     public void postUndoRedoEvent() {
         boolean canRedo = this.canRedo();
         boolean canUndo = this.canUndo();
-        eventBus.post(new UndoRedoEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
-                canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
+        eventBus.post(
+            new UndoRedoEvent(
+                canUndo,
+                canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
+                canRedo,
+                canRedo ? getRedoPresentationName() : Localization.lang("Redo")
+            )
+        );
     }
 
     private void postAddUndoEvent() {
         boolean canRedo = this.canRedo();
         boolean canUndo = this.canUndo();
-        eventBus.post(new AddUndoableActionEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
-                canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
+        eventBus.post(
+            new AddUndoableActionEvent(
+                canUndo,
+                canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
+                canRedo,
+                canRedo ? getRedoPresentationName() : Localization.lang("Redo")
+            )
+        );
     }
 }

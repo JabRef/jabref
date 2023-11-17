@@ -19,7 +19,9 @@ public class OpenEntryEditorAction extends SimpleCommand {
 
     public void execute() {
         if (!stateManager.getSelectedEntries().isEmpty()) {
-            frame.getCurrentLibraryTab().showAndEdit(stateManager.getSelectedEntries().get(0));
+            frame
+                .getCurrentLibraryTab()
+                .showAndEdit(stateManager.getSelectedEntries().get(0));
         }
     }
 }

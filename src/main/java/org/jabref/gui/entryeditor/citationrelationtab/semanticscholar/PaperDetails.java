@@ -2,11 +2,11 @@ package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 public class PaperDetails {
+
     private String paperId;
     private String title;
     private String year;
@@ -65,9 +65,10 @@ public class PaperDetails {
             bibEntry.setField(StandardField.YEAR, getYear());
         }
 
-        String authors = getAuthors().stream()
-                                     .map(AuthorResponse::getName)
-                                     .collect(Collectors.joining(" and "));
+        String authors = getAuthors()
+            .stream()
+            .map(AuthorResponse::getName)
+            .collect(Collectors.joining(" and "));
         bibEntry.setField(StandardField.AUTHOR, authors);
 
         return bibEntry;
@@ -75,12 +76,22 @@ public class PaperDetails {
 
     @Override
     public String toString() {
-        return "PaperDetails{" +
-                "paperId='" + paperId + '\'' +
-                ", title='" + title + '\'' +
-                ", year='" + year + '\'' +
-                ", citationCount=" + citationCount +
-                ", referenceCount=" + referenceCount +
-                '}';
+        return (
+            "PaperDetails{" +
+            "paperId='" +
+            paperId +
+            '\'' +
+            ", title='" +
+            title +
+            '\'' +
+            ", year='" +
+            year +
+            '\'' +
+            ", citationCount=" +
+            citationCount +
+            ", referenceCount=" +
+            referenceCount +
+            '}'
+        );
     }
 }

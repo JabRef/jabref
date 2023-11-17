@@ -5,9 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javafx.scene.input.Dragboard;
-
 import org.jabref.logic.util.io.FileUtil;
 
 public class DragAndDropHelper {
@@ -20,7 +18,12 @@ public class DragAndDropHelper {
         if (!dragboard.hasFiles()) {
             return Collections.emptyList();
         } else {
-            return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
+            return dragboard
+                .getFiles()
+                .stream()
+                .map(File::toPath)
+                .filter(FileUtil::isBibFile)
+                .collect(Collectors.toList());
         }
     }
 
@@ -32,7 +35,9 @@ public class DragAndDropHelper {
         if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
             return Collections.emptyList();
         } else {
-            return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+            return (List<String>) dragboard.getContent(
+                DragAndDropDataFormats.GROUP
+            );
         }
     }
 }

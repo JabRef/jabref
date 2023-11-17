@@ -3,7 +3,6 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -36,10 +35,15 @@ import org.jabref.logic.l10n.Localization;
  */
 public class NormalizePagesFormatter extends Formatter {
 
-    private static final Pattern EM_EN_DASH_PATTERN = Pattern.compile("\u2013|\u2014");
-    private static final Pattern DASHES_DETECT_PATTERN = Pattern.compile("[ ]*-+[ ]*");
+    private static final Pattern EM_EN_DASH_PATTERN = Pattern.compile(
+        "\u2013|\u2014"
+    );
+    private static final Pattern DASHES_DETECT_PATTERN = Pattern.compile(
+        "[ ]*-+[ ]*"
+    );
 
-    private final Formatter unprotectTermsFormatter = new UnprotectTermsFormatter();
+    private final Formatter unprotectTermsFormatter =
+        new UnprotectTermsFormatter();
 
     @Override
     public String getName() {

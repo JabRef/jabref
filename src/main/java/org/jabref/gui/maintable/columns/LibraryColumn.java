@@ -11,11 +11,13 @@ public class LibraryColumn extends MainTableColumn<String> {
 
     public LibraryColumn(MainTableColumnModel model) {
         super(model);
-
         setText(Localization.lang("Library"));
-        new ValueTableCellFactory<BibEntryTableViewModel, String>().withText(FileUtil::getBaseName)
-                                                                   .install(this);
-        setCellValueFactory(param -> param.getValue().bibDatabaseContextProperty());
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+            .withText(FileUtil::getBaseName)
+            .install(this);
+        setCellValueFactory(param ->
+            param.getValue().bibDatabaseContextProperty()
+        );
     }
 
     public LibraryColumn() {

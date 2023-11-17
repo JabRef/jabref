@@ -11,7 +11,6 @@ package org.jabref.logic.layout;
  */
 @FunctionalInterface
 public interface LayoutFormatter {
-
     /**
      * Failure Mode:
      * <p>

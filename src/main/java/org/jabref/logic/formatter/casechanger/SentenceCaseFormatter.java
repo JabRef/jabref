@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.casechanger;
 
 import java.util.stream.Collectors;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
@@ -23,22 +22,24 @@ public class SentenceCaseFormatter extends Formatter {
      */
     @Override
     public String format(String input) {
-        return StringUtil.getStringAsSentences(input)
-                .stream()
-                .map(new LowerCaseFormatter()::format)
-                .map(Title::new)
-                .map(title -> {
-                    title.getFirstWord().ifPresent(Word::toUpperFirst);
-                    return title;
-                })
-                .map(Object::toString)
-                .collect(Collectors.joining(" "));
+        return StringUtil
+            .getStringAsSentences(input)
+            .stream()
+            .map(new LowerCaseFormatter()::format)
+            .map(Title::new)
+            .map(title -> {
+                title.getFirstWord().ifPresent(Word::toUpperFirst);
+                return title;
+            })
+            .map(Object::toString)
+            .collect(Collectors.joining(" "));
     }
 
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Capitalize the first word, changes other words to lower case.");
+            "Capitalize the first word, changes other words to lower case."
+        );
     }
 
     @Override

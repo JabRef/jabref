@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 public class AuthorResponse {
+
     private String authorId;
     private String name;
 

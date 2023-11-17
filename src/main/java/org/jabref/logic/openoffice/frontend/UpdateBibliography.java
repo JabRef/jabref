@@ -1,7 +1,10 @@
 package org.jabref.logic.openoffice.frontend;
 
+import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.text.XTextCursor;
+import com.sun.star.text.XTextDocument;
+import com.sun.star.text.XTextRange;
 import java.util.Optional;
-
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.OOFormatBibliography;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -12,46 +15,37 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoBookmark;
 import org.jabref.model.openoffice.uno.UnoTextSection;
 
-import com.sun.star.lang.WrappedTargetException;
-import com.sun.star.text.XTextCursor;
-import com.sun.star.text.XTextDocument;
-import com.sun.star.text.XTextRange;
-
 public class UpdateBibliography {
 
     private static final String BIB_SECTION_NAME = "JR_bib";
     private static final String BIB_SECTION_END_NAME = "JR_bib_end";
 
-    private UpdateBibliography() {
-    }
+    private UpdateBibliography() {}
 
     public static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
-            throws
-            NoDocumentException,
-            WrappedTargetException {
+        throws NoDocumentException, WrappedTargetException {
         return UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);
     }
 
     /**
      * Rebuilds the bibliography.
      */
-    public static void rebuildBibTextSection(XTextDocument doc,
-                                             OOFrontend frontend,
-                                             CitedKeys bibliography,
-                                             OOBibStyle style,
-                                             boolean alwaysAddCitedOnPages)
-            throws
-            WrappedTargetException,
-            CreationException,
-            NoDocumentException {
-
+    public static void rebuildBibTextSection(
+        XTextDocument doc,
+        OOFrontend frontend,
+        CitedKeys bibliography,
+        OOBibStyle style,
+        boolean alwaysAddCitedOnPages
+    ) throws WrappedTargetException, CreationException, NoDocumentException {
         clearBibTextSectionContent2(doc);
 
-        populateBibTextSection(doc,
-                frontend,
-                bibliography,
-                style,
-                alwaysAddCitedOnPages);
+        populateBibTextSection(
+            doc,
+            frontend,
+            bibliography,
+            style,
+            alwaysAddCitedOnPages
+        );
     }
 
     /**
@@ -60,9 +54,7 @@ public class UpdateBibliography {
      * Only called from `clearBibTextSectionContent2`
      */
     private static void createBibTextSection2(XTextDocument doc)
-            throws
-            CreationException {
-
+        throws CreationException {
         // Always creating at the end of the document.
         // Alternatively, we could receive a cursor.
         XTextCursor textCursor = doc.getText().createTextCursor();
@@ -76,18 +68,16 @@ public class UpdateBibliography {
      * Only called from: `rebuildBibTextSection`
      */
     private static void clearBibTextSectionContent2(XTextDocument doc)
-            throws
-            CreationException,
-            NoDocumentException,
-            WrappedTargetException {
-
+        throws CreationException, NoDocumentException, WrappedTargetException {
         // Optional<XTextRange> sectionRange = UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
         if (sectionRange.isEmpty()) {
             createBibTextSection2(doc);
         } else {
             // Clear it
-            XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());
+            XTextCursor cursor = doc
+                .getText()
+                .createTextCursorByRange(sectionRange.get());
             cursor.setString("");
         }
     }
@@ -97,33 +87,38 @@ public class UpdateBibliography {
      * <p>
      * Assumes the section named BIB_SECTION_NAME exists.
      */
-    private static void populateBibTextSection(XTextDocument doc,
-                                               OOFrontend frontend,
-                                               CitedKeys bibliography,
-                                               OOBibStyle style,
-                                               boolean alwaysAddCitedOnPages)
-            throws
-            CreationException,
-            IllegalArgumentException,
-            NoDocumentException,
-            WrappedTargetException {
+    private static void populateBibTextSection(
+        XTextDocument doc,
+        OOFrontend frontend,
+        CitedKeys bibliography,
+        OOBibStyle style,
+        boolean alwaysAddCitedOnPages
+    )
+        throws CreationException, IllegalArgumentException, NoDocumentException, WrappedTargetException {
+        XTextRange sectionRange = getBibliographyRange(doc)
+            .orElseThrow(IllegalStateException::new);
 
-        XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
-
-        XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange);
+        XTextCursor cursor = doc
+            .getText()
+            .createTextCursorByRange(sectionRange);
 
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);
-        OOText bibliographyText = OOFormatBibliography.formatBibliography(frontend.citationGroups,
-                bibliography,
-                style,
-                alwaysAddCitedOnPages);
+        OOText bibliographyText = OOFormatBibliography.formatBibliography(
+            frontend.citationGroups,
+            bibliography,
+            style,
+            alwaysAddCitedOnPages
+        );
         OOTextIntoOO.write(doc, cursor, bibliographyText);
         cursor.collapseToEnd();
 
         // remove the initial empty paragraph from the section.
-        sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
-        XTextCursor initialParagraph = doc.getText().createTextCursorByRange(sectionRange);
+        sectionRange =
+            getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
+        XTextCursor initialParagraph = doc
+            .getText()
+            .createTextCursorByRange(sectionRange);
         initialParagraph.collapseToStart();
         initialParagraph.goRight((short) 1, true);
         initialParagraph.setString("");

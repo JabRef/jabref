@@ -1,17 +1,16 @@
 package org.jabref.gui.util;
 
+import com.tobiasdiez.easybind.PreboundBinding;
 import java.util.Optional;
-
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 
-import com.tobiasdiez.easybind.PreboundBinding;
-
 /**
  * Similar to {@link com.tobiasdiez.easybind.monadic.MonadicObservableValue}
  */
-public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>> {
+public class OptionalObjectProperty<T>
+    extends SimpleObjectProperty<Optional<T>> {
 
     private OptionalObjectProperty(Optional<T> initialValue) {
         super(initialValue);
@@ -35,11 +34,13 @@ public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>>
     }
 
     public BooleanExpression isPresent() {
-        return BooleanExpression.booleanExpression(new PreboundBinding<Boolean>(this) {
-            @Override
-            protected Boolean computeValue() {
-                return OptionalObjectProperty.this.getValue().isPresent();
+        return BooleanExpression.booleanExpression(
+            new PreboundBinding<Boolean>(this) {
+                @Override
+                protected Boolean computeValue() {
+                    return OptionalObjectProperty.this.getValue().isPresent();
+                }
             }
-        });
+        );
     }
 }

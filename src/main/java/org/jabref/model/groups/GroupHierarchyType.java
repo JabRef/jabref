@@ -1,7 +1,6 @@
 package org.jabref.model.groups;
 
 public enum GroupHierarchyType {
-
     /**
      * Group's contents are independent of its hierarchical position.
      */

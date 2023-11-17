@@ -6,7 +6,6 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 
 public class ProtectedTermsListItemModel {

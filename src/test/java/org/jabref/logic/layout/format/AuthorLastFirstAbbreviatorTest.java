@@ -1,8 +1,8 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case  that verifies the functionalities of the formater AuthorLastFirstAbbreviator.
@@ -26,7 +26,10 @@ class AuthorLastFirstAbbreviatorTest {
      */
     @Test
     void testOneAuthorCommonName() {
-        assertEquals("Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
+        assertEquals(
+            "Lastname, N. M.",
+            abbreviate("Lastname, Name Middlename")
+        );
     }
 
     /**
@@ -36,7 +39,9 @@ class AuthorLastFirstAbbreviatorTest {
      */
     @Test
     void testTwoAuthorsCommonName() {
-        String result = abbreviate("Lastname, Name Middlename and Sobrenome, Nome Nomedomeio");
+        String result = abbreviate(
+            "Lastname, Name Middlename and Sobrenome, Nome Nomedomeio"
+        );
         String expectedResult = "Lastname, N. M. and Sobrenome, N. N.";
 
         assertEquals(expectedResult, result);
@@ -52,8 +57,12 @@ class AuthorLastFirstAbbreviatorTest {
         assertEquals("", abbreviate(""));
         assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
         assertEquals("Smith, J.", abbreviate("Smith, John"));
-        assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
-                abbreviate("von Neumann, John and Smith, John and Black Brown, Peter"));
+        assertEquals(
+            "von Neumann, J. and Smith, J. and Black Brown, P.",
+            abbreviate(
+                "von Neumann, John and Smith, John and Black Brown, Peter"
+            )
+        );
     }
 
     private String abbreviate(String name) {

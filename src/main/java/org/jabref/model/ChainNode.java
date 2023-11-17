@@ -44,7 +44,9 @@ public abstract class ChainNode<T extends ChainNode<T>> {
         child = null;
 
         if (!derivingClass.isInstance(this)) {
-            throw new UnsupportedOperationException("The class extending ChainNode<T> has to derive from T");
+            throw new UnsupportedOperationException(
+                "The class extending ChainNode<T> has to derive from T"
+            );
         }
     }
 
@@ -89,7 +91,9 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     public T setChild(T child) {
         Objects.requireNonNull(child);
         if (child.getParent().isPresent()) {
-            throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
+            throw new UnsupportedOperationException(
+                "Cannot add a node which already has a parent, use moveTo instead"
+            );
         }
 
         child.setParent((T) this);
@@ -111,7 +115,9 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
         // Check that the target node is not an ancestor of this node, because this would create loops in the tree
         if (this.isAncestorOf(target)) {
-            throw new UnsupportedOperationException("the target cannot be a descendant of this node");
+            throw new UnsupportedOperationException(
+                "the target cannot be a descendant of this node"
+            );
         }
 
         // Remove from previous parent

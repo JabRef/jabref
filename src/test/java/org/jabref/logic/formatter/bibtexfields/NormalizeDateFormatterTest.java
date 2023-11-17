@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -134,6 +134,9 @@ public class NormalizeDateFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals("2003-11-29", formatter.format(formatter.getExampleInput()));
+        assertEquals(
+            "2003-11-29",
+            formatter.format(formatter.getExampleInput())
+        );
     }
 }

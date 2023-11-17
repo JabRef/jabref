@@ -5,7 +5,7 @@ public class GroupDiffMode implements DiffMethod {
     private final String separator;
 
     public GroupDiffMode(String separator) {
-       this.separator = separator;
+        this.separator = separator;
     }
 
     @Override

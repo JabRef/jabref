@@ -8,17 +8,17 @@ public final class AbbreviationFormat {
     public static final char ESCAPE = '\\';
     public static final char QUOTE = '"';
 
-    private AbbreviationFormat() {
-    }
+    private AbbreviationFormat() {}
 
     public static CSVFormat getCSVFormatWithDelimiter(char delimiter) {
-        return CSVFormat.DEFAULT.builder()
-                .setIgnoreEmptyLines(true)
-                .setDelimiter(delimiter)
-                .setEscape(ESCAPE)
-                .setQuote(QUOTE)
-                .setTrim(true)
-                .build();
+        return CSVFormat.DEFAULT
+            .builder()
+            .setIgnoreEmptyLines(true)
+            .setDelimiter(delimiter)
+            .setEscape(ESCAPE)
+            .setQuote(QUOTE)
+            .setTrim(true)
+            .build();
     }
 
     public static CSVFormat getCSVFormatWithDefaultDilimeter() {

@@ -3,7 +3,6 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.ExplicitGroup;
@@ -22,9 +21,13 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
             return;
         }
 
-        for (ExplicitGroup group : getExplicitGroupsWithLegacyKeys(parserResult.getMetaData().getGroups().get())) {
+        for (ExplicitGroup group : getExplicitGroupsWithLegacyKeys(
+            parserResult.getMetaData().getGroups().get()
+        )) {
             for (String entryKey : group.getLegacyEntryKeys()) {
-                for (BibEntry entry : parserResult.getDatabase().getEntriesByCitationKey(entryKey)) {
+                for (BibEntry entry : parserResult
+                    .getDatabase()
+                    .getEntriesByCitationKey(entryKey)) {
                     group.add(entry);
                 }
             }
@@ -32,7 +35,9 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
         }
     }
 
-    private List<ExplicitGroup> getExplicitGroupsWithLegacyKeys(GroupTreeNode node) {
+    private List<ExplicitGroup> getExplicitGroupsWithLegacyKeys(
+        GroupTreeNode node
+    ) {
         Objects.requireNonNull(node);
         List<ExplicitGroup> findings = new ArrayList<>();
 
@@ -43,7 +48,11 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
             }
         }
 
-        node.getChildren().forEach(child -> findings.addAll(getExplicitGroupsWithLegacyKeys(child)));
+        node
+            .getChildren()
+            .forEach(child ->
+                findings.addAll(getExplicitGroupsWithLegacyKeys(child))
+            );
 
         return findings;
     }

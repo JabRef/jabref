@@ -1,14 +1,13 @@
 package org.jabref.gui.fieldeditors;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import java.util.Optional;
-
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -19,31 +18,46 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
-
 public class ISSNEditor extends HBox implements FieldEditorFX {
-    @FXML private ISSNEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
-    @FXML private Button journalInfoButton;
-    @FXML private Button fetchInformationByIdentifierButton;
 
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
-    @Inject private UndoManager undoManager;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private StateManager stateManager;
+    @FXML
+    private ISSNEditorViewModel viewModel;
+
+    @FXML
+    private EditorTextArea textArea;
+
+    @FXML
+    private Button journalInfoButton;
+
+    @FXML
+    private Button fetchInformationByIdentifierButton;
+
+    @Inject
+    private DialogService dialogService;
+
+    @Inject
+    private PreferencesService preferencesService;
+
+    @Inject
+    private UndoManager undoManager;
+
+    @Inject
+    private TaskExecutor taskExecutor;
+
+    @Inject
+    private StateManager stateManager;
+
     private Optional<BibEntry> entry = Optional.empty();
 
-    public ISSNEditor(Field field,
-                      SuggestionProvider<?> suggestionProvider,
-                      FieldCheckers fieldCheckers) {
+    public ISSNEditor(
+        Field field,
+        SuggestionProvider<?> suggestionProvider,
+        FieldCheckers fieldCheckers
+    ) {
+        ViewLoader.view(this).root(this).load();
 
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
-
-        this.viewModel = new ISSNEditorViewModel(
+        this.viewModel =
+            new ISSNEditorViewModel(
                 field,
                 suggestionProvider,
                 fieldCheckers,
@@ -51,12 +65,17 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager,
                 stateManager,
-                preferencesService);
+                preferencesService
+            );
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.initContextMenu(new DefaultMenu(textArea));
 
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferencesService)
+            .configureValidation(
+                viewModel.getFieldValidator().getValidationStatus(),
+                textArea
+            );
     }
 
     public ISSNEditorViewModel getViewModel() {
@@ -86,7 +105,12 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void showJournalInfo() {
-        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getEntryEditorPreferences())) {
+        if (
+            JournalInfoOptInDialogHelper.isJournalInfoEnabled(
+                dialogService,
+                preferencesService.getEntryEditorPreferences()
+            )
+        ) {
             viewModel.showJournalInfo(journalInfoButton);
         }
     }

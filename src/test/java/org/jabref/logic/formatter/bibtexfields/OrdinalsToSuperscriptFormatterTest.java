@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -36,27 +36,33 @@ public class OrdinalsToSuperscriptFormatterTest {
     @Test
     public void replaceSuperscriptsInMultilineStrings() {
         expectCorrect(
-                "replace on 1st line\nand on 2nd line.",
-                "replace on 1\\textsuperscript{st} line\nand on 2\\textsuperscript{nd} line."
+            "replace on 1st line\nand on 2nd line.",
+            "replace on 1\\textsuperscript{st} line\nand on 2\\textsuperscript{nd} line."
         );
     }
 
     @Test
     public void replaceAllSuperscripts() {
         expectCorrect(
-                "1st 2nd 3rd 4th",
-                "1\\textsuperscript{st} 2\\textsuperscript{nd} 3\\textsuperscript{rd} 4\\textsuperscript{th}"
+            "1st 2nd 3rd 4th",
+            "1\\textsuperscript{st} 2\\textsuperscript{nd} 3\\textsuperscript{rd} 4\\textsuperscript{th}"
         );
     }
 
     @Test
     public void ignoreSuperscriptsInsideWords() {
-        expectCorrect("1st 1stword words1st inside1stwords", "1\\textsuperscript{st} 1stword words1st inside1stwords");
+        expectCorrect(
+            "1st 1stword words1st inside1stwords",
+            "1\\textsuperscript{st} 1stword words1st inside1stwords"
+        );
     }
 
     @Test
     public void formatExample() {
-        assertEquals("11\\textsuperscript{th}", formatter.format(formatter.getExampleInput()));
+        assertEquals(
+            "11\\textsuperscript{th}",
+            formatter.format(formatter.getExampleInput())
+        );
     }
 
     private void expectCorrect(String input, String expected) {

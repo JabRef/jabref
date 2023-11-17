@@ -6,11 +6,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -21,28 +19,36 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomImporterTabViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        CustomImporterTabViewModel.class
+    );
 
-    private final ListProperty<ImporterViewModel> importers = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<ImporterViewModel> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ImporterViewModel> importers =
+        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ImporterViewModel> selectedImporters =
+        new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
 
-    public CustomImporterTabViewModel(PreferencesService preferences, DialogService dialogService) {
+    public CustomImporterTabViewModel(
+        PreferencesService preferences,
+        DialogService dialogService
+    ) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
 
     @Override
     public void setValues() {
-        Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImporters();
+        Set<CustomImporter> importersLogic = preferences
+            .getImporterPreferences()
+            .getCustomImporters();
         importers.clear();
         for (CustomImporter importer : importersLogic) {
             importers.add(new ImporterViewModel(importer));
@@ -51,9 +57,14 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.getImporterPreferences().setCustomImporters(importers.stream()
-                                                                         .map(ImporterViewModel::getLogic)
-                                                                         .collect(Collectors.toSet()));
+        preferences
+            .getImporterPreferences()
+            .setCustomImporters(
+                importers
+                    .stream()
+                    .map(ImporterViewModel::getLogic)
+                    .collect(Collectors.toSet())
+            );
     }
 
     /**
@@ -64,7 +75,9 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
      * @return class name
      */
     private static String pathToClass(String basePath, Path path) {
-        String className = FileUtil.relativize(path, Collections.singletonList(Path.of(basePath))).toString();
+        String className = FileUtil
+            .relativize(path, Collections.singletonList(Path.of(basePath)))
+            .toString();
         if (className != null) {
             int lastDot = className.lastIndexOf('.');
             if (lastDot < 0) {
@@ -76,55 +89,115 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addImporter() {
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR, StandardFileType.ZIP)
+        FileDialogConfiguration fileDialogConfiguration =
+            new FileDialogConfiguration.Builder()
+                .addExtensionFilter(
+                    StandardFileType.CLASS,
+                    StandardFileType.JAR,
+                    StandardFileType.ZIP
+                )
                 .withDefaultExtension(StandardFileType.CLASS)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(
+                    preferences.getFilePreferences().getWorkingDirectory()
+                )
                 .build();
 
-        Optional<Path> selectedFile = dialogService.showFileOpenDialog(fileDialogConfiguration);
+        Optional<Path> selectedFile = dialogService.showFileOpenDialog(
+            fileDialogConfiguration
+        );
 
-        if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
-            boolean isArchive = FileUtil.getFileExtension(selectedFile.get())
-                                        .filter(extension -> "jar".equalsIgnoreCase(extension) || "zip".equalsIgnoreCase(extension))
-                                        .isPresent();
+        if (
+            selectedFile.isPresent() && (selectedFile.get().getParent() != null)
+        ) {
+            boolean isArchive = FileUtil
+                .getFileExtension(selectedFile.get())
+                .filter(extension ->
+                    "jar".equalsIgnoreCase(extension) ||
+                    "zip".equalsIgnoreCase(extension)
+                )
+                .isPresent();
 
             if (isArchive) {
                 try {
-                    Optional<Path> selectedFileInArchive = dialogService.showFileOpenFromArchiveDialog(selectedFile.get());
+                    Optional<Path> selectedFileInArchive =
+                        dialogService.showFileOpenFromArchiveDialog(
+                            selectedFile.get()
+                        );
                     if (selectedFileInArchive.isPresent()) {
-                        String className = selectedFileInArchive.get().toString().substring(0, selectedFileInArchive.get().toString().lastIndexOf('.')).replace(
-                                "/", ".");
-                        CustomImporter importer = new CustomImporter(selectedFile.get().toAbsolutePath().toString(), className);
+                        String className = selectedFileInArchive
+                            .get()
+                            .toString()
+                            .substring(
+                                0,
+                                selectedFileInArchive
+                                    .get()
+                                    .toString()
+                                    .lastIndexOf('.')
+                            )
+                            .replace("/", ".");
+                        CustomImporter importer = new CustomImporter(
+                            selectedFile.get().toAbsolutePath().toString(),
+                            className
+                        );
                         importers.add(new ImporterViewModel(importer));
                     }
                 } catch (IOException exc) {
                     LOGGER.error("Could not open ZIP-archive.", exc);
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Could not open %0", selectedFile.get().toString()) + "\n"
-                                    + Localization.lang("Have you chosen the correct package path?"),
-                            exc);
+                        Localization.lang(
+                            "Could not open %0",
+                            selectedFile.get().toString()
+                        ) +
+                        "\n" +
+                        Localization.lang(
+                            "Have you chosen the correct package path?"
+                        ),
+                        exc
+                    );
                 } catch (ImportException exc) {
                     LOGGER.error("Could not instantiate importer", exc);
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Could not instantiate %0 %1", "importer"),
-                            exc);
+                        Localization.lang(
+                            "Could not instantiate %0 %1",
+                            "importer"
+                        ),
+                        exc
+                    );
                 }
             } else {
                 try {
                     String basePath = selectedFile.get().getParent().toString();
-                    String className = pathToClass(basePath, selectedFile.get());
-                    CustomImporter importer = new CustomImporter(basePath, className);
+                    String className = pathToClass(
+                        basePath,
+                        selectedFile.get()
+                    );
+                    CustomImporter importer = new CustomImporter(
+                        basePath,
+                        className
+                    );
 
                     importers.add(new ImporterViewModel(importer));
                 } catch (Exception exc) {
                     LOGGER.error("Could not instantiate importer", exc);
-                    dialogService.showErrorDialogAndWait(Localization.lang("Could not instantiate %0", selectedFile.get().toString()), exc);
-                } catch (NoClassDefFoundError exc) {
-                    LOGGER.error("Could not find class while instantiating importer", exc);
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Could not instantiate %0. Have you chosen the correct package path?", selectedFile.get().toString()),
-                            exc);
+                        Localization.lang(
+                            "Could not instantiate %0",
+                            selectedFile.get().toString()
+                        ),
+                        exc
+                    );
+                } catch (NoClassDefFoundError exc) {
+                    LOGGER.error(
+                        "Could not find class while instantiating importer",
+                        exc
+                    );
+                    dialogService.showErrorDialogAndWait(
+                        Localization.lang(
+                            "Could not instantiate %0. Have you chosen the correct package path?",
+                            selectedFile.get().toString()
+                        ),
+                        exc
+                    );
                 }
             }
         }

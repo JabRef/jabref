@@ -3,7 +3,6 @@ package org.jabref.gui.mergeentries;
 import org.jabref.logic.l10n.Localization;
 
 public enum DiffMode {
-
     PLAIN(Localization.lang("None")),
     WORD(Localization.lang("Word by word")),
     CHARACTER(Localization.lang("Character by character")),

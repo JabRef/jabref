@@ -2,7 +2,6 @@ package org.jabref.logic.importer.util;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -15,6 +14,7 @@ import org.jabref.model.entry.identifier.MathSciNetId;
 import org.jabref.model.strings.StringUtil;
 
 public class IdentifierParser {
+
     private final BibEntry entry;
 
     public IdentifierParser(BibEntry entry) {
@@ -43,8 +43,12 @@ public class IdentifierParser {
     }
 
     private Optional<? extends Identifier> parseEprint(String eprint) {
-        Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
-        Optional<String> archivePrefixOpt = entry.getField(StandardField.ARCHIVEPREFIX);
+        Optional<String> eprintTypeOpt = entry.getField(
+            StandardField.EPRINTTYPE
+        );
+        Optional<String> archivePrefixOpt = entry.getField(
+            StandardField.ARCHIVEPREFIX
+        );
 
         String eprintType = eprintTypeOpt.or(() -> archivePrefixOpt).orElse("");
         if ("arxiv".equalsIgnoreCase(eprintType)) {

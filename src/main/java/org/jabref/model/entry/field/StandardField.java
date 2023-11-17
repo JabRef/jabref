@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
-
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 
 /**
@@ -13,7 +12,6 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
  * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
-
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
     ADDRESS("address"),
@@ -32,7 +30,12 @@ public enum StandardField implements Field {
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
-    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
+    COMMENT(
+        "comment",
+        FieldProperty.COMMENT,
+        FieldProperty.MULTILINE_TEXT,
+        FieldProperty.VERBATIM
+    ),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),
@@ -138,7 +141,12 @@ public enum StandardField implements Field {
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
 
-    public static Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
+    public static Set<Field> AUTOMATIC_FIELDS = Set.of(
+        OWNER,
+        TIMESTAMP,
+        CREATIONDATE,
+        MODIFICATIONDATE
+    );
 
     private final String name;
     private final String displayName;
@@ -156,7 +164,12 @@ public enum StandardField implements Field {
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
-    StandardField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
+    StandardField(
+        String name,
+        String displayName,
+        FieldProperty first,
+        FieldProperty... rest
+    ) {
         this.name = name;
         this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);
@@ -169,9 +182,10 @@ public enum StandardField implements Field {
     }
 
     public static Optional<StandardField> fromName(String name) {
-        return Arrays.stream(StandardField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Arrays
+            .stream(StandardField.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     @Override

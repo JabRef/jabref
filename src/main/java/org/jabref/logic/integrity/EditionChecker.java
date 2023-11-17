@@ -4,17 +4,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
 public class EditionChecker implements ValueChecker {
 
-    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
-    private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9].+)$")
-                                                                              .asPredicate();
-    private static final Predicate<String> ONLY_NUMERALS = Pattern.compile("[0-9]+").asPredicate();
+    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern
+        .compile("^[A-Z]")
+        .asPredicate();
+    private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern
+        .compile("^([0-9]+|[^0-9].+)$")
+        .asPredicate();
+    private static final Predicate<String> ONLY_NUMERALS = Pattern
+        .compile("[0-9]+")
+        .asPredicate();
     private static final String FIRST_EDITION = "1";
 
     private final BibDatabaseContext bibDatabaseContextEdition;
@@ -22,8 +26,12 @@ public class EditionChecker implements ValueChecker {
     // Allow integers in 'edition' field in BibTeX mode --> see GeneralTab.fml
     private final boolean allowIntegerEdition;
 
-    public EditionChecker(BibDatabaseContext bibDatabaseContext, boolean allowIntegerEdition) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+    public EditionChecker(
+        BibDatabaseContext bibDatabaseContext,
+        boolean allowIntegerEdition
+    ) {
+        this.bibDatabaseContextEdition =
+            Objects.requireNonNull(bibDatabaseContext);
         this.allowIntegerEdition = allowIntegerEdition;
     }
 
@@ -41,25 +49,41 @@ public class EditionChecker implements ValueChecker {
         }
 
         if (value.equals(FIRST_EDITION)) {
-            return Optional.of(Localization.lang("edition of book reported as just 1"));
+            return Optional.of(
+                Localization.lang("edition of book reported as just 1")
+            );
         }
 
         if (bibDatabaseContextEdition.isBiblatexMode()) {
             if (!ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
-                return Optional.of(Localization.lang("should contain an integer or a literal"));
+                return Optional.of(
+                    Localization.lang("should contain an integer or a literal")
+                );
             }
         } else {
             if (ONLY_NUMERALS.test(value) && (!allowIntegerEdition)) {
-                return Optional.of(Localization.lang("no integer as values for edition allowed"));
+                return Optional.of(
+                    Localization.lang(
+                        "no integer as values for edition allowed"
+                    )
+                );
             }
         }
-        if (!isFirstCharDigit(value) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-            return Optional.of(Localization.lang("should have the first letter capitalized"));
+        if (
+            !isFirstCharDigit(value) &&
+            !FIRST_LETTER_CAPITALIZED.test(value.trim())
+        ) {
+            return Optional.of(
+                Localization.lang("should have the first letter capitalized")
+            );
         }
         return Optional.empty();
     }
 
     boolean isFirstCharDigit(String input) {
-        return !StringUtil.isNullOrEmpty(input) && Character.isDigit(input.charAt(0));
+        return (
+            !StringUtil.isNullOrEmpty(input) &&
+            Character.isDigit(input.charAt(0))
+        );
     }
 }

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
@@ -13,7 +12,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +23,9 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public abstract class FullTextSearchRule implements SearchRule {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FullTextSearchRule.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        FullTextSearchRule.class
+    );
 
     protected final EnumSet<SearchRules.SearchFlags> searchFlags;
 
@@ -47,8 +47,14 @@ public abstract class FullTextSearchRule implements SearchRule {
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
+    public PdfSearchResults getFulltextResults(
+        String query,
+        BibEntry bibEntry
+    ) {
+        if (
+            !searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) ||
+            databaseContext == null
+        ) {
             return new PdfSearchResults();
         }
 
@@ -64,8 +70,11 @@ public abstract class FullTextSearchRule implements SearchRule {
             }
         }
 
-        return new PdfSearchResults(lastSearchResults.stream()
-                                                     .filter(searchResult -> searchResult.isResultFor(bibEntry))
-                                                     .collect(Collectors.toList()));
+        return new PdfSearchResults(
+            lastSearchResults
+                .stream()
+                .filter(searchResult -> searchResult.isResultFor(bibEntry))
+                .collect(Collectors.toList())
+        );
     }
 }

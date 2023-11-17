@@ -2,7 +2,6 @@ package org.jabref.gui.mergeentries;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -14,17 +13,27 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.preferences.PreferencesService;
 
 public class MergeEntriesAction extends SimpleCommand {
+
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
+    public MergeEntriesAction(
+        DialogService dialogService,
+        StateManager stateManager,
+        PreferencesService preferencesService
+    ) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager));
+        this.executable.bind(
+                ActionHelper.needsEntriesSelected(
+                    NUMBER_OF_ENTRIES_NEEDED,
+                    stateManager
+                )
+            );
     }
 
     @Override
@@ -38,8 +47,11 @@ public class MergeEntriesAction extends SimpleCommand {
         if (selectedEntries.size() != 2) {
             // Inform the user to select entries first.
             dialogService.showInformationDialogAndWait(
-                    Localization.lang("Merge entries"),
-                    Localization.lang("You have to choose exactly two entries to merge."));
+                Localization.lang("Merge entries"),
+                Localization.lang(
+                    "You have to choose exactly two entries to merge."
+                )
+            );
             return;
         }
 
@@ -50,7 +62,11 @@ public class MergeEntriesAction extends SimpleCommand {
         // compare two entries
         BibEntry first;
         BibEntry second;
-        EntryComparator entryComparator = new EntryComparator(false, false, InternalField.KEY_FIELD);
+        EntryComparator entryComparator = new EntryComparator(
+            false,
+            false,
+            InternalField.KEY_FIELD
+        );
         if (entryComparator.compare(one, two) <= 0) {
             first = one;
             second = two;
@@ -59,14 +75,26 @@ public class MergeEntriesAction extends SimpleCommand {
             second = one;
         }
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferencesService);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(
+            first,
+            second,
+            preferencesService
+        );
         dialog.setTitle(Localization.lang("Merge entries"));
 
-        Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
-        mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            new MergeTwoEntriesAction(entriesMergeResult, stateManager).execute();
+        Optional<EntriesMergeResult> mergeResultOpt =
+            dialogService.showCustomDialogAndWait(dialog);
+        mergeResultOpt.ifPresentOrElse(
+            entriesMergeResult -> {
+                new MergeTwoEntriesAction(entriesMergeResult, stateManager)
+                    .execute();
 
-            dialogService.notify(Localization.lang("Merged entries"));
-        }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
+                dialogService.notify(Localization.lang("Merged entries"));
+            },
+            () ->
+                dialogService.notify(
+                    Localization.lang("Canceled merging entries")
+                )
+        );
     }
 }

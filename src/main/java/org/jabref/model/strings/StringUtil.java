@@ -1,5 +1,6 @@
 package org.jabref.model.strings;
 
+import com.google.common.base.CharMatcher;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,12 +11,9 @@ import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.apache.commons.lang3.StringUtils;
 import org.jabref.architecture.ApacheCommonsLang3Allowed;
 import org.jabref.logic.bibtex.FieldWriter;
-
-import com.google.common.base.CharMatcher;
-import org.apache.commons.lang3.StringUtils;
 
 @ApacheCommonsLang3Allowed("There is no equivalent in Google's Guava")
 public class StringUtil {
@@ -23,9 +21,14 @@ public class StringUtil {
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
     // contains all possible line breaks, not omitting any break such as "\\n"
-    private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
-    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
-    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+    private static final Pattern LINE_BREAKS = Pattern.compile(
+        "\\r\\n|\\r|\\n"
+    );
+    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile(
+        "\\{[A-Z]+\\}"
+    );
+    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP =
+        new UnicodeToReadableCharMap();
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
@@ -39,7 +42,11 @@ public class StringUtil {
      * @param quoteChar The quoting character.
      * @return A String with every special character (including the quoting character itself) quoted.
      */
-    public static String quote(String toQuote, String specials, char quoteChar) {
+    public static String quote(
+        String toQuote,
+        String specials,
+        char quoteChar
+    ) {
         if (toQuote == null) {
             return "";
         }
@@ -65,7 +72,11 @@ public class StringUtil {
     /**
      * Creates a substring from a text
      */
-    public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
+    public static String getPart(
+        String text,
+        int startIndex,
+        boolean terminateOnEndBraceOnly
+    ) {
         char c;
         int count = 0;
 
@@ -73,14 +84,21 @@ public class StringUtil {
 
         // advance to first char and skip whitespace
         int index = startIndex + 1;
-        while ((index < text.length()) && Character.isWhitespace(text.charAt(index))) {
+        while (
+            (index < text.length()) &&
+            Character.isWhitespace(text.charAt(index))
+        ) {
             index++;
         }
 
         // then grab whatever is the first token (counting braces)
         while (index < text.length()) {
             c = text.charAt(index);
-            if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
+            if (
+                !terminateOnEndBraceOnly &&
+                (count == 0) &&
+                Character.isWhitespace(c)
+            ) {
                 // end argument and leave whitespace for further processing
                 break;
             }
@@ -121,7 +139,12 @@ public class StringUtil {
      *
      * @param to        Excluding strings[to]
      */
-    public static String join(String[] strings, String separator, int from, int to) {
+    public static String join(
+        String[] strings,
+        String separator,
+        int from,
+        int to
+    ) {
         if ((strings.length == 0) || (from >= to)) {
             return "";
         }
@@ -150,12 +173,19 @@ public class StringUtil {
      * extends the filename with a default Extension, if no Extension '.x' could
      * be found
      */
-    public static String getCorrectFileName(String orgName, String defaultExtension) {
+    public static String getCorrectFileName(
+        String orgName,
+        String defaultExtension
+    ) {
         if (orgName == null) {
             return "";
         }
 
-        if (orgName.toLowerCase(Locale.ROOT).endsWith("." + defaultExtension.toLowerCase(Locale.ROOT))) {
+        if (
+            orgName
+                .toLowerCase(Locale.ROOT)
+                .endsWith("." + defaultExtension.toLowerCase(Locale.ROOT))
+        ) {
             return orgName;
         }
 
@@ -180,7 +210,12 @@ public class StringUtil {
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
+        addWrappedLine(
+            result,
+            CharMatcher.whitespace().trimTrailingFrom(lines[0]),
+            wrapAmount,
+            newline
+        );
         for (int i = 1; i < lines.length; i++) {
             if (lines[i].trim().isEmpty()) {
                 result.append(newline);
@@ -191,7 +226,9 @@ public class StringUtil {
                 result.append(newline);
                 result.append('\t');
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-                String line = CharMatcher.whitespace().trimTrailingFrom(lines[i]);
+                String line = CharMatcher
+                    .whitespace()
+                    .trimTrailingFrom(lines[i]);
                 addWrappedLine(result, line, wrapAmount, newline);
             }
         }
@@ -206,7 +243,12 @@ public class StringUtil {
      * @param wrapAmount    the number of characters belonging to a line of text
      * @param newlineString a string containing the newline character(s)
      */
-    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
+    private static void addWrappedLine(
+        StringBuilder result,
+        String line,
+        int wrapAmount,
+        String newlineString
+    ) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
         // Add the line, unmodified:
@@ -307,19 +349,30 @@ public class StringUtil {
                 inBrace++;
             } else if (c == '}') {
                 inBrace--;
-            } else if (!escaped && (c == FieldWriter.BIBTEX_STRING_START_END_SYMBOL)) {
+            } else if (
+                !escaped && (c == FieldWriter.BIBTEX_STRING_START_END_SYMBOL)
+            ) {
                 inString = !inString;
             }
 
             // See if we should start bracing:
-            if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
-                    && Character.isUpperCase((char) c)) {
+            if (
+                (inBrace == 0) &&
+                !isBracing &&
+                !inString &&
+                Character.isLetter((char) c) &&
+                Character.isUpperCase((char) c)
+            ) {
                 buf.append('{');
                 isBracing = true;
             }
 
             // See if we should close a brace set:
-            if (isBracing && !(Character.isLetter((char) c) && Character.isUpperCase((char) c))) {
+            if (
+                isBracing &&
+                !(Character.isLetter((char) c) &&
+                    Character.isUpperCase((char) c))
+            ) {
                 buf.append('}');
                 isBracing = false;
             }
@@ -349,7 +402,10 @@ public class StringUtil {
     public static String removeBracesAroundCapitals(String s) {
         String current = s;
         String previous = s;
-        while ((current = removeSingleBracesAroundCapitals(current)).length() < previous.length()) {
+        while (
+            (current = removeSingleBracesAroundCapitals(current)).length() <
+            previous.length()
+        ) {
             previous = current;
         }
         return current;
@@ -368,7 +424,10 @@ public class StringUtil {
         StringBuilder buf = new StringBuilder();
         while (mcr.find()) {
             String replaceStr = mcr.group();
-            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
+            mcr.appendReplacement(
+                buf,
+                replaceStr.substring(1, replaceStr.length() - 1)
+            );
         }
         mcr.appendTail(buf);
         return buf.toString();
@@ -404,7 +463,10 @@ public class StringUtil {
         if ((toCheck == null) || toCheck.isEmpty()) {
             return false;
         } else {
-            if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
+            if (
+                (toCheck.charAt(0) == '{') &&
+                (toCheck.charAt(toCheck.length() - 1) == '}')
+            ) {
                 for (char c : toCheck.toCharArray()) {
                     if (c == '{') {
                         if (brackets == 0) {
@@ -426,7 +488,10 @@ public class StringUtil {
         if ((toCheck == null) || toCheck.isEmpty()) {
             return false; // In case of null or empty string
         } else {
-            return (toCheck.charAt(0) == '[') && (toCheck.charAt(toCheck.length() - 1) == ']');
+            return (
+                (toCheck.charAt(0) == '[') &&
+                (toCheck.charAt(toCheck.length() - 1) == ']')
+            );
         }
     }
 
@@ -434,7 +499,10 @@ public class StringUtil {
         if ((toCheck == null) || (toCheck.length() <= 1)) {
             return false; // In case of null, empty string, or a single citation mark
         } else {
-            return (toCheck.charAt(0) == '"') && (toCheck.charAt(toCheck.length() - 1) == '"');
+            return (
+                (toCheck.charAt(0) == '"') &&
+                (toCheck.charAt(toCheck.length() - 1) == '"')
+            );
         }
     }
 
@@ -453,12 +521,20 @@ public class StringUtil {
         boolean sign = false;
         char ch;
 
-        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+        if (
+            (str == null) ||
+            ((end = str.length()) == 0) ||
+            ((((ch = str.charAt(0)) < '0') || (ch > '9')) &&
+                (!(sign = ch == '-') ||
+                    (++idx == end) ||
+                    ((ch = str.charAt(idx)) < '0') ||
+                    (ch > '9')))
+        ) {
             throw new NumberFormatException(str);
         }
 
         int ival = 0;
-        for (; ; ival *= 10) {
+        for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return sign ? ival : -ival;
@@ -483,12 +559,20 @@ public class StringUtil {
         boolean sign = false;
         char ch;
 
-        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+        if (
+            (str == null) ||
+            ((end = str.length()) == 0) ||
+            ((((ch = str.charAt(0)) < '0') || (ch > '9')) &&
+                (!(sign = ch == '-') ||
+                    (++idx == end) ||
+                    ((ch = str.charAt(idx)) < '0') ||
+                    (ch > '9')))
+        ) {
             return Optional.empty();
         }
 
         int ival = 0;
-        for (; ; ival *= 10) {
+        for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return Optional.of(sign ? ival : -ival);
@@ -521,8 +605,13 @@ public class StringUtil {
 
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
-                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
+            if (
+                (current == 0x9) ||
+                (current == 0xA) ||
+                (current == 0xD) ||
+                ((current >= 0x20) && (current <= 0xD7FF)) ||
+                ((current >= 0xE000) && (current <= 0xFFFD))
+            ) {
                 out.append(current);
             }
         }
@@ -570,8 +659,15 @@ public class StringUtil {
          * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`, they will expect NFC.
          * A more holistic approach should likely start with the <a href="http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure">compatibility equivalence</a>. */
         String result = Normalizer.normalize(s, Normalizer.Form.NFC);
-        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
-            result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
+        for (Map.Entry<
+            String,
+            String
+        > chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
+            result =
+                result.replace(
+                    chrAndReplace.getKey(),
+                    chrAndReplace.getValue()
+                );
         }
         return result;
     }
@@ -672,7 +768,9 @@ public class StringUtil {
         return result.toString();
     }
 
-    @ApacheCommonsLang3Allowed("No Guava equivalent existing - see https://stackoverflow.com/q/3322152/873282 for a list of other implementations")
+    @ApacheCommonsLang3Allowed(
+        "No Guava equivalent existing - see https://stackoverflow.com/q/3322152/873282 for a list of other implementations"
+    )
     public static String stripAccents(String searchQuery) {
         return StringUtils.stripAccents(searchQuery);
     }
@@ -682,8 +780,10 @@ public class StringUtil {
      */
     public static String capitalizeFirst(String toCapitalize) {
         if (toCapitalize.length() > 1) {
-            return toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT)
-                    + toCapitalize.substring(1).toLowerCase(Locale.ROOT);
+            return (
+                toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT) +
+                toCapitalize.substring(1).toLowerCase(Locale.ROOT)
+            );
         } else {
             return toCapitalize.toUpperCase(Locale.ROOT);
         }
@@ -705,21 +805,31 @@ public class StringUtil {
      */
     public static List<String> getStringAsSentences(String text) {
         // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
-        Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
+        Pattern splitTextPattern = Pattern.compile(
+            "(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+"
+        );
         return Arrays.asList(splitTextPattern.split(text));
     }
 
-    @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
+    @ApacheCommonsLang3Allowed(
+        "No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282"
+    )
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);
     }
 
-    public static String substringBetween(String str, String open, String close) {
+    public static String substringBetween(
+        String str,
+        String open,
+        String close
+    ) {
         return StringUtils.substringBetween(str, open, close);
     }
 
     public static String ignoreCurlyBracket(String title) {
-        return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
+        return isNotBlank(title)
+            ? title.replace("{", "").replace("}", "")
+            : title;
     }
 
     /**
@@ -746,8 +856,13 @@ public class StringUtil {
         return s.chars().anyMatch(Character::isWhitespace);
     }
 
-    @ApacheCommonsLang3Allowed("No Guava equivalent existing - see https://stackoverflow.com/a/23825984")
-    public static String removeStringAtTheEnd(String string, String stringToBeRemoved) {
+    @ApacheCommonsLang3Allowed(
+        "No Guava equivalent existing - see https://stackoverflow.com/a/23825984"
+    )
+    public static String removeStringAtTheEnd(
+        String string,
+        String stringToBeRemoved
+    ) {
         return StringUtils.removeEndIgnoreCase(string, stringToBeRemoved);
     }
 

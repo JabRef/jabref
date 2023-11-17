@@ -1,6 +1,7 @@
 package org.jabref.model;
 
 public class TreeNodeTestData {
+
     /**
      * Gets the marked node in the following tree: Root A A (= parent) B (<-- this)
      */
@@ -86,9 +87,7 @@ public class TreeNodeTestData {
 
         @Override
         public String toString() {
-            return "TreeNodeMock{" +
-                    "name='" + name + '\'' +
-                    '}';
+            return "TreeNodeMock{" + "name='" + name + '\'' + '}';
         }
 
         @Override

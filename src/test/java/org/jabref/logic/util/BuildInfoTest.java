@@ -1,9 +1,9 @@
 package org.jabref.logic.util;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 public class BuildInfoTest {
 
@@ -15,7 +15,9 @@ public class BuildInfoTest {
 
     @Test
     public void testFileImport() {
-        BuildInfo buildInfo = new BuildInfo("/org/jabref/util/build.properties");
+        BuildInfo buildInfo = new BuildInfo(
+            "/org/jabref/util/build.properties"
+        );
         assertEquals("42", buildInfo.version.getFullVersion());
     }
 

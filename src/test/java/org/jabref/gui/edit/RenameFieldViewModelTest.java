@@ -1,8 +1,10 @@
 package org.jabref.gui.edit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldViewModel;
 import org.jabref.model.database.BibDatabase;
@@ -11,14 +13,11 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
 public class RenameFieldViewModelTest {
+
     RenameFieldViewModel renameFieldViewModel;
     BibEntry entryA;
     BibEntry entryB;
@@ -29,18 +28,25 @@ public class RenameFieldViewModelTest {
 
     @BeforeEach
     void setup() {
-        entryA = new BibEntry(BibEntry.DEFAULT_TYPE)
+        entryA =
+            new BibEntry(BibEntry.DEFAULT_TYPE)
                 .withField(StandardField.YEAR, "2015")
                 .withField(StandardField.DATE, "2014")
                 .withField(StandardField.AUTHOR, "Doe");
 
-        entryB = new BibEntry(BibEntry.DEFAULT_TYPE)
+        entryB =
+            new BibEntry(BibEntry.DEFAULT_TYPE)
                 .withField(StandardField.DATE, "1998")
                 .withField(StandardField.YEAR, "")
                 .withField(StandardField.AUTHOR, "Eddie");
 
         bibDatabase = new BibDatabase();
-        renameFieldViewModel = new RenameFieldViewModel(List.of(entryA, entryB), bibDatabase, stateManager);
+        renameFieldViewModel =
+            new RenameFieldViewModel(
+                List.of(entryA, entryB),
+                bibDatabase,
+                stateManager
+            );
     }
 
     @Test
@@ -49,10 +55,16 @@ public class RenameFieldViewModelTest {
         renameFieldViewModel.setNewFieldName("ETAD");
         renameFieldViewModel.renameField();
 
-        assertEquals(Optional.of("2014"), entryA.getField(FieldFactory.parseField("ETAD")));
+        assertEquals(
+            Optional.of("2014"),
+            entryA.getField(FieldFactory.parseField("ETAD"))
+        );
         assertEquals(Optional.empty(), entryA.getField(StandardField.DATE));
 
-        assertEquals(Optional.of("1998"), entryB.getField(FieldFactory.parseField("ETAD")));
+        assertEquals(
+            Optional.of("1998"),
+            entryB.getField(FieldFactory.parseField("ETAD"))
+        );
         assertEquals(Optional.empty(), entryB.getField(StandardField.DATE));
     }
 
@@ -64,10 +76,16 @@ public class RenameFieldViewModelTest {
         renameFieldViewModel.renameField();
 
         assertEquals(Optional.empty(), entryA.getField(toRenameField));
-        assertEquals(Optional.empty(), entryA.getField(new UnknownField("new_field_name")));
+        assertEquals(
+            Optional.empty(),
+            entryA.getField(new UnknownField("new_field_name"))
+        );
 
         assertEquals(Optional.empty(), entryB.getField(toRenameField));
-        assertEquals(Optional.empty(), entryB.getField(new UnknownField("new_field_name")));
+        assertEquals(
+            Optional.empty(),
+            entryB.getField(new UnknownField("new_field_name"))
+        );
     }
 
     @Test
@@ -77,10 +95,19 @@ public class RenameFieldViewModelTest {
         renameFieldViewModel.renameField();
 
         assertEquals(Optional.of("Doe"), entryA.getField(StandardField.AUTHOR));
-        assertEquals(Optional.empty(), entryA.getField(FieldFactory.parseField("")));
+        assertEquals(
+            Optional.empty(),
+            entryA.getField(FieldFactory.parseField(""))
+        );
 
-        assertEquals(Optional.of("Eddie"), entryB.getField(StandardField.AUTHOR));
-        assertEquals(Optional.empty(), entryB.getField(FieldFactory.parseField("")));
+        assertEquals(
+            Optional.of("Eddie"),
+            entryB.getField(StandardField.AUTHOR)
+        );
+        assertEquals(
+            Optional.empty(),
+            entryB.getField(FieldFactory.parseField(""))
+        );
     }
 
     @Test
@@ -90,10 +117,19 @@ public class RenameFieldViewModelTest {
         renameFieldViewModel.renameField();
 
         assertEquals(Optional.of("Doe"), entryA.getField(StandardField.AUTHOR));
-        assertEquals(Optional.empty(), entryA.getField(FieldFactory.parseField("Hello, World")));
+        assertEquals(
+            Optional.empty(),
+            entryA.getField(FieldFactory.parseField("Hello, World"))
+        );
 
-        assertEquals(Optional.of("Eddie"), entryB.getField(StandardField.AUTHOR));
-        assertEquals(Optional.empty(), entryB.getField(FieldFactory.parseField("Hello, World")));
+        assertEquals(
+            Optional.of("Eddie"),
+            entryB.getField(StandardField.AUTHOR)
+        );
+        assertEquals(
+            Optional.empty(),
+            entryB.getField(FieldFactory.parseField("Hello, World"))
+        );
     }
 
     @Test

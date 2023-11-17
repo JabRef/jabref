@@ -1,10 +1,12 @@
 package org.jabref.gui.importer;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
-
+import org.controlsfx.control.PopOver;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -14,17 +16,19 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
-import org.controlsfx.control.PopOver;
-
 public class GenerateEntryFromIdDialog {
 
-    @FXML DialogPane dialogPane;
-    @FXML TextField idTextField;
-    @FXML Button generateButton;
+    @FXML
+    DialogPane dialogPane;
 
-    @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @FXML
+    TextField idTextField;
+
+    @FXML
+    Button generateButton;
+
+    @Inject
+    private FileUpdateMonitor fileUpdateMonitor;
 
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
@@ -34,18 +38,27 @@ public class GenerateEntryFromIdDialog {
 
     private PopOver entryFromIdPopOver;
 
-    public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, StateManager stateManager) {
+    public GenerateEntryFromIdDialog(
+        LibraryTab libraryTab,
+        DialogService dialogService,
+        PreferencesService preferencesService,
+        TaskExecutor taskExecutor,
+        StateManager stateManager
+    ) {
         ViewLoader.view(this).load();
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
-        this.generateButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        this.generateButton.setGraphic(
+                IconTheme.JabRefIcons.IMPORT.getGraphicNode()
+            );
         this.generateButton.setDefaultButton(true);
     }
 
-    @FXML private void generateEntry() {
+    @FXML
+    private void generateEntry() {
         if (idTextField.getText().isEmpty()) {
             dialogService.notify(Localization.lang("Enter a valid ID"));
             return;
@@ -53,7 +66,8 @@ public class GenerateEntryFromIdDialog {
 
         this.idTextField.requestFocus();
 
-        GenerateEntryFromIdAction generateEntryFromIdAction = new GenerateEntryFromIdAction(
+        GenerateEntryFromIdAction generateEntryFromIdAction =
+            new GenerateEntryFromIdAction(
                 libraryTab,
                 dialogService,
                 preferencesService,
@@ -62,7 +76,7 @@ public class GenerateEntryFromIdDialog {
                 idTextField.getText(),
                 stateManager,
                 fileUpdateMonitor
-        );
+            );
         generateEntryFromIdAction.execute();
     }
 

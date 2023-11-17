@@ -9,7 +9,10 @@ public class PushToWinEdt extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.WIN_EDT;
 
-    public PushToWinEdt(DialogService dialogService, PreferencesService preferencesService) {
+    public PushToWinEdt(
+        DialogService dialogService,
+        PreferencesService preferencesService
+    ) {
         super(dialogService, preferencesService);
     }
 
@@ -25,7 +28,13 @@ public class PushToWinEdt extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath,
-                "\"[InsText('" + getCitePrefix() + keyString.replace("'", "''") + getCiteSuffix() + "');]\""};
+        return new String[] {
+            commandPath,
+            "\"[InsText('" +
+            getCitePrefix() +
+            keyString.replace("'", "''") +
+            getCiteSuffix() +
+            "');]\"",
+        };
     }
 }

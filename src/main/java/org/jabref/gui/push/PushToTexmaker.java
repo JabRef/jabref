@@ -12,7 +12,10 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     public static final String NAME = "Texmaker";
 
-    public PushToTexmaker(DialogService dialogService, PreferencesService preferencesService) {
+    public PushToTexmaker(
+        DialogService dialogService,
+        PreferencesService preferencesService
+    ) {
         super(dialogService, preferencesService);
     }
 
@@ -28,6 +31,10 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "-insert", getCitePrefix() + keyString + getCiteSuffix()};
+        return new String[] {
+            commandPath,
+            "-insert",
+            getCitePrefix() + keyString + getCiteSuffix(),
+        };
     }
 }

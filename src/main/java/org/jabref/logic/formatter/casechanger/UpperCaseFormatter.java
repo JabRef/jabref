@@ -29,8 +29,7 @@ public class UpperCaseFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-                "CHANGES ALL LETTERS TO UPPER CASE.");
+        return Localization.lang("CHANGES ALL LETTERS TO UPPER CASE.");
     }
 
     @Override

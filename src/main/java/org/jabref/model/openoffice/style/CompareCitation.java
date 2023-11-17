@@ -1,7 +1,6 @@
 package org.jabref.model.openoffice.style;
 
 import java.util.Comparator;
-
 import org.jabref.model.entry.BibEntry;
 
 /*
@@ -12,8 +11,12 @@ public class CompareCitation implements Comparator<ComparableCitation> {
 
     private final CompareCitedKey citedKeyComparator;
 
-    CompareCitation(Comparator<BibEntry> entryComparator, boolean unresolvedComesFirst) {
-        this.citedKeyComparator = new CompareCitedKey(entryComparator, unresolvedComesFirst);
+    CompareCitation(
+        Comparator<BibEntry> entryComparator,
+        boolean unresolvedComesFirst
+    ) {
+        this.citedKeyComparator =
+            new CompareCitedKey(entryComparator, unresolvedComesFirst);
     }
 
     public int compare(ComparableCitation a, ComparableCitation b) {
@@ -26,5 +29,3 @@ public class CompareCitation implements Comparator<ComparableCitation> {
         return res;
     }
 }
-
-

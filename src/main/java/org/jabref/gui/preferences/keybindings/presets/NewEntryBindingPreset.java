@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.keybindings.presets;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 

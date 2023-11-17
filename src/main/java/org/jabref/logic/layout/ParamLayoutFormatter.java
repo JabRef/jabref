@@ -10,7 +10,6 @@ package org.jabref.logic.layout;
  * invoked without the setArgument() method being called first.
  */
 public interface ParamLayoutFormatter extends LayoutFormatter {
-
     /**
      * Method for setting the argument of this formatter.
      *

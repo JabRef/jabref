@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -25,7 +24,9 @@ class RegExpBasedFileFinder implements FileFinder {
 
     private static final String EXT_MARKER = "__EXTENSION__";
 
-    private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
+    private static final Pattern ESCAPE_PATTERN = Pattern.compile(
+        "([^\\\\])\\\\([^\\\\])"
+    );
 
     private final String regExp;
     private final Character keywordDelimiter;
@@ -43,24 +44,48 @@ class RegExpBasedFileFinder implements FileFinder {
      *
      * @throws IOException throws an IOException if a PatternSyntaxException occurs
      */
-    private Pattern createFileNamePattern(String[] fileParts, String extensionRegExp, BibEntry entry) throws IOException {
+    private Pattern createFileNamePattern(
+        String[] fileParts,
+        String extensionRegExp,
+        BibEntry entry
+    ) throws IOException {
         // Protect the extension marker so that it isn't treated as a bracketed pattern
-        String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
+        String filePart =
+            fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
 
         // We need to supply a custom function to deal with the content of a bracketed expression and expandBracketContent is the default function
-        Function<String, String> expandBracket = BracketedPattern.expandBracketContent(keywordDelimiter, entry, null);
+        Function<String, String> expandBracket =
+            BracketedPattern.expandBracketContent(
+                keywordDelimiter,
+                entry,
+                null
+            );
         // but, we want to post-process the expanded content so that it can be used as a regex for finding a file name
-        Function<String, String> bracketToFileNameRegex = expandBracket.andThen(RegExpBasedFileFinder::toFileNameRegex);
+        Function<String, String> bracketToFileNameRegex = expandBracket.andThen(
+            RegExpBasedFileFinder::toFileNameRegex
+        );
 
-        String expandedBracketAsFileNameRegex = BracketedPattern.expandBrackets(filePart, bracketToFileNameRegex);
+        String expandedBracketAsFileNameRegex = BracketedPattern.expandBrackets(
+            filePart,
+            bracketToFileNameRegex
+        );
 
         String fileNamePattern = expandedBracketAsFileNameRegex
-                .replaceAll(EXT_MARKER, extensionRegExp) // Replace the extension marker
-                .replaceAll("\\\\\\\\", "\\\\");
+            .replaceAll(EXT_MARKER, extensionRegExp) // Replace the extension marker
+            .replaceAll("\\\\\\\\", "\\\\");
         try {
-            return Pattern.compile('^' + fileNamePattern + '$', Pattern.CASE_INSENSITIVE);
+            return Pattern.compile(
+                '^' + fileNamePattern + '$',
+                Pattern.CASE_INSENSITIVE
+            );
         } catch (PatternSyntaxException e) {
-            throw new IOException(String.format("There is a syntax error in the regular expression %s used to search for files", fileNamePattern), e);
+            throw new IOException(
+                String.format(
+                    "There is a syntax error in the regular expression %s used to search for files",
+                    fileNamePattern
+                ),
+                e
+            );
         }
     }
 
@@ -72,8 +97,13 @@ class RegExpBasedFileFinder implements FileFinder {
      */
     private static String toFileNameRegex(String expandedContent) {
         var cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
-        return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :
-                "(" + Pattern.quote(expandedContent) + ")|(" + Pattern.quote(cleanedContent) + ")";
+        return expandedContent.equals(cleanedContent)
+            ? Pattern.quote(expandedContent)
+            : "(" +
+            Pattern.quote(expandedContent) +
+            ")|(" +
+            Pattern.quote(cleanedContent) +
+            ")";
     }
 
     /**
@@ -86,7 +116,11 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return A list of files paths matching the given criteria.
      */
     @Override
-    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) throws IOException {
+    public List<Path> findAssociatedFiles(
+        BibEntry entry,
+        List<Path> directories,
+        List<String> extensions
+    ) throws IOException {
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
         return findFile(entry, directories, extensionRegExp);
     }
@@ -121,7 +155,11 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return Will return the first file found to match the given criteria or
      * null if none was found.
      */
-    private List<Path> findFile(BibEntry entry, List<Path> dirs, String extensionRegExp) throws IOException {
+    private List<Path> findFile(
+        BibEntry entry,
+        List<Path> dirs,
+        String extensionRegExp
+    ) throws IOException {
         List<Path> res = new ArrayList<>();
         for (Path directory : dirs) {
             res.addAll(findFile(entry, directory, regExp, extensionRegExp));
@@ -133,7 +171,12 @@ class RegExpBasedFileFinder implements FileFinder {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    private List<Path> findFile(final BibEntry entry, final Path directory, final String file, final String extensionRegExp) throws IOException {
+    private List<Path> findFile(
+        final BibEntry entry,
+        final Path directory,
+        final String file,
+        final String extensionRegExp
+    ) throws IOException {
         List<Path> resultFiles = new ArrayList<>();
 
         String fileName = file;
@@ -176,23 +219,51 @@ class RegExpBasedFileFinder implements FileFinder {
             if ("*".equals(dirToProcess)) { // Do for all direct subdirs
                 File[] subDirs = actualDirectory.toFile().listFiles();
                 if (subDirs != null) {
-                    String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
+                    String restOfFileString = StringUtil.join(
+                        fileParts,
+                        "/",
+                        index + 1,
+                        fileParts.length
+                    );
                     for (File subDir : subDirs) {
                         if (subDir.isDirectory()) {
-                            resultFiles.addAll(findFile(entry, subDir.toPath(), restOfFileString, extensionRegExp));
+                            resultFiles.addAll(
+                                findFile(
+                                    entry,
+                                    subDir.toPath(),
+                                    restOfFileString,
+                                    extensionRegExp
+                                )
+                            );
                         }
                     }
                 }
             }
             // Do for all direct and indirect subdirs
             if ("**".equals(dirToProcess)) {
-                String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
+                String restOfFileString = StringUtil.join(
+                    fileParts,
+                    "/",
+                    index + 1,
+                    fileParts.length
+                );
 
                 final Path rootDirectory = actualDirectory;
                 try (Stream<Path> pathStream = Files.walk(actualDirectory)) {
                     // We only want to transverse directory (and not the current one; this is already done below)
-                    for (Path path : pathStream.filter(element -> isSubDirectory(rootDirectory, element)).collect(Collectors.toList())) {
-                        resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
+                    for (Path path : pathStream
+                        .filter(element ->
+                            isSubDirectory(rootDirectory, element)
+                        )
+                        .collect(Collectors.toList())) {
+                        resultFiles.addAll(
+                            findFile(
+                                entry,
+                                path,
+                                restOfFileString,
+                                extensionRegExp
+                            )
+                        );
                     }
                 } catch (UncheckedIOException ioe) {
                     throw ioe.getCause();
@@ -201,9 +272,21 @@ class RegExpBasedFileFinder implements FileFinder {
         }
 
         // Last step: check if the given file can be found in this directory
-        Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
-        BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
-        try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
+        Pattern toMatch = createFileNamePattern(
+            fileParts,
+            extensionRegExp,
+            entry
+        );
+        BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) ->
+            toMatch.matcher(path.getFileName().toString()).matches();
+        try (
+            Stream<Path> pathStream = Files.find(
+                actualDirectory,
+                1,
+                matcher,
+                FileVisitOption.FOLLOW_LINKS
+            )
+        ) {
             resultFiles.addAll(pathStream.collect(Collectors.toList()));
         } catch (UncheckedIOException uncheckedIOException) {
             // Previously, an empty list were returned here on both IOException and UncheckedIOException

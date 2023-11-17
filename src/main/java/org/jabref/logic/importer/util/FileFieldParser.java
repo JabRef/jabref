@@ -6,14 +6,15 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jabref.model.entry.LinkedFile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileFieldParser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        FileFieldParser.class
+    );
 
     private final String value;
 
@@ -87,7 +88,9 @@ public class FileFieldParser {
                 // Check if we are entering an XML special character construct such
                 // as "&#44;", because we need to know in order to ignore the semicolon.
                 charactersOfCurrentElement.append(c);
-                if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
+                if (
+                    (value.length() > (i + 1)) && (value.charAt(i + 1) == '#')
+                ) {
                     inXmlChar = true;
                 }
             } else if (!escaped && inXmlChar && (c == ';')) {
@@ -95,8 +98,10 @@ public class FileFieldParser {
                 charactersOfCurrentElement.append(c);
                 inXmlChar = false;
             } else if (!escaped && (c == ':')) {
-                if ((linkedFileData.size() == 1) && // we already parsed the description
-                        (charactersOfCurrentElement.length() == 1)) { // we parsed one character
+                if (
+                    (linkedFileData.size() == 1) && // we already parsed the description
+                    (charactersOfCurrentElement.length() == 1)
+                ) { // we parsed one character
                     // special case of Windows paths
                     // Example: ":c:\test.pdf:PDF"
                     // We are at the second : (position 3 in the example) and "just" add it to the current element
@@ -149,10 +154,16 @@ public class FileFieldParser {
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
-                field = new LinkedFile(entry.get(0), new URL(entry.get(1)), entry.get(2));
+                field =
+                    new LinkedFile(
+                        entry.get(0),
+                        new URL(entry.get(1)),
+                        entry.get(2)
+                    );
             } catch (MalformedURLException e) {
                 // in case the URL is malformed, store it nevertheless
-                field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
+                field =
+                    new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
             }
         }
 
@@ -169,16 +180,27 @@ public class FileFieldParser {
                     field = new LinkedFile(entry.get(0), path, entry.get(2));
                 } catch (InvalidPathException e) {
                     // Ignored
-                    LOGGER.debug("Invalid path object, continueing with string", e);
+                    LOGGER.debug(
+                        "Invalid path object, continueing with string",
+                        e
+                    );
                     field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
                 }
             }
         }
 
         // link is the only mandatory field
-        if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
+        if (
+            field.getDescription().isEmpty() &&
+            field.getLink().isEmpty() &&
+            !field.getFileType().isEmpty()
+        ) {
             field = new LinkedFile("", Path.of(field.getFileType()), "");
-        } else if (!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
+        } else if (
+            !field.getDescription().isEmpty() &&
+            field.getLink().isEmpty() &&
+            field.getFileType().isEmpty()
+        ) {
             field = new LinkedFile("", Path.of(field.getDescription()), "");
         }
         entry.clear();

@@ -4,11 +4,9 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.bst.BstVMException;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +27,12 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class BstNameFormatter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);
 
-    private BstNameFormatter() {
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BstNameFormatter.class
+    );
+
+    private BstNameFormatter() {}
 
     /**
      * Formats the nth author of the author name list by a given format string
@@ -41,14 +41,25 @@ public class BstNameFormatter {
      * @param whichName       index of the list, starting with 1
      * @param formatString    TODO
      */
-    public static String formatName(String authorsNameList, int whichName, String formatString) {
+    public static String formatName(
+        String authorsNameList,
+        int whichName,
+        String formatString
+    ) {
         AuthorList al = AuthorList.parse(authorsNameList);
 
         if ((whichName < 1) && (whichName > al.getNumberOfAuthors())) {
-            LOGGER.warn("AuthorList {} does not contain an author with number {}", authorsNameList, whichName);
+            LOGGER.warn(
+                "AuthorList {} does not contain an author with number {}",
+                authorsNameList,
+                whichName
+            );
             return "";
         }
-        return BstNameFormatter.formatName(al.getAuthor(whichName - 1), formatString);
+        return BstNameFormatter.formatName(
+            al.getAuthor(whichName - 1),
+            formatString
+        );
     }
 
     public static String formatName(Author author, String format) {
@@ -81,7 +92,11 @@ public class BstNameFormatter {
                     }
                     if ((braceLevel == 1) && Character.isLetter(c[i])) {
                         if ("fvlj".indexOf(c[i]) == -1) {
-                            LOGGER.warn("Format string in format.name$ may only contain fvlj on brace level 1 in group {}: {}", group, format);
+                            LOGGER.warn(
+                                "Format string in format.name$ may only contain fvlj on brace level 1 in group {}: {}",
+                                group,
+                                format
+                            );
                         } else {
                             level1Chars.append(c[i]);
                         }
@@ -89,30 +104,32 @@ public class BstNameFormatter {
                     i++;
                 }
                 i--; // unskip last brace (for last i++ at the end)
-                String control = level1Chars.toString().toLowerCase(Locale.ROOT);
+                String control = level1Chars
+                    .toString()
+                    .toLowerCase(Locale.ROOT);
 
                 if (control.isEmpty()) {
                     continue;
                 }
 
                 if (control.length() > 2) {
-                    LOGGER.warn("Format string in format.name$ may only be one or two character long on brace level 1 in group {}: {}", group, format);
+                    LOGGER.warn(
+                        "Format string in format.name$ may only be one or two character long on brace level 1 in group {}: {}",
+                        group,
+                        format
+                    );
                 }
 
                 char type = control.charAt(0);
 
-                Optional<String> tokenS = switch (type) {
-                    case 'f' ->
-                            author.getFirst();
-                    case 'v' ->
-                            author.getVon();
-                    case 'l' ->
-                            author.getLast();
-                    case 'j' ->
-                            author.getJr();
-                    default ->
-                            throw new BstVMException("Internal error");
-                };
+                Optional<String> tokenS =
+                    switch (type) {
+                        case 'f' -> author.getFirst();
+                        case 'v' -> author.getVon();
+                        case 'l' -> author.getLast();
+                        case 'j' -> author.getJr();
+                        default -> throw new BstVMException("Internal error");
+                    };
 
                 if (tokenS.isEmpty()) {
                     i++;
@@ -126,13 +143,20 @@ public class BstNameFormatter {
                     if (control.charAt(1) == control.charAt(0)) {
                         abbreviateThatIsSingleLetter = false;
                     } else {
-                        LOGGER.warn("Format string in format.name$ may only contain one type of vlfj on brace level 1 in group {}: {}", group, format);
+                        LOGGER.warn(
+                            "Format string in format.name$ may only contain one type of vlfj on brace level 1 in group {}: {}",
+                            group,
+                            format
+                        );
                     }
                 }
 
                 // Now we know what to do
 
-                if ((braceLevel == 0) && (wholeChar.charAt(wholeChar.length() - 1) == '}')) {
+                if (
+                    (braceLevel == 0) &&
+                    (wholeChar.charAt(wholeChar.length() - 1) == '}')
+                ) {
                     wholeChar.deleteCharAt(wholeChar.length() - 1);
                 }
 
@@ -151,8 +175,17 @@ public class BstNameFormatter {
                         }
                         if (((j + 1) < d.length) && (d[j + 1] == '{')) {
                             StringBuilder interTokenSb = new StringBuilder();
-                            j = BstNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
-                            interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
+                            j =
+                                BstNameFormatter.consumeToMatchingBrace(
+                                    interTokenSb,
+                                    d,
+                                    j + 1
+                                );
+                            interToken =
+                                interTokenSb.substring(
+                                    1,
+                                    interTokenSb.length() - 1
+                                );
                         }
 
                         for (int k = 0; k < tokens.length; k++) {
@@ -160,8 +193,13 @@ public class BstNameFormatter {
                             if (abbreviateThatIsSingleLetter) {
                                 String[] dashes = token.split("-");
 
-                                token = Arrays.stream(dashes).map(BstNameFormatter::getFirstCharOfString)
-                                              .collect(Collectors.joining(".-"));
+                                token =
+                                    Arrays
+                                        .stream(dashes)
+                                        .map(
+                                            BstNameFormatter::getFirstCharOfString
+                                        )
+                                        .collect(Collectors.joining(".-"));
                             }
 
                             // Output token
@@ -176,7 +214,17 @@ public class BstNameFormatter {
                                     // No clue what this means (What the hell are tokens anyway???
                                     // if (lex_class[name_sep_char[cur_token]] = sep_char) then
                                     //    append_ex_buf_char_and_check (name_sep_char[cur_token])
-                                    if ((k == (tokens.length - 2)) || (BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 3) < 3)) {
+                                    if (
+                                        (k == (tokens.length - 2)) ||
+                                        (BstNameFormatter.numberOfChars(
+                                                sb.substring(
+                                                    groupStart,
+                                                    sb.length()
+                                                ),
+                                                3
+                                            ) <
+                                            3)
+                                    ) {
                                         sb.append('~');
                                     } else {
                                         sb.append(' ');
@@ -200,9 +248,16 @@ public class BstNameFormatter {
                 }
                 if (sb.length() > 0) {
                     boolean noDisTie = false;
-                    if ((sb.charAt(sb.length() - 1) == '~') &&
-                            ((BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
-                                    ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
+                    if (
+                        (sb.charAt(sb.length() - 1) == '~') &&
+                        ((BstNameFormatter.numberOfChars(
+                                    sb.substring(groupStart, sb.length()),
+                                    4
+                                ) >=
+                                4) ||
+                            ((sb.length() > 1) &&
+                                (noDisTie = sb.charAt(sb.length() - 2) == '~')))
+                    ) {
                         sb.deleteCharAt(sb.length() - 1);
                         if (!noDisTie) {
                             sb.append(' ');
@@ -217,7 +272,10 @@ public class BstNameFormatter {
             i++;
         }
         if (braceLevel != 0) {
-            LOGGER.warn("Unbalanced brace in format string for nameFormat: {}", format);
+            LOGGER.warn(
+                "Unbalanced brace in format string for nameFormat: {}",
+                format
+            );
         }
 
         return sb.toString();
@@ -226,7 +284,11 @@ public class BstNameFormatter {
     /**
      * Including the matching brace.
      */
-    public static int consumeToMatchingBrace(StringBuilder interTokenSb, char[] c, int pos) {
+    public static int consumeToMatchingBrace(
+        StringBuilder interTokenSb,
+        char[] c,
+        int pos
+    ) {
         int braceLevel = 0;
 
         for (int i = pos; i < c.length; i++) {

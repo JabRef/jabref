@@ -1,7 +1,6 @@
 package org.jabref.gui.util.comparator;
 
 import java.util.Comparator;
-
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -48,7 +47,10 @@ public class NumericFieldComparator implements Comparator<String> {
         if (StringUtil.isNullOrEmpty(number)) {
             return false;
         }
-        if (number.length() == 1 && (number.charAt(0) == '-' || number.charAt(0) == '+')) {
+        if (
+            number.length() == 1 &&
+            (number.charAt(0) == '-' || number.charAt(0) == '+')
+        ) {
             return false;
         }
         for (int i = 0; i < number.length(); i++) {

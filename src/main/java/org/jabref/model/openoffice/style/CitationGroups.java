@@ -8,12 +8,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.util.OOListUtil;
 import org.jabref.model.openoffice.util.OOPair;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +22,9 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationGroups {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationGroups.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        CitationGroups.class
+    );
 
     private final Map<CitationGroupId, CitationGroup> citationGroupsUnordered;
 
@@ -55,17 +55,22 @@ public class CitationGroups {
     /**
      * For each citation in {@code where} call {@code fun.accept(new Pair(citation, value));}
      */
-    public <T> void distributeToCitations(List<CitationPath> where,
-                                          Consumer<OOPair<Citation, T>> fun,
-                                          T value) {
-
+    public <T> void distributeToCitations(
+        List<CitationPath> where,
+        Consumer<OOPair<Citation, T>> fun,
+        T value
+    ) {
         for (CitationPath p : where) {
             CitationGroup group = citationGroupsUnordered.get(p.group);
             if (group == null) {
-                LOGGER.warn("CitationGroups.distributeToCitations: group missing");
+                LOGGER.warn(
+                    "CitationGroups.distributeToCitations: group missing"
+                );
                 continue;
             }
-            Citation cit = group.citationsInStorageOrder.get(p.storageIndexInGroup);
+            Citation cit = group.citationsInStorageOrder.get(
+                p.storageIndexInGroup
+            );
             fun.accept(new OOPair<>(cit, value));
         }
     }
@@ -85,7 +90,6 @@ public class CitationGroups {
         CitedKeys cks = getCitedKeysUnordered();
         cks.lookupInDatabases(databases);
         cks.distributeLookupResults(this);
-
         // (2) lookup each citation directly
         //
         // CitationDatabaseLookupResult for the same citation key may be a different object:
@@ -110,7 +114,9 @@ public class CitationGroups {
      */
     public List<CitationGroup> getCitationGroupsInGlobalOrder() {
         if (globalOrder.isEmpty()) {
-            throw new IllegalStateException("getCitationGroupsInGlobalOrder: not ordered yet");
+            throw new IllegalStateException(
+                "getCitationGroupsInGlobalOrder: not ordered yet"
+            );
         }
         return OOListUtil.map(globalOrder.get(), citationGroupsUnordered::get);
     }
@@ -123,14 +129,18 @@ public class CitationGroups {
     public void setGlobalOrder(List<CitationGroupId> globalOrder) {
         Objects.requireNonNull(globalOrder);
         if (globalOrder.size() != numberOfCitationGroups()) {
-            throw new IllegalStateException("setGlobalOrder: globalOrder.size() != numberOfCitationGroups()");
+            throw new IllegalStateException(
+                "setGlobalOrder: globalOrder.size() != numberOfCitationGroups()"
+            );
         }
         this.globalOrder = Optional.of(globalOrder);
 
         // Propagate to each CitationGroup
         for (int i = 0; i < globalOrder.size(); i++) {
             CitationGroupId groupId = globalOrder.get(i);
-            citationGroupsUnordered.get(groupId).setIndexInGlobalOrder(Optional.of(i));
+            citationGroupsUnordered
+                .get(groupId)
+                .setIndexInGlobalOrder(Optional.of(i));
         }
     }
 
@@ -156,7 +166,10 @@ public class CitationGroups {
             int storageIndexInGroup = 0;
             for (Citation cit : group.citationsInStorageOrder) {
                 String key = cit.citationKey;
-                CitationPath path = new CitationPath(group.groupId, storageIndexInGroup);
+                CitationPath path = new CitationPath(
+                    group.groupId,
+                    storageIndexInGroup
+                );
                 if (res.containsKey(key)) {
                     res.get(key).addPath(path, cit);
                 } else {
@@ -173,7 +186,9 @@ public class CitationGroups {
      */
     public CitedKeys getCitedKeysSortedInOrderOfAppearance() {
         if (!hasGlobalOrder()) {
-            throw new IllegalStateException("getSortedCitedKeys: no globalOrder");
+            throw new IllegalStateException(
+                "getSortedCitedKeys: no globalOrder"
+            );
         }
         LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
         for (CitationGroup group : getCitationGroupsInGlobalOrder()) {
@@ -212,8 +227,10 @@ public class CitationGroups {
 
     public void createNumberedBibliographySortedInOrderOfAppearance() {
         if (bibliography.isPresent()) {
-            throw new IllegalStateException("createNumberedBibliographySortedInOrderOfAppearance:"
-                    + " already have a bibliography");
+            throw new IllegalStateException(
+                "createNumberedBibliographySortedInOrderOfAppearance:" +
+                " already have a bibliography"
+            );
         }
         CitedKeys citedKeys = getCitedKeysSortedInOrderOfAppearance();
         citedKeys.numberCitedKeysInCurrentOrder();
@@ -224,9 +241,13 @@ public class CitationGroups {
     /**
      * precondition: database lookup already performed (otherwise we just sort citation keys)
      */
-    public void createPlainBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
+    public void createPlainBibliographySortedByComparator(
+        Comparator<BibEntry> entryComparator
+    ) {
         if (bibliography.isPresent()) {
-            throw new IllegalStateException("createPlainBibliographySortedByComparator: already have a bibliography");
+            throw new IllegalStateException(
+                "createPlainBibliographySortedByComparator: already have a bibliography"
+            );
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
         citedKeys.sortByComparator(entryComparator);
@@ -236,9 +257,13 @@ public class CitationGroups {
     /**
      * precondition: database lookup already performed (otherwise we just sort citation keys)
      */
-    public void createNumberedBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
+    public void createNumberedBibliographySortedByComparator(
+        Comparator<BibEntry> entryComparator
+    ) {
         if (bibliography.isPresent()) {
-            throw new IllegalStateException("createNumberedBibliographySortedByComparator: already have a bibliography");
+            throw new IllegalStateException(
+                "createNumberedBibliographySortedByComparator: already have a bibliography"
+            );
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
         citedKeys.sortByComparator(entryComparator);

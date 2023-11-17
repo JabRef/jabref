@@ -15,15 +15,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.model.texparser.LatexParserResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultLatexParser implements LatexParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLatexParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DefaultLatexParser.class
+    );
     private static final String TEX_EXT = ".tex";
     private static final String BIB_EXT = ".bib";
 
@@ -32,22 +32,35 @@ public class DefaultLatexParser implements LatexParser {
      * "[cC]ite(author|title|year|t|p)?".
      */
     private static final String[] CITE_COMMANDS = {
-            "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
-            "([aA]|[aA]uto|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite([s*]?)",
-            "footcitetext", "(block|text)cquote"
+        "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
+        "([aA]|[aA]uto|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite([s*]?)",
+        "footcitetext",
+        "(block|text)cquote",
     };
     private static final String CITE_GROUP = "key";
     private static final Pattern CITE_PATTERN = Pattern.compile(
-            String.format("\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}(?:\\{[^\\}]*\\})?",
-                    String.join("|", CITE_COMMANDS), CITE_GROUP));
+        String.format(
+            "\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}(?:\\{[^\\}]*\\})?",
+            String.join("|", CITE_COMMANDS),
+            CITE_GROUP
+        )
+    );
 
     private static final String BIBLIOGRAPHY_GROUP = "bib";
     private static final Pattern BIBLIOGRAPHY_PATTERN = Pattern.compile(
-            String.format("\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}", BIBLIOGRAPHY_GROUP));
+        String.format(
+            "\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}",
+            BIBLIOGRAPHY_GROUP
+        )
+    );
 
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
-            String.format("\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}", INCLUDE_GROUP));
+        String.format(
+            "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}",
+            INCLUDE_GROUP
+        )
+    );
 
     private final LatexParserResult latexParserResult;
 
@@ -82,10 +95,18 @@ public class DefaultLatexParser implements LatexParser {
             }
 
             try (
-                    InputStream inputStream = Files.newInputStream(file);
-                    Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                    LineNumberReader lineNumberReader = new LineNumberReader(reader)) {
-                for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
+                InputStream inputStream = Files.newInputStream(file);
+                Reader reader = new InputStreamReader(
+                    inputStream,
+                    StandardCharsets.UTF_8
+                );
+                LineNumberReader lineNumberReader = new LineNumberReader(reader)
+            ) {
+                for (
+                    String line = lineNumberReader.readLine();
+                    line != null;
+                    line = lineNumberReader.readLine()
+                ) {
                     // Skip comments and blank lines.
                     if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
                         continue;
@@ -122,7 +143,14 @@ public class DefaultLatexParser implements LatexParser {
 
         while (citeMatch.find()) {
             for (String key : citeMatch.group(CITE_GROUP).split(",")) {
-                latexParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
+                latexParserResult.addKey(
+                    key.trim(),
+                    file,
+                    lineNumber,
+                    citeMatch.start(),
+                    citeMatch.end(),
+                    line
+                );
             }
         }
     }
@@ -134,12 +162,17 @@ public class DefaultLatexParser implements LatexParser {
         Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
 
         while (bibliographyMatch.find()) {
-            for (String bibString : bibliographyMatch.group(BIBLIOGRAPHY_GROUP).split(",")) {
+            for (String bibString : bibliographyMatch
+                .group(BIBLIOGRAPHY_GROUP)
+                .split(",")) {
                 bibString = bibString.trim();
-                Path bibFile = file.getParent().resolve(
+                Path bibFile = file
+                    .getParent()
+                    .resolve(
                         bibString.endsWith(BIB_EXT)
-                                ? bibString
-                                : String.format("%s%s", bibString, BIB_EXT));
+                            ? bibString
+                            : String.format("%s%s", bibString, BIB_EXT)
+                    );
 
                 if (bibFile.toFile().exists()) {
                     latexParserResult.addBibFile(file, bibFile);
@@ -151,16 +184,23 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find inputs and includes along a specific line and store them for parsing later.
      */
-    private void matchNestedFile(Path texFile, List<Path> texFiles, List<Path> referencedFiles, String line) {
+    private void matchNestedFile(
+        Path texFile,
+        List<Path> texFiles,
+        List<Path> referencedFiles,
+        String line
+    ) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
 
         while (includeMatch.find()) {
             String filenamePassedToInclude = includeMatch.group(INCLUDE_GROUP);
             String texFileName = filenamePassedToInclude.endsWith(TEX_EXT)
-                    ? filenamePassedToInclude
-                    : String.format("%s%s", filenamePassedToInclude, TEX_EXT);
+                ? filenamePassedToInclude
+                : String.format("%s%s", filenamePassedToInclude, TEX_EXT);
             Path nestedFile = texFile.getParent().resolve(texFileName);
-            if (nestedFile.toFile().exists() && !texFiles.contains(nestedFile)) {
+            if (
+                nestedFile.toFile().exists() && !texFiles.contains(nestedFile)
+            ) {
                 referencedFiles.add(nestedFile);
             }
         }

@@ -2,14 +2,12 @@ package org.jabref.logic.texparser;
 
 import java.nio.file.Path;
 import java.util.List;
-
 import org.jabref.model.texparser.LatexParserResult;
 
 /**
  * Parses a LaTeX file
  */
 public interface LatexParser {
-
     /**
      * For testing purposes.
      *

@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
-
+import org.apache.commons.cli.ParseException;
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -27,8 +27,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
-
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -42,6 +40,7 @@ import org.tinylog.configuration.Configuration;
  * - Start the JavaFX application (if not in cli mode)
  */
 public class Launcher {
+
     private static Logger LOGGER;
     private static String[] ARGUMENTS;
     private static boolean isDebugEnabled;
@@ -66,10 +65,16 @@ public class Launcher {
             Globals.entryTypesManager = entryTypesManager;
 
             // Initialize preferences
-            final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            final JabRefPreferences preferences =
+                JabRefPreferences.getInstance();
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(ARGUMENTS, preferences.getRemotePreferences())) {
+            if (
+                !handleMultipleAppInstances(
+                    ARGUMENTS,
+                    preferences.getRemotePreferences()
+                )
+            ) {
                 return;
             }
 
@@ -83,24 +88,34 @@ public class Launcher {
             clearOldSearchIndices();
 
             try {
-                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
+                FileUpdateMonitor fileUpdateMonitor =
+                    Globals.getFileUpdateMonitor();
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                        ARGUMENTS,
-                        ArgumentProcessor.Mode.INITIAL_START,
-                        preferences,
-                        fileUpdateMonitor,
-                        entryTypesManager);
+                    ARGUMENTS,
+                    ArgumentProcessor.Mode.INITIAL_START,
+                    preferences,
+                    fileUpdateMonitor,
+                    entryTypesManager
+                );
                 argumentProcessor.processArguments();
                 if (argumentProcessor.shouldShutDown()) {
-                    LOGGER.debug("JabRef shut down after processing command line arguments");
+                    LOGGER.debug(
+                        "JabRef shut down after processing command line arguments"
+                    );
                     // A clean shutdown takes 60s time
                     // We don't need the clean shutdown here
                     System.exit(0);
                 }
 
-                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
+                MainApplication.main(
+                    argumentProcessor.getParserResults(),
+                    argumentProcessor.isBlank(),
+                    preferences,
+                    fileUpdateMonitor,
+                    ARGUMENTS
+                );
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
@@ -132,13 +147,23 @@ public class Launcher {
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "writerFile", "shared file",
-                "writerFile.level", isDebugEnabled ? "debug" : "info",
-                "level", isDebugEnabled ? "debug" : "info",
-                "writerFile.file", directory.resolve("log.txt").toString(),
-                "writerFile.charset", "UTF-8");
+            "writerFile",
+            "shared file",
+            "writerFile.level",
+            isDebugEnabled ? "debug" : "info",
+            "level",
+            isDebugEnabled ? "debug" : "info",
+            "writerFile.file",
+            directory.resolve("log.txt").toString(),
+            "writerFile.charset",
+            "UTF-8"
+        );
 
-        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        configuration
+            .entrySet()
+            .forEach(config ->
+                Configuration.set(config.getKey(), config.getValue())
+            );
         initializeLogger();
     }
 
@@ -146,19 +171,30 @@ public class Launcher {
         LOGGER = LoggerFactory.getLogger(MainApplication.class);
     }
 
-    private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
+    private static boolean handleMultipleAppInstances(
+        String[] args,
+        RemotePreferences remotePreferences
+    ) {
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            RemoteClient remoteClient = new RemoteClient(
+                remotePreferences.getPort()
+            );
             if (remoteClient.ping()) {
                 // We are not alone, there is already a server out there, send command line
                 // arguments to other instance
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
-                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    LOGGER.info(
+                        Localization.lang(
+                            "Arguments passed on to running JabRef instance. Shutting down."
+                        )
+                    );
                     return false;
                 } else {
-                    LOGGER.warn("Could not communicate with other running JabRef instance.");
+                    LOGGER.warn(
+                        "Could not communicate with other running JabRef instance."
+                    );
                 }
             }
         }
@@ -167,26 +203,38 @@ public class Launcher {
 
     private static void initGlobals(PreferencesService preferences) {
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader
-                .loadRepository(preferences.getJournalAbbreviationPreferences());
+        Globals.journalAbbreviationRepository =
+            JournalAbbreviationLoader.loadRepository(
+                preferences.getJournalAbbreviationPreferences()
+            );
 
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
-        Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
+        Globals.protectedTermsLoader =
+            new ProtectedTermsLoader(
+                preferences.getProtectedTermsPreferences()
+            );
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
         ProxyRegisterer.register(proxyPreferences);
-        if (proxyPreferences.shouldUseProxy() && proxyPreferences.shouldUseAuthentication()) {
+        if (
+            proxyPreferences.shouldUseProxy() &&
+            proxyPreferences.shouldUseAuthentication()
+        ) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
     }
 
     private static void configureSSL(SSLPreferences sslPreferences) {
-        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        TrustStoreManager.createTruststoreFileIfNotExist(
+            Path.of(sslPreferences.getTruststorePath())
+        );
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path currentIndexPath = OS
+            .getNativeDesktop()
+            .getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {
@@ -197,13 +245,21 @@ public class Launcher {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
-                        && !path.equals(currentIndexPath)) {
-                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
-                    Files.walk(path)
-                            .sorted(Comparator.reverseOrder())
-                            .map(Path::toFile)
-                            .forEach(File::delete);
+                if (
+                    Files.isDirectory(path) &&
+                    !path.toString().endsWith("ssl") &&
+                    path.toString().contains("lucene") &&
+                    !path.equals(currentIndexPath)
+                ) {
+                    LOGGER.info(
+                        "Deleting out-of-date fulltext search index at {}.",
+                        path
+                    );
+                    Files
+                        .walk(path)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
                 }
             }
         } catch (IOException e) {

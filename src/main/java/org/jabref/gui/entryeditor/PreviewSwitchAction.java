@@ -1,19 +1,26 @@
 package org.jabref.gui.entryeditor;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
-
 public class PreviewSwitchAction extends SimpleCommand {
 
-    public enum Direction { PREVIOUS, NEXT }
+    public enum Direction {
+        PREVIOUS,
+        NEXT,
+    }
 
     private final JabRefFrame frame;
     private final Direction direction;
 
-    public PreviewSwitchAction(Direction direction, JabRefFrame frame, StateManager stateManager) {
+    public PreviewSwitchAction(
+        Direction direction,
+        JabRefFrame frame,
+        StateManager stateManager
+    ) {
         this.frame = frame;
         this.direction = direction;
 
@@ -25,7 +32,10 @@ public class PreviewSwitchAction extends SimpleCommand {
         if (direction == Direction.NEXT) {
             frame.getCurrentLibraryTab().getEntryEditor().nextPreviewStyle();
         } else {
-            frame.getCurrentLibraryTab().getEntryEditor().previousPreviewStyle();
+            frame
+                .getCurrentLibraryTab()
+                .getEntryEditor()
+                .previousPreviewStyle();
         }
     }
 }

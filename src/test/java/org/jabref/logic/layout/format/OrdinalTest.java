@@ -1,9 +1,9 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
 
 public class OrdinalTest {
 
@@ -43,7 +43,10 @@ public class OrdinalTest {
     public void testFullSentence() {
         assertEquals("1st edn.", new Ordinal().format("1 edn."));
         assertEquals("1st edition", new Ordinal().format("1st edition"));
-        assertEquals("The 2nd conference on 3rd.14th", new Ordinal().format("The 2 conference on 3.14"));
+        assertEquals(
+            "The 2nd conference on 3rd.14th",
+            new Ordinal().format("The 2 conference on 3.14")
+        );
     }
 
     @Test

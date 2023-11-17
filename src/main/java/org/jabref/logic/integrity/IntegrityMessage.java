@@ -1,11 +1,11 @@
 package org.jabref.logic.integrity;
 
 import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public final class IntegrityMessage implements Cloneable {
+
     private final BibEntry entry;
     private final Field field;
     private final String message;
@@ -18,7 +18,14 @@ public final class IntegrityMessage implements Cloneable {
 
     @Override
     public String toString() {
-        return "[" + getEntry().getCitationKey().orElse("") + "] in " + field.getDisplayName() + ": " + getMessage();
+        return (
+            "[" +
+            getEntry().getCitationKey().orElse("") +
+            "] in " +
+            field.getDisplayName() +
+            ": " +
+            getMessage()
+        );
     }
 
     public String getMessage() {
@@ -47,9 +54,11 @@ public final class IntegrityMessage implements Cloneable {
             return false;
         }
         IntegrityMessage that = (IntegrityMessage) o;
-        return Objects.equals(entry, that.entry) &&
-                Objects.equals(field, that.field) &&
-                Objects.equals(message, that.message);
+        return (
+            Objects.equals(entry, that.entry) &&
+            Objects.equals(field, that.field) &&
+            Objects.equals(message, that.message)
+        );
     }
 
     @Override

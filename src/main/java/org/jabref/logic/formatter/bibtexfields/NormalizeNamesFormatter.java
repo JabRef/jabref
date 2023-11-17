@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.AuthorList;
@@ -30,7 +29,9 @@ public class NormalizeNamesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Normalizes lists of persons to the BibTeX standard.");
+        return Localization.lang(
+            "Normalizes lists of persons to the BibTeX standard."
+        );
     }
 
     @Override

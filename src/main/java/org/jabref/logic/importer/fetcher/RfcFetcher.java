@@ -5,15 +5,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Optional;
-
+import org.apache.http.client.utils.URIBuilder;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-
-import org.apache.http.client.utils.URIBuilder;
 
 /*
  * https://datatracker.ietf.org
@@ -22,7 +20,7 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public class RfcFetcher implements IdBasedParserFetcher {
 
-    private final static String DRAFT_PREFIX = "draft";
+    private static final String DRAFT_PREFIX = "draft";
     private final ImportFormatPreferences importFormatPreferences;
 
     public RfcFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -46,14 +44,22 @@ public class RfcFetcher implements IdBasedParserFetcher {
      * @return the URL of the RFC resource
      */
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         String prefixedIdentifier = identifier.toLowerCase(Locale.ENGLISH);
         // if not a "draft" version
-        if ((!prefixedIdentifier.startsWith(DRAFT_PREFIX)) && (!prefixedIdentifier.startsWith("rfc"))) {
+        if (
+            (!prefixedIdentifier.startsWith(DRAFT_PREFIX)) &&
+            (!prefixedIdentifier.startsWith("rfc"))
+        ) {
             // Add "rfc" prefix if user's search entry was numerical
             prefixedIdentifier = "rfc" + prefixedIdentifier;
         }
-        URIBuilder uriBuilder = new URIBuilder("https://datatracker.ietf.org/doc/" + prefixedIdentifier + "/bibtex/");
+        URIBuilder uriBuilder = new URIBuilder(
+            "https://datatracker.ietf.org/doc/" +
+            prefixedIdentifier +
+            "/bibtex/"
+        );
         return uriBuilder.build().toURL();
     }
 

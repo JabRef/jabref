@@ -1,9 +1,9 @@
 package org.jabref.gui.entryeditor;
 
+import com.tobiasdiez.easybind.EasyBind;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
 import javafx.geometry.HPos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -13,7 +13,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-
+import org.controlsfx.control.HyperlinkLabel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
@@ -21,13 +21,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-import org.controlsfx.control.HyperlinkLabel;
-
 public class SciteTab extends EntryEditorTab {
 
     public static final String NAME = "Scite";
-    public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
+    public static final String SCITE_REPORTS_URL_BASE =
+        "https://scite.ai/reports/";
 
     private final GridPane sciteResultsPane;
     private final ProgressIndicator progressIndicator;
@@ -35,14 +33,23 @@ public class SciteTab extends EntryEditorTab {
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
 
-    public SciteTab(PreferencesService preferencesService, TaskExecutor taskExecutor, DialogService dialogService) {
+    public SciteTab(
+        PreferencesService preferencesService,
+        TaskExecutor taskExecutor,
+        DialogService dialogService
+    ) {
         this.preferencesService = preferencesService;
-        this.viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
+        this.viewModel =
+            new SciteTabViewModel(preferencesService, taskExecutor);
         this.dialogService = dialogService;
         this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
         setText(NAME);
-        setTooltip(new Tooltip(Localization.lang("Search scite.ai for Smart Citations")));
+        setTooltip(
+            new Tooltip(
+                Localization.lang("Search scite.ai for Smart Citations")
+            )
+        );
         setSciteResultsPane();
     }
 
@@ -58,17 +65,25 @@ public class SciteTab extends EntryEditorTab {
         sciteResultsPane.setId("scitePane");
         setContent(sciteResultsPane);
 
-        EasyBind.subscribe(viewModel.statusProperty(), status -> {
-            sciteResultsPane.getChildren().clear();
-            switch (status) {
-                case IN_PROGRESS ->
-                        sciteResultsPane.add(progressIndicator, 0, 0);
-                case FOUND ->
-                        viewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
-                case ERROR ->
-                        sciteResultsPane.add(getErrorPane(), 0, 0);
+        EasyBind.subscribe(
+            viewModel.statusProperty(),
+            status -> {
+                sciteResultsPane.getChildren().clear();
+                switch (status) {
+                    case IN_PROGRESS -> sciteResultsPane.add(
+                        progressIndicator,
+                        0,
+                        0
+                    );
+                    case FOUND -> viewModel
+                        .getCurrentResult()
+                        .ifPresent(result ->
+                            sciteResultsPane.add(getTalliesPane(result), 0, 0)
+                        );
+                    case ERROR -> sciteResultsPane.add(getErrorPane(), 0, 0);
+                }
             }
-        });
+        );
     }
 
     @Override
@@ -91,25 +106,34 @@ public class SciteTab extends EntryEditorTab {
     }
 
     private VBox getTalliesPane(SciteTallyModel tallModel) {
-        Label titleLabel = new Label(Localization.lang("Tallies for %0", tallModel.doi()));
+        Label titleLabel = new Label(
+            Localization.lang("Tallies for %0", tallModel.doi())
+        );
         titleLabel.getStyleClass().add("scite-tallies-label");
-        Text message = new Text(String.format("Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d",
-            tallModel.total(),
-            tallModel.supporting(),
-            tallModel.contradicting(),
-            tallModel.mentioning(),
-            tallModel.unclassified(),
-            tallModel.citingPublications()
-        ));
+        Text message = new Text(
+            String.format(
+                "Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d",
+                tallModel.total(),
+                tallModel.supporting(),
+                tallModel.contradicting(),
+                tallModel.mentioning(),
+                tallModel.unclassified(),
+                tallModel.citingPublications()
+            )
+        );
 
-        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
+        String url =
+            SCITE_REPORTS_URL_BASE +
+            URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
         VBox messageBox = getMessageBox(url, titleLabel, message);
         messageBox.getStyleClass().add("scite-message-box");
         return messageBox;
     }
 
     private VBox getMessageBox(String url, Label titleLabel, Text message) {
-        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("See full report at [%0]", url));
+        HyperlinkLabel link = new HyperlinkLabel(
+            Localization.lang("See full report at [%0]", url)
+        );
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 var filePreferences = preferencesService.getFilePreferences();
@@ -118,8 +142,11 @@ public class SciteTab extends EntryEditorTab {
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(
-                    "An error occurred opening web browser",
-                "JabRef was unable to open a web browser for link:\n\n" + url + "\n\nError Message:\n\n" + ioex.getMessage(),
+                        "An error occurred opening web browser",
+                        "JabRef was unable to open a web browser for link:\n\n" +
+                        url +
+                        "\n\nError Message:\n\n" +
+                        ioex.getMessage(),
                         ioex
                     );
                 }

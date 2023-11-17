@@ -1,10 +1,9 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.jabref.logic.layout.LayoutFormatter;
+import org.junit.jupiter.api.Test;
 
 public class AuthorFirstLastOxfordCommasTest {
 
@@ -19,17 +18,26 @@ public class AuthorFirstLastOxfordCommasTest {
         assertEquals("", a.format(""));
 
         // Single Names
-        assertEquals("Van Something Someone", a.format("Someone, Van Something"));
+        assertEquals(
+            "Van Something Someone",
+            a.format("Someone, Van Something")
+        );
 
         // Two names
-        assertEquals("John von Neumann and Peter Black Brown", a
-                .format("John von Neumann and Peter Black Brown"));
+        assertEquals(
+            "John von Neumann and Peter Black Brown",
+            a.format("John von Neumann and Peter Black Brown")
+        );
 
         // Three names
-        assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
-                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
+        assertEquals(
+            "John von Neumann, John Smith, and Peter Black Brown",
+            a.format("von Neumann, John and Smith, John and Black Brown, Peter")
+        );
 
-        assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
-                .format("John von Neumann and John Smith and Black Brown, Peter"));
+        assertEquals(
+            "John von Neumann, John Smith, and Peter Black Brown",
+            a.format("John von Neumann and John Smith and Black Brown, Peter")
+        );
     }
 }

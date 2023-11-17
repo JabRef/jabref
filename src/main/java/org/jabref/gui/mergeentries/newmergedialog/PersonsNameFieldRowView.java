@@ -11,25 +11,50 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.preferences.PreferencesService;
 
 public class PersonsNameFieldRowView extends FieldRowView {
+
     private final AuthorList leftEntryNames;
     private final AuthorList rightEntryNames;
 
-    public PersonsNameFieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, PreferencesService preferencesService, int rowIndex) {
-        super(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory, preferencesService, rowIndex);
+    public PersonsNameFieldRowView(
+        Field field,
+        BibEntry leftEntry,
+        BibEntry rightEntry,
+        BibEntry mergedEntry,
+        FieldMergerFactory fieldMergerFactory,
+        PreferencesService preferencesService,
+        int rowIndex
+    ) {
+        super(
+            field,
+            leftEntry,
+            rightEntry,
+            mergedEntry,
+            fieldMergerFactory,
+            preferencesService,
+            rowIndex
+        );
         assert field.getProperties().contains(FieldProperty.PERSON_NAMES);
 
         var authorsParser = new AuthorListParser();
         leftEntryNames = authorsParser.parse(viewModel.getLeftFieldValue());
         rightEntryNames = authorsParser.parse(viewModel.getRightFieldValue());
 
-        if (!viewModel.hasEqualLeftAndRightValues() && leftEntryNames.equals(rightEntryNames)) {
+        if (
+            !viewModel.hasEqualLeftAndRightValues() &&
+            leftEntryNames.equals(rightEntryNames)
+        ) {
             showPersonsNamesAreTheSameInfo();
             shouldShowDiffs.set(false);
         }
     }
 
     private void showPersonsNamesAreTheSameInfo() {
-        InfoButton infoButton = new InfoButton(Localization.lang("The %0s are the same. However, the order of field content differs", viewModel.getField().getName()));
+        InfoButton infoButton = new InfoButton(
+            Localization.lang(
+                "The %0s are the same. However, the order of field content differs",
+                viewModel.getField().getName()
+            )
+        );
         getFieldNameCell().addSideButton(infoButton);
     }
 }

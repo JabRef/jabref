@@ -1,11 +1,9 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
-
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntry;
@@ -21,7 +19,9 @@ public class MathSciNetTab extends EntryEditorTab {
     }
 
     private Optional<MathSciNetId> getMathSciNetId(BibEntry entry) {
-        return entry.getField(StandardField.MR_NUMBER).flatMap(MathSciNetId::parse);
+        return entry
+            .getField(StandardField.MR_NUMBER)
+            .flatMap(MathSciNetId::parse);
     }
 
     private StackPane getPane(BibEntry entry) {
@@ -31,21 +31,29 @@ public class MathSciNetTab extends EntryEditorTab {
         WebView browser = WebViewStore.get();
 
         // Quick hack to disable navigating
-        browser.addEventFilter(javafx.scene.input.MouseEvent.ANY, javafx.scene.input.MouseEvent::consume);
+        browser.addEventFilter(
+            javafx.scene.input.MouseEvent.ANY,
+            javafx.scene.input.MouseEvent::consume
+        );
         browser.setContextMenuEnabled(false);
 
         root.getChildren().addAll(browser, progress);
 
         Optional<MathSciNetId> mathSciNetId = getMathSciNetId(entry);
-        mathSciNetId.flatMap(MathSciNetId::getExternalURI)
-                    .ifPresent(url -> browser.getEngine().load(url.toASCIIString()));
+        mathSciNetId
+            .flatMap(MathSciNetId::getExternalURI)
+            .ifPresent(url -> browser.getEngine().load(url.toASCIIString()));
 
         // Hide progress indicator if finished (over 70% loaded)
-        browser.getEngine().getLoadWorker().progressProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() >= 0.7) {
-                progress.setVisible(false);
-            }
-        });
+        browser
+            .getEngine()
+            .getLoadWorker()
+            .progressProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue.doubleValue() >= 0.7) {
+                    progress.setVisible(false);
+                }
+            });
         return root;
     }
 

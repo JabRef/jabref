@@ -1,22 +1,24 @@
 package org.jabref.gui.fieldeditors;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 public class GenderEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private final BiMap<String, String> itemMap = HashBiMap.create(7);
 
-    public GenderEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public GenderEditorViewModel(
+        Field field,
+        SuggestionProvider<?> suggestionProvider,
+        FieldCheckers fieldCheckers,
+        UndoManager undoManager
+    ) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
-
         itemMap.put("sf", Localization.lang("Female name"));
         itemMap.put("sm", Localization.lang("Male name"));
         itemMap.put("sn", Localization.lang("Neuter name"));

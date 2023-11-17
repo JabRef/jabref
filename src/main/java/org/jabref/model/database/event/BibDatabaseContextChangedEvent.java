@@ -9,6 +9,7 @@ import org.jabref.model.metadata.event.MetaDataChangedEvent;
  * because all three inherit from this class.
  */
 public abstract class BibDatabaseContextChangedEvent {
+
     // If the event has been filtered out
     private boolean filteredOut;
 

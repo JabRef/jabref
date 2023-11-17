@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
@@ -36,7 +35,6 @@ import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +56,15 @@ import org.slf4j.LoggerFactory;
 public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String ITALIC_ET_AL = "ItalicEtAl";
-    public static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
+    public static final String MULTI_CITE_CHRONOLOGICAL =
+        "MultiCiteChronological";
     public static final String MINIMUM_GROUPING_COUNT = "MinimumGroupingCount";
     public static final String ET_AL_STRING = "EtAlString";
     public static final String MAX_AUTHORS_FIRST = "MaxAuthorsFirst";
-    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
-    public static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
+    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT =
+        "ReferenceHeaderParagraphFormat";
+    public static final String REFERENCE_PARAGRAPH_FORMAT =
+        "ReferenceParagraphFormat";
 
     public static final String TITLE = "Title";
     public static final String UNDEFINED_CITATION_MARKER = "??";
@@ -82,24 +83,34 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
     private static final String BOLD_CITATIONS = "BoldCitations";
     private static final String ITALIC_CITATIONS = "ItalicCitations";
-    private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
+    private static final String CITATION_CHARACTER_FORMAT =
+        "CitationCharacterFormat";
     private static final String FORMAT_CITATIONS = "FormatCitations";
-    private static final String GROUPED_NUMBERS_SEPARATOR = "GroupedNumbersSeparator";
+    private static final String GROUPED_NUMBERS_SEPARATOR =
+        "GroupedNumbersSeparator";
 
     // These two can do what ItalicCitations, BoldCitations,
     // SuperscriptCitations and SubscriptCitations were supposed to do,
     // as well as underline smallcaps and strikeout.
-    private static final String CITATION_GROUP_MARKUP_BEFORE = "CitationGroupMarkupBefore";
-    private static final String CITATION_GROUP_MARKUP_AFTER = "CitationGroupMarkupAfter";
+    private static final String CITATION_GROUP_MARKUP_BEFORE =
+        "CitationGroupMarkupBefore";
+    private static final String CITATION_GROUP_MARKUP_AFTER =
+        "CitationGroupMarkupAfter";
 
-    private static final String AUTHORS_PART_MARKUP_BEFORE = "AuthorsPartMarkupBefore";
-    private static final String AUTHORS_PART_MARKUP_AFTER = "AuthorsPartMarkupAfter";
+    private static final String AUTHORS_PART_MARKUP_BEFORE =
+        "AuthorsPartMarkupBefore";
+    private static final String AUTHORS_PART_MARKUP_AFTER =
+        "AuthorsPartMarkupAfter";
 
-    private static final String AUTHOR_NAMES_LIST_MARKUP_BEFORE = "AuthorNamesListMarkupBefore";
-    private static final String AUTHOR_NAMES_LIST_MARKUP_AFTER = "AuthorNamesListMarkupAfter";
+    private static final String AUTHOR_NAMES_LIST_MARKUP_BEFORE =
+        "AuthorNamesListMarkupBefore";
+    private static final String AUTHOR_NAMES_LIST_MARKUP_AFTER =
+        "AuthorNamesListMarkupAfter";
 
-    private static final String AUTHOR_NAME_MARKUP_BEFORE = "AuthorNameMarkupBefore";
-    private static final String AUTHOR_NAME_MARKUP_AFTER = "AuthorNameMarkupAfter";
+    private static final String AUTHOR_NAME_MARKUP_BEFORE =
+        "AuthorNameMarkupBefore";
+    private static final String AUTHOR_NAME_MARKUP_AFTER =
+        "AuthorNameMarkupAfter";
 
     private static final String PAGE_INFO_SEPARATOR = "PageInfoSeparator";
     private static final String CITATION_SEPARATOR = "CitationSeparator";
@@ -114,14 +125,17 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String SORT_ALGORITHM = "SortAlgorithm";
     private static final String OXFORD_COMMA = "OxfordComma";
     private static final String YEAR_SEPARATOR = "YearSeparator";
-    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
+    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT =
+        "AuthorLastSeparatorInText";
     private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
 
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
 
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        OOBibStyle.class
+    );
     private final SortedSet<String> journals = new TreeSet<>();
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
@@ -141,7 +155,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public OOBibStyle(Path styleFile, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {
+    public OOBibStyle(
+        Path styleFile,
+        LayoutFormatterPreferences layoutPreferences,
+        JournalAbbreviationRepository abbreviationRepository
+    ) throws IOException {
         this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
         this.abbreviationRepository = abbreviationRepository;
         this.styleFile = Objects.requireNonNull(styleFile);
@@ -151,7 +169,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.toAbsolutePath().toString();
     }
 
-    public OOBibStyle(String resourcePath, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {
+    public OOBibStyle(
+        String resourcePath,
+        LayoutFormatterPreferences layoutPreferences,
+        JournalAbbreviationRepository abbreviationRepository
+    ) throws IOException {
         this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
         this.abbreviationRepository = abbreviationRepository;
 
@@ -178,7 +200,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Set default properties for the citation marker:
-        citProperties.put(AUTHOR_FIELD, FieldFactory.serializeOrFields(StandardField.AUTHOR, StandardField.EDITOR));
+        citProperties.put(
+            AUTHOR_FIELD,
+            FieldFactory.serializeOrFields(
+                StandardField.AUTHOR,
+                StandardField.EDITOR
+            )
+        );
 
         citProperties.put(CITATION_GROUP_MARKUP_BEFORE, "");
         citProperties.put(CITATION_GROUP_MARKUP_AFTER, "");
@@ -238,7 +266,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void initialize(InputStream stream) throws IOException {
         Objects.requireNonNull(stream);
 
-        try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+        try (
+            Reader reader = new InputStreamReader(
+                stream,
+                StandardCharsets.UTF_8
+            )
+        ) {
             readFormatFile(reader);
         }
     }
@@ -263,7 +296,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private void reload() throws IOException {
         if (styleFile != null) {
-            this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
+            this.styleFileModificationTime =
+                Files.getLastModifiedTime(styleFile).toMillis();
             try (InputStream stream = Files.newInputStream(styleFile)) {
                 initialize(stream);
             }
@@ -281,7 +315,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             return true;
         } else {
             try {
-                return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;
+                return (
+                    Files.getLastModifiedTime(styleFile).toMillis() ==
+                    this.styleFileModificationTime
+                );
             } catch (IOException e) {
                 return false;
             }
@@ -289,7 +326,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     private void readFormatFile(Reader input) throws IOException {
-
         // First read all the contents of the file:
         StringBuilder stringBuilder = new StringBuilder();
         int chr;
@@ -384,10 +420,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             try {
                 final String typeName = line.substring(0, index);
                 final String formatString = line.substring(index + 1);
-                Layout layout = new LayoutHelper(new StringReader(formatString), layoutPreferences, abbreviationRepository).getLayoutFromText();
+                Layout layout = new LayoutHelper(
+                    new StringReader(formatString),
+                    layoutPreferences,
+                    abbreviationRepository
+                )
+                    .getLayoutFromText();
                 EntryType type = EntryTypeFactory.parse(typeName);
 
-                if (!isDefaultLayoutPresent && OOBibStyle.DEFAULT_MARK.equals(typeName)) {
+                if (
+                    !isDefaultLayoutPresent &&
+                    OOBibStyle.DEFAULT_MARK.equals(typeName)
+                ) {
                     isDefaultLayoutPresent = true;
                     defaultBibLayout = layout;
                 } else {
@@ -409,7 +453,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
-            if ((value.trim().length() > 1) && QUOTED.matcher(value.trim()).matches()) {
+            if (
+                (value.trim().length() > 1) &&
+                QUOTED.matcher(value.trim()).matches()
+            ) {
                 value = value.trim().substring(1, value.trim().length() - 1);
             }
             Object toSet = value;
@@ -553,10 +600,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             return true;
         }
         if (object instanceof OOBibStyle otherStyle) {
-            return Objects.equals(path, otherStyle.path)
-                    && Objects.equals(name, otherStyle.name)
-                    && Objects.equals(citProperties, otherStyle.citProperties)
-                    && Objects.equals(properties, otherStyle.properties);
+            return (
+                Objects.equals(path, otherStyle.path) &&
+                Objects.equals(name, otherStyle.name) &&
+                Objects.equals(citProperties, otherStyle.citProperties) &&
+                Objects.equals(properties, otherStyle.properties)
+            );
         }
         return false;
     }
@@ -572,7 +621,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         PROPERTIES,
         CITATION,
         NAME,
-        JOURNALS
+        JOURNALS,
     }
 
     /** The String to represent authors that are not mentioned,
@@ -672,32 +721,49 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @return The text for the citation.
      */
-    public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
+    public OOText getNumCitationMarker2(
+        List<CitationMarkerNumericEntry> entries
+    ) {
         final int minGroupingCount = this.getMinimumGroupingCount();
-        return OOBibStyleGetNumCitationMarker.getNumCitationMarker2(this,
-                                                                    entries,
-                                                                    minGroupingCount);
+        return OOBibStyleGetNumCitationMarker.getNumCitationMarker2(
+            this,
+            entries,
+            minGroupingCount
+        );
     }
 
     /**
      * For some tests we need to override minGroupingCount.
      */
-    public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries,
-                                        int minGroupingCount) {
-        return OOBibStyleGetNumCitationMarker.getNumCitationMarker2(this,
-                                                                    entries,
-                                                                    minGroupingCount);
+    public OOText getNumCitationMarker2(
+        List<CitationMarkerNumericEntry> entries,
+        int minGroupingCount
+    ) {
+        return OOBibStyleGetNumCitationMarker.getNumCitationMarker2(
+            this,
+            entries,
+            minGroupingCount
+        );
     }
 
     /**
      * Format a number-based bibliography label for the given number.
      */
-    public OOText getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry entry) {
-        return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
+    public OOText getNumCitationMarkerForBibliography(
+        CitationMarkerNumericBibEntry entry
+    ) {
+        return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(
+            this,
+            entry
+        );
     }
 
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
+        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(
+            this,
+            entry,
+            Optional.empty()
+        );
     }
 
     /**
@@ -731,13 +797,17 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *         OOFormat.setLocaleNone() and OOFormat.setCharStyle().
      *         These are added by decorateCitationMarker()
      */
-    public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
-                                       boolean inParenthesis,
-                                       NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
-        return OOBibStyleGetCitationMarker.createCitationMarker(this,
-                                                                citationMarkerEntries,
-                                                                inParenthesis,
-                                                                nonUniqueCitationMarkerHandling);
+    public OOText createCitationMarker(
+        List<CitationMarkerEntry> citationMarkerEntries,
+        boolean inParenthesis,
+        NonUniqueCitationMarker nonUniqueCitationMarkerHandling
+    ) {
+        return OOBibStyleGetCitationMarker.createCitationMarker(
+            this,
+            citationMarkerEntries,
+            inParenthesis,
+            nonUniqueCitationMarkerHandling
+        );
     }
 
     /**
@@ -835,7 +905,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *  non-empty field will be used.
      */
     protected OrFields getAuthorFieldNames() {
-        String authorFieldNamesString = this.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
+        String authorFieldNamesString =
+            this.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
         return FieldFactory.parseOrFields(authorFieldNamesString);
     }
 
@@ -843,7 +914,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *  @return Field containing year, with fallback fields.
      */
     protected OrFields getYearFieldNames() {
-        String yearFieldNamesString = this.getStringCitProperty(OOBibStyle.YEAR_FIELD);
+        String yearFieldNamesString =
+            this.getStringCitProperty(OOBibStyle.YEAR_FIELD);
         return FieldFactory.parseOrFields(yearFieldNamesString);
     }
 
@@ -854,8 +926,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /* As getAuthorLastSeparator, for in-text citation. */
     protected String getAuthorLastSeparatorInTextWithFallBack() {
-        String preferred = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);
-        String fallback = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
+        String preferred = getStringCitProperty(
+            OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT
+        );
+        String fallback = getStringCitProperty(
+            OOBibStyle.AUTHOR_LAST_SEPARATOR
+        );
         return Objects.requireNonNullElse(preferred, fallback);
     }
 
@@ -906,7 +982,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public String getBracketBeforeInListWithFallBack() {
-        return Objects.requireNonNullElse(getBracketBeforeInList(), getBracketBefore());
+        return Objects.requireNonNullElse(
+            getBracketBeforeInList(),
+            getBracketBefore()
+        );
     }
 
     /** Closing parenthesis after citation marker in the bibliography */
@@ -915,7 +994,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     String getBracketAfterInListWithFallBack() {
-        return Objects.requireNonNullElse(getBracketAfterInList(), getBracketAfter());
+        return Objects.requireNonNullElse(
+            getBracketAfterInList(),
+            getBracketAfter()
+        );
     }
 
     public OOText getFormattedBibliographyTitle() {
@@ -923,7 +1005,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
         return parStyle == null
-                ? OOFormat.paragraph(title)
-                : OOFormat.paragraph(title, parStyle);
+            ? OOFormat.paragraph(title)
+            : OOFormat.paragraph(title, parStyle);
     }
 }

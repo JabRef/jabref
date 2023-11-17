@@ -1,16 +1,16 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.jabref.logic.layout.LayoutFormatter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class RTFCharsTest {
+
     private LayoutFormatter formatter;
 
     @BeforeEach
@@ -29,8 +29,10 @@ class RTFCharsTest {
 
         assertEquals("hallo", formatter.format("hallo"));
 
-        assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e",
-                formatter.format("Réflexions sur le timing de la quantité"));
+        assertEquals(
+            "R\\u233eflexions sur le timing de la quantit\\u233e",
+            formatter.format("Réflexions sur le timing de la quantité")
+        );
 
         assertEquals("h\\'e1llo", formatter.format("h\\'allo"));
         assertEquals("h\\'e1llo", formatter.format("h\\'allo"));
@@ -40,7 +42,12 @@ class RTFCharsTest {
     void testLaTeXHighlighting() {
         assertEquals("{\\i hallo}", formatter.format("\\emph{hallo}"));
         assertEquals("{\\i hallo}", formatter.format("{\\emph hallo}"));
-        assertEquals("An article title with {\\i a book title} emphasized", formatter.format("An article title with \\emph{a book title} emphasized"));
+        assertEquals(
+            "An article title with {\\i a book title} emphasized",
+            formatter.format(
+                "An article title with \\emph{a book title} emphasized"
+            )
+        );
 
         assertEquals("{\\i hallo}", formatter.format("\\textit{hallo}"));
         assertEquals("{\\i hallo}", formatter.format("{\\textit hallo}"));
@@ -51,8 +58,12 @@ class RTFCharsTest {
 
     @Test
     void testComplicated() {
-        assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
-                formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ"));
+        assertEquals(
+            "R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
+            formatter.format(
+                "Réflexions sur le timing de la quantité {\\ae} should be æ"
+            )
+        );
     }
 
     @Test
@@ -62,35 +73,49 @@ class RTFCharsTest {
 
     @Test
     void testComplicated3() {
-        assertEquals("Le c\\u339oeur d\\u233e\\u231cu mais l'\\u226ame plut\\u244ot na\\u239ive, Lou\\u255ys r" +
-                "\\u234eva de crapa\\u252?ter en cano\\u235e au del\\u224a des \\u238iles, pr\\u232es du m\\u228alstr" +
-                "\\u246om o\\u249u br\\u251ulent les nov\\u230ae.", formatter.format("Le cœur déçu mais l'âme plutôt " +
-                "naïve, Louÿs rêva de crapaüter en canoë au delà des îles, près du mälström où brûlent les novæ."));
+        assertEquals(
+            "Le c\\u339oeur d\\u233e\\u231cu mais l'\\u226ame plut\\u244ot na\\u239ive, Lou\\u255ys r" +
+            "\\u234eva de crapa\\u252?ter en cano\\u235e au del\\u224a des \\u238iles, pr\\u232es du m\\u228alstr" +
+            "\\u246om o\\u249u br\\u251ulent les nov\\u230ae.",
+            formatter.format(
+                "Le cœur déçu mais l'âme plutôt " +
+                "naïve, Louÿs rêva de crapaüter en canoë au delà des îles, près du mälström où brûlent les novæ."
+            )
+        );
     }
 
     @Test
     void testComplicated4() {
-        assertEquals("l'\\u238ile exigu\\u235e\n" +
-                "  O\\u249u l'ob\\u232ese jury m\\u251ur\n" +
-                "  F\\u234ete l'ha\\u239i volap\\u252?k,\n" +
-                "  \\u194Ane ex a\\u233equo au whist,\n" +
-                "  \\u212Otez ce v\\u339oeu d\\u233e\\u231cu.", formatter.format("l'île exiguë\n" +
+        assertEquals(
+            "l'\\u238ile exigu\\u235e\n" +
+            "  O\\u249u l'ob\\u232ese jury m\\u251ur\n" +
+            "  F\\u234ete l'ha\\u239i volap\\u252?k,\n" +
+            "  \\u194Ane ex a\\u233equo au whist,\n" +
+            "  \\u212Otez ce v\\u339oeu d\\u233e\\u231cu.",
+            formatter.format(
+                "l'île exiguë\n" +
                 "  Où l'obèse jury mûr\n" +
                 "  Fête l'haï volapük,\n" +
                 "  Âne ex aéquo au whist,\n" +
-                "  Ôtez ce vœu déçu."));
+                "  Ôtez ce vœu déçu."
+            )
+        );
     }
 
     @Test
     void testComplicated5() {
-        assertEquals("\\u193Arv\\u237izt\\u369?r\\u337? t\\u252?k\\u246orf\\u250ur\\u243og\\u233ep",
-                formatter.format("Árvíztűrő tükörfúrógép"));
+        assertEquals(
+            "\\u193Arv\\u237izt\\u369?r\\u337? t\\u252?k\\u246orf\\u250ur\\u243og\\u233ep",
+            formatter.format("Árvíztűrő tükörfúrógép")
+        );
     }
 
     @Test
     void testComplicated6() {
-        assertEquals("Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig",
-                formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
+        assertEquals(
+            "Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig",
+            formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig")
+        );
     }
 
     @Test
@@ -133,7 +158,8 @@ class RTFCharsTest {
     }
 
     @ParameterizedTest(name = "specialChar={0}, formattedStr={1}")
-    @CsvSource({
+    @CsvSource(
+        {
             "ÀÁÂÃÄĀĂĄ, \\u192A\\u193A\\u194A\\u195A\\u196A\\u256A\\u258A\\u260A", // A
             "àáâãäåāăą, \\u224a\\u225a\\u226a\\u227a\\u228a\\u229a\\u257a\\u259a\\u261a", // a
             "ÇĆĈĊČ, \\u199C\\u262C\\u264C\\u266C\\u268C", // C
@@ -178,9 +204,13 @@ class RTFCharsTest {
             "œ, \\u339oe", // oe
             "Þ, \\u222TH", // TH
             "ß, \\u223ss", // ss
-            "¡, \\u161!" // !
-    })
-    public void testMoreSpecialCharacters(String specialChar, String expectedResult) {
+            "¡, \\u161!", // !
+        }
+    )
+    public void testMoreSpecialCharacters(
+        String specialChar,
+        String expectedResult
+    ) {
         String formattedStr = formatter.format(specialChar);
         assertEquals(expectedResult, formattedStr);
     }

@@ -5,7 +5,9 @@ import java.util.regex.Pattern;
 
 public class BracesCorrector {
 
-    private static final Pattern PATTERN_ESCAPED_CURLY_BRACES = Pattern.compile("(\\\\\\{)|(\\\\\\})");
+    private static final Pattern PATTERN_ESCAPED_CURLY_BRACES = Pattern.compile(
+        "(\\\\\\{)|(\\\\\\})"
+    );
 
     public static String apply(String input) {
         if (input == null) {
@@ -15,7 +17,9 @@ public class BracesCorrector {
             String addedBraces = input;
             String c = matcher.replaceAll("");
 
-            long diff = c.chars().filter(ch -> ch == '{').count() - c.chars().filter(ch -> ch == '}').count();
+            long diff =
+                c.chars().filter(ch -> ch == '{').count() -
+                c.chars().filter(ch -> ch == '}').count();
             while (diff != 0) {
                 if (diff < 0) {
                     addedBraces = "{" + addedBraces;

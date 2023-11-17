@@ -18,10 +18,12 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class BstTextPrefixer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BstTextPrefixer.class);
 
-    private BstTextPrefixer() {
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BstTextPrefixer.class
+    );
+
+    private BstTextPrefixer() {}
 
     public static String textPrefix(int inNumOfChars, String toPrefix) {
         int numOfChars = inNumOfChars;
@@ -54,7 +56,10 @@ public class BstTextPrefixer {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    LOGGER.warn("Unbalanced brace in string for purify$: {}", toPrefix);
+                    LOGGER.warn(
+                        "Unbalanced brace in string for purify$: {}",
+                        toPrefix
+                    );
                 }
             } else {
                 numOfChars--;

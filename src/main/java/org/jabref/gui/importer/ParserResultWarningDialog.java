@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -12,8 +11,7 @@ import org.jabref.logic.l10n.Localization;
  */
 public class ParserResultWarningDialog {
 
-    private ParserResultWarningDialog() {
-    }
+    private ParserResultWarningDialog() {}
 
     /**
      * Shows a dialog with the warnings from an import or open of a file
@@ -21,7 +19,10 @@ public class ParserResultWarningDialog {
      * @param parserResult - ParserResult for the current import/open
      * @param jabRefFrame  - the JabRefFrame
      */
-    public static void showParserResultWarningDialog(final ParserResult parserResult, final JabRefFrame jabRefFrame) {
+    public static void showParserResultWarningDialog(
+        final ParserResult parserResult,
+        final JabRefFrame jabRefFrame
+    ) {
         Objects.requireNonNull(parserResult);
         Objects.requireNonNull(jabRefFrame);
         showParserResultWarningDialog(parserResult, jabRefFrame, -1);
@@ -34,8 +35,11 @@ public class ParserResultWarningDialog {
      * @param jabRefFrame    - the JabRefFrame
      * @param dataBaseNumber - Database tab number to activate when showing the warning dialog
      */
-    public static void showParserResultWarningDialog(final ParserResult parserResult, final JabRefFrame jabRefFrame,
-                                                     final int dataBaseNumber) {
+    public static void showParserResultWarningDialog(
+        final ParserResult parserResult,
+        final JabRefFrame jabRefFrame,
+        final int dataBaseNumber
+    ) {
         Objects.requireNonNull(parserResult);
         Objects.requireNonNull(jabRefFrame);
         // Return if no warnings
@@ -53,7 +57,9 @@ public class ParserResultWarningDialog {
         final StringBuilder dialogContent = new StringBuilder();
         int warningCount = 1;
         for (final String warning : warnings) {
-            dialogContent.append(String.format("%d. %s%n", warningCount++, warning));
+            dialogContent.append(
+                String.format("%d. %s%n", warningCount++, warning)
+            );
         }
         dialogContent.deleteCharAt(dialogContent.length() - 1);
 
@@ -62,10 +68,16 @@ public class ParserResultWarningDialog {
         if (dataBaseNumber < 0 || parserResult.getPath().isEmpty()) {
             dialogTitle = Localization.lang("Warnings");
         } else {
-            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getPath().get().getFileName() + ")";
+            dialogTitle =
+                Localization.lang("Warnings") +
+                " (" +
+                parserResult.getPath().get().getFileName() +
+                ")";
         }
 
         // Show dialog
-        jabRefFrame.getDialogService().showWarningDialogAndWait(dialogTitle, dialogContent.toString());
+        jabRefFrame
+            .getDialogService()
+            .showWarningDialogAndWait(dialogTitle, dialogContent.toString());
     }
 }

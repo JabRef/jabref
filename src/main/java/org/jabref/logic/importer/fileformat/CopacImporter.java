@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -47,7 +46,8 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         String str;
         while ((str = reader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
@@ -57,7 +57,12 @@ public class CopacImporter extends Importer {
         return false;
     }
 
-    private static void setOrAppend(BibEntry b, Field field, String value, String separator) {
+    private static void setOrAppend(
+        BibEntry b,
+        Field field,
+        String value,
+        String separator
+    ) {
         if (b.hasField(field) && b.getField(field).isPresent()) {
             b.setField(field, b.getField(field).get() + separator + value);
         } else {
@@ -66,7 +71,8 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         Objects.requireNonNull(reader);
 
         List<String> entries = new LinkedList<>();
@@ -117,28 +123,75 @@ public class CopacImporter extends Importer {
                 String code = line.substring(0, 4);
 
                 switch (code) {
-                    case "TI- " ->
-                            setOrAppend(b, StandardField.TITLE, line.substring(4).trim(), ", ");
-                    case "AU- " ->
-                            setOrAppend(b, StandardField.AUTHOR, line.substring(4).trim(), " and ");
-                    case "PY- " ->
-                            setOrAppend(b, StandardField.YEAR, line.substring(4).trim(), ", ");
-                    case "PU- " ->
-                            setOrAppend(b, StandardField.PUBLISHER, line.substring(4).trim(), ", ");
-                    case "SE- " ->
-                            setOrAppend(b, StandardField.SERIES, line.substring(4).trim(), ", ");
-                    case "IS- " ->
-                            setOrAppend(b, StandardField.ISBN, line.substring(4).trim(), ", ");
-                    case "KW- " ->
-                            setOrAppend(b, StandardField.KEYWORDS, line.substring(4).trim(), ", ");
-                    case "NT- " ->
-                            setOrAppend(b, StandardField.NOTE, line.substring(4).trim(), ", ");
-                    case "PD- " ->
-                            setOrAppend(b, new UnknownField("physicaldimensions"), line.substring(4).trim(), ", ");
-                    case "DT- " ->
-                            setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
-                    default ->
-                            setOrAppend(b, FieldFactory.parseField(StandardEntryType.Book, line.substring(0, 2)), line.substring(4).trim(), ", ");
+                    case "TI- " -> setOrAppend(
+                        b,
+                        StandardField.TITLE,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "AU- " -> setOrAppend(
+                        b,
+                        StandardField.AUTHOR,
+                        line.substring(4).trim(),
+                        " and "
+                    );
+                    case "PY- " -> setOrAppend(
+                        b,
+                        StandardField.YEAR,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "PU- " -> setOrAppend(
+                        b,
+                        StandardField.PUBLISHER,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "SE- " -> setOrAppend(
+                        b,
+                        StandardField.SERIES,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "IS- " -> setOrAppend(
+                        b,
+                        StandardField.ISBN,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "KW- " -> setOrAppend(
+                        b,
+                        StandardField.KEYWORDS,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "NT- " -> setOrAppend(
+                        b,
+                        StandardField.NOTE,
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "PD- " -> setOrAppend(
+                        b,
+                        new UnknownField("physicaldimensions"),
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    case "DT- " -> setOrAppend(
+                        b,
+                        new UnknownField("documenttype"),
+                        line.substring(4).trim(),
+                        ", "
+                    );
+                    default -> setOrAppend(
+                        b,
+                        FieldFactory.parseField(
+                            StandardEntryType.Book,
+                            line.substring(0, 2)
+                        ),
+                        line.substring(4).trim(),
+                        ", "
+                    );
                 }
             }
             results.add(b);

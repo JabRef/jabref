@@ -3,7 +3,6 @@ package org.jabref.gui.maintable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -12,12 +11,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TableColumn;
-
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +26,9 @@ public class MainTableColumnModel {
 
     public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MainTableColumnModel.class
+    );
 
     public enum Type {
         INDEX("index", Localization.lang("Index")),
@@ -41,7 +40,12 @@ public class MainTableColumnModel {
         SPECIALFIELD("special", Localization.lang("Special")),
         LIBRARY_NAME("library", Localization.lang("Library"));
 
-        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, LINKED_IDENTIFIER);
+        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(
+            EXTRAFILE,
+            FILES,
+            GROUPS,
+            LINKED_IDENTIFIER
+        );
 
         private final String name;
         private final String displayName;
@@ -75,10 +79,12 @@ public class MainTableColumnModel {
         }
     }
 
-    private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<Type> typeProperty =
+        new SimpleObjectProperty<>();
     private final StringProperty qualifierProperty = new SimpleStringProperty();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
-    private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<TableColumn.SortType> sortTypeProperty =
+        new SimpleObjectProperty<>();
 
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
@@ -119,7 +125,6 @@ public class MainTableColumnModel {
      */
     public MainTableColumnModel(Type type, String qualifier, double width) {
         this(type, qualifier);
-
         this.widthProperty.setValue(width);
     }
 
@@ -135,18 +140,27 @@ public class MainTableColumnModel {
         if (qualifierProperty.getValue().isBlank()) {
             return typeProperty.getValue().getName();
         } else {
-            return typeProperty.getValue().getName() + COLUMNS_QUALIFIER_DELIMITER + qualifierProperty.getValue();
+            return (
+                typeProperty.getValue().getName() +
+                COLUMNS_QUALIFIER_DELIMITER +
+                qualifierProperty.getValue()
+            );
         }
     }
 
     public String getDisplayName() {
-        if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
-                || (typeProperty.getValue() == Type.INDEX)) {
+        if (
+            (Type.ICON_COLUMNS.contains(typeProperty.getValue()) &&
+                qualifierProperty.getValue().isBlank()) ||
+            (typeProperty.getValue() == Type.INDEX)
+        ) {
             return typeProperty.getValue().getDisplayName();
         } else {
             // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
             // "author/editor(Custom)" instead of "author/editor" in the output
-            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()));
+            return FieldsUtil.getNameWithType(
+                FieldFactory.parseField(qualifierProperty.getValue())
+            );
         }
     }
 
@@ -180,9 +194,12 @@ public class MainTableColumnModel {
      */
     public List<SaveOrder.SortCriterion> getSortCriteria() {
         boolean descending = getSortType() == TableColumn.SortType.DESCENDING;
-        return FieldFactory.parseOrFields(getQualifier()).getFields().stream()
-                .map(field -> new SaveOrder.SortCriterion(field, descending))
-                .toList();
+        return FieldFactory
+            .parseOrFields(getQualifier())
+            .getFields()
+            .stream()
+            .map(field -> new SaveOrder.SortCriterion(field, descending))
+            .toList();
     }
 
     @Override
@@ -200,12 +217,18 @@ public class MainTableColumnModel {
         if (typeProperty.getValue() != that.typeProperty.getValue()) {
             return false;
         }
-        return Objects.equals(qualifierProperty.getValue(), that.qualifierProperty.getValue());
+        return Objects.equals(
+            qualifierProperty.getValue(),
+            that.qualifierProperty.getValue()
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
+        return Objects.hash(
+            typeProperty.getValue(),
+            qualifierProperty.getValue()
+        );
     }
 
     /**
@@ -216,14 +239,18 @@ public class MainTableColumnModel {
      */
     public static MainTableColumnModel parse(String rawColumnName) {
         Objects.requireNonNull(rawColumnName);
-        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
+        String[] splittedName = rawColumnName.split(
+            COLUMNS_QUALIFIER_DELIMITER.toString()
+        );
 
         Type type = Type.fromString(splittedName[0]);
         String qualifier = "";
 
-        if ((type == Type.NORMALFIELD)
-                || (type == Type.SPECIALFIELD)
-                || (type == Type.EXTRAFILE)) {
+        if (
+            (type == Type.NORMALFIELD) ||
+            (type == Type.SPECIALFIELD) ||
+            (type == Type.EXTRAFILE)
+        ) {
             if (splittedName.length == 1) {
                 qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
             } else {

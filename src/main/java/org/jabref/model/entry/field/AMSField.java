@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public enum AMSField implements Field {
-
     FJOURNAL("fjournal");
 
     private final String name;
@@ -25,7 +24,12 @@ public enum AMSField implements Field {
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
-    AMSField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
+    AMSField(
+        String name,
+        String displayName,
+        FieldProperty first,
+        FieldProperty... rest
+    ) {
         this.name = name;
         this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);
@@ -38,9 +42,10 @@ public enum AMSField implements Field {
     }
 
     public static <T> Optional<AMSField> fromName(T type, String name) {
-        return Arrays.stream(AMSField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Arrays
+            .stream(AMSField.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     @Override

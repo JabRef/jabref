@@ -1,7 +1,6 @@
 package org.jabref.model.database.event;
 
 import java.util.List;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
@@ -21,7 +20,11 @@ public class EntriesAddedEvent extends EntriesEvent {
      * @param firstEntry the first entry being added
      */
 
-    public EntriesAddedEvent(List<BibEntry> bibEntries, BibEntry firstEntry, EntriesEventSource location) {
+    public EntriesAddedEvent(
+        List<BibEntry> bibEntries,
+        BibEntry firstEntry,
+        EntriesEventSource location
+    ) {
         super(bibEntries, location);
         this.firstEntry = firstEntry;
     }
@@ -30,7 +33,10 @@ public class EntriesAddedEvent extends EntriesEvent {
      * @param bibEntries <code>List</code> of <code>BibEntry</code> objects which are being added.
      * @param location   Location affected by this event
      */
-    public EntriesAddedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
+    public EntriesAddedEvent(
+        List<BibEntry> bibEntries,
+        EntriesEventSource location
+    ) {
         super(bibEntries, location);
         this.firstEntry = null;
     }

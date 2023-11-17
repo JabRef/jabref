@@ -13,6 +13,7 @@ import org.jabref.model.groups.WordKeywordGroup;
  * Specifies how metadata is read and written.
  */
 public class MetadataSerializationConfiguration {
+
     /**
      * Character used for quoting in the string representation.
      */
@@ -51,18 +52,19 @@ public class MetadataSerializationConfiguration {
     /**
      * Identifier for {@link AutomaticPersonsGroup}.
      */
-    public static final String AUTOMATIC_PERSONS_GROUP_ID = "AutomaticPersonsGroup:";
+    public static final String AUTOMATIC_PERSONS_GROUP_ID =
+        "AutomaticPersonsGroup:";
 
     /**
      * Identifier for {@link AutomaticKeywordGroup}.
      */
-    public static final String AUTOMATIC_KEYWORD_GROUP_ID = "AutomaticKeywordGroup:";
+    public static final String AUTOMATIC_KEYWORD_GROUP_ID =
+        "AutomaticKeywordGroup:";
 
     /**
      * Identifier for {@link TexGroup}.
      */
     public static final String TEX_GROUP_ID = "TexGroup:";
 
-    private MetadataSerializationConfiguration() {
-    }
+    private MetadataSerializationConfiguration() {}
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -38,49 +37,51 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 
 public class Formatters {
-    private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
 
-    private Formatters() {
-    }
+    private static final Pattern TRUNCATE_PATTERN = Pattern.compile(
+        "\\Atruncate\\d+\\z"
+    );
+
+    private Formatters() {}
 
     public static List<Formatter> getConverters() {
         return Arrays.asList(
-                new HtmlToLatexFormatter(),
-                new HtmlToUnicodeFormatter(),
-                new LatexToUnicodeFormatter(),
-                new UnicodeToLatexFormatter()
+            new HtmlToLatexFormatter(),
+            new HtmlToUnicodeFormatter(),
+            new LatexToUnicodeFormatter(),
+            new UnicodeToLatexFormatter()
         );
     }
 
     public static List<Formatter> getCaseChangers() {
         return Arrays.asList(
-                new CapitalizeFormatter(),
-                new LowerCaseFormatter(),
-                new SentenceCaseFormatter(),
-                new TitleCaseFormatter(),
-                new UpperCaseFormatter()
+            new CapitalizeFormatter(),
+            new LowerCaseFormatter(),
+            new SentenceCaseFormatter(),
+            new TitleCaseFormatter(),
+            new UpperCaseFormatter()
         );
     }
 
     public static List<Formatter> getOthers() {
         return Arrays.asList(
-                new ClearFormatter(),
-                new CleanupUrlFormatter(),
-                new LatexCleanupFormatter(),
-                new MinifyNameListFormatter(),
-                new NormalizeDateFormatter(),
-                new NormalizeMonthFormatter(),
-                new NormalizeNamesFormatter(),
-                new NormalizePagesFormatter(),
-                new OrdinalsToSuperscriptFormatter(),
-                new RemoveBracesFormatter(),
-                new UnitsToLatexFormatter(),
-                new EscapeUnderscoresFormatter(),
-                new EscapeAmpersandsFormatter(),
-                new EscapeDollarSignFormatter(),
-                new ShortenDOIFormatter(),
-                new ReplaceUnicodeLigaturesFormatter(),
-                new UnprotectTermsFormatter()
+            new ClearFormatter(),
+            new CleanupUrlFormatter(),
+            new LatexCleanupFormatter(),
+            new MinifyNameListFormatter(),
+            new NormalizeDateFormatter(),
+            new NormalizeMonthFormatter(),
+            new NormalizeNamesFormatter(),
+            new NormalizePagesFormatter(),
+            new OrdinalsToSuperscriptFormatter(),
+            new RemoveBracesFormatter(),
+            new UnitsToLatexFormatter(),
+            new EscapeUnderscoresFormatter(),
+            new EscapeAmpersandsFormatter(),
+            new EscapeDollarSignFormatter(),
+            new ShortenDOIFormatter(),
+            new ReplaceUnicodeLigaturesFormatter(),
+            new UnprotectTermsFormatter()
         );
     }
 
@@ -115,7 +116,10 @@ public class Formatters {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
-            return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
+            return getAll()
+                .stream()
+                .filter(f -> f.getKey().equals(modifier))
+                .findAny();
         }
     }
 }

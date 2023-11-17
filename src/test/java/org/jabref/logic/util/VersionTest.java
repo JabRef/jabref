@@ -1,19 +1,17 @@
 package org.jabref.logic.util;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
+import org.junit.jupiter.api.Test;
 
 public class VersionTest {
 
@@ -217,13 +215,19 @@ public class VersionTest {
     @Test
     public void changelogOfDevelopmentVersionWithDash() {
         Version version = Version.parse("4.0-dev");
-        assertEquals("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased", version.getChangelogUrl());
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased",
+            version.getChangelogUrl()
+        );
     }
 
     @Test
     public void changelogOfDevelopmentVersionWithoutDash() {
         Version version = Version.parse("3.7dev");
-        assertEquals("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased", version.getChangelogUrl());
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased",
+            version.getChangelogUrl()
+        );
     }
 
     @Test
@@ -232,22 +236,40 @@ public class VersionTest {
         Version version2 = Version.parse("4.0-beta");
         Version version3 = Version.parse("4.0-beta2");
         Version version4 = Version.parse("4.0-beta3");
-        assertEquals("https://github.com/JabRef/jabref/blob/v4.0/CHANGELOG.md", version1.getChangelogUrl());
-        assertEquals("https://github.com/JabRef/jabref/blob/v4.0-beta/CHANGELOG.md", version2.getChangelogUrl());
-        assertEquals("https://github.com/JabRef/jabref/blob/v4.0-beta2/CHANGELOG.md", version3.getChangelogUrl());
-        assertEquals("https://github.com/JabRef/jabref/blob/v4.0-beta3/CHANGELOG.md", version4.getChangelogUrl());
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/v4.0/CHANGELOG.md",
+            version1.getChangelogUrl()
+        );
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/v4.0-beta/CHANGELOG.md",
+            version2.getChangelogUrl()
+        );
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/v4.0-beta2/CHANGELOG.md",
+            version3.getChangelogUrl()
+        );
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/v4.0-beta3/CHANGELOG.md",
+            version4.getChangelogUrl()
+        );
     }
 
     @Test
     public void changelogWithTwoDigits() {
         Version version = Version.parse("3.4");
-        assertEquals("https://github.com/JabRef/jabref/blob/v3.4/CHANGELOG.md", version.getChangelogUrl());
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/v3.4/CHANGELOG.md",
+            version.getChangelogUrl()
+        );
     }
 
     @Test
     public void changelogWithThreeDigits() {
         Version version = Version.parse("3.4.1");
-        assertEquals("https://github.com/JabRef/jabref/blob/v3.4.1/CHANGELOG.md", version.getChangelogUrl());
+        assertEquals(
+            "https://github.com/JabRef/jabref/blob/v3.4.1/CHANGELOG.md",
+            version.getChangelogUrl()
+        );
     }
 
     @Test
@@ -310,8 +332,14 @@ public class VersionTest {
     public void alphaShouldBeUpdatedToStables() {
         Version alpha = Version.parse("2.8-alpha");
         Version stable = Version.parse("2.8");
-        List<Version> availableVersions = Arrays.asList(Version.parse("2.8-beta"), stable);
-        assertEquals(Optional.of(stable), alpha.shouldBeUpdatedTo(availableVersions));
+        List<Version> availableVersions = Arrays.asList(
+            Version.parse("2.8-beta"),
+            stable
+        );
+        assertEquals(
+            Optional.of(stable),
+            alpha.shouldBeUpdatedTo(availableVersions)
+        );
     }
 
     @Test
@@ -330,6 +358,9 @@ public class VersionTest {
     @FetcherTest
     @DisabledOnCIServer("GitHub puts a low rate limit on unauthenticated calls")
     public void getAllAvailableVersionsReturnsSomething() throws Exception {
-        assertNotEquals(Collections.emptyList(), Version.getAllAvailableVersions());
+        assertNotEquals(
+            Collections.emptyList(),
+            Version.getAllAvailableVersions()
+        );
     }
 }

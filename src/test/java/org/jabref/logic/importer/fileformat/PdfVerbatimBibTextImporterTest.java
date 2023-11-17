@@ -1,25 +1,22 @@
 package org.jabref.logic.importer.fileformat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-
 import javafx.collections.FXCollections;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PdfVerbatimBibTextImporterTest {
 
@@ -27,8 +24,12 @@ class PdfVerbatimBibTextImporterTest {
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        ImportFormatPreferences importFormatPreferences = mock(
+            ImportFormatPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields())
+            .thenReturn(FXCollections.emptyObservableList());
         importer = new PdfVerbatimBibTextImporter(importFormatPreferences);
     }
 
@@ -39,21 +40,37 @@ class PdfVerbatimBibTextImporterTest {
 
     @Test
     void testGetDescription() {
-        assertEquals("PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.",
-                     importer.getDescription());
+        assertEquals(
+            "PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.",
+            importer.getDescription()
+        );
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        Path file = Path.of(
+            PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf")
+                .toURI()
+        );
+        List<BibEntry> result = importer
+            .importDatabase(file)
+            .getDatabase()
+            .getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Path.of(PdfVerbatimBibTextImporterTest.class.getResource("mixedMetadata.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        Path file = Path.of(
+            PdfVerbatimBibTextImporterTest.class.getResource(
+                    "mixedMetadata.pdf"
+                )
+                .toURI()
+        );
+        List<BibEntry> result = importer
+            .importDatabase(file)
+            .getDatabase()
+            .getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Article);
         expected.setCitationKey("jabreftest2021");
@@ -63,9 +80,16 @@ class PdfVerbatimBibTextImporterTest {
         expected.setField(StandardField.JOURNAL, "Some Journal");
         expected.setField(StandardField.YEAR, "2021");
         expected.setField(StandardField.ISBN, "0134685997");
-        expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
+        expected.setFiles(
+            Collections.singletonList(
+                new LinkedFile("", file.toAbsolutePath(), "PDF")
+            )
+        );
 
-        List<BibEntry> resultSecondImport = importer.importDatabase(file).getDatabase().getEntries();
+        List<BibEntry> resultSecondImport = importer
+            .importDatabase(file)
+            .getDatabase()
+            .getEntries();
         assertEquals(Collections.singletonList(expected), result);
         assertEquals(Collections.singletonList(expected), resultSecondImport);
     }

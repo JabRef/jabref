@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -15,17 +14,25 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 
 public class SpecialFieldsToSeparateFields implements PostOpenMigration {
+
     private final KeywordList possibleKeywordsToMigrate;
     private final Character keywordDelimiter;
-    private final Map<String, SpecialField> migrationTable = getMigrationTable();
+    private final Map<String, SpecialField> migrationTable =
+        getMigrationTable();
 
     public SpecialFieldsToSeparateFields(Character keywordDelimiter) {
-        List<SpecialFieldValue> specialFieldValues = Arrays.asList(SpecialFieldValue.values());
-        possibleKeywordsToMigrate = new KeywordList(specialFieldValues.stream()
-                                                                      .map(SpecialFieldValue::getKeyword)
-                                                                      .filter(Optional::isPresent)
-                                                                      .map(Optional::get)
-                                                                      .collect(Collectors.toList()));
+        List<SpecialFieldValue> specialFieldValues = Arrays.asList(
+            SpecialFieldValue.values()
+        );
+        possibleKeywordsToMigrate =
+            new KeywordList(
+                specialFieldValues
+                    .stream()
+                    .map(SpecialFieldValue::getKeyword)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList())
+            );
         this.keywordDelimiter = keywordDelimiter;
     }
 
@@ -36,8 +43,14 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
 
     private void migrateEntry(BibEntry entry) {
         for (Keyword keyword : possibleKeywordsToMigrate) {
-            if (entry.getKeywords(keywordDelimiter).contains(keyword) && migrationTable.containsKey(keyword.get())) {
-                entry.setField(migrationTable.get(keyword.get()), keyword.get());
+            if (
+                entry.getKeywords(keywordDelimiter).contains(keyword) &&
+                migrationTable.containsKey(keyword.get())
+            ) {
+                entry.setField(
+                    migrationTable.get(keyword.get()),
+                    keyword.get()
+                );
             }
         }
 

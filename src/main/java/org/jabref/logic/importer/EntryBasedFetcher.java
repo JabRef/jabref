@@ -1,7 +1,6 @@
 package org.jabref.logic.importer;
 
 import java.util.List;
-
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -10,7 +9,6 @@ import org.jabref.model.entry.BibEntry;
  * May return multiple search hits.
  */
 public interface EntryBasedFetcher extends WebFetcher {
-
     /**
      * Looks for hits which are matched by the given {@link BibEntry}.
      *

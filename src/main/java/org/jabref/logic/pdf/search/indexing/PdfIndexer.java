@@ -9,16 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.jabref.gui.LibraryTab;
-import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
-import org.jabref.model.pdf.search.SearchFieldConstants;
-import org.jabref.preferences.FilePreferences;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -33,6 +23,14 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.jabref.gui.LibraryTab;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.pdf.search.EnglishStemAnalyzer;
+import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.preferences.FilePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,20 +39,31 @@ import org.slf4j.LoggerFactory;
  */
 public class PdfIndexer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        LibraryTab.class
+    );
 
     private final Directory directoryToIndex;
     private BibDatabaseContext databaseContext;
 
     private final FilePreferences filePreferences;
 
-    public PdfIndexer(Directory indexDirectory, FilePreferences filePreferences) {
+    public PdfIndexer(
+        Directory indexDirectory,
+        FilePreferences filePreferences
+    ) {
         this.directoryToIndex = indexDirectory;
         this.filePreferences = filePreferences;
     }
 
-    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
+    public static PdfIndexer of(
+        BibDatabaseContext databaseContext,
+        FilePreferences filePreferences
+    ) throws IOException {
+        return new PdfIndexer(
+            new NIOFSDirectory(databaseContext.getFulltextIndexPath()),
+            filePreferences
+        );
     }
 
     /**
@@ -63,7 +72,13 @@ public class PdfIndexer {
      */
     public void createIndex() {
         // Create new index by creating IndexWriter but not writing anything.
-        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
+        try (
+            IndexWriter indexWriter = new IndexWriter(
+                directoryToIndex,
+                new IndexWriterConfig(new EnglishStemAnalyzer())
+                    .setOpenMode(IndexWriterConfig.OpenMode.CREATE)
+            )
+        ) {
             // empty comment for checkstyle
         } catch (IOException e) {
             LOGGER.warn("Could not create new Index!", e);
@@ -92,7 +107,11 @@ public class PdfIndexer {
      * @param entry a bibtex entry to link the pdf files to
      * @param databaseContext the associated BibDatabaseContext
      */
-    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
+    public void addToIndex(
+        BibEntry entry,
+        List<LinkedFile> linkedFiles,
+        BibDatabaseContext databaseContext
+    ) {
         for (LinkedFile linkedFile : linkedFiles) {
             addToIndex(entry, linkedFile, databaseContext);
         }
@@ -104,7 +123,11 @@ public class PdfIndexer {
      * @param entry a bibtex entry
      * @param linkedFile the link to the pdf files
      */
-    public void addToIndex(BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
+    public void addToIndex(
+        BibEntry entry,
+        LinkedFile linkedFile,
+        BibDatabaseContext databaseContext
+    ) {
         if (databaseContext != null) {
             this.databaseContext = databaseContext;
         }
@@ -119,11 +142,16 @@ public class PdfIndexer {
      * @param linkedFilePath the path to the file to be removed
      */
     public void removeFromIndex(String linkedFilePath) {
-        try (IndexWriter indexWriter = new IndexWriter(
+        try (
+            IndexWriter indexWriter = new IndexWriter(
                 directoryToIndex,
-                new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-            indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
+                new IndexWriterConfig(new EnglishStemAnalyzer())
+                    .setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
+            )
+        ) {
+            indexWriter.deleteDocuments(
+                new Term(SearchFieldConstants.PATH, linkedFilePath)
+            );
             indexWriter.commit();
         } catch (IOException e) {
             LOGGER.warn("Could not initialize the IndexWriter!", e);
@@ -171,10 +199,16 @@ public class PdfIndexer {
      * @param linkedFile the file to write to the index
      */
     private void addToIndex(BibEntry entry, LinkedFile linkedFile) {
-        if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
+        if (
+            linkedFile.isOnlineLink() ||
+            !StandardFileType.PDF.getName().equals(linkedFile.getFileType())
+        ) {
             return;
         }
-        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> resolvedPath = linkedFile.findIn(
+            databaseContext,
+            filePreferences
+        );
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
@@ -184,16 +218,28 @@ public class PdfIndexer {
             // Check if a document with this path is already in the index
             try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
-                TermQuery query = new TermQuery(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
+                TermQuery query = new TermQuery(
+                    new Term(SearchFieldConstants.PATH, linkedFile.getLink())
+                );
                 TopDocs topDocs = searcher.search(query, 1);
                 // If a document was found, check if is less current than the one in the FS
                 if (topDocs.scoreDocs.length > 0) {
                     Document doc = reader.document(topDocs.scoreDocs[0].doc);
-                    long indexModificationTime = Long.parseLong(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
+                    long indexModificationTime = Long.parseLong(
+                        doc
+                            .getField(SearchFieldConstants.MODIFIED)
+                            .stringValue()
+                    );
 
-                    BasicFileAttributes attributes = Files.readAttributes(resolvedPath.get(), BasicFileAttributes.class);
+                    BasicFileAttributes attributes = Files.readAttributes(
+                        resolvedPath.get(),
+                        BasicFileAttributes.class
+                    );
 
-                    if (indexModificationTime >= attributes.lastModifiedTime().to(TimeUnit.SECONDS)) {
+                    if (
+                        indexModificationTime >=
+                        attributes.lastModifiedTime().to(TimeUnit.SECONDS)
+                    ) {
                         return;
                     }
                 }
@@ -201,17 +247,31 @@ public class PdfIndexer {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
-            Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
+            Optional<List<Document>> pages = new DocumentReader(
+                entry,
+                filePreferences
+            )
+                .readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
-                try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                                                               new IndexWriterConfig(
-                                                                                     new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                try (
+                    IndexWriter indexWriter = new IndexWriter(
+                        directoryToIndex,
+                        new IndexWriterConfig(new EnglishStemAnalyzer())
+                            .setOpenMode(
+                                IndexWriterConfig.OpenMode.CREATE_OR_APPEND
+                            )
+                    )
+                ) {
                     indexWriter.addDocuments(pages.get());
                     indexWriter.commit();
                 }
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
+            LOGGER.warn(
+                "Could not add the document {} to the index!",
+                linkedFile.getLink(),
+                e
+            );
         }
     }
 
@@ -228,7 +288,9 @@ public class PdfIndexer {
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
                 Document doc = reader.document(scoreDoc.doc);
-                paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
+                paths.add(
+                    doc.getField(SearchFieldConstants.PATH).stringValue()
+                );
             }
         } catch (IOException e) {
             return paths;

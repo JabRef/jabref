@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.Optional;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
@@ -20,7 +19,9 @@ public class BracketChecker implements ValueChecker {
                 counter++;
             } else if (a == '}') {
                 if (counter == 0) {
-                    return Optional.of(Localization.lang("unexpected closing curly bracket"));
+                    return Optional.of(
+                        Localization.lang("unexpected closing curly bracket")
+                    );
                 } else {
                     counter--;
                 }
@@ -28,7 +29,9 @@ public class BracketChecker implements ValueChecker {
         }
 
         if (counter > 0) {
-            return Optional.of(Localization.lang("unexpected opening curly bracket"));
+            return Optional.of(
+                Localization.lang("unexpected opening curly bracket")
+            );
         }
 
         return Optional.empty();

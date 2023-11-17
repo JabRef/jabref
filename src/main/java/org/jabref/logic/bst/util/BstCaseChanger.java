@@ -2,13 +2,14 @@ package org.jabref.logic.bst.util;
 
 import java.util.Locale;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class BstCaseChanger {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BstCaseChanger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BstCaseChanger.class
+    );
 
     // stores whether the char before the current char was a colon
     private boolean prevColon = true;
@@ -67,8 +68,7 @@ public final class BstCaseChanger {
         }
     }
 
-    private BstCaseChanger() {
-    }
+    private BstCaseChanger() {}
 
     /**
      * Changes case of the given string s
@@ -97,7 +97,11 @@ public final class BstCaseChanger {
                     i++;
                     continue;
                 }
-                if ((format == FormatMode.TITLE_LOWERS) && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
+                if (
+                    (format == FormatMode.TITLE_LOWERS) &&
+                    ((i == 0) ||
+                        (prevColon && Character.isWhitespace(c[i - 1])))
+                ) {
                     sb.append('{');
                     i++;
                     prevColon = false;
@@ -142,7 +146,12 @@ public final class BstCaseChanger {
      *
      * @param start  the current position. It points to the opening brace
      */
-    private int convertSpecialChar(StringBuilder sb, char[] c, int start, FormatMode format) {
+    private int convertSpecialChar(
+        StringBuilder sb,
+        char[] c,
+        int start,
+        FormatMode format
+    ) {
         int i = start;
 
         sb.append(c[i]);
@@ -177,7 +186,13 @@ public final class BstCaseChanger {
      *
      * @return the new position
      */
-    private int convertAccented(char[] c, int start, String s, StringBuilder sb, FormatMode format) {
+    private int convertAccented(
+        char[] c,
+        int start,
+        String s,
+        StringBuilder sb,
+        FormatMode format
+    ) {
         int pos = start;
         pos += s.length();
 
@@ -210,7 +225,12 @@ public final class BstCaseChanger {
         return pos;
     }
 
-    private int convertNonControl(char[] c, int start, StringBuilder sb, FormatMode format) {
+    private int convertNonControl(
+        char[] c,
+        int start,
+        StringBuilder sb,
+        FormatMode format
+    ) {
         int pos = start;
         switch (format) {
             case TITLE_LOWERS, ALL_LOWERS -> {
@@ -221,17 +241,25 @@ public final class BstCaseChanger {
                 sb.append(Character.toUpperCase(c[pos]));
                 pos++;
             }
-            default ->
-                    LOGGER.info("convertNonControl - Unknown format: " + format);
+            default -> LOGGER.info(
+                "convertNonControl - Unknown format: " + format
+            );
         }
         return pos;
     }
 
-    private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FormatMode format) {
+    private int convertCharIfBraceLevelIsZero(
+        char[] c,
+        int start,
+        StringBuilder sb,
+        FormatMode format
+    ) {
         int i = start;
         switch (format) {
             case TITLE_LOWERS -> {
-                if ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1]))) {
+                if (
+                    (i == 0) || (prevColon && Character.isWhitespace(c[i - 1]))
+                ) {
                     sb.append(c[i]);
                 } else {
                     sb.append(Character.toLowerCase(c[i]));
@@ -242,12 +270,11 @@ public final class BstCaseChanger {
                     prevColon = false;
                 }
             }
-            case ALL_LOWERS ->
-                    sb.append(Character.toLowerCase(c[i]));
-            case ALL_UPPERS ->
-                    sb.append(Character.toUpperCase(c[i]));
-            default ->
-                    LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
+            case ALL_LOWERS -> sb.append(Character.toLowerCase(c[i]));
+            case ALL_UPPERS -> sb.append(Character.toUpperCase(c[i]));
+            default -> LOGGER.info(
+                "convertCharIfBraceLevelIsZero - Unknown format: " + format
+            );
         }
         i++;
         return i;

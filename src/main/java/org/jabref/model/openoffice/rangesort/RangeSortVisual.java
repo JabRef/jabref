@@ -1,14 +1,12 @@
 package org.jabref.model.openoffice.rangesort;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jabref.model.openoffice.uno.UnoScreenRefresh;
-
 import com.sun.star.awt.Point;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextViewCursor;
+import java.util.ArrayList;
+import java.util.List;
+import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +19,11 @@ import org.slf4j.LoggerFactory;
  */
 public class RangeSortVisual {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RangeSortVisual.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        RangeSortVisual.class
+    );
 
-    private RangeSortVisual() {
-    }
+    private RangeSortVisual() {}
 
     /**
      * Sort the input {@code inputs} visually.
@@ -33,12 +32,14 @@ public class RangeSortVisual {
      *
      * @return The input, sorted by the elements XTextRange and getIndexInPosition.
      */
-    public static <T> List<RangeSortable<T>> visualSort(List<RangeSortable<T>> inputs,
-                                                        XTextDocument doc,
-                                                        FunctionalTextViewCursor fcursor) {
-
+    public static <T> List<RangeSortable<T>> visualSort(
+        List<RangeSortable<T>> inputs,
+        XTextDocument doc,
+        FunctionalTextViewCursor fcursor
+    ) {
         if (UnoScreenRefresh.hasControllersLocked(doc)) {
-            final String msg = "visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless";
+            final String msg =
+                "visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless";
             LOGGER.warn(msg);
             throw new IllegalStateException(msg);
         }
@@ -55,12 +56,17 @@ public class RangeSortVisual {
         fcursor.restore(doc);
 
         // order by position
-        ArrayList<ComparableMark<RangeSortable<T>>> comparableMarks = new ArrayList<>(inputSize);
+        ArrayList<ComparableMark<RangeSortable<T>>> comparableMarks =
+            new ArrayList<>(inputSize);
         for (int i = 0; i < inputSize; i++) {
             RangeSortable<T> input = inputs.get(i);
-            comparableMarks.add(new ComparableMark<>(positions.get(i),
+            comparableMarks.add(
+                new ComparableMark<>(
+                    positions.get(i),
                     input.getIndexInPosition(),
-                    input));
+                    input
+                )
+            );
         }
         comparableMarks.sort(RangeSortVisual::compareTopToBottomLeftToRight);
 
@@ -71,7 +77,9 @@ public class RangeSortVisual {
         }
 
         if (result.size() != inputSize) {
-            throw new IllegalStateException("visualSort: result.size() != inputSize");
+            throw new IllegalStateException(
+                "visualSort: result.size() != inputSize"
+            );
         }
 
         return result;
@@ -89,12 +97,18 @@ public class RangeSortVisual {
      * @param range  Location.
      * @param cursor To get the position, we need az XTextViewCursor. It will be moved to the range.
      */
-    private static Point findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
+    private static Point findPositionOfTextRange(
+        XTextRange range,
+        XTextViewCursor cursor
+    ) {
         cursor.gotoRange(range, false);
         return cursor.getPosition();
     }
 
-    private static <T> int compareTopToBottomLeftToRight(ComparableMark<T> a, ComparableMark<T> b) {
+    private static <T> int compareTopToBottomLeftToRight(
+        ComparableMark<T> a,
+        ComparableMark<T> b
+    ) {
         if (a.position.Y != b.position.Y) {
             return a.position.Y - b.position.Y;
         }

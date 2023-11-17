@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -25,7 +24,8 @@ public class PdfGrobidImporter extends Importer {
     private final ImportFormatPreferences importFormatPreferences;
 
     public PdfGrobidImporter(ImportFormatPreferences importFormatPreferences) {
-        this.grobidService = new GrobidService(importFormatPreferences.grobidPreferences());
+        this.grobidService =
+            new GrobidService(importFormatPreferences.grobidPreferences());
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -40,27 +40,37 @@ public class PdfGrobidImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
-                "PdfGrobidImporter does not support importDatabase(BufferedReader reader)."
-                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+            "PdfGrobidImporter does not support importDatabase(BufferedReader reader)." +
+            "Instead use importDatabase(Path filePath, Charset defaultEncoding)."
+        );
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
         throw new UnsupportedOperationException(
-                "PdfGrobidImporter does not support importDatabase(String data)."
-                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+            "PdfGrobidImporter does not support importDatabase(String data)." +
+            "Instead use importDatabase(Path filePath, Charset defaultEncoding)."
+        );
     }
 
     @Override
     public ParserResult importDatabase(Path filePath) {
         Objects.requireNonNull(filePath);
         try {
-            List<BibEntry> result = grobidService.processPDF(filePath, importFormatPreferences);
-            result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
+            List<BibEntry> result = grobidService.processPDF(
+                filePath,
+                importFormatPreferences
+            );
+            result.forEach(entry ->
+                entry.addFile(
+                    new LinkedFile("", filePath.toAbsolutePath(), "PDF")
+                )
+            );
             return new ParserResult(result);
         } catch (Exception exception) {
             return ParserResult.fromError(exception);
@@ -68,7 +78,8 @@ public class PdfGrobidImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         Objects.requireNonNull(reader);
         return false;
     }
@@ -81,7 +92,9 @@ public class PdfGrobidImporter extends Importer {
     public boolean isRecognizedFormat(Path filePath) throws IOException {
         Objects.requireNonNull(filePath);
         Optional<String> extension = FileUtil.getFileExtension(filePath);
-        return extension.filter(s -> getFileType().getExtensions().contains(s)).isPresent();
+        return extension
+            .filter(s -> getFileType().getExtensions().contains(s))
+            .isPresent();
     }
 
     @Override

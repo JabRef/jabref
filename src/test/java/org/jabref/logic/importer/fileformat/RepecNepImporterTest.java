@@ -1,21 +1,19 @@
 package org.jabref.logic.importer.fileformat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RepecNepImporterTest {
 
@@ -25,15 +23,21 @@ public class RepecNepImporterTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ImportFormatPreferences importFormatPreferences = mock(
+            ImportFormatPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
+        when(
+            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
+        )
+            .thenReturn(',');
 
         testImporter = new RepecNepImporter(importFormatPreferences);
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("RepecNepImporter")
-                && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name ->
+            name.startsWith("RepecNepImporter") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -57,7 +61,11 @@ public class RepecNepImporterTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(
+            testImporter,
+            fileName,
+            FILE_ENDING
+        );
     }
 
     @Test
@@ -77,7 +85,9 @@ public class RepecNepImporterTest {
 
     @Test
     public final void testGetDescription() {
-        assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
-                testImporter.getDescription());
+        assertEquals(
+            "Imports a New Economics Papers-Message from the REPEC-NEP Service.",
+            testImporter.getDescription()
+        );
     }
 }

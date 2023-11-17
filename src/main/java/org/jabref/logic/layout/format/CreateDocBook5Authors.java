@@ -15,7 +15,12 @@ public class CreateDocBook5Authors implements LayoutFormatter {
         AuthorList al = AuthorList.parse(fieldText);
 
         DocBookAuthorFormatter authorFormatter = new DocBookAuthorFormatter();
-        authorFormatter.addBody(sb, al, StandardField.AUTHOR.getName(), DocBookVersion.DOCBOOK_5);
+        authorFormatter.addBody(
+            sb,
+            al,
+            StandardField.AUTHOR.getName(),
+            DocBookVersion.DOCBOOK_5
+        );
         return sb.toString();
     }
 }

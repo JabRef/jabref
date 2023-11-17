@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -24,7 +23,9 @@ import org.jabref.model.entry.types.StandardEntryType;
  */
 public class InspecImporter extends Importer {
 
-    private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
+    private static final Pattern INSPEC_PATTERN = Pattern.compile(
+        "Record.*INSPEC.*"
+    );
 
     @Override
     public String getName() {
@@ -42,7 +43,8 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         // Our strategy is to look for the "PY <year>" line.
         String str;
         while ((str = reader.readLine()) != null) {
@@ -54,7 +56,8 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;
@@ -82,17 +85,16 @@ public class InspecImporter extends Importer {
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 switch (f3) {
-                    case "TI" ->
-                            h.put(StandardField.TITLE, frest);
-                    case "PY" ->
-                            h.put(StandardField.YEAR, frest);
-                    case "AU" ->
-                            h.put(StandardField.AUTHOR,
-                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
-                    case "AB" ->
-                            h.put(StandardField.ABSTRACT, frest);
-                    case "ID" ->
-                            h.put(StandardField.KEYWORDS, frest);
+                    case "TI" -> h.put(StandardField.TITLE, frest);
+                    case "PY" -> h.put(StandardField.YEAR, frest);
+                    case "AU" -> h.put(
+                        StandardField.AUTHOR,
+                        AuthorList.fixAuthorLastNameFirst(
+                            frest.replace(",-", ", ").replace(";", " and ")
+                        )
+                    );
+                    case "AB" -> h.put(StandardField.ABSTRACT, frest);
+                    case "ID" -> h.put(StandardField.KEYWORDS, frest);
                     case "SO" -> {
                         int m = frest.indexOf('.');
                         if (m >= 0) {
@@ -118,10 +120,14 @@ public class InspecImporter extends Importer {
                         frest = frest.trim();
                         if ("Journal-Paper".equals(frest)) {
                             type = StandardEntryType.Article;
-                        } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
+                        } else if (
+                            "Conference-Paper".equals(frest) ||
+                            "Conference-Paper; Journal-Paper".equals(frest)
+                        ) {
                             type = StandardEntryType.InProceedings;
                         } else {
-                            type = EntryTypeFactory.parse(frest.replace(" ", ""));
+                            type =
+                                EntryTypeFactory.parse(frest.replace(" ", ""));
                         }
                     }
                 }

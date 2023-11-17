@@ -10,17 +10,16 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
-
 import org.jabref.logic.l10n.Localization;
 
 public class TextFlowLimited extends TextFlow {
+
     private boolean isCollapsed = true;
     private Hyperlink moreLink = new Hyperlink(Localization.lang("(more)"));
     private Rectangle clip = new Rectangle();
 
     public TextFlowLimited(Text... texts) {
         super(texts);
-
         this.setPrefWidth(Region.USE_PREF_SIZE);
 
         moreLink.setOnAction(event -> expand());
@@ -67,7 +66,16 @@ public class TextFlowLimited extends TextFlow {
             if (!this.getChildren().contains(moreLink)) {
                 this.getChildren().add(moreLink);
             }
-            layoutInArea(moreLink, 0, 0, getWidth(), getHeight(), getBaselineOffset(), HPos.RIGHT, VPos.BOTTOM);
+            layoutInArea(
+                moreLink,
+                0,
+                0,
+                getWidth(),
+                getHeight(),
+                getBaselineOffset(),
+                HPos.RIGHT,
+                VPos.BOTTOM
+            );
 
             // Clip content if it expands above pref height (no idea why this is needed, but otherwise sometimes the text is still visible)
             clip.setHeight(computePrefHeight(this.getWidth()));

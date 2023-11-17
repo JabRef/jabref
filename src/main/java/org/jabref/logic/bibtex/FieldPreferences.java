@@ -2,12 +2,10 @@ package org.jabref.logic.bibtex;
 
 import java.util.Collection;
 import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.model.entry.field.Field;
 
 public class FieldPreferences {
@@ -19,12 +17,16 @@ public class FieldPreferences {
     /**
      * @param resolveStrings true - The character {@link FieldWriter#BIBTEX_STRING_START_END_SYMBOL} should be interpreted as indicator of BibTeX strings
      */
-    public FieldPreferences(boolean resolveStrings,
-                            List<Field> resolvableFields,
-                            List<Field> nonWrappableFields) {
+    public FieldPreferences(
+        boolean resolveStrings,
+        List<Field> resolvableFields,
+        List<Field> nonWrappableFields
+    ) {
         this.resolveStrings.set(resolveStrings);
-        this.resolvableFields = FXCollections.observableArrayList(resolvableFields);
-        this.nonWrappableFields = FXCollections.observableArrayList(nonWrappableFields);
+        this.resolvableFields =
+            FXCollections.observableArrayList(resolvableFields);
+        this.nonWrappableFields =
+            FXCollections.observableArrayList(nonWrappableFields);
     }
 
     public boolean shouldResolveStrings() {

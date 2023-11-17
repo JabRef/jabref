@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.util.OOListUtil;
@@ -55,16 +54,20 @@ public class CitationGroup {
      */
     private Optional<OOText> citationMarker;
 
-    public CitationGroup(OODataModel dataModel,
-                         CitationGroupId groupId,
-                         CitationType citationType,
-                         List<Citation> citationsInStorageOrder,
-                         Optional<String> referenceMarkNameForLinking) {
+    public CitationGroup(
+        OODataModel dataModel,
+        CitationGroupId groupId,
+        CitationType citationType,
+        List<Citation> citationsInStorageOrder,
+        Optional<String> referenceMarkNameForLinking
+    ) {
         this.dataModel = dataModel;
         this.groupId = groupId;
         this.citationType = citationType;
-        this.citationsInStorageOrder = Collections.unmodifiableList(citationsInStorageOrder);
-        this.localOrder = OOListUtil.makeIndices(citationsInStorageOrder.size());
+        this.citationsInStorageOrder =
+            Collections.unmodifiableList(citationsInStorageOrder);
+        this.localOrder =
+            OOListUtil.makeIndices(citationsInStorageOrder.size());
         this.referenceMarkNameForLinking = referenceMarkNameForLinking;
         this.indexInGlobalOrder = Optional.empty();
         this.citationMarker = Optional.empty();
@@ -92,8 +95,11 @@ public class CitationGroup {
             lastCitation.setPageInfo(Optional.empty());
         }
 
-        this.localOrder = OOListUtil.order(citationsInStorageOrder,
-                new CompareCitation(entryComparator, true));
+        this.localOrder =
+            OOListUtil.order(
+                citationsInStorageOrder,
+                new CompareCitation(entryComparator, true)
+            );
 
         if (dataModel == OODataModel.JabRef52) {
             getCitationsInLocalOrder().get(last).setPageInfo(lastPageInfo);
@@ -132,7 +138,9 @@ public class CitationGroup {
         return referenceMarkNameForLinking;
     }
 
-    public void setReferenceMarkNameForLinking(Optional<String> referenceMarkNameForLinking) {
+    public void setReferenceMarkNameForLinking(
+        Optional<String> referenceMarkNameForLinking
+    ) {
         this.referenceMarkNameForLinking = referenceMarkNameForLinking;
     }
 

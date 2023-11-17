@@ -13,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
 public class PreviewTab extends EntryEditorTab {
+
     public static final String NAME = "Preview";
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
@@ -23,13 +24,15 @@ public class PreviewTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private PreviewPanel previewPanel;
 
-    public PreviewTab(BibDatabaseContext databaseContext,
-                      DialogService dialogService,
-                      PreferencesService preferences,
-                      StateManager stateManager,
-                      ThemeManager themeManager,
-                      IndexingTaskManager indexingTaskManager,
-                      TaskExecutor taskExecutor) {
+    public PreviewTab(
+        BibDatabaseContext databaseContext,
+        DialogService dialogService,
+        PreferencesService preferences,
+        StateManager stateManager,
+        ThemeManager themeManager,
+        IndexingTaskManager indexingTaskManager,
+        TaskExecutor taskExecutor
+    ) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -58,13 +61,25 @@ public class PreviewTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab();
+        return preferences
+            .getPreviewPreferences()
+            .shouldShowPreviewAsExtraTab();
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager, taskExecutor);
+            previewPanel =
+                new PreviewPanel(
+                    databaseContext,
+                    dialogService,
+                    preferences.getKeyBindingRepository(),
+                    preferences,
+                    stateManager,
+                    themeManager,
+                    indexingTaskManager,
+                    taskExecutor
+                );
             setContent(previewPanel);
         }
 

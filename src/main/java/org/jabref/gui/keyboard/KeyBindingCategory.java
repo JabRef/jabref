@@ -4,7 +4,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 
 public enum KeyBindingCategory {
-
     FILE(Localization.lang("File")),
     EDIT(Localization.lang("Edit")),
     SEARCH(Localization.lang("Search")),

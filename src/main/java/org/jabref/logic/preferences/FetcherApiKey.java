@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class FetcherApiKey {
+
     private final StringProperty name;
     private final BooleanProperty use;
     private final StringProperty key;

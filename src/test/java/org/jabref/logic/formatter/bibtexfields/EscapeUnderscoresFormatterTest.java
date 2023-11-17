@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EscapeUnderscoresFormatterTest {
 
@@ -26,6 +26,9 @@ class EscapeUnderscoresFormatterTest {
 
     @Test
     void formatExample() {
-        assertEquals("Text\\_with\\_underscores", formatter.format(formatter.getExampleInput()));
+        assertEquals(
+            "Text\\_with\\_underscores",
+            formatter.format(formatter.getExampleInput())
+        );
     }
 }

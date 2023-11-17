@@ -1,24 +1,21 @@
 package org.jabref.logic.importer.fileformat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-
 import javafx.collections.FXCollections;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PdfEmbeddedBibFileImporterTest {
 
@@ -26,8 +23,12 @@ class PdfEmbeddedBibFileImporterTest {
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        ImportFormatPreferences importFormatPreferences = mock(
+            ImportFormatPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields())
+            .thenReturn(FXCollections.emptyObservableList());
         importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
     }
 
@@ -38,21 +39,37 @@ class PdfEmbeddedBibFileImporterTest {
 
     @Test
     void testGetDescription() {
-        assertEquals("PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.",
-                     importer.getDescription());
+        assertEquals(
+            "PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.",
+            importer.getDescription()
+        );
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfEmbeddedBibFileImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        Path file = Path.of(
+            PdfEmbeddedBibFileImporter.class.getResource("/pdfs/encrypted.pdf")
+                .toURI()
+        );
+        List<BibEntry> result = importer
+            .importDatabase(file)
+            .getDatabase()
+            .getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importWorksAsExpected() throws Exception {
-        Path file = Path.of(PdfEmbeddedBibFileImporterTest.class.getResource("mixedMetadata.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        Path file = Path.of(
+            PdfEmbeddedBibFileImporterTest.class.getResource(
+                    "mixedMetadata.pdf"
+                )
+                .toURI()
+        );
+        List<BibEntry> result = importer
+            .importDatabase(file)
+            .getDatabase()
+            .getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Misc);
         expected.setCitationKey("jabreftext2021");

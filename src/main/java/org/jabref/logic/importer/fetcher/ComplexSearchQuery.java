@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
-
+import org.apache.lucene.index.Term;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.lucene.index.Term;
-
 public class ComplexSearchQuery {
+
     // Field for non-fielded search
     private final List<String> defaultField;
     private final List<String> authors;
@@ -23,7 +22,17 @@ public class ComplexSearchQuery {
     private final String journal;
     private final String doi;
 
-    private ComplexSearchQuery(List<String> defaultField, List<String> authors, List<String> titlePhrases, List<String> abstractPhrases, Integer fromYear, Integer toYear, Integer singleYear, String journal, String doi) {
+    private ComplexSearchQuery(
+        List<String> defaultField,
+        List<String> authors,
+        List<String> titlePhrases,
+        List<String> abstractPhrases,
+        Integer fromYear,
+        Integer toYear,
+        Integer singleYear,
+        String journal,
+        String doi
+    ) {
         this.defaultField = defaultField;
         this.authors = authors;
         this.titlePhrases = titlePhrases;
@@ -108,56 +117,103 @@ public class ComplexSearchQuery {
         ComplexSearchQuery that = (ComplexSearchQuery) o;
 
         // Just check for set equality, order does not matter
-        if (!(getDefaultFieldPhrases().containsAll(that.getDefaultFieldPhrases()) && that.getDefaultFieldPhrases().containsAll(getDefaultFieldPhrases()))) {
+        if (
+            !(getDefaultFieldPhrases()
+                    .containsAll(that.getDefaultFieldPhrases()) &&
+                that
+                    .getDefaultFieldPhrases()
+                    .containsAll(getDefaultFieldPhrases()))
+        ) {
             return false;
         }
-        if (!(getAuthors().containsAll(that.getAuthors()) && that.getAuthors().containsAll(getAuthors()))) {
+        if (
+            !(getAuthors().containsAll(that.getAuthors()) &&
+                that.getAuthors().containsAll(getAuthors()))
+        ) {
             return false;
         }
-        if (!(getTitlePhrases().containsAll(that.getTitlePhrases()) && that.getTitlePhrases().containsAll(getTitlePhrases()))) {
+        if (
+            !(getTitlePhrases().containsAll(that.getTitlePhrases()) &&
+                that.getTitlePhrases().containsAll(getTitlePhrases()))
+        ) {
             return false;
         }
-        if (!(getAbstractPhrases().containsAll(that.getAbstractPhrases()) && that.getAbstractPhrases().containsAll(getAbstractPhrases()))) {
+        if (
+            !(getAbstractPhrases().containsAll(that.getAbstractPhrases()) &&
+                that.getAbstractPhrases().containsAll(getAbstractPhrases()))
+        ) {
             return false;
         }
-        if (getFromYear().isPresent() ? !getFromYear().equals(that.getFromYear()) : that.getFromYear().isPresent()) {
+        if (
+            getFromYear().isPresent()
+                ? !getFromYear().equals(that.getFromYear())
+                : that.getFromYear().isPresent()
+        ) {
             return false;
         }
-        if (getToYear().isPresent() ? !getToYear().equals(that.getToYear()) : that.getToYear().isPresent()) {
+        if (
+            getToYear().isPresent()
+                ? !getToYear().equals(that.getToYear())
+                : that.getToYear().isPresent()
+        ) {
             return false;
         }
-        if (getSingleYear().isPresent() ? !getSingleYear().equals(that.getSingleYear()) : that.getSingleYear().isPresent()) {
+        if (
+            getSingleYear().isPresent()
+                ? !getSingleYear().equals(that.getSingleYear())
+                : that.getSingleYear().isPresent()
+        ) {
             return false;
         }
-        if (getDOI().isPresent() ? !getDOI().equals(that.getDOI()) : that.getDOI().isPresent()) {
+        if (
+            getDOI().isPresent()
+                ? !getDOI().equals(that.getDOI())
+                : that.getDOI().isPresent()
+        ) {
             return false;
         }
-        return getJournal().isPresent() ? getJournal().equals(that.getJournal()) : that.getJournal().isEmpty();
+        return getJournal().isPresent()
+            ? getJournal().equals(that.getJournal())
+            : that.getJournal().isEmpty();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(defaultField, getAuthors(), getSingleYear(), getAbstractPhrases(), getFromYear(), getToYear(), getTitlePhrases(), getJournal(), getDOI());
+        return Objects.hash(
+            defaultField,
+            getAuthors(),
+            getSingleYear(),
+            getAbstractPhrases(),
+            getFromYear(),
+            getToYear(),
+            getTitlePhrases(),
+            getJournal(),
+            getDOI()
+        );
     }
 
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
-        getSingleYear().ifPresent(singleYear -> stringJoiner.add(singleYear.toString()));
-        getFromYear().ifPresent(fromYear -> stringJoiner.add(fromYear.toString()));
+        getSingleYear()
+            .ifPresent(singleYear -> stringJoiner.add(singleYear.toString()));
+        getFromYear()
+            .ifPresent(fromYear -> stringJoiner.add(fromYear.toString()));
         getToYear().ifPresent(toYear -> stringJoiner.add(toYear.toString()));
         getJournal().ifPresent(stringJoiner::add);
         getDOI().ifPresent(newElement -> stringJoiner.add("doi:" + newElement));
-        stringJoiner.add(String.join(" ", getTitlePhrases()))
-                    .add(String.join(" ", getDefaultFieldPhrases()))
-                    .add(String.join(" ", getAuthors()))
-                    .add(String.join(" ", getAbstractPhrases()));
+        stringJoiner
+            .add(String.join(" ", getTitlePhrases()))
+            .add(String.join(" ", getDefaultFieldPhrases()))
+            .add(String.join(" ", getAuthors()))
+            .add(String.join(" ", getAbstractPhrases()));
 
         return stringJoiner.toString();
     }
 
     public static class ComplexSearchQueryBuilder {
+
         private final List<String> defaultFieldPhrases = new ArrayList<>();
         private final List<String> authors = new ArrayList<>();
         private final List<String> titlePhrases = new ArrayList<>();
@@ -168,15 +224,23 @@ public class ComplexSearchQuery {
         private Integer toYear;
         private Integer singleYear;
 
-        private ComplexSearchQueryBuilder() {
-        }
+        private ComplexSearchQueryBuilder() {}
 
-        public ComplexSearchQueryBuilder defaultFieldPhrase(String defaultFieldPhrase) {
+        public ComplexSearchQueryBuilder defaultFieldPhrase(
+            String defaultFieldPhrase
+        ) {
             if (Objects.requireNonNull(defaultFieldPhrase).isBlank()) {
-                throw new IllegalArgumentException("Parameter must not be blank");
+                throw new IllegalArgumentException(
+                    "Parameter must not be blank"
+                );
             }
             // Strip all quotes before wrapping
-            this.defaultFieldPhrases.add(String.format("\"%s\"", defaultFieldPhrase.replace("\"", "")));
+            this.defaultFieldPhrases.add(
+                    String.format(
+                        "\"%s\"",
+                        defaultFieldPhrase.replace("\"", "")
+                    )
+                );
             return this;
         }
 
@@ -185,7 +249,9 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQueryBuilder author(String author) {
             if (Objects.requireNonNull(author).isBlank()) {
-                throw new IllegalArgumentException("Parameter must not be blank");
+                throw new IllegalArgumentException(
+                    "Parameter must not be blank"
+                );
             }
             // Strip all quotes before wrapping
             this.authors.add(String.format("\"%s\"", author.replace("\"", "")));
@@ -197,10 +263,14 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQueryBuilder titlePhrase(String titlePhrase) {
             if (Objects.requireNonNull(titlePhrase).isBlank()) {
-                throw new IllegalArgumentException("Parameter must not be blank");
+                throw new IllegalArgumentException(
+                    "Parameter must not be blank"
+                );
             }
             // Strip all quotes before wrapping
-            this.titlePhrases.add(String.format("\"%s\"", titlePhrase.replace("\"", "")));
+            this.titlePhrases.add(
+                    String.format("\"%s\"", titlePhrase.replace("\"", ""))
+                );
             return this;
         }
 
@@ -209,16 +279,25 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQueryBuilder abstractPhrase(String abstractPhrase) {
             if (Objects.requireNonNull(abstractPhrase).isBlank()) {
-                throw new IllegalArgumentException("Parameter must not be blank");
+                throw new IllegalArgumentException(
+                    "Parameter must not be blank"
+                );
             }
             // Strip all quotes before wrapping
-            this.titlePhrases.add(String.format("\"%s\"", abstractPhrase.replace("\"", "")));
+            this.titlePhrases.add(
+                    String.format("\"%s\"", abstractPhrase.replace("\"", ""))
+                );
             return this;
         }
 
-        public ComplexSearchQueryBuilder fromYearAndToYear(Integer fromYear, Integer toYear) {
+        public ComplexSearchQueryBuilder fromYearAndToYear(
+            Integer fromYear,
+            Integer toYear
+        ) {
             if (Objects.nonNull(singleYear)) {
-                throw new IllegalArgumentException("You can not use single year and year range search.");
+                throw new IllegalArgumentException(
+                    "You can not use single year and year range search."
+                );
             }
             this.fromYear = Objects.requireNonNull(fromYear);
             this.toYear = Objects.requireNonNull(toYear);
@@ -227,7 +306,9 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder singleYear(Integer singleYear) {
             if (Objects.nonNull(fromYear) || Objects.nonNull(toYear)) {
-                throw new IllegalArgumentException("You can not use single year and year range search.");
+                throw new IllegalArgumentException(
+                    "You can not use single year and year range search."
+                );
             }
             this.singleYear = Objects.requireNonNull(singleYear);
             return this;
@@ -235,7 +316,9 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder journal(String journal) {
             if (Objects.requireNonNull(journal).isBlank()) {
-                throw new IllegalArgumentException("Parameter must not be blank");
+                throw new IllegalArgumentException(
+                    "Parameter must not be blank"
+                );
             }
             this.journal = String.format("\"%s\"", journal.replace("\"", ""));
             return this;
@@ -243,7 +326,9 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder DOI(String doi) {
             if (Objects.requireNonNull(doi).isBlank()) {
-                throw new IllegalArgumentException("Parameter must not be blank");
+                throw new IllegalArgumentException(
+                    "Parameter must not be blank"
+                );
             }
             this.doi = doi.replace("\"", "");
             return this;
@@ -276,9 +361,21 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQuery build() throws IllegalStateException {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {
-                throw new IllegalStateException("At least one text field has to be set");
+                throw new IllegalStateException(
+                    "At least one text field has to be set"
+                );
             }
-            return new ComplexSearchQuery(defaultFieldPhrases, authors, titlePhrases, abstractPhrases, fromYear, toYear, singleYear, journal, doi);
+            return new ComplexSearchQuery(
+                defaultFieldPhrases,
+                authors,
+                titlePhrases,
+                abstractPhrases,
+                fromYear,
+                toYear,
+                singleYear,
+                journal,
+                doi
+            );
         }
 
         void parseYearRange(String termText) {
@@ -301,16 +398,30 @@ public class ComplexSearchQuery {
         }
 
         private boolean textSearchFieldsAndYearFieldsAreEmpty() {
-            return this.stringListIsBlank(defaultFieldPhrases) && this.stringListIsBlank(titlePhrases) &&
-                    this.stringListIsBlank(authors) && this.stringListIsBlank(abstractPhrases) && StringUtil.isBlank(journal) && StringUtil.isBlank(doi) && yearFieldsAreEmpty();
+            return (
+                this.stringListIsBlank(defaultFieldPhrases) &&
+                this.stringListIsBlank(titlePhrases) &&
+                this.stringListIsBlank(authors) &&
+                this.stringListIsBlank(abstractPhrases) &&
+                StringUtil.isBlank(journal) &&
+                StringUtil.isBlank(doi) &&
+                yearFieldsAreEmpty()
+            );
         }
 
         private boolean yearFieldsAreEmpty() {
-            return Objects.isNull(singleYear) && Objects.isNull(fromYear) && Objects.isNull(toYear);
+            return (
+                Objects.isNull(singleYear) &&
+                Objects.isNull(fromYear) &&
+                Objects.isNull(toYear)
+            );
         }
 
         private boolean stringListIsBlank(List<String> stringList) {
-            return Objects.isNull(stringList) || stringList.stream().allMatch(String::isBlank);
+            return (
+                Objects.isNull(stringList) ||
+                stringList.stream().allMatch(String::isBlank)
+            );
         }
     }
 }

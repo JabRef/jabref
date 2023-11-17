@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -27,7 +25,11 @@ public class SpecialFieldViewModel {
     private final PreferencesService preferencesService;
     private final UndoManager undoManager;
 
-    public SpecialFieldViewModel(SpecialField field, PreferencesService preferencesService, UndoManager undoManager) {
+    public SpecialFieldViewModel(
+        SpecialField field,
+        PreferencesService preferencesService,
+        UndoManager undoManager
+    ) {
         this.field = Objects.requireNonNull(field);
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.undoManager = Objects.requireNonNull(undoManager);
@@ -37,21 +39,24 @@ public class SpecialFieldViewModel {
         return field;
     }
 
-    public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value,
-                                                    JabRefFrame frame,
-                                                    DialogService dialogService,
-                                                    StateManager stateManager) {
+    public SpecialFieldAction getSpecialFieldAction(
+        SpecialFieldValue value,
+        JabRefFrame frame,
+        DialogService dialogService,
+        StateManager stateManager
+    ) {
         return new SpecialFieldAction(
-                frame,
-                field,
-                value.getFieldValue().orElse(null),
-                // if field contains only one value, it has to be nulled, as another setting does not empty the field
-                field.getValues().size() == 1,
-                getLocalization(),
-                dialogService,
-                preferencesService,
-                undoManager,
-                stateManager);
+            frame,
+            field,
+            value.getFieldValue().orElse(null),
+            // if field contains only one value, it has to be nulled, as another setting does not empty the field
+            field.getValues().size() == 1,
+            getLocalization(),
+            dialogService,
+            preferencesService,
+            undoManager,
+            stateManager
+        );
     }
 
     public JabRefIcon getIcon() {
@@ -78,15 +83,27 @@ public class SpecialFieldViewModel {
     }
 
     public List<SpecialFieldValueViewModel> getValues() {
-        return field.getValues().stream()
-                    .map(SpecialFieldValueViewModel::new)
-                    .collect(Collectors.toList());
+        return field
+            .getValues()
+            .stream()
+            .map(SpecialFieldValueViewModel::new)
+            .collect(Collectors.toList());
     }
 
-    public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
-        Optional<FieldChange> change = UpdateField.updateField(bibEntry, getField(), value.getFieldValue().orElse(null), getField().isSingleValueField());
+    public void setSpecialFieldValue(
+        BibEntry bibEntry,
+        SpecialFieldValue value
+    ) {
+        Optional<FieldChange> change = UpdateField.updateField(
+            bibEntry,
+            getField(),
+            value.getFieldValue().orElse(null),
+            getField().isSingleValueField()
+        );
 
-        change.ifPresent(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
+        change.ifPresent(fieldChange ->
+            undoManager.addEdit(new UndoableFieldChange(fieldChange))
+        );
     }
 
     public void toggle(BibEntry entry) {

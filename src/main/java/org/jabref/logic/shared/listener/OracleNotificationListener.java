@@ -1,9 +1,8 @@
 package org.jabref.logic.shared.listener;
 
-import org.jabref.logic.shared.DBMSSynchronizer;
-
 import oracle.jdbc.dcn.DatabaseChangeEvent;
 import oracle.jdbc.dcn.DatabaseChangeListener;
+import org.jabref.logic.shared.DBMSSynchronizer;
 
 /**
  * A listener for Oracle database notifications.

@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -31,15 +30,21 @@ public class DatabaseFileLookup {
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      */
-    public DatabaseFileLookup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public DatabaseFileLookup(
+        BibDatabaseContext databaseContext,
+        FilePreferences filePreferences
+    ) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(filePreferences))
-                                    .orElse(new ArrayList<>());
+        possibleFilePaths =
+            Optional
+                .ofNullable(databaseContext.getFileDirectories(filePreferences))
+                .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));
         }
-        this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(""));
+        this.pathOfDatabase =
+            databaseContext.getDatabasePath().orElse(Path.of(""));
     }
 
     /**
@@ -62,12 +67,14 @@ public class DatabaseFileLookup {
     private List<Path> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        return entry.getFiles().stream()
-                    .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
-                    .map(file -> file.findIn(possibleFilePaths))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
+        return entry
+            .getFiles()
+            .stream()
+            .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
+            .map(file -> file.findIn(possibleFilePaths))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
     }
 
     /**

@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
-
 import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.GroupTreeNode;
@@ -63,17 +62,22 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
      *            then call this constructor. When removing, you first have to
      *            call this constructor, then remove the node.
      */
-    public UndoableAddOrRemoveGroup(GroupTreeNodeViewModel groupsRoot,
-                                    GroupTreeNodeViewModel editedNode, int editType) {
+    public UndoableAddOrRemoveGroup(
+        GroupTreeNodeViewModel groupsRoot,
+        GroupTreeNodeViewModel editedNode,
+        int editType
+    ) {
         m_groupsRootHandle = groupsRoot;
         m_editType = editType;
         m_subtreeRootChildCount = editedNode.getChildren().size();
         // storing a backup of the whole subtree is not required when children
         // are kept
-        m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ?
-                editedNode.getNode()
-                          .copySubtree()
-                : GroupTreeNode.fromGroup(editedNode.getNode().getGroup().deepCopy());
+        m_subtreeBackup =
+            editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN
+                ? editedNode.getNode().copySubtree()
+                : GroupTreeNode.fromGroup(
+                    editedNode.getNode().getGroup().deepCopy()
+                );
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
         // robust.
@@ -122,8 +126,11 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
                 case REMOVE_NODE_KEEP_CHILDREN:
                     // move all children to newNode, then add newNode
                     GroupTreeNode newNode = m_subtreeBackup.copySubtree();
-                    for (int i = childIndex; i < (childIndex
-                            + m_subtreeRootChildCount); ++i) {
+                    for (
+                        int i = childIndex;
+                        i < (childIndex + m_subtreeRootChildCount);
+                        ++i
+                    ) {
                         cursor.getChildAt(childIndex).get().moveTo(newNode);
                     }
                     newNode.moveTo(cursor, childIndex);
@@ -142,10 +149,14 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
                 case REMOVE_NODE_KEEP_CHILDREN:
                     // remove node, then insert all children
                     GroupTreeNode removedNode = cursor
-                            .getChildAt(childIndex).get();
+                        .getChildAt(childIndex)
+                        .get();
                     cursor.removeChild(childIndex);
                     while (removedNode.getNumberOfChildren() > 0) {
-                        removedNode.getFirstChild().get().moveTo(cursor, childIndex);
+                        removedNode
+                            .getFirstChild()
+                            .get()
+                            .moveTo(cursor, childIndex);
                     }
                     break;
                 case REMOVE_NODE_AND_CHILDREN:

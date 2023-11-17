@@ -1,14 +1,15 @@
 package org.jabref.logic.formatter.minifier;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
 public class TruncateFormatterTest {
+
     private final String TITLE = "A Title";
 
     @Test

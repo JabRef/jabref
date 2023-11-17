@@ -1,5 +1,7 @@
 package org.jabref.model.texparser;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,11 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.jabref.model.entry.BibEntry;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 public class LatexParserResult {
 
@@ -63,7 +61,10 @@ public class LatexParserResult {
      * Return a collection of citations using a BibEntry as reference.
      */
     public Collection<Citation> getCitationsByKey(BibEntry entry) {
-        return entry.getCitationKey().map(this::getCitationsByKey).orElse(Collections.emptyList());
+        return entry
+            .getCitationKey()
+            .map(this::getCitationsByKey)
+            .orElse(Collections.emptyList());
     }
 
     /**
@@ -87,18 +88,27 @@ public class LatexParserResult {
     /**
      * Add a citation to the citations multimap.
      */
-    public void addKey(String key, Path file, int lineNumber, int start, int end, String line) {
+    public void addKey(
+        String key,
+        Path file,
+        int lineNumber,
+        int start,
+        int end,
+        String line
+    ) {
         Citation citation = new Citation(file, lineNumber, start, end, line);
         citations.put(key, citation);
     }
 
     @Override
     public String toString() {
-        return String.format("TexParserResult{fileList=%s, nestedFiles=%s, bibFiles=%s, citations=%s}",
-                this.fileList,
-                this.nestedFiles,
-                this.bibFiles,
-                this.citations);
+        return String.format(
+            "TexParserResult{fileList=%s, nestedFiles=%s, bibFiles=%s, citations=%s}",
+            this.fileList,
+            this.nestedFiles,
+            this.bibFiles,
+            this.citations
+        );
     }
 
     @Override
@@ -113,10 +123,12 @@ public class LatexParserResult {
 
         LatexParserResult that = (LatexParserResult) obj;
 
-        return Objects.equals(fileList, that.fileList)
-                && Objects.equals(nestedFiles, that.nestedFiles)
-                && Objects.equals(bibFiles, that.bibFiles)
-                && Objects.equals(citations, that.citations);
+        return (
+            Objects.equals(fileList, that.fileList) &&
+            Objects.equals(nestedFiles, that.nestedFiles) &&
+            Objects.equals(bibFiles, that.bibFiles) &&
+            Objects.equals(citations, that.citations)
+        );
     }
 
     @Override

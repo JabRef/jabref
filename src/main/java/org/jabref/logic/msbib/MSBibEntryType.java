@@ -26,5 +26,5 @@ public enum MSBibEntryType {
     Patent,
     ElectronicSource,
     Case,
-    Misc
+    Misc,
 }

@@ -2,12 +2,10 @@ package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
-
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
@@ -22,9 +20,13 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private static final Formatter FORMATTER = new ProtectTermsFormatter(
+        Globals.protectedTermsLoader
+    );
     private final TextInputControl textInputControl;
-    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+    private final ActionFactory factory = new ActionFactory(
+        Globals.getKeyPrefs()
+    );
 
     private final Action protectSelectionActionInformation = new Action() {
         @Override
@@ -56,8 +58,11 @@ class ProtectedTermsMenu extends Menu {
     };
 
     private class ProtectSelectionAction extends SimpleCommand {
+
         ProtectSelectionAction() {
-            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
+            this.executable.bind(
+                    textInputControl.selectedTextProperty().isNotEmpty()
+                );
         }
 
         @Override
@@ -72,36 +77,45 @@ class ProtectedTermsMenu extends Menu {
             if (selectedText.endsWith(" ")) {
                 lastStr = "} ";
             }
-            textInputControl.replaceSelection(firstStr + selectedText.strip() + lastStr);
+            textInputControl.replaceSelection(
+                firstStr + selectedText.strip() + lastStr
+            );
         }
     }
 
     private class UnprotectSelectionAction extends SimpleCommand {
 
         public UnprotectSelectionAction() {
-            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
+            this.executable.bind(
+                    textInputControl.selectedTextProperty().isNotEmpty()
+                );
         }
 
         @Override
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
-            String formattedString = new UnprotectTermsFormatter().format(selectedText);
+            String formattedString = new UnprotectTermsFormatter()
+                .format(selectedText);
             textInputControl.replaceSelection(formattedString);
         }
     }
 
     private class FormatFieldAction extends SimpleCommand {
+
         FormatFieldAction() {
             this.executable.bind(textInputControl.textProperty().isNotEmpty());
         }
 
         @Override
         public void execute() {
-            textInputControl.setText(FORMATTER.format(textInputControl.getText()));
+            textInputControl.setText(
+                FORMATTER.format(textInputControl.getText())
+            );
         }
     }
 
     private class AddToProtectedTermsAction extends SimpleCommand {
+
         ProtectedTermsList list;
 
         public AddToProtectedTermsAction(ProtectedTermsList list) {
@@ -129,7 +143,9 @@ class ProtectedTermsMenu extends Menu {
                 list.addProtectedTerm(text.substring(beginIdx, endIdx));
             } else {
                 // Remove leading and trailing whitespaces
-                list.addProtectedTerm(textInputControl.getSelectedText().strip());
+                list.addProtectedTerm(
+                    textInputControl.getSelectedText().strip()
+                );
             }
         }
     }
@@ -138,23 +154,49 @@ class ProtectedTermsMenu extends Menu {
         super(Localization.lang("Protect terms"));
         this.textInputControl = textInputControl;
 
-        getItems().addAll(factory.createMenuItem(protectSelectionActionInformation, new ProtectSelectionAction()),
+        getItems()
+            .addAll(
+                factory.createMenuItem(
+                    protectSelectionActionInformation,
+                    new ProtectSelectionAction()
+                ),
                 getExternalFilesMenu(),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(() -> Localization.lang("Format field"), new FormatFieldAction()),
-                factory.createMenuItem(unprotectSelectionActionInformation, new UnprotectSelectionAction()));
+                factory.createMenuItem(
+                    () -> Localization.lang("Format field"),
+                    new FormatFieldAction()
+                ),
+                factory.createMenuItem(
+                    unprotectSelectionActionInformation,
+                    new UnprotectSelectionAction()
+                )
+            );
     }
 
     private Menu getExternalFilesMenu() {
-        Menu protectedTermsMenu = factory.createSubMenu(() -> Localization.lang("Add selected text to list"));
+        Menu protectedTermsMenu = factory.createSubMenu(() ->
+            Localization.lang("Add selected text to list")
+        );
 
-        Globals.protectedTermsLoader.getProtectedTermsLists().stream()
-                                    .filter(list -> !list.isInternalList())
-                                    .forEach(list -> protectedTermsMenu.getItems().add(
-                                            factory.createMenuItem(list::getDescription, new AddToProtectedTermsAction(list))));
+        Globals.protectedTermsLoader
+            .getProtectedTermsLists()
+            .stream()
+            .filter(list -> !list.isInternalList())
+            .forEach(list ->
+                protectedTermsMenu
+                    .getItems()
+                    .add(
+                        factory.createMenuItem(
+                            list::getDescription,
+                            new AddToProtectedTermsAction(list)
+                        )
+                    )
+            );
 
         if (protectedTermsMenu.getItems().isEmpty()) {
-            MenuItem emptyItem = new MenuItem(Localization.lang("No list enabled"));
+            MenuItem emptyItem = new MenuItem(
+                Localization.lang("No list enabled")
+            );
             emptyItem.setDisable(true);
             protectedTermsMenu.getItems().add(emptyItem);
         }

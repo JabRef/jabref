@@ -1,12 +1,11 @@
 package org.jabref.logic.bibtex.comparator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EntryComparatorTest {
 
@@ -14,16 +13,24 @@ class EntryComparatorTest {
     @Test
     void recognizeIdenticalObjectsAsEqual() {
         BibEntry entry = new BibEntry();
-        assertEquals(0, new EntryComparator(false, false, StandardField.TITLE).compare(entry, entry));
+        assertEquals(
+            0,
+            new EntryComparator(false, false, StandardField.TITLE)
+                .compare(entry, entry)
+        );
     }
 
     @Test
     void compareAuthorFieldBiggerAscending() {
         BibEntry entry1 = new BibEntry()
-                .withField(StandardField.AUTHOR, "Stephen King");
+            .withField(StandardField.AUTHOR, "Stephen King");
         BibEntry entry2 = new BibEntry()
-                .withField(StandardField.AUTHOR, "Henning Mankell");
-        EntryComparator entryComparator = new EntryComparator(false, false, StandardField.AUTHOR);
+            .withField(StandardField.AUTHOR, "Henning Mankell");
+        EntryComparator entryComparator = new EntryComparator(
+            false,
+            false,
+            StandardField.AUTHOR
+        );
 
         assertEquals(-2, entryComparator.compare(entry1, entry2));
     }
@@ -31,10 +38,14 @@ class EntryComparatorTest {
     @Test
     void bothEntriesHaveNotSetTheFieldToCompareAscending() {
         BibEntry entry1 = new BibEntry()
-                .withField(StandardField.BOOKTITLE, "Stark - The Dark Half (1989)");
+            .withField(StandardField.BOOKTITLE, "Stark - The Dark Half (1989)");
         BibEntry entry2 = new BibEntry()
-                .withField(StandardField.COMMENTATOR, "Some Commentator");
-        EntryComparator entryComparator = new EntryComparator(false, false, StandardField.TITLE);
+            .withField(StandardField.COMMENTATOR, "Some Commentator");
+        EntryComparator entryComparator = new EntryComparator(
+            false,
+            false,
+            StandardField.TITLE
+        );
 
         assertEquals(-1, entryComparator.compare(entry1, entry2));
     }
@@ -42,10 +53,14 @@ class EntryComparatorTest {
     @Test
     void secondEntryHasNotSetFieldToCompareAscending() {
         BibEntry entry1 = new BibEntry()
-                .withField(StandardField.TITLE, "Stark - The Dark Half (1989)");
+            .withField(StandardField.TITLE, "Stark - The Dark Half (1989)");
         BibEntry entry2 = new BibEntry()
-                .withField(StandardField.COMMENTATOR, "Some Commentator");
-        EntryComparator entryComparator = new EntryComparator(false, false, StandardField.TITLE);
+            .withField(StandardField.COMMENTATOR, "Some Commentator");
+        EntryComparator entryComparator = new EntryComparator(
+            false,
+            false,
+            StandardField.TITLE
+        );
 
         assertEquals(1, entryComparator.compare(entry1, entry2));
     }
@@ -53,99 +68,151 @@ class EntryComparatorTest {
     @Test
     void firstEntryHasNotSetFieldToCompareAscending() {
         BibEntry entry1 = new BibEntry()
-                .withField(StandardField.COMMENTATOR, "Some Commentator");
+            .withField(StandardField.COMMENTATOR, "Some Commentator");
         BibEntry entry2 = new BibEntry()
-                .withField(StandardField.TITLE, "Stark - The Dark Half (1989)");
+            .withField(StandardField.TITLE, "Stark - The Dark Half (1989)");
 
-        EntryComparator entryComparator = new EntryComparator(false, false, StandardField.TITLE);
+        EntryComparator entryComparator = new EntryComparator(
+            false,
+            false,
+            StandardField.TITLE
+        );
 
         assertEquals(-1, entryComparator.compare(entry1, entry2));
     }
 
     @Test
     void bothEntriesNumericAscending() {
-        BibEntry entry1 = new BibEntry()
-                .withField(StandardField.EDITION, "1");
-        BibEntry entry2 = new BibEntry()
-                .withField(StandardField.EDITION, "3");
+        BibEntry entry1 = new BibEntry().withField(StandardField.EDITION, "1");
+        BibEntry entry2 = new BibEntry().withField(StandardField.EDITION, "3");
 
-        EntryComparator entryComparator = new EntryComparator(false, false, StandardField.EDITION);
+        EntryComparator entryComparator = new EntryComparator(
+            false,
+            false,
+            StandardField.EDITION
+        );
 
         assertEquals(-1, entryComparator.compare(entry1, entry2));
     }
 
     @Test
     void compareObjectsByKeyAscending() {
-        BibEntry e1 = new BibEntry()
-                .withCitationKey("Mayer2019b");
-        BibEntry e2 = new BibEntry()
-                .withCitationKey("Mayer2019a");
-        assertEquals(1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
-        assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e2, e1));
+        BibEntry e1 = new BibEntry().withCitationKey("Mayer2019b");
+        BibEntry e2 = new BibEntry().withCitationKey("Mayer2019a");
+        assertEquals(
+            1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
+        assertEquals(
+            -1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e2, e1)
+        );
     }
 
     @Test
     void compareObjectsByKeyWithNull() {
-        BibEntry e1 = new BibEntry()
-                .withCitationKey("Mayer2019b");
+        BibEntry e1 = new BibEntry().withCitationKey("Mayer2019b");
         BibEntry e2 = new BibEntry();
-        assertEquals(1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
-        assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e2, e1));
+        assertEquals(
+            1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
+        assertEquals(
+            -1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e2, e1)
+        );
     }
 
     @Test
     void compareObjectsByKeyWithBlank() {
-        BibEntry e1 = new BibEntry()
-                .withCitationKey("Mayer2019b");
-        BibEntry e2 = new BibEntry()
-                .withCitationKey(" ");
-        assertEquals(1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
-        assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e2, e1));
+        BibEntry e1 = new BibEntry().withCitationKey("Mayer2019b");
+        BibEntry e2 = new BibEntry().withCitationKey(" ");
+        assertEquals(
+            1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
+        assertEquals(
+            -1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e2, e1)
+        );
     }
 
     @Test
     void compareWithCrLfFields() {
         BibEntry e1 = new BibEntry()
-                .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
+            .withField(
+                StandardField.COMMENT,
+                "line1\r\n\r\nline3\r\n\r\nline5"
+            );
         BibEntry e2 = new BibEntry()
-                .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
-        assertEquals(0, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+            .withField(
+                StandardField.COMMENT,
+                "line1\r\n\r\nline3\r\n\r\nline5"
+            );
+        assertEquals(
+            0,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
     }
 
     @Test
     void compareWithLfFields() {
         BibEntry e1 = new BibEntry()
-                .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
+            .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry e2 = new BibEntry()
-                .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
-        assertEquals(0, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+            .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
+        assertEquals(
+            0,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
     }
 
     @Test
     void compareWithMixedLineEndings() {
         BibEntry e1 = new BibEntry()
-                .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
+            .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry e2 = new BibEntry()
-                .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
-        assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+            .withField(
+                StandardField.COMMENT,
+                "line1\r\n\r\nline3\r\n\r\nline5"
+            );
+        assertEquals(
+            -1,
+            new EntryComparator(false, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
     }
 
     @Test
     void withAuthorIsBeforeWithEmptyAuthorWhenSortingWithNonExistentKey() {
         BibEntry e1 = new BibEntry()
             .withField(StandardField.AUTHOR, "Stephen King");
-        BibEntry e2 = new BibEntry()
-            .withField(StandardField.AUTHOR, "");
-        assertEquals(-1, new EntryComparator(true, false, InternalField.KEY_FIELD).compare(e1, e2));
+        BibEntry e2 = new BibEntry().withField(StandardField.AUTHOR, "");
+        assertEquals(
+            -1,
+            new EntryComparator(true, false, InternalField.KEY_FIELD)
+                .compare(e1, e2)
+        );
     }
 
     @Test
     void withAuthorIsBeforeEmptyAuthorWhenSortingWithAuthor() {
         BibEntry e1 = new BibEntry()
             .withField(StandardField.AUTHOR, "Stephen King");
-        BibEntry e2 = new BibEntry()
-            .withField(StandardField.AUTHOR, "");
-        assertEquals(-1, new EntryComparator(true, false, StandardField.AUTHOR).compare(e1, e2));
+        BibEntry e2 = new BibEntry().withField(StandardField.AUTHOR, "");
+        assertEquals(
+            -1,
+            new EntryComparator(true, false, StandardField.AUTHOR)
+                .compare(e1, e2)
+        );
     }
 
     @Test
@@ -153,8 +220,10 @@ class EntryComparatorTest {
         BibEntry e1 = new BibEntry()
             .withField(StandardField.AUTHOR, "Stephen King");
         BibEntry e2 = new BibEntry();
-        assertEquals(1, new EntryComparator(false, false, StandardField.AUTHOR).compare(e1, e2));
+        assertEquals(
+            1,
+            new EntryComparator(false, false, StandardField.AUTHOR)
+                .compare(e1, e2)
+        );
     }
 }
-
-

@@ -1,15 +1,14 @@
 package org.jabref.logic.layout.format;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class WrapFileLinksTest {
 
@@ -32,7 +31,10 @@ class WrapFileLinksTest {
 
     @Test
     void testNoFormatSetNonEmptyString() {
-        assertThrows(NullPointerException.class, () -> formatter.format("test.pdf"));
+        assertThrows(
+            NullPointerException.class,
+            () -> formatter.format("test.pdf")
+        );
     }
 
     @Test
@@ -86,7 +88,10 @@ class WrapFileLinksTest {
     @Test
     void testIteratorTwoItems() {
         formatter.setArgument("\\i\n");
-        assertEquals("1\n2\n", formatter.format("Test file:test.pdf:PDF;test2.pdf"));
+        assertEquals(
+            "1\n2\n",
+            formatter.format("Test file:test.pdf:PDF;test2.pdf")
+        );
     }
 
     @Test
@@ -97,23 +102,41 @@ class WrapFileLinksTest {
 
     @Test
     void testPath() throws IOException {
-        formatter = new WrapFileLinks(Collections.singletonList(Path.of("src/test/resources/pdfs/")), "");
+        formatter =
+            new WrapFileLinks(
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")),
+                ""
+            );
         formatter.setArgument("\\p");
-        assertEquals(new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
-                formatter.format("Preferences:encrypted.pdf:PDF"));
+        assertEquals(
+            new File("src/test/resources/pdfs/encrypted.pdf")
+                .getCanonicalPath(),
+            formatter.format("Preferences:encrypted.pdf:PDF")
+        );
     }
 
     @Test
     void testPathFallBackToGeneratedDir() throws IOException {
-        formatter = new WrapFileLinks(Collections.emptyList(), "src/test/resources/pdfs/");
+        formatter =
+            new WrapFileLinks(
+                Collections.emptyList(),
+                "src/test/resources/pdfs/"
+            );
         formatter.setArgument("\\p");
-        assertEquals(new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
-                formatter.format("Preferences:encrypted.pdf:PDF"));
+        assertEquals(
+            new File("src/test/resources/pdfs/encrypted.pdf")
+                .getCanonicalPath(),
+            formatter.format("Preferences:encrypted.pdf:PDF")
+        );
     }
 
     @Test
     void testPathReturnsRelativePathIfNotFound() {
-        formatter = new WrapFileLinks(Collections.singletonList(Path.of("src/test/resources/pdfs/")), "");
+        formatter =
+            new WrapFileLinks(
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")),
+                ""
+            );
         formatter.setArgument("\\p");
         assertEquals("test.pdf", formatter.format("Preferences:test.pdf:PDF"));
     }

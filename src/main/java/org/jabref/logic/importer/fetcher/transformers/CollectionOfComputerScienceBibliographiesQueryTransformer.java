@@ -2,7 +2,8 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import org.jabref.model.strings.StringUtil;
 
-public class CollectionOfComputerScienceBibliographiesQueryTransformer extends AbstractQueryTransformer {
+public class CollectionOfComputerScienceBibliographiesQueryTransformer
+    extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {

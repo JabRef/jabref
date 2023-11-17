@@ -1,19 +1,16 @@
 package org.jabref.model.openoffice.rangesort;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jabref.model.openoffice.uno.UnoCast;
-import org.jabref.model.openoffice.uno.UnoTextRange;
-
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
+import java.util.ArrayList;
+import java.util.List;
+import org.jabref.model.openoffice.uno.UnoCast;
+import org.jabref.model.openoffice.uno.UnoTextRange;
 
 public class RangeOverlapWithin {
 
-    private RangeOverlapWithin() {
-    }
+    private RangeOverlapWithin() {}
 
     /**
      * Report identical, overlapping or touching ranges between elements of rangeHolders.
@@ -26,13 +23,16 @@ public class RangeOverlapWithin {
      * @param reportAtMost    Limit the number of records returned to atMost. Zero {@code reportAtMost} means no limit.
      * @param includeTouching Should the result contain ranges sharing only a boundary?
      */
-    public static <V extends RangeHolder>
-    List<RangeOverlap<V>> findOverlappingRanges(XTextDocument doc,
-                                                List<V> rangeHolders,
-                                                boolean includeTouching,
-                                                int reportAtMost) {
-
-        RangeSort.RangePartitions<V> partitions = RangeSort.partitionAndSortRanges(rangeHolders);
+    public static <V extends RangeHolder> List<
+        RangeOverlap<V>
+    > findOverlappingRanges(
+        XTextDocument doc,
+        List<V> rangeHolders,
+        boolean includeTouching,
+        int reportAtMost
+    ) {
+        RangeSort.RangePartitions<V> partitions =
+            RangeSort.partitionAndSortRanges(rangeHolders);
 
         return findOverlappingRanges(partitions, reportAtMost, includeTouching);
     }
@@ -45,10 +45,13 @@ public class RangeOverlapWithin {
      * @param atMost          Limit the number of records returned to atMost. Zero {@code atMost} means no limit.
      * @param includeTouching Should the result contain ranges sharing only a boundary?
      */
-    public static <V extends RangeHolder>
-    List<RangeOverlap<V>> findOverlappingRanges(RangeSort.RangePartitions<V> input,
-                                                int atMost,
-                                                boolean includeTouching) {
+    public static <V extends RangeHolder> List<
+        RangeOverlap<V>
+    > findOverlappingRanges(
+        RangeSort.RangePartitions<V> input,
+        int atMost,
+        boolean includeTouching
+    ) {
         assert atMost >= 0;
 
         List<RangeOverlap<V>> result = new ArrayList<>();
@@ -57,8 +60,12 @@ public class RangeOverlapWithin {
             if (partition.isEmpty()) {
                 continue;
             }
-            XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
-                    partition.get(0).getRange().getText()).get();
+            XTextRangeCompare cmp = UnoCast
+                .cast(
+                    XTextRangeCompare.class,
+                    partition.get(0).getRange().getText()
+                )
+                .get();
 
             for (int i = 0; i < (partition.size() - 1); i++) {
                 V aHolder = partition.get(i);
@@ -67,22 +74,35 @@ public class RangeOverlapWithin {
                 XTextRange bRange = bHolder.getRange();
 
                 // check equal values
-                int cmpResult = UnoTextRange.compareStartsThenEndsUnsafe(cmp, aRange, bRange);
+                int cmpResult = UnoTextRange.compareStartsThenEndsUnsafe(
+                    cmp,
+                    aRange,
+                    bRange
+                );
                 if (cmpResult == 0) {
                     List<V> aValues = new ArrayList<>();
                     aValues.add(aHolder);
                     // aValues.add(bHolder);
                     // collect those equal
-                    while (i < (partition.size() - 1) &&
-                            UnoTextRange.compareStartsThenEndsUnsafe(
-                                    cmp,
-                                    aRange,
-                                    partition.get(i + 1).getRange()) == 0) {
+                    while (
+                        i < (partition.size() - 1) &&
+                        UnoTextRange.compareStartsThenEndsUnsafe(
+                                cmp,
+                                aRange,
+                                partition.get(i + 1).getRange()
+                            ) ==
+                            0
+                    ) {
                         bHolder = partition.get(i + 1);
                         aValues.add(bHolder);
                         i++;
                     }
-                    result.add(new RangeOverlap<>(RangeOverlapKind.EQUAL_RANGE, aValues));
+                    result.add(
+                        new RangeOverlap<>(
+                            RangeOverlapKind.EQUAL_RANGE,
+                            aValues
+                        )
+                    );
                     if (atMost > 0 && result.size() >= atMost) {
                         return result;
                     }
@@ -91,16 +111,25 @@ public class RangeOverlapWithin {
 
                 // Not equal, and (a <= b) since sorted.
                 // Check if a.end >= b.start
-                cmpResult = UnoTextRange.compareStartsUnsafe(cmp, aRange.getEnd(), bRange.getStart());
+                cmpResult =
+                    UnoTextRange.compareStartsUnsafe(
+                        cmp,
+                        aRange.getEnd(),
+                        bRange.getStart()
+                    );
                 if (cmpResult > 0 || (includeTouching && (cmpResult == 0))) {
                     // found overlap or touch
                     List<V> valuesForOverlappingRanges = new ArrayList<>();
                     valuesForOverlappingRanges.add(aHolder);
                     valuesForOverlappingRanges.add(bHolder);
-                    result.add(new RangeOverlap<>(cmpResult == 0
-                            ? RangeOverlapKind.TOUCH
-                            : RangeOverlapKind.OVERLAP,
-                            valuesForOverlappingRanges));
+                    result.add(
+                        new RangeOverlap<>(
+                            cmpResult == 0
+                                ? RangeOverlapKind.TOUCH
+                                : RangeOverlapKind.OVERLAP,
+                            valuesForOverlappingRanges
+                        )
+                    );
                 }
                 if (atMost > 0 && result.size() >= atMost) {
                     return result;

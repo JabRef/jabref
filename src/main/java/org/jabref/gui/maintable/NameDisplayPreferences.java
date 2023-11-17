@@ -6,18 +6,27 @@ import javafx.beans.property.SimpleObjectProperty;
 public class NameDisplayPreferences {
 
     public enum DisplayStyle {
-        NATBIB, AS_IS, FIRSTNAME_LASTNAME, LASTNAME_FIRSTNAME
+        NATBIB,
+        AS_IS,
+        FIRSTNAME_LASTNAME,
+        LASTNAME_FIRSTNAME,
     }
 
     public enum AbbreviationStyle {
-        NONE, LASTNAME_ONLY, FULL
+        NONE,
+        LASTNAME_ONLY,
+        FULL,
     }
 
-    private final ObjectProperty<DisplayStyle> displayStyle = new SimpleObjectProperty<>();
-    private final ObjectProperty<AbbreviationStyle> abbreviationStyle = new SimpleObjectProperty<>();
+    private final ObjectProperty<DisplayStyle> displayStyle =
+        new SimpleObjectProperty<>();
+    private final ObjectProperty<AbbreviationStyle> abbreviationStyle =
+        new SimpleObjectProperty<>();
 
-    public NameDisplayPreferences(DisplayStyle displayStyle,
-                                  AbbreviationStyle abbreviationStyle) {
+    public NameDisplayPreferences(
+        DisplayStyle displayStyle,
+        AbbreviationStyle abbreviationStyle
+    ) {
         this.displayStyle.set(displayStyle);
         this.abbreviationStyle.set(abbreviationStyle);
     }

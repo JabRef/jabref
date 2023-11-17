@@ -3,7 +3,6 @@ package org.jabref.model.groups;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
@@ -16,7 +15,13 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     private final Character keywordHierarchicalDelimiter;
     private final Field field;
 
-    public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
+    public AutomaticKeywordGroup(
+        String name,
+        GroupHierarchyType context,
+        Field field,
+        Character keywordDelimiter,
+        Character keywordHierarchicalDelimiter
+    ) {
         super(name, context);
         this.field = field;
         this.keywordDelimiter = keywordDelimiter;
@@ -37,7 +42,13 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
+        return new AutomaticKeywordGroup(
+            this.name.getValue(),
+            this.context,
+            field,
+            this.keywordDelimiter,
+            keywordHierarchicalDelimiter
+        );
     }
 
     @Override
@@ -49,8 +60,10 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
             return false;
         }
         AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
-        return Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
-                Objects.equals(field, that.field);
+        return (
+            Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
+            Objects.equals(field, that.field)
+        );
     }
 
     @Override
@@ -60,26 +73,32 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
-        return keywordList.stream()
-                          .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
-                          .map(this::createGroup)
-                          .collect(Collectors.toSet());
+        KeywordList keywordList = entry.getFieldAsKeywords(
+            field,
+            keywordDelimiter
+        );
+        return keywordList
+            .stream()
+            .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+            .map(this::createGroup)
+            .collect(Collectors.toSet());
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {
         WordKeywordGroup rootGroup = new WordKeywordGroup(
-                keywordChain.get(),
-                GroupHierarchyType.INCLUDING,
-                field,
-                keywordChain.getPathFromRootAsString(keywordHierarchicalDelimiter),
-                true,
-                keywordDelimiter,
-                true);
+            keywordChain.get(),
+            GroupHierarchyType.INCLUDING,
+            field,
+            keywordChain.getPathFromRootAsString(keywordHierarchicalDelimiter),
+            true,
+            keywordDelimiter,
+            true
+        );
         GroupTreeNode root = new GroupTreeNode(rootGroup);
-        keywordChain.getChild()
-                    .map(this::createGroup)
-                    .ifPresent(root::addChild);
+        keywordChain
+            .getChild()
+            .map(this::createGroup)
+            .ifPresent(root::addChild);
         return root;
     }
 }

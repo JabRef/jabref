@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.minifier;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -9,6 +8,7 @@ import org.jabref.logic.l10n.Localization;
  * Replaces three or more authors with and others
  */
 public class MinifyNameListFormatter extends Formatter {
+
     @Override
     public String getName() {
         return Localization.lang("Minify list of person names");
@@ -42,7 +42,9 @@ public class MinifyNameListFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Shortens lists of persons if there are more than 2 persons to \"et al.\".");
+        return Localization.lang(
+            "Shortens lists of persons if there are more than 2 persons to \"et al.\"."
+        );
     }
 
     @Override
@@ -66,7 +68,10 @@ public class MinifyNameListFormatter extends Formatter {
         }
 
         // already abbreviated
-        if ("others".equals(authors[authors.length - 1]) && (authors.length == 2)) {
+        if (
+            "others".equals(authors[authors.length - 1]) &&
+            (authors.length == 2)
+        ) {
             return authorField;
         }
 

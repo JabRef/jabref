@@ -9,7 +9,10 @@ public class PushToTeXstudio extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.TEXSTUDIO;
 
-    public PushToTeXstudio(DialogService dialogService, PreferencesService preferencesService) {
+    public PushToTeXstudio(
+        DialogService dialogService,
+        PreferencesService preferencesService
+    ) {
         super(dialogService, preferencesService);
     }
 
@@ -25,6 +28,15 @@ public class PushToTeXstudio extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "--insert-cite", String.format("%s%s%s", getCitePrefix(), keyString, getCiteSuffix())};
+        return new String[] {
+            commandPath,
+            "--insert-cite",
+            String.format(
+                "%s%s%s",
+                getCitePrefix(),
+                keyString,
+                getCiteSuffix()
+            ),
+        };
     }
 }

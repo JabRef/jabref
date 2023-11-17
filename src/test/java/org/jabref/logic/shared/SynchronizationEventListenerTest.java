@@ -1,10 +1,9 @@
 package org.jabref.logic.shared;
 
+import com.google.common.eventbus.Subscribe;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.testutils.category.DatabaseTest;
-
-import com.google.common.eventbus.Subscribe;
 
 @DatabaseTest
 public class SynchronizationEventListenerTest {

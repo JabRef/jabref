@@ -8,15 +8,19 @@ import java.util.regex.Pattern;
  */
 public class SearchRules {
 
-    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
+    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile(
+        "[^\\p{Punct}]*"
+    );
 
-    private SearchRules() {
-    }
+    private SearchRules() {}
 
     /**
      * Returns the appropriate search rule that fits best to the given parameter.
      */
-    public static SearchRule getSearchRuleByQuery(String query, EnumSet<SearchFlags> searchFlags) {
+    public static SearchRule getSearchRuleByQuery(
+        String query,
+        EnumSet<SearchFlags> searchFlags
+    ) {
         if (isSimpleQuery(query)) {
             return new ContainsBasedSearchRule(searchFlags);
         }
@@ -44,6 +48,9 @@ public class SearchRules {
     }
 
     public enum SearchFlags {
-        CASE_SENSITIVE, REGULAR_EXPRESSION, FULLTEXT, KEEP_SEARCH_STRING
+        CASE_SENSITIVE,
+        REGULAR_EXPRESSION,
+        FULLTEXT,
+        KEEP_SEARCH_STRING,
     }
 }

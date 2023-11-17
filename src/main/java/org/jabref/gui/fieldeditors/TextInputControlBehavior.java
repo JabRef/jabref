@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import com.sun.javafx.scene.control.Properties;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -12,8 +13,6 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Screen;
 import javafx.stage.Window;
 
-import com.sun.javafx.scene.control.Properties;
-
 /**
  * This class contains some code taken from {@link com.sun.javafx.scene.control.behavior.TextInputControlBehavior},
  * witch is not accessible and thus we have no other choice.
@@ -25,7 +24,11 @@ public class TextInputControlBehavior {
     /**
      * taken from {@link com.sun.javafx.scene.control.behavior.TextFieldBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}
      */
-    public static void showContextMenu(TextField textField, ContextMenu contextMenu, ContextMenuEvent e) {
+    public static void showContextMenu(
+        TextField textField,
+        ContextMenu contextMenu,
+        ContextMenuEvent e
+    ) {
         double screenX = e.getScreenX();
         double screenY = e.getScreenY();
         double sceneX = e.getSceneX();
@@ -39,8 +42,14 @@ public class TextInputControlBehavior {
                 menuPos = skin.getMenuPosition();
             } else {
                 menuPos = skin.getMenuPosition();
-                if (menuPos != null && (menuPos.getX() <= 0 || menuPos.getY() <= 0)) {
-                    skin.positionCaret(skin.getIndex(e.getX(), e.getY()), false);
+                if (
+                    menuPos != null &&
+                    (menuPos.getX() <= 0 || menuPos.getY() <= 0)
+                ) {
+                    skin.positionCaret(
+                        skin.getIndex(e.getX(), e.getY()),
+                        false
+                    );
                     menuPos = skin.getMenuPosition();
                 }
             }
@@ -49,8 +58,10 @@ public class TextInputControlBehavior {
                 Point2D p = textField.localToScene(menuPos);
                 Scene scene = textField.getScene();
                 Window window = scene.getWindow();
-                Point2D location = new Point2D(window.getX() + scene.getX() + p.getX(),
-                        window.getY() + scene.getY() + p.getY());
+                Point2D location = new Point2D(
+                    window.getX() + scene.getX() + p.getX(),
+                    window.getY() + scene.getY() + p.getY()
+                );
                 screenX = location.getX();
                 sceneX = p.getX();
                 screenY = location.getY();
@@ -58,7 +69,8 @@ public class TextInputControlBehavior {
         }
 
         double menuWidth = contextMenu.prefWidth(-1);
-        double menuX = screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
+        double menuX =
+            screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
         Screen currentScreen = Screen.getPrimary();
         Rectangle2D bounds = currentScreen.getBounds();
 
@@ -83,7 +95,11 @@ public class TextInputControlBehavior {
     /**
      * taken from {@link com.sun.javafx.scene.control.behavior.TextAreaBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}
      */
-    public static void showContextMenu(TextArea textArea, ContextMenu contextMenu, ContextMenuEvent e) {
+    public static void showContextMenu(
+        TextArea textArea,
+        ContextMenu contextMenu,
+        ContextMenuEvent e
+    ) {
         double screenX = e.getScreenX();
         double screenY = e.getScreenY();
         double sceneX = e.getSceneX();
@@ -97,8 +113,14 @@ public class TextInputControlBehavior {
                 menuPos = skin.getMenuPosition();
             } else {
                 menuPos = skin.getMenuPosition();
-                if (menuPos != null && (menuPos.getX() <= 0 || menuPos.getY() <= 0)) {
-                    skin.positionCaret(skin.getIndex(e.getX(), e.getY()), false);
+                if (
+                    menuPos != null &&
+                    (menuPos.getX() <= 0 || menuPos.getY() <= 0)
+                ) {
+                    skin.positionCaret(
+                        skin.getIndex(e.getX(), e.getY()),
+                        false
+                    );
                     menuPos = skin.getMenuPosition();
                 }
             }
@@ -107,8 +129,10 @@ public class TextInputControlBehavior {
                 Point2D p = textArea.localToScene(menuPos);
                 Scene scene = textArea.getScene();
                 Window window = scene.getWindow();
-                Point2D location = new Point2D(window.getX() + scene.getX() + p.getX(),
-                        window.getY() + scene.getY() + p.getY());
+                Point2D location = new Point2D(
+                    window.getX() + scene.getX() + p.getX(),
+                    window.getY() + scene.getY() + p.getY()
+                );
                 screenX = location.getX();
                 sceneX = p.getX();
                 screenY = location.getY();
@@ -116,7 +140,8 @@ public class TextInputControlBehavior {
         }
 
         double menuWidth = contextMenu.prefWidth(-1);
-        double menuX = screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
+        double menuX =
+            screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
         Screen currentScreen = Screen.getPrimary();
         Rectangle2D bounds = currentScreen.getBounds();
 

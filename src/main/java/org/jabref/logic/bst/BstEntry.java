@@ -2,7 +2,6 @@ package org.jabref.logic.bst;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jabref.model.entry.BibEntry;
 
 public class BstEntry {

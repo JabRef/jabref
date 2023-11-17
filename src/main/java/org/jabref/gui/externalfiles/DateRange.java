@@ -11,11 +11,11 @@ public enum DateRange {
 
     private final String dateRange;
 
-    DateRange(String dateRange) { 
-       this.dateRange = dateRange;
+    DateRange(String dateRange) {
+        this.dateRange = dateRange;
     }
 
     public String getDateRange() {
-        return dateRange; 
-    } 
+        return dateRange;
+    }
 }

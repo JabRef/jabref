@@ -1,7 +1,8 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import java.nio.file.Path;
-
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -18,26 +19,38 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.tobiasdiez.easybind.EasyBind;
-import jakarta.inject.Inject;
-
 public class FileAnnotationTabView {
 
-    @FXML public ComboBox<Path> files;
-    @FXML public ListView<FileAnnotationViewModel> annotationList;
-    @FXML public Label author;
-    @FXML public Label page;
-    @FXML public Label date;
-    @FXML public TextArea content;
-    @FXML public TextArea marking;
-    @FXML public VBox details;
+    @FXML
+    public ComboBox<Path> files;
+
+    @FXML
+    public ListView<FileAnnotationViewModel> annotationList;
+
+    @FXML
+    public Label author;
+
+    @FXML
+    public Label page;
+
+    @FXML
+    public Label date;
+
+    @FXML
+    public TextArea content;
+
+    @FXML
+    public TextArea marking;
+
+    @FXML
+    public VBox details;
+
     private final BibEntry entry;
     private final FileAnnotationCache fileAnnotationCache;
     private FileAnnotationTabViewModel viewModel;
@@ -45,35 +58,78 @@ public class FileAnnotationTabView {
     @Inject
     private FileUpdateMonitor fileMonitor;
 
-    public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {
+    public FileAnnotationTabView(
+        BibEntry entry,
+        FileAnnotationCache fileAnnotationCache
+    ) {
         this.entry = entry;
         this.fileAnnotationCache = fileAnnotationCache;
     }
 
     @FXML
     public void initialize() {
-        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
+        viewModel =
+            new FileAnnotationTabViewModel(
+                fileAnnotationCache,
+                entry,
+                fileMonitor
+            );
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
-        files.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedFile(newValue));
+        files
+            .getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) ->
+                viewModel.notifyNewSelectedFile(newValue)
+            );
         files.getSelectionModel().selectFirst();
 
         // Set-up annotation list
-        annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
-        ViewModelListCellFactory<FileAnnotationViewModel> cellFactory = new ViewModelListCellFactory<FileAnnotationViewModel>()
+        annotationList
+            .getSelectionModel()
+            .setSelectionMode(SelectionMode.SINGLE);
+        annotationList
+            .getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) ->
+                viewModel.notifyNewSelectedAnnotation(newValue)
+            );
+        ViewModelListCellFactory<FileAnnotationViewModel> cellFactory =
+            new ViewModelListCellFactory<FileAnnotationViewModel>()
                 .withGraphic(this::createFileAnnotationNode);
         annotationList.setCellFactory(cellFactory);
-        annotationList.setPlaceholder(new Label(Localization.lang("File has no attached annotations")));
-        Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());
+        annotationList.setPlaceholder(
+            new Label(Localization.lang("File has no attached annotations"))
+        );
+        Bindings.bindContent(
+            annotationList.itemsProperty().get(),
+            viewModel.annotationsProperty()
+        );
         annotationList.getSelectionModel().selectFirst();
-        annotationList.itemsProperty().get().addListener(
-                (ListChangeListener<? super FileAnnotationViewModel>) c -> annotationList.getSelectionModel().selectFirst());
+        annotationList
+            .itemsProperty()
+            .get()
+            .addListener(
+                (ListChangeListener<? super FileAnnotationViewModel>) c ->
+                    annotationList.getSelectionModel().selectFirst()
+            );
 
         // Set-up details pane
-        content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
-        marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
+        content
+            .textProperty()
+            .bind(
+                EasyBind
+                    .select(viewModel.currentAnnotationProperty())
+                    .selectObject(FileAnnotationViewModel::contentProperty)
+            );
+        marking
+            .textProperty()
+            .bind(
+                EasyBind
+                    .select(viewModel.currentAnnotationProperty())
+                    .selectObject(FileAnnotationViewModel::markingProperty)
+            );
         details.disableProperty().bind(viewModel.isAnnotationsEmpty());
     }
 
@@ -91,7 +147,9 @@ public class FileAnnotationTabView {
         Label marking = new Label(annotation.getMarking());
         Label author = new Label(annotation.getAuthor());
         Label date = new Label(annotation.getDate());
-        Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
+        Label page = new Label(
+            Localization.lang("Page") + ": " + annotation.getPage()
+        );
 
         marking.setStyle("-fx-font-size: 0.75em; -fx-font-weight: bold");
         marking.setMaxHeight(30);

@@ -1,5 +1,7 @@
 package org.jabref.gui.documentviewer;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
@@ -11,7 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.OnlyIntegerFormatter;
@@ -21,22 +22,37 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
-
 public class DocumentViewerView extends BaseDialog<Void> {
 
-    @FXML private ScrollBar scrollBar;
-    @FXML private ComboBox<LinkedFile> fileChoice;
-    @FXML private BorderPane mainPane;
-    @FXML private ToggleButton modeLive;
-    @FXML private ToggleButton modeLock;
-    @FXML private TextField currentPage;
-    @FXML private Label maxPages;
+    @FXML
+    private ScrollBar scrollBar;
 
-    @Inject private StateManager stateManager;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private PreferencesService preferencesService;
+    @FXML
+    private ComboBox<LinkedFile> fileChoice;
+
+    @FXML
+    private BorderPane mainPane;
+
+    @FXML
+    private ToggleButton modeLive;
+
+    @FXML
+    private ToggleButton modeLock;
+
+    @FXML
+    private TextField currentPage;
+
+    @FXML
+    private Label maxPages;
+
+    @Inject
+    private StateManager stateManager;
+
+    @Inject
+    private TaskExecutor taskExecutor;
+
+    @Inject
+    private PreferencesService preferencesService;
 
     private DocumentViewerControl viewer;
     private DocumentViewerViewModel viewModel;
@@ -45,9 +61,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
         this.setTitle(Localization.lang("Document viewer"));
         this.initModality(Modality.NONE);
 
-        ViewLoader.view(this)
-                  .load()
-                  .setAsContent(this.getDialogPane());
+        ViewLoader.view(this).load().setAsContent(this.getDialogPane());
 
         // Remove button bar at bottom, but add close button to keep the dialog closable by clicking the "x" window symbol
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
@@ -56,7 +70,8 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new DocumentViewerViewModel(stateManager, preferencesService);
+        viewModel =
+            new DocumentViewerViewModel(stateManager, preferencesService);
 
         setupViewer();
         setupScrollbar();
@@ -77,33 +92,47 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupPageControls() {
         OnlyIntegerFormatter integerFormatter = new OnlyIntegerFormatter(1);
-        viewModel.currentPageProperty().bindBidirectional(integerFormatter.valueProperty());
+        viewModel
+            .currentPageProperty()
+            .bindBidirectional(integerFormatter.valueProperty());
         currentPage.setTextFormatter(integerFormatter);
         maxPages.textProperty().bind(viewModel.maxPagesProperty().asString());
     }
 
     private void setupFileChoice() {
-        ViewModelListCellFactory<LinkedFile> cellFactory = new ViewModelListCellFactory<LinkedFile>()
+        ViewModelListCellFactory<LinkedFile> cellFactory =
+            new ViewModelListCellFactory<LinkedFile>()
                 .withText(LinkedFile::getLink);
         fileChoice.setButtonCell(cellFactory.call(null));
         fileChoice.setCellFactory(cellFactory);
-        fileChoice.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> viewModel.switchToFile(newValue));
+        fileChoice
+            .getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldValue, newValue) ->
+                viewModel.switchToFile(newValue)
+            );
         // We always want that the first item is selected after a change
         // This also automatically selects the first file on the initial load
-        fileChoice.itemsProperty().addListener(
-                (observable, oldValue, newValue) -> fileChoice.getSelectionModel().selectFirst());
+        fileChoice
+            .itemsProperty()
+            .addListener((observable, oldValue, newValue) ->
+                fileChoice.getSelectionModel().selectFirst()
+            );
         fileChoice.itemsProperty().bind(viewModel.filesProperty());
     }
 
     private void setupViewer() {
         viewer = new DocumentViewerControl(taskExecutor);
-        viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
-            if (newDocument != null) {
-                viewer.show(newDocument);
-            }
-        });
-        viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
+        viewModel
+            .currentDocumentProperty()
+            .addListener((observable, oldDocument, newDocument) -> {
+                if (newDocument != null) {
+                    viewer.show(newDocument);
+                }
+            });
+        viewModel
+            .currentPageProperty()
+            .bindBidirectional(viewer.currentPageProperty());
         mainPane.setCenter(viewer);
     }
 

@@ -4,6 +4,7 @@ package org.jabref.model.openoffice.style;
  * Identifies a citation group in a document.
  */
 public class CitationGroupId {
+
     String groupId;
 
     public CitationGroupId(String groupId) {

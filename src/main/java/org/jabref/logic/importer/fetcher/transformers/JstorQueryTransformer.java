@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
 public class JstorQueryTransformer extends AbstractQueryTransformer {
+
     @Override
     protected String getLogicalAndOperator() {
         return " AND ";
@@ -42,6 +43,12 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
         if (endYear == Integer.MAX_VALUE) {
             return yearRange;
         }
-        return "sd:" + Integer.toString(startYear) + getLogicalAndOperator() + "ed:" + Integer.toString(endYear);
+        return (
+            "sd:" +
+            Integer.toString(startYear) +
+            getLogicalAndOperator() +
+            "ed:" +
+            Integer.toString(endYear)
+        );
     }
 }

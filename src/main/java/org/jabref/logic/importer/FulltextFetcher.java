@@ -3,7 +3,6 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
-
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.model.entry.BibEntry;
 
@@ -22,7 +21,8 @@ public interface FulltextFetcher {
      * @throws java.io.IOException  if an IO operation has failed
      * @throws FetcherException     if a fetcher specific error occurred
      */
-    Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException;
+    Optional<URL> findFullText(BibEntry entry)
+        throws IOException, FetcherException;
 
     /**
      * Returns the level of trust for this fetcher.

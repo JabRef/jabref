@@ -1,5 +1,6 @@
 package org.jabref.logic.citationstyle;
 
+import de.undercouch.citeproc.helper.CSLUtils;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -16,13 +17,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.jabref.logic.util.StandardFileType;
-
-import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.CharacterData;
@@ -39,16 +36,23 @@ public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        CitationStyle.class
+    );
     private static final String STYLES_ROOT = "/csl-styles";
     private static final List<CitationStyle> STYLES = new ArrayList<>();
-    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
+    private static final DocumentBuilderFactory FACTORY =
+        DocumentBuilderFactory.newInstance();
 
     private final String filePath;
     private final String title;
     private final String source;
 
-    private CitationStyle(final String filename, final String title, final String source) {
+    private CitationStyle(
+        final String filename,
+        final String title,
+        final String source
+    ) {
         this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
         this.source = Objects.requireNonNull(source);
@@ -57,27 +61,46 @@ public class CitationStyle {
     /**
      * Creates an CitationStyle instance out of the style string
      */
-    private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
-        if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
+    private static Optional<CitationStyle> createCitationStyleFromSource(
+        final String source,
+        final String filename
+    ) {
+        if (
+            (filename != null) &&
+            !filename.isEmpty() &&
+            (source != null) &&
+            !source.isEmpty()
+        ) {
             try {
                 InputSource inputSource = new InputSource();
-                inputSource.setCharacterStream(new StringReader(stripInvalidProlog(source)));
+                inputSource.setCharacterStream(
+                    new StringReader(stripInvalidProlog(source))
+                );
 
                 Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
 
                 // See CSL#canFormatBibliographies, checks if the tag exists
                 NodeList bibs = doc.getElementsByTagName("bibliography");
                 if (bibs.getLength() <= 0) {
-                    LOGGER.debug("no bibliography element for file {} ", filename);
+                    LOGGER.debug(
+                        "no bibliography element for file {} ",
+                        filename
+                    );
                     return Optional.empty();
                 }
 
                 NodeList nodes = doc.getElementsByTagName("info");
-                NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-                String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
+                NodeList titleNode =
+                    ((Element) nodes.item(0)).getElementsByTagName("title");
+                String title =
+                    ((CharacterData) titleNode
+                            .item(0)
+                            .getFirstChild()).getData();
 
                 return Optional.of(new CitationStyle(filename, title, source));
-            } catch (ParserConfigurationException | SAXException | IOException e) {
+            } catch (
+                ParserConfigurationException | SAXException | IOException e
+            ) {
                 LOGGER.error("Error while parsing source", e);
             }
         }
@@ -96,7 +119,9 @@ public class CitationStyle {
     /**
      * Loads the CitationStyle from the given file
      */
-    public static Optional<CitationStyle> createCitationStyleFromFile(final String styleFile) {
+    public static Optional<CitationStyle> createCitationStyleFromFile(
+        final String styleFile
+    ) {
         if (!isCitationStyleFile(styleFile)) {
             LOGGER.error("Can only load style files: {}", styleFile);
             return Optional.empty();
@@ -104,11 +129,18 @@ public class CitationStyle {
 
         try {
             String text;
-            String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
+            String internalFile =
+                STYLES_ROOT +
+                (styleFile.startsWith("/") ? "" : "/") +
+                styleFile;
             URL url = CitationStyle.class.getResource(internalFile);
 
             if (url != null) {
-                text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
+                text =
+                    CSLUtils.readURLToString(
+                        url,
+                        StandardCharsets.UTF_8.toString()
+                    );
             } else {
                 // if the url is null then the style is located outside the classpath
                 text = Files.readString(Path.of(styleFile));
@@ -128,7 +160,8 @@ public class CitationStyle {
      * @return default citation style
      */
     public static CitationStyle getDefault() {
-        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", ""));
+        return createCitationStyleFromFile(DEFAULT)
+            .orElse(new CitationStyle("", "Empty", ""));
     }
 
     /**
@@ -141,7 +174,8 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
+        URL url =
+            CitationStyle.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
         Objects.requireNonNull(url);
 
         try {
@@ -151,19 +185,30 @@ public class CitationStyle {
 
             return STYLES;
         } catch (URISyntaxException | IOException e) {
-            LOGGER.error("something went wrong while searching available CitationStyles", e);
+            LOGGER.error(
+                "something went wrong while searching available CitationStyles",
+                e
+            );
             return Collections.emptyList();
         }
     }
 
-    private static List<CitationStyle> discoverCitationStylesInPath(Path path) throws IOException {
-        try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
-            return stream.map(Path::getFileName)
-                         .map(Path::toString)
-                         .map(CitationStyle::createCitationStyleFromFile)
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .collect(Collectors.toList());
+    private static List<CitationStyle> discoverCitationStylesInPath(Path path)
+        throws IOException {
+        try (
+            Stream<Path> stream = Files.find(
+                path,
+                1,
+                (file, attr) -> file.toString().endsWith("csl")
+            )
+        ) {
+            return stream
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .map(CitationStyle::createCitationStyleFromFile)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
         }
     }
 
@@ -171,7 +216,10 @@ public class CitationStyle {
      * Checks if the given style file is a CitationStyle
      */
     public static boolean isCitationStyleFile(String styleFile) {
-        return StandardFileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
+        return StandardFileType.CITATION_STYLE
+            .getExtensions()
+            .stream()
+            .anyMatch(styleFile::endsWith);
     }
 
     public String getTitle() {

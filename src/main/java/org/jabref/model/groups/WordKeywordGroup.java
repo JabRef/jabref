@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
@@ -21,17 +20,24 @@ import org.jabref.model.util.ListUtil;
 /**
  * Matches entries if a given field contains a specified word.
  */
-public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
+public class WordKeywordGroup
+    extends KeywordGroup
+    implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
     private final SearchStrategy searchStrategy;
     private final boolean onlySplitWordsAtSeparator;
 
-    public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
-                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
-                            boolean onlySplitWordsAtSeparator) {
+    public WordKeywordGroup(
+        String name,
+        GroupHierarchyType context,
+        Field searchField,
+        String searchExpression,
+        boolean caseSensitive,
+        Character keywordSeparator,
+        boolean onlySplitWordsAtSeparator
+    ) {
         super(name, context, searchField, searchExpression, caseSensitive);
-
         this.keywordSeparator = keywordSeparator;
         this.onlySplitWordsAtSeparator = onlySplitWordsAtSeparator;
 
@@ -46,7 +52,10 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         }
     }
 
-    private static boolean containsCaseInsensitive(Set<String> searchIn, Collection<String> searchFor) {
+    private static boolean containsCaseInsensitive(
+        Set<String> searchIn,
+        Collection<String> searchFor
+    ) {
         for (String searchWord : searchFor) {
             if (!containsCaseInsensitive(searchIn, searchWord)) {
                 return false;
@@ -55,7 +64,10 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         return true;
     }
 
-    private static boolean containsCaseInsensitive(Set<String> searchIn, String searchFor) {
+    private static boolean containsCaseInsensitive(
+        Set<String> searchIn,
+        String searchFor
+    ) {
         for (String word : searchIn) {
             if (word.equalsIgnoreCase(searchFor)) {
                 return true;
@@ -72,7 +84,10 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         for (BibEntry entry : new ArrayList<>(entriesToAdd)) {
             if (!contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
-                KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
+                KeywordList wordlist = KeywordList.parse(
+                    oldContent,
+                    keywordSeparator
+                );
                 wordlist.add(searchExpression);
                 String newContent = wordlist.getAsString(keywordSeparator);
                 entry.setField(searchField, newContent).ifPresent(changes::add);
@@ -88,7 +103,10 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         for (BibEntry entry : new ArrayList<>(entriesToRemove)) {
             if (contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
-                KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
+                KeywordList wordlist = KeywordList.parse(
+                    oldContent,
+                    keywordSeparator
+                );
                 wordlist.remove(searchExpression);
                 String newContent = wordlist.getAsString(keywordSeparator);
                 entry.setField(searchField, newContent).ifPresent(changes::add);
@@ -106,13 +124,21 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
             return false;
         }
         WordKeywordGroup other = (WordKeywordGroup) o;
-        return Objects.equals(getName(), other.getName())
-                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
-                && Objects.equals(searchField, other.searchField)
-                && Objects.equals(searchExpression, other.searchExpression)
-                && Objects.equals(caseSensitive, other.caseSensitive)
-                && Objects.equals(keywordSeparator, other.keywordSeparator)
-                && Objects.equals(onlySplitWordsAtSeparator, other.onlySplitWordsAtSeparator);
+        return (
+            Objects.equals(getName(), other.getName()) &&
+            Objects.equals(
+                getHierarchicalContext(),
+                other.getHierarchicalContext()
+            ) &&
+            Objects.equals(searchField, other.searchField) &&
+            Objects.equals(searchExpression, other.searchExpression) &&
+            Objects.equals(caseSensitive, other.caseSensitive) &&
+            Objects.equals(keywordSeparator, other.keywordSeparator) &&
+            Objects.equals(
+                onlySplitWordsAtSeparator,
+                other.onlySplitWordsAtSeparator
+            )
+        );
     }
 
     @Override
@@ -122,19 +148,28 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
     @Override
     public AbstractGroup deepCopy() {
-        return new WordKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
-                caseSensitive, keywordSeparator, onlySplitWordsAtSeparator);
+        return new WordKeywordGroup(
+            getName(),
+            getHierarchicalContext(),
+            searchField,
+            searchExpression,
+            caseSensitive,
+            keywordSeparator,
+            onlySplitWordsAtSeparator
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(),
-                getHierarchicalContext(),
-                searchField,
-                searchExpression,
-                caseSensitive,
-                keywordSeparator,
-                onlySplitWordsAtSeparator);
+        return Objects.hash(
+            getName(),
+            getHierarchicalContext(),
+            searchField,
+            searchExpression,
+            caseSensitive,
+            keywordSeparator,
+            onlySplitWordsAtSeparator
+        );
     }
 
     interface SearchStrategy {
@@ -142,10 +177,12 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     class StringSearchStrategy implements SearchStrategy {
+
         Set<String> searchWords;
 
         StringSearchStrategy() {
-            searchWords = new HashSet<>(StringUtil.getStringAsWords(searchExpression));
+            searchWords =
+                new HashSet<>(StringUtil.getStringAsWords(searchExpression));
         }
 
         @Override
@@ -164,16 +201,19 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         Set<EntryType> searchWords;
 
         TypeSearchStrategy() {
-            searchWords = KeywordList.parse(searchExpression, keywordSeparator)
-                                     .stream()
-                                     .map(word -> EntryTypeFactory.parse(word.get()))
-                                     .collect(Collectors.toSet());
+            searchWords =
+                KeywordList
+                    .parse(searchExpression, keywordSeparator)
+                    .stream()
+                    .map(word -> EntryTypeFactory.parse(word.get()))
+                    .collect(Collectors.toSet());
         }
 
         @Override
         public boolean contains(BibEntry entry) {
-            return searchWords.stream()
-                              .anyMatch(word -> entry.getType().equals(word));
+            return searchWords
+                .stream()
+                .anyMatch(word -> entry.getType().equals(word));
         }
     }
 
@@ -187,7 +227,10 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
         @Override
         public boolean contains(BibEntry entry) {
-            KeywordList fieldValue = entry.getFieldAsKeywords(searchField, keywordSeparator);
+            KeywordList fieldValue = entry.getFieldAsKeywords(
+                searchField,
+                keywordSeparator
+            );
             return ListUtil.allMatch(searchWords, fieldValue::contains);
         }
     }

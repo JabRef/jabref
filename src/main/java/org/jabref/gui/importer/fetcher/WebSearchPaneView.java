@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.BooleanExpression;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
@@ -11,7 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -24,43 +24,66 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-
 public class WebSearchPaneView extends VBox {
 
-    private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");
+    private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass(
+        "invalid"
+    );
 
     private final WebSearchPaneViewModel viewModel;
     private final PreferencesService preferences;
     private final DialogService dialogService;
 
-    public WebSearchPaneView(PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
+    public WebSearchPaneView(
+        PreferencesService preferences,
+        DialogService dialogService,
+        StateManager stateManager
+    ) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
+        this.viewModel =
+            new WebSearchPaneViewModel(
+                preferences,
+                dialogService,
+                stateManager
+            );
         initialize();
     }
 
     private void initialize() {
         ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
         new ViewModelListCellFactory<SearchBasedFetcher>()
-                .withText(SearchBasedFetcher::getName)
-                .install(fetchers);
+            .withText(SearchBasedFetcher::getName)
+            .install(fetchers);
         fetchers.itemsProperty().bind(viewModel.fetchersProperty());
-        fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
+        fetchers
+            .valueProperty()
+            .bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
 
         // Create help button for currently selected fetcher
         StackPane helpButtonContainer = new StackPane();
-        ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
-        EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
-            if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getFilePreferences()));
-                helpButtonContainer.getChildren().setAll(helpButton);
-            } else {
-                helpButtonContainer.getChildren().clear();
+        ActionFactory factory = new ActionFactory(
+            preferences.getKeyBindingRepository()
+        );
+        EasyBind.subscribe(
+            viewModel.selectedFetcherProperty(),
+            fetcher -> {
+                if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
+                    Button helpButton = factory.createIconButton(
+                        StandardActions.HELP,
+                        new HelpAction(
+                            fetcher.getHelpPage().get(),
+                            dialogService,
+                            preferences.getFilePreferences()
+                        )
+                    );
+                    helpButtonContainer.getChildren().setAll(helpButton);
+                } else {
+                    helpButtonContainer.getChildren().clear();
+                }
             }
-        });
+        );
         HBox fetcherContainer = new HBox(fetchers, helpButtonContainer);
         HBox.setHgrow(fetchers, Priority.ALWAYS);
 
@@ -69,16 +92,32 @@ public class WebSearchPaneView extends VBox {
         query.getStyleClass().add("searchBar");
 
         viewModel.queryProperty().bind(query.textProperty());
-        EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),
-                valid -> {
-                    if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
-                        query.setTooltip(new Tooltip(viewModel.queryValidationStatus().getHighestMessage().get().getMessage()));
-                        query.pseudoClassStateChanged(QUERY_INVALID, true);
-                    } else {
-                        query.setTooltip(null);
-                        query.pseudoClassStateChanged(QUERY_INVALID, false);
-                    }
-                });
+        EasyBind.subscribe(
+            viewModel.queryValidationStatus().validProperty(),
+            valid -> {
+                if (
+                    !valid &&
+                    viewModel
+                        .queryValidationStatus()
+                        .getHighestMessage()
+                        .isPresent()
+                ) {
+                    query.setTooltip(
+                        new Tooltip(
+                            viewModel
+                                .queryValidationStatus()
+                                .getHighestMessage()
+                                .get()
+                                .getMessage()
+                        )
+                    );
+                    query.pseudoClassStateChanged(QUERY_INVALID, true);
+                } else {
+                    query.setTooltip(null);
+                    query.pseudoClassStateChanged(QUERY_INVALID, false);
+                }
+            }
+        );
 
         // Allows triggering search on pressing enter
         query.setOnKeyPressed(event -> {
@@ -90,7 +129,9 @@ public class WebSearchPaneView extends VBox {
         ClipBoardManager.addX11Support(query);
 
         // Create button that triggers search
-        BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();
+        BooleanExpression importerEnabled = preferences
+            .getImporterPreferences()
+            .importerEnabledProperty();
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());

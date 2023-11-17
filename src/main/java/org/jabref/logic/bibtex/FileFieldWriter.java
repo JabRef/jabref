@@ -4,19 +4,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.jabref.model.entry.LinkedFile;
 
 public class FileFieldWriter {
 
-    private FileFieldWriter() {
-    }
+    private FileFieldWriter() {}
 
     public static String getStringRepresentation(List<LinkedFile> fields) {
         String[][] array = new String[fields.size()][];
         int i = 0;
         for (LinkedFile entry : fields) {
-            array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
+            array[i] =
+                new String[] {
+                    entry.getDescription(),
+                    entry.getLink(),
+                    entry.getFileType(),
+                };
             i++;
         }
         return encodeStringArray(array);
@@ -34,9 +37,10 @@ public class FileFieldWriter {
      * @return The encoded String.
      */
     public static String encodeStringArray(String[][] values) {
-        return Arrays.stream(values)
-                     .map(FileFieldWriter::encodeStringArray)
-                     .collect(Collectors.joining(";"));
+        return Arrays
+            .stream(values)
+            .map(FileFieldWriter::encodeStringArray)
+            .collect(Collectors.joining(";"));
     }
 
     /**
@@ -47,9 +51,10 @@ public class FileFieldWriter {
      * @return The encoded String.
      */
     private static String encodeStringArray(String[] entry) {
-        return Arrays.stream(entry)
-                     .map(FileFieldWriter::quote)
-                     .collect(Collectors.joining(":"));
+        return Arrays
+            .stream(entry)
+            .map(FileFieldWriter::quote)
+            .collect(Collectors.joining(":"));
     }
 
     public static String quote(String s) {

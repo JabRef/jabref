@@ -1,15 +1,18 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
 import org.jabref.model.strings.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * DBLP does not support explicit year field search, thus we extend YearAndYearRangeByFilteringQueryTransformer
  */
-public class DBLPQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DBLPQueryTransformer.class);
+public class DBLPQueryTransformer
+    extends YearAndYearRangeByFilteringQueryTransformer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DBLPQueryTransformer.class
+    );
 
     @Override
     protected String getLogicalAndOperator() {

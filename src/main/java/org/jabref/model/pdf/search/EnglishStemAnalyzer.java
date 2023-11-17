@@ -22,4 +22,3 @@ public class EnglishStemAnalyzer extends Analyzer {
         return new TokenStreamComponents(source, filter);
     }
 }
-

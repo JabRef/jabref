@@ -7,12 +7,13 @@ import org.jabref.preferences.PushToApplicationPreferences;
 
 public class PushToLyxSettings extends PushToApplicationSettings {
 
-    public PushToLyxSettings(PushToApplication application,
-                             DialogService dialogService,
-                             FilePreferences filePreferences,
-                             PushToApplicationPreferences preferences) {
+    public PushToLyxSettings(
+        PushToApplication application,
+        DialogService dialogService,
+        FilePreferences filePreferences,
+        PushToApplicationPreferences preferences
+    ) {
         super(application, dialogService, filePreferences, preferences);
-
         commandLabel.setText(Localization.lang("Path to LyX pipe") + ":");
     }
 }

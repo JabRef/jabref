@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 public interface PreferenceTabViewModel {
-
     /**
      * This method is called when the dialog is opened, or if it is made
      * visible after being hidden. The tab should update all its values.

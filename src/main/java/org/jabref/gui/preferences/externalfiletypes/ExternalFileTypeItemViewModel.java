@@ -4,14 +4,15 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 
 public class ExternalFileTypeItemViewModel {
-    private final ObjectProperty<JabRefIcon> icon = new SimpleObjectProperty<>();
+
+    private final ObjectProperty<JabRefIcon> icon =
+        new SimpleObjectProperty<>();
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty extension = new SimpleStringProperty();
     private final StringProperty mimetype = new SimpleStringProperty();
@@ -26,7 +27,16 @@ public class ExternalFileTypeItemViewModel {
     }
 
     public ExternalFileTypeItemViewModel() {
-        this(new CustomExternalFileType("", "", "", "", "new", IconTheme.JabRefIcons.FILE));
+        this(
+            new CustomExternalFileType(
+                "",
+                "",
+                "",
+                "",
+                "new",
+                IconTheme.JabRefIcons.FILE
+            )
+        );
     }
 
     public ObjectProperty<JabRefIcon> iconProperty() {
@@ -58,11 +68,12 @@ public class ExternalFileTypeItemViewModel {
 
     public ExternalFileType toExternalFileType() {
         return new CustomExternalFileType(
-                this.name.get(),
-                this.extension.get(),
-                this.mimetype.get(),
-                this.application.get(),
-                this.icon.get().name(),
-                this.icon.get());
+            this.name.get(),
+            this.extension.get(),
+            this.mimetype.get(),
+            this.application.get(),
+            this.icon.get().name(),
+            this.icon.get()
+        );
     }
 }

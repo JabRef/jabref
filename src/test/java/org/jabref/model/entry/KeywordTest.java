@@ -1,18 +1,20 @@
 package org.jabref.model.entry;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class KeywordTest {
 
     @Test
     public void getPathFromRootAsStringForSimpleChain() throws Exception {
         Keyword keywordChain = Keyword.of("A", "B", "C");
-        assertEquals("A > B", keywordChain.getChild().get().getPathFromRootAsString('>'));
+        assertEquals(
+            "A > B",
+            keywordChain.getChild().get().getPathFromRootAsString('>')
+        );
     }
 
     @Test

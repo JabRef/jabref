@@ -9,9 +9,14 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.ToggleGroup;
 
 public class FieldValueCellViewModel {
+
     private final StringProperty fieldValue = new SimpleStringProperty();
-    private final BooleanProperty selected = new SimpleBooleanProperty(FieldValueCell.class, "selected");
-    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>();
+    private final BooleanProperty selected = new SimpleBooleanProperty(
+        FieldValueCell.class,
+        "selected"
+    );
+    private final ObjectProperty<ToggleGroup> toggleGroup =
+        new SimpleObjectProperty<>();
 
     public FieldValueCellViewModel(String text) {
         setFieldValue(text);

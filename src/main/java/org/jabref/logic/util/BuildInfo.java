@@ -12,10 +12,19 @@ public final class BuildInfo {
 
     public static final String UNKNOWN_VERSION = "UNKNOWN";
 
-    public static final String OS = System.getProperty("os.name", UNKNOWN_VERSION);
-    public static final String OS_VERSION = System.getProperty("os.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
-    public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
-    public static final String JAVA_VERSION = System.getProperty("java.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+    public static final String OS = System.getProperty(
+        "os.name",
+        UNKNOWN_VERSION
+    );
+    public static final String OS_VERSION = System
+        .getProperty("os.version", UNKNOWN_VERSION)
+        .toLowerCase(Locale.ROOT);
+    public static final String OS_ARCH = System
+        .getProperty("os.arch", UNKNOWN_VERSION)
+        .toLowerCase(Locale.ROOT);
+    public static final String JAVA_VERSION = System
+        .getProperty("java.version", UNKNOWN_VERSION)
+        .toLowerCase(Locale.ROOT);
 
     public final Version version;
     public final String maintainers;
@@ -38,7 +47,12 @@ public final class BuildInfo {
 
         try (InputStream stream = BuildInfo.class.getResourceAsStream(path)) {
             if (stream != null) {
-                try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                try (
+                    InputStreamReader reader = new InputStreamReader(
+                        stream,
+                        StandardCharsets.UTF_8
+                    )
+                ) {
                     properties.load(reader);
                 }
             }
@@ -49,21 +63,54 @@ public final class BuildInfo {
         version = Version.parse(properties.getProperty("version"));
         year = properties.getProperty("year", "");
         maintainers = properties.getProperty("maintainers", "");
-        azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "");
-        springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
-        astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
-        ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
-        scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
-        minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
-        allowJava9 = "true".equals(properties.getProperty("allowJava9", "true"));
-        biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
+        azureInstrumentationKey =
+            BuildInfo.getValue(properties, "azureInstrumentationKey", "");
+        springerNatureAPIKey =
+            BuildInfo.getValue(
+                properties,
+                "springerNatureAPIKey",
+                "118d90a519d0fc2a01ee9715400054d4"
+            );
+        astrophysicsDataSystemAPIKey =
+            BuildInfo.getValue(
+                properties,
+                "astrophysicsDataSystemAPIKey",
+                "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c"
+            );
+        ieeeAPIKey =
+            BuildInfo.getValue(
+                properties,
+                "ieeeAPIKey",
+                "5jv3wyt4tt2bwcwv7jjk7pc3"
+            );
+        scienceDirectApiKey =
+            BuildInfo.getValue(
+                properties,
+                "scienceDirectApiKey",
+                "fb82f2e692b3c72dafe5f4f1fa0ac00b"
+            );
+        minRequiredJavaVersion =
+            properties.getProperty("minRequiredJavaVersion", "1.8");
+        allowJava9 =
+            "true".equals(properties.getProperty("allowJava9", "true"));
+        biodiversityHeritageApiKey =
+            BuildInfo.getValue(
+                properties,
+                "biodiversityHeritageApiKey",
+                "36b910b6-2eb3-46f2-b64c-9abc149925ba"
+            );
     }
 
-    private static String getValue(Properties properties, String key, String defaultValue) {
-        String result = Optional.ofNullable(properties.getProperty(key))
-                                // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gradle
-                                .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
-                                .orElse("");
+    private static String getValue(
+        Properties properties,
+        String key,
+        String defaultValue
+    ) {
+        String result = Optional
+            .ofNullable(properties.getProperty(key))
+            // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gradle
+            .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
+            .orElse("");
         if (!"".equals(result)) {
             return result;
         }

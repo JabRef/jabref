@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 

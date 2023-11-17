@@ -1,12 +1,14 @@
 package org.jabref.gui.entryeditor;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @GUITest
 @ExtendWith(ApplicationExtension.class)
 public class SciteTabTest {
@@ -27,17 +26,23 @@ public class SciteTabTest {
 
     @Mock
     private PreferencesService preferencesService;
+
     @Mock
     private TaskExecutor taskExecutor;
+
     @Mock
     private DialogService dialogService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        EntryEditorPreferences entryEditorPreferences = mock(
+            EntryEditorPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
         when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
-        when(preferencesService.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+        when(preferencesService.getEntryEditorPreferences())
+            .thenReturn(entryEditorPreferences);
     }
 
     @Test
@@ -61,8 +66,7 @@ public class SciteTabTest {
     @Test
     public void testBindEntry() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
-        var entry = new BibEntry()
-                .withField(StandardField.DOI, SAMPLE_DOI);
+        var entry = new BibEntry().withField(StandardField.DOI, SAMPLE_DOI);
 
         tab.bindToEntry(entry);
     }

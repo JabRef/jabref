@@ -4,7 +4,6 @@ package org.jabref.model.openoffice.style;
  * Presentation types of citation groups.
  */
 public enum CitationType {
-
     AUTHORYEAR_PAR,
     AUTHORYEAR_INTEXT,
     INVISIBLE_CIT;
@@ -20,5 +19,3 @@ public enum CitationType {
         return this != INVISIBLE_CIT;
     }
 }
-
-

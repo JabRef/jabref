@@ -1,7 +1,6 @@
 package org.jabref.preferences;
 
 import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,7 +11,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 
@@ -24,16 +22,22 @@ public class PreviewPreferences {
     private final StringProperty defaultCustomPreviewLayout;
     private final BooleanProperty showPreviewAsExtraTab;
 
-    public PreviewPreferences(List<PreviewLayout> layoutCycle,
-                              int layoutCyclePosition,
-                              TextBasedPreviewLayout customPreviewLayout,
-                              String defaultCustomPreviewLayout,
-                              boolean showPreviewAsExtraTab) {
+    public PreviewPreferences(
+        List<PreviewLayout> layoutCycle,
+        int layoutCyclePosition,
+        TextBasedPreviewLayout customPreviewLayout,
+        String defaultCustomPreviewLayout,
+        boolean showPreviewAsExtraTab
+    ) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
-        this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
-        this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
-        this.defaultCustomPreviewLayout = new SimpleStringProperty(defaultCustomPreviewLayout);
-        this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
+        this.layoutCyclePosition =
+            new SimpleIntegerProperty(layoutCyclePosition);
+        this.customPreviewLayout =
+            new SimpleObjectProperty<>(customPreviewLayout);
+        this.defaultCustomPreviewLayout =
+            new SimpleStringProperty(defaultCustomPreviewLayout);
+        this.showPreviewAsExtraTab =
+            new SimpleBooleanProperty(showPreviewAsExtraTab);
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -56,14 +60,18 @@ public class PreviewPreferences {
             while (previewCyclePosition < 0) {
                 previewCyclePosition += layoutCycle.size();
             }
-            this.layoutCyclePosition.setValue(previewCyclePosition % layoutCycle.size());
+            this.layoutCyclePosition.setValue(
+                    previewCyclePosition % layoutCycle.size()
+                );
         }
     }
 
     public PreviewLayout getSelectedPreviewLayout() {
-        if (layoutCycle.size() <= 0
-                || layoutCyclePosition.getValue() < 0
-                || layoutCyclePosition.getValue() >= layoutCycle.size()) {
+        if (
+            layoutCycle.size() <= 0 ||
+            layoutCyclePosition.getValue() < 0 ||
+            layoutCyclePosition.getValue() >= layoutCycle.size()
+        ) {
             return getCustomPreviewLayout();
         } else {
             return layoutCycle.get(layoutCyclePosition.getValue());
@@ -74,7 +82,9 @@ public class PreviewPreferences {
         return customPreviewLayout.getValue();
     }
 
-    public ObjectProperty<TextBasedPreviewLayout> customPreviewLayoutProperty() {
+    public ObjectProperty<
+        TextBasedPreviewLayout
+    > customPreviewLayoutProperty() {
         return customPreviewLayout;
     }
 

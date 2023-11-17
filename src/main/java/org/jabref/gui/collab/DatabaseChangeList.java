@@ -3,7 +3,6 @@ package org.jabref.gui.collab;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrydelete.EntryDelete;
@@ -20,8 +19,8 @@ import org.jabref.logic.bibtex.comparator.BibStringDiff;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class DatabaseChangeList {
-    private DatabaseChangeList() {
-    }
+
+    private DatabaseChangeList() {}
 
     /**
      * Compares the given two databases, and returns the list of changes required to change the {@code originalDatabase} into the {@code otherDatabase}
@@ -30,49 +29,146 @@ public class DatabaseChangeList {
      * @param otherDatabase    This is the other database.
      * @return an unmodifiable list of {@code DatabaseChange} required to change {@code originalDatabase} into {@code otherDatabase}
      */
-    public static List<DatabaseChange> compareAndGetChanges(BibDatabaseContext originalDatabase, BibDatabaseContext otherDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+    public static List<DatabaseChange> compareAndGetChanges(
+        BibDatabaseContext originalDatabase,
+        BibDatabaseContext otherDatabase,
+        DatabaseChangeResolverFactory databaseChangeResolverFactory
+    ) {
         List<DatabaseChange> changes = new ArrayList<>();
 
-        BibDatabaseDiff differences = BibDatabaseDiff.compare(originalDatabase, otherDatabase);
+        BibDatabaseDiff differences = BibDatabaseDiff.compare(
+            originalDatabase,
+            otherDatabase
+        );
 
-        differences.getMetaDataDifferences().ifPresent(diff -> {
-            changes.add(new MetadataChange(diff, originalDatabase, databaseChangeResolverFactory));
-            diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChange(
-                    groupDiff, originalDatabase, databaseChangeResolverFactory
-            )));
-        });
-        differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChange(diff, originalDatabase, databaseChangeResolverFactory)));
-        differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(originalDatabase, databaseChangeResolverFactory, diff)));
-        differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(originalDatabase, databaseChangeResolverFactory, diff)));
+        differences
+            .getMetaDataDifferences()
+            .ifPresent(diff -> {
+                changes.add(
+                    new MetadataChange(
+                        diff,
+                        originalDatabase,
+                        databaseChangeResolverFactory
+                    )
+                );
+                diff
+                    .getGroupDifferences()
+                    .ifPresent(groupDiff ->
+                        changes.add(
+                            new GroupChange(
+                                groupDiff,
+                                originalDatabase,
+                                databaseChangeResolverFactory
+                            )
+                        )
+                    );
+            });
+        differences
+            .getPreambleDifferences()
+            .ifPresent(diff ->
+                changes.add(
+                    new PreambleChange(
+                        diff,
+                        originalDatabase,
+                        databaseChangeResolverFactory
+                    )
+                )
+            );
+        differences
+            .getBibStringDifferences()
+            .forEach(diff ->
+                changes.add(
+                    createBibStringDiff(
+                        originalDatabase,
+                        databaseChangeResolverFactory,
+                        diff
+                    )
+                )
+            );
+        differences
+            .getEntryDifferences()
+            .forEach(diff ->
+                changes.add(
+                    createBibEntryDiff(
+                        originalDatabase,
+                        databaseChangeResolverFactory,
+                        diff
+                    )
+                )
+            );
 
         return Collections.unmodifiableList(changes);
     }
 
-    private static DatabaseChange createBibStringDiff(BibDatabaseContext originalDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory, BibStringDiff diff) {
+    private static DatabaseChange createBibStringDiff(
+        BibDatabaseContext originalDatabase,
+        DatabaseChangeResolverFactory databaseChangeResolverFactory,
+        BibStringDiff diff
+    ) {
         if (diff.getOriginalString() == null) {
-            return new BibTexStringAdd(diff.getNewString(), originalDatabase, databaseChangeResolverFactory);
+            return new BibTexStringAdd(
+                diff.getNewString(),
+                originalDatabase,
+                databaseChangeResolverFactory
+            );
         }
 
         if (diff.getNewString() == null) {
-            return new BibTexStringDelete(diff.getOriginalString(), originalDatabase, databaseChangeResolverFactory);
+            return new BibTexStringDelete(
+                diff.getOriginalString(),
+                originalDatabase,
+                databaseChangeResolverFactory
+            );
         }
 
-        if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {
-            return new BibTexStringChange(diff.getOriginalString(), diff.getNewString(), originalDatabase, databaseChangeResolverFactory);
+        if (
+            diff
+                .getOriginalString()
+                .getName()
+                .equals(diff.getNewString().getName())
+        ) {
+            return new BibTexStringChange(
+                diff.getOriginalString(),
+                diff.getNewString(),
+                originalDatabase,
+                databaseChangeResolverFactory
+            );
         }
 
-        return new BibTexStringRename(diff.getOriginalString(), diff.getNewString(), originalDatabase, databaseChangeResolverFactory);
+        return new BibTexStringRename(
+            diff.getOriginalString(),
+            diff.getNewString(),
+            originalDatabase,
+            databaseChangeResolverFactory
+        );
     }
 
-    private static DatabaseChange createBibEntryDiff(BibDatabaseContext originalDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory, BibEntryDiff diff) {
+    private static DatabaseChange createBibEntryDiff(
+        BibDatabaseContext originalDatabase,
+        DatabaseChangeResolverFactory databaseChangeResolverFactory,
+        BibEntryDiff diff
+    ) {
         if (diff.getOriginalEntry() == null) {
-            return new EntryAdd(diff.getNewEntry(), originalDatabase, databaseChangeResolverFactory);
+            return new EntryAdd(
+                diff.getNewEntry(),
+                originalDatabase,
+                databaseChangeResolverFactory
+            );
         }
 
         if (diff.getNewEntry() == null) {
-            return new EntryDelete(diff.getOriginalEntry(), originalDatabase, databaseChangeResolverFactory);
+            return new EntryDelete(
+                diff.getOriginalEntry(),
+                originalDatabase,
+                databaseChangeResolverFactory
+            );
         }
 
-        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), originalDatabase, databaseChangeResolverFactory);
+        return new EntryChange(
+            diff.getOriginalEntry(),
+            diff.getNewEntry(),
+            originalDatabase,
+            databaseChangeResolverFactory
+        );
     }
 }

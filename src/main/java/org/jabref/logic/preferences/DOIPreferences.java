@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class DOIPreferences {
+
     private BooleanProperty useCustom;
     private final StringProperty defaultBaseURI;
 

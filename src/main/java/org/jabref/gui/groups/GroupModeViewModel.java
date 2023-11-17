@@ -2,7 +2,6 @@ package org.jabref.gui.groups;
 
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
-
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.logic.l10n.Localization;
 

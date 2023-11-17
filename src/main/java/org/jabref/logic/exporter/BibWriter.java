@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.io.Writer;
-
 import org.jabref.model.strings.StringUtil;
 
 /**

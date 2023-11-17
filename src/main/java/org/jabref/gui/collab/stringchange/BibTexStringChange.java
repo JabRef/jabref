@@ -7,22 +7,31 @@ import org.jabref.gui.undo.UndoableStringChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class BibTexStringChange extends DatabaseChange {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringChange.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BibTexStringChange.class
+    );
 
     private final BibtexString oldString;
     private final BibtexString newString;
 
-    public BibTexStringChange(BibtexString oldString, BibtexString newString, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+    public BibTexStringChange(
+        BibtexString oldString,
+        BibtexString newString,
+        BibDatabaseContext databaseContext,
+        DatabaseChangeResolverFactory databaseChangeResolverFactory
+    ) {
         super(databaseContext, databaseChangeResolverFactory);
         this.oldString = oldString;
         this.newString = newString;
 
-        setChangeName(Localization.lang("Modified string: '%0'", oldString.getName()));
+        setChangeName(
+            Localization.lang("Modified string: '%0'", oldString.getName())
+        );
     }
 
     @Override
@@ -30,7 +39,9 @@ public final class BibTexStringChange extends DatabaseChange {
         String oldContent = oldString.getContent();
         String newContent = newString.getContent();
         oldString.setContent(newContent);
-        undoEdit.addEdit(new UndoableStringChange(oldString, false, oldContent, newContent));
+        undoEdit.addEdit(
+            new UndoableStringChange(oldString, false, oldContent, newContent)
+        );
     }
 
     public BibtexString getOldString() {

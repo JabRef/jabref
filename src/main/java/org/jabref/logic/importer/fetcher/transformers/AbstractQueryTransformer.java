@@ -3,15 +3,13 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-
-import org.jabref.model.strings.StringUtil;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +18,11 @@ import org.slf4j.LoggerFactory;
  * Otherwise, a single instance QueryTransformer can be used.
  */
 public abstract class AbstractQueryTransformer {
+
     public static final String NO_EXPLICIT_FIELD = "default";
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        AbstractQueryTransformer.class
+    );
 
     // These can be used for filtering in post processing
     protected int startYear = Integer.MAX_VALUE;
@@ -40,10 +41,12 @@ public abstract class AbstractQueryTransformer {
             delimiter = getLogicalAndOperator();
         }
 
-        String result = query.getChildren().stream()
-                             .map(this::transform)
-                             .flatMap(Optional::stream)
-                             .collect(Collectors.joining(delimiter, "(", ")"));
+        String result = query
+            .getChildren()
+            .stream()
+            .map(this::transform)
+            .flatMap(Optional::stream)
+            .collect(Collectors.joining(delimiter, "(", ")"));
         if ("()".equals(result)) {
             return Optional.empty();
         }
@@ -117,7 +120,8 @@ public abstract class AbstractQueryTransformer {
     private Optional<String> transform(ModifierQueryNode query) {
         ModifierQueryNode.Modifier modifier = query.getModifier();
         if (modifier == ModifierQueryNode.Modifier.MOD_NOT) {
-            return transform(query.getChild()).map(s -> getLogicalNotOperator() + s);
+            return transform(query.getChild())
+                .map(s -> getLogicalNotOperator() + s);
         } else {
             return transform(query.getChild());
         }
@@ -194,15 +198,27 @@ public abstract class AbstractQueryTransformer {
         return createKeyValuePair(fieldAsString, term, ":");
     }
 
-    protected String createKeyValuePair(String fieldAsString, String term, String separator) {
-        return String.format("%s%s%s", fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
+    protected String createKeyValuePair(
+        String fieldAsString,
+        String term,
+        String separator
+    ) {
+        return String.format(
+            "%s%s%s",
+            fieldAsString,
+            separator,
+            StringUtil.quoteStringIfSpaceIsContained(term)
+        );
     }
 
     /**
      * Return a string representation of the provided field
      * If it is not supported return an empty optional.
      */
-    protected Optional<String> handleOtherField(String fieldAsString, String term) {
+    protected Optional<String> handleOtherField(
+        String fieldAsString,
+        String term
+    ) {
         return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
@@ -216,7 +232,10 @@ public abstract class AbstractQueryTransformer {
         } else if (query instanceof ModifierQueryNode) {
             return transform((ModifierQueryNode) query);
         } else {
-            LOGGER.error("Unsupported case when transforming the query:\n {}", query);
+            LOGGER.error(
+                "Unsupported case when transforming the query:\n {}",
+                query
+            );
             return Optional.empty();
         }
     }

@@ -1,24 +1,24 @@
 package org.jabref.model.paging;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class PageTest {
+
     private Page<String> page1;
     private Page<String> page2;
     private final int testPageNumber = 3;
     private final String testQuery = "anyQuery";
     private Collection<String> testContent = new ArrayList<>();
-    private final String[] testStrings = {"str1", "str2", "str3"};
+    private final String[] testStrings = { "str1", "str2", "str3" };
 
     @BeforeEach
     public void setup() {

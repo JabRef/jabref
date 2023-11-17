@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.logic.formatter.bibtexfields.RemoveHyphenatedNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.pdf.FileAnnotation;
@@ -30,8 +29,12 @@ public class FileAnnotationViewModel {
         if (annotation.hasLinkedAnnotation()) {
             this.content.set(annotation.getLinkedFileAnnotation().getContent());
             String annotationContent = annotation.getContent();
-            String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
-            String markingContent = annotationContent.isEmpty() ? illegibleTextMessage : annotationContent;
+            String illegibleTextMessage = Localization.lang(
+                "The marked area does not contain any legible text!"
+            );
+            String markingContent = annotationContent.isEmpty()
+                ? illegibleTextMessage
+                : annotationContent;
             this.marking.set(removePunctuationMark(markingContent));
         } else {
             String content = annotation.getContent();
@@ -88,10 +91,14 @@ public class FileAnnotationViewModel {
     @Override
     public String toString() {
         if (annotation.hasLinkedAnnotation() && this.getContent().isEmpty()) {
-            if (FileAnnotationType.UNDERLINE == annotation.getAnnotationType()) {
+            if (
+                FileAnnotationType.UNDERLINE == annotation.getAnnotationType()
+            ) {
                 return Localization.lang("Empty Underline");
             }
-            if (FileAnnotationType.HIGHLIGHT == annotation.getAnnotationType()) {
+            if (
+                FileAnnotationType.HIGHLIGHT == annotation.getAnnotationType()
+            ) {
                 return Localization.lang("Empty Highlight");
             }
             return Localization.lang("Empty Marking");

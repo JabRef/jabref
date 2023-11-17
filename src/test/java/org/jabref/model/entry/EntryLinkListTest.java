@@ -1,17 +1,15 @@
 package org.jabref.model.entry;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.field.StandardField;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.Optional;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class EntryLinkListTest {
 
@@ -33,8 +31,7 @@ public class EntryLinkListTest {
     }
 
     private BibEntry create(String citeKey) {
-        BibEntry entry = new BibEntry()
-                .withCitationKey(citeKey);
+        BibEntry entry = new BibEntry().withCitationKey(citeKey);
         database.insertEntry(entry);
         return entry;
     }
@@ -62,8 +59,10 @@ public class EntryLinkListTest {
 
     @Test
     public void givenBibEntryWhenParsingThenExpectLink() {
-      ParsedEntryLink expected = new ParsedEntryLink(new BibEntry().withCitationKey("key"));
-      assertFalse(expected.getLinkedEntry().isEmpty());
+        ParsedEntryLink expected = new ParsedEntryLink(
+            new BibEntry().withCitationKey("key")
+        );
+        assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test
@@ -79,7 +78,9 @@ public class EntryLinkListTest {
     }
 
     private void assertSourceCrossrefsTarget(BibEntry target, BibEntry source) {
-        Optional<String> sourceCrossref = source.getField(StandardField.CROSSREF);
+        Optional<String> sourceCrossref = source.getField(
+            StandardField.CROSSREF
+        );
         Optional<String> targetCiteKey = target.getCitationKey();
         assertEquals(sourceCrossref, targetCiteKey);
     }

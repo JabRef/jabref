@@ -3,7 +3,6 @@ package org.jabref.logic.citationstyle;
 import org.jabref.logic.util.OS;
 
 public enum CitationStyleOutputFormat {
-
     HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
     TEXT("text", "");
 

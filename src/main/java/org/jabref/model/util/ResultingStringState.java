@@ -1,6 +1,7 @@
 package org.jabref.model.util;
 
 public class ResultingStringState {
+
     public final int caretPosition;
     public final String text;
 

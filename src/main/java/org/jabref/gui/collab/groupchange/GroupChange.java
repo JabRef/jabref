@@ -12,13 +12,21 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
 
 public final class GroupChange extends DatabaseChange {
+
     private final GroupDiff groupDiff;
 
-    public GroupChange(GroupDiff groupDiff, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+    public GroupChange(
+        GroupDiff groupDiff,
+        BibDatabaseContext databaseContext,
+        DatabaseChangeResolverFactory databaseChangeResolverFactory
+    ) {
         super(databaseContext, databaseChangeResolverFactory);
         this.groupDiff = groupDiff;
-        setChangeName(groupDiff.getOriginalGroupRoot() == null ? Localization.lang("Removed all groups") : Localization
-                .lang("Modified groups tree"));
+        setChangeName(
+            groupDiff.getOriginalGroupRoot() == null
+                ? Localization.lang("Removed all groups")
+                : Localization.lang("Modified groups tree")
+        );
     }
 
     @Override
@@ -26,19 +34,33 @@ public final class GroupChange extends DatabaseChange {
         GroupTreeNode oldRoot = groupDiff.getOriginalGroupRoot();
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
-        GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
-            GroupTreeNode groupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
-            databaseContext.getMetaData().setGroups(groupTreeNode);
-            return groupTreeNode;
-        });
+        GroupTreeNode root = databaseContext
+            .getMetaData()
+            .getGroups()
+            .orElseGet(() -> {
+                GroupTreeNode groupTreeNode = new GroupTreeNode(
+                    DefaultGroupsFactory.getAllEntriesGroup()
+                );
+                databaseContext.getMetaData().setGroups(groupTreeNode);
+                return groupTreeNode;
+            });
 
         final UndoableModifySubtree undo = new UndoableModifySubtree(
-                new GroupTreeNodeViewModel(databaseContext.getMetaData().getGroups().orElse(null)),
-                new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
+            new GroupTreeNodeViewModel(
+                databaseContext.getMetaData().getGroups().orElse(null)
+            ),
+            new GroupTreeNodeViewModel(root),
+            Localization.lang("Modified groups")
+        );
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
-            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup(), false, false, null);
+            root.setGroup(
+                DefaultGroupsFactory.getAllEntriesGroup(),
+                false,
+                false,
+                null
+            );
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(newRoot.getGroup(), false, false, null);

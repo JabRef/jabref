@@ -1,10 +1,10 @@
 package org.jabref.model.entry;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 public class BibtexStringTest {
 
@@ -40,7 +40,10 @@ public class BibtexStringTest {
 
     @Test
     public void clonedBibtexStringEqualsOriginalString() {
-        BibtexString bibtexString = new BibtexString("AAA", "An alternative action");
+        BibtexString bibtexString = new BibtexString(
+            "AAA",
+            "An alternative action"
+        );
         bibtexString.setId("ID");
 
         BibtexString clone = (BibtexString) bibtexString.clone();
@@ -77,7 +80,10 @@ public class BibtexStringTest {
     @Test
     public void modifyingACloneDoesNotModifyTheOriginalEntry() {
         // Instantiate
-        BibtexString original = new BibtexString("AAA", "An alternative action");
+        BibtexString original = new BibtexString(
+            "AAA",
+            "An alternative action"
+        );
         original.setId("ID");
 
         BibtexString clone = (BibtexString) original.clone();
@@ -105,7 +111,10 @@ public class BibtexStringTest {
     @Test
     public void institutionTypeCorrectlyDetermined() {
         // Source of the example: https://docs.jabref.org/fields/strings
-        BibtexString bibtexString = new BibtexString("iMIT", "{Massachusetts Institute of Technology ({MIT})}");
+        BibtexString bibtexString = new BibtexString(
+            "iMIT",
+            "{Massachusetts Institute of Technology ({MIT})}"
+        );
         assertEquals(BibtexString.Type.INSTITUTION, bibtexString.getType());
     }
 
@@ -119,7 +128,10 @@ public class BibtexStringTest {
     @Test
     public void otherTypeCorrectlyDeterminedForUpperCase() {
         // Source of the example: https://docs.jabref.org/fields/strings
-        BibtexString bibtexString = new BibtexString("lTOSCA", "Topology and Orchestration Specification for Cloud Applications");
+        BibtexString bibtexString = new BibtexString(
+            "lTOSCA",
+            "Topology and Orchestration Specification for Cloud Applications"
+        );
         assertEquals(BibtexString.Type.OTHER, bibtexString.getType());
     }
 }

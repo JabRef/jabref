@@ -2,10 +2,10 @@ package org.jabref.gui.slr;
 
 import java.nio.file.Path;
 import java.util.Objects;
-
 import org.jabref.model.study.Study;
 
 public class SlrStudyAndDirectory {
+
     private final Study study;
     private final Path studyDirectory;
 

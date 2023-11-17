@@ -1,10 +1,10 @@
 package org.jabref.logic.layout.format;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RisMonthTest {
 
@@ -19,7 +19,8 @@ public class RisMonthTest {
     }
 
     @ParameterizedTest(name = "input={0}, formattedStr={1}")
-    @CsvSource({
+    @CsvSource(
+        {
             "jan, 01", // jan
             "feb, 02", // feb
             "mar, 03", // mar
@@ -32,7 +33,8 @@ public class RisMonthTest {
             "oct, 10", // oct
             "nov, 11", // nov
             "dec, 12", // dec
-    })
+        }
+    )
     public void testValidMonth(String input, String expectedResult) {
         String formattedStr = new RisMonth().format(input);
         assertEquals(expectedResult, formattedStr);

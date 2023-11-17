@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 public class ReferenceDataItem {
+
     private PaperDetails citedPaper;
 
     public PaperDetails getCitedPaper() {

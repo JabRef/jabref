@@ -1,18 +1,16 @@
 package org.jabref.logic.importer.fileformat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.util.StandardFileType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SilverPlatterImporterTest {
 
@@ -26,12 +24,15 @@ class SilverPlatterImporterTest {
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("SilverPlatterImporterTest") && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name ->
+            name.startsWith("SilverPlatterImporterTest") &&
+            name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("SilverPlatterImporterTest");
+        Predicate<String> fileName = name ->
+            !name.startsWith("SilverPlatterImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -50,16 +51,26 @@ class SilverPlatterImporterTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(
+            testImporter,
+            fileName,
+            FILE_ENDING
+        );
     }
 
     @Test
     void testsGetExtensions() {
-        assertEquals(StandardFileType.SILVER_PLATTER, testImporter.getFileType());
+        assertEquals(
+            StandardFileType.SILVER_PLATTER,
+            testImporter.getFileType()
+        );
     }
 
     @Test
     void testGetDescription() {
-        assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
+        assertEquals(
+            "Imports a SilverPlatter exported file.",
+            testImporter.getDescription()
+        );
     }
 }

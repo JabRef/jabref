@@ -6,7 +6,6 @@ import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Optional;
-
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
@@ -26,7 +25,11 @@ public class FieldComparator implements Comparator<BibEntry> {
     private static final Collator COLLATOR = getCollator();
 
     enum FieldType {
-        NAME, TYPE, YEAR, MONTH, OTHER
+        NAME,
+        TYPE,
+        YEAR,
+        MONTH,
+        OTHER,
     }
 
     private final OrFields fields;
@@ -52,7 +55,9 @@ public class FieldComparator implements Comparator<BibEntry> {
     private static Collator getCollator() {
         try {
             return new RuleBasedCollator(
-                    ((RuleBasedCollator) Collator.getInstance()).getRules().replace("<'\u005f'", "<' '<'\u005f'"));
+                ((RuleBasedCollator) Collator.getInstance()).getRules()
+                    .replace("<'\u005f'", "<' '<'\u005f'")
+            );
         } catch (ParseException e) {
             return Collator.getInstance();
         }
@@ -61,7 +66,11 @@ public class FieldComparator implements Comparator<BibEntry> {
     private FieldType determineFieldType() {
         if (InternalField.TYPE_HEADER == this.fields.getPrimary()) {
             return FieldType.TYPE;
-        } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
+        } else if (
+            this.fields.getPrimary()
+                .getProperties()
+                .contains(FieldProperty.PERSON_NAMES)
+        ) {
             return FieldType.NAME;
         } else if (StandardField.YEAR == this.fields.getPrimary()) {
             return FieldType.YEAR;

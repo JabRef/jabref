@@ -1,30 +1,38 @@
 package org.jabref.gui.actions;
 
+import de.saxsys.mvvmfx.utils.commands.Command;
 import java.util.Map;
-
 import javafx.beans.binding.Bindings;
-
 import org.jabref.gui.Telemetry;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-
-import de.saxsys.mvvmfx.utils.commands.Command;
 
 /**
  * Wrapper around one of our actions from {@link Action} to convert them to controlsfx {@link org.controlsfx.control.action.Action}.
  */
 class JabRefAction extends org.controlsfx.control.action.Action {
 
-    public JabRefAction(Action action, KeyBindingRepository keyBindingRepository) {
+    public JabRefAction(
+        Action action,
+        KeyBindingRepository keyBindingRepository
+    ) {
         super(action.getText());
-        action.getIcon()
-              .ifPresent(icon -> setGraphic(icon.getGraphicNode()));
-        action.getKeyBinding()
-              .ifPresent(keyBinding -> keyBindingRepository.getKeyCombination(keyBinding).ifPresent(combination -> setAccelerator(combination)));
+        action.getIcon().ifPresent(icon -> setGraphic(icon.getGraphicNode()));
+        action
+            .getKeyBinding()
+            .ifPresent(keyBinding ->
+                keyBindingRepository
+                    .getKeyCombination(keyBinding)
+                    .ifPresent(combination -> setAccelerator(combination))
+            );
 
         setLongText(action.getDescription());
     }
 
-    public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository) {
+    public JabRefAction(
+        Action action,
+        Command command,
+        KeyBindingRepository keyBindingRepository
+    ) {
         this(action, command, keyBindingRepository, null);
     }
 
@@ -33,9 +41,13 @@ class JabRefAction extends org.controlsfx.control.action.Action {
      *
      * @param source is a string contains the source, for example "button"
      */
-    public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository, Sources source) {
+    public JabRefAction(
+        Action action,
+        Command command,
+        KeyBindingRepository keyBindingRepository,
+        Sources source
+    ) {
         this(action, keyBindingRepository);
-
         setEventHandler(event -> {
             command.execute();
             if (source == null) {
@@ -48,7 +60,13 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         disabledProperty().bind(command.executableProperty().not());
 
         if (command instanceof SimpleCommand ourCommand) {
-            longTextProperty().bind(Bindings.concat(action.getDescription(), ourCommand.statusMessageProperty()));
+            longTextProperty()
+                .bind(
+                    Bindings.concat(
+                        action.getDescription(),
+                        ourCommand.statusMessageProperty()
+                    )
+                );
         }
     }
 
@@ -57,11 +75,13 @@ class JabRefAction extends org.controlsfx.control.action.Action {
             return action.getText();
         } else {
             String commandName = command.getClass().getSimpleName();
-            if (commandName.contains("EditAction")
-                    || commandName.contains("CopyMoreAction")
-                    || commandName.contains("CopyCitationAction")
-                    || commandName.contains("PreviewSwitchAction")
-                    || commandName.contains("SaveAction")) {
+            if (
+                commandName.contains("EditAction") ||
+                commandName.contains("CopyMoreAction") ||
+                commandName.contains("CopyCitationAction") ||
+                commandName.contains("PreviewSwitchAction") ||
+                commandName.contains("SaveAction")
+            ) {
                 return command.toString();
             } else {
                 return commandName;
@@ -70,14 +90,21 @@ class JabRefAction extends org.controlsfx.control.action.Action {
     }
 
     private void trackExecute(String actionName) {
-        Telemetry.getTelemetryClient()
-                 .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName));
+        Telemetry
+            .getTelemetryClient()
+            .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName)
+            );
     }
 
     private void trackUserActionSource(String actionName, Sources source) {
-        Telemetry.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(
-                actionName,
-                Map.of("Source", source.toString()),
-                Map.of()));
+        Telemetry
+            .getTelemetryClient()
+            .ifPresent(telemetryClient ->
+                telemetryClient.trackEvent(
+                    actionName,
+                    Map.of("Source", source.toString()),
+                    Map.of()
+                )
+            );
     }
 }

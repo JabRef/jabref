@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import org.jabref.logic.JabRefException;
 
 public class ShortDOIServiceException extends JabRefException {
+
     public ShortDOIServiceException(String message) {
         super(message);
     }
@@ -15,7 +16,11 @@ public class ShortDOIServiceException extends JabRefException {
         super(message, localizedMessage);
     }
 
-    public ShortDOIServiceException(String message, String localizedMessage, Throwable cause) {
+    public ShortDOIServiceException(
+        String message,
+        String localizedMessage,
+        Throwable cause
+    ) {
         super(message, localizedMessage, cause);
     }
 

@@ -3,7 +3,6 @@ package org.jabref.logic.shared;
 import org.jabref.model.entry.BibEntry;
 
 public interface DatabaseSynchronizer {
-
     String getDBName();
 
     void pullChanges();
@@ -12,7 +11,8 @@ public interface DatabaseSynchronizer {
 
     void registerListener(Object listener);
 
-    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException;
+    void openSharedDatabase(DatabaseConnection connection)
+        throws DatabaseNotSupportedException;
 
     void synchronizeSharedEntry(BibEntry bibEntry);
 

@@ -1,10 +1,8 @@
 package org.jabref.logic.shared.listener;
 
 import java.sql.SQLException;
-
 import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.logic.shared.DBMSSynchronizer;
-
 import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 import org.slf4j.Logger;
@@ -15,13 +13,18 @@ import org.slf4j.LoggerFactory;
  */
 public class PostgresSQLNotificationListener implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        PostgresSQLNotificationListener.class
+    );
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final PGConnection pgConnection;
     private volatile boolean stop;
 
-    public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
+    public PostgresSQLNotificationListener(
+        DBMSSynchronizer dbmsSynchronizer,
+        PGConnection pgConnection
+    ) {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
     }
@@ -32,11 +35,16 @@ public class PostgresSQLNotificationListener implements Runnable {
         try {
             // noinspection InfiniteLoopStatement
             while (!stop) {
-                PGNotification notifications[] = pgConnection.getNotifications();
+                PGNotification notifications[] =
+                    pgConnection.getNotifications();
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
-                        if (!notification.getName().equals(DBMSProcessor.PROCESSOR_ID)) {
+                        if (
+                            !notification
+                                .getName()
+                                .equals(DBMSProcessor.PROCESSOR_ID)
+                        ) {
                             dbmsSynchronizer.pullChanges();
                         }
                     }
@@ -46,7 +54,10 @@ public class PostgresSQLNotificationListener implements Runnable {
                 Thread.sleep(500);
             }
         } catch (SQLException | InterruptedException exception) {
-            LOGGER.error("Error while listening for updates to PostgresSQL", exception);
+            LOGGER.error(
+                "Error while listening for updates to PostgresSQL",
+                exception
+            );
         }
     }
 

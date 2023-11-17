@@ -1,12 +1,13 @@
 package org.jabref.gui.util.comparator;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class NumericFieldComparatorTest {
 
-    private final NumericFieldComparator comparator = new NumericFieldComparator();
+    private final NumericFieldComparator comparator =
+        new NumericFieldComparator();
 
     @Test
     public void compareTwoNumericInputs() {

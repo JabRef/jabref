@@ -13,16 +13,17 @@ public class MsBibAuthor {
         this.author = author;
 
         StringBuilder sb = new StringBuilder();
-        author.getFirst().ifPresent(firstNames -> {
-
-            String[] names = firstNames.split(" ");
-            for (int i = 1; i < names.length; i++) {
-                sb.append(names[i]);
-                sb.append(" ");
-            }
-            this.middleName = sb.toString().trim();
-            this.firstName = names[0];
-        });
+        author
+            .getFirst()
+            .ifPresent(firstNames -> {
+                String[] names = firstNames.split(" ");
+                for (int i = 1; i < names.length; i++) {
+                    sb.append(names[i]);
+                    sb.append(" ");
+                }
+                this.middleName = sb.toString().trim();
+                this.firstName = names[0];
+            });
     }
 
     public MsBibAuthor(Author author, boolean isCorporate) {

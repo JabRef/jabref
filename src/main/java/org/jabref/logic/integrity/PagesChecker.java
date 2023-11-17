@@ -4,37 +4,39 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
 public class PagesChecker implements ValueChecker {
 
-    private static final String PAGES_EXP_BIBTEX = ""
-            + "\\A"                 // begin String
-            + "[A-Za-z]?\\d*"       // optional prefix and number
-            + "("
-            + "(\\+|-{2}|\u2013)"   // separator, must contain exactly two dashes
-            + "[A-Za-z]?\\d*"       // optional prefix and number
-            + ")?"
-            + "\\z";                // end String
+    private static final String PAGES_EXP_BIBTEX =
+        "" +
+        "\\A" + // begin String
+        "[A-Za-z]?\\d*" + // optional prefix and number
+        "(" +
+        "(\\+|-{2}|\u2013)" + // separator, must contain exactly two dashes
+        "[A-Za-z]?\\d*" + // optional prefix and number
+        ")?" +
+        "\\z"; // end String
 
     // See https://packages.oth-regensburg.de/ctan/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsubsection.3.15.3 for valid content
-    private static final String PAGES_EXP_BIBLATEX = ""
-            + "\\A"               // begin String
-            + "[A-Za-z]?\\d*"     // optional prefix and number
-            + "("
-            + "(\\+|-{1,2}|\u2013)" // separator
-            + "[A-Za-z]?\\d*"     // optional prefix and number
-            + ")?"
-            + "\\z";              // end String
+    private static final String PAGES_EXP_BIBLATEX =
+        "" +
+        "\\A" + // begin String
+        "[A-Za-z]?\\d*" + // optional prefix and number
+        "(" +
+        "(\\+|-{1,2}|\u2013)" + // separator
+        "[A-Za-z]?\\d*" + // optional prefix and number
+        ")?" +
+        "\\z"; // end String
 
     private final Predicate<String> isValidPageNumber;
 
     public PagesChecker(BibDatabaseContext databaseContext) {
         if (databaseContext.isBiblatexMode()) {
-            isValidPageNumber = Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
+            isValidPageNumber =
+                Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
         } else {
             isValidPageNumber = Pattern.compile(PAGES_EXP_BIBTEX).asPredicate();
         }
@@ -55,10 +57,15 @@ public class PagesChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        if (Arrays.stream(value.split(","))
+        if (
+            Arrays
+                .stream(value.split(","))
                 .map(String::trim)
-                .anyMatch(pageRange -> !isValidPageNumber.test(pageRange))) {
-            return Optional.of(Localization.lang("should contain a valid page number range"));
+                .anyMatch(pageRange -> !isValidPageNumber.test(pageRange))
+        ) {
+            return Optional.of(
+                Localization.lang("should contain a valid page number range")
+            );
         }
         return Optional.empty();
     }

@@ -1,12 +1,10 @@
 package org.jabref.gui.autocompleter;
 
+import com.google.common.base.Equivalence;
 import java.util.Comparator;
 import java.util.stream.Stream;
-
-import org.jabref.model.strings.StringUtil;
-
-import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.jabref.model.strings.StringUtil;
 
 abstract class StringSuggestionProvider extends SuggestionProvider<String> {
 
@@ -21,7 +19,10 @@ abstract class StringSuggestionProvider extends SuggestionProvider<String> {
     }
 
     @Override
-    protected boolean isMatch(String candidate, AutoCompletionBinding.ISuggestionRequest request) {
+    protected boolean isMatch(
+        String candidate,
+        AutoCompletionBinding.ISuggestionRequest request
+    ) {
         return StringUtil.containsIgnoreCase(candidate, request.getUserText());
     }
 

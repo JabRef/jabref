@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -22,7 +21,10 @@ public class DetectOpenOfficeInstallation {
     private final OpenOfficePreferences openOfficePreferences;
     private final DialogService dialogService;
 
-    public DetectOpenOfficeInstallation(OpenOfficePreferences openOfficePreferences, DialogService dialogService) {
+    public DetectOpenOfficeInstallation(
+        OpenOfficePreferences openOfficePreferences,
+        DialogService dialogService
+    ) {
         this.dialogService = dialogService;
         this.openOfficePreferences = openOfficePreferences;
     }
@@ -34,35 +36,59 @@ public class DetectOpenOfficeInstallation {
     public Optional<Path> selectInstallationPath() {
         final NativeDesktop nativeDesktop = OS.getNativeDesktop();
 
-        dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+        dialogService.showInformationDialogAndWait(
+            Localization.lang(
+                "Could not find OpenOffice/LibreOffice installation"
+            ),
+            Localization.lang(
+                "Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."
+            )
+        );
+        DirectoryDialogConfiguration dirDialogConfiguration =
+            new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(nativeDesktop.getApplicationDirectory())
                 .build();
-        return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
+        return dialogService.showDirectorySelectionDialog(
+            dirDialogConfiguration
+        );
     }
 
     /**
      * Checks whether the executablePath exists
      */
-    private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
+    private boolean checkAutoDetectedPaths(
+        OpenOfficePreferences openOfficePreferences
+    ) {
         String executablePath = openOfficePreferences.getExecutablePath();
 
         if (OS.LINUX && (System.getenv("FLATPAK_SANDBOX_DIR") != null)) {
-            executablePath = OpenOfficePreferences.DEFAULT_LINUX_FLATPAK_EXEC_PATH;
+            executablePath =
+                OpenOfficePreferences.DEFAULT_LINUX_FLATPAK_EXEC_PATH;
         }
-        return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Path.of(executablePath));
+        return (
+            !StringUtil.isNullOrEmpty(executablePath) &&
+            Files.exists(Path.of(executablePath))
+        );
     }
 
     public boolean setOpenOfficePreferences(Path installDir) {
         Optional<Path> execPath = Optional.empty();
 
         if (OS.WINDOWS) {
-            execPath = FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, installDir);
+            execPath =
+                FileUtil.find(
+                    OpenOfficePreferences.WINDOWS_EXECUTABLE,
+                    installDir
+                );
         } else if (OS.OS_X) {
-            execPath = FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, installDir);
+            execPath =
+                FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, installDir);
         } else if (OS.LINUX) {
-            execPath = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, installDir);
+            execPath =
+                FileUtil.find(
+                    OpenOfficePreferences.LINUX_EXECUTABLE,
+                    installDir
+                );
         }
 
         if (execPath.isPresent()) {
@@ -83,10 +109,14 @@ public class DetectOpenOfficeInstallation {
         }
 
         return dialogService.showChoiceDialogAndWait(
-                Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                Localization.lang("Found more than one OpenOffice/LibreOffice executable.") + "\n"
-                        + Localization.lang("Please choose which one to connect to:"),
-                Localization.lang("Use selected instance"),
-                installDirs);
+            Localization.lang("Choose OpenOffice/LibreOffice executable"),
+            Localization.lang(
+                "Found more than one OpenOffice/LibreOffice executable."
+            ) +
+            "\n" +
+            Localization.lang("Please choose which one to connect to:"),
+            Localization.lang("Use selected instance"),
+            installDirs
+        );
     }
 }

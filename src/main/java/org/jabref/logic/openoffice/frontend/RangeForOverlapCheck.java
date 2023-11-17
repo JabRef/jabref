@@ -1,8 +1,7 @@
 package org.jabref.logic.openoffice.frontend;
 
-import org.jabref.model.openoffice.rangesort.RangeHolder;
-
 import com.sun.star.text.XTextRange;
+import org.jabref.model.openoffice.rangesort.RangeHolder;
 
 /**
  * Describe a protected range for overlap checking and reporting.
@@ -13,10 +12,10 @@ import com.sun.star.text.XTextRange;
  */
 public class RangeForOverlapCheck<T> implements RangeHolder {
 
-    public final static int REFERENCE_MARK_KIND = 0;
-    public final static int FOOTNOTE_MARK_KIND = 1;
-    public final static int CURSOR_MARK_KIND = 2;
-    public final static int BIBLIOGRAPHY_MARK_KIND = 3;
+    public static final int REFERENCE_MARK_KIND = 0;
+    public static final int FOOTNOTE_MARK_KIND = 1;
+    public static final int CURSOR_MARK_KIND = 2;
+    public static final int BIBLIOGRAPHY_MARK_KIND = 3;
 
     public final XTextRange range;
 
@@ -24,7 +23,12 @@ public class RangeForOverlapCheck<T> implements RangeHolder {
     public final T idWithinKind;
     private final String description;
 
-    public RangeForOverlapCheck(XTextRange range, T idWithinKind, int kind, String description) {
+    public RangeForOverlapCheck(
+        XTextRange range,
+        T idWithinKind,
+        int kind,
+        String description
+    ) {
         this.range = range;
         this.kind = kind;
         this.idWithinKind = idWithinKind;

@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -19,7 +18,9 @@ import org.jabref.logic.l10n.Localization;
 public class CleanupUrlFormatter extends Formatter {
 
     // This regexp find "url=" or "to=" parameter in full link and get text after them
-    private static final Pattern PATTERN_URL = Pattern.compile("(?:url|to)=([^&]*)");
+    private static final Pattern PATTERN_URL = Pattern.compile(
+        "(?:url|to)=([^&]*)"
+    );
 
     @Override
     public String getName() {
@@ -50,8 +51,8 @@ public class CleanupUrlFormatter extends Formatter {
     @Override
     public String format(String url) {
         var toDecode = Objects
-                .requireNonNull(url, "Null url")
-                .replaceAll("\\+", "%2b");
+            .requireNonNull(url, "Null url")
+            .replaceAll("\\+", "%2b");
         Matcher matcher = PATTERN_URL.matcher(toDecode);
         if (matcher.find()) {
             return URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8);
@@ -61,15 +62,19 @@ public class CleanupUrlFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Cleanup URL link by removing special symbols and extracting simple link");
+        return Localization.lang(
+            "Cleanup URL link by removing special symbols and extracting simple link"
+        );
     }
 
     @Override
     public String getExampleInput() {
-        return "https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=11&cad=" +
-               "rja&uact=8&ved=0ahUKEwjg3ZrB_ZPXAhVGuhoKHYdOBOg4ChAWCCYwAA&url=" +
-               "http%3A%2F%2Fwww.focus.de%2Fgesundheit%2Fratgeber%2Fherz%2Ftest%2" +
-               "Flebenserwartung-werden-sie-100-jahre-alt_aid_363828.html" +
-               "&usg=AOvVaw1G6m2jf-pTHYkXceii4hXU";
+        return (
+            "https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=11&cad=" +
+            "rja&uact=8&ved=0ahUKEwjg3ZrB_ZPXAhVGuhoKHYdOBOg4ChAWCCYwAA&url=" +
+            "http%3A%2F%2Fwww.focus.de%2Fgesundheit%2Fratgeber%2Fherz%2Ftest%2" +
+            "Flebenserwartung-werden-sie-100-jahre-alt_aid_363828.html" +
+            "&usg=AOvVaw1G6m2jf-pTHYkXceii4hXU"
+        );
     }
 }

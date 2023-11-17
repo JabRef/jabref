@@ -1,6 +1,7 @@
 package org.jabref.model.openoffice.util;
 
 public class OOPair<A, B> {
+
     public final A a;
     public final B b;
 
@@ -9,4 +10,3 @@ public class OOPair<A, B> {
         this.b = b;
     }
 }
-

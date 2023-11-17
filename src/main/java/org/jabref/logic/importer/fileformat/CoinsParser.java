@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.util.OS;
@@ -34,8 +33,11 @@ public class CoinsParser implements Parser {
     private final Pattern AUTHOR = Pattern.compile("&amp;rft.au=([^&]+)");
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
-        String data = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
+    public List<BibEntry> parseEntries(InputStream inputStream)
+        throws ParseException {
+        String data = new BufferedReader(new InputStreamReader(inputStream))
+            .lines()
+            .collect(Collectors.joining(OS.NEWLINE));
         BibEntry entry = new BibEntry();
 
         appendData(data, entry, DOI, StandardField.DOI);
@@ -70,7 +72,12 @@ public class CoinsParser implements Parser {
         return Collections.singletonList(entry);
     }
 
-    private void appendData(String data, BibEntry entry, Pattern pattern, Field field) {
+    private void appendData(
+        String data,
+        BibEntry entry,
+        Pattern pattern,
+        Field field
+    ) {
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
             entry.setField(field, matcher.group(1));

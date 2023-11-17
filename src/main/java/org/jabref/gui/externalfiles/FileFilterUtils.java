@@ -9,13 +9,14 @@ import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileFilterUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        FileFilterUtils.class
+    );
 
     /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
@@ -27,9 +28,9 @@ public class FileFilterUtils {
             return LocalDateTime.now();
         }
         LocalDateTime localDateTime = lastEditedTime
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
         return localDateTime;
     }
 
@@ -65,13 +66,14 @@ public class FileFilterUtils {
     public static boolean filterByDate(Path path, DateRange filter) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         LocalDateTime fileTime = FileFilterUtils.getFileTime(path);
-        boolean isInDateRange = switch (filter) {
-            case DAY -> fileFilter.isDuringLastDay(fileTime);
-            case WEEK -> fileFilter.isDuringLastWeek(fileTime);
-            case MONTH -> fileFilter.isDuringLastMonth(fileTime);
-            case YEAR -> fileFilter.isDuringLastYear(fileTime);
-            case ALL_TIME -> true;
-        };
+        boolean isInDateRange =
+            switch (filter) {
+                case DAY -> fileFilter.isDuringLastDay(fileTime);
+                case WEEK -> fileFilter.isDuringLastWeek(fileTime);
+                case MONTH -> fileFilter.isDuringLastMonth(fileTime);
+                case YEAR -> fileFilter.isDuringLastYear(fileTime);
+                case ALL_TIME -> true;
+            };
         return isInDateRange;
     }
 
@@ -80,12 +82,18 @@ public class FileFilterUtils {
      * of their corresponding files, from newest to oldest.
      */
     public List<Path> sortByDateAscending(List<Path> files) {
-        return files.stream()
-                .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
+        return files
+            .stream()
+            .sorted(
+                Comparator.comparingLong(file ->
+                    FileFilterUtils
+                        .getFileTime(file)
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
-                        .toEpochMilli()))
-                .collect(Collectors.toList());
+                        .toEpochMilli()
+                )
+            )
+            .collect(Collectors.toList());
     }
 
     /**
@@ -93,26 +101,35 @@ public class FileFilterUtils {
      * of their corresponding files, from oldest to newest.
      */
     public List<Path> sortByDateDescending(List<Path> files) {
-        return files.stream()
-                .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
+        return files
+            .stream()
+            .sorted(
+                Comparator.comparingLong(file ->
+                    -FileFilterUtils
+                        .getFileTime(file)
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
-                        .toEpochMilli()))
-                .collect(Collectors.toList());
+                        .toEpochMilli()
+                )
+            )
+            .collect(Collectors.toList());
     }
 
     /**
      * Sorts a list of Path objects according to the last edited date
      * the order depends on the specified sorter type.
      */
-    public static List<Path> sortByDate(List<Path> files, ExternalFileSorter sortType) {
+    public static List<Path> sortByDate(
+        List<Path> files,
+        ExternalFileSorter sortType
+    ) {
         FileFilterUtils fileFilter = new FileFilterUtils();
-        List<Path> sortedFiles = switch (sortType) {
-            case DEFAULT -> files;
-            case DATE_ASCENDING -> fileFilter.sortByDateDescending(files);
-            case DATE_DESCENDING -> fileFilter.sortByDateAscending(files);
-        };
+        List<Path> sortedFiles =
+            switch (sortType) {
+                case DEFAULT -> files;
+                case DATE_ASCENDING -> fileFilter.sortByDateDescending(files);
+                case DATE_DESCENDING -> fileFilter.sortByDateAscending(files);
+            };
         return sortedFiles;
     }
 }
-

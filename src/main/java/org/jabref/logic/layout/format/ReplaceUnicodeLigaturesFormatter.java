@@ -3,13 +3,14 @@ package org.jabref.logic.layout.format;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.UnicodeLigaturesMap;
 
-public class ReplaceUnicodeLigaturesFormatter extends Formatter implements LayoutFormatter {
+public class ReplaceUnicodeLigaturesFormatter
+    extends Formatter
+    implements LayoutFormatter {
 
     private final Map<Pattern, String> ligaturesMap;
 
@@ -42,7 +43,9 @@ public class ReplaceUnicodeLigaturesFormatter extends Formatter implements Layou
 
     @Override
     public String getDescription() {
-        return Localization.lang("Replaces Unicode ligatures with their expanded form");
+        return Localization.lang(
+            "Replaces Unicode ligatures with their expanded form"
+        );
     }
 
     @Override

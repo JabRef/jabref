@@ -5,6 +5,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.BibEntryPreferences;
 
 public class FieldMergerFactory {
+
     private final BibEntryPreferences bibEntryPreferences;
 
     public FieldMergerFactory(BibEntryPreferences bibEntryPreferences) {
@@ -21,11 +22,19 @@ public class FieldMergerFactory {
         } else if (field == StandardField.FILE) {
             return new FileMerger();
         } else {
-            throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
+            throw new IllegalArgumentException(
+                "No implementation found for merging the given field: " +
+                field.getDisplayName()
+            );
         }
     }
 
     public static boolean canMerge(Field field) {
-        return field == StandardField.GROUPS || field == StandardField.KEYWORDS || field == StandardField.COMMENT || field == StandardField.FILE;
+        return (
+            field == StandardField.GROUPS ||
+            field == StandardField.KEYWORDS ||
+            field == StandardField.COMMENT ||
+            field == StandardField.FILE
+        );
     }
 }

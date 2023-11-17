@@ -3,6 +3,7 @@ package org.jabref.model.strings;
 import java.util.HashMap;
 
 public class UnicodeToReadableCharMap extends HashMap<String, String> {
+
     public UnicodeToReadableCharMap() {
         put("\u00C0", "A");
         put("\u00C1", "A");
@@ -253,7 +254,6 @@ public class UnicodeToReadableCharMap extends HashMap<String, String> {
 
         put("\u0178", "Y");
         put("\u00FE", ""); // thorn character
-
         // UNICODE_CHARS.put("\u0100", "");
     }
 }

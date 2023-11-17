@@ -1,12 +1,9 @@
 package org.jabref.gui.search;
 
 import java.util.List;
-
 import javafx.stage.Stage;
-
 import org.jabref.gui.StateManager;
 import org.jabref.testutils.category.GUITest;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +13,7 @@ import org.testfx.framework.junit5.Start;
 @GUITest
 @ExtendWith(ApplicationExtension.class)
 public class GetLastSearchHistoryTest {
+
     @Start
     void onStart(Stage stage) {
         // Needed to init JavaFX thread

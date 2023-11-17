@@ -1,10 +1,9 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.ParamLayoutFormatter;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.jabref.logic.layout.ParamLayoutFormatter;
+import org.junit.jupiter.api.Test;
 
 public class ReplaceTest {
 
@@ -39,13 +38,19 @@ public class ReplaceTest {
     @Test
     public void testNoArgumentSet() {
         ParamLayoutFormatter a = new Replace();
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+        assertEquals(
+            "Bob Bruce and Jolly Jumper",
+            a.format("Bob Bruce and Jolly Jumper")
+        );
     }
 
     @Test
     public void testNoProperArgument() {
         ParamLayoutFormatter a = new Replace();
         a.setArgument("Eds.");
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+        assertEquals(
+            "Bob Bruce and Jolly Jumper",
+            a.format("Bob Bruce and Jolly Jumper")
+        );
     }
 }

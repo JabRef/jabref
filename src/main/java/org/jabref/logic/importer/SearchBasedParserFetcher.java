@@ -6,11 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
-
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * Provides a convenient interface for search-based fetcher, which follows the usual three-step procedure:
@@ -34,7 +32,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  * </p>
  */
 public interface SearchBasedParserFetcher extends SearchBasedFetcher {
-
     /**
      * This method is used to send queries with advanced URL parameters.
      * This method is necessary as the performSearch method does not support certain URL parameters that are used for
@@ -43,26 +40,40 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * @param luceneQuery the root node of the lucene query
      */
     @Override
-    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+    default List<BibEntry> performSearch(QueryNode luceneQuery)
+        throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery);
-        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
-            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
+        } catch (
+            URISyntaxException | MalformedURLException | FetcherException e
+        ) {
+            throw new FetcherException(
+                "Search URI crafted from complex search query is malformed",
+                e
+            );
         }
         return getBibEntries(urlForQuery);
     }
 
-    private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
+    private List<BibEntry> getBibEntries(URL urlForQuery)
+        throws FetcherException {
         try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
+            throw new FetcherException(
+                "A network error occurred while fetching from " + urlForQuery,
+                e
+            );
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
+            throw new FetcherException(
+                "An internal parser error occurred while fetching from " +
+                urlForQuery,
+                e
+            );
         }
     }
 
@@ -76,7 +87,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      *
      * @param luceneQuery the root node of the lucene query
      */
-    URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForQuery(QueryNode luceneQuery)
+        throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Performs a cleanup of the fetched entry.

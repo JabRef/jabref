@@ -4,19 +4,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
 public class NoteChecker implements ValueChecker {
 
-    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[^a-z]").asPredicate();
+    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern
+        .compile("^[^a-z]")
+        .asPredicate();
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
     public NoteChecker(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+        this.bibDatabaseContextEdition =
+            Objects.requireNonNull(bibDatabaseContext);
     }
 
     /**
@@ -32,8 +34,13 @@ public class NoteChecker implements ValueChecker {
         }
 
         // BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-            return Optional.of(Localization.lang("should have the first letter capitalized"));
+        if (
+            !bibDatabaseContextEdition.isBiblatexMode() &&
+            !FIRST_LETTER_CAPITALIZED.test(value.trim())
+        ) {
+            return Optional.of(
+                Localization.lang("should have the first letter capitalized")
+            );
         }
 
         return Optional.empty();

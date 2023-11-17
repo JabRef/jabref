@@ -1,7 +1,6 @@
 package org.jabref.model.entry.event;
 
 import java.util.Collections;
-
 import org.jabref.model.entry.BibEntry;
 
 /**

@@ -1,8 +1,9 @@
 package org.jabref.gui.libraryproperties.saving;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
@@ -11,23 +12,26 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
+public class SavingPropertiesView
+    extends AbstractPropertiesTabView<SavingPropertiesViewModel>
+    implements PropertiesTab {
 
-public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
+    @FXML
+    private CheckBox protect;
 
-    @FXML private CheckBox protect;
-    @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
-    @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
+    @FXML
+    private SaveOrderConfigPanel saveOrderConfigPanel;
 
-    @Inject private PreferencesService preferencesService;
+    @FXML
+    private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
+
+    @Inject
+    private PreferencesService preferencesService;
 
     public SavingPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
 
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        ViewLoader.view(this).root(this).load();
     }
 
     @Override
@@ -36,18 +40,35 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     public void initialize() {
-        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferencesService);
+        this.viewModel =
+            new SavingPropertiesViewModel(databaseContext, preferencesService);
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
-        protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
+        protect
+            .selectedProperty()
+            .bindBidirectional(viewModel.libraryProtectedProperty());
 
-        saveOrderConfigPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
-        saveOrderConfigPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
-        saveOrderConfigPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
-        saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
+        saveOrderConfigPanel
+            .saveInOriginalProperty()
+            .bindBidirectional(viewModel.saveInOriginalProperty());
+        saveOrderConfigPanel
+            .saveInTableOrderProperty()
+            .bindBidirectional(viewModel.saveInTableOrderProperty());
+        saveOrderConfigPanel
+            .saveInSpecifiedOrderProperty()
+            .bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
+        saveOrderConfigPanel
+            .sortableFieldsProperty()
+            .bind(viewModel.sortableFieldsProperty());
+        saveOrderConfigPanel
+            .sortCriteriaProperty()
+            .bindBidirectional(viewModel.sortCriteriaProperty());
 
-        fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.cleanupsDisableProperty());
-        fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
+        fieldFormatterCleanupsPanel
+            .cleanupsDisableProperty()
+            .bindBidirectional(viewModel.cleanupsDisableProperty());
+        fieldFormatterCleanupsPanel
+            .cleanupsProperty()
+            .bindBidirectional(viewModel.cleanupsProperty());
     }
 }

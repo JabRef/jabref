@@ -6,14 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
+import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 
 /**
  * This class converts a query string written in lucene syntax into a complex  query.
@@ -29,7 +27,9 @@ public class QueryParser {
      * @param query The given query string
      * @return A complex query containing all fields of the query string
      */
-    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String query) {
+    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(
+        String query
+    ) {
         try {
             StandardQueryParser parser = new StandardQueryParser();
             Query luceneQuery = parser.parse(query, "default");
@@ -42,7 +42,11 @@ public class QueryParser {
             List<Term> sortedTerms = new ArrayList<>(terms);
             sortedTerms.sort(Comparator.comparing(Term::text).reversed());
             return Optional.of(ComplexSearchQuery.fromTerms(sortedTerms));
-        } catch (QueryNodeException | IllegalStateException | IllegalArgumentException ex) {
+        } catch (
+            QueryNodeException
+            | IllegalStateException
+            | IllegalArgumentException ex
+        ) {
             return Optional.empty();
         }
     }

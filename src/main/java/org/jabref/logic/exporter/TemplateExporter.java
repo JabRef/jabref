@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
@@ -30,7 +29,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +44,9 @@ public class TemplateExporter extends Exporter {
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        TemplateExporter.class
+    );
 
     private final String lfFileName;
     private final String directory;
@@ -64,12 +64,23 @@ public class TemplateExporter extends Exporter {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      */
-    public TemplateExporter(String displayName,
-                            String consoleName,
-                            String lfFileName,
-                            String directory,
-                            FileType extension) {
-        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);
+    public TemplateExporter(
+        String displayName,
+        String consoleName,
+        String lfFileName,
+        String directory,
+        FileType extension
+    ) {
+        this(
+            displayName,
+            consoleName,
+            lfFileName,
+            directory,
+            extension,
+            null,
+            null,
+            null
+        );
     }
 
     /**
@@ -79,18 +90,22 @@ public class TemplateExporter extends Exporter {
      * @param lfFileName        Name of the main layout file.
      * @param extension         May or may not contain the . (for instance .txt).
      */
-    public TemplateExporter(String name,
-                            String lfFileName,
-                            String extension,
-                            LayoutFormatterPreferences layoutPreferences,
-                            SelfContainedSaveOrder saveOrder) {
-        this(name,
-                name,
-                lfFileName,
-                null,
-                StandardFileType.fromExtensions(extension),
-                layoutPreferences,
-                saveOrder);
+    public TemplateExporter(
+        String name,
+        String lfFileName,
+        String extension,
+        LayoutFormatterPreferences layoutPreferences,
+        SelfContainedSaveOrder saveOrder
+    ) {
+        this(
+            name,
+            name,
+            lfFileName,
+            null,
+            StandardFileType.fromExtensions(extension),
+            layoutPreferences,
+            saveOrder
+        );
     }
 
     /**
@@ -102,14 +117,25 @@ public class TemplateExporter extends Exporter {
      * @param directory         Directory in which to find the layout file.
      * @param extension         Should contain the . (for instance .txt).
      */
-    public TemplateExporter(String displayName,
-                            String consoleName,
-                            String lfFileName,
-                            String directory,
-                            FileType extension,
-                            LayoutFormatterPreferences layoutPreferences,
-                            SelfContainedSaveOrder saveOrder) {
-        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);
+    public TemplateExporter(
+        String displayName,
+        String consoleName,
+        String lfFileName,
+        String directory,
+        FileType extension,
+        LayoutFormatterPreferences layoutPreferences,
+        SelfContainedSaveOrder saveOrder
+    ) {
+        this(
+            displayName,
+            consoleName,
+            lfFileName,
+            directory,
+            extension,
+            layoutPreferences,
+            saveOrder,
+            null
+        );
     }
 
     /**
@@ -123,23 +149,30 @@ public class TemplateExporter extends Exporter {
      * @param layoutPreferences Preferences for layout
      * @param blankLineBehaviour how to behave regarding blank lines.
      */
-    public TemplateExporter(String displayName,
-                            String consoleName,
-                            String lfFileName,
-                            String directory,
-                            FileType extension,
-                            LayoutFormatterPreferences layoutPreferences,
-                            SelfContainedSaveOrder saveOrder,
-                            BlankLineBehaviour blankLineBehaviour) {
+    public TemplateExporter(
+        String displayName,
+        String consoleName,
+        String lfFileName,
+        String directory,
+        FileType extension,
+        LayoutFormatterPreferences layoutPreferences,
+        SelfContainedSaveOrder saveOrder,
+        BlankLineBehaviour blankLineBehaviour
+    ) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
-            this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
+            this.lfFileName =
+                lfFileName.substring(
+                    0,
+                    lfFileName.length() - LAYOUT_EXTENSION.length()
+                );
         } else {
             this.lfFileName = lfFileName;
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.saveOrder = saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
+        this.saveOrder =
+            saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
         this.blankLineBehaviour = blankLineBehaviour;
     }
 
@@ -192,16 +225,28 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
-        export(databaseContext, file, entries, Collections.emptyList(), JournalAbbreviationLoader.loadBuiltInRepository());
+    public void export(
+        BibDatabaseContext databaseContext,
+        Path file,
+        List<BibEntry> entries
+    ) throws Exception {
+        export(
+            databaseContext,
+            file,
+            entries,
+            Collections.emptyList(),
+            JournalAbbreviationLoader.loadBuiltInRepository()
+        );
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext,
-                       final Path file,
-                       List<BibEntry> entries,
-                       List<Path> fileDirForDatabase,
-                       JournalAbbreviationRepository abbreviationRepository) throws Exception {
+    public void export(
+        final BibDatabaseContext databaseContext,
+        final Path file,
+        List<BibEntry> entries,
+        List<Path> fileDirForDatabase,
+        JournalAbbreviationRepository abbreviationRepository
+    ) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
@@ -221,8 +266,17 @@ public class TemplateExporter extends Exporter {
             List<String> missingFormatters = new ArrayList<>(1);
 
             // Print header
-            try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
+            try (
+                Reader reader = getReader(
+                    lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION
+                )
+            ) {
+                LayoutHelper layoutHelper = new LayoutHelper(
+                    reader,
+                    fileDirForDatabase,
+                    layoutPreferences,
+                    abbreviationRepository
+                );
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
@@ -238,19 +292,31 @@ public class TemplateExporter extends Exporter {
              * Write database entries; entries will be sorted as they appear on the
              * screen, or sorted by author, depending on Preferences.
              */
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(entries, saveOrder);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
+                entries,
+                saveOrder
+            );
 
             // Load default layout
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + LAYOUT_EXTENSION)) {
-                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
+                layoutHelper =
+                    new LayoutHelper(
+                        reader,
+                        fileDirForDatabase,
+                        layoutPreferences,
+                        abbreviationRepository
+                    );
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
                 if (!missingFormatters.isEmpty()) {
-                    LOGGER.warn("Missing formatters found: {}", missingFormatters);
+                    LOGGER.warn(
+                        "Missing formatters found: {}",
+                        missingFormatters
+                    );
                 }
             }
             Map<EntryType, Layout> layouts = new HashMap<>();
@@ -264,13 +330,25 @@ public class TemplateExporter extends Exporter {
                 if (layouts.containsKey(type)) {
                     layout = layouts.get(type);
                 } else {
-                    try (Reader reader = getReader(lfFileName + '.' + type.getName() + LAYOUT_EXTENSION)) {
+                    try (
+                        Reader reader = getReader(
+                            lfFileName + '.' + type.getName() + LAYOUT_EXTENSION
+                        )
+                    ) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
+                        layoutHelper =
+                            new LayoutHelper(
+                                reader,
+                                fileDirForDatabase,
+                                layoutPreferences,
+                                abbreviationRepository
+                            );
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
-                            missingFormatters.addAll(layout.getMissingFormatters());
+                            missingFormatters.addAll(
+                                layout.getMissingFormatters()
+                            );
                         }
                     } catch (IOException ex) {
                         // The exception indicates that no type-specific layout
@@ -282,23 +360,42 @@ public class TemplateExporter extends Exporter {
 
                 // Write the entry
                 if (layout != null) {
-                    if (blankLineBehaviour == BlankLineBehaviour.DELETE_BLANKS) {
-                        String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split(BLANK_LINE_PATTERN);
+                    if (
+                        blankLineBehaviour == BlankLineBehaviour.DELETE_BLANKS
+                    ) {
+                        String[] lines = layout
+                            .doLayout(entry, databaseContext.getDatabase())
+                            .split(BLANK_LINE_PATTERN);
                         for (String line : lines) {
                             if (!line.isBlank() && !line.isEmpty()) {
                                 ps.write(line + OS.NEWLINE);
                             }
                         }
                     } else {
-                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                        ps.write(
+                            layout.doLayout(
+                                entry,
+                                databaseContext.getDatabase()
+                            )
+                        );
                     }
                 }
             }
 
             // Print footer
             Layout endLayout = null;
-            try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
-                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
+            try (
+                Reader reader = getReader(
+                    lfFileName + END_INFIX + LAYOUT_EXTENSION
+                )
+            ) {
+                layoutHelper =
+                    new LayoutHelper(
+                        reader,
+                        fileDirForDatabase,
+                        layoutPreferences,
+                        abbreviationRepository
+                    );
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
@@ -314,7 +411,10 @@ public class TemplateExporter extends Exporter {
             layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Formatters {} not found", String.join(", ", missingFormatters));
+                LOGGER.warn(
+                    "Formatters {} not found",
+                    String.join(", ", missingFormatters)
+                );
             }
         }
     }
@@ -326,7 +426,12 @@ public class TemplateExporter extends Exporter {
     private void readFormatterFile() {
         Path formatterFile = Path.of(lfFileName + FORMATTERS_EXTENSION);
         if (Files.exists(formatterFile)) {
-            try (Reader in = Files.newBufferedReader(formatterFile, StandardCharsets.UTF_8)) {
+            try (
+                Reader in = Files.newBufferedReader(
+                    formatterFile,
+                    StandardCharsets.UTF_8
+                )
+            ) {
                 // Ok, we found and opened the file. Read all contents:
                 StringBuilder sb = new StringBuilder();
                 int c;
@@ -345,7 +450,10 @@ public class TemplateExporter extends Exporter {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        layoutPreferences.putCustomExportNameFormatter(formatterName, contents);
+                        layoutPreferences.putCustomExportNameFormatter(
+                            formatterName,
+                            contents
+                        );
                     }
                 }
             } catch (IOException ex) {

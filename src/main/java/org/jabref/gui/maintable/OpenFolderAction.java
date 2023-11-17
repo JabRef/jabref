@@ -20,19 +20,30 @@ public class OpenFolderAction extends SimpleCommand {
     private final LinkedFile linkedFile;
     private final TaskExecutor taskExecutor;
 
-    public OpenFolderAction(DialogService dialogService,
-                            StateManager stateManager,
-                            PreferencesService preferencesService,
-                            TaskExecutor taskExecutor) {
-        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
+    public OpenFolderAction(
+        DialogService dialogService,
+        StateManager stateManager,
+        PreferencesService preferencesService,
+        TaskExecutor taskExecutor
+    ) {
+        this(
+            dialogService,
+            stateManager,
+            preferencesService,
+            null,
+            null,
+            taskExecutor
+        );
     }
 
-    public OpenFolderAction(DialogService dialogService,
-                            StateManager stateManager,
-                            PreferencesService preferencesService,
-                            BibEntry entry,
-                            LinkedFile linkedFile,
-                            TaskExecutor taskExecutor) {
+    public OpenFolderAction(
+        DialogService dialogService,
+        StateManager stateManager,
+        PreferencesService preferencesService,
+        BibEntry entry,
+        LinkedFile linkedFile,
+        TaskExecutor taskExecutor
+    ) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -41,7 +52,12 @@ public class OpenFolderAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         if (this.linkedFile == null) {
-            this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferencesService));
+            this.executable.bind(
+                    ActionHelper.isFilePresentForSelectedEntry(
+                        stateManager,
+                        preferencesService
+                    )
+                );
         } else {
             this.setExecutable(true);
         }
@@ -49,26 +65,36 @@ public class OpenFolderAction extends SimpleCommand {
 
     @Override
     public void execute() {
-            stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+        stateManager
+            .getActiveDatabase()
+            .ifPresent(databaseContext -> {
                 if (entry == null) {
-                    stateManager.getSelectedEntries().stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> {
-                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
-                                entry.getFiles().get(0),
-                                entry,
-                                databaseContext,
-                                taskExecutor,
-                                dialogService,
-                                preferencesService);
-                        linkedFileViewModel.openFolder();
-                    });
+                    stateManager
+                        .getSelectedEntries()
+                        .stream()
+                        .filter(entry -> !entry.getFiles().isEmpty())
+                        .forEach(entry -> {
+                            LinkedFileViewModel linkedFileViewModel =
+                                new LinkedFileViewModel(
+                                    entry.getFiles().get(0),
+                                    entry,
+                                    databaseContext,
+                                    taskExecutor,
+                                    dialogService,
+                                    preferencesService
+                                );
+                            linkedFileViewModel.openFolder();
+                        });
                 } else {
-                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
+                    LinkedFileViewModel linkedFileViewModel =
+                        new LinkedFileViewModel(
                             linkedFile,
                             entry,
                             databaseContext,
                             taskExecutor,
                             dialogService,
-                            preferencesService);
+                            preferencesService
+                        );
                     linkedFileViewModel.openFolder();
                 }
             });

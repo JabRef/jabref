@@ -3,11 +3,8 @@ package org.jabref.gui.entryeditor;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Tooltip;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -31,19 +28,32 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     public static final String NAME = "Required fields";
     private final BibEntryTypesManager entryTypesManager;
 
-    public RequiredFieldsTab(BibDatabaseContext databaseContext,
-                             SuggestionProviders suggestionProviders,
-                             UndoManager undoManager,
-                             DialogService dialogService,
-                             PreferencesService preferences,
-                             StateManager stateManager,
-                             ThemeManager themeManager,
-                             IndexingTaskManager indexingTaskManager,
-                             BibEntryTypesManager entryTypesManager,
-                             TaskExecutor taskExecutor,
-                             JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService,
-                preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
+    public RequiredFieldsTab(
+        BibDatabaseContext databaseContext,
+        SuggestionProviders suggestionProviders,
+        UndoManager undoManager,
+        DialogService dialogService,
+        PreferencesService preferences,
+        StateManager stateManager,
+        ThemeManager themeManager,
+        IndexingTaskManager indexingTaskManager,
+        BibEntryTypesManager entryTypesManager,
+        TaskExecutor taskExecutor,
+        JournalAbbreviationRepository journalAbbreviationRepository
+    ) {
+        super(
+            false,
+            databaseContext,
+            suggestionProviders,
+            undoManager,
+            dialogService,
+            preferences,
+            stateManager,
+            themeManager,
+            taskExecutor,
+            journalAbbreviationRepository,
+            indexingTaskManager
+        );
         this.entryTypesManager = entryTypesManager;
         setText(Localization.lang("Required fields"));
         setTooltip(new Tooltip(Localization.lang("Show required fields")));
@@ -52,7 +62,10 @@ public class RequiredFieldsTab extends FieldsEditorTab {
 
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(
+            entry.getType(),
+            databaseContext.getMode()
+        );
         Set<Field> fields = new LinkedHashSet<>();
         if (entryType.isPresent()) {
             for (OrFields orFields : entryType.get().getRequiredFields()) {

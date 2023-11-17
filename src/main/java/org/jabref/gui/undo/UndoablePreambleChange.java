@@ -12,8 +12,11 @@ public class UndoablePreambleChange extends AbstractUndoableJabRefEdit {
     private final String oldValue;
     private final String newValue;
 
-    public UndoablePreambleChange(BibDatabase base,
-                                  String oldValue, String newValue) {
+    public UndoablePreambleChange(
+        BibDatabase base,
+        String oldValue,
+        String newValue
+    ) {
         this.base = base;
         this.oldValue = oldValue;
         this.newValue = newValue;

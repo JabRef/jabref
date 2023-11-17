@@ -1,7 +1,10 @@
 package org.jabref.gui;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import java.util.Optional;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -13,7 +16,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.util.TaskExecutor;
@@ -29,25 +31,27 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EntryTypeViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        EntryTypeViewModel.class
+    );
 
     private final PreferencesService preferencesService;
-    private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
-    private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
-    private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
-    private final ListProperty<IdBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty searchingProperty =
+        new SimpleBooleanProperty();
+    private final BooleanProperty searchSuccesfulProperty =
+        new SimpleBooleanProperty();
+    private final ObjectProperty<IdBasedFetcher> selectedItemProperty =
+        new SimpleObjectProperty<>();
+    private final ListProperty<IdBasedFetcher> fetchers =
+        new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty idText = new SimpleStringProperty();
-    private final BooleanProperty focusAndSelectAllProperty = new SimpleBooleanProperty();
+    private final BooleanProperty focusAndSelectAllProperty =
+        new SimpleBooleanProperty();
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -56,12 +60,14 @@ public class EntryTypeViewModel {
     private final TaskExecutor taskExecutor;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public EntryTypeViewModel(PreferencesService preferences,
-                              LibraryTab libraryTab,
-                              DialogService dialogService,
-                              StateManager stateManager,
-                              TaskExecutor taskExecutor,
-                              FileUpdateMonitor fileUpdateMonitor) {
+    public EntryTypeViewModel(
+        PreferencesService preferences,
+        LibraryTab libraryTab,
+        DialogService dialogService,
+        StateManager stateManager,
+        TaskExecutor taskExecutor,
+        FileUpdateMonitor fileUpdateMonitor
+    ) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
@@ -69,14 +75,24 @@ public class EntryTypeViewModel {
         this.taskExecutor = taskExecutor;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
-        fetchers.addAll(WebFetchers.getIdBasedFetchers(
+        fetchers.addAll(
+            WebFetchers.getIdBasedFetchers(
                 preferences.getImportFormatPreferences(),
-                preferences.getImporterPreferences()));
+                preferences.getImporterPreferences()
+            )
+        );
         selectedItemProperty.setValue(getLastSelectedFetcher());
-        idFieldValidator = new FunctionBasedValidator<>(
+        idFieldValidator =
+            new FunctionBasedValidator<>(
                 idText,
                 StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
+                ValidationMessage.error(
+                    Localization.lang(
+                        "Required field \"%0\" is empty.",
+                        Localization.lang("ID")
+                    )
+                )
+            );
     }
 
     public BooleanProperty searchSuccesfulProperty() {
@@ -104,15 +120,29 @@ public class EntryTypeViewModel {
     }
 
     public void storeSelectedFetcher() {
-        preferencesService.getGuiPreferences().setLastSelectedIdBasedFetcher(selectedItemProperty.getValue().getName());
+        preferencesService
+            .getGuiPreferences()
+            .setLastSelectedIdBasedFetcher(
+                selectedItemProperty.getValue().getName()
+            );
     }
 
     private IdBasedFetcher getLastSelectedFetcher() {
-        return fetchers.stream().filter(fetcher -> fetcher.getName()
-                                                          .equals(preferencesService.getGuiPreferences()
-                                                                                    .getLastSelectedIdBasedFetcher()))
-                       .findFirst()
-                       .orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
+        return fetchers
+            .stream()
+            .filter(fetcher ->
+                fetcher
+                    .getName()
+                    .equals(
+                        preferencesService
+                            .getGuiPreferences()
+                            .getLastSelectedIdBasedFetcher()
+                    )
+            )
+            .findFirst()
+            .orElse(
+                new DoiFetcher(preferencesService.getImportFormatPreferences())
+            );
     }
 
     public ListProperty<IdBasedFetcher> fetcherItemsProperty() {
@@ -126,6 +156,7 @@ public class EntryTypeViewModel {
     }
 
     private class FetcherWorker extends Task<Optional<BibEntry>> {
+
         private IdBasedFetcher fetcher = null;
         private String searchID = "";
 
@@ -152,14 +183,39 @@ public class EntryTypeViewModel {
             String searchId = idText.getValue();
 
             if (exception instanceof FetcherClientException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage);
+                dialogService.showInformationDialogAndWait(
+                    Localization.lang("Failed to import by ID"),
+                    Localization.lang(
+                        "Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness."
+                    ) +
+                    "\n" +
+                    fetcherExceptionMessage
+                );
             } else if (exception instanceof FetcherServerException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try again later.") + "\n" + fetcherExceptionMessage);
+                dialogService.showInformationDialogAndWait(
+                    Localization.lang("Failed to import by ID"),
+                    Localization.lang(
+                        "Bibliographic data not found. Cause is likely the server side. Please try again later."
+                    ) +
+                    "\n" +
+                    fetcherExceptionMessage
+                );
             } else {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(
+                    Localization.lang("Failed to import by ID"),
+                    Localization.lang(
+                        "Error message %0",
+                        fetcherExceptionMessage
+                    )
+                );
             }
 
-            LOGGER.error("Exception during fetching when using fetcher '{}' with entry id '{}'.", fetcher, searchId, exception);
+            LOGGER.error(
+                "Exception during fetching when using fetcher '{}' with entry id '{}'.",
+                fetcher,
+                searchId,
+                exception
+            );
 
             searchingProperty.set(false);
             fetcherWorker = new FetcherWorker();
@@ -171,18 +227,25 @@ public class EntryTypeViewModel {
                 final BibEntry entry = result.get();
 
                 ImportHandler handler = new ImportHandler(
-                        libraryTab.getBibDatabaseContext(),
-                        preferencesService,
-                        fileUpdateMonitor,
-                        libraryTab.getUndoManager(),
-                        stateManager,
-                        dialogService,
-                        taskExecutor);
-                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
+                    libraryTab.getBibDatabaseContext(),
+                    preferencesService,
+                    fileUpdateMonitor,
+                    libraryTab.getUndoManager(),
+                    stateManager,
+                    dialogService,
+                    taskExecutor
+                );
+                handler.importEntryWithDuplicateCheck(
+                    libraryTab.getBibDatabaseContext(),
+                    entry
+                );
 
                 searchSuccesfulProperty.set(true);
             } else if (StringUtil.isBlank(idText.getValue())) {
-                dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
+                dialogService.showWarningDialogAndWait(
+                    Localization.lang("Empty search ID"),
+                    Localization.lang("The given search ID was empty.")
+                );
             } else {
                 // result is empty
 
@@ -190,17 +253,26 @@ public class EntryTypeViewModel {
                 String searchId = idText.getValue();
 
                 // When DOI ID is not found, allow the user to either return to the dialog or add entry manually
-                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Identifier not found"),
-                        Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId),
+                boolean addEntryFlag =
+                    dialogService.showConfirmationDialogAndWait(
+                        Localization.lang("Identifier not found"),
+                        Localization.lang(
+                            "Fetcher '%0' did not find an entry for id '%1'.",
+                            fetcher,
+                            searchId
+                        ),
                         Localization.lang("Add entry manually"),
-                        Localization.lang("Return to dialog"));
+                        Localization.lang("Return to dialog")
+                    );
                 if (addEntryFlag) {
                     new NewEntryAction(
-                            libraryTab.frame(),
-                            StandardEntryType.Article,
-                            dialogService,
-                            preferencesService,
-                            stateManager).execute();
+                        libraryTab.frame(),
+                        StandardEntryType.Article,
+                        dialogService,
+                        preferencesService,
+                        stateManager
+                    )
+                        .execute();
                     searchSuccesfulProperty.set(true);
                 }
             }

@@ -1,10 +1,8 @@
 package org.jabref.gui.integrity;
 
 import java.util.List;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.integrity.IntegrityMessage;
 

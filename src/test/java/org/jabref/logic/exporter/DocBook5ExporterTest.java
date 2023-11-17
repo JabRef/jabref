@@ -1,5 +1,8 @@
 package org.jabref.logic.exporter;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +11,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,7 +19,6 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -27,9 +28,6 @@ import org.xmlunit.builder.Input.Builder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 
 public class DocBook5ExporterTest {
 
@@ -42,31 +40,43 @@ public class DocBook5ExporterTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        exporter = new TemplateExporter(
+        exporter =
+            new TemplateExporter(
                 "DocBook 5.1",
                 "docbook5",
                 "docbook5",
                 null,
                 StandardFileType.XML,
-                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                SaveOrder.getDefaultSaveOrder());
+                mock(
+                    LayoutFormatterPreferences.class,
+                    Answers.RETURNS_DEEP_STUBS
+                ),
+                SaveOrder.getDefaultSaveOrder()
+            );
 
         LocalDate myDate = LocalDate.of(2018, 1, 1);
 
-        xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
+        xmlFile =
+            Path.of(
+                DocBook5ExporterTest.class.getResource(
+                        "Docbook5ExportFormat.xml"
+                    )
+                    .toURI()
+            );
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         BibEntry entry = new BibEntry(StandardEntryType.Book)
-                .withField(StandardField.TITLE, "my paper title")
-                .withField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez")
-                .withField(StandardField.ISBN, "1-2-34")
-                .withCitationKey("mykey")
-                .withDate(new Date(myDate));
+            .withField(StandardField.TITLE, "my paper title")
+            .withField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez")
+            .withField(StandardField.ISBN, "1-2-34")
+            .withCitationKey("mykey")
+            .withDate(new Date(myDate));
         entries = Collections.singletonList(entry);
     }
 
     @Test
-    void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
+    void testPerformExportForSingleEntry(@TempDir Path testFolder)
+        throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         exporter.export(databaseContext, path, entries);
@@ -74,8 +84,15 @@ public class DocBook5ExporterTest {
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(path));
 
-        assertThat(test, CompareMatcher.isSimilarTo(control)
-                                       .normalizeWhitespace()
-                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        assertThat(
+            test,
+            CompareMatcher
+                .isSimilarTo(control)
+                .normalizeWhitespace()
+                .withNodeMatcher(
+                    new DefaultNodeMatcher(ElementSelectors.byNameAndText)
+                )
+                .throwComparisonFailure()
+        );
     }
 }

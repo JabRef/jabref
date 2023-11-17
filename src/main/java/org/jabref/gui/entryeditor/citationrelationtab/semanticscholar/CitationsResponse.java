@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 import java.util.List;
 
 public class CitationsResponse {
+
     private int offset;
     private int next;
     private List<CitationDataItem> data;

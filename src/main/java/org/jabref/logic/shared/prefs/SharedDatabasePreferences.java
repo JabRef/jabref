@@ -5,16 +5,16 @@ import java.security.GeneralSecurityException;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
 import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.security.Password;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SharedDatabasePreferences {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabasePreferences.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        SharedDatabasePreferences.class
+    );
 
     private static final String DEFAULT_NODE = "default";
     private static final String PREFERENCES_PATH_NAME = "/org/jabref-shared";
@@ -24,13 +24,19 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_PORT = "sharedDatabasePort";
     private static final String SHARED_DATABASE_NAME = "sharedDatabaseName";
     private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
-    private static final String SHARED_DATABASE_PASSWORD = "sharedDatabasePassword";
+    private static final String SHARED_DATABASE_PASSWORD =
+        "sharedDatabasePassword";
     private static final String SHARED_DATABASE_FOLDER = "sharedDatabaseFolder";
-    private static final String SHARED_DATABASE_AUTOSAVE = "sharedDatabaseAutosave";
-    private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
-    private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
-    private static final String SHARED_DATABASE_KEYSTORE_FILE = "sharedDatabaseKeyStoreFile";
-    private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
+    private static final String SHARED_DATABASE_AUTOSAVE =
+        "sharedDatabaseAutosave";
+    private static final String SHARED_DATABASE_REMEMBER_PASSWORD =
+        "sharedDatabaseRememberPassword";
+    private static final String SHARED_DATABASE_USE_SSL =
+        "sharedDatabaseUseSSL";
+    private static final String SHARED_DATABASE_KEYSTORE_FILE =
+        "sharedDatabaseKeyStoreFile";
+    private static final String SHARED_DATABASE_SERVER_TIMEZONE =
+        "sharedDatabaseServerTimezone";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
@@ -40,7 +46,11 @@ public class SharedDatabasePreferences {
     }
 
     public SharedDatabasePreferences(String sharedDatabaseID) {
-        internalPrefs = Preferences.userRoot().node(PREFERENCES_PATH_NAME).node(sharedDatabaseID);
+        internalPrefs =
+            Preferences
+                .userRoot()
+                .node(PREFERENCES_PATH_NAME)
+                .node(sharedDatabaseID);
     }
 
     public Optional<String> getType() {
@@ -76,7 +86,10 @@ public class SharedDatabasePreferences {
     }
 
     public boolean getRememberPassword() {
-        return internalPrefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);
+        return internalPrefs.getBoolean(
+            SHARED_DATABASE_REMEMBER_PASSWORD,
+            false
+        );
     }
 
     public Optional<String> getFolder() {
@@ -116,7 +129,10 @@ public class SharedDatabasePreferences {
     }
 
     public void setRememberPassword(boolean rememberPassword) {
-        internalPrefs.putBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, rememberPassword);
+        internalPrefs.putBoolean(
+            SHARED_DATABASE_REMEMBER_PASSWORD,
+            rememberPassword
+        );
     }
 
     public void setFolder(String folder) {
@@ -155,7 +171,9 @@ public class SharedDatabasePreferences {
         Preferences.userRoot().node(PREFERENCES_PATH_NAME).clear();
     }
 
-    public void putAllDBMSConnectionProperties(DatabaseConnectionProperties properties) {
+    public void putAllDBMSConnectionProperties(
+        DatabaseConnectionProperties properties
+    ) {
         assert (properties.isValid());
 
         setType(properties.getType().toString());
@@ -168,9 +186,18 @@ public class SharedDatabasePreferences {
         setServerTimezone(properties.getServerTimezone());
 
         try {
-            setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());
+            setPassword(
+                new Password(
+                    properties.getPassword().toCharArray(),
+                    properties.getUser()
+                )
+                    .encrypt()
+            );
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            LOGGER.error("Could not store the password due to encryption problems.", e);
+            LOGGER.error(
+                "Could not store the password due to encryption problems.",
+                e
+            );
         }
     }
 }

@@ -1,20 +1,17 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import com.tobiasdiez.easybind.EasyBind;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
-
-import com.tobiasdiez.easybind.EasyBind;
 
 public class DefaultMenu implements Supplier<List<MenuItem>> {
 
@@ -31,12 +28,13 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
 
     public List<MenuItem> get() {
         return List.of(
-                getCaseChangeMenu(textInputControl),
-                getConversionMenu(textInputControl),
-                new SeparatorMenuItem(),
-                new ProtectedTermsMenu(textInputControl),
-                new SeparatorMenuItem(),
-                getClearFieldMenuItem(textInputControl));
+            getCaseChangeMenu(textInputControl),
+            getConversionMenu(textInputControl),
+            new SeparatorMenuItem(),
+            new ProtectedTermsMenu(textInputControl),
+            new SeparatorMenuItem(),
+            getClearFieldMenuItem(textInputControl)
+        );
     }
 
     private static Menu getCaseChangeMenu(TextInputControl textInputControl) {
@@ -45,9 +43,19 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
 
         for (final Formatter caseChanger : Formatters.getCaseChangers()) {
             MenuItem menuItem = new MenuItem(caseChanger.getName());
-            EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
+            EasyBind.subscribe(
+                textInputControl.textProperty(),
+                value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value))
+            );
             menuItem.setOnAction(event ->
-                    textInputControl.textProperty().set(caseChanger.format(textInputControl.textProperty().get())));
+                textInputControl
+                    .textProperty()
+                    .set(
+                        caseChanger.format(
+                            textInputControl.textProperty().get()
+                        )
+                    )
+            );
             submenu.getItems().add(menuItem);
         }
 
@@ -59,9 +67,17 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
 
         for (Formatter converter : Formatters.getConverters()) {
             MenuItem menuItem = new MenuItem(converter.getName());
-            EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
+            EasyBind.subscribe(
+                textInputControl.textProperty(),
+                value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value))
+            );
             menuItem.setOnAction(event ->
-                    textInputControl.textProperty().set(converter.format(textInputControl.textProperty().get())));
+                textInputControl
+                    .textProperty()
+                    .set(
+                        converter.format(textInputControl.textProperty().get())
+                    )
+            );
             submenu.getItems().add(menuItem);
         }
 
@@ -69,7 +85,9 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
     }
 
     // Icon: DELETE_SWEEP
-    private static MenuItem getClearFieldMenuItem(TextInputControl textInputControl) {
+    private static MenuItem getClearFieldMenuItem(
+        TextInputControl textInputControl
+    ) {
         MenuItem menuItem = new MenuItem(Localization.lang("Clear"));
         menuItem.setOnAction(event -> textInputControl.setText(""));
 

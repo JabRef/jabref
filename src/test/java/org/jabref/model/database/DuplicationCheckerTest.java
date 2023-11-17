@@ -1,11 +1,10 @@
 package org.jabref.model.database;
 
-import org.jabref.model.entry.BibEntry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.jabref.model.entry.BibEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DuplicationCheckerTest {
 

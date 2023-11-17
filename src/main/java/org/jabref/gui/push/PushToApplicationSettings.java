@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -10,7 +9,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -26,10 +24,12 @@ public class PushToApplicationSettings {
     protected final PushToApplicationPreferences preferences;
     protected final AbstractPushToApplication application;
 
-    public PushToApplicationSettings(PushToApplication application,
-                                     DialogService dialogService,
-                                     FilePreferences filePreferences,
-                                     PushToApplicationPreferences preferences) {
+    public PushToApplicationSettings(
+        PushToApplication application,
+        DialogService dialogService,
+        FilePreferences filePreferences,
+        PushToApplicationPreferences preferences
+    ) {
         this.application = (AbstractPushToApplication) application;
         this.preferences = preferences;
 
@@ -48,22 +48,34 @@ public class PushToApplicationSettings {
         browse.setPrefWidth(20.0);
 
         // In case the application name and the actual command is not the same, add the command in brackets
-        StringBuilder commandLine = new StringBuilder(Localization.lang("Path to %0", application.getDisplayName()));
+        StringBuilder commandLine = new StringBuilder(
+            Localization.lang("Path to %0", application.getDisplayName())
+        );
         if (this.application.getCommandName() == null) {
             commandLine.append(':');
         } else {
-            commandLine.append(" (").append(this.application.getCommandName()).append("):");
+            commandLine
+                .append(" (")
+                .append(this.application.getCommandName())
+                .append("):");
         }
         commandLabel.setText(commandLine.toString());
         settingsPane.add(commandLabel, 0, 0);
 
-        path.setText(preferences.getCommandPaths().get(this.application.getDisplayName()));
+        path.setText(
+            preferences.getCommandPaths().get(this.application.getDisplayName())
+        );
         settingsPane.add(path, 1, 0);
 
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(filePreferences.getWorkingDirectory()).build();
-        browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
-                                             .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
+        FileDialogConfiguration fileDialogConfiguration =
+            new FileDialogConfiguration.Builder()
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
+                .build();
+        browse.setOnAction(e ->
+            dialogService
+                .showFileOpenDialog(fileDialogConfiguration)
+                .ifPresent(f -> path.setText(f.toAbsolutePath().toString()))
+        );
         settingsPane.add(browse, 2, 0);
 
         ColumnConstraints textConstraints = new ColumnConstraints();
@@ -71,7 +83,9 @@ public class PushToApplicationSettings {
         pathConstraints.setHgrow(Priority.ALWAYS);
         ColumnConstraints browseConstraints = new ColumnConstraints(20.0);
         browseConstraints.setHgrow(Priority.NEVER);
-        settingsPane.getColumnConstraints().addAll(textConstraints, pathConstraints, browseConstraints);
+        settingsPane
+            .getColumnConstraints()
+            .addAll(textConstraints, pathConstraints, browseConstraints);
     }
 
     /**
@@ -80,7 +94,9 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Map<String, String> commandPaths = new HashMap<>(preferences.getCommandPaths());
+        Map<String, String> commandPaths = new HashMap<>(
+            preferences.getCommandPaths()
+        );
         commandPaths.put(application.getDisplayName(), path.getText());
         preferences.setCommandPaths(commandPaths);
     }

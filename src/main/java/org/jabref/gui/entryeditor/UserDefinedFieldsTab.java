@@ -2,9 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -19,22 +17,36 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
+
     private final LinkedHashSet<Field> fields;
 
-    public UserDefinedFieldsTab(String name,
-                                Set<Field> fields,
-                                BibDatabaseContext databaseContext,
-                                SuggestionProviders suggestionProviders,
-                                UndoManager undoManager,
-                                DialogService dialogService,
-                                PreferencesService preferences,
-                                StateManager stateManager,
-                                ThemeManager themeManager,
-                                IndexingTaskManager indexingTaskManager,
-                                TaskExecutor taskExecutor,
-                                JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
-
+    public UserDefinedFieldsTab(
+        String name,
+        Set<Field> fields,
+        BibDatabaseContext databaseContext,
+        SuggestionProviders suggestionProviders,
+        UndoManager undoManager,
+        DialogService dialogService,
+        PreferencesService preferences,
+        StateManager stateManager,
+        ThemeManager themeManager,
+        IndexingTaskManager indexingTaskManager,
+        TaskExecutor taskExecutor,
+        JournalAbbreviationRepository journalAbbreviationRepository
+    ) {
+        super(
+            false,
+            databaseContext,
+            suggestionProviders,
+            undoManager,
+            dialogService,
+            preferences,
+            stateManager,
+            themeManager,
+            taskExecutor,
+            journalAbbreviationRepository,
+            indexingTaskManager
+        );
         this.fields = new LinkedHashSet<>(fields);
 
         setText(name);

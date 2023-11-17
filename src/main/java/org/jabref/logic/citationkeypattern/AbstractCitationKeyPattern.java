@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
 import org.jabref.model.entry.types.EntryType;
 
 /**
@@ -49,7 +48,9 @@ public abstract class AbstractCitationKeyPattern {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractCitationKeyPattern{");
+        final StringBuilder sb = new StringBuilder(
+            "AbstractCitationKeyPattern{"
+        );
         sb.append("defaultPattern=").append(defaultPattern);
         sb.append(", data=").append(data);
         sb.append('}');
@@ -65,7 +66,10 @@ public abstract class AbstractCitationKeyPattern {
             return false;
         }
         AbstractCitationKeyPattern that = (AbstractCitationKeyPattern) o;
-        return Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data);
+        return (
+            Objects.equals(defaultPattern, that.defaultPattern) &&
+            Objects.equals(data, that.data)
+        );
     }
 
     @Override
@@ -120,7 +124,8 @@ public abstract class AbstractCitationKeyPattern {
      */
     public void setDefaultValue(String bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
-        this.defaultPattern = AbstractCitationKeyPattern.split(bibtexKeyPattern);
+        this.defaultPattern =
+            AbstractCitationKeyPattern.split(bibtexKeyPattern);
     }
 
     public Set<EntryType> getAllKeys() {
@@ -128,7 +133,10 @@ public abstract class AbstractCitationKeyPattern {
     }
 
     public Map<EntryType, List<String>> getPatterns() {
-        return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return data
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public abstract List<String> getLastLevelCitationKeyPattern(EntryType key);

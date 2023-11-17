@@ -4,6 +4,5 @@ import javafx.scene.text.TextFlow;
 
 @FunctionalInterface
 public interface SearchDescriber {
-
     TextFlow getDescription();
 }

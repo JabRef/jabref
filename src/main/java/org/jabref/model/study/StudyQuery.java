@@ -1,6 +1,7 @@
 package org.jabref.model.study;
 
 public class StudyQuery {
+
     private String query;
 
     public StudyQuery(String query) {
@@ -10,8 +11,7 @@ public class StudyQuery {
     /**
      * Used for Jackson deserialization
      */
-    public StudyQuery() {
-    }
+    public StudyQuery() {}
 
     public String getQuery() {
         return query;
@@ -32,7 +32,9 @@ public class StudyQuery {
 
         StudyQuery that = (StudyQuery) o;
 
-        return getQuery() != null ? getQuery().equals(that.getQuery()) : that.getQuery() == null;
+        return getQuery() != null
+            ? getQuery().equals(that.getQuery())
+            : that.getQuery() == null;
     }
 
     @Override
@@ -42,8 +44,6 @@ public class StudyQuery {
 
     @Override
     public String toString() {
-        return "QueryEntry{" +
-                "query='" + query + '\'' +
-                '}';
+        return "QueryEntry{" + "query='" + query + '\'' + '}';
     }
 }

@@ -1,22 +1,24 @@
 package org.jabref.gui.fieldeditors;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 public class PatentTypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(12);
 
-    public PatentTypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public PatentTypeEditorViewModel(
+        Field field,
+        SuggestionProvider<?> suggestionProvider,
+        FieldCheckers fieldCheckers,
+        UndoManager undoManager
+    ) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
-
         itemMap.put("patent", Localization.lang("Patent"));
         itemMap.put("patentde", Localization.lang("German patent"));
         itemMap.put("patenteu", Localization.lang("European patent"));

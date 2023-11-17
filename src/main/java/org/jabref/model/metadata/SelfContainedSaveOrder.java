@@ -1,7 +1,6 @@
 package org.jabref.model.metadata;
 
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,13 +11,20 @@ import org.slf4j.LoggerFactory;
  */
 public class SelfContainedSaveOrder extends SaveOrder {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(SelfContainedSaveOrder.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(
+        SelfContainedSaveOrder.class
+    );
 
-    public SelfContainedSaveOrder(OrderType orderType, List<SortCriterion> sortCriteria) {
+    public SelfContainedSaveOrder(
+        OrderType orderType,
+        List<SortCriterion> sortCriteria
+    ) {
         super(orderType, sortCriteria);
         if (orderType == OrderType.TABLE) {
             LOGGER.debug("TABLE with sort criteria {}", sortCriteria);
-            throw new IllegalArgumentException("TABLE might require external lookup.");
+            throw new IllegalArgumentException(
+                "TABLE might require external lookup."
+            );
         }
     }
 
@@ -31,11 +37,20 @@ public class SelfContainedSaveOrder extends SaveOrder {
         if (saveOrder instanceof SelfContainedSaveOrder order) {
             return order;
         }
-        if ((saveOrder.getOrderType() == OrderType.TABLE) && (!saveOrder.getSortCriteria().isEmpty())) {
+        if (
+            (saveOrder.getOrderType() == OrderType.TABLE) &&
+            (!saveOrder.getSortCriteria().isEmpty())
+        ) {
             // We map from TABLE to SPECIFIED to have the users of this class just to `switch` between
             //   ORIGINAL and SPECIFIED
-            return new SelfContainedSaveOrder(OrderType.SPECIFIED, saveOrder.getSortCriteria());
+            return new SelfContainedSaveOrder(
+                OrderType.SPECIFIED,
+                saveOrder.getSortCriteria()
+            );
         }
-        return new SelfContainedSaveOrder(saveOrder.getOrderType(), saveOrder.getSortCriteria());
+        return new SelfContainedSaveOrder(
+            saveOrder.getOrderType(),
+            saveOrder.getSortCriteria()
+        );
     }
 }

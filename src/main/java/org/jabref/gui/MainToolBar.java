@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -12,7 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
-
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
@@ -39,11 +41,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.TaskProgressView;
-
 public class MainToolBar extends ToolBar {
+
     private final JabRefFrame frame;
     private final PushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
@@ -58,16 +57,18 @@ public class MainToolBar extends ToolBar {
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
 
-    public MainToolBar(JabRefFrame frame,
-                       PushToApplicationCommand pushToApplicationCommand,
-                       GlobalSearchBar globalSearchBar,
-                       DialogService dialogService,
-                       StateManager stateManager,
-                       PreferencesService preferencesService,
-                       FileUpdateMonitor fileUpdateMonitor,
-                       TaskExecutor taskExecutor,
-                       BibEntryTypesManager entryTypesManager,
-                       CountingUndoManager undoManager) {
+    public MainToolBar(
+        JabRefFrame frame,
+        PushToApplicationCommand pushToApplicationCommand,
+        GlobalSearchBar globalSearchBar,
+        DialogService dialogService,
+        StateManager stateManager,
+        PreferencesService preferencesService,
+        FileUpdateMonitor fileUpdateMonitor,
+        TaskExecutor taskExecutor,
+        BibEntryTypesManager entryTypesManager,
+        CountingUndoManager undoManager
+    ) {
         this.frame = frame;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -88,55 +89,167 @@ public class MainToolBar extends ToolBar {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
-        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
+        final Button pushToApplicationButton = factory.createIconButton(
+            pushToApplicationCommand.getAction(),
+            pushToApplicationCommand
+        );
+        pushToApplicationCommand.registerReconfigurable(
+            pushToApplicationButton
+        );
 
         // Setup Toolbar
 
-        getItems().addAll(
+        getItems()
+            .addAll(
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, taskExecutor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, dialogService, preferencesService, stateManager))),
-
+                    factory.createIconButton(
+                        StandardActions.NEW_LIBRARY,
+                        new NewDatabaseAction(frame, preferencesService)
+                    ),
+                    factory.createIconButton(
+                        StandardActions.OPEN_LIBRARY,
+                        new OpenDatabaseAction(
+                            frame,
+                            preferencesService,
+                            dialogService,
+                            stateManager,
+                            fileUpdateMonitor,
+                            entryTypesManager,
+                            undoManager,
+                            taskExecutor
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.SAVE_LIBRARY,
+                        new SaveAction(
+                            SaveAction.SaveMethod.SAVE,
+                            frame,
+                            dialogService,
+                            preferencesService,
+                            stateManager
+                        )
+                    )
+                ),
                 leftSpacer,
-
                 globalSearchBar,
-
                 rightSpacer,
-
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame, StandardEntryType.Article, dialogService, preferencesService, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame, dialogService, preferencesService, stateManager)),
-                        createNewEntryFromIdButton(),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, preferencesService, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame, stateManager))),
-
+                    factory.createIconButton(
+                        StandardActions.NEW_ARTICLE,
+                        new NewEntryAction(
+                            frame,
+                            StandardEntryType.Article,
+                            dialogService,
+                            preferencesService,
+                            stateManager
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.NEW_ENTRY,
+                        new NewEntryAction(
+                            frame,
+                            dialogService,
+                            preferencesService,
+                            stateManager
+                        )
+                    ),
+                    createNewEntryFromIdButton(),
+                    factory.createIconButton(
+                        StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT,
+                        new ExtractBibtexAction(
+                            dialogService,
+                            preferencesService,
+                            stateManager
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.DELETE_ENTRY,
+                        new EditAction(
+                            StandardActions.DELETE_ENTRY,
+                            frame,
+                            stateManager
+                        )
+                    )
+                ),
                 new Separator(Orientation.VERTICAL),
-
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager))),
-
+                    factory.createIconButton(
+                        StandardActions.UNDO,
+                        new UndoRedoAction(
+                            StandardActions.UNDO,
+                            frame,
+                            dialogService,
+                            stateManager
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.REDO,
+                        new UndoRedoAction(
+                            StandardActions.REDO,
+                            frame,
+                            dialogService,
+                            stateManager
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.CUT,
+                        new EditAction(StandardActions.CUT, frame, stateManager)
+                    ),
+                    factory.createIconButton(
+                        StandardActions.COPY,
+                        new EditAction(
+                            StandardActions.COPY,
+                            frame,
+                            stateManager
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.PASTE,
+                        new EditAction(
+                            StandardActions.PASTE,
+                            frame,
+                            stateManager
+                        )
+                    )
+                ),
                 new Separator(Orientation.VERTICAL),
-
                 new HBox(
-                        pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame, dialogService, stateManager, taskExecutor, preferencesService)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor))),
-
+                    pushToApplicationButton,
+                    factory.createIconButton(
+                        StandardActions.GENERATE_CITE_KEYS,
+                        new GenerateCitationKeyAction(
+                            frame,
+                            dialogService,
+                            stateManager,
+                            taskExecutor,
+                            preferencesService
+                        )
+                    ),
+                    factory.createIconButton(
+                        StandardActions.CLEANUP_ENTRIES,
+                        new CleanupAction(
+                            frame,
+                            preferencesService,
+                            dialogService,
+                            stateManager,
+                            taskExecutor
+                        )
+                    )
+                ),
                 new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        createTaskIndicator()),
-
+                new HBox(createTaskIndicator()),
                 new Separator(Orientation.VERTICAL),
-
                 new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferencesService.getFilePreferences()))));
+                    factory.createIconButton(
+                        StandardActions.OPEN_GITHUB,
+                        new OpenBrowserAction(
+                            "https://github.com/JabRef/jabref",
+                            dialogService,
+                            preferencesService.getFilePreferences()
+                        )
+                    )
+                )
+            );
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
@@ -150,17 +263,30 @@ public class MainToolBar extends ToolBar {
     Button createNewEntryFromIdButton() {
         Button newEntryFromIdButton = new Button();
 
-        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        newEntryFromIdButton.setGraphic(
+            IconTheme.JabRefIcons.IMPORT.getGraphicNode()
+        );
         newEntryFromIdButton.getStyleClass().setAll("icon-button");
         newEntryFromIdButton.setFocusTraversable(false);
-        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
+        newEntryFromIdButton
+            .disableProperty()
+            .bind(ActionHelper.needsDatabase(stateManager).not());
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(frame.getCurrentLibraryTab(), dialogService, preferencesService, taskExecutor, stateManager);
+            GenerateEntryFromIdDialog entryFromId =
+                new GenerateEntryFromIdDialog(
+                    frame.getCurrentLibraryTab(),
+                    dialogService,
+                    preferencesService,
+                    taskExecutor,
+                    stateManager
+                );
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
                 entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
-                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                entryFromIdPopOver.setArrowLocation(
+                    PopOver.ArrowLocation.TOP_CENTER
+                );
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
                 entryFromIdPopOver.show(newEntryFromIdButton);
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
@@ -172,7 +298,9 @@ public class MainToolBar extends ToolBar {
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             }
         });
-        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
+        newEntryFromIdButton.setTooltip(
+            new Tooltip(Localization.lang("Import by ID"))
+        );
 
         return newEntryFromIdButton;
     }
@@ -182,45 +310,65 @@ public class MainToolBar extends ToolBar {
         indicator.getStyleClass().add("progress-indicatorToolbar");
         indicator.progressProperty().bind(stateManager.getTasksProgress());
 
-        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
-        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
+        Tooltip someTasksRunning = new Tooltip(
+            Localization.lang("Background Tasks are running")
+        );
+        Tooltip noTasksRunning = new Tooltip(
+            Localization.lang("Background Tasks are done")
+        );
         indicator.setTooltip(noTasksRunning);
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                indicator.setTooltip(someTasksRunning);
-            } else {
-                indicator.setTooltip(noTasksRunning);
-            }
-        });
+        stateManager
+            .getAnyTaskRunning()
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    indicator.setTooltip(someTasksRunning);
+                } else {
+                    indicator.setTooltip(noTasksRunning);
+                }
+            });
 
         /*
         The label of the indicator cannot be removed with styling. Therefore,
         hide it and clip it to a square of (width x width) each time width is updated.
          */
-        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
-            /*
+        indicator
+            .widthProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                /*
             The indeterminate spinner is wider than the determinate spinner.
             We must make sure they are the same width for the clipping to result in a square of the same size always.
              */
-            if (!indicator.isIndeterminate()) {
-                indicator.setPrefWidth(newValue.doubleValue());
-            }
-            if (newValue.doubleValue() > 0) {
-                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
-                indicator.setClip(clip);
-            }
-        });
+                if (!indicator.isIndeterminate()) {
+                    indicator.setPrefWidth(newValue.doubleValue());
+                }
+                if (newValue.doubleValue() > 0) {
+                    Rectangle clip = new Rectangle(
+                        newValue.doubleValue(),
+                        newValue.doubleValue()
+                    );
+                    indicator.setClip(clip);
+                }
+            });
 
         indicator.setOnMouseClicked(event -> {
-            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<Task<?>>();
-            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<
+                Task<?>
+            >();
+            EasyBind.bindContent(
+                taskProgressView.getTasks(),
+                stateManager.getBackgroundTasks()
+            );
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
             if (progressViewPopOver == null) {
                 progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                progressViewPopOver.setTitle(
+                    Localization.lang("Background Tasks")
+                );
+                progressViewPopOver.setArrowLocation(
+                    PopOver.ArrowLocation.RIGHT_TOP
+                );
                 progressViewPopOver.setContentNode(taskProgressView);
                 progressViewPopOver.show(indicator);
             } else if (progressViewPopOver.isShowing()) {

@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -26,7 +25,8 @@ public class CustomImporter extends Importer {
 
     private final Importer importer;
 
-    public CustomImporter(String basePath, String className) throws ImportException {
+    public CustomImporter(String basePath, String className)
+        throws ImportException {
         this.basePath = Path.of(basePath);
         this.className = className;
         try {
@@ -37,8 +37,10 @@ public class CustomImporter extends Importer {
     }
 
     private static Importer load(URL basePathURL, String className)
-            throws IOException, ReflectiveOperationException {
-        try (URLClassLoader cl = new URLClassLoader(new URL[]{basePathURL})) {
+        throws IOException, ReflectiveOperationException {
+        try (
+            URLClassLoader cl = new URLClassLoader(new URL[] { basePathURL })
+        ) {
             Class<?> clazz = Class.forName(className, true, cl);
             return (Importer) clazz.getDeclaredConstructor().newInstance();
         }
@@ -66,7 +68,10 @@ public class CustomImporter extends Importer {
             return false;
         }
 
-        return Objects.equals(className, otherImporter.className) && Objects.equals(basePath, otherImporter.basePath);
+        return (
+            Objects.equals(className, otherImporter.className) &&
+            Objects.equals(basePath, otherImporter.basePath)
+        );
     }
 
     @Override
@@ -75,7 +80,8 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
+    public ParserResult importDatabase(BufferedReader input)
+        throws IOException {
         return importer.importDatabase(input);
     }
 

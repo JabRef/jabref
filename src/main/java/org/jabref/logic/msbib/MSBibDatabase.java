@@ -7,14 +7,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -31,10 +28,13 @@ import org.xml.sax.SAXException;
  */
 public class MSBibDatabase {
 
-    public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
+    public static final String NAMESPACE =
+        "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MSBibDatabase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MSBibDatabase.class
+    );
 
     private Set<MSBibEntry> entries;
 
@@ -55,7 +55,10 @@ public class MSBibDatabase {
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
-            var resolvedEntries = database.resolveForStrings(database.getEntries(), false);
+            var resolvedEntries = database.resolveForStrings(
+                database.getEntries(),
+                false
+            );
             addEntriesForExport(resolvedEntries);
         } else {
             var resolvedEntries = database.resolveForStrings(entries, false);
@@ -72,7 +75,8 @@ public class MSBibDatabase {
         entries = new HashSet<>();
         Document inputDocument;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory =
+                DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
@@ -80,7 +84,10 @@ public class MSBibDatabase {
             LOGGER.warn("Could not parse document", e);
             return Collections.emptyList();
         }
-        NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
+        NodeList rootList = inputDocument.getElementsByTagNameNS(
+            "*",
+            "Sources"
+        );
         if (rootList.getLength() == 0) {
             rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         }
@@ -89,7 +96,8 @@ public class MSBibDatabase {
             return bibitems;
         }
 
-        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
+        NodeList sourceList =
+            ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
             MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i));
             entries.add(entry);
@@ -115,15 +123,26 @@ public class MSBibDatabase {
     public Document getDomForExport() {
         Document document = null;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory =
+                DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             document = documentBuilder.newDocument();
 
-            Element rootNode = document.createElementNS(NAMESPACE, PREFIX + "Sources");
-            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
-            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/",
-                    "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
+            Element rootNode = document.createElementNS(
+                NAMESPACE,
+                PREFIX + "Sources"
+            );
+            rootNode.setAttributeNS(
+                "http://www.w3.org/2000/xmlns/",
+                "xmlns",
+                NAMESPACE
+            );
+            rootNode.setAttributeNS(
+                "http://www.w3.org/2000/xmlns/",
+                "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1),
+                NAMESPACE
+            );
             rootNode.setAttribute("SelectedStyle", "");
 
             for (MSBibEntry entry : entries) {

@@ -1,5 +1,7 @@
 package org.jabref.benchmarks;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -7,7 +9,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
 import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -35,15 +36,12 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.preferences.JabRefPreferences;
-
 import org.openjdk.jmh.Main;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
-
-import static org.mockito.Mockito.mock;
 
 @State(Scope.Thread)
 public class Benchmarks {
@@ -62,7 +60,11 @@ public class Benchmarks {
             BibEntry entry = new BibEntry();
             entry.setCitationKey("id" + i);
             entry.setField(StandardField.TITLE, "This is my title " + i);
-            entry.setField(StandardField.AUTHOR, "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" + i);
+            entry.setField(
+                StandardField.AUTHOR,
+                "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" +
+                i
+            );
             entry.setField(StandardField.JOURNAL, "Journal Title " + i);
             entry.setField(StandardField.KEYWORDS, "testkeyword");
             entry.setField(StandardField.YEAR, "1" + i);
@@ -72,27 +74,35 @@ public class Benchmarks {
 
         bibtexString = getOutputWriter().toString();
 
-        latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
+        latexConversionString =
+            "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
 
-        htmlConversionString = "<b>&Ouml;sterreich</b> &#8211; &amp; characters &#x2aa2; <i>italic</i>";
+        htmlConversionString =
+            "<b>&Ouml;sterreich</b> &#8211; &amp; characters &#x2aa2; <i>italic</i>";
     }
 
     private StringWriter getOutputWriter() throws IOException {
         StringWriter outputWriter = new StringWriter();
         BibWriter bibWriter = new BibWriter(outputWriter, OS.NEWLINE);
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
-                bibWriter,
-                mock(SelfContainedSaveConfiguration.class),
-                mock(FieldPreferences.class),
-                mock(CitationKeyPatternPreferences.class),
-                new BibEntryTypesManager());
-        databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
+            bibWriter,
+            mock(SelfContainedSaveConfiguration.class),
+            mock(FieldPreferences.class),
+            mock(CitationKeyPatternPreferences.class),
+            new BibEntryTypesManager()
+        );
+        databaseWriter.savePartOfDatabase(
+            new BibDatabaseContext(database, new MetaData()),
+            database.getEntries()
+        );
         return outputWriter;
     }
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        BibtexParser parser = new BibtexParser(
+            Globals.prefs.getImportFormatPreferences()
+        );
         return parser.parse(new StringReader(bibtexString));
     }
 
@@ -104,15 +114,29 @@ public class Benchmarks {
     @Benchmark
     public List<BibEntry> search() {
         // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
-        return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+        SearchQuery searchQuery = new SearchQuery(
+            "Journal Title 500",
+            EnumSet.noneOf(SearchFlags.class)
+        );
+        return database
+            .getEntries()
+            .stream()
+            .filter(searchQuery::isMatch)
+            .collect(Collectors.toList());
     }
 
     @Benchmark
     public List<BibEntry> parallelSearch() {
         // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
-        return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
+        SearchQuery searchQuery = new SearchQuery(
+            "Journal Title 500",
+            EnumSet.noneOf(SearchFlags.class)
+        );
+        return database
+            .getEntries()
+            .parallelStream()
+            .filter(searchQuery::isMatch)
+            .collect(Collectors.toList());
     }
 
     @Benchmark
@@ -140,7 +164,15 @@ public class Benchmarks {
 
     @Benchmark
     public boolean keywordGroupContains() {
-        KeywordGroup group = new WordKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "testkeyword", false, ',', false);
+        KeywordGroup group = new WordKeywordGroup(
+            "testGroup",
+            GroupHierarchyType.INDEPENDENT,
+            StandardField.KEYWORDS,
+            "testkeyword",
+            false,
+            ',',
+            false
+        );
         return group.containsAll(database.getEntries());
     }
 

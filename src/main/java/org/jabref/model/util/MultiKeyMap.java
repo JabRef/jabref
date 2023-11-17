@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class MultiKeyMap<K1 extends Enum<K1>, K2, V> {
+
     private final EnumMap<K1, Map<K2, V>> map;
 
     public MultiKeyMap(Class<K1> keyType) {

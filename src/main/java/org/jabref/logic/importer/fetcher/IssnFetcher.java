@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -26,11 +25,18 @@ public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry)
+        throws FetcherException {
         Optional<String> issn = entry.getField(StandardField.ISSN);
         if (issn.isPresent()) {
-            Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(issn.get(), "");
-            return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, issn.get())).stream().toList();
+            Optional<JournalInformation> journalInformation =
+                journalInformationFetcher.getJournalInformation(issn.get(), "");
+            return journalInformation
+                .map(journalInfo ->
+                    journalInformationToBibEntry(journalInfo, issn.get())
+                )
+                .stream()
+                .toList();
         }
         return Collections.emptyList();
     }
@@ -41,12 +47,22 @@ public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(identifier, "");
-        return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, identifier));
+    public Optional<BibEntry> performSearchById(String identifier)
+        throws FetcherException {
+        Optional<JournalInformation> journalInformation =
+            journalInformationFetcher.getJournalInformation(identifier, "");
+        return journalInformation.map(journalInfo ->
+            journalInformationToBibEntry(journalInfo, identifier)
+        );
     }
 
-    private BibEntry journalInformationToBibEntry(JournalInformation journalInfo, String issn) {
-        return new BibEntry().withField(StandardField.JOURNALTITLE, journalInfo.title()).withField(StandardField.PUBLISHER, journalInfo.publisher()).withField(StandardField.ISSN, issn);
+    private BibEntry journalInformationToBibEntry(
+        JournalInformation journalInfo,
+        String issn
+    ) {
+        return new BibEntry()
+            .withField(StandardField.JOURNALTITLE, journalInfo.title())
+            .withField(StandardField.PUBLISHER, journalInfo.publisher())
+            .withField(StandardField.ISSN, issn);
     }
 }

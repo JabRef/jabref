@@ -3,7 +3,6 @@ package org.jabref.logic.net;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 

@@ -1,9 +1,9 @@
 package org.jabref.gui.documentviewer;
 
+import com.tobiasdiez.easybind.EasyBind;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-
 import javafx.animation.FadeTransition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -17,24 +17,24 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
-
-import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.Cell;
 import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.flowless.VirtualFlowHit;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 
 public class DocumentViewerControl extends StackPane {
 
     private final TaskExecutor taskExecutor;
 
-    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>(1);
+    private final ObjectProperty<Integer> currentPage =
+        new SimpleObjectProperty<>(1);
     private final DoubleProperty scrollY = new SimpleDoubleProperty();
     private final DoubleProperty scrollYMax = new SimpleDoubleProperty();
     private VirtualFlow<DocumentPageViewModel, DocumentViewerPage> flow;
-    private PageDimension desiredPageDimension = PageDimension.ofFixedWidth(600);
+    private PageDimension desiredPageDimension = PageDimension.ofFixedWidth(
+        600
+    );
 
     public DocumentViewerControl(TaskExecutor taskExecutor) {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
@@ -68,17 +68,38 @@ public class DocumentViewerControl extends StackPane {
     }
 
     public void show(DocumentViewModel document) {
-        flow = VirtualFlow.createVertical(document.getPages(), DocumentViewerPage::new);
+        flow =
+            VirtualFlow.createVertical(
+                document.getPages(),
+                DocumentViewerPage::new
+            );
         getChildren().setAll(flow);
-        flow.visibleCells().addListener((ListChangeListener<? super DocumentViewerPage>) c -> updateCurrentPage(flow.visibleCells()));
+        flow
+            .visibleCells()
+            .addListener(
+                (ListChangeListener<? super DocumentViewerPage>) c ->
+                    updateCurrentPage(flow.visibleCells())
+            );
 
         // (Bidirectional) binding does not work, so use listeners instead
-        flow.estimatedScrollYProperty().addListener((observable, oldValue, newValue) -> scrollY.setValue(newValue));
-        scrollY.addListener((observable, oldValue, newValue) -> flow.estimatedScrollYProperty().setValue((double) newValue));
-        flow.totalLengthEstimateProperty().addListener((observable, oldValue, newValue) -> scrollYMax.setValue(newValue));
+        flow
+            .estimatedScrollYProperty()
+            .addListener((observable, oldValue, newValue) ->
+                scrollY.setValue(newValue)
+            );
+        scrollY.addListener((observable, oldValue, newValue) ->
+            flow.estimatedScrollYProperty().setValue((double) newValue)
+        );
+        flow
+            .totalLengthEstimateProperty()
+            .addListener((observable, oldValue, newValue) ->
+                scrollYMax.setValue(newValue)
+            );
     }
 
-    private void updateCurrentPage(ObservableList<DocumentViewerPage> visiblePages) {
+    private void updateCurrentPage(
+        ObservableList<DocumentViewerPage> visiblePages
+    ) {
         if (flow == null) {
             return;
         }
@@ -86,7 +107,10 @@ public class DocumentViewerControl extends StackPane {
         // We try to find the page that is displayed in the center of the viewport
         Optional<DocumentViewerPage> inMiddleOfViewport = Optional.empty();
         try {
-            VirtualFlowHit<DocumentViewerPage> hit = flow.hit(0, flow.getHeight() / 2);
+            VirtualFlowHit<DocumentViewerPage> hit = flow.hit(
+                0,
+                flow.getHeight() / 2
+            );
             if (hit.isCellHit()) {
                 // Successful hit
                 inMiddleOfViewport = Optional.of(hit.getCell());
@@ -101,7 +125,12 @@ public class DocumentViewerControl extends StackPane {
         } else {
             // Heuristic missed, so try to get page number from first shown page
             currentPage.set(
-                    visiblePages.stream().findFirst().map(DocumentViewerPage::getPageNumber).orElse(1));
+                visiblePages
+                    .stream()
+                    .findFirst()
+                    .map(DocumentViewerPage::getPageNumber)
+                    .orElse(1)
+            );
         }
     }
 
@@ -135,7 +164,9 @@ public class DocumentViewerControl extends StackPane {
      * Represents the viewport for a page. Note: the instances of {@link DocumentViewerPage} are reused, i.e., not every
      * page is rendered in a new instance but instead {@link DocumentViewerPage#updateItem(Object)} is called.
      */
-    private class DocumentViewerPage implements Cell<DocumentPageViewModel, StackPane> {
+    private class DocumentViewerPage
+        implements Cell<DocumentPageViewModel, StackPane> {
+
         private final ImageView imageView;
         private final StackPane imageHolder;
         private final Rectangle background;
@@ -157,12 +188,12 @@ public class DocumentViewerControl extends StackPane {
             background.setStyle("-fx-fill: WHITE");
             // imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .wrap(() -> renderPage(initialPage))
-                    .onSuccess(image -> {
-                        imageView.setImage(image);
-                        progress.setVisible(false);
-                        background.setVisible(false);
-                    });
+                .wrap(() -> renderPage(initialPage))
+                .onSuccess(image -> {
+                    imageView.setImage(image);
+                    progress.setVisible(false);
+                    background.setVisible(false);
+                });
             taskExecutor.execute(generateImage);
 
             imageHolder.getChildren().setAll(background, progress, imageView);
@@ -197,16 +228,19 @@ public class DocumentViewerControl extends StackPane {
             imageView.setOpacity(0);
 
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .wrap(() -> renderPage(page))
-                    .onSuccess(image -> {
-                        imageView.setImage(image);
+                .wrap(() -> renderPage(page))
+                .onSuccess(image -> {
+                    imageView.setImage(image);
 
-                        // Fade new page in for smoother transition
-                        FadeTransition fadeIn = new FadeTransition(Duration.millis(100), imageView);
-                        fadeIn.setFromValue(0);
-                        fadeIn.setToValue(1);
-                        fadeIn.play();
-                    });
+                    // Fade new page in for smoother transition
+                    FadeTransition fadeIn = new FadeTransition(
+                        Duration.millis(100),
+                        imageView
+                    );
+                    fadeIn.setFromValue(0);
+                    fadeIn.setToValue(1);
+                    fadeIn.play();
+                });
             taskExecutor.execute(generateImage);
         }
 

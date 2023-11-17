@@ -13,7 +13,9 @@ class UiThreadInvalidationListener implements InvalidationListener {
 
     @Override
     public void invalidated(Observable observable) {
-        UiThreadHelper.ensureUiThreadExecution(() -> delegate.invalidated(observable));
+        UiThreadHelper.ensureUiThreadExecution(() ->
+            delegate.invalidated(observable)
+        );
     }
 
     @Override

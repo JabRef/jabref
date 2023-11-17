@@ -1,10 +1,9 @@
-
 package org.jabref.logic.formatter.bibtexfields;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TrimWhitespaceFormatterTest {
 
@@ -54,6 +53,9 @@ public class TrimWhitespaceFormatterTest {
     public void removeMixedWhitespaceChars() {
         assertEquals("whitespace", formatter.format(" \r\t\fwhitespace"));
         assertEquals("whitespace", formatter.format("whitespace \n \r"));
-        assertEquals("whitespace", formatter.format("   \f\t whitespace  \r \n"));
+        assertEquals(
+            "whitespace",
+            formatter.format("   \f\t whitespace  \r \n")
+        );
     }
 }

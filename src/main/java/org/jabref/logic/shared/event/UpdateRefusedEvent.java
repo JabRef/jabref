@@ -16,7 +16,11 @@ public class UpdateRefusedEvent {
      * @param bibDatabaseContext Affected {@link BibDatabaseContext}
      * @param localBibEntry      Affected {@link BibEntry}
      */
-    public UpdateRefusedEvent(BibDatabaseContext bibDatabaseContext, BibEntry localBibEntry, BibEntry sharedBibEntry) {
+    public UpdateRefusedEvent(
+        BibDatabaseContext bibDatabaseContext,
+        BibEntry localBibEntry,
+        BibEntry sharedBibEntry
+    ) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.localBibEntry = localBibEntry;
         this.sharedBibEntry = sharedBibEntry;

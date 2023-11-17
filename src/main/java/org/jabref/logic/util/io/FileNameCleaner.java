@@ -9,8 +9,7 @@ package org.jabref.logic.util.io;
  */
 public class FileNameCleaner {
 
-    private FileNameCleaner() {
-    }
+    private FileNameCleaner() {}
 
     /**
      * Replaces illegal characters in given fileName by '_'

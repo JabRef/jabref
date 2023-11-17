@@ -2,7 +2,6 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -10,6 +9,7 @@ import org.jabref.logic.l10n.Localization;
  * Removes all hyphenated line breaks in the string.
  */
 public class RemoveHyphenatedNewlinesFormatter extends Formatter {
+
     private static final Pattern HYPHENATED_WORDS = Pattern.compile("-\\R");
 
     @Override
@@ -32,7 +32,9 @@ public class RemoveHyphenatedNewlinesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Removes all hyphenated line breaks in the field content.");
+        return Localization.lang(
+            "Removes all hyphenated line breaks in the field content."
+        );
     }
 
     @Override

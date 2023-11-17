@@ -1,14 +1,12 @@
 package org.jabref.gui.util.comparator;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Optional;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.model.entry.field.SpecialFieldValue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SpecialFieldComparatorTest {
 
@@ -16,9 +14,15 @@ public class SpecialFieldComparatorTest {
     private final SpecialFieldValue value1 = SpecialFieldValue.PRIORITY_HIGH;
     private final SpecialFieldValue value2 = SpecialFieldValue.PRIORITY_LOW;
     private final SpecialFieldValue value3 = SpecialFieldValue.READ;
-    private final Optional<SpecialFieldValueViewModel> prio1 = Optional.of(new SpecialFieldValueViewModel(value1));
-    private final Optional<SpecialFieldValueViewModel> prio3 = Optional.of(new SpecialFieldValueViewModel(value2));
-    private final Optional<SpecialFieldValueViewModel> read = Optional.of(new SpecialFieldValueViewModel(value3));
+    private final Optional<SpecialFieldValueViewModel> prio1 = Optional.of(
+        new SpecialFieldValueViewModel(value1)
+    );
+    private final Optional<SpecialFieldValueViewModel> prio3 = Optional.of(
+        new SpecialFieldValueViewModel(value2)
+    );
+    private final Optional<SpecialFieldValueViewModel> read = Optional.of(
+        new SpecialFieldValueViewModel(value3)
+    );
 
     @BeforeEach
     public void setUp() {

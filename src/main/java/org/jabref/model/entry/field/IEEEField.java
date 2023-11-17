@@ -31,9 +31,10 @@ public enum IEEEField implements Field {
     }
 
     public static Optional<IEEEField> fromName(String name) {
-        return Arrays.stream(IEEEField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Arrays
+            .stream(IEEEField.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     @Override

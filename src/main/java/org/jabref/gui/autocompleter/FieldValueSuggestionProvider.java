@@ -2,7 +2,6 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Objects;
 import java.util.stream.Stream;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 
@@ -21,6 +20,9 @@ class FieldValueSuggestionProvider extends StringSuggestionProvider {
 
     @Override
     public Stream<String> getSource() {
-        return database.getEntries().parallelStream().flatMap(entry -> entry.getField(field).stream());
+        return database
+            .getEntries()
+            .parallelStream()
+            .flatMap(entry -> entry.getField(field).stream());
     }
 }

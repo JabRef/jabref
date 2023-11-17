@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -19,12 +18,15 @@ public class FieldViewModel {
     private final StringProperty displayName = new SimpleStringProperty("");
     private final BooleanProperty required = new SimpleBooleanProperty();
     private final BooleanProperty multiline = new SimpleBooleanProperty();
-    private final ObjectProperty<FieldPriority> priorityProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<FieldPriority> priorityProperty =
+        new SimpleObjectProperty<>();
 
-    public FieldViewModel(Field field,
-                          Mandatory required,
-                          FieldPriority priorityProperty,
-                          boolean multiline) {
+    public FieldViewModel(
+        Field field,
+        Mandatory required,
+        FieldPriority priorityProperty,
+        boolean multiline
+    ) {
         this.displayName.setValue(field.getDisplayName());
         this.required.setValue(required == Mandatory.REQUIRED);
         this.priorityProperty.setValue(priorityProperty);

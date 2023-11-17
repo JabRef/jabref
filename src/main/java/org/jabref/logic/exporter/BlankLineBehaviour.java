@@ -5,5 +5,5 @@ package org.jabref.logic.exporter;
  */
 public enum BlankLineBehaviour {
     KEEP_BLANKS,
-    DELETE_BLANKS
+    DELETE_BLANKS,
 }

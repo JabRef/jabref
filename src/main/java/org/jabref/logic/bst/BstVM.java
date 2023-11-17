@@ -7,10 +7,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
-
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
-
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -20,6 +16,8 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 public class BstVM {
 
@@ -66,7 +64,10 @@ public class BstVM {
      * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
      * @return list of references in plain text form
      */
-    public String render(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
+    public String render(
+        Collection<BibEntry> bibEntries,
+        BibDatabase bibDatabase
+    ) {
         Objects.requireNonNull(bibEntries);
 
         List<BstEntry> entries = new ArrayList<>(bibEntries.size());
@@ -76,12 +77,24 @@ public class BstVM {
 
         StringBuilder resultBuffer = new StringBuilder();
 
-        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase, path);
-        bstVMContext.functions().putAll(new BstFunctions(bstVMContext, resultBuffer).getBuiltInFunctions());
+        BstVMContext bstVMContext = new BstVMContext(
+            entries,
+            bibDatabase,
+            path
+        );
+        bstVMContext
+            .functions()
+            .putAll(
+                new BstFunctions(bstVMContext, resultBuffer)
+                    .getBuiltInFunctions()
+            );
         bstVMContext.integers().put("entry.max$", Integer.MAX_VALUE);
         bstVMContext.integers().put("global.max$", Integer.MAX_VALUE);
 
-        BstVMVisitor bstVMVisitor = new BstVMVisitor(bstVMContext, resultBuffer);
+        BstVMVisitor bstVMVisitor = new BstVMVisitor(
+            bstVMContext,
+            resultBuffer
+        );
         bstVMVisitor.visit(tree);
 
         latestContext = bstVMContext;
@@ -97,18 +110,29 @@ public class BstVM {
         if (latestContext != null) {
             return latestContext.stack();
         } else {
-            throw new BstVMException("BstVM must have rendered at least once to provide the latest stack");
+            throw new BstVMException(
+                "BstVM must have rendered at least once to provide the latest stack"
+            );
         }
     }
 
     private static class ThrowingErrorListener extends BaseErrorListener {
-        public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+
+        public static final ThrowingErrorListener INSTANCE =
+            new ThrowingErrorListener();
 
         @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                int line, int charPositionInLine, String msg, RecognitionException e)
-                throws ParseCancellationException {
-            throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg);
+        public void syntaxError(
+            Recognizer<?, ?> recognizer,
+            Object offendingSymbol,
+            int line,
+            int charPositionInLine,
+            String msg,
+            RecognitionException e
+        ) throws ParseCancellationException {
+            throw new ParseCancellationException(
+                "line " + line + ":" + charPositionInLine + " " + msg
+            );
         }
     }
 }

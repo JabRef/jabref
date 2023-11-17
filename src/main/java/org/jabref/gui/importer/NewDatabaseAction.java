@@ -19,7 +19,10 @@ public class NewDatabaseAction extends SimpleCommand {
      * @param jabRefFrame        the application frame of JabRef
      * @param preferencesService the preferencesService of JabRef
      */
-    public NewDatabaseAction(JabRefFrame jabRefFrame, PreferencesService preferencesService) {
+    public NewDatabaseAction(
+        JabRefFrame jabRefFrame,
+        PreferencesService preferencesService
+    ) {
         this.jabRefFrame = jabRefFrame;
         this.preferencesService = preferencesService;
     }
@@ -27,7 +30,11 @@ public class NewDatabaseAction extends SimpleCommand {
     @Override
     public void execute() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
+        bibDatabaseContext.setMode(
+            preferencesService
+                .getLibraryPreferences()
+                .getDefaultBibDatabaseMode()
+        );
         jabRefFrame.addTab(bibDatabaseContext, true);
     }
 }

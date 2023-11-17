@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.style;
 
 import java.util.Map;
 import java.util.Objects;
-
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.strings.StringUtil;
@@ -12,14 +11,16 @@ import org.jabref.model.strings.StringUtil;
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
+    private static final Map<String, String> CHARS =
+        HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 
     @Override
     public String format(String field) {
         int i;
-        String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
-                                  .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+        String finalResult = field
+            .replaceAll("&|\\\\&", "&") // Replace & and \& with &
+            .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+            .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -45,17 +46,23 @@ public class OOPreFormatter implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow braces, necessary for replacing encoded characters
-            } else if (Character.isLetter(c) || (c == '%')
-                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (
+                Character.isLetter(c) ||
+                (c == '%') ||
+                StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))
+            ) {
                 escaped = false;
 
                 if (!incommand) {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom:
-                    if ((currentCommand.length() == 1)
-                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                    testCharCom:if (
+                        (currentCommand.length() == 1) &&
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
+                            currentCommand.toString()
+                        )
+                    ) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (finalResult.length() - 1)) {
@@ -67,13 +74,19 @@ public class OOPreFormatter implements LayoutFormatter {
                         c = finalResult.charAt(i);
                         String combody;
                         if (c == '{') {
-                            String part = StringUtil.getPart(finalResult, i, false);
+                            String part = StringUtil.getPart(
+                                finalResult,
+                                i,
+                                false
+                            );
                             i += part.length();
                             combody = part;
                         } else {
                             combody = finalResult.substring(i, i + 1);
                         }
-                        String result = OOPreFormatter.CHARS.get(command + combody);
+                        String result = OOPreFormatter.CHARS.get(
+                            command + combody
+                        );
 
                         if (result != null) {
                             sb.append(result);
@@ -87,7 +100,9 @@ public class OOPreFormatter implements LayoutFormatter {
                             String command = currentCommand.toString();
                             String result = OOPreFormatter.CHARS.get(command);
                             // If found, then use translated version. If not, then keep the text of the parameter intact.
-                            sb.append(Objects.requireNonNullElse(result, command));
+                            sb.append(
+                                Objects.requireNonNullElse(result, command)
+                            );
                         }
                     }
                 }
@@ -96,7 +111,9 @@ public class OOPreFormatter implements LayoutFormatter {
 
                 if (!incommand) {
                     sb.append(c);
-                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
+                } else if (
+                    Character.isWhitespace(c) || (c == '{') || (c == '}')
+                ) {
                     String command = currentCommand.toString();
 
                     // Test if we are dealing with a formatting command. If so, handle.
@@ -104,13 +121,22 @@ public class OOPreFormatter implements LayoutFormatter {
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
-                        sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
+                        sb
+                            .append('<')
+                            .append(tag)
+                            .append('>')
+                            .append(part)
+                            .append("</")
+                            .append(tag)
+                            .append('>');
                     } else if (c == '{') {
                         String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
                         argument = part;
                         // handle common case of general latex command
-                        String result = OOPreFormatter.CHARS.get(command + argument);
+                        String result = OOPreFormatter.CHARS.get(
+                            command + argument
+                        );
                         // If found, then use translated version. If not, then keep the text of the parameter intact.
                         sb.append(Objects.requireNonNullElse(result, argument));
                     } else if (c == '}') {
@@ -148,16 +174,16 @@ public class OOPreFormatter implements LayoutFormatter {
         String result = "";
         switch (latexCommand) {
             // Should really separate between emphasized and italic but since in later stages both are converted to italic...
-            case "textit", "it", "emph", "em" -> result = "i";  // Italic
-            case "textbf", "bf" -> result = "b";                // Bold font
-            case "textsc" -> result = "smallcaps";              // Small caps
-                                                                // Not a proper HTML tag, but used here for convenience
-            case "underline" -> result = "u";                   // Underline
-            case "sout" -> result = "s";                        // Strikeout
-                                                                // sout is the "standard" command, although it is actually based on the package ulem
-            case "texttt" -> result = "tt";                     // Monospace font
-            case "textsuperscript" -> result = "sup";           // Superscript
-            case "textsubscript" -> result = "sub";             // Subscript
+            case "textit", "it", "emph", "em" -> result = "i"; // Italic
+            case "textbf", "bf" -> result = "b"; // Bold font
+            case "textsc" -> result = "smallcaps"; // Small caps
+            // Not a proper HTML tag, but used here for convenience
+            case "underline" -> result = "u"; // Underline
+            case "sout" -> result = "s"; // Strikeout
+            // sout is the "standard" command, although it is actually based on the package ulem
+            case "texttt" -> result = "tt"; // Monospace font
+            case "textsuperscript" -> result = "sup"; // Superscript
+            case "textsubscript" -> result = "sub"; // Subscript
         }
         return result;
     }

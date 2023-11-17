@@ -1,9 +1,15 @@
 package org.jabref.logic.importer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.BufferedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
@@ -23,43 +29,55 @@ import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
+    public void isRecognizedFormatWithNullForBufferedReaderThrowsException(
+        Importer format
+    ) {
+        assertThrows(
+            NullPointerException.class,
+            () -> format.isRecognizedFormat((BufferedReader) null)
+        );
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
+    public void isRecognizedFormatWithNullForStringThrowsException(
+        Importer format
+    ) {
+        assertThrows(
+            NullPointerException.class,
+            () -> format.isRecognizedFormat((String) null)
+        );
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
+    public void importDatabaseWithNullForBufferedReaderThrowsException(
+        Importer format
+    ) {
+        assertThrows(
+            NullPointerException.class,
+            () -> format.importDatabase((BufferedReader) null)
+        );
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void importDatabaseWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
+    public void importDatabaseWithNullForStringThrowsException(
+        Importer format
+    ) {
+        assertThrows(
+            NullPointerException.class,
+            () -> format.importDatabase((String) null)
+        );
     }
 
     @ParameterizedTest
@@ -89,7 +107,9 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
+    public void getIdStripsSpecialCharactersAndConvertsToLowercase(
+        Importer format
+    ) {
         Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
         when(importer.getName()).thenReturn("*Test-Importer");
         assertEquals("testimporter", importer.getId());
@@ -105,8 +125,14 @@ public class ImporterTest {
         // all classes implementing {@link Importer}
         // sorted alphabetically
 
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ImportFormatPreferences importFormatPreferences = mock(
+            ImportFormatPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
+        when(
+            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
+        )
+            .thenReturn(',');
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
         return Stream.of(

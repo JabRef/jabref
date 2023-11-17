@@ -10,11 +10,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +23,6 @@ import org.slf4j.LoggerFactory;
  * 3. Extract identifier
  */
 public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
-
     Logger LOGGER = LoggerFactory.getLogger(IdParserFetcher.class);
 
     /**
@@ -33,7 +30,8 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
      *
      * @param entry the entry to look information for
      */
-    URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForEntry(BibEntry entry)
+        throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
@@ -65,13 +63,20 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
      *                       the result)
      * @param fetchedEntries list of entries returned by the web service
      */
-    Optional<T> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException;
+    Optional<T> extractIdentifier(
+        BibEntry inputEntry,
+        List<BibEntry> fetchedEntries
+    ) throws FetcherException;
 
     @Override
     default Optional<T> findIdentifier(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
+        try (
+            InputStream stream = new BufferedInputStream(
+                getURLForEntry(entry).openStream()
+            )
+        ) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {

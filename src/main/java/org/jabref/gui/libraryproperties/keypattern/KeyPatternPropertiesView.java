@@ -1,8 +1,9 @@
 package org.jabref.gui.libraryproperties.keypattern;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -16,23 +17,26 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
+public class KeyPatternPropertiesView
+    extends AbstractPropertiesTabView<KeyPatternPropertiesViewModel>
+    implements PropertiesTab {
 
-public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatternPropertiesViewModel> implements PropertiesTab {
+    @FXML
+    private Button keyPatternHelp;
 
-    @FXML private Button keyPatternHelp;
-    @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
+    @FXML
+    private CitationKeyPatternPanel bibtexKeyPatternTable;
 
-    @Inject private PreferencesService preferencesService;
-    @Inject private BibEntryTypesManager bibEntryTypesManager;
+    @Inject
+    private PreferencesService preferencesService;
+
+    @Inject
+    private BibEntryTypesManager bibEntryTypesManager;
 
     public KeyPatternPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
 
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        ViewLoader.view(this).root(this).load();
     }
 
     @Override
@@ -41,23 +45,53 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
     }
 
     public void initialize() {
-        this.viewModel = new KeyPatternPropertiesViewModel(databaseContext, preferencesService);
+        this.viewModel =
+            new KeyPatternPropertiesViewModel(
+                databaseContext,
+                preferencesService
+            );
 
-        bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
-        bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
+        bibtexKeyPatternTable
+            .patternListProperty()
+            .bindBidirectional(viewModel.patternListProperty());
+        bibtexKeyPatternTable
+            .defaultKeyPatternProperty()
+            .bindBidirectional(viewModel.defaultKeyPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getFilePreferences()), keyPatternHelp);
+        actionFactory.configureIconButton(
+            StandardActions.HELP_KEY_PATTERNS,
+            new HelpAction(
+                HelpFile.CITATION_KEY_PATTERN,
+                dialogService,
+                preferencesService.getFilePreferences()
+            ),
+            keyPatternHelp
+        );
     }
 
     @Override
     public void setValues() {
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
-                bibEntryTypesManager.getAllTypes(databaseContext.getMetaData().getMode()
-                                                                .orElse(preferencesService.getLibraryPreferences()
-                                                                                          .getDefaultBibDatabaseMode())),
-                databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern()));
+            bibEntryTypesManager.getAllTypes(
+                databaseContext
+                    .getMetaData()
+                    .getMode()
+                    .orElse(
+                        preferencesService
+                            .getLibraryPreferences()
+                            .getDefaultBibDatabaseMode()
+                    )
+            ),
+            databaseContext
+                .getMetaData()
+                .getCiteKeyPattern(
+                    preferencesService
+                        .getCitationKeyPatternPreferences()
+                        .getKeyPattern()
+                )
+        );
     }
 
     @FXML

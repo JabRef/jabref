@@ -14,7 +14,6 @@ public class CSLType implements LayoutFormatter {
             case Report, TechReport -> "report";
             case Thesis, MastersThesis, PhdThesis -> "thesis";
             case WWW, Online -> "webpage";
-
             default -> "no-type";
         };
     }

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -35,33 +34,39 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
-                "PdfXmpImporter does not support importDatabase(BufferedReader reader)."
-                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+            "PdfXmpImporter does not support importDatabase(BufferedReader reader)." +
+            "Instead use importDatabase(Path filePath, Charset defaultEncoding)."
+        );
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
         throw new UnsupportedOperationException(
-                "PdfXmpImporter does not support importDatabase(String data)."
-                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+            "PdfXmpImporter does not support importDatabase(String data)." +
+            "Instead use importDatabase(Path filePath, Charset defaultEncoding)."
+        );
     }
 
     @Override
     public ParserResult importDatabase(Path filePath) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(new XmpUtilReader().readXmp(filePath, xmpPreferences));
+            return new ParserResult(
+                new XmpUtilReader().readXmp(filePath, xmpPreferences)
+            );
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         Objects.requireNonNull(reader);
         return false;
     }

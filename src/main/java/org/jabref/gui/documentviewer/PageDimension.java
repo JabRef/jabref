@@ -23,6 +23,7 @@ public abstract class PageDimension {
     public abstract int getHeight(double aspectRatio);
 
     private static class FixedWidthPageDimension extends PageDimension {
+
         private final int width;
 
         public FixedWidthPageDimension(int width) {
@@ -41,6 +42,7 @@ public abstract class PageDimension {
     }
 
     private static class FixedHeightPageDimension extends PageDimension {
+
         private final int height;
 
         public FixedHeightPageDimension(int height) {

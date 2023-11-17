@@ -14,9 +14,13 @@ public class StaxParser {
      * @param reader the stream reader
      * @return Returns the inner XML content
      */
-    public static String getXMLContent(XMLStreamReader reader) throws XMLStreamException {
+    public static String getXMLContent(XMLStreamReader reader)
+        throws XMLStreamException {
         // skip over START DOCUMENT event
-        while (reader.getEventType() == XMLStreamConstants.START_DOCUMENT && reader.hasNext()) {
+        while (
+            reader.getEventType() == XMLStreamConstants.START_DOCUMENT &&
+            reader.hasNext()
+        ) {
             reader.next();
         }
 
@@ -60,7 +64,10 @@ public class StaxParser {
                 content.append(getXMLComment(reader));
             } else if (event == XMLStreamConstants.PROCESSING_INSTRUCTION) {
                 content.append(getXMLProcessingInstruction(reader));
-            } else if (event == XMLStreamConstants.SPACE || event == XMLStreamConstants.ENTITY_REFERENCE) {
+            } else if (
+                event == XMLStreamConstants.SPACE ||
+                event == XMLStreamConstants.ENTITY_REFERENCE
+            ) {
                 content.append(getXMLText(reader));
             }
         }
@@ -68,26 +75,36 @@ public class StaxParser {
         return content.toString().trim();
     }
 
-    private static String getXMLStartTag(XMLStreamReader reader, boolean addNamespaceURI) {
+    private static String getXMLStartTag(
+        XMLStreamReader reader,
+        boolean addNamespaceURI
+    ) {
         StringBuilder startTag = new StringBuilder();
 
         String prefix = reader.getPrefix();
 
-        startTag.append("<")
-                .append(prefix != null && !prefix.isBlank() ? prefix + ":" : "")
-                .append(reader.getName().getLocalPart());
+        startTag
+            .append("<")
+            .append(prefix != null && !prefix.isBlank() ? prefix + ":" : "")
+            .append(reader.getName().getLocalPart());
 
         String namespaceURI = reader.getNamespaceURI();
         if (addNamespaceURI && namespaceURI != null) {
-            startTag.append(" xmlns")
-                    .append(prefix != null && !prefix.isBlank() ? ":" + prefix : "")
-                    .append("=\"")
-                    .append(namespaceURI)
-                    .append("\"");
+            startTag
+                .append(" xmlns")
+                .append(prefix != null && !prefix.isBlank() ? ":" + prefix : "")
+                .append("=\"")
+                .append(namespaceURI)
+                .append("\"");
         }
 
         for (int i = 0; i < reader.getAttributeCount(); i++) {
-            startTag.append(" ").append(reader.getAttributeLocalName(i)).append("=\"").append(reader.getAttributeValue(i)).append("\"");
+            startTag
+                .append(" ")
+                .append(reader.getAttributeLocalName(i))
+                .append("=\"")
+                .append(reader.getAttributeValue(i))
+                .append("\"");
         }
 
         if (reader.isEndElement()) {
@@ -102,10 +119,11 @@ public class StaxParser {
         StringBuilder endTag = new StringBuilder();
         String prefix = reader.getPrefix();
 
-        endTag.append("</")
-              .append(prefix != null && !prefix.isBlank() ? prefix + ":" : "")
-              .append(reader.getName().getLocalPart())
-              .append(">");
+        endTag
+            .append("</")
+            .append(prefix != null && !prefix.isBlank() ? prefix + ":" : "")
+            .append(reader.getName().getLocalPart())
+            .append(">");
 
         return endTag.toString();
     }

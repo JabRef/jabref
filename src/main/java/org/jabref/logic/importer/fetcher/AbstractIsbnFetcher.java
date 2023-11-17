@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
-
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -15,7 +14,9 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
 
     protected final ImportFormatPreferences importFormatPreferences;
 
-    public AbstractIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
+    public AbstractIsbnFetcher(
+        ImportFormatPreferences importFormatPreferences
+    ) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -24,10 +25,13 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_ISBN);
     }
 
-    protected void ensureThatIsbnIsValid(String identifier) throws FetcherException {
+    protected void ensureThatIsbnIsValid(String identifier)
+        throws FetcherException {
         ISBN isbn = new ISBN(identifier);
         if (!isbn.isValid()) {
-            throw new FetcherException(Localization.lang("Invalid ISBN: '%0'.", identifier));
+            throw new FetcherException(
+                Localization.lang("Invalid ISBN: '%0'.", identifier)
+            );
         }
     }
 

@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -22,7 +21,10 @@ public class MathSciNetId implements Identifier {
 
     public static Optional<MathSciNetId> parse(String mrNumberRaw) {
         // Take everything before whitespace or open bracket, so something like `619693 (82j:58046)` gets parsed correctly
-        String identifier = StringUtil.tokenizeToList(mrNumberRaw, " (").get(0).trim();
+        String identifier = StringUtil
+            .tokenizeToList(mrNumberRaw, " (")
+            .get(0)
+            .trim();
         return Optional.of(new MathSciNetId(identifier));
     }
 
@@ -54,7 +56,11 @@ public class MathSciNetId implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("https://www.ams.org/mathscinet-getitem?mr=" + identifier));
+            return Optional.of(
+                new URI(
+                    "https://www.ams.org/mathscinet-getitem?mr=" + identifier
+                )
+            );
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

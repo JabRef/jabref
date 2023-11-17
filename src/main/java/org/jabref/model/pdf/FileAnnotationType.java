@@ -1,7 +1,6 @@
 package org.jabref.model.pdf;
 
 import java.util.Locale;
-
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,9 @@ public enum FileAnnotationType {
     UNKNOWN("Unknown", false),
     NONE("None", false);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationType.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        FileAnnotationType.class
+    );
 
     private final String name;
     private final boolean linkedFileAnnotationType;
@@ -45,9 +46,16 @@ public enum FileAnnotationType {
      */
     public static FileAnnotationType parse(PDAnnotation annotation) {
         try {
-            return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));
+            return FileAnnotationType.valueOf(
+                annotation.getSubtype().toUpperCase(Locale.ROOT)
+            );
         } catch (IllegalArgumentException e) {
-            LOGGER.info(String.format("FileAnnotationType %s is not supported and was converted into 'Unknown'!", annotation.getSubtype()));
+            LOGGER.info(
+                String.format(
+                    "FileAnnotationType %s is not supported and was converted into 'Unknown'!",
+                    annotation.getSubtype()
+                )
+            );
             return UNKNOWN;
         }
     }
@@ -60,7 +68,10 @@ public enum FileAnnotationType {
      */
     public static boolean isMarkedFileAnnotationType(String annotationType) {
         try {
-            return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT)).linkedFileAnnotationType;
+            return FileAnnotationType.valueOf(
+                annotationType.toUpperCase(Locale.ROOT)
+            )
+                .linkedFileAnnotationType;
         } catch (IllegalArgumentException e) {
             return false;
         }

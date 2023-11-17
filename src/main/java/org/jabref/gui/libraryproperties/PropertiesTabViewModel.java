@@ -1,7 +1,6 @@
 package org.jabref.gui.libraryproperties;
 
 public interface PropertiesTabViewModel {
-
     void setValues();
 
     void storeSettings();

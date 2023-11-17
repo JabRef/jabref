@@ -1,15 +1,14 @@
 package org.jabref.gui.help;
 
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -17,8 +16,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.PreferencesService;
-
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +23,40 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private static final String HOMEPAGE_URL = "https://www.jabref.org";
     private static final String DONATION_URL = "https://donations.jabref.org";
-    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/main/external-libraries.md";
+    private static final String LIBRARIES_URL =
+        "https://github.com/JabRef/jabref/blob/main/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
-    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
-    private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
-    private static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
+    private static final String LICENSE_URL =
+        "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
+    private static final String CONTRIBUTORS_URL =
+        "https://github.com/JabRef/jabref/graphs/contributors";
+    private static final String PRIVACY_POLICY_URL =
+        "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
     private final String changelogUrl;
     private final String versionInfo;
-    private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
-    private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
+    private final ReadOnlyStringWrapper environmentInfo =
+        new ReadOnlyStringWrapper();
+    private final Logger logger = LoggerFactory.getLogger(
+        AboutDialogViewModel.class
+    );
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper maintainers =
+        new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
-    private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
+    private final ReadOnlyBooleanWrapper isDevelopmentVersion =
+        new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper developmentVersion =
+        new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
-    public AboutDialogViewModel(DialogService dialogService, PreferencesService preferencesService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public AboutDialogViewModel(
+        DialogService dialogService,
+        PreferencesService preferencesService,
+        ClipBoardManager clipBoardManager,
+        BuildInfo buildInfo
+    ) {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
@@ -55,18 +67,31 @@ public class AboutDialogViewModel extends AbstractViewModel {
             isDevelopmentVersion.set(false);
         } else {
             isDevelopmentVersion.set(true);
-            String dev = Lists.newArrayList(version).stream().filter(string -> !string.equals(version[0])).collect(
-                    Collectors.joining("--"));
+            String dev = Lists
+                .newArrayList(version)
+                .stream()
+                .filter(string -> !string.equals(version[0]))
+                .collect(Collectors.joining("--"));
             developmentVersion.set(dev);
         }
         maintainers.set(buildInfo.maintainers);
         license.set(Localization.lang("License") + ":");
         changelogUrl = buildInfo.version.getChangelogUrl();
 
-        String javafx_version = System.getProperty("javafx.runtime.version", BuildInfo.UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+        String javafx_version = System
+            .getProperty("javafx.runtime.version", BuildInfo.UNKNOWN_VERSION)
+            .toLowerCase(Locale.ROOT);
 
-        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
-                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, javafx_version);
+        versionInfo =
+            String.format(
+                "JabRef %s%n%s %s %s %nJava %s %nJavaFX %s",
+                buildInfo.version,
+                BuildInfo.OS,
+                BuildInfo.OS_VERSION,
+                BuildInfo.OS_ARCH,
+                BuildInfo.JAVA_VERSION,
+                javafx_version
+            );
     }
 
     public String getDevelopmentVersion() {
@@ -152,9 +177,15 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+            JabRefDesktop.openBrowser(
+                url,
+                preferencesService.getFilePreferences()
+            );
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
+            dialogService.showErrorDialogAndWait(
+                Localization.lang("Could not open website."),
+                e
+            );
             logger.error("Could not open default browser.", e);
         }
     }

@@ -1,16 +1,19 @@
 package org.jabref.gui.libraryproperties;
 
+import jakarta.inject.Inject;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
-
 import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabaseContext;
 
-import jakarta.inject.Inject;
+public abstract class AbstractPropertiesTabView<
+    T extends PropertiesTabViewModel
+>
+    extends VBox
+    implements PropertiesTab {
 
-public abstract class AbstractPropertiesTabView<T extends PropertiesTabViewModel> extends VBox implements PropertiesTab {
-
-    @Inject protected DialogService dialogService;
+    @Inject
+    protected DialogService dialogService;
 
     protected BibDatabaseContext databaseContext;
     protected T viewModel;

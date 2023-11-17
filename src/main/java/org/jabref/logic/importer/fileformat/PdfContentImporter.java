@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
+import com.google.common.base.Strings;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -10,7 +11,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -25,10 +27,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import com.google.common.base.Strings;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
  * <p>
@@ -37,7 +35,9 @@ import org.apache.pdfbox.text.PDFTextStripper;
  */
 public class PdfContentImporter extends Importer {
 
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile(
+        "\\d{4}"
+    );
     // input lines into several lines
     private String[] lines;
     // current index in lines
@@ -91,7 +91,10 @@ public class PdfContentImporter extends Importer {
                     if (posAnd >= 0) {
                         String nameBefore = curName.substring(0, posAnd);
                         // cannot be first name as "," is contained in the string
-                        res = res.concat(" and ").concat(removeNonLettersAtEnd(nameBefore));
+                        res =
+                            res
+                                .concat(" and ")
+                                .concat(removeNonLettersAtEnd(nameBefore));
                         curName = curName.substring(posAnd + 5);
                     }
                 }
@@ -133,7 +136,10 @@ public class PdfContentImporter extends Importer {
                         // last name found
                         res = res.concat(removeNonLettersAtEnd(splitNames[i]));
 
-                        if (!splitNames[i].isEmpty() && Character.isLowerCase(splitNames[i].charAt(0))) {
+                        if (
+                            !splitNames[i].isEmpty() &&
+                            Character.isLowerCase(splitNames[i].charAt(0))
+                        ) {
                             // it is probably be "van", "vom", ...
                             // we just rely on the fact that these things are written in lower case letters
                             // do NOT finish name
@@ -150,15 +156,18 @@ public class PdfContentImporter extends Importer {
                         } else {
                             res = res.concat(" and ");
                         }
-                        if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1))
-                                && "al.".equalsIgnoreCase(splitNames[i + 1])) {
+                        if (
+                            "et".equalsIgnoreCase(splitNames[i]) &&
+                            (splitNames.length > (i + 1)) &&
+                            "al.".equalsIgnoreCase(splitNames[i + 1])
+                        ) {
                             res = res.concat("others");
                             break;
                         } else {
                             res = res.concat(splitNames[i]).concat(" ");
                             workedOnFirstOrMiddle = true;
                         }
-                    }  // do nothing, just increment i at the end of this iteration
+                    } // do nothing, just increment i at the end of this iteration
                 }
                 i++;
             } while (i < splitNames.length);
@@ -176,38 +185,56 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(BufferedReader reader)."
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+        throw new UnsupportedOperationException(
+            "PdfContentImporter does not support importDatabase(BufferedReader reader)." +
+            "Instead use importDatabase(Path filePath, Charset defaultEncoding)."
+        );
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(String data)."
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+        throw new UnsupportedOperationException(
+            "PdfContentImporter does not support importDatabase(String data)." +
+            "Instead use importDatabase(Path filePath, Charset defaultEncoding)."
+        );
     }
 
     @Override
     public ParserResult importDatabase(Path filePath) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
+        try (
+            PDDocument document = new XmpUtilReader()
+                .loadWithAutomaticDecryption(filePath)
+        ) {
             String firstPageContents = getFirstPageContents(document);
-            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
+            Optional<BibEntry> entry = getEntryFromPDFContent(
+                firstPageContents,
+                OS.NEWLINE
+            );
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+            return ParserResult.fromErrorMessage(
+                Localization.lang("Decryption not supported.")
+            );
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
 
-        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
+        result.forEach(entry ->
+            entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF"))
+        );
         return new ParserResult(result);
     }
 
     // make this method package visible so we can test it
-    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
+    Optional<BibEntry> getEntryFromPDFContent(
+        String firstpageContents,
+        String lineSeparator
+    ) {
         // idea: split[] contains the different lines
         // blocks are separated by empty lines
         // treat each block
@@ -217,7 +244,10 @@ public class PdfContentImporter extends Importer {
         // curString (mostly) contains the current block
         //   the different lines are joined into one and thereby separated by " "
 
-        String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
+        String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(
+            firstpageContents,
+            lineSeparator
+        );
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
 
@@ -286,7 +316,7 @@ public class PdfContentImporter extends Importer {
             } else {
                 if (!"".equals(curString)) {
                     author = author.concat(" and ").concat(curString);
-                }  // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
+                } // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
             }
             lineIndex++;
         }
@@ -296,28 +326,48 @@ public class PdfContentImporter extends Importer {
         // then, abstract and keywords follow
         while (lineIndex < lines.length) {
             curString = lines[lineIndex];
-            if ((curString.length() >= "Abstract".length()) && "Abstract".equalsIgnoreCase(curString.substring(0, "Abstract".length()))) {
+            if (
+                (curString.length() >= "Abstract".length()) &&
+                "Abstract".equalsIgnoreCase(
+                        curString.substring(0, "Abstract".length())
+                    )
+            ) {
                 if (curString.length() == "Abstract".length()) {
                     // only word "abstract" found -- skip line
                     curString = "";
                 } else {
-                    curString = curString.substring("Abstract".length() + 1).trim().concat(System.lineSeparator());
+                    curString =
+                        curString
+                            .substring("Abstract".length() + 1)
+                            .trim()
+                            .concat(System.lineSeparator());
                 }
                 lineIndex++;
                 // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
                 // whereas we need linebreak as separator
-                while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
-                    curString = curString.concat(lines[lineIndex]).concat(System.lineSeparator());
+                while (
+                    (lineIndex < lines.length) && !"".equals(lines[lineIndex])
+                ) {
+                    curString =
+                        curString
+                            .concat(lines[lineIndex])
+                            .concat(System.lineSeparator());
                     lineIndex++;
                 }
                 abstractT = curString.trim();
                 lineIndex++;
-            } else if ((curString.length() >= "Keywords".length()) && "Keywords".equalsIgnoreCase(curString.substring(0, "Keywords".length()))) {
+            } else if (
+                (curString.length() >= "Keywords".length()) &&
+                "Keywords".equalsIgnoreCase(
+                        curString.substring(0, "Keywords".length())
+                    )
+            ) {
                 if (curString.length() == "Keywords".length()) {
                     // only word "Keywords" found -- skip line
                     curString = "";
                 } else {
-                    curString = curString.substring("Keywords".length() + 1).trim();
+                    curString =
+                        curString.substring("Keywords".length() + 1).trim();
                 }
                 lineIndex++;
                 fillCurStringWithNonEmptyLines();
@@ -424,7 +474,9 @@ public class PdfContentImporter extends Importer {
                             // before the price, the ISSN is stated
                             // skip that
                             pos -= 2;
-                            while ((pos >= 0) && (curString.charAt(pos) != ' ')) {
+                            while (
+                                (pos >= 0) && (curString.charAt(pos) != ' ')
+                            ) {
                                 pos--;
                             }
                             if (pos > 0) {
@@ -483,7 +535,8 @@ public class PdfContentImporter extends Importer {
         return Optional.of(entry);
     }
 
-    private String getFirstPageContents(PDDocument document) throws IOException {
+    private String getFirstPageContents(PDDocument document)
+        throws IOException {
         PDFTextStripper stripper = new PDFTextStripper();
 
         stripper.setStartPage(1);
@@ -516,7 +569,9 @@ public class PdfContentImporter extends Importer {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while ((lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()) {
+        while (
+            (lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()
+        ) {
             lineIndex++;
         }
     }

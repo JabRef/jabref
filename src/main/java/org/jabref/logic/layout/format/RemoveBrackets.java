@@ -10,6 +10,7 @@ import org.jabref.logic.layout.LayoutFormatter;
  * </example>
  */
 public class RemoveBrackets implements LayoutFormatter {
+
     @Override
     public String format(String fieldText) {
         StringBuilder builder = new StringBuilder(fieldText.length());

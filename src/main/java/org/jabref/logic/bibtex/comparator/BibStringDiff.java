@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
@@ -22,7 +21,10 @@ public class BibStringDiff {
         this.newString = newString;
     }
 
-    public static List<BibStringDiff> compare(BibDatabase originalDatabase, BibDatabase newDatabase) {
+    public static List<BibStringDiff> compare(
+        BibDatabase originalDatabase,
+        BibDatabase newDatabase
+    ) {
         if (originalDatabase.hasNoStrings() && newDatabase.hasNoStrings()) {
             return Collections.emptyList();
         }
@@ -35,12 +37,18 @@ public class BibStringDiff {
         // First try to match by string names.
         for (BibtexString original : originalDatabase.getStringValues()) {
             Optional<BibtexString> match = newDatabase
-                    .getStringValues().stream()
-                    .filter(test -> test.getName().equals(original.getName()))
-                    .findAny();
+                .getStringValues()
+                .stream()
+                .filter(test -> test.getName().equals(original.getName()))
+                .findAny();
             if (match.isPresent()) {
                 // We have found a string with a matching name.
-                if (!Objects.equals(original.getContent(), match.get().getContent())) {
+                if (
+                    !Objects.equals(
+                        original.getContent(),
+                        match.get().getContent()
+                    )
+                ) {
                     // But they have non-matching contents, so we've found a change.
                     differences.add(new BibStringDiff(original, match.get()));
                 }
@@ -52,13 +60,17 @@ public class BibStringDiff {
         }
 
         // See if we can detect a name change for those entries that we couldn't match, based on their content
-        for (Iterator<BibtexString> iterator = notMatched.iterator(); iterator.hasNext(); ) {
+        for (
+            Iterator<BibtexString> iterator = notMatched.iterator();
+            iterator.hasNext();
+        ) {
             BibtexString original = iterator.next();
 
             Optional<BibtexString> match = newDatabase
-                    .getStringValues().stream()
-                    .filter(test -> test.getContent().equals(original.getContent()))
-                    .findAny();
+                .getStringValues()
+                .stream()
+                .filter(test -> test.getContent().equals(original.getContent()))
+                .findAny();
             if (match.isPresent()) {
                 // We have found a string with the same content. It cannot have the same
                 // name, or we would have found it above.
@@ -74,9 +86,13 @@ public class BibStringDiff {
         }
 
         // Finally, see if there are remaining strings in the new database. They must have been added.
-        newDatabase.getStringValues().stream()
-                   .filter(test -> !used.contains(test))
-                   .forEach(newString -> differences.add(new BibStringDiff(null, newString)));
+        newDatabase
+            .getStringValues()
+            .stream()
+            .filter(test -> !used.contains(test))
+            .forEach(newString ->
+                differences.add(new BibStringDiff(null, newString))
+            );
 
         return differences;
     }
@@ -99,7 +115,10 @@ public class BibStringDiff {
         }
 
         BibStringDiff that = (BibStringDiff) other;
-        return Objects.equals(newString, that.newString) && Objects.equals(originalString, that.originalString);
+        return (
+            Objects.equals(newString, that.newString) &&
+            Objects.equals(originalString, that.originalString)
+        );
     }
 
     @Override

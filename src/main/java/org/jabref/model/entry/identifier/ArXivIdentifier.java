@@ -6,9 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.model.strings.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +14,13 @@ import org.slf4j.LoggerFactory;
  * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
  */
 public class ArXivIdentifier extends EprintIdentifier {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
-    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        ArXivIdentifier.class
+    );
+
+    private static final String ARXIV_PREFIX =
+        "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
     private final String identifier;
     private final String classification;
     private final String version;
@@ -39,13 +41,21 @@ public class ArXivIdentifier extends EprintIdentifier {
 
     public static Optional<ArXivIdentifier> parse(String value) {
         String identifier = value.replace(" ", "");
-        Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
+        Pattern identifierPattern = Pattern.compile(
+            "(" +
+            ARXIV_PREFIX +
+            ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?"
+        );
         Matcher identifierMatcher = identifierPattern.matcher(identifier);
         if (identifierMatcher.matches()) {
             return getArXivIdentifier(identifierMatcher);
         }
 
-        Pattern oldIdentifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
+        Pattern oldIdentifierPattern = Pattern.compile(
+            "(" +
+            ARXIV_PREFIX +
+            ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?"
+        );
         Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
         if (oldIdentifierMatcher.matches()) {
             return getArXivIdentifier(oldIdentifierMatcher);
@@ -54,7 +64,9 @@ public class ArXivIdentifier extends EprintIdentifier {
         return Optional.empty();
     }
 
-    private static Optional<ArXivIdentifier> getArXivIdentifier(Matcher matcher) {
+    private static Optional<ArXivIdentifier> getArXivIdentifier(
+        Matcher matcher
+    ) {
         String id = matcher.group("id");
         String classification = matcher.group("classification");
         if (classification == null) {
@@ -93,10 +105,16 @@ public class ArXivIdentifier extends EprintIdentifier {
 
     @Override
     public String toString() {
-        return "ArXivIdentifier{" +
-                "identifier='" + identifier + '\'' +
-                ", classification='" + classification + '\'' +
-                '}';
+        return (
+            "ArXivIdentifier{" +
+            "identifier='" +
+            identifier +
+            '\'' +
+            ", classification='" +
+            classification +
+            '\'' +
+            '}'
+        );
     }
 
     @Override
@@ -109,8 +127,10 @@ public class ArXivIdentifier extends EprintIdentifier {
         }
 
         ArXivIdentifier that = (ArXivIdentifier) o;
-        return Objects.equals(identifier, that.identifier) &&
-                Objects.equals(classification, that.classification);
+        return (
+            Objects.equals(identifier, that.identifier) &&
+            Objects.equals(classification, that.classification)
+        );
     }
 
     @Override
@@ -134,7 +154,9 @@ public class ArXivIdentifier extends EprintIdentifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("https://arxiv.org/abs/" + getNormalized()));
+            return Optional.of(
+                new URI("https://arxiv.org/abs/" + getNormalized())
+            );
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

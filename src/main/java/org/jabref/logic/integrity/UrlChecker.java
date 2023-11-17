@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.Optional;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
@@ -14,7 +13,10 @@ public class UrlChecker implements ValueChecker {
         }
 
         if (!value.contains("://")) {
-            return Optional.of(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...");
+            return Optional.of(
+                Localization.lang("should contain a protocol") +
+                ": http[s]://, file://, ftp://, ..."
+            );
         }
 
         return Optional.empty();

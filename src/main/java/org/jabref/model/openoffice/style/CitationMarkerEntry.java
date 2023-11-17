@@ -1,14 +1,12 @@
 package org.jabref.model.openoffice.style;
 
 import java.util.Optional;
-
 import org.jabref.model.openoffice.ootext.OOText;
 
 /**
  * This is what we need for createCitationMarker to produce author-year citation markers.
  */
 public interface CitationMarkerEntry extends CitationMarkerNormEntry {
-
     /**
      * uniqueLetter or Optional.empty() if not needed.
      */

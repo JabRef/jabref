@@ -1,7 +1,6 @@
 package org.jabref.model.search.matchers;
 
 import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 

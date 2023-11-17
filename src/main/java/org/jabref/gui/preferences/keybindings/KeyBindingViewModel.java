@@ -1,21 +1,18 @@
 package org.jabref.gui.preferences.keybindings;
 
+import com.google.common.base.CaseFormat;
 import java.util.Optional;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-
-import com.google.common.base.CaseFormat;
 
 /**
  * This class represents a view model for objects of the KeyBinding
@@ -28,21 +25,30 @@ public class KeyBindingViewModel {
 
     private KeyBinding keyBinding = null;
     private String realBinding = "";
-    private final ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
+    private final ObservableList<KeyBindingViewModel> children =
+        FXCollections.observableArrayList();
     private final KeyBindingRepository keyBindingRepository;
     private final SimpleStringProperty displayName = new SimpleStringProperty();
-    private final SimpleStringProperty shownBinding = new SimpleStringProperty();
+    private final SimpleStringProperty shownBinding =
+        new SimpleStringProperty();
 
     private final KeyBindingCategory category;
 
-    public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBinding keyBinding, String binding) {
+    public KeyBindingViewModel(
+        KeyBindingRepository keyBindingRepository,
+        KeyBinding keyBinding,
+        String binding
+    ) {
         this(keyBindingRepository, keyBinding.getCategory());
         this.keyBinding = keyBinding;
         setDisplayName();
         setBinding(binding);
     }
 
-    public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBindingCategory category) {
+    public KeyBindingViewModel(
+        KeyBindingRepository keyBindingRepository,
+        KeyBindingCategory category
+    ) {
         this.keyBindingRepository = keyBindingRepository;
         this.category = category;
         setDisplayName();
@@ -69,13 +75,21 @@ public class KeyBindingViewModel {
         String[] parts = bind.split(" ");
         StringBuilder displayBind = new StringBuilder();
         for (String part : parts) {
-            displayBind.append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part)).append(" ");
+            displayBind
+                .append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part))
+                .append(" ");
         }
-        this.shownBinding.set(displayBind.toString().trim().replace(" ", " + "));
+        this.shownBinding.set(
+                displayBind.toString().trim().replace(" ", " + ")
+            );
     }
 
     private void setDisplayName() {
-        this.displayName.set(keyBinding == null ? this.category.getName() : keyBinding.getLocalization());
+        this.displayName.set(
+                keyBinding == null
+                    ? this.category.getName()
+                    : keyBinding.getLocalization()
+            );
     }
 
     public StringProperty nameProperty() {
@@ -97,8 +111,14 @@ public class KeyBindingViewModel {
         // validate the shortcut is no modifier key
 
         KeyCode code = evt.getCode();
-        if (code.isModifierKey() || (code == KeyCode.BACK_SPACE) || (code == KeyCode.SPACE) || (code == KeyCode.TAB)
-                || (code == KeyCode.ENTER) || (code == KeyCode.UNDEFINED)) {
+        if (
+            code.isModifierKey() ||
+            (code == KeyCode.BACK_SPACE) ||
+            (code == KeyCode.SPACE) ||
+            (code == KeyCode.TAB) ||
+            (code == KeyCode.ENTER) ||
+            (code == KeyCode.UNDEFINED)
+        ) {
             return false;
         }
 
@@ -116,7 +136,11 @@ public class KeyBindingViewModel {
 
         // if no modifier keys are pressed, only special keys can be shortcuts
         if (modifiers.isEmpty()) {
-            if (!(code.isFunctionKey() || (code == KeyCode.ESCAPE) || (code == KeyCode.DELETE))) {
+            if (
+                !(code.isFunctionKey() ||
+                    (code == KeyCode.ESCAPE) ||
+                    (code == KeyCode.DELETE))
+            ) {
                 return false;
             }
         }
@@ -147,10 +171,14 @@ public class KeyBindingViewModel {
     }
 
     public Optional<JabRefIcon> getResetIcon() {
-        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.REFRESH);
+        return isCategory()
+            ? Optional.empty()
+            : Optional.of(IconTheme.JabRefIcons.REFRESH);
     }
 
     public Optional<JabRefIcon> getClearIcon() {
-        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
+        return isCategory()
+            ? Optional.empty()
+            : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
     }
 }

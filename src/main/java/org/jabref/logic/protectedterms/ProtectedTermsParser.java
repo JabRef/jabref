@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.jabref.logic.l10n.Localization;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +19,31 @@ import org.slf4j.LoggerFactory;
  */
 public class ProtectedTermsParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        ProtectedTermsParser.class
+    );
 
     private final List<String> terms = new ArrayList<>();
-    private String description = Localization.lang("The text after the last line starting with # will be used");
+    private String description = Localization.lang(
+        "The text after the last line starting with # will be used"
+    );
 
     private String location;
 
-    public void readTermsFromResource(String resourceFileName, String descriptionString) {
+    public void readTermsFromResource(
+        String resourceFileName,
+        String descriptionString
+    ) {
         try {
-            Path path = Path.of(Objects.requireNonNull(ProtectedTermsLoader.class.getResource(Objects.requireNonNull(resourceFileName))).toURI());
+            Path path = Path.of(
+                Objects
+                    .requireNonNull(
+                        ProtectedTermsLoader.class.getResource(
+                                Objects.requireNonNull(resourceFileName)
+                            )
+                    )
+                    .toURI()
+            );
             readTermsList(path);
             description = descriptionString;
             location = resourceFileName;
@@ -50,7 +63,12 @@ public class ProtectedTermsParser {
             return;
         }
         try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).collect(Collectors.toList()));
+            this.terms.addAll(
+                    lines
+                        .map(this::setDescription)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+                );
         } catch (IOException e) {
             LOGGER.warn("Could not read terms from file {}", path, e);
         }
@@ -69,8 +87,16 @@ public class ProtectedTermsParser {
         return line;
     }
 
-    public ProtectedTermsList getProtectTermsList(boolean enabled, boolean internal) {
-        ProtectedTermsList termList = new ProtectedTermsList(description, terms, location, internal);
+    public ProtectedTermsList getProtectTermsList(
+        boolean enabled,
+        boolean internal
+    ) {
+        ProtectedTermsList termList = new ProtectedTermsList(
+            description,
+            terms,
+            location,
+            internal
+        );
         termList.setEnabled(enabled);
         return termList;
     }

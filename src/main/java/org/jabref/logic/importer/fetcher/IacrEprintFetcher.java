@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -23,13 +22,21 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
 
     public static final String NAME = "IACR eprints";
 
-    private static final Pattern WITHOUT_LETTERS_SPACE = Pattern.compile("[^0-9/]");
+    private static final Pattern WITHOUT_LETTERS_SPACE = Pattern.compile(
+        "[^0-9/]"
+    );
 
-    private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
-    private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/";
-    private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
-    private static final String FULLTEXT_URL_PREFIX = "https://eprint.iacr.org/";
-    private static final String VERSION_URL_PREFIX = "https://eprint.iacr.org/archive/versions/";
+    private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern
+        .compile("\\d{4}/\\d{3,5}")
+        .asPredicate();
+    private static final String CITATION_URL_PREFIX =
+        "https://eprint.iacr.org/";
+    private static final String DESCRIPTION_URL_PREFIX =
+        "https://eprint.iacr.org/";
+    private static final String FULLTEXT_URL_PREFIX =
+        "https://eprint.iacr.org/";
+    private static final String VERSION_URL_PREFIX =
+        "https://eprint.iacr.org/archive/versions/";
 
     private final ImportFormatPreferences prefs;
 
@@ -38,14 +45,22 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        String identifierWithoutLettersAndSpaces = WITHOUT_LETTERS_SPACE.matcher(identifier).replaceAll(" ").trim();
+    public Optional<BibEntry> performSearchById(String identifier)
+        throws FetcherException {
+        String identifierWithoutLettersAndSpaces = WITHOUT_LETTERS_SPACE
+            .matcher(identifier)
+            .replaceAll(" ")
+            .trim();
 
         if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {
-            throw new FetcherException(Localization.lang("Invalid identifier: '%0'.", identifier));
+            throw new FetcherException(
+                Localization.lang("Invalid identifier: '%0'.", identifier)
+            );
         }
 
-        Optional<BibEntry> entry = createEntryFromIacrCitation(identifierWithoutLettersAndSpaces);
+        Optional<BibEntry> entry = createEntryFromIacrCitation(
+            identifierWithoutLettersAndSpaces
+        );
 
         if (entry.isPresent()) {
             setAdditionalFields(entry.get(), identifierWithoutLettersAndSpaces);
@@ -54,21 +69,33 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         return entry;
     }
 
-    private Optional<BibEntry> createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
-        String bibtexCitationHtml = getHtml(CITATION_URL_PREFIX + validIdentifier);
+    private Optional<BibEntry> createEntryFromIacrCitation(
+        String validIdentifier
+    ) throws FetcherException {
+        String bibtexCitationHtml = getHtml(
+            CITATION_URL_PREFIX + validIdentifier
+        );
         if (bibtexCitationHtml.contains("No such report found")) {
             throw new FetcherException(Localization.lang("No results found."));
         }
-        String actualEntry = getRequiredValueBetween("<pre id=\"bibtex\">", "</pre>", bibtexCitationHtml);
+        String actualEntry = getRequiredValueBetween(
+            "<pre id=\"bibtex\">",
+            "</pre>",
+            bibtexCitationHtml
+        );
 
         try {
             return BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
-            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
+            throw new FetcherException(
+                Localization.lang("Entry from %0 could not be parsed.", "IACR"),
+                e
+            );
         }
     }
 
-    private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
+    private void setAdditionalFields(BibEntry entry, String identifier)
+        throws FetcherException {
         String entryUrl = DESCRIPTION_URL_PREFIX + identifier;
         String descriptiveHtml = getHtml(entryUrl);
 
@@ -85,21 +112,37 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         }
     }
 
-    private String getVersion(String identifier, String versionHtml) throws FetcherException {
-        String startOfVersionString = "<li><a href=\"/archive/" + identifier + "/";
-        String version = getRequiredValueBetween(startOfVersionString, "\">", versionHtml);
+    private String getVersion(String identifier, String versionHtml)
+        throws FetcherException {
+        String startOfVersionString =
+            "<li><a href=\"/archive/" + identifier + "/";
+        String version = getRequiredValueBetween(
+            startOfVersionString,
+            "\">",
+            versionHtml
+        );
         return version;
     }
 
     private String getAbstract(String descriptiveHtml) throws FetcherException {
-        String startOfAbstractString = "<h5 class=\"mt-3\">Abstract</h5>\n    <p style=\"white-space: pre-wrap;\">";
-        String abstractText = getRequiredValueBetween(startOfAbstractString, "</p>", descriptiveHtml);
+        String startOfAbstractString =
+            "<h5 class=\"mt-3\">Abstract</h5>\n    <p style=\"white-space: pre-wrap;\">";
+        String abstractText = getRequiredValueBetween(
+            startOfAbstractString,
+            "</p>",
+            descriptiveHtml
+        );
         return abstractText;
     }
 
     private String getDate(String descriptiveHtml) throws FetcherException {
-        String startOfHistoryString = "<dt>History</dt>\n      \n      \n      <dd>";
-        String dateStringAsInHtml = getRequiredValueBetween(startOfHistoryString, ":", descriptiveHtml);
+        String startOfHistoryString =
+            "<dt>History</dt>\n      \n      \n      <dd>";
+        String dateStringAsInHtml = getRequiredValueBetween(
+            startOfHistoryString,
+            ":",
+            descriptiveHtml
+        );
         return dateStringAsInHtml;
     }
 
@@ -108,25 +151,40 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
             URLDownload download = new URLDownload(url);
             return download.asString();
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Could not retrieve entry data from '%0'.", url), e);
+            throw new FetcherException(
+                Localization.lang(
+                    "Could not retrieve entry data from '%0'.",
+                    url
+                ),
+                e
+            );
         }
     }
 
-    private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
+    private String getRequiredValueBetween(
+        String from,
+        String to,
+        String haystack
+    ) throws FetcherException {
         String value = StringUtil.substringBetween(haystack, from, to);
         if (value == null) {
-            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
+            throw new FetcherException(
+                Localization.lang("Entry from %0 could not be parsed.", "IACR")
+            );
         } else {
             return value;
         }
     }
 
-    private boolean isFromOrAfterYear2000(BibEntry entry) throws FetcherException {
+    private boolean isFromOrAfterYear2000(BibEntry entry)
+        throws FetcherException {
         Optional<String> yearField = entry.getField(StandardField.YEAR);
         if (yearField.isPresent()) {
             return Integer.parseInt(yearField.get()) > 2000;
         }
-        throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
+        throw new FetcherException(
+            Localization.lang("Entry from %0 could not be parsed.", "IACR")
+        );
     }
 
     @Override
@@ -135,18 +193,26 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry)
+        throws IOException, FetcherException {
         Objects.requireNonNull(entry);
 
         Optional<String> urlField = entry.getField(StandardField.URL);
         if (urlField.isPresent()) {
             String descriptiveHtml = getHtml(urlField.get());
-            String startOfFulltextLink = "<a class=\"btn btn-sm btn-outline-dark\"";
-            String fulltextLinkAsInHtml = getRequiredValueBetween(startOfFulltextLink, ".pdf", descriptiveHtml);
+            String startOfFulltextLink =
+                "<a class=\"btn btn-sm btn-outline-dark\"";
+            String fulltextLinkAsInHtml = getRequiredValueBetween(
+                startOfFulltextLink,
+                ".pdf",
+                descriptiveHtml
+            );
             // There is an additional "\n           href=\"/archive/" we have to remove - and for some reason,
             // getRequiredValueBetween refuses to match across the line break.
-            fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(".*href=\"/", "").trim();
-            String fulltextLink = FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + ".pdf";
+            fulltextLinkAsInHtml =
+                fulltextLinkAsInHtml.replaceFirst(".*href=\"/", "").trim();
+            String fulltextLink =
+                FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + ".pdf";
             return Optional.of(new URL(fulltextLink));
         }
         return Optional.empty();

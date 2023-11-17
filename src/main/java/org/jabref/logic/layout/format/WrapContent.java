@@ -1,7 +1,6 @@
 package org.jabref.logic.layout.format;
 
 import java.util.List;
-
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /**

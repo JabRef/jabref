@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 public enum BackupFileType implements FileType {
-
     // Used at BackupManager
     BACKUP("Backup", "bak"),
 

@@ -1,7 +1,6 @@
 package org.jabref.logic.layout.format;
 
 import java.util.Objects;
-
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatter;
 

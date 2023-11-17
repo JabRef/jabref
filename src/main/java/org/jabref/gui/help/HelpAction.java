@@ -16,7 +16,11 @@ public class HelpAction extends SimpleCommand {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
 
-    public HelpAction(HelpFile helpPage, DialogService dialogService, FilePreferences filePreferences) {
+    public HelpAction(
+        HelpFile helpPage,
+        DialogService dialogService,
+        FilePreferences filePreferences
+    ) {
         this.helpPage = helpPage;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
@@ -25,7 +29,11 @@ public class HelpAction extends SimpleCommand {
     void openHelpPage(HelpFile helpPage) {
         StringBuilder sb = new StringBuilder("https://docs.jabref.org/");
         sb.append(helpPage.getPageName());
-        JabRefDesktop.openBrowserShowPopup(sb.toString(), dialogService, filePreferences);
+        JabRefDesktop.openBrowserShowPopup(
+            sb.toString(),
+            dialogService,
+            filePreferences
+        );
     }
 
     @Override

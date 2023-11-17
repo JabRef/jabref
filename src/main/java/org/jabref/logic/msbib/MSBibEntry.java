@@ -7,13 +7,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -75,7 +73,9 @@ class MSBibEntry {
      *  tested using http://www.regexpal.com/
      */
 
-    private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
+    private final Pattern ADDRESS_PATTERN = Pattern.compile(
+        "\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b"
+    );
 
     public MSBibEntry() {
         // empty
@@ -135,7 +135,10 @@ class MSBibEntry {
         if (city != null) {
             addressBuffer.append(city);
         }
-        if (((state != null) && !state.isEmpty()) && ((city != null) && !city.isEmpty())) {
+        if (
+            ((state != null) && !state.isEmpty()) &&
+            ((city != null) && !city.isEmpty())
+        ) {
             addressBuffer.append(",").append(' ');
             addressBuffer.append(state);
         }
@@ -153,17 +156,22 @@ class MSBibEntry {
         }
         journalName = getXmlElementTextContent("JournalName", entry);
         month = getXmlElementTextContent("Month", entry);
-        internetSiteTitle = getXmlElementTextContent("InternetSiteTitle", entry);
+        internetSiteTitle =
+            getXmlElementTextContent("InternetSiteTitle", entry);
 
         String monthAccessed = getXmlElementTextContent("MonthAccessed", entry);
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
         String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
 
-        Optional<Date> parsedDateAcessed = Date.parse(Optional.ofNullable(yearAccessed),
-                Optional.ofNullable(monthAccessed),
-                Optional.ofNullable(dayAccessed));
+        Optional<Date> parsedDateAcessed = Date.parse(
+            Optional.ofNullable(yearAccessed),
+            Optional.ofNullable(monthAccessed),
+            Optional.ofNullable(dayAccessed)
+        );
 
-        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
+        parsedDateAcessed
+            .map(Date::getNormalized)
+            .ifPresent(date -> dateAccessed = date);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -195,20 +203,28 @@ class MSBibEntry {
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "NameList");
+        nodeLst =
+            ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "NameList");
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "Person");
+        NodeList person =
+            ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "Person");
         if (person.getLength() <= 0) {
             return result;
         }
 
         result = new LinkedList<>();
         for (int i = 0; i < person.getLength(); i++) {
-            NodeList firstName = ((Element) person.item(i)).getElementsByTagNameNS("*", "First");
-            NodeList lastName = ((Element) person.item(i)).getElementsByTagNameNS("*", "Last");
-            NodeList middleName = ((Element) person.item(i)).getElementsByTagNameNS("*", "Middle");
+            NodeList firstName =
+                ((Element) person.item(i)).getElementsByTagNameNS("*", "First");
+            NodeList lastName =
+                ((Element) person.item(i)).getElementsByTagNameNS("*", "Last");
+            NodeList middleName =
+                ((Element) person.item(i)).getElementsByTagNameNS(
+                        "*",
+                        "Middle"
+                    );
 
             StringBuilder sb = new StringBuilder();
 
@@ -240,15 +256,23 @@ class MSBibEntry {
      * @return XmlElement represenation of one entry
      */
     public Element getEntryDom(Document document) {
-        Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
+        Element rootNode = document.createElementNS(
+            MSBibDatabase.NAMESPACE,
+            MSBibDatabase.PREFIX + "Source"
+        );
 
         for (Map.Entry<String, String> entry : fields.entrySet()) {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        Optional.ofNullable(dateAccessed).ifPresent(field -> addDateAcessedFields(document, rootNode));
+        Optional
+            .ofNullable(dateAccessed)
+            .ifPresent(field -> addDateAcessedFields(document, rootNode));
 
-        Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
+        Element allAuthors = document.createElementNS(
+            MSBibDatabase.NAMESPACE,
+            MSBibDatabase.PREFIX + "Author"
+        );
 
         addAuthor(document, allAuthors, "Author", authors);
         addAuthor(document, allAuthors, "BookAuthor", bookAuthors);
@@ -295,35 +319,65 @@ class MSBibEntry {
         return rootNode;
     }
 
-    private void addField(Document document, Element parent, String name, String value) {
+    private void addField(
+        Document document,
+        Element parent,
+        String name,
+        String value
+    ) {
         if (value == null) {
             return;
         }
-        Element elem = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + name);
-        elem.appendChild(document.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
+        Element elem = document.createElementNS(
+            MSBibDatabase.NAMESPACE,
+            MSBibDatabase.PREFIX + name
+        );
+        elem.appendChild(
+            document.createTextNode(
+                StringUtil.stripNonValidXMLCharacters(value)
+            )
+        );
         parent.appendChild(elem);
     }
 
     // Add authors for export
-    private void addAuthor(Document document, Element allAuthors, String entryName, List<MsBibAuthor> authorsLst) {
+    private void addAuthor(
+        Document document,
+        Element allAuthors,
+        String entryName,
+        List<MsBibAuthor> authorsLst
+    ) {
         if (authorsLst == null) {
             return;
         }
-        Element authorTop = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + entryName);
+        Element authorTop = document.createElementNS(
+            MSBibDatabase.NAMESPACE,
+            MSBibDatabase.PREFIX + entryName
+        );
 
-        Optional<MsBibAuthor> personName = authorsLst.stream().filter(MsBibAuthor::isCorporate)
-                                                     .findFirst();
+        Optional<MsBibAuthor> personName = authorsLst
+            .stream()
+            .filter(MsBibAuthor::isCorporate)
+            .findFirst();
         if (personName.isPresent()) {
             MsBibAuthor person = personName.get();
 
-            Element corporate = document.createElementNS(MSBibDatabase.NAMESPACE,
-                    MSBibDatabase.PREFIX + "Corporate");
+            Element corporate = document.createElementNS(
+                MSBibDatabase.NAMESPACE,
+                MSBibDatabase.PREFIX + "Corporate"
+            );
             corporate.setTextContent(person.getFirstLast());
             authorTop.appendChild(corporate);
         } else {
-            Element nameList = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "NameList");
+            Element nameList = document.createElementNS(
+                MSBibDatabase.NAMESPACE,
+                MSBibDatabase.PREFIX + "NameList"
+            );
             for (MsBibAuthor name : authorsLst) {
-                Element person = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Person");
+                Element person = document.createElementNS(
+                    MSBibDatabase.NAMESPACE,
+                    MSBibDatabase.PREFIX + "Person"
+                );
                 addField(document, person, "Last", name.getLastName());
                 addField(document, person, "Middle", name.getMiddleName());
                 addField(document, person, "First", name.getFirstName());
@@ -336,27 +390,48 @@ class MSBibEntry {
 
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
-        parsedDateAcesseField.flatMap(Date::getYear).map(Object::toString).ifPresent(yearAccessed -> {
-            addField(document, rootNode, "Year" + "Accessed", yearAccessed);
-        });
+        parsedDateAcesseField
+            .flatMap(Date::getYear)
+            .map(Object::toString)
+            .ifPresent(yearAccessed -> {
+                addField(document, rootNode, "Year" + "Accessed", yearAccessed);
+            });
 
-        parsedDateAcesseField.flatMap(Date::getMonth)
-                             .map(Month::getFullName).ifPresent(monthAcessed -> {
-            addField(document, rootNode, "Month" + "Accessed", monthAcessed);
-        });
-        parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> {
-            addField(document, rootNode, "Day" + "Accessed", dayAccessed);
-        });
+        parsedDateAcesseField
+            .flatMap(Date::getMonth)
+            .map(Month::getFullName)
+            .ifPresent(monthAcessed -> {
+                addField(
+                    document,
+                    rootNode,
+                    "Month" + "Accessed",
+                    monthAcessed
+                );
+            });
+        parsedDateAcesseField
+            .flatMap(Date::getDay)
+            .map(Object::toString)
+            .ifPresent(dayAccessed -> {
+                addField(document, rootNode, "Day" + "Accessed", dayAccessed);
+            });
     }
 
-    private void addAddress(Document document, Element parent, String addressToSplit) {
+    private void addAddress(
+        Document document,
+        Element parent,
+        String addressToSplit
+    ) {
         if (addressToSplit == null) {
             return;
         }
 
         Matcher matcher = ADDRESS_PATTERN.matcher(addressToSplit);
 
-        if (addressToSplit.contains(",") && matcher.matches() && (matcher.groupCount() >= 3)) {
+        if (
+            addressToSplit.contains(",") &&
+            matcher.matches() &&
+            (matcher.groupCount() >= 3)
+        ) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));

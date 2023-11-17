@@ -2,7 +2,7 @@ package org.jabref.gui.slr;
 
 import java.io.IOException;
 import java.nio.file.Path;
-
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -19,13 +19,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExistingStudySearchAction extends SimpleCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistingStudySearchAction.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        ExistingStudySearchAction.class
+    );
 
     protected final DialogService dialogService;
 
@@ -43,32 +44,36 @@ public class ExistingStudySearchAction extends SimpleCommand {
      * @param openDatabaseAction Required to open the tab after the study is exectued
      */
     public ExistingStudySearchAction(
-            JabRefFrame frame,
-            OpenDatabaseAction openDatabaseAction,
-            DialogService dialogService,
-            FileUpdateMonitor fileUpdateMonitor,
-            TaskExecutor taskExecutor,
-            PreferencesService preferencesService,
-            StateManager stateManager) {
-        this(frame,
-                openDatabaseAction,
-                dialogService,
-                fileUpdateMonitor,
-                taskExecutor,
-                preferencesService,
-                stateManager,
-                false);
+        JabRefFrame frame,
+        OpenDatabaseAction openDatabaseAction,
+        DialogService dialogService,
+        FileUpdateMonitor fileUpdateMonitor,
+        TaskExecutor taskExecutor,
+        PreferencesService preferencesService,
+        StateManager stateManager
+    ) {
+        this(
+            frame,
+            openDatabaseAction,
+            dialogService,
+            fileUpdateMonitor,
+            taskExecutor,
+            preferencesService,
+            stateManager,
+            false
+        );
     }
 
     protected ExistingStudySearchAction(
-            JabRefFrame frame,
-            OpenDatabaseAction openDatabaseAction,
-            DialogService dialogService,
-            FileUpdateMonitor fileUpdateMonitor,
-            TaskExecutor taskExecutor,
-            PreferencesService preferencesService,
-            StateManager stateManager,
-            boolean isNew) {
+        JabRefFrame frame,
+        OpenDatabaseAction openDatabaseAction,
+        DialogService dialogService,
+        FileUpdateMonitor fileUpdateMonitor,
+        TaskExecutor taskExecutor,
+        PreferencesService preferencesService,
+        StateManager stateManager,
+        boolean isNew
+    ) {
         this.frame = frame;
         this.openDatabaseAction = openDatabaseAction;
         this.dialogService = dialogService;
@@ -88,13 +93,16 @@ public class ExistingStudySearchAction extends SimpleCommand {
             LOGGER.error("Database is not present, even if it should");
             return;
         }
-        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
+        BibDatabaseContext bibDatabaseContext = stateManager
+            .getActiveDatabase()
+            .get();
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             LOGGER.error("Database path is not present, even if it should");
             return;
         }
-        this.studyDirectory = bibDatabaseContext.getDatabasePath().get().getParent();
+        this.studyDirectory =
+            bibDatabaseContext.getDatabasePath().get().getParent();
 
         crawl();
     }
@@ -103,44 +111,66 @@ public class ExistingStudySearchAction extends SimpleCommand {
         try {
             crawlPreparation(this.studyDirectory);
         } catch (IOException | GitAPIException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Study repository could not be created"), e);
+            dialogService.showErrorDialogAndWait(
+                Localization.lang("Study repository could not be created"),
+                e
+            );
             return;
         }
 
         final Crawler crawler;
         try {
-            crawler = new Crawler(
+            crawler =
+                new Crawler(
                     this.studyDirectory,
                     new SlrGitHandler(this.studyDirectory),
                     preferencesService,
                     new BibEntryTypesManager(),
-                    fileUpdateMonitor);
+                    fileUpdateMonitor
+                );
         } catch (IOException | ParseException e) {
             LOGGER.error("Error during reading of study definition file.", e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);
+            dialogService.showErrorDialogAndWait(
+                Localization.lang(
+                    "Error during reading of study definition file."
+                ),
+                e
+            );
             return;
         }
 
         dialogService.notify(Localization.lang("Searching..."));
-        BackgroundTask.wrap(() -> {
-                          crawler.performCrawl();
-                          return 0; // Return any value to make this a callable instead of a runnable. This allows throwing exceptions.
-                      })
-                      .onFailure(e -> {
-                          LOGGER.error("Error during persistence of crawling results.");
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
-                      })
-                      .onSuccess(unused -> {
-                          dialogService.notify(Localization.lang("Finished Searching"));
-                          openDatabaseAction.openFile(Path.of(this.studyDirectory.toString(), Crawler.FILENAME_STUDY_RESULT_BIB));
-                      })
-                      .executeWith(taskExecutor);
+        BackgroundTask
+            .wrap(() -> {
+                crawler.performCrawl();
+                return 0; // Return any value to make this a callable instead of a runnable. This allows throwing exceptions.
+            })
+            .onFailure(e -> {
+                LOGGER.error("Error during persistence of crawling results.");
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang(
+                        "Error during persistence of crawling results."
+                    ),
+                    e
+                );
+            })
+            .onSuccess(unused -> {
+                dialogService.notify(Localization.lang("Finished Searching"));
+                openDatabaseAction.openFile(
+                    Path.of(
+                        this.studyDirectory.toString(),
+                        Crawler.FILENAME_STUDY_RESULT_BIB
+                    )
+                );
+            })
+            .executeWith(taskExecutor);
     }
 
     /**
      * Hook for setting up the crawl phase (e.g., initialization the repository)
      */
-    protected void crawlPreparation(Path studyRepositoryRoot) throws IOException, GitAPIException {
+    protected void crawlPreparation(Path studyRepositoryRoot)
+        throws IOException, GitAPIException {
         // Do nothing with the repository as repository is already setup
 
         // The user focused an SLR

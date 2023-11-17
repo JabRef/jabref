@@ -4,13 +4,18 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 public class MainTablePreferences {
-    private final ColumnPreferences columnPreferences;
-    private final BooleanProperty resizeColumnsToFit = new SimpleBooleanProperty();
-    private final BooleanProperty extraFileColumnsEnabled = new SimpleBooleanProperty();
 
-    public MainTablePreferences(ColumnPreferences columnPreferences,
-                                boolean resizeColumnsToFit,
-                                boolean extraFileColumnsEnabled) {
+    private final ColumnPreferences columnPreferences;
+    private final BooleanProperty resizeColumnsToFit =
+        new SimpleBooleanProperty();
+    private final BooleanProperty extraFileColumnsEnabled =
+        new SimpleBooleanProperty();
+
+    public MainTablePreferences(
+        ColumnPreferences columnPreferences,
+        boolean resizeColumnsToFit,
+        boolean extraFileColumnsEnabled
+    ) {
         this.columnPreferences = columnPreferences;
         this.resizeColumnsToFit.set(resizeColumnsToFit);
         this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);

@@ -16,5 +16,5 @@ public enum RemoteMessage {
     /**
      * Request server to identify itself. No message content.
      */
-    PING
+    PING,
 }

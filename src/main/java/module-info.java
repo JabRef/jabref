@@ -26,18 +26,18 @@ open module org.jabref {
     uses org.kordamp.ikonli.IkonProvider;
 
     provides org.kordamp.ikonli.IkonHandler
-            with org.jabref.gui.icon.JabRefIkonHandler;
+        with org.jabref.gui.icon.JabRefIkonHandler;
     provides org.kordamp.ikonli.IkonProvider
-            with org.jabref.gui.icon.JabrefIconProvider;
+        with org.jabref.gui.icon.JabrefIconProvider;
 
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
     requires com.tobiasdiez.easybind;
 
     provides com.airhacks.afterburner.views.ResourceLocator
-            with org.jabref.gui.util.JabRefResourceLocator;
+        with org.jabref.gui.util.JabRefResourceLocator;
     provides com.airhacks.afterburner.injection.PresenterFactory
-            with org.jabref.gui.DefaultInjector;
+        with org.jabref.gui.DefaultInjector;
 
     // Logging
     requires org.slf4j;
@@ -47,8 +47,7 @@ open module org.jabref {
     requires org.tinylog.api.slf4j;
     requires org.tinylog.impl;
 
-    provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiWriter;
+    provides org.tinylog.writers.Writer with org.jabref.gui.logging.GuiWriter;
 
     // Preferences and XML
     requires java.prefs;

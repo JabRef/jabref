@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
-
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 
-public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
+public class EditorTextArea
+    extends javafx.scene.control.TextArea
+    implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
     /**
@@ -30,7 +30,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
     public EditorTextArea(final String text) {
         super(text);
-
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
 
@@ -40,7 +39,14 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     @Override
     public void initContextMenu(final Supplier<List<MenuItem>> items) {
         setOnContextMenuRequested(event -> {
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
+            contextMenu
+                .getItems()
+                .setAll(
+                    EditorContextAction.getDefaultContextMenuItems(
+                        this,
+                        Globals.getKeyPrefs()
+                    )
+                );
             contextMenu.getItems().addAll(0, items.get());
 
             TextInputControlBehavior.showContextMenu(this, contextMenu, event);

@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor;
 
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -18,31 +17,33 @@ public class OptionalFields2Tab extends OptionalFieldsTabBase {
 
     public static final String NAME = "Optional fields 2";
 
-    public OptionalFields2Tab(BibDatabaseContext databaseContext,
-                              SuggestionProviders suggestionProviders,
-                              UndoManager undoManager,
-                              DialogService dialogService,
-                              PreferencesService preferences,
-                              StateManager stateManager,
-                              ThemeManager themeManager,
-                              IndexingTaskManager indexingTaskManager,
-                              BibEntryTypesManager entryTypesManager,
-                              TaskExecutor taskExecutor,
-                              JournalAbbreviationRepository journalAbbreviationRepository) {
+    public OptionalFields2Tab(
+        BibDatabaseContext databaseContext,
+        SuggestionProviders suggestionProviders,
+        UndoManager undoManager,
+        DialogService dialogService,
+        PreferencesService preferences,
+        StateManager stateManager,
+        ThemeManager themeManager,
+        IndexingTaskManager indexingTaskManager,
+        BibEntryTypesManager entryTypesManager,
+        TaskExecutor taskExecutor,
+        JournalAbbreviationRepository journalAbbreviationRepository
+    ) {
         super(
-                Localization.lang("Optional fields 2"),
-                false,
-                databaseContext,
-                suggestionProviders,
-                undoManager,
-                dialogService,
-                preferences,
-                stateManager,
-                themeManager,
-                indexingTaskManager,
-                entryTypesManager,
-                taskExecutor,
-                journalAbbreviationRepository
+            Localization.lang("Optional fields 2"),
+            false,
+            databaseContext,
+            suggestionProviders,
+            undoManager,
+            dialogService,
+            preferences,
+            stateManager,
+            themeManager,
+            indexingTaskManager,
+            entryTypesManager,
+            taskExecutor,
+            journalAbbreviationRepository
         );
     }
 }

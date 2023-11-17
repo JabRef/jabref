@@ -1,8 +1,8 @@
 package org.jabref.model.entry.field;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 class StandardFieldTest {
 

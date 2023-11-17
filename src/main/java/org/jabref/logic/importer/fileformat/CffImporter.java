@@ -1,5 +1,9 @@
 package org.jabref.logic.importer.fileformat;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -19,11 +22,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class CffImporter extends Importer {
 
@@ -49,6 +47,7 @@ public class CffImporter extends Importer {
 
     // POJO classes for yaml data
     private static class CffFormat {
+
         private final HashMap<String, String> values = new HashMap<>();
 
         @JsonProperty("authors")
@@ -57,8 +56,7 @@ public class CffImporter extends Importer {
         @JsonProperty("identifiers")
         private List<CffIdentifier> ids;
 
-        public CffFormat() {
-        }
+        public CffFormat() {}
 
         @JsonAnySetter
         private void setValues(String key, String value) {
@@ -67,10 +65,10 @@ public class CffImporter extends Importer {
     }
 
     private static class CffAuthor {
+
         private final HashMap<String, String> values = new HashMap<>();
 
-        public CffAuthor() {
-        }
+        public CffAuthor() {}
 
         @JsonAnySetter
         private void setValues(String key, String value) {
@@ -79,17 +77,19 @@ public class CffImporter extends Importer {
     }
 
     private static class CffIdentifier {
+
         @JsonProperty("type")
         private String type;
+
         @JsonProperty("value")
         private String value;
 
-        public CffIdentifier() {
-        }
+        public CffIdentifier() {}
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         HashMap<Field, String> entryMap = new HashMap<>();
@@ -99,32 +99,49 @@ public class CffImporter extends Importer {
         HashMap<String, Field> fieldMap = getFieldMappings();
         for (Map.Entry<String, String> property : citation.values.entrySet()) {
             if (fieldMap.containsKey(property.getKey())) {
-                entryMap.put(fieldMap.get(property.getKey()), property.getValue());
+                entryMap.put(
+                    fieldMap.get(property.getKey()),
+                    property.getValue()
+                );
             } else if ("type".equals(property.getKey())) {
                 if ("dataset".equals(property.getValue())) {
                     entryType = StandardEntryType.Dataset;
                 }
             } else if (getUnmappedFields().contains(property.getKey())) {
-                entryMap.put(new UnknownField(property.getKey()), property.getValue());
+                entryMap.put(
+                    new UnknownField(property.getKey()),
+                    property.getValue()
+                );
             }
         }
 
         // Translate CFF author format to JabRef author format
-        String authorStr = citation.authors.stream()
-                        .map(author -> author.values)
-                        .map(vals -> vals.get("name") != null ?
-                                new Author(vals.get("name"), "", "", "", "") :
-                                new Author(vals.get("given-names"), null, vals.get("name-particle"),
-                                        vals.get("family-names"), vals.get("name-suffix")))
-                        .collect(AuthorList.collect())
-                        .getAsFirstLastNamesWithAnd();
+        String authorStr = citation.authors
+            .stream()
+            .map(author -> author.values)
+            .map(vals ->
+                vals.get("name") != null
+                    ? new Author(vals.get("name"), "", "", "", "")
+                    : new Author(
+                        vals.get("given-names"),
+                        null,
+                        vals.get("name-particle"),
+                        vals.get("family-names"),
+                        vals.get("name-suffix")
+                    )
+            )
+            .collect(AuthorList.collect())
+            .getAsFirstLastNamesWithAnd();
         entryMap.put(StandardField.AUTHOR, authorStr);
 
         // Select DOI to keep
-        if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
-            List<CffIdentifier> doiIds = citation.ids.stream()
-                            .filter(id -> "doi".equals(id.type))
-                            .collect(Collectors.toList());
+        if (
+            (entryMap.get(StandardField.DOI) == null) && (citation.ids != null)
+        ) {
+            List<CffIdentifier> doiIds = citation.ids
+                .stream()
+                .filter(id -> "doi".equals(id.type))
+                .collect(Collectors.toList());
             if (doiIds.size() == 1) {
                 entryMap.put(StandardField.DOI, doiIds.get(0).value);
             }
@@ -132,18 +149,20 @@ public class CffImporter extends Importer {
 
         // Select SWHID to keep
         if (citation.ids != null) {
-            List<String> swhIds = citation.ids.stream()
-                                           .filter(id -> "swh".equals(id.type))
-                                           .map(id -> id.value)
-                                           .collect(Collectors.toList());
+            List<String> swhIds = citation.ids
+                .stream()
+                .filter(id -> "swh".equals(id.type))
+                .map(id -> id.value)
+                .collect(Collectors.toList());
 
             if (swhIds.size() == 1) {
                 entryMap.put(BiblatexSoftwareField.SWHID, swhIds.get(0));
             } else if (swhIds.size() > 1) {
-                List<String> relSwhIds = swhIds.stream()
-                                               .filter(id -> id.split(":").length > 3) // quick filter for invalid swhids
-                                               .filter(id -> "rel".equals(id.split(":")[2]))
-                                               .collect(Collectors.toList());
+                List<String> relSwhIds = swhIds
+                    .stream()
+                    .filter(id -> id.split(":").length > 3) // quick filter for invalid swhids
+                    .filter(id -> "rel".equals(id.split(":")[2]))
+                    .collect(Collectors.toList());
                 if (relSwhIds.size() == 1) {
                     entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.get(0));
                 }
@@ -160,8 +179,8 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation;
 

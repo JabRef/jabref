@@ -1,18 +1,17 @@
 package org.jabref.logic.protectedterms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProtectedTermsListTest {
 
@@ -25,8 +24,19 @@ public class ProtectedTermsListTest {
         Files.createFile(path);
         String tempFileName = path.toString();
 
-        internalList = new ProtectedTermsList("Name", new ArrayList<>(Arrays.asList("AAA", "BBB")), "location", true);
-        externalList = new ProtectedTermsList("Namely", new ArrayList<>(Arrays.asList("AAA", "BBB")), tempFileName);
+        internalList =
+            new ProtectedTermsList(
+                "Name",
+                new ArrayList<>(Arrays.asList("AAA", "BBB")),
+                "location",
+                true
+            );
+        externalList =
+            new ProtectedTermsList(
+                "Namely",
+                new ArrayList<>(Arrays.asList("AAA", "BBB")),
+                tempFileName
+            );
     }
 
     @Test

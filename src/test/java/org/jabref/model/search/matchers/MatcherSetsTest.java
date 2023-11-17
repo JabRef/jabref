@@ -1,12 +1,11 @@
 package org.jabref.model.search.matchers;
 
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.rules.MockSearchMatcher;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.rules.MockSearchMatcher;
+import org.junit.jupiter.api.Test;
 
 public class MatcherSetsTest {
 

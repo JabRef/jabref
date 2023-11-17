@@ -2,10 +2,10 @@ package org.jabref.model.entry.types;
 
 import java.util.Locale;
 import java.util.Objects;
-
 import org.jabref.model.strings.StringUtil;
 
 public class UnknownEntryType implements EntryType {
+
     private final String name;
 
     public UnknownEntryType(String name) {
@@ -14,9 +14,7 @@ public class UnknownEntryType implements EntryType {
 
     @Override
     public String toString() {
-        return "UnknownEntryType{" +
-                "name='" + name + '\'' +
-                '}';
+        return "UnknownEntryType{" + "name='" + name + '\'' + '}';
     }
 
     @Override

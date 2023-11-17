@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
@@ -14,32 +13,46 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
-
+import org.controlsfx.control.textfield.CustomPasswordField;
+import org.controlsfx.dialog.ProgressDialog;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
-import org.controlsfx.control.textfield.CustomPasswordField;
-import org.controlsfx.dialog.ProgressDialog;
-
 /**
  * This interface provides methods to create dialogs and show them to the user.
  */
 public interface DialogService {
-
     /**
      * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
      *
      * @implNote The implementation should accept {@code null} for {@code defaultChoice}, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
      */
-    <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
+    <T> Optional<T> showChoiceDialogAndWait(
+        String title,
+        String content,
+        String okButtonLabel,
+        T defaultChoice,
+        Collection<T> choices
+    );
 
     /**
      * This will create and display new {@link ChoiceDialog} of type T with a collection of possible choices
      */
-    default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
-        return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
+    default <T> Optional<T> showChoiceDialogAndWait(
+        String title,
+        String content,
+        String okButtonLabel,
+        Collection<T> choices
+    ) {
+        return showChoiceDialogAndWait(
+            title,
+            content,
+            okButtonLabel,
+            null,
+            choices
+        );
     }
 
     /**
@@ -50,7 +63,11 @@ public interface DialogService {
     /**
      * This will create and display new {@link TextInputDialog} with a text field with a default value to enter data
      */
-    Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue);
+    Optional<String> showInputDialogWithDefaultAndWait(
+        String title,
+        String content,
+        String defaultValue
+    );
 
     /**
      * This will create and display a new information dialog.
@@ -90,7 +107,10 @@ public interface DialogService {
      * @param exception the exception causing the error
      */
     default void showErrorDialogAndWait(Exception exception) {
-        showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
+        showErrorDialogAndWait(
+            Localization.lang("Unhandled exception occurred."),
+            exception
+        );
     }
 
     /**
@@ -98,7 +118,11 @@ public interface DialogService {
      *
      * @param exception the exception causing the error
      */
-    void showErrorDialogAndWait(String title, String content, Throwable exception);
+    void showErrorDialogAndWait(
+        String title,
+        String content,
+        Throwable exception
+    );
 
     /**
      * Create and display error dialog displaying the given message.
@@ -125,7 +149,11 @@ public interface DialogService {
      *
      * @return true if the use clicked "OK" otherwise false
      */
-    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel);
+    boolean showConfirmationDialogAndWait(
+        String title,
+        String content,
+        String okButtonLabel
+    );
 
     /**
      * Create and display a new confirmation dialog.
@@ -135,7 +163,12 @@ public interface DialogService {
      *
      * @return true if the use clicked "OK" otherwise false
      */
-    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel);
+    boolean showConfirmationDialogAndWait(
+        String title,
+        String content,
+        String okButtonLabel,
+        String cancelButtonLabel
+    );
 
     /**
      * Create and display a new confirmation dialog.
@@ -146,8 +179,12 @@ public interface DialogService {
      *
      * @return true if the use clicked "YES" otherwise false
      */
-    boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-                                                    String optOutMessage, Consumer<Boolean> optOutAction);
+    boolean showConfirmationDialogWithOptOutAndWait(
+        String title,
+        String content,
+        String optOutMessage,
+        Consumer<Boolean> optOutAction
+    );
 
     /**
      * Create and display a new confirmation dialog.
@@ -158,9 +195,14 @@ public interface DialogService {
      *
      * @return true if the use clicked "YES" otherwise false
      */
-    boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-                                                    String okButtonLabel, String cancelButtonLabel,
-                                                    String optOutMessage, Consumer<Boolean> optOutAction);
+    boolean showConfirmationDialogWithOptOutAndWait(
+        String title,
+        String content,
+        String okButtonLabel,
+        String cancelButtonLabel,
+        String optOutMessage,
+        Consumer<Boolean> optOutAction
+    );
 
     /**
      * This will create and display new {@link CustomPasswordField} that doesn't show the text, and two buttons
@@ -168,7 +210,11 @@ public interface DialogService {
      *
      * @return the entered password if pressed "OK", null otherwise
      */
-    Optional<String> showPasswordDialogAndWait(String title, String header, String content);
+    Optional<String> showPasswordDialogAndWait(
+        String title,
+        String header,
+        String content
+    );
 
     /**
      * Shows a custom dialog without returning any results.
@@ -184,8 +230,12 @@ public interface DialogService {
      *
      * @return Optional with the pressed Button as ButtonType
      */
-    Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
-                                                       ButtonType... buttonTypes);
+    Optional<ButtonType> showCustomButtonDialogAndWait(
+        Alert.AlertType type,
+        String title,
+        String content,
+        ButtonType... buttonTypes
+    );
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
@@ -193,7 +243,11 @@ public interface DialogService {
      *
      * @return Optional with the pressed Button as ButtonType
      */
-    Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
+    Optional<ButtonType> showCustomDialogAndWait(
+        String title,
+        DialogPane contentPane,
+        ButtonType... buttonTypes
+    );
 
     /**
      * Shows a custom dialog and returns the result.
@@ -201,7 +255,9 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(
+        javafx.scene.control.Dialog<R> dialog
+    );
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
@@ -221,7 +277,11 @@ public interface DialogService {
      * @param content      message to show below the list of background tasks
      * @param stateManager The {@link StateManager} which contains the background tasks
      */
-    <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
+    <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(
+        String title,
+        String content,
+        StateManager stateManager
+    );
 
     /**
      * Notify the user in a non-blocking way (i.e., in form of toast in a snackbar).
@@ -238,7 +298,9 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration);
+    Optional<Path> showFileSaveDialog(
+        FileDialogConfiguration fileDialogConfiguration
+    );
 
     /**
      * Shows a new file open dialog. The method doesn't return until the
@@ -249,7 +311,9 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+    Optional<Path> showFileOpenDialog(
+        FileDialogConfiguration fileDialogConfiguration
+    );
 
     /**
      * Shows a new file open dialog. The method doesn't return until the
@@ -259,7 +323,9 @@ public interface DialogService {
      *
      * @return the selected files or an empty {@link List} if no file has been selected
      */
-    List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration);
+    List<Path> showFileOpenDialogAndGetMultipleFiles(
+        FileDialogConfiguration fileDialogConfiguration
+    );
 
     /**
      * Shows a new directory selection dialog. The method doesn't return until the
@@ -269,7 +335,9 @@ public interface DialogService {
      *
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
-    Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
+    Optional<Path> showDirectorySelectionDialog(
+        DirectoryDialogConfiguration directoryDialogConfiguration
+    );
 
     /**
      * Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be
@@ -288,5 +356,6 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
+    Optional<Path> showFileOpenFromArchiveDialog(Path archivePath)
+        throws IOException;
 }

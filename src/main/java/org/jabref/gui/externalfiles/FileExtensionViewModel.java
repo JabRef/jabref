@@ -4,7 +4,6 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.JabRefIcon;
@@ -26,13 +25,17 @@ public class FileExtensionViewModel {
     }
 
     public String getDescription() {
-        return this.description + extensions.stream().collect(Collectors.joining(", ", " (", ")"));
+        return (
+            this.description +
+            extensions.stream().collect(Collectors.joining(", ", " (", ")"))
+        );
     }
 
     public JabRefIcon getIcon() {
-        return ExternalFileTypes.getExternalFileTypeByExt(extensions.get(0), filePreferences)
-                                .map(ExternalFileType::getIcon)
-                                .orElse(null);
+        return ExternalFileTypes
+            .getExternalFileTypeByExt(extensions.get(0), filePreferences)
+            .map(ExternalFileType::getIcon)
+            .orElse(null);
     }
 
     public Filter<Path> dirFilter() {

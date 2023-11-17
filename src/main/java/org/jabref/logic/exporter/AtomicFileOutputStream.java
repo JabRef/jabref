@@ -12,10 +12,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
-
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.FileUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +44,13 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicFileOutputStream extends FilterOutputStream {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        AtomicFileOutputStream.class
+    );
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().get(0);
+    private static final String SAVE_EXTENSION =
+        "." + BackupFileType.SAVE.getExtensions().get(0);
 
     /**
      * The file we want to create/replace.
@@ -78,9 +79,15 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * @param path       the path of the file to write to or replace
      * @param keepBackup whether to keep the backup file (.sav) after a successful write process
      */
-    public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
+    public AtomicFileOutputStream(Path path, boolean keepBackup)
+        throws IOException {
         // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
-        this(path, getPathOfTemporaryFile(path), new FileOutputStream(getPathOfTemporaryFile(path).toFile()), keepBackup);
+        this(
+            path,
+            getPathOfTemporaryFile(path),
+            new FileOutputStream(getPathOfTemporaryFile(path).toFile()),
+            keepBackup
+        );
     }
 
     /**
@@ -96,7 +103,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /**
      * Required for proper testing
      */
-    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
+    AtomicFileOutputStream(
+        Path path,
+        Path pathOfTemporaryFile,
+        OutputStream temporaryFileOutputStream,
+        boolean keepBackup
+    ) throws IOException {
         super(temporaryFileOutputStream);
         this.targetFile = path;
         this.temporaryFile = pathOfTemporaryFile;
@@ -110,14 +122,22 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                     temporaryFileLock = stream.getChannel().tryLock();
                 } catch (IOException ex) {
                     // workaround for https://bugs.openjdk.org/browse/JDK-8167023
-                    LOGGER.warn("Could not acquire file lock. Maybe we are on a network drive?", ex);
+                    LOGGER.warn(
+                        "Could not acquire file lock. Maybe we are on a network drive?",
+                        ex
+                    );
                     temporaryFileLock = null;
                 }
             } else {
                 temporaryFileLock = null;
             }
         } catch (OverlappingFileLockException exception) {
-            throw new IOException("Could not obtain write access to " + temporaryFile + ". Maybe another instance of JabRef is currently writing to the same file?", exception);
+            throw new IOException(
+                "Could not obtain write access to " +
+                temporaryFile +
+                ". Maybe another instance of JabRef is currently writing to the same file?",
+                exception
+            );
         }
     }
 
@@ -160,7 +180,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             Files.deleteIfExists(temporaryFile);
             Files.deleteIfExists(backupFile);
         } catch (IOException exception) {
-            LOGGER.debug("Unable to abort writing to file {}", temporaryFile, exception);
+            LOGGER.debug(
+                "Unable to abort writing to file {}",
+                temporaryFile,
+                exception
+            );
         }
     }
 
@@ -172,7 +196,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         } catch (IOException exception) {
             // Currently, we always get the exception:
             // Unable to release lock on file C:\Users\koppor\AppData\Local\Temp\junit11976839611279549873\error-during-save.txt.tmp: java.nio.channels.ClosedChannelException
-            LOGGER.debug("Unable to release lock on file {}", temporaryFile, exception);
+            LOGGER.debug(
+                "Unable to release lock on file {}",
+                temporaryFile,
+                exception
+            );
         }
         try {
             Files.deleteIfExists(temporaryFile);
@@ -207,29 +235,45 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
             // We successfully wrote everything to the temporary file, lets copy it to the correct place
             // First, make backup of original file and try to save file permissions to restore them later (by default: 664)
-            Set<PosixFilePermission> oldFilePermissions = EnumSet.of(PosixFilePermission.OWNER_READ,
-                    PosixFilePermission.OWNER_WRITE,
-                    PosixFilePermission.GROUP_READ,
-                    PosixFilePermission.GROUP_WRITE,
-                    PosixFilePermission.OTHERS_READ);
+            Set<PosixFilePermission> oldFilePermissions = EnumSet.of(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.GROUP_READ,
+                PosixFilePermission.GROUP_WRITE,
+                PosixFilePermission.OTHERS_READ
+            );
             if (Files.exists(targetFile)) {
                 try {
-                    Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(
+                        targetFile,
+                        backupFile,
+                        StandardCopyOption.REPLACE_EXISTING
+                    );
                 } catch (Exception e) {
                     LOGGER.warn("Could not create backup file {}", backupFile);
                 }
                 if (FileUtil.IS_POSIX_COMPLIANT) {
                     try {
-                        oldFilePermissions = Files.getPosixFilePermissions(targetFile);
+                        oldFilePermissions =
+                            Files.getPosixFilePermissions(targetFile);
                     } catch (IOException exception) {
-                        LOGGER.warn("Error getting file permissions for file {}.", targetFile, exception);
+                        LOGGER.warn(
+                            "Error getting file permissions for file {}.",
+                            targetFile,
+                            exception
+                        );
                     }
                 }
             }
 
             try {
                 // Move temporary file (replace original if it exists)
-                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                Files.move(
+                    temporaryFile,
+                    targetFile,
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING
+                );
             } catch (Exception e) {
                 LOGGER.warn("Could not move temporary file", e);
                 throw e;
@@ -238,9 +282,16 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
                 try {
-                    Files.setPosixFilePermissions(targetFile, oldFilePermissions);
+                    Files.setPosixFilePermissions(
+                        targetFile,
+                        oldFilePermissions
+                    );
                 } catch (IOException exception) {
-                    LOGGER.warn("Error writing file permissions to file {}.", targetFile, exception);
+                    LOGGER.warn(
+                        "Error writing file permissions to file {}.",
+                        targetFile,
+                        exception
+                    );
                 }
             }
 
@@ -274,4 +325,3 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
     }
 }
-

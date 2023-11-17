@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -38,7 +37,9 @@ public class EscapeAmpersandsFormatter extends Formatter {
                 if (!inCommandOption) {
                     commandName.append(c);
                 }
-            } else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
+            } else if (
+                Character.isWhitespace(c) && (inCommand || inCommandOption)
+            ) {
                 // Whitespace
             } else if (inCommandName) {
                 // This means the command name is ended.
@@ -62,7 +63,9 @@ public class EscapeAmpersandsFormatter extends Formatter {
                 if ("begin".contentEquals(commandName)) {
                     nestedEnvironments++;
                 }
-                if ((nestedEnvironments > 0) && "end".contentEquals(commandName)) {
+                if (
+                    (nestedEnvironments > 0) && "end".contentEquals(commandName)
+                ) {
                     nestedEnvironments--;
                 }
 
@@ -72,8 +75,12 @@ public class EscapeAmpersandsFormatter extends Formatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-            if ((c == '&') && !escape && !(inCommand && "url".contentEquals(commandName))
-                    && (nestedEnvironments == 0)) {
+            if (
+                (c == '&') &&
+                !escape &&
+                !(inCommand && "url".contentEquals(commandName)) &&
+                (nestedEnvironments == 0)
+            ) {
                 result.append("\\&");
             } else {
                 result.append(c);

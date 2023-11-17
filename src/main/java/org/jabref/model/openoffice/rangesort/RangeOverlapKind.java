@@ -1,7 +1,6 @@
 package org.jabref.model.openoffice.rangesort;
 
 public enum RangeOverlapKind {
-
     /**
      * The ranges share a boundary
      */
@@ -15,6 +14,5 @@ public enum RangeOverlapKind {
     /**
      * They cover the same XTextRange
      */
-    EQUAL_RANGE
+    EQUAL_RANGE,
 }
-

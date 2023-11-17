@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -36,23 +35,43 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         List<LinkedFile> fileList = new ArrayList<>(entry.getFiles());
         int oldItemCount = fileList.size();
         for (Map.Entry<Field, String> field : fields.entrySet()) {
-            entry.getField(field.getKey()).ifPresent(fieldContent -> {
-                if (fieldContent.trim().isEmpty()) {
-                    return;
-                }
-                Path path = Path.of(fieldContent);
-                LinkedFile flEntry = new LinkedFile(path.getFileName().toString(), path, field.getValue());
-                fileList.add(flEntry);
+            entry
+                .getField(field.getKey())
+                .ifPresent(fieldContent -> {
+                    if (fieldContent.trim().isEmpty()) {
+                        return;
+                    }
+                    Path path = Path.of(fieldContent);
+                    LinkedFile flEntry = new LinkedFile(
+                        path.getFileName().toString(),
+                        path,
+                        field.getValue()
+                    );
+                    fileList.add(flEntry);
 
-                entry.clearField(field.getKey());
-                changes.add(new FieldChange(entry, field.getKey(), fieldContent, null));
-            });
+                    entry.clearField(field.getKey());
+                    changes.add(
+                        new FieldChange(
+                            entry,
+                            field.getKey(),
+                            fieldContent,
+                            null
+                        )
+                    );
+                });
         }
 
         if (fileList.size() != oldItemCount) {
             String newValue = FileFieldWriter.getStringRepresentation(fileList);
             entry.setField(StandardField.FILE, newValue);
-            changes.add(new FieldChange(entry, StandardField.FILE, oldFileContent, newValue));
+            changes.add(
+                new FieldChange(
+                    entry,
+                    StandardField.FILE,
+                    oldFileContent,
+                    newValue
+                )
+            );
         }
 
         return changes;

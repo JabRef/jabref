@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
@@ -17,14 +16,15 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseLogic("because it needs access to aux parser")
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        TexGroup.class
+    );
 
     private final Path filePath;
     private Set<String> keysUsedInAux;
@@ -33,7 +33,15 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private final MetaData metaData;
     private final String user;
 
-    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) {
+    TexGroup(
+        String name,
+        GroupHierarchyType context,
+        Path filePath,
+        AuxParser auxParser,
+        FileUpdateMonitor fileMonitor,
+        MetaData metaData,
+        String user
+    ) {
         super(name, context);
         this.metaData = metaData;
         this.user = user;
@@ -42,19 +50,63 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         this.fileMonitor = fileMonitor;
     }
 
-    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        this(name, context, filePath, auxParser, fileMonitor, metaData, System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName());
+    TexGroup(
+        String name,
+        GroupHierarchyType context,
+        Path filePath,
+        AuxParser auxParser,
+        FileUpdateMonitor fileMonitor,
+        MetaData metaData
+    ) throws IOException {
+        this(
+            name,
+            context,
+            filePath,
+            auxParser,
+            fileMonitor,
+            metaData,
+            System.getProperty("user.name") +
+            '-' +
+            InetAddress.getLocalHost().getHostName()
+        );
     }
 
-    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    public static TexGroup create(
+        String name,
+        GroupHierarchyType context,
+        Path filePath,
+        AuxParser auxParser,
+        FileUpdateMonitor fileMonitor,
+        MetaData metaData
+    ) throws IOException {
+        TexGroup group = new TexGroup(
+            name,
+            context,
+            filePath,
+            auxParser,
+            fileMonitor,
+            metaData
+        );
         fileMonitor.addListenerForFile(group.getFilePathResolved(), group);
         return group;
     }
 
     // without FileUpdateMonitor
-    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, MetaData metaData) throws IOException {
-        return new TexGroup(name, context, filePath, auxParser, new DummyFileUpdateMonitor(), metaData);
+    public static TexGroup create(
+        String name,
+        GroupHierarchyType context,
+        Path filePath,
+        AuxParser auxParser,
+        MetaData metaData
+    ) throws IOException {
+        return new TexGroup(
+            name,
+            context,
+            filePath,
+            auxParser,
+            new DummyFileUpdateMonitor(),
+            metaData
+        );
     }
 
     public Path getFilePathResolved() {
@@ -68,7 +120,10 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
             keysUsedInAux = auxResult.getUniqueKeys();
         }
 
-        return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
+        return entry
+            .getCitationKey()
+            .map(keysUsedInAux::contains)
+            .orElse(false);
     }
 
     @Override
@@ -79,7 +134,14 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor, metaData);
+            return new TexGroup(
+                name.getValue(),
+                context,
+                filePath,
+                auxParser,
+                fileMonitor,
+                metaData
+            );
         } catch (IOException ex) {
             // This should never happen because we were able to monitor the file just fine until now
             LOGGER.error("Problem creating copy of group", ex);
@@ -104,12 +166,19 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public String toString() {
-        return "TexGroup{" +
-                "filePath=" + filePath +
-                ", keysUsedInAux=" + keysUsedInAux +
-                ", auxParser=" + auxParser +
-                ", fileMonitor=" + fileMonitor +
-                "} " + super.toString();
+        return (
+            "TexGroup{" +
+            "filePath=" +
+            filePath +
+            ", keysUsedInAux=" +
+            keysUsedInAux +
+            ", auxParser=" +
+            auxParser +
+            ", fileMonitor=" +
+            fileMonitor +
+            "} " +
+            super.toString()
+        );
     }
 
     @Override
@@ -139,8 +208,9 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        return metaData.getLatexFileDirectory(user)
-                       .map(List::of)
-                       .orElse(Collections.emptyList());
+        return metaData
+            .getLatexFileDirectory(user)
+            .map(List::of)
+            .orElse(Collections.emptyList());
     }
 }

@@ -3,7 +3,6 @@ package org.jabref.logic.bst;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -13,13 +12,14 @@ import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BstPreviewLayout implements PreviewLayout {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BstPreviewLayout.class
+    );
 
     private final String name;
 
@@ -30,19 +30,24 @@ public class BstPreviewLayout implements PreviewLayout {
         name = path.getFileName().toString();
         if (!Files.exists(path)) {
             LOGGER.error("File {} not found", path.toAbsolutePath());
-            error = Localization.lang("Error opening file '%0'", path.toString());
+            error =
+                Localization.lang("Error opening file '%0'", path.toString());
             return;
         }
         try {
             bstVM = new BstVM(path);
         } catch (Exception e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
-            error = Localization.lang("Error opening file '%0'", path.toString());
+            error =
+                Localization.lang("Error opening file '%0'", path.toString());
         }
     }
 
     @Override
-    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
+    public String generatePreview(
+        BibEntry originalEntry,
+        BibDatabaseContext databaseContext
+    ) {
         if (error != null) {
             return error;
         }

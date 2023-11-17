@@ -1,22 +1,24 @@
 package org.jabref.gui.fieldeditors;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 public class PaginationEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(7);
 
-    public PaginationEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public PaginationEditorViewModel(
+        Field field,
+        SuggestionProvider<?> suggestionProvider,
+        FieldCheckers fieldCheckers,
+        UndoManager undoManager
+    ) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
-
         itemMap.put("page", Localization.lang("Page"));
         itemMap.put("column", Localization.lang("Column"));
         itemMap.put("line", Localization.lang("Line"));

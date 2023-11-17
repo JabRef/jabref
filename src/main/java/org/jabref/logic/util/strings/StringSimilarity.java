@@ -1,10 +1,10 @@
 package org.jabref.logic.util.strings;
 
+import info.debatty.java.stringsimilarity.Levenshtein;
 import java.util.Locale;
 
-import info.debatty.java.stringsimilarity.Levenshtein;
-
 public class StringSimilarity {
+
     private final Levenshtein METRIC_DISTANCE = new Levenshtein();
     // edit distance threshold for entry title comparison
     private final int METRIC_THRESHOLD = 4;
@@ -22,6 +22,9 @@ public class StringSimilarity {
 
     public double editDistanceIgnoreCase(String a, String b) {
         // TODO: Locale is dependent on the language of the strings. English is a good denominator.
-        return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
+        return METRIC_DISTANCE.distance(
+            a.toLowerCase(Locale.ENGLISH),
+            b.toLowerCase(Locale.ENGLISH)
+        );
     }
 }

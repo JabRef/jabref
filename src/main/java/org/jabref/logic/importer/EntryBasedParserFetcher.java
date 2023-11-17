@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
@@ -20,13 +19,13 @@ import org.jabref.model.entry.BibEntry;
  * 3. Post-process fetched entries
  */
 public interface EntryBasedParserFetcher extends EntryBasedFetcher {
-
     /**
      * Constructs a URL based on the {@link BibEntry}.
      *
      * @param entry the entry to look information for
      */
-    URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForEntry(BibEntry entry)
+        throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
@@ -52,7 +51,8 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    default List<BibEntry> performSearch(BibEntry entry)
+        throws FetcherException {
         Objects.requireNonNull(entry);
 
         URL UrlForEntry;
@@ -64,7 +64,11 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
+        try (
+            InputStream stream = new BufferedInputStream(
+                UrlForEntry.openStream()
+            )
+        ) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup

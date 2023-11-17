@@ -13,7 +13,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.util.OS;
@@ -26,22 +25,29 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
-
 import org.slf4j.LoggerFactory;
 
 public class BibEntryWriter {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(
+        BibEntryWriter.class
+    );
 
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
 
-    public BibEntryWriter(FieldWriter fieldWriter, BibEntryTypesManager entryTypesManager) {
+    public BibEntryWriter(
+        FieldWriter fieldWriter,
+        BibEntryTypesManager entryTypesManager
+    ) {
         this.fieldWriter = fieldWriter;
         this.entryTypesManager = entryTypesManager;
     }
 
-    public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
+    public String serializeAll(
+        List<BibEntry> entries,
+        BibDatabaseMode databaseMode
+    ) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         for (BibEntry entry : entries) {
@@ -50,7 +56,11 @@ public class BibEntryWriter {
         return writer.toString();
     }
 
-    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode) throws IOException {
+    public void write(
+        BibEntry entry,
+        BibWriter out,
+        BibDatabaseMode bibDatabaseMode
+    ) throws IOException {
         write(entry, out, bibDatabaseMode, false);
     }
 
@@ -62,7 +72,12 @@ public class BibEntryWriter {
      * @param bibDatabaseMode The database mode (bibtex or biblatex)
      * @param reformat        Should the entry be in any case, even if no change occurred?
      */
-    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
+    public void write(
+        BibEntry entry,
+        BibWriter out,
+        BibDatabaseMode bibDatabaseMode,
+        Boolean reformat
+    ) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
             out.write(entry.getParsedSerialization());
@@ -71,11 +86,16 @@ public class BibEntryWriter {
         }
 
         writeUserComments(entry, out);
-        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
+        writeRequiredFieldsFirstRemainingFieldsSecond(
+            entry,
+            out,
+            bibDatabaseMode
+        );
         out.finishBlock();
     }
 
-    private void writeUserComments(BibEntry entry, BibWriter out) throws IOException {
+    private void writeUserComments(BibEntry entry, BibWriter out)
+        throws IOException {
         String userComments = entry.getUserComments();
 
         if (!userComments.isEmpty()) {
@@ -88,8 +108,11 @@ public class BibEntryWriter {
     /**
      * Writes fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
      */
-    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, BibWriter out,
-                                                               BibDatabaseMode bibDatabaseMode) throws IOException {
+    private void writeRequiredFieldsFirstRemainingFieldsSecond(
+        BibEntry entry,
+        BibWriter out,
+        BibDatabaseMode bibDatabaseMode
+    ) throws IOException {
         // Write header with type and bibtex-key
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
         out.write('@' + typedEntry.getTypeForDisplay() + '{');
@@ -100,28 +123,33 @@ public class BibEntryWriter {
         written.add(InternalField.KEY_FIELD);
         final int indent = getLengthOfLongestFieldName(entry);
 
-        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), bibDatabaseMode);
+        Optional<BibEntryType> type = entryTypesManager.enrich(
+            entry.getType(),
+            bibDatabaseMode
+        );
         if (type.isPresent()) {
             // Write required fields first
-            List<Field> requiredFields = type.get()
-                    .getRequiredFields()
-                    .stream()
-                    .map(OrFields::getFields)
-                    .flatMap(Collection::stream)
-                    .sorted(Comparator.comparing(Field::getName))
-                    .collect(Collectors.toList());
+            List<Field> requiredFields = type
+                .get()
+                .getRequiredFields()
+                .stream()
+                .map(OrFields::getFields)
+                .flatMap(Collection::stream)
+                .sorted(Comparator.comparing(Field::getName))
+                .collect(Collectors.toList());
 
             for (Field field : requiredFields) {
                 writeField(entry, out, field, indent);
             }
 
             // Then optional fields
-            List<Field> optionalFields = type.get()
-                                             .getOptionalFields()
-                                             .stream()
-                                             .map(BibField::field)
-                                             .sorted(Comparator.comparing(Field::getName))
-                                             .collect(Collectors.toList());
+            List<Field> optionalFields = type
+                .get()
+                .getOptionalFields()
+                .stream()
+                .map(BibField::field)
+                .sorted(Comparator.comparing(Field::getName))
+                .collect(Collectors.toList());
 
             for (Field field : optionalFields) {
                 writeField(entry, out, field, indent);
@@ -131,10 +159,15 @@ public class BibEntryWriter {
             written.addAll(optionalFields);
         }
         // Then write remaining fields in alphabetic order.
-        SortedSet<Field> remainingFields = entry.getFields()
-                                                .stream()
-                                                .filter(key -> !written.contains(key))
-                                                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
+        SortedSet<Field> remainingFields = entry
+            .getFields()
+            .stream()
+            .filter(key -> !written.contains(key))
+            .collect(
+                Collectors.toCollection(() ->
+                    new TreeSet<>(Comparator.comparing(Field::getName))
+                )
+            );
 
         for (Field field : remainingFields) {
             writeField(entry, out, field, indent);
@@ -144,8 +177,11 @@ public class BibEntryWriter {
         out.writeLine("}");
     }
 
-    private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
+    private void writeKeyField(BibEntry entry, BibWriter out)
+        throws IOException {
+        String keyField = StringUtil.shaveString(
+            entry.getCitationKey().orElse("")
+        );
         out.writeLine(keyField + ',');
     }
 
@@ -157,7 +193,12 @@ public class BibEntryWriter {
      * @param field the field
      * @throws IOException In case of an IO error
      */
-    private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {
+    private void writeField(
+        BibEntry entry,
+        BibWriter out,
+        Field field,
+        int indent
+    ) throws IOException {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
         // field.ifPresent does not work as an IOException may be thrown
@@ -167,21 +208,37 @@ public class BibEntryWriter {
             try {
                 out.write(fieldWriter.write(field, value.get()));
             } catch (InvalidFieldValueException ex) {
-                LOGGER.warn("Invalid field value {} of field {} of entry {]", value.get(), field, entry.getCitationKey().orElse(""), ex);
-                throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
+                LOGGER.warn(
+                    "Invalid field value {} of field {} of entry {]",
+                    value.get(),
+                    field,
+                    entry.getCitationKey().orElse(""),
+                    ex
+                );
+                throw new IOException(
+                    "Error in field '" +
+                    field +
+                    " of entry " +
+                    entry.getCitationKey().orElse("") +
+                    "': " +
+                    ex.getMessage(),
+                    ex
+                );
             }
             out.writeLine(",");
         }
     }
 
     static int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<Field> isNotCitationKey = field -> InternalField.KEY_FIELD != field;
-        return entry.getFields()
-                    .stream()
-                    .filter(isNotCitationKey)
-                    .mapToInt(field -> field.getName().length())
-                    .max()
-                    .orElse(0);
+        Predicate<Field> isNotCitationKey = field ->
+            InternalField.KEY_FIELD != field;
+        return entry
+            .getFields()
+            .stream()
+            .filter(isNotCitationKey)
+            .mapToInt(field -> field.getName().length())
+            .max()
+            .orElse(0);
     }
 
     /**
@@ -198,6 +255,10 @@ public class BibEntryWriter {
      */
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
-        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
+        return (
+            fieldName.toLowerCase(Locale.ROOT) +
+            StringUtil.repeatSpaces(indent - fieldName.length()) +
+            " = "
+        );
     }
 }

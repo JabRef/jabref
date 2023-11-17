@@ -1,7 +1,6 @@
 package org.jabref.logic.layout.format;
 
 import java.util.Locale;
-
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**

@@ -1,11 +1,11 @@
 package org.jabref.logic.formatter.casechanger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -21,11 +21,15 @@ public class CapitalizeFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals("I Have {a} Dream", formatter.format(formatter.getExampleInput()));
+        assertEquals(
+            "I Have {a} Dream",
+            formatter.format(formatter.getExampleInput())
+        );
     }
 
     @ParameterizedTest(name = "input={0}, formattedStr={1}")
-    @CsvSource(value = {
+    @CsvSource(
+        value = {
             "{}, {}", // {}
             "{upper, {upper", // unmatched braces
             "upper, Upper", // single word lower case
@@ -50,7 +54,8 @@ public class CapitalizeFormatterTest {
             "{u}pper-each-{f}irst, {u}pper-Each-{f}irst", // multiple words lower case with {} and -
             "-upper, -Upper", // single word with -
             "-{u}pper, -{u}pper", // single word with {} and -
-    })
+        }
+    )
     public void testInputs(String input, String expectedResult) {
         String formattedStr = formatter.format(input);
         assertEquals(expectedResult, formattedStr);

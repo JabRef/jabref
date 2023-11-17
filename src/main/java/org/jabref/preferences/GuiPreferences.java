@@ -2,7 +2,6 @@ package org.jabref.preferences;
 
 import java.nio.file.Path;
 import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -13,11 +12,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {
+
     private final DoubleProperty positionX;
     private final DoubleProperty positionY;
     private final DoubleProperty sizeX;
@@ -40,39 +39,47 @@ public class GuiPreferences {
     private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
 
-    public GuiPreferences(double positionX,
-                          double positionY,
-                          double sizeX,
-                          double sizeY,
-                          boolean windowMaximised,
-                          boolean windowFullScreen,
-                          List<String> lastFilesOpened,
-                          Path lastFocusedFile,
-                          FileHistory fileHistory,
-                          String lastSelectedIdBasedFetcher,
-                          DiffMode mergeDiffMode,
-                          boolean mergeShouldShowDiff,
-                          boolean mergeShouldShowUnifiedDiff,
-                          boolean mergeHighlightWords,
-                          double sidePaneWidth,
-                          boolean mergeShowChangedFieldsOnly) {
+    public GuiPreferences(
+        double positionX,
+        double positionY,
+        double sizeX,
+        double sizeY,
+        boolean windowMaximised,
+        boolean windowFullScreen,
+        List<String> lastFilesOpened,
+        Path lastFocusedFile,
+        FileHistory fileHistory,
+        String lastSelectedIdBasedFetcher,
+        DiffMode mergeDiffMode,
+        boolean mergeShouldShowDiff,
+        boolean mergeShouldShowUnifiedDiff,
+        boolean mergeHighlightWords,
+        double sidePaneWidth,
+        boolean mergeShowChangedFieldsOnly
+    ) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
         this.sizeY = new SimpleDoubleProperty(sizeY);
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
         this.windowFullScreen = new SimpleBooleanProperty(windowFullScreen);
-        this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
+        this.lastFilesOpened =
+            FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
-        this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
+        this.lastSelectedIdBasedFetcher =
+            new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
-        this.mergeShouldShowDiff = new SimpleBooleanProperty(mergeShouldShowDiff);
-        this.mergeShouldShowUnifiedDiff = new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);
-        this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightWords);
+        this.mergeShouldShowDiff =
+            new SimpleBooleanProperty(mergeShouldShowDiff);
+        this.mergeShouldShowUnifiedDiff =
+            new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);
+        this.mergeHighlightWords =
+            new SimpleBooleanProperty(mergeHighlightWords);
 
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
-        this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
+        this.mergeShowChangedFieldsOnly =
+            new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
     }
 
     public double getPositionX() {
@@ -179,7 +186,9 @@ public class GuiPreferences {
         return lastSelectedIdBasedFetcher;
     }
 
-    public void setLastSelectedIdBasedFetcher(String lastSelectedIdBasedFetcher) {
+    public void setLastSelectedIdBasedFetcher(
+        String lastSelectedIdBasedFetcher
+    ) {
         this.lastSelectedIdBasedFetcher.set(lastSelectedIdBasedFetcher);
     }
 
@@ -215,7 +224,9 @@ public class GuiPreferences {
         return mergeShouldShowUnifiedDiff;
     }
 
-    public void setMergeShouldShowUnifiedDiff(boolean mergeShouldShowUnifiedDiff) {
+    public void setMergeShouldShowUnifiedDiff(
+        boolean mergeShouldShowUnifiedDiff
+    ) {
         this.mergeShouldShowUnifiedDiff.set(mergeShouldShowUnifiedDiff);
     }
 

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.model.entry.field.Field;
 
 public class ContentSelectors {
@@ -89,9 +88,13 @@ public class ContentSelectors {
 
     @Override
     public String toString() {
-        return "ContentSelectors{" +
-                "contentSelectors=" + contentSelectors +
-                ", fieldsWithSelectors=" + getFieldsWithSelectors() +
-                '}';
+        return (
+            "ContentSelectors{" +
+            "contentSelectors=" +
+            contentSelectors +
+            ", fieldsWithSelectors=" +
+            getFieldsWithSelectors() +
+            '}'
+        );
     }
 }

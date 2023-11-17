@@ -1,19 +1,17 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class GroupDiffTest {
 
@@ -23,11 +21,21 @@ public class GroupDiffTest {
 
     @BeforeEach
     void setup() {
-        rootOriginal = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
-        rootOriginal.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
-        GroupTreeNode parent = rootOriginal
-                .addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT, ','));
-        parent.addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ','));
+        rootOriginal =
+            GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        rootOriginal.addSubgroup(
+            new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ',')
+        );
+        GroupTreeNode parent = rootOriginal.addSubgroup(
+            new ExplicitGroup(
+                "ExplicitParent",
+                GroupHierarchyType.INDEPENDENT,
+                ','
+            )
+        );
+        parent.addSubgroup(
+            new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ',')
+        );
     }
 
     @Test
@@ -35,30 +43,56 @@ public class GroupDiffTest {
         when(originalMetaData.getGroups()).thenReturn(Optional.empty());
         when(newMetaData.getGroups()).thenReturn(Optional.empty());
 
-        assertEquals(Optional.empty(), GroupDiff.compare(originalMetaData, newMetaData));
+        assertEquals(
+            Optional.empty(),
+            GroupDiff.compare(originalMetaData, newMetaData)
+        );
     }
 
     @Test
     void compareGroupWithItself() {
-        when(originalMetaData.getGroups()).thenReturn(Optional.of(rootOriginal));
+        when(originalMetaData.getGroups())
+            .thenReturn(Optional.of(rootOriginal));
         when(newMetaData.getGroups()).thenReturn(Optional.of(rootOriginal));
 
-        assertEquals(Optional.empty(), GroupDiff.compare(originalMetaData, newMetaData));
+        assertEquals(
+            Optional.empty(),
+            GroupDiff.compare(originalMetaData, newMetaData)
+        );
     }
 
     @Test
     void compareWithChangedGroup() {
-        GroupTreeNode rootModified = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
-        rootModified.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
+        GroupTreeNode rootModified = GroupTreeNode.fromGroup(
+            new AllEntriesGroup("All entries")
+        );
+        rootModified.addSubgroup(
+            new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ',')
+        );
 
-        when(originalMetaData.getGroups()).thenReturn(Optional.of(rootOriginal));
+        when(originalMetaData.getGroups())
+            .thenReturn(Optional.of(rootOriginal));
         when(newMetaData.getGroups()).thenReturn(Optional.of(rootModified));
 
-        Optional<GroupDiff> groupDiff = GroupDiff.compare(originalMetaData, newMetaData);
+        Optional<GroupDiff> groupDiff = GroupDiff.compare(
+            originalMetaData,
+            newMetaData
+        );
 
-        Optional<GroupDiff> expectedGroupDiff = Optional.of(new GroupDiff(originalMetaData.getGroups().get(), newMetaData.getGroups().get()));
+        Optional<GroupDiff> expectedGroupDiff = Optional.of(
+            new GroupDiff(
+                originalMetaData.getGroups().get(),
+                newMetaData.getGroups().get()
+            )
+        );
 
-        assertEquals(expectedGroupDiff.get().getNewGroupRoot(), groupDiff.get().getNewGroupRoot());
-        assertEquals(expectedGroupDiff.get().getOriginalGroupRoot(), groupDiff.get().getOriginalGroupRoot());
+        assertEquals(
+            expectedGroupDiff.get().getNewGroupRoot(),
+            groupDiff.get().getNewGroupRoot()
+        );
+        assertEquals(
+            expectedGroupDiff.get().getOriginalGroupRoot(),
+            groupDiff.get().getOriginalGroupRoot()
+        );
     }
 }

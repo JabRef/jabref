@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -23,13 +22,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExternalFilesEntryLinker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        ExternalFilesEntryLinker.class
+    );
 
     private final FilePreferences filePreferences;
     private final BibDatabaseContext bibDatabaseContext;
@@ -37,18 +37,27 @@ public class ExternalFilesEntryLinker {
     private final RenamePdfCleanup renameFilesCleanup;
     private final DialogService dialogService;
 
-    public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
+    public ExternalFilesEntryLinker(
+        FilePreferences filePreferences,
+        BibDatabaseContext bibDatabaseContext,
+        DialogService dialogService
+    ) {
         this.filePreferences = filePreferences;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
-        this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
+        this.moveFilesCleanup =
+            new MoveFilesCleanup(bibDatabaseContext, filePreferences);
+        this.renameFilesCleanup =
+            new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
         this.dialogService = dialogService;
     }
 
     public Optional<Path> copyFileToFileDir(Path file) {
-        Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
+        Optional<Path> firstExistingFileDir =
+            bibDatabaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingFileDir.isPresent()) {
-            Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
+            Path targetFile = firstExistingFileDir
+                .get()
+                .resolve(file.getFileName());
             if (FileUtil.copyFile(file, targetFile, false)) {
                 return Optional.of(targetFile);
             }
@@ -67,17 +76,31 @@ public class ExternalFilesEntryLinker {
     public void addFilesToEntry(BibEntry entry, List<Path> files) {
         List<Path> validFiles = getValidFileNames(files);
         for (Path file : validFiles) {
-            FileUtil.getFileExtension(file).ifPresent(ext -> {
-                ExternalFileType type = ExternalFileTypes.getExternalFileTypeByExt(ext, filePreferences)
-                                                         .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectories(filePreferences));
-                LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
-                entry.addFile(linkedfile);
-            });
+            FileUtil
+                .getFileExtension(file)
+                .ifPresent(ext -> {
+                    ExternalFileType type = ExternalFileTypes
+                        .getExternalFileTypeByExt(ext, filePreferences)
+                        .orElse(new UnknownExternalFileType(ext));
+                    Path relativePath = FileUtil.relativize(
+                        file,
+                        bibDatabaseContext.getFileDirectories(filePreferences)
+                    );
+                    LinkedFile linkedfile = new LinkedFile(
+                        "",
+                        relativePath,
+                        type.getName()
+                    );
+                    entry.addFile(linkedfile);
+                });
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+    public void moveFilesToFileDirRenameAndAddToEntry(
+        BibEntry entry,
+        List<Path> files,
+        IndexingTaskManager indexingTaskManager
+    ) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
@@ -87,17 +110,30 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+            indexingTaskManager.addToIndex(
+                PdfIndexer.of(bibDatabaseContext, filePreferences),
+                entry,
+                bibDatabaseContext
+            );
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+    public void copyFilesToFileDirAndAddToEntry(
+        BibEntry entry,
+        List<Path> files,
+        IndexingTaskManager indexingTaskManager
+    ) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
             for (Path file : files) {
                 copyFileToFileDir(file)
-                        .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
+                    .ifPresent(copiedFile ->
+                        addFilesToEntry(
+                            entry,
+                            Collections.singletonList(copiedFile)
+                        )
+                    );
             }
             renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
@@ -105,7 +141,11 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+            indexingTaskManager.addToIndex(
+                PdfIndexer.of(bibDatabaseContext, filePreferences),
+                entry,
+                bibDatabaseContext
+            );
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
@@ -116,11 +156,22 @@ public class ExternalFilesEntryLinker {
 
         for (Path fileToAdd : filesToAdd) {
             if (FileUtil.detectBadFileName(fileToAdd.toString())) {
-                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
+                String newFilename = FileNameCleaner.cleanFileName(
+                    fileToAdd.getFileName().toString()
+                );
 
-                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
-                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
-                        Localization.lang("Rename and add"));
+                boolean correctButtonPressed =
+                    dialogService.showConfirmationDialogAndWait(
+                        Localization.lang(
+                            "File \"%0\" cannot be added!",
+                            fileToAdd.getFileName()
+                        ),
+                        Localization.lang(
+                            "Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.",
+                            newFilename
+                        ),
+                        Localization.lang("Rename and add")
+                    );
 
                 if (correctButtonPressed) {
                     Path correctPath = fileToAdd.resolveSibling(newFilename);

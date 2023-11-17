@@ -25,7 +25,8 @@ public class AtomicFileWriter extends OutputStreamWriter {
         this(file, encoding, false);
     }
 
-    public AtomicFileWriter(Path file, Charset encoding, boolean keepBackup) throws IOException {
+    public AtomicFileWriter(Path file, Charset encoding, boolean keepBackup)
+        throws IOException {
         super(new AtomicFileOutputStream(file, keepBackup), encoding);
         encoder = encoding.newEncoder();
     }

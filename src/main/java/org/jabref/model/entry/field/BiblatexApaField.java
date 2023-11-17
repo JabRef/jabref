@@ -4,11 +4,9 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
-
 import org.jabref.model.entry.types.BiblatexApaEntryType;
 
 public enum BiblatexApaField implements Field {
-
     AMENDMENT("amendment"),
     ARTICLE("article"),
     CITATION("citation"),
@@ -34,7 +32,12 @@ public enum BiblatexApaField implements Field {
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
-    BiblatexApaField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
+    BiblatexApaField(
+        String name,
+        String displayName,
+        FieldProperty first,
+        FieldProperty... rest
+    ) {
         this.name = name;
         this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);
@@ -50,9 +53,10 @@ public enum BiblatexApaField implements Field {
         if (!(type instanceof BiblatexApaEntryType)) {
             return Optional.empty();
         }
-        return Arrays.stream(BiblatexApaField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Arrays
+            .stream(BiblatexApaField.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     @Override

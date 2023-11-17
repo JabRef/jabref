@@ -1,10 +1,9 @@
 package org.jabref.model.entry;
 
-import java.util.HashSet;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.HashSet;
+import org.junit.jupiter.api.Test;
 
 public class IdGeneratorTest {
 

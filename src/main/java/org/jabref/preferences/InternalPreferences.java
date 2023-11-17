@@ -1,14 +1,12 @@
 package org.jabref.preferences;
 
 import java.nio.file.Path;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.logic.util.Version;
 
 public class InternalPreferences {
@@ -19,11 +17,13 @@ public class InternalPreferences {
     private final StringProperty userAndHost;
     private final BooleanProperty memoryStickMode;
 
-    public InternalPreferences(Version ignoredVersion,
-                               boolean versionCheck,
-                               Path exportPath,
-                               String userAndHost,
-                               boolean memoryStickMode) {
+    public InternalPreferences(
+        Version ignoredVersion,
+        boolean versionCheck,
+        Path exportPath,
+        String userAndHost,
+        boolean memoryStickMode
+    ) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);

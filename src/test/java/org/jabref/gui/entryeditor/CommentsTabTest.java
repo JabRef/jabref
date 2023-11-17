@@ -1,10 +1,14 @@
 package org.jabref.gui.entryeditor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Optional;
 import java.util.Set;
-
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -24,19 +28,12 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
@@ -48,26 +45,37 @@ class CommentsTabTest {
 
     @Mock
     private BibEntryTypesManager entryTypesManager;
+
     @Mock
     private BibDatabaseContext databaseContext;
+
     @Mock
     private SuggestionProviders suggestionProviders;
+
     @Mock
     private UndoManager undoManager;
+
     @Mock
     private DialogService dialogService;
+
     @Mock
     private PreferencesService preferences;
+
     @Mock
     private StateManager stateManager;
+
     @Mock
     private ThemeManager themeManager;
+
     @Mock
     private TaskExecutor taskExecutor;
+
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
+
     @Mock
     private IndexingTaskManager indexingTaskManager;
+
     @Mock
     private OwnerPreferences ownerPreferences;
 
@@ -79,9 +87,11 @@ class CommentsTabTest {
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
         BibEntryType entryTypeMock = mock(BibEntryType.class);
-        when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
+        when(entryTypesManager.enrich(any(), any()))
+            .thenReturn(Optional.of(entryTypeMock));
 
-        commentsTab = new CommentsTab(
+        commentsTab =
+            new CommentsTab(
                 preferences,
                 databaseContext,
                 suggestionProviders,
@@ -92,16 +102,17 @@ class CommentsTabTest {
                 indexingTaskManager,
                 taskExecutor,
                 journalAbbreviationRepository
-        );
+            );
     }
 
     @Test
     void testDetermineFieldsToShowWorksForASingleUser() {
-        final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
+        final UserSpecificCommentField ownerComment =
+            new UserSpecificCommentField(ownerName);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
-                .withField(StandardField.COMMENT, "Standard comment text")
-                .withField(ownerComment, "User-specific comment text");
+            .withField(StandardField.COMMENT, "Standard comment text")
+            .withField(ownerComment, "User-specific comment text");
 
         Set<Field> fields = commentsTab.determineFieldsToShow(entry);
 
@@ -110,23 +121,32 @@ class CommentsTabTest {
 
     @Test
     void testDetermineFieldsToShowWorksForMultipleUsers() {
-        final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
-        final UserSpecificCommentField otherUsersComment = new UserSpecificCommentField("other-user-id");
+        final UserSpecificCommentField ownerComment =
+            new UserSpecificCommentField(ownerName);
+        final UserSpecificCommentField otherUsersComment =
+            new UserSpecificCommentField("other-user-id");
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
-                .withField(StandardField.COMMENT, "Standard comment text")
-                .withField(ownerComment, "User-specific comment text")
-                .withField(otherUsersComment, "other-user-id comment text");
+            .withField(StandardField.COMMENT, "Standard comment text")
+            .withField(ownerComment, "User-specific comment text")
+            .withField(otherUsersComment, "other-user-id comment text");
 
         Set<Field> fields = commentsTab.determineFieldsToShow(entry);
 
-        assertEquals(Set.of(StandardField.COMMENT, ownerComment, otherUsersComment), fields);
+        assertEquals(
+            Set.of(StandardField.COMMENT, ownerComment, otherUsersComment),
+            fields
+        );
     }
 
     @Test
     public void testDifferentiateCaseInUserName() {
         UserSpecificCommentField field1 = new UserSpecificCommentField("USER");
         UserSpecificCommentField field2 = new UserSpecificCommentField("user");
-        assertNotEquals(field1, field2, "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different");
+        assertNotEquals(
+            field1,
+            field2,
+            "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different"
+        );
     }
 }

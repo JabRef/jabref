@@ -2,12 +2,10 @@ package org.jabref.gui.undo;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +16,9 @@ import org.slf4j.LoggerFactory;
  */
 public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableInsertEntries.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        UndoableInsertEntries.class
+    );
     private final BibDatabase database;
     private final List<BibEntry> entries;
     private final boolean paste;
@@ -31,7 +31,11 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
         this(database, entries, false);
     }
 
-    public UndoableInsertEntries(BibDatabase database, List<BibEntry> entries, boolean paste) {
+    public UndoableInsertEntries(
+        BibDatabase database,
+        List<BibEntry> entries,
+        boolean paste
+    ) {
         this.database = database;
         this.entries = entries;
         this.paste = paste;
@@ -43,8 +47,15 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
             if (entries.size() > 1) {
                 return Localization.lang("paste entries");
             } else if (entries.size() == 1) {
-                return Localization.lang("paste entry %0",
-                        StringUtil.boldHTML(entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))));
+                return Localization.lang(
+                    "paste entry %0",
+                    StringUtil.boldHTML(
+                        entries
+                            .get(0)
+                            .getCitationKey()
+                            .orElse(Localization.lang("undefined"))
+                    )
+                );
             } else {
                 return null;
             }
@@ -52,8 +63,15 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
             if (entries.size() > 1) {
                 return Localization.lang("insert entries");
             } else if (entries.size() == 1) {
-                return Localization.lang("insert entry %0",
-                        StringUtil.boldHTML(entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))));
+                return Localization.lang(
+                    "insert entry %0",
+                    StringUtil.boldHTML(
+                        entries
+                            .get(0)
+                            .getCitationKey()
+                            .orElse(Localization.lang("undefined"))
+                    )
+                );
             } else {
                 return null;
             }

@@ -8,19 +8,18 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HexFormat;
 import java.util.Optional;
-
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.logic.util.BackupFileType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BackupFileUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BackupFileUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BackupFileUtil.class
+    );
 
-    private BackupFileUtil() {
-    }
+    private BackupFileUtil() {}
 
     /**
      * Determines the path of the backup file (using the given extension)
@@ -39,9 +38,15 @@ public class BackupFileUtil {
      * </p>
      */
 
-    public static Path getPathForNewBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType, Path backupDir) {
+    public static Path getPathForNewBackupFileAndCreateDirectory(
+        Path targetFile,
+        BackupFileType fileType,
+        Path backupDir
+    ) {
         String extension = "." + fileType.getExtensions().get(0);
-        String timeSuffix = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd--HH.mm.ss"));
+        String timeSuffix = ZonedDateTime
+            .now()
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd--HH.mm.ss"));
 
         // We choose the data directory, because a ".bak" file should survive cache cleanups
         Path directory = backupDir;
@@ -49,15 +54,29 @@ public class BackupFileUtil {
             Files.createDirectories(directory);
         } catch (IOException e) {
             Path result = FileUtil.addExtension(targetFile, extension);
-            LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
+            LOGGER.warn(
+                "Could not create bib writing directory {}, using {} as file",
+                directory,
+                result,
+                e
+            );
             return result;
         }
-        String baseFileName = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName() + "--" + timeSuffix;
+        String baseFileName =
+            getUniqueFilePrefix(targetFile) +
+            "--" +
+            targetFile.getFileName() +
+            "--" +
+            timeSuffix;
         Path fileName = FileUtil.addExtension(Path.of(baseFileName), extension);
         return directory.resolve(fileName);
     }
 
-    public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType, Path backupDir) {
+    public static Optional<Path> getPathOfLatestExistingBackupFile(
+        Path targetFile,
+        BackupFileType fileType,
+        Path backupDir
+    ) {
         // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
 
         String extension = "." + fileType.getExtensions().get(0);
@@ -73,14 +92,17 @@ public class BackupFileUtil {
         }
 
         // Search the directory for the latest file
-        final String prefix = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
+        final String prefix =
+            getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
         Optional<Path> mostRecentFile;
         try {
-            mostRecentFile = Files.list(backupDir)
-                                  // just list the .sav belonging to the given targetFile
-                                  .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                  .sorted()
-                                  .reduce((first, second) -> second);
+            mostRecentFile =
+                Files
+                    .list(backupDir)
+                    // just list the .sav belonging to the given targetFile
+                    .filter(p -> p.getFileName().toString().startsWith(prefix))
+                    .sorted()
+                    .reduce((first, second) -> second);
         } catch (IOException e) {
             LOGGER.error("Could not determine most recent file", e);
             return Optional.empty();

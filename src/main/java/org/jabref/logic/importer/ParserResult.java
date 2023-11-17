@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
@@ -18,6 +17,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.metadata.MetaData;
 
 public class ParserResult {
+
     private final Set<BibEntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
     private BibDatabase database;
@@ -39,7 +39,11 @@ public class ParserResult {
         this(database, new MetaData(), new HashSet<>());
     }
 
-    public ParserResult(BibDatabase database, MetaData metaData, Set<BibEntryType> entryTypes) {
+    public ParserResult(
+        BibDatabase database,
+        MetaData metaData,
+        Set<BibEntryType> entryTypes
+    ) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.entryTypes = Objects.requireNonNull(entryTypes);
@@ -55,7 +59,8 @@ public class ParserResult {
     private static String getErrorMessage(Exception exception) {
         String errorMessage = exception.getLocalizedMessage();
         if (exception.getCause() != null) {
-            errorMessage += " Caused by: " + exception.getCause().getLocalizedMessage();
+            errorMessage +=
+            " Caused by: " + exception.getCause().getLocalizedMessage();
         }
         return errorMessage;
     }
@@ -147,10 +152,12 @@ public class ParserResult {
     }
 
     public boolean isEmpty() {
-        return !this.getDatabase().hasEntries() &&
-                this.getDatabase().hasNoStrings() &&
-                this.getDatabase().getPreamble().isEmpty() &&
-                this.getMetaData().isEmpty();
+        return (
+            !this.getDatabase().hasEntries() &&
+            this.getDatabase().hasNoStrings() &&
+            this.getDatabase().getPreamble().isEmpty() &&
+            this.getMetaData().isEmpty()
+        );
     }
 
     public boolean wasChangedOnMigration() {

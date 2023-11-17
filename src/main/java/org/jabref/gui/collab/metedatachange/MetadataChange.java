@@ -8,9 +8,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 public final class MetadataChange extends DatabaseChange {
+
     private final MetaDataDiff metaDataDiff;
 
-    public MetadataChange(MetaDataDiff metaDataDiff, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+    public MetadataChange(
+        MetaDataDiff metaDataDiff,
+        BibDatabaseContext databaseContext,
+        DatabaseChangeResolverFactory databaseChangeResolverFactory
+    ) {
         super(databaseContext, databaseChangeResolverFactory);
         this.metaDataDiff = metaDataDiff;
         setChangeName(Localization.lang("Metadata change"));
@@ -22,8 +27,13 @@ public final class MetadataChange extends DatabaseChange {
         databaseContext.setMetaData(metaDataDiff.getNewMetaData());
         // group change is handled by GroupChange, so we set the groups root to the original value
         // to prevent any inconsistency
-        metaDataDiff.getGroupDifferences()
-                    .ifPresent(groupDiff -> databaseContext.getMetaData().setGroups(groupDiff.getOriginalGroupRoot()));
+        metaDataDiff
+            .getGroupDifferences()
+            .ifPresent(groupDiff ->
+                databaseContext
+                    .getMetaData()
+                    .setGroups(groupDiff.getOriginalGroupRoot())
+            );
     }
 
     public MetaDataDiff getMetaDataDiff() {

@@ -4,7 +4,7 @@ public class MatcherSets {
 
     public enum MatcherType {
         AND,
-        OR
+        OR,
     }
 
     public static MatcherSet build(MatcherType ruleSet) {

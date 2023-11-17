@@ -2,7 +2,6 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -31,7 +30,9 @@ public class ReplaceTabsBySpaceFormater extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Replace tabs with space in the field content.");
+        return Localization.lang(
+            "Replace tabs with space in the field content."
+        );
     }
 
     @Override

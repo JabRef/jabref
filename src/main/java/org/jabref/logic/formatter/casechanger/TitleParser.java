@@ -46,7 +46,13 @@ public final class TitleParser {
         char[] chars = buffer.toString().toCharArray();
         boolean[] protectedChars = new boolean[chars.length];
 
-        System.arraycopy(isProtected, wordStart, protectedChars, 0, chars.length);
+        System.arraycopy(
+            isProtected,
+            wordStart,
+            protectedChars,
+            0,
+            chars.length
+        );
 
         reset();
 

@@ -19,24 +19,29 @@ public class ExternalApplicationsPreferences {
     private final StringProperty customFileBrowserCommand;
     private final StringProperty kindleEmail;
 
-    public ExternalApplicationsPreferences(String eMailSubject,
-                                           boolean shouldAutoOpenEmailAttachmentsFolder,
-                                           String citeCommand,
-                                           String defaultCiteCommand,
-                                           boolean useCustomTerminal,
-                                           String customTerminalCommand,
-                                           boolean useCustomFileBrowser,
-                                           String customFileBrowserCommand,
-                                           String kindleEmail) {
-
+    public ExternalApplicationsPreferences(
+        String eMailSubject,
+        boolean shouldAutoOpenEmailAttachmentsFolder,
+        String citeCommand,
+        String defaultCiteCommand,
+        boolean useCustomTerminal,
+        String customTerminalCommand,
+        boolean useCustomFileBrowser,
+        String customFileBrowserCommand,
+        String kindleEmail
+    ) {
         this.eMailSubject = new SimpleStringProperty(eMailSubject);
-        this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
+        this.shouldAutoOpenEmailAttachmentsFolder =
+            new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
         this.citeCommand = new SimpleStringProperty(citeCommand);
         this.defaultCiteCommand = new SimpleStringProperty(defaultCiteCommand);
         this.useCustomTerminal = new SimpleBooleanProperty(useCustomTerminal);
-        this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);
-        this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
-        this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);
+        this.customTerminalCommand =
+            new SimpleStringProperty(customTerminalCommand);
+        this.useCustomFileBrowser =
+            new SimpleBooleanProperty(useCustomFileBrowser);
+        this.customFileBrowserCommand =
+            new SimpleStringProperty(customFileBrowserCommand);
         this.kindleEmail = new SimpleStringProperty(kindleEmail);
     }
 
@@ -60,8 +65,12 @@ public class ExternalApplicationsPreferences {
         return shouldAutoOpenEmailAttachmentsFolder;
     }
 
-    public void setAutoOpenEmailAttachmentsFolder(boolean shouldAutoOpenEmailAttachmentsFolder) {
-        this.shouldAutoOpenEmailAttachmentsFolder.set(shouldAutoOpenEmailAttachmentsFolder);
+    public void setAutoOpenEmailAttachmentsFolder(
+        boolean shouldAutoOpenEmailAttachmentsFolder
+    ) {
+        this.shouldAutoOpenEmailAttachmentsFolder.set(
+                shouldAutoOpenEmailAttachmentsFolder
+            );
     }
 
     public String getCiteCommand() {

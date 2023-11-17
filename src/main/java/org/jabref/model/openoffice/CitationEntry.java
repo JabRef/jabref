@@ -17,7 +17,11 @@ public class CitationEntry implements Comparable<CitationEntry> {
         this(refMarkName, context, Optional.ofNullable(pageInfo));
     }
 
-    public CitationEntry(String refMarkName, String context, Optional<String> pageInfo) {
+    public CitationEntry(
+        String refMarkName,
+        String context,
+        Optional<String> pageInfo
+    ) {
         this.refMarkName = refMarkName;
         this.context = context;
         this.pageInfo = pageInfo;

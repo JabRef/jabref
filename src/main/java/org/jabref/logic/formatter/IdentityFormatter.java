@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 

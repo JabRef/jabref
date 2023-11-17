@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.jabref.model.ChainNode;
 
 /**
@@ -46,9 +45,11 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
             return false;
         }
         Keyword other = (Keyword) o;
-        return Objects.equals(this.keyword, other.keyword)
-                // && Objects.equals(this.getParent(), other.getParent()) : we can't check the parents because then we would run in circles
-                && Objects.equals(this.getChild(), other.getChild());
+        return (
+            Objects.equals(this.keyword, other.keyword) &&
+            // && Objects.equals(this.getParent(), other.getParent()) : we can't check the parents because then we would run in circles
+            Objects.equals(this.getChild(), other.getChild())
+        );
     }
 
     @Override
@@ -79,9 +80,17 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * E.g., calling {@link #getSubchainAsString(Character)} on the node "B" in "A > B > C" returns "B > C".
      */
     private String getSubchainAsString(Character hierarchicalDelimiter) {
-        return keyword +
-                getChild().map(child -> " " + hierarchicalDelimiter + " " + child.getSubchainAsString(hierarchicalDelimiter))
-                          .orElse("");
+        return (
+            keyword +
+            getChild()
+                .map(child ->
+                    " " +
+                    hierarchicalDelimiter +
+                    " " +
+                    child.getSubchainAsString(hierarchicalDelimiter)
+                )
+                .orElse("")
+        );
     }
 
     /**
@@ -96,10 +105,17 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * E.g., calling {@link #getPathFromRootAsString(Character)} on the node "B" in "A > B > C" returns "A > B".
      */
     public String getPathFromRootAsString(Character hierarchicalDelimiter) {
-        return getParent()
-                .map(parent -> parent.getPathFromRootAsString(hierarchicalDelimiter) + " " + hierarchicalDelimiter + " ")
-                .orElse("")
-                + keyword;
+        return (
+            getParent()
+                .map(parent ->
+                    parent.getPathFromRootAsString(hierarchicalDelimiter) +
+                    " " +
+                    hierarchicalDelimiter +
+                    " "
+                )
+                .orElse("") +
+            keyword
+        );
     }
 
     /**
@@ -108,19 +124,25 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      */
     public Set<Keyword> flatten() {
         return Stream
-                .concat(Stream.of(this),
-                        getChild().stream()
-                                  .flatMap(child -> child.flatten().stream()))
-                .collect(Collectors.toSet());
+            .concat(
+                Stream.of(this),
+                getChild().stream().flatMap(child -> child.flatten().stream())
+            )
+            .collect(Collectors.toSet());
     }
 
     /**
      * Returns all subchains starting at this node.
      * E.g., for the chain "A > B > C" the subchains {"A", "A > B", "A > B > C"} are returned.
      */
-    public Set<String> getAllSubchainsAsString(Character hierarchicalDelimiter) {
-        return flatten().stream()
-                        .map(subchain -> subchain.getPathFromRootAsString(hierarchicalDelimiter))
-                        .collect(Collectors.toSet());
+    public Set<String> getAllSubchainsAsString(
+        Character hierarchicalDelimiter
+    ) {
+        return flatten()
+            .stream()
+            .map(subchain ->
+                subchain.getPathFromRootAsString(hierarchicalDelimiter)
+            )
+            .collect(Collectors.toSet());
     }
 }

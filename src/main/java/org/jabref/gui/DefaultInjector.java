@@ -1,9 +1,9 @@
 package org.jabref.gui;
 
+import com.airhacks.afterburner.injection.Injector;
+import com.airhacks.afterburner.injection.PresenterFactory;
 import java.util.function.Function;
-
 import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -12,15 +12,14 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-
-import com.airhacks.afterburner.injection.Injector;
-import com.airhacks.afterburner.injection.PresenterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultInjector implements PresenterFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DefaultInjector.class
+    );
 
     /**
      * This method takes care of creating dependencies.
@@ -63,7 +62,10 @@ public class DefaultInjector implements PresenterFactory {
     }
 
     @Override
-    public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
+    public <T> T instantiatePresenter(
+        Class<T> clazz,
+        Function<String, Object> injectionContext
+    ) {
         LOGGER.debug("Instantiate {}", clazz.getName());
 
         // Use our own method to construct dependencies
@@ -73,7 +75,10 @@ public class DefaultInjector implements PresenterFactory {
     }
 
     @Override
-    public void injectMembers(Object instance, Function<String, Object> injectionContext) {
+    public void injectMembers(
+        Object instance,
+        Function<String, Object> injectionContext
+    ) {
         LOGGER.debug("Inject into {}", instance.getClass().getName());
 
         // Use our own method to construct dependencies

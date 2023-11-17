@@ -1,17 +1,15 @@
 package org.jabref.gui.autosaveandbackup;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +20,9 @@ import org.slf4j.LoggerFactory;
  */
 public class AutosaveManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        AutosaveManager.class
+    );
 
     private static final int DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS = 31;
 
@@ -45,17 +45,20 @@ public class AutosaveManager {
         this.executor.scheduleAtFixedRate(
                 () -> {
                     if (needsSave) {
-                       eventBus.post(new AutosaveEvent());
-                       needsSave = false;
+                        eventBus.post(new AutosaveEvent());
+                        needsSave = false;
                     }
                 },
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
-                TimeUnit.SECONDS);
+                TimeUnit.SECONDS
+            );
     }
 
     @Subscribe
-    public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+    public void listen(
+        @SuppressWarnings("unused") BibDatabaseContextChangedEvent event
+    ) {
         if (!event.isFilteredOut()) {
             this.needsSave = true;
         }
@@ -73,7 +76,9 @@ public class AutosaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
-        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext);
+        AutosaveManager autosaveManager = new AutosaveManager(
+            bibDatabaseContext
+        );
         runningInstances.add(autosaveManager);
         return autosaveManager;
     }
@@ -84,11 +89,16 @@ public class AutosaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
-                        .ifPresent(instance -> {
-                            instance.shutdown();
-                            runningInstances.remove(instance);
-                        });
+        runningInstances
+            .stream()
+            .filter(instance ->
+                instance.bibDatabaseContext == bibDatabaseContext
+            )
+            .findAny()
+            .ifPresent(instance -> {
+                instance.shutdown();
+                runningInstances.remove(instance);
+            });
     }
 
     public void registerListener(Object listener) {

@@ -2,7 +2,6 @@ package org.jabref.model.openoffice.style;
 
 import java.util.Comparator;
 import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 
 /*
@@ -14,7 +13,10 @@ public class CompareCitedKey implements Comparator<ComparableCitedKey> {
     Comparator<BibEntry> entryComparator;
     boolean unresolvedComesFirst;
 
-    CompareCitedKey(Comparator<BibEntry> entryComparator, boolean unresolvedComesFirst) {
+    CompareCitedKey(
+        Comparator<BibEntry> entryComparator,
+        boolean unresolvedComesFirst
+    ) {
         this.entryComparator = entryComparator;
         this.unresolvedComesFirst = unresolvedComesFirst;
     }

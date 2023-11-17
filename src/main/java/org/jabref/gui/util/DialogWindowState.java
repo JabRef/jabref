@@ -5,6 +5,7 @@ package org.jabref.gui.util;
  * these properties stay consistent when they are closed and re-opened
  */
 public class DialogWindowState {
+
     private final double x;
     private final double y;
     private final double height;

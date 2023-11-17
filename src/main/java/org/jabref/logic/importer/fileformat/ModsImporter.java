@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
+import com.google.common.base.Joiner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,12 +17,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -38,8 +37,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
-
-import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +47,20 @@ import org.slf4j.LoggerFactory;
  */
 public class ModsImporter extends Importer implements Parser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ModsImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        ModsImporter.class
+    );
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
 
     private final String keywordSeparator;
     private final XMLInputFactory xmlInputFactory;
 
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
-        keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
+        keywordSeparator =
+            importFormatPreferences
+                .bibEntryPreferences()
+                .getKeywordSeparator() +
+            " ";
         xmlInputFactory = XMLInputFactory.newInstance();
         // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
         // Not supported by aalto-xml
@@ -67,16 +70,21 @@ public class ModsImporter extends Importer implements Parser {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
+        return input
+            .lines()
+            .anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
+    public ParserResult importDatabase(BufferedReader input)
+        throws IOException {
         Objects.requireNonNull(input);
 
         List<BibEntry> bibItems = new ArrayList<>();
         try {
-            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(
+                input
+            );
             parseModsCollection(bibItems, reader);
         } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
@@ -86,10 +94,16 @@ public class ModsImporter extends Importer implements Parser {
         return new ParserResult(bibItems);
     }
 
-    private void parseModsCollection(List<BibEntry> bibItems, XMLStreamReader reader) throws XMLStreamException {
+    private void parseModsCollection(
+        List<BibEntry> bibItems,
+        XMLStreamReader reader
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
-            if (isStartXMLEvent(reader) && "mods".equals(reader.getName().getLocalPart())) {
+            if (
+                isStartXMLEvent(reader) &&
+                "mods".equals(reader.getName().getLocalPart())
+            ) {
                 BibEntry entry = new BibEntry();
                 Map<Field, String> fields = new HashMap<>();
 
@@ -106,7 +120,11 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void parseModsGroup(Map<Field, String> fields, XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+    private void parseModsGroup(
+        Map<Field, String> fields,
+        XMLStreamReader reader,
+        BibEntry entry
+    ) throws XMLStreamException {
         // These elements (subject, keywords and authors) can appear more than once,
         // so they are collected in lists
         List<String> notes = new ArrayList<>();
@@ -122,13 +140,21 @@ public class ModsImporter extends Importer implements Parser {
                     case "abstract" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.ABSTRACT, reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                StandardField.ABSTRACT,
+                                reader.getText()
+                            );
                         }
                     }
                     case "genre" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            entry.setType(EntryTypeFactory.parse(mapGenre(reader.getText())));
+                            entry.setType(
+                                EntryTypeFactory.parse(
+                                    mapGenre(reader.getText())
+                                )
+                            );
                         }
                     }
                     case "language" -> {
@@ -141,7 +167,11 @@ public class ModsImporter extends Importer implements Parser {
                         String type = reader.getAttributeValue(null, "type");
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            parseIdentifier(fields, new Identifier(type, reader.getText()), entry);
+                            parseIdentifier(
+                                fields,
+                                new Identifier(type, reader.getText()),
+                                entry
+                            );
                         }
                     }
                     case "note" -> {
@@ -171,13 +201,21 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "mods".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "mods".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
 
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
-        putIfListIsNotEmpty(fields, keywords, StandardField.KEYWORDS, this.keywordSeparator);
+        putIfListIsNotEmpty(
+            fields,
+            keywords,
+            StandardField.KEYWORDS,
+            this.keywordSeparator
+        );
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
     }
 
@@ -187,7 +225,10 @@ public class ModsImporter extends Importer implements Parser {
      * Also, if there appears a title field, then this indicates that is the name of the journal
      * which the article belongs to.
      */
-    private void parseRelatedItem(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseRelatedItem(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
@@ -195,7 +236,11 @@ public class ModsImporter extends Importer implements Parser {
                     case "title" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.JOURNAL, reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                StandardField.JOURNAL,
+                                reader.getText()
+                            );
                         }
                     }
                     case "detail" -> {
@@ -207,13 +252,19 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "relatedItem".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "relatedItem".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void handleExtent(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void handleExtent(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         String total = "";
         String startPage = "";
         String endPage = "";
@@ -243,7 +294,10 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "extent".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "extent".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
@@ -260,7 +314,10 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void handleDetail(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void handleDetail(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         String type = reader.getAttributeValue(null, "type");
         Set<String> detailElementSet = Set.of("number", "caption", "title");
 
@@ -268,21 +325,34 @@ public class ModsImporter extends Importer implements Parser {
             reader.next();
 
             if (isStartXMLEvent(reader)) {
-                if (detailElementSet.contains(reader.getName().getLocalPart())) {
+                if (
+                    detailElementSet.contains(reader.getName().getLocalPart())
+                ) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        putIfValueNotNull(fields, FieldFactory.parseField(type), reader.getText());
+                        putIfValueNotNull(
+                            fields,
+                            FieldFactory.parseField(type),
+                            reader.getText()
+                        );
                     }
                 }
             }
 
-            if (isEndXMLEvent(reader) && "detail".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "detail".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parseName(XMLStreamReader reader, Map<Field, String> fields, List<String> authors) throws XMLStreamException {
+    private void parseName(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        List<String> authors
+    ) throws XMLStreamException {
         List<Name> names = new ArrayList<>();
 
         while (reader.hasNext()) {
@@ -292,7 +362,11 @@ public class ModsImporter extends Importer implements Parser {
                 if ("affiliation".equals(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        putIfValueNotNull(fields, new UnknownField("affiliation"), reader.getText());
+                        putIfValueNotNull(
+                            fields,
+                            new UnknownField("affiliation"),
+                            reader.getText()
+                        );
                     }
                 } else if ("namePart".equals(reader.getName().getLocalPart())) {
                     String type = reader.getAttributeValue(null, "type");
@@ -303,7 +377,10 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "name".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "name".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
@@ -311,7 +388,10 @@ public class ModsImporter extends Importer implements Parser {
         handleAuthorsInNamePart(names, authors);
     }
 
-    private void parseOriginInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseOriginInfo(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         List<String> places = new ArrayList<>();
 
         while (reader.hasNext()) {
@@ -323,28 +403,46 @@ public class ModsImporter extends Importer implements Parser {
                     case "issuance" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, new UnknownField("issuance"), reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                new UnknownField("issuance"),
+                                reader.getText()
+                            );
                         }
                     }
                     case "placeTerm" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            appendIfValueNotNullOrBlank(places, reader.getText());
+                            appendIfValueNotNullOrBlank(
+                                places,
+                                reader.getText()
+                            );
                         }
                     }
                     case "publisher" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.PUBLISHER, reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                StandardField.PUBLISHER,
+                                reader.getText()
+                            );
                         }
                     }
                     case "edition" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.EDITION, reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                StandardField.EDITION,
+                                reader.getText()
+                            );
                         }
                     }
-                    case "dateIssued", "dateCreated", "dateCaptured", "dateModified" -> {
+                    case "dateIssued",
+                        "dateCreated",
+                        "dateCaptured",
+                        "dateModified" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
                             putDate(fields, elementName, reader.getText());
@@ -353,7 +451,10 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "originInfo".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "originInfo".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
@@ -361,7 +462,11 @@ public class ModsImporter extends Importer implements Parser {
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
     }
 
-    private void parseSubject(XMLStreamReader reader, Map<Field, String> fields, List<String> keywords) throws XMLStreamException {
+    private void parseSubject(
+        XMLStreamReader reader,
+        Map<Field, String> fields,
+        List<String> keywords
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
 
@@ -376,25 +481,39 @@ public class ModsImporter extends Importer implements Parser {
                     case "city" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, new UnknownField("city"), reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                new UnknownField("city"),
+                                reader.getText()
+                            );
                         }
                     }
                     case "country" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, new UnknownField("country"), reader.getText());
+                            putIfValueNotNull(
+                                fields,
+                                new UnknownField("country"),
+                                reader.getText()
+                            );
                         }
                     }
                 }
             }
 
-            if (isEndXMLEvent(reader) && "subject".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "subject".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parseRecordInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseRecordInfo(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         RecordInfo recordInfoDefinition = new RecordInfo();
         List<String> recordContents = recordInfoDefinition.recordContents();
         List<String> languages = recordInfoDefinition.languages();
@@ -403,12 +522,18 @@ public class ModsImporter extends Importer implements Parser {
             reader.next();
 
             if (isStartXMLEvent(reader)) {
-                if (RecordInfo.elementNameSet.contains(reader.getName().getLocalPart())) {
+                if (
+                    RecordInfo.elementNameSet.contains(
+                        reader.getName().getLocalPart()
+                    )
+                ) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         recordContents.add(0, reader.getText());
                     }
-                } else if ("languageTerm".equals(reader.getName().getLocalPart())) {
+                } else if (
+                    "languageTerm".equals(reader.getName().getLocalPart())
+                ) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         languages.add(reader.getText());
@@ -416,52 +541,86 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "recordInfo".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "recordInfo".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
 
         for (String recordContent : recordContents) {
-            putIfValueNotNull(fields, new UnknownField("source"), recordContent);
+            putIfValueNotNull(
+                fields,
+                new UnknownField("source"),
+                recordContent
+            );
         }
         putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
     }
 
-    private void parseLanguage(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseLanguage(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
 
-            if (isStartXMLEvent(reader) && "languageTerm".equals(reader.getName().getLocalPart())) {
+            if (
+                isStartXMLEvent(reader) &&
+                "languageTerm".equals(reader.getName().getLocalPart())
+            ) {
                 reader.next();
                 if (isCharacterXMLEvent(reader)) {
-                    putIfValueNotNull(fields, StandardField.LANGUAGE, reader.getText());
+                    putIfValueNotNull(
+                        fields,
+                        StandardField.LANGUAGE,
+                        reader.getText()
+                    );
                 }
             }
 
-            if (isEndXMLEvent(reader) && "language".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "language".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parseTitle(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseTitle(XMLStreamReader reader, Map<Field, String> fields)
+        throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
 
-            if (isStartXMLEvent(reader) && "title".equals(reader.getName().getLocalPart())) {
+            if (
+                isStartXMLEvent(reader) &&
+                "title".equals(reader.getName().getLocalPart())
+            ) {
                 reader.next();
                 if (isCharacterXMLEvent(reader)) {
-                    putIfValueNotNull(fields, StandardField.TITLE, reader.getText());
+                    putIfValueNotNull(
+                        fields,
+                        StandardField.TITLE,
+                        reader.getText()
+                    );
                 }
             }
 
-            if (isEndXMLEvent(reader) && "titleInfo".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "titleInfo".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
     }
 
-    private void parseLocationAndUrl(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseLocationAndUrl(
+        XMLStreamReader reader,
+        Map<Field, String> fields
+    ) throws XMLStreamException {
         List<String> locations = new ArrayList<>();
         List<String> urls = new ArrayList<>();
 
@@ -469,7 +628,9 @@ public class ModsImporter extends Importer implements Parser {
             reader.next();
 
             if (isStartXMLEvent(reader)) {
-                if ("physicalLocation".equals(reader.getName().getLocalPart())) {
+                if (
+                    "physicalLocation".equals(reader.getName().getLocalPart())
+                ) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         locations.add(reader.getText());
@@ -482,7 +643,10 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && "location".equals(reader.getName().getLocalPart())) {
+            if (
+                isEndXMLEvent(reader) &&
+                "location".equals(reader.getName().getLocalPart())
+            ) {
                 break;
             }
         }
@@ -496,59 +660,108 @@ public class ModsImporter extends Importer implements Parser {
             case "conference publication" -> "proceedings";
             case "database" -> "dataset";
             case "yearbook", "handbook" -> "book";
-            case "law report or digest", "technical report", "reporting" -> "report";
+            case "law report or digest",
+                "technical report",
+                "reporting" -> "report";
             default -> genre;
         };
     }
 
-    private void parseIdentifier(Map<Field, String> fields, Identifier identifier, BibEntry entry) {
+    private void parseIdentifier(
+        Map<Field, String> fields,
+        Identifier identifier,
+        BibEntry entry
+    ) {
         String type = identifier.type();
         if ("citekey".equals(type) && entry.getCitationKey().isEmpty()) {
             entry.setCitationKey(identifier.value());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
-            putIfValueNotNull(fields, FieldFactory.parseField(identifier.type()), identifier.value());
+            putIfValueNotNull(
+                fields,
+                FieldFactory.parseField(identifier.type()),
+                identifier.value()
+            );
         }
     }
 
-    private void putDate(Map<Field, String> fields, String elementName, String date) {
+    private void putDate(
+        Map<Field, String> fields,
+        String elementName,
+        String date
+    ) {
         if (date != null) {
             Optional<Date> optionalParsedDate = Date.parse(date);
             switch (elementName) {
                 case "dateIssued" -> {
+                    optionalParsedDate.ifPresent(parsedDate ->
+                        fields.put(
+                            StandardField.DATE,
+                            parsedDate.getNormalized()
+                        )
+                    );
+
                     optionalParsedDate
-                            .ifPresent(parsedDate -> fields.put(StandardField.DATE, parsedDate.getNormalized()));
+                        .flatMap(Date::getYear)
+                        .ifPresent(year ->
+                            fields.put(StandardField.YEAR, year.toString())
+                        );
 
-                    optionalParsedDate.flatMap(Date::getYear)
-                            .ifPresent(year -> fields.put(StandardField.YEAR, year.toString()));
-
-                    optionalParsedDate.flatMap(Date::getMonth)
-                            .ifPresent(month -> fields.put(StandardField.MONTH, month.getJabRefFormat()));
+                    optionalParsedDate
+                        .flatMap(Date::getMonth)
+                        .ifPresent(month ->
+                            fields.put(
+                                StandardField.MONTH,
+                                month.getJabRefFormat()
+                            )
+                        );
                 }
                 case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
-                    fields.computeIfAbsent(StandardField.YEAR, k -> date.substring(0, 4));
+                    fields.computeIfAbsent(
+                        StandardField.YEAR,
+                        k -> date.substring(0, 4)
+                    );
                     fields.put(new UnknownField("created"), date);
                 }
                 case "dateCaptured" -> {
-                    optionalParsedDate
-                            .ifPresent(parsedDate -> fields.put(StandardField.CREATIONDATE, parsedDate.getNormalized()));
+                    optionalParsedDate.ifPresent(parsedDate ->
+                        fields.put(
+                            StandardField.CREATIONDATE,
+                            parsedDate.getNormalized()
+                        )
+                    );
                 }
                 case "dateModified" -> {
-                    optionalParsedDate
-                            .ifPresent(parsedDate -> fields.put(StandardField.MODIFICATIONDATE, parsedDate.getNormalized()));
+                    optionalParsedDate.ifPresent(parsedDate ->
+                        fields.put(
+                            StandardField.MODIFICATIONDATE,
+                            parsedDate.getNormalized()
+                        )
+                    );
                 }
             }
         }
     }
 
-    private void putIfListIsNotEmpty(Map<Field, String> fields, List<String> list, Field key, String separator) {
+    private void putIfListIsNotEmpty(
+        Map<Field, String> fields,
+        List<String> list,
+        Field key,
+        String separator
+    ) {
         if (!list.isEmpty()) {
-            fields.put(key, list.stream().collect(Collectors.joining(separator)));
+            fields.put(
+                key,
+                list.stream().collect(Collectors.joining(separator))
+            );
         }
     }
 
-    private void handleAuthorsInNamePart(List<Name> names, List<String> authors) {
+    private void handleAuthorsInNamePart(
+        List<Name> names,
+        List<String> authors
+    ) {
         List<String> foreName = new ArrayList<>();
         String familyName = "";
         String author = "";
@@ -588,7 +801,11 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
+    private void putIfValueNotNull(
+        Map<Field, String> fields,
+        Field field,
+        String value
+    ) {
         if (value != null) {
             fields.put(field, value);
         }
@@ -628,9 +845,16 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream)
+        throws ParseException {
         try {
-            return importDatabase(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
+            return importDatabase(
+                new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8)
+                )
+            )
+                .getDatabase()
+                .getEntries();
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }

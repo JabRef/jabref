@@ -2,7 +2,6 @@ package org.jabref.model.search;
 
 import java.util.EnumSet;
 import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.SearchRule;
 import org.jabref.model.search.rules.SearchRules;
@@ -22,8 +21,12 @@ public class GroupSearchQuery implements SearchMatcher {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s)", query, getCaseSensitiveDescription(),
-                getRegularExpressionDescription());
+        return String.format(
+            "\"%s\" (%s, %s)",
+            query,
+            getCaseSensitiveDescription(),
+            getRegularExpressionDescription()
+        );
     }
 
     @Override

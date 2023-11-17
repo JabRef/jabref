@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -28,7 +27,9 @@ public class TrimWhitespaceFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Trim all whitespace characters in the field content.");
+        return Localization.lang(
+            "Trim all whitespace characters in the field content."
+        );
     }
 
     @Override

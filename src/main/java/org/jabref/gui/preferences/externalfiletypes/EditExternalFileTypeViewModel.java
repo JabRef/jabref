@@ -7,27 +7,43 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 public class EditExternalFileTypeViewModel {
+
     private final ExternalFileTypeItemViewModel fileTypeViewModel;
 
     private final StringProperty nameProperty = new SimpleStringProperty("");
-    private final StringProperty mimeTypeProperty = new SimpleStringProperty("");
-    private final StringProperty extensionProperty = new SimpleStringProperty("");
-    private final StringProperty selectedApplicationProperty = new SimpleStringProperty("");
-    private final BooleanProperty defaultApplicationSelectedProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty customApplicationSelectedProperty = new SimpleBooleanProperty(false);
+    private final StringProperty mimeTypeProperty = new SimpleStringProperty(
+        ""
+    );
+    private final StringProperty extensionProperty = new SimpleStringProperty(
+        ""
+    );
+    private final StringProperty selectedApplicationProperty =
+        new SimpleStringProperty("");
+    private final BooleanProperty defaultApplicationSelectedProperty =
+        new SimpleBooleanProperty(false);
+    private final BooleanProperty customApplicationSelectedProperty =
+        new SimpleBooleanProperty(false);
 
-    public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel) {
+    public EditExternalFileTypeViewModel(
+        ExternalFileTypeItemViewModel fileTypeViewModel
+    ) {
         this.fileTypeViewModel = fileTypeViewModel;
 
-        extensionProperty.setValue(fileTypeViewModel.extensionProperty().getValue());
+        extensionProperty.setValue(
+            fileTypeViewModel.extensionProperty().getValue()
+        );
         nameProperty.setValue(fileTypeViewModel.nameProperty().getValue());
-        mimeTypeProperty.setValue(fileTypeViewModel.mimetypeProperty().getValue());
+        mimeTypeProperty.setValue(
+            fileTypeViewModel.mimetypeProperty().getValue()
+        );
 
         if (fileTypeViewModel.applicationProperty().getValue().isEmpty()) {
             defaultApplicationSelectedProperty.setValue(true);
         } else {
             customApplicationSelectedProperty.setValue(true);
-            selectedApplicationProperty.setValue(fileTypeViewModel.applicationProperty().getValue());
+            selectedApplicationProperty.setValue(
+                fileTypeViewModel.applicationProperty().getValue()
+            );
         }
     }
 
@@ -60,8 +76,12 @@ public class EditExternalFileTypeViewModel {
     }
 
     public void storeSettings() {
-        fileTypeViewModel.nameProperty().setValue(nameProperty.getValue().trim());
-        fileTypeViewModel.mimetypeProperty().setValue(mimeTypeProperty.getValue().trim());
+        fileTypeViewModel
+            .nameProperty()
+            .setValue(nameProperty.getValue().trim());
+        fileTypeViewModel
+            .mimetypeProperty()
+            .setValue(mimeTypeProperty.getValue().trim());
 
         String ext = extensionProperty.getValue().trim();
         if (!ext.isEmpty() && (ext.charAt(0) == '.')) {
@@ -73,7 +93,10 @@ public class EditExternalFileTypeViewModel {
         String application = selectedApplicationProperty.getValue().trim();
 
         // store application as empty if the "Default" option is selected, or if the application name is empty:
-        if (defaultApplicationSelectedProperty.getValue() || application.isEmpty()) {
+        if (
+            defaultApplicationSelectedProperty.getValue() ||
+            application.isEmpty()
+        ) {
             fileTypeViewModel.applicationProperty().setValue("");
             selectedApplicationProperty.setValue("");
         } else {

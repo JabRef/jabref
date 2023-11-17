@@ -1,5 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -16,7 +22,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -25,15 +30,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-
 @FetcherTest
-@DisabledOnCIServer("eprint.iacr.org blocks with 500 when there are too many calls from the same IP address.")
+@DisabledOnCIServer(
+    "eprint.iacr.org blocks with 500 when there are too many calls from the same IP address."
+)
 public class IacrEprintFetcherTest {
 
     private IacrEprintFetcher fetcher;
@@ -44,104 +44,199 @@ public class IacrEprintFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new IacrEprintFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher =
+            new IacrEprintFetcher(
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
+            );
 
-        abram2017 = new BibEntry(StandardEntryType.Misc)
+        abram2017 =
+            new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("cryptoeprint:2017/1118")
                 .withField(StandardField.ABSTRACT, "dummy")
-                .withField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman")
+                .withField(
+                    StandardField.AUTHOR,
+                    "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman"
+                )
                 .withField(StandardField.DATE, "2017-11-24")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2017/1118")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1118}")
-                .withField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1118/20171124:064527")
+                .withField(
+                    StandardField.HOWPUBLISHED,
+                    "Cryptology ePrint Archive, Paper 2017/1118"
+                )
+                .withField(
+                    StandardField.NOTE,
+                    "\\url{https://eprint.iacr.org/2017/1118}"
+                )
+                .withField(
+                    StandardField.TITLE,
+                    "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus"
+                )
+                .withField(
+                    StandardField.URL,
+                    "https://eprint.iacr.org/2017/1118/20171124:064527"
+                )
                 .withField(StandardField.VERSION, "20171124:064527")
                 .withField(StandardField.YEAR, "2017");
 
-        abram2017noVersion = new BibEntry(StandardEntryType.Misc)
+        abram2017noVersion =
+            new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("cryptoeprint:2017/1118")
                 .withField(StandardField.ABSTRACT, "dummy")
-                .withField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman")
+                .withField(
+                    StandardField.AUTHOR,
+                    "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman"
+                )
                 .withField(StandardField.DATE, "2017-11-24")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2017/1118")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1118}")
-                .withField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1118")
+                .withField(
+                    StandardField.HOWPUBLISHED,
+                    "Cryptology ePrint Archive, Paper 2017/1118"
+                )
+                .withField(
+                    StandardField.NOTE,
+                    "\\url{https://eprint.iacr.org/2017/1118}"
+                )
+                .withField(
+                    StandardField.TITLE,
+                    "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus"
+                )
+                .withField(
+                    StandardField.URL,
+                    "https://eprint.iacr.org/2017/1118"
+                )
                 .withField(StandardField.YEAR, "2017");
 
-        beierle2016 = new BibEntry(StandardEntryType.Misc)
+        beierle2016 =
+            new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("cryptoeprint:2016/119")
                 .withField(StandardField.ABSTRACT, "dummy")
-                .withField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander")
+                .withField(
+                    StandardField.AUTHOR,
+                    "Christof Beierle and Thorsten Kranz and Gregor Leander"
+                )
                 .withField(StandardField.DATE, "2017-02-17")
                 .withField(StandardField.DOI, "10.1007/978-3-662-53018-4_23")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2016/119")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2016/119}")
-                .withField(StandardField.TITLE, "Lightweight Multiplication in GF(2^n) with Applications to MDS Matrices")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2016/119/20170217:150415")
+                .withField(
+                    StandardField.HOWPUBLISHED,
+                    "Cryptology ePrint Archive, Paper 2016/119"
+                )
+                .withField(
+                    StandardField.NOTE,
+                    "\\url{https://eprint.iacr.org/2016/119}"
+                )
+                .withField(
+                    StandardField.TITLE,
+                    "Lightweight Multiplication in GF(2^n) with Applications to MDS Matrices"
+                )
+                .withField(
+                    StandardField.URL,
+                    "https://eprint.iacr.org/2016/119/20170217:150415"
+                )
                 .withField(StandardField.VERSION, "20170217:150415")
                 .withField(StandardField.YEAR, "2016");
 
-        delgado2017 = new BibEntry(StandardEntryType.Misc)
+        delgado2017 =
+            new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("cryptoeprint:2017/1095")
                 .withField(StandardField.ABSTRACT, "dummy")
-                .withField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí")
+                .withField(
+                    StandardField.AUTHOR,
+                    "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí"
+                )
                 .withField(StandardField.DATE, "2018-01-19")
-                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2017/1095")
-                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1095}")
-                .withField(StandardField.TITLE, "Analysis of the Bitcoin UTXO set")
-                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1095/20180119:113352")
+                .withField(
+                    StandardField.HOWPUBLISHED,
+                    "Cryptology ePrint Archive, Paper 2017/1095"
+                )
+                .withField(
+                    StandardField.NOTE,
+                    "\\url{https://eprint.iacr.org/2017/1095}"
+                )
+                .withField(
+                    StandardField.TITLE,
+                    "Analysis of the Bitcoin UTXO set"
+                )
+                .withField(
+                    StandardField.URL,
+                    "https://eprint.iacr.org/2017/1095/20180119:113352"
+                )
                 .withField(StandardField.VERSION, "20180119:113352")
                 .withField(StandardField.YEAR, "2017");
     }
 
     @Test
     public void searchByIdWithValidId1() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("Report 2017/1118 ");
-        assertFalse(fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
+            "Report 2017/1118 "
+        );
+        assertFalse(
+            fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty()
+        );
         fetchedEntry.get().setField(StandardField.ABSTRACT, "dummy");
         assertEquals(Optional.of(abram2017), fetchedEntry);
     }
 
     @Test
     public void searchByIdWithValidId2() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("iacr ePrint 2016/119");
-        assertFalse(fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
+            "iacr ePrint 2016/119"
+        );
+        assertFalse(
+            fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty()
+        );
         fetchedEntry.get().setField(StandardField.ABSTRACT, "dummy");
         assertEquals(Optional.of(beierle2016), fetchedEntry);
     }
 
     @Test
-    public void searchByIdWithValidIdAndNonAsciiChars() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("some random 2017/1095 stuff around the id");
-        assertFalse(fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty());
+    public void searchByIdWithValidIdAndNonAsciiChars()
+        throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
+            "some random 2017/1095 stuff around the id"
+        );
+        assertFalse(
+            fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty()
+        );
         fetchedEntry.get().setField(StandardField.ABSTRACT, "dummy");
         assertEquals(Optional.of(delgado2017), fetchedEntry);
     }
 
     @Test
     public void searchByIdWithEmptyIdFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("")
+        );
     }
 
     @Test
     public void searchByIdWithInvalidReportNumberFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/1"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("2016/1")
+        );
     }
 
     @Test
     public void searchByIdWithInvalidYearFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("16/115"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("16/115")
+        );
     }
 
     @Test
     public void searchByIdWithInvalidIdFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("asdf"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("asdf")
+        );
     }
 
     @Test
     public void searchForNonexistentIdFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/6425"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("2016/6425")
+        );
     }
 
     @Test
@@ -151,25 +246,51 @@ public class IacrEprintFetcherTest {
 
     @Test
     public void searchByIdForWithdrawnPaperFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("1998/016"));
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.performSearchById("1998/016")
+        );
     }
 
     @Test
-    public void searchByIdWithOldHtmlFormatAndCheckDate() throws FetcherException {
+    public void searchByIdWithOldHtmlFormatAndCheckDate()
+        throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("1997/006");
-        assertEquals(Optional.of("1997-05-04"), fetchedEntry.get().getField(StandardField.DATE));
+        assertEquals(
+            Optional.of("1997-05-04"),
+            fetchedEntry.get().getField(StandardField.DATE)
+        );
     }
 
     @DisplayName("Get all entries with old HTML format (except withdrawn ones)")
     @ParameterizedTest(name = "Fetch for id: {0}")
     @MethodSource("allNonWithdrawnIdsWithOldHtmlFormat")
     @Disabled("Takes a lot of time - should only be called manually")
-    public void searchByIdWithOldHtmlFormatWithoutDateCheck(String id) throws FetcherException {
+    public void searchByIdWithOldHtmlFormatWithoutDateCheck(String id)
+        throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(id);
-        assertTrue(fetchedEntry.isPresent(), "Expected to get an entry for id " + id);
-        assertNotEquals(Optional.empty(), fetchedEntry.get().getField(StandardField.DATE), "Expected non empty date field, entry is\n" + fetchedEntry.toString());
-        assertTrue(fetchedEntry.get().getField(StandardField.DATE).get().length() == 10, "Expected yyyy-MM-dd date format, entry is\n" + fetchedEntry.toString());
-        assertNotEquals(Optional.empty(), fetchedEntry.get().getField(StandardField.ABSTRACT), "Expected non empty abstract field, entry is\n" + fetchedEntry.toString());
+        assertTrue(
+            fetchedEntry.isPresent(),
+            "Expected to get an entry for id " + id
+        );
+        assertNotEquals(
+            Optional.empty(),
+            fetchedEntry.get().getField(StandardField.DATE),
+            "Expected non empty date field, entry is\n" +
+            fetchedEntry.toString()
+        );
+        assertTrue(
+            fetchedEntry.get().getField(StandardField.DATE).get().length() ==
+            10,
+            "Expected yyyy-MM-dd date format, entry is\n" +
+            fetchedEntry.toString()
+        );
+        assertNotEquals(
+            Optional.empty(),
+            fetchedEntry.get().getField(StandardField.ABSTRACT),
+            "Expected non empty abstract field, entry is\n" +
+            fetchedEntry.toString()
+        );
     }
 
     /**
@@ -203,13 +324,22 @@ public class IacrEprintFetcherTest {
     @Test
     public void getFulltextWithVersion() throws FetcherException, IOException {
         Optional<URL> pdfUrl = fetcher.findFullText(abram2017);
-        assertEquals(Optional.of("https://eprint.iacr.org/archive/2017/1118/1511505927.pdf"), pdfUrl.map(URL::toString));
+        assertEquals(
+            Optional.of(
+                "https://eprint.iacr.org/archive/2017/1118/1511505927.pdf"
+            ),
+            pdfUrl.map(URL::toString)
+        );
     }
 
     @Test
-    public void getFulltextWithoutVersion() throws FetcherException, IOException {
+    public void getFulltextWithoutVersion()
+        throws FetcherException, IOException {
         Optional<URL> pdfUrl = fetcher.findFullText(abram2017noVersion);
-        assertEquals(Optional.of("https://eprint.iacr.org/2017/1118.pdf"), pdfUrl.map(URL::toString));
+        assertEquals(
+            Optional.of("https://eprint.iacr.org/2017/1118.pdf"),
+            pdfUrl.map(URL::toString)
+        );
     }
 
     @Test
@@ -223,7 +353,13 @@ public class IacrEprintFetcherTest {
     @Test
     public void getFulltextWithNonIACRUrl() throws IOException {
         BibEntry abram2017WithNonIACRUrl = abram2017;
-        abram2017WithNonIACRUrl.setField(StandardField.URL, "https://example.com");
-        assertThrows(FetcherException.class, () -> fetcher.findFullText(abram2017WithNonIACRUrl));
+        abram2017WithNonIACRUrl.setField(
+            StandardField.URL,
+            "https://example.com"
+        );
+        assertThrows(
+            FetcherException.class,
+            () -> fetcher.findFullText(abram2017WithNonIACRUrl)
+        );
     }
 }

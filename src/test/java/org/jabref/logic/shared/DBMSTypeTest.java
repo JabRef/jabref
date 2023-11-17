@@ -1,13 +1,11 @@
 package org.jabref.logic.shared;
 
-import java.util.Optional;
-
-import org.jabref.testutils.category.DatabaseTest;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.util.Optional;
+import org.jabref.testutils.category.DatabaseTest;
+import org.junit.jupiter.api.Test;
 
 @DatabaseTest
 public class DBMSTypeTest {
@@ -34,7 +32,10 @@ public class DBMSTypeTest {
 
     @Test
     public void fromStringWorksForPostgreSQL() {
-        assertEquals(Optional.of(DBMSType.POSTGRESQL), DBMSType.fromString("PostgreSQL"));
+        assertEquals(
+            Optional.of(DBMSType.POSTGRESQL),
+            DBMSType.fromString("PostgreSQL")
+        );
     }
 
     @Test
@@ -54,17 +55,26 @@ public class DBMSTypeTest {
 
     @Test
     public void driverClassForMysqlIsCorrect() {
-        assertEquals("org.mariadb.jdbc.Driver", DBMSType.MYSQL.getDriverClassPath());
+        assertEquals(
+            "org.mariadb.jdbc.Driver",
+            DBMSType.MYSQL.getDriverClassPath()
+        );
     }
 
     @Test
     public void driverClassForOracleIsCorrect() {
-        assertEquals("oracle.jdbc.driver.OracleDriver", DBMSType.ORACLE.getDriverClassPath());
+        assertEquals(
+            "oracle.jdbc.driver.OracleDriver",
+            DBMSType.ORACLE.getDriverClassPath()
+        );
     }
 
     @Test
     public void driverClassForPostgresIsCorrect() {
-        assertEquals("org.postgresql.Driver", DBMSType.POSTGRESQL.getDriverClassPath());
+        assertEquals(
+            "org.postgresql.Driver",
+            DBMSType.POSTGRESQL.getDriverClassPath()
+        );
     }
 
     @Test
@@ -79,7 +89,10 @@ public class DBMSTypeTest {
 
     @Test
     public void fromStringForPostgresReturnsCorrectValue() {
-        assertEquals(DBMSType.POSTGRESQL, DBMSType.fromString("PostgreSQL").get());
+        assertEquals(
+            DBMSType.POSTGRESQL,
+            DBMSType.fromString("PostgreSQL").get()
+        );
     }
 
     @Test
@@ -89,17 +102,26 @@ public class DBMSTypeTest {
 
     @Test
     public void getUrlForMysqlHasCorrectFormat() {
-        assertEquals("jdbc:mariadb://localhost:3306/xe", DBMSType.MYSQL.getUrl("localhost", 3306, "xe"));
+        assertEquals(
+            "jdbc:mariadb://localhost:3306/xe",
+            DBMSType.MYSQL.getUrl("localhost", 3306, "xe")
+        );
     }
 
     @Test
     public void getUrlForOracleHasCorrectFormat() {
-        assertEquals("jdbc:oracle:thin:@localhost:1521/xe", DBMSType.ORACLE.getUrl("localhost", 1521, "xe"));
+        assertEquals(
+            "jdbc:oracle:thin:@localhost:1521/xe",
+            DBMSType.ORACLE.getUrl("localhost", 1521, "xe")
+        );
     }
 
     @Test
     public void getUrlForPostgresHasCorrectFormat() {
-        assertEquals("jdbc:postgresql://localhost:5432/xe", DBMSType.POSTGRESQL.getUrl("localhost", 5432, "xe"));
+        assertEquals(
+            "jdbc:postgresql://localhost:5432/xe",
+            DBMSType.POSTGRESQL.getUrl("localhost", 5432, "xe")
+        );
     }
 
     @Test

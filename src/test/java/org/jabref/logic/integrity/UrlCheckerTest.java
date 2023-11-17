@@ -1,11 +1,10 @@
 package org.jabref.logic.integrity;
 
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
 public class UrlCheckerTest {
 
@@ -13,17 +12,28 @@ public class UrlCheckerTest {
 
     @Test
     void urlFieldAcceptsHttpAddress() {
-        assertEquals(Optional.empty(), checker.checkValue("http://www.google.com"));
+        assertEquals(
+            Optional.empty(),
+            checker.checkValue("http://www.google.com")
+        );
     }
 
     @Test
     void urlFieldAcceptsFullLocalPath() {
-        assertEquals(Optional.empty(), checker.checkValue("file://c:/asdf/asdf"));
+        assertEquals(
+            Optional.empty(),
+            checker.checkValue("file://c:/asdf/asdf")
+        );
     }
 
     @Test
     void urlFieldAcceptsFullPathHttpAddress() {
-        assertEquals(Optional.empty(), checker.checkValue("http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
+        assertEquals(
+            Optional.empty(),
+            checker.checkValue(
+                "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"
+            )
+        );
     }
 
     @Test

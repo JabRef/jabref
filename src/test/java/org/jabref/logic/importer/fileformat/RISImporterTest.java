@@ -1,16 +1,14 @@
 package org.jabref.logic.importer.fileformat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-
 import org.jabref.logic.util.StandardFileType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class RISImporterTest {
 
@@ -38,12 +36,19 @@ public class RISImporterTest {
 
     @Test
     public void testGetDescription() {
-        assertEquals("Imports a Biblioscape Tag File.", importer.getDescription());
+        assertEquals(
+            "Imports a Biblioscape Tag File.",
+            importer.getDescription()
+        );
     }
 
     @Test
-    public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
-        Path file = Path.of(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
+    public void testIfNotRecognizedFormat()
+        throws IOException, URISyntaxException {
+        Path file = Path.of(
+            RISImporterTest.class.getResource("RisImporterCorrupted.ris")
+                .toURI()
+        );
         assertFalse(importer.isRecognizedFormat(file));
     }
 }

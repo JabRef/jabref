@@ -1,7 +1,6 @@
 package org.jabref.model.groups;
 
 import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -20,7 +19,10 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof AllEntriesGroup aeg && Objects.equals(aeg.getName(), getName());
+        return (
+            o instanceof AllEntriesGroup aeg &&
+            Objects.equals(aeg.getName(), getName())
+        );
     }
 
     @Override

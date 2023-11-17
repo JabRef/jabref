@@ -1,5 +1,7 @@
 package org.jabref.gui.util;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -11,14 +13,10 @@ import java.nio.file.WatchService;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +28,23 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DefaultFileUpdateMonitor.class
+    );
 
-    private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
+    private final Multimap<Path, FileUpdateListener> listeners =
+        ArrayListMultimap.create(20, 4);
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
-    private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
+    private final AtomicReference<
+        Optional<JabRefException>
+    > filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
 
     @Override
     public void run() {
-        try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
+        try (
+            WatchService watcher = FileSystems.getDefault().newWatchService()
+        ) {
             this.watcher = watcher;
             filesystemMonitorFailure.set(Optional.empty());
 
@@ -57,11 +62,15 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
                         continue;
-                    } else if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                    } else if (
+                        kind == StandardWatchEventKinds.ENTRY_CREATE ||
+                        kind == StandardWatchEventKinds.ENTRY_MODIFY
+                    ) {
                         // We only handle "ENTRY_CREATE" and "ENTRY_MODIFY" here, so the context is always a Path
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                        Path path = ((Path) key.watchable()).resolve(ev.context());
+                        Path path =
+                            ((Path) key.watchable()).resolve(ev.context());
                         notifyAboutChange(path);
                     }
                     key.reset();
@@ -70,7 +79,10 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             }
         } catch (IOException e) {
             JabRefException exception = new WatchServiceUnavailableException(
-                    e.getMessage(), e.getLocalizedMessage(), e.getCause());
+                e.getMessage(),
+                e.getLocalizedMessage(),
+                e.getCause()
+            );
             filesystemMonitorFailure.set(Optional.of(exception));
             LOGGER.warn("Error during watching", e);
         }
@@ -86,14 +98,23 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     }
 
     @Override
-    public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
+    public void addListenerForFile(Path file, FileUpdateListener listener)
+        throws IOException {
         if (isActive()) {
             // We can't watch files directly, so monitor their parent directory for updates
             Path directory = file.toAbsolutePath().getParent();
-            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+            directory.register(
+                watcher,
+                StandardWatchEventKinds.ENTRY_CREATE,
+                StandardWatchEventKinds.ENTRY_MODIFY
+            );
             listeners.put(file, listener);
         } else {
-            LOGGER.warn("Not adding listener {} to file {} because the file update monitor isn't active", listener, file);
+            LOGGER.warn(
+                "Not adding listener {} to file {} because the file update monitor isn't active",
+                listener,
+                file
+            );
         }
     }
 

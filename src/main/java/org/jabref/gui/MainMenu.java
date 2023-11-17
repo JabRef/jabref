@@ -1,13 +1,11 @@
 package org.jabref.gui;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
@@ -73,6 +71,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 public class MainMenu extends MenuBar {
+
     private final JabRefFrame frame;
     private final SidePane sidePane;
     private final PushToApplicationCommand pushToApplicationCommand;
@@ -86,18 +85,20 @@ public class MainMenu extends MenuBar {
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
 
-    public MainMenu(JabRefFrame frame,
-                    SidePane sidePane,
-                    PushToApplicationCommand pushToApplicationCommand,
-                    PreferencesService preferencesService,
-                    StateManager stateManager,
-                    FileUpdateMonitor fileUpdateMonitor,
-                    TaskExecutor taskExecutor,
-                    DialogService dialogService,
-                    JournalAbbreviationRepository abbreviationRepository,
-                    BibEntryTypesManager entryTypesManager,
-                    UndoManager undoManager,
-                    ClipBoardManager clipBoardManager) {
+    public MainMenu(
+        JabRefFrame frame,
+        SidePane sidePane,
+        PushToApplicationCommand pushToApplicationCommand,
+        PreferencesService preferencesService,
+        StateManager stateManager,
+        FileUpdateMonitor fileUpdateMonitor,
+        TaskExecutor taskExecutor,
+        DialogService dialogService,
+        JournalAbbreviationRepository abbreviationRepository,
+        BibEntryTypesManager entryTypesManager,
+        UndoManager undoManager,
+        ClipBoardManager clipBoardManager
+    ) {
         this.frame = frame;
         this.sidePane = sidePane;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -125,90 +126,356 @@ public class MainMenu extends MenuBar {
         Menu tools = new Menu(Localization.lang("Tools"));
         Menu help = new Menu(Localization.lang("Help"));
 
-        file.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                factory.createMenuItem(StandardActions.OPEN_LIBRARY, frame.getOpenDatabaseAction()),
+        file
+            .getItems()
+            .addAll(
+                factory.createMenuItem(
+                    StandardActions.NEW_LIBRARY,
+                    new NewDatabaseAction(frame, preferencesService)
+                ),
+                factory.createMenuItem(
+                    StandardActions.OPEN_LIBRARY,
+                    frame.getOpenDatabaseAction()
+                ),
                 frame.getFileHistory(),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame, dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame, preferencesService)),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame)),
-
+                factory.createMenuItem(
+                    StandardActions.SAVE_LIBRARY,
+                    new SaveAction(
+                        SaveAction.SaveMethod.SAVE,
+                        frame,
+                        dialogService,
+                        preferencesService,
+                        stateManager
+                    )
+                ),
+                factory.createMenuItem(
+                    StandardActions.SAVE_LIBRARY_AS,
+                    new SaveAction(
+                        SaveAction.SaveMethod.SAVE_AS,
+                        frame,
+                        dialogService,
+                        preferencesService,
+                        stateManager
+                    )
+                ),
+                factory.createMenuItem(
+                    StandardActions.SAVE_ALL,
+                    new SaveAllAction(frame, preferencesService)
+                ),
+                factory.createMenuItem(
+                    StandardActions.CLOSE_LIBRARY,
+                    new JabRefFrame.CloseDatabaseAction(frame)
+                ),
                 new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferencesService, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferencesService, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
-
-                factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame, dialogService, preferencesService, stateManager))),
-
+                factory.createSubMenu(
+                    StandardActions.IMPORT,
+                    factory.createMenuItem(
+                        StandardActions.IMPORT_INTO_CURRENT_LIBRARY,
+                        new ImportCommand(
+                            frame,
+                            ImportCommand.ImportMethod.TO_EXISTING,
+                            preferencesService,
+                            stateManager,
+                            fileUpdateMonitor,
+                            taskExecutor,
+                            dialogService
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.IMPORT_INTO_NEW_LIBRARY,
+                        new ImportCommand(
+                            frame,
+                            ImportCommand.ImportMethod.AS_NEW,
+                            preferencesService,
+                            stateManager,
+                            fileUpdateMonitor,
+                            taskExecutor,
+                            dialogService
+                        )
+                    )
+                ),
+                factory.createSubMenu(
+                    StandardActions.EXPORT,
+                    factory.createMenuItem(
+                        StandardActions.EXPORT_ALL,
+                        new ExportCommand(
+                            ExportCommand.ExportMethod.EXPORT_ALL,
+                            frame,
+                            stateManager,
+                            dialogService,
+                            preferencesService,
+                            entryTypesManager,
+                            abbreviationRepository,
+                            taskExecutor
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.EXPORT_SELECTED,
+                        new ExportCommand(
+                            ExportCommand.ExportMethod.EXPORT_SELECTED,
+                            frame,
+                            stateManager,
+                            dialogService,
+                            preferencesService,
+                            entryTypesManager,
+                            abbreviationRepository,
+                            taskExecutor
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX,
+                        new SaveAction(
+                            SaveAction.SaveMethod.SAVE_SELECTED,
+                            frame,
+                            dialogService,
+                            preferencesService,
+                            stateManager
+                        )
+                    )
+                ),
                 new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.REMOTE_DB,
-                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame)),
-                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
-
+                factory.createSubMenu(
+                    StandardActions.REMOTE_DB,
+                    factory.createMenuItem(
+                        StandardActions.CONNECT_TO_SHARED_DB,
+                        new ConnectToSharedDatabaseCommand(frame)
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.PULL_CHANGES_FROM_SHARED_DB,
+                        new PullChangesFromSharedAction(stateManager)
+                    )
+                ),
                 new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, taskExecutor)),
-
+                factory.createMenuItem(
+                    StandardActions.SHOW_PREFS,
+                    new ShowPreferencesAction(frame, taskExecutor)
+                ),
                 new SeparatorMenuItem(),
+                factory.createMenuItem(
+                    StandardActions.QUIT,
+                    new JabRefFrame.CloseAction(frame)
+                )
+            );
 
-                factory.createMenuItem(StandardActions.QUIT, new JabRefFrame.CloseAction(frame))
-        );
-
-        edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)),
-
+        edit
+            .getItems()
+            .addAll(
+                factory.createMenuItem(
+                    StandardActions.UNDO,
+                    new UndoRedoAction(
+                        StandardActions.UNDO,
+                        frame,
+                        dialogService,
+                        stateManager
+                    )
+                ),
+                factory.createMenuItem(
+                    StandardActions.REDO,
+                    new UndoRedoAction(
+                        StandardActions.REDO,
+                        frame,
+                        dialogService,
+                        stateManager
+                    )
+                ),
                 new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager)),
-
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager)),
-                factory.createSubMenu(StandardActions.COPY_MORE,
-                        factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService))),
-
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager)),
-
+                factory.createMenuItem(
+                    StandardActions.CUT,
+                    new EditAction(StandardActions.CUT, frame, stateManager)
+                ),
+                factory.createMenuItem(
+                    StandardActions.COPY,
+                    new EditAction(StandardActions.COPY, frame, stateManager)
+                ),
+                factory.createSubMenu(
+                    StandardActions.COPY_MORE,
+                    factory.createMenuItem(
+                        StandardActions.COPY_TITLE,
+                        new CopyMoreAction(
+                            StandardActions.COPY_TITLE,
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            preferencesService,
+                            abbreviationRepository
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.COPY_KEY,
+                        new CopyMoreAction(
+                            StandardActions.COPY_KEY,
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            preferencesService,
+                            abbreviationRepository
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.COPY_CITE_KEY,
+                        new CopyMoreAction(
+                            StandardActions.COPY_CITE_KEY,
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            preferencesService,
+                            abbreviationRepository
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.COPY_KEY_AND_TITLE,
+                        new CopyMoreAction(
+                            StandardActions.COPY_KEY_AND_TITLE,
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            preferencesService,
+                            abbreviationRepository
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.COPY_KEY_AND_LINK,
+                        new CopyMoreAction(
+                            StandardActions.COPY_KEY_AND_LINK,
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            preferencesService,
+                            abbreviationRepository
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.COPY_CITATION_PREVIEW,
+                        new CopyCitationAction(
+                            CitationStyleOutputFormat.HTML,
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            taskExecutor,
+                            preferencesService,
+                            abbreviationRepository
+                        )
+                    ),
+                    factory.createMenuItem(
+                        StandardActions.EXPORT_SELECTED_TO_CLIPBOARD,
+                        new ExportToClipboardAction(
+                            dialogService,
+                            stateManager,
+                            clipBoardManager,
+                            taskExecutor,
+                            preferencesService
+                        )
+                    )
+                ),
+                factory.createMenuItem(
+                    StandardActions.PASTE,
+                    new EditAction(StandardActions.PASTE, frame, stateManager)
+                ),
                 new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame, stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame, dialogService, stateManager, taskExecutor, preferencesService)),
-
+                factory.createMenuItem(
+                    StandardActions.REPLACE_ALL,
+                    new ReplaceStringAction(frame, stateManager)
+                ),
+                factory.createMenuItem(
+                    StandardActions.GENERATE_CITE_KEYS,
+                    new GenerateCitationKeyAction(
+                        frame,
+                        dialogService,
+                        stateManager,
+                        taskExecutor,
+                        preferencesService
+                    )
+                ),
                 new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),
-                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService)));
+                factory.createMenuItem(
+                    StandardActions.MANAGE_KEYWORDS,
+                    new ManageKeywordsAction(stateManager)
+                ),
+                factory.createMenuItem(
+                    StandardActions.AUTOMATIC_FIELD_EDITOR,
+                    new AutomaticFieldEditorAction(stateManager, dialogService)
+                )
+            );
         SeparatorMenuItem specialFieldsSeparator = new SeparatorMenuItem();
-        specialFieldsSeparator.visibleProperty().bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
+        specialFieldsSeparator
+            .visibleProperty()
+            .bind(
+                preferencesService
+                    .getSpecialFieldsPreferences()
+                    .specialFieldsEnabledProperty()
+            );
 
-        edit.getItems().addAll(
+        edit
+            .getItems()
+            .addAll(
                 specialFieldsSeparator,
                 // ToDo: SpecialField needs the active BasePanel to mark it as changed.
                 //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame, dialogService, preferencesService, undoManager, stateManager));
-        edit.addEventHandler(ActionEvent.ACTION, event -> {
-            // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
-            // If the mainscreen is not focused, the actions captured by menu are consumed.
-            if (OS.OS_X && !frame.getMainStage().focusedProperty().get()) {
-                event.consume();
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(
+                    SpecialField.RANKING,
+                    factory,
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    undoManager,
+                    stateManager
+                ),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(
+                    SpecialField.RELEVANCE,
+                    factory,
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    undoManager,
+                    stateManager
+                ),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(
+                    SpecialField.QUALITY,
+                    factory,
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    undoManager,
+                    stateManager
+                ),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(
+                    SpecialField.PRINTED,
+                    factory,
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    undoManager,
+                    stateManager
+                ),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(
+                    SpecialField.PRIORITY,
+                    factory,
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    undoManager,
+                    stateManager
+                ),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(
+                    SpecialField.READ_STATUS,
+                    factory,
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    undoManager,
+                    stateManager
+                )
+            );
+        edit.addEventHandler(
+            ActionEvent.ACTION,
+            event -> {
+                // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
+                // If the mainscreen is not focused, the actions captured by menu are consumed.
+                if (OS.OS_X && !frame.getMainStage().focusedProperty().get()) {
+                    event.consume();
+                }
             }
-        });
+        );
 
         // @formatter:off
         library.getItems().addAll(
@@ -334,27 +601,41 @@ public class MainMenu extends MenuBar {
 
         // @formatter:on
         getStyleClass().add("mainMenu");
-        getMenus().addAll(
-                file,
-                edit,
-                library,
-                quality,
-                lookup,
-                tools,
-                view,
-                help);
+        getMenus()
+            .addAll(file, edit, library, quality, lookup, tools, view, help);
         setUseSystemMenuBar(true);
     }
 
-    private Menu createSendSubMenu(ActionFactory factory,
-                                   DialogService dialogService,
-                                   StateManager stateManager,
-                                   PreferencesService preferencesService) {
+    private Menu createSendSubMenu(
+        ActionFactory factory,
+        DialogService dialogService,
+        StateManager stateManager,
+        PreferencesService preferencesService
+    ) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
-        sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager, taskExecutor))
-        );
+        sendMenu
+            .getItems()
+            .addAll(
+                factory.createMenuItem(
+                    StandardActions.SEND_AS_EMAIL,
+                    new SendAsStandardEmailAction(
+                        dialogService,
+                        preferencesService,
+                        stateManager,
+                        entryTypesManager,
+                        taskExecutor
+                    )
+                ),
+                factory.createMenuItem(
+                    StandardActions.SEND_TO_KINDLE,
+                    new SendAsKindleEmailAction(
+                        dialogService,
+                        preferencesService,
+                        stateManager,
+                        taskExecutor
+                    )
+                )
+            );
 
         return sendMenu;
     }

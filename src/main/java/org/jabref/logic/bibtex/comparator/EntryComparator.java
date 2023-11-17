@@ -3,7 +3,6 @@ package org.jabref.logic.bibtex.comparator;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
-
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -31,7 +30,12 @@ public class EntryComparator implements Comparator<BibEntry> {
      * @param field the field to sort on
      * @param next the next comparator to use (if the current comparator results in equality)
      */
-    public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
+    public EntryComparator(
+        boolean binary,
+        boolean descending,
+        Field field,
+        Comparator<BibEntry> next
+    ) {
         this.binary = binary;
         this.sortField = field;
         this.descending = descending;
@@ -60,9 +64,13 @@ public class EntryComparator implements Comparator<BibEntry> {
         if (binary) {
             // We just separate on set and unset fields:
             if (f1 == null) {
-                return f2 == null ? (next == null ? idCompare(e1, e2) : next.compare(e1, e2)) : 1;
+                return f2 == null
+                    ? (next == null ? idCompare(e1, e2) : next.compare(e1, e2))
+                    : 1;
             } else {
-                return f2 == null ? -1 : (next == null ? idCompare(e1, e2) : next.compare(e1, e2));
+                return f2 == null
+                    ? -1
+                    : (next == null ? idCompare(e1, e2) : next.compare(e1, e2));
             }
         }
 
@@ -70,10 +78,16 @@ public class EntryComparator implements Comparator<BibEntry> {
         // sorted according to last name.
         if (sortField.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
-                f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase(Locale.ROOT);
+                f1 =
+                    AuthorList
+                        .fixAuthorForAlphabetization((String) f1)
+                        .toLowerCase(Locale.ROOT);
             }
             if (f2 != null) {
-                f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase(Locale.ROOT);
+                f2 =
+                    AuthorList
+                        .fixAuthorForAlphabetization((String) f2)
+                        .toLowerCase(Locale.ROOT);
             }
         } else if (sortField.equals(InternalField.TYPE_HEADER)) {
             // Sort by type.

@@ -1,6 +1,7 @@
 package org.jabref.logic.shared;
 
 public class DBMSConnectionPropertiesBuilder {
+
     private DBMSType type;
     private String host;
     private int port = -1;
@@ -47,12 +48,16 @@ public class DBMSConnectionPropertiesBuilder {
         return this;
     }
 
-    public DBMSConnectionPropertiesBuilder setAllowPublicKeyRetrieval(boolean allowPublicKeyRetrieval) {
+    public DBMSConnectionPropertiesBuilder setAllowPublicKeyRetrieval(
+        boolean allowPublicKeyRetrieval
+    ) {
         this.allowPublicKeyRetrieval = allowPublicKeyRetrieval;
         return this;
     }
 
-    public DBMSConnectionPropertiesBuilder setServerTimezone(String serverTimezone) {
+    public DBMSConnectionPropertiesBuilder setServerTimezone(
+        String serverTimezone
+    ) {
         this.serverTimezone = serverTimezone;
         return this;
     }
@@ -66,6 +71,17 @@ public class DBMSConnectionPropertiesBuilder {
         if (port == -1) {
             port = type.getDefaultPort();
         }
-        return new DBMSConnectionProperties(type, host, port, database, user, password, useSSL, allowPublicKeyRetrieval, serverTimezone, keyStore);
+        return new DBMSConnectionProperties(
+            type,
+            host,
+            port,
+            database,
+            user,
+            password,
+            useSSL,
+            allowPublicKeyRetrieval,
+            serverTimezone,
+            keyStore
+        );
     }
 }

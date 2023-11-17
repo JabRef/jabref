@@ -5,7 +5,8 @@ import org.jabref.model.entry.BibEntry;
 
 public class ImportCleanupBiblatex implements ImportCleanup {
 
-    private final ConvertToBiblatexCleanup convertToBiblatexCleanup = new ConvertToBiblatexCleanup();
+    private final ConvertToBiblatexCleanup convertToBiblatexCleanup =
+        new ConvertToBiblatexCleanup();
 
     /**
      * Performs a format conversion of the given entry into the targeted format.
@@ -15,7 +16,7 @@ public class ImportCleanupBiblatex implements ImportCleanup {
      */
     @Override
     public BibEntry doPostCleanup(BibEntry entry) {
-         convertToBiblatexCleanup.cleanup(entry);
-         return entry;
+        convertToBiblatexCleanup.cleanup(entry);
+        return entry;
     }
 }

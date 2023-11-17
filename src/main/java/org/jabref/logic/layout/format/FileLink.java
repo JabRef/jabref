@@ -3,7 +3,6 @@ package org.jabref.logic.layout.format;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.model.entry.LinkedFile;
@@ -58,9 +57,10 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = fileDirectories;
         }
 
-        return link.findIn(dirs)
-                   .map(path -> path.normalize().toString())
-                   .orElse(link.getLink());
+        return link
+            .findIn(dirs)
+            .map(path -> path.normalize().toString())
+            .orElse(link.getLink());
     }
 
     /**

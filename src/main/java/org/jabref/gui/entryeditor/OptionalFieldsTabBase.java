@@ -3,11 +3,8 @@ package org.jabref.gui.entryeditor;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Tooltip;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -26,33 +23,38 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
+
     private final BibEntryTypesManager entryTypesManager;
     private final boolean isPrimaryOptionalFields;
 
-    public OptionalFieldsTabBase(String title,
-                                 boolean isPrimaryOptionalFields,
-                                 BibDatabaseContext databaseContext,
-                                 SuggestionProviders suggestionProviders,
-                                 UndoManager undoManager,
-                                 DialogService dialogService,
-                                 PreferencesService preferences,
-                                 StateManager stateManager,
-                                 ThemeManager themeManager,
-                                 IndexingTaskManager indexingTaskManager,
-                                 BibEntryTypesManager entryTypesManager,
-                                 TaskExecutor taskExecutor,
-                                 JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(true,
-                databaseContext,
-                suggestionProviders,
-                undoManager,
-                dialogService,
-                preferences,
-                stateManager,
-                themeManager,
-                taskExecutor,
-                journalAbbreviationRepository,
-                indexingTaskManager);
+    public OptionalFieldsTabBase(
+        String title,
+        boolean isPrimaryOptionalFields,
+        BibDatabaseContext databaseContext,
+        SuggestionProviders suggestionProviders,
+        UndoManager undoManager,
+        DialogService dialogService,
+        PreferencesService preferences,
+        StateManager stateManager,
+        ThemeManager themeManager,
+        IndexingTaskManager indexingTaskManager,
+        BibEntryTypesManager entryTypesManager,
+        TaskExecutor taskExecutor,
+        JournalAbbreviationRepository journalAbbreviationRepository
+    ) {
+        super(
+            true,
+            databaseContext,
+            suggestionProviders,
+            undoManager,
+            dialogService,
+            preferences,
+            stateManager,
+            themeManager,
+            taskExecutor,
+            journalAbbreviationRepository,
+            indexingTaskManager
+        );
         this.entryTypesManager = entryTypesManager;
         this.isPrimaryOptionalFields = isPrimaryOptionalFields;
         setText(title);
@@ -63,12 +65,17 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(
+            entry.getType(),
+            mode
+        );
         if (entryType.isPresent()) {
             if (isPrimaryOptionalFields) {
                 return entryType.get().getPrimaryOptionalFields();
             } else {
-                return entryType.get().getSecondaryOptionalNotDeprecatedFields(mode);
+                return entryType
+                    .get()
+                    .getSecondaryOptionalNotDeprecatedFields(mode);
             }
         } else {
             // Entry type unknown -> treat all fields as required

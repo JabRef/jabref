@@ -1,9 +1,7 @@
 package org.jabref.gui.sidepane;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Node;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -17,6 +15,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 public class SidePaneContentFactory {
+
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferences;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -27,15 +26,17 @@ public class SidePaneContentFactory {
     private final BibEntryTypesManager entryTypesManager;
     private final UndoManager undoManager;
 
-    public SidePaneContentFactory(LibraryTabContainer tabContainer,
-                                  PreferencesService preferences,
-                                  JournalAbbreviationRepository abbreviationRepository,
-                                  TaskExecutor taskExecutor,
-                                  DialogService dialogService,
-                                  StateManager stateManager,
-                                  FileUpdateMonitor fileUpdateMonitor,
-                                  BibEntryTypesManager entryTypesManager,
-                                  UndoManager undoManager) {
+    public SidePaneContentFactory(
+        LibraryTabContainer tabContainer,
+        PreferencesService preferences,
+        JournalAbbreviationRepository abbreviationRepository,
+        TaskExecutor taskExecutor,
+        DialogService dialogService,
+        StateManager stateManager,
+        FileUpdateMonitor fileUpdateMonitor,
+        BibEntryTypesManager entryTypesManager,
+        UndoManager undoManager
+    ) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
@@ -50,25 +51,29 @@ public class SidePaneContentFactory {
     public Node create(SidePaneType sidePaneType) {
         return switch (sidePaneType) {
             case GROUPS -> new GroupTreeView(
-                    taskExecutor,
-                    stateManager,
-                    preferences,
-                    dialogService);
+                taskExecutor,
+                stateManager,
+                preferences,
+                dialogService
+            );
             case OPEN_OFFICE -> new OpenOfficePanel(
-                    tabContainer,
-                    preferences,
-                    preferences.getKeyBindingRepository(),
-                    abbreviationRepository,
-                    taskExecutor,
-                    dialogService,
-                    stateManager,
-                    fileUpdateMonitor,
-                    entryTypesManager,
-                    undoManager).getContent();
+                tabContainer,
+                preferences,
+                preferences.getKeyBindingRepository(),
+                abbreviationRepository,
+                taskExecutor,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager
+            )
+                .getContent();
             case WEB_SEARCH -> new WebSearchPaneView(
-                    preferences,
-                    dialogService,
-                    stateManager);
+                preferences,
+                dialogService,
+                stateManager
+            );
         };
     }
 }

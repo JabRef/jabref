@@ -11,15 +11,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
 import javafx.scene.control.CheckBoxTreeItem;
-
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +25,9 @@ import org.slf4j.LoggerFactory;
  */
 public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesCrawler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        UnlinkedFilesCrawler.class
+    );
 
     private final Path directory;
     private final Filter<Path> fileFilter;
@@ -37,7 +36,14 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, DateRange dateFilter, ExternalFileSorter sorter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public UnlinkedFilesCrawler(
+        Path directory,
+        Filter<Path> fileFilter,
+        DateRange dateFilter,
+        ExternalFileSorter sorter,
+        BibDatabaseContext databaseContext,
+        FilePreferences filePreferences
+    ) {
         this.directory = directory;
         this.fileFilter = fileFilter;
         this.dateFilter = dateFilter;
@@ -48,7 +54,11 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
     @Override
     protected FileNodeViewModel call() throws IOException {
-        UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext, filePreferences);
+        UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(
+            fileFilter,
+            databaseContext,
+            filePreferences
+        );
         return searchDirectory(directory, unlinkedPDFFileFilter);
     }
 
@@ -74,23 +84,40 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * @return FileNodeViewModel containing the data of the current directory and all subdirectories
      * @throws IOException if directory is not a directory or empty
      */
-    FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter) throws IOException {
+    FileNodeViewModel searchDirectory(
+        Path directory,
+        UnlinkedPDFFileFilter unlinkedPDFFileFilter
+    ) throws IOException {
         // Return null if the directory is not valid.
         if ((directory == null) || !Files.isDirectory(directory)) {
-            throw new IOException(String.format("Invalid directory for searching: %s", directory));
+            throw new IOException(
+                String.format("Invalid directory for searching: %s", directory)
+            );
         }
 
-        FileNodeViewModel fileNodeViewModelForCurrentDirectory = new FileNodeViewModel(directory);
+        FileNodeViewModel fileNodeViewModelForCurrentDirectory =
+            new FileNodeViewModel(directory);
 
         // Map from isDirectory (true/false) to full path
         // Result: Contains only files not matching the filter (i.e., PDFs not linked and files not ignored)
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        ChainedFilters filters = new ChainedFilters(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory));
+        ChainedFilters filters = new ChainedFilters(
+            unlinkedPDFFileFilter,
+            new GitIgnoreFileFilter(directory)
+        );
         Map<Boolean, List<Path>> directoryAndFilePartition;
-        try (Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(directory, filters).spliterator(), false)) {
-            directoryAndFilePartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
+        try (
+            Stream<Path> filesStream = StreamSupport.stream(
+                Files.newDirectoryStream(directory, filters).spliterator(),
+                false
+            )
+        ) {
+            directoryAndFilePartition =
+                filesStream.collect(
+                    Collectors.partitioningBy(Files::isDirectory)
+                );
         } catch (IOException e) {
             LOGGER.error("Error while searching files", e);
             return fileNodeViewModelForCurrentDirectory;
@@ -105,7 +132,10 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
         // now we crawl into the found subdirectories first (!)
         for (Path subDirectory : subDirectories) {
-            FileNodeViewModel subRoot = searchDirectory(subDirectory, unlinkedPDFFileFilter);
+            FileNodeViewModel subRoot = searchDirectory(
+                subDirectory,
+                unlinkedPDFFileFilter
+            );
             if (!subRoot.getChildren().isEmpty()) {
                 fileCountOfSubdirectories += subRoot.getFileCount();
                 fileNodeViewModelForCurrentDirectory.getChildren().add(subRoot);
@@ -129,12 +159,19 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         resultingFiles = FileFilterUtils.sortByDate(resultingFiles, sorter);
 
         // the count of all files is the count of the found files in current directory plus the count of all files in the subdirectories
-        fileNodeViewModelForCurrentDirectory.setFileCount(resultingFiles.size() + fileCountOfSubdirectories);
+        fileNodeViewModelForCurrentDirectory.setFileCount(
+            resultingFiles.size() + fileCountOfSubdirectories
+        );
 
         // create and add FileNodeViewModel to the FileNodeViewModel for the current directory
-        fileNodeViewModelForCurrentDirectory.getChildren().addAll(resultingFiles.stream()
-                .map(FileNodeViewModel::new)
-                .collect(Collectors.toList()));
+        fileNodeViewModelForCurrentDirectory
+            .getChildren()
+            .addAll(
+                resultingFiles
+                    .stream()
+                    .map(FileNodeViewModel::new)
+                    .collect(Collectors.toList())
+            );
 
         return fileNodeViewModelForCurrentDirectory;
     }

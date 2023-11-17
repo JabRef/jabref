@@ -2,14 +2,12 @@ package org.jabref.logic.util;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.jabref.model.util.OptionalUtil;
 
 /**
  * @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
  */
 public enum StandardFileType implements FileType {
-
     ENDNOTE("Endnote", "ref", "enw"),
     ISI("Isi", "isi", "txt"),
     MEDLINE("Medline", "nbib", "xml"),
@@ -47,9 +45,6 @@ public enum StandardFileType implements FileType {
     CITAVI("Citavi", "ctv6bak", "ctv5bak"),
     MARKDOWN("Markdown", "md");
 
-
-
-
     private final List<String> extensions;
     private final String name;
 
@@ -71,9 +66,14 @@ public enum StandardFileType implements FileType {
     public static FileType fromExtensions(String... extensions) {
         var exts = Arrays.asList(extensions);
 
-        return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
-                                         .filter(field -> field.getExtensions().stream().anyMatch(exts::contains))
-                                         .findAny(),
-                                   new UnknownFileType(extensions));
+        return OptionalUtil.orElse(
+            Arrays
+                .stream(StandardFileType.values())
+                .filter(field ->
+                    field.getExtensions().stream().anyMatch(exts::contains)
+                )
+                .findAny(),
+            new UnknownFileType(extensions)
+        );
     }
 }

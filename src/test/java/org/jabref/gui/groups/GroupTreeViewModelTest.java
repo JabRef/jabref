@@ -1,7 +1,12 @@
 package org.jabref.gui.groups;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
@@ -16,16 +21,9 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.preferences.PreferencesService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class GroupTreeViewModelTest {
 
@@ -40,37 +38,74 @@ class GroupTreeViewModelTest {
     void setUp() {
         databaseContext = new BibDatabaseContext();
         stateManager = new StateManager();
-        stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
+        stateManager
+            .activeDatabaseProperty()
+            .setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
-        when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                GroupViewMode.UNION,
-                true,
-                true,
-                GroupHierarchyType.INDEPENDENT));
-        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
+        when(preferencesService.getGroupsPreferences())
+            .thenReturn(
+                new GroupsPreferences(
+                    GroupViewMode.UNION,
+                    true,
+                    true,
+                    GroupHierarchyType.INDEPENDENT
+                )
+            );
+        groupTree =
+            new GroupTreeViewModel(
+                stateManager,
+                mock(DialogService.class),
+                preferencesService,
+                taskExecutor,
+                new CustomLocalDragboard()
+            );
     }
 
     @Test
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferencesService), groupTree.rootGroupProperty().getValue());
+        assertEquals(
+            new GroupNodeViewModel(
+                databaseContext,
+                stateManager,
+                taskExecutor,
+                allEntriesGroup,
+                new CustomLocalDragboard(),
+                preferencesService
+            ),
+            groupTree.rootGroupProperty().getValue()
+        );
     }
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
+        assertEquals(
+            groupTree.rootGroupProperty().get().getGroupNode(),
+            stateManager.getSelectedGroup(databaseContext).get(0)
+        );
     }
 
     @Test
     void explicitGroupsAreRemovedFromEntriesOnDelete() {
-        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        ExplicitGroup group = new ExplicitGroup(
+            "group",
+            GroupHierarchyType.INDEPENDENT,
+            ','
+        );
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        GroupNodeViewModel model = new GroupNodeViewModel(
+            databaseContext,
+            stateManager,
+            taskExecutor,
+            group,
+            new CustomLocalDragboard(),
+            preferencesService
+        );
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
@@ -80,11 +115,26 @@ class GroupTreeViewModelTest {
     @Test
     void keywordGroupsAreNotRemovedFromEntriesOnDelete() {
         String groupName = "A";
-        WordKeywordGroup group = new WordKeywordGroup(groupName, GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, groupName, true, ',', true);
+        WordKeywordGroup group = new WordKeywordGroup(
+            groupName,
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            groupName,
+            true,
+            ',',
+            true
+        );
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
+        GroupNodeViewModel model = new GroupNodeViewModel(
+            databaseContext,
+            stateManager,
+            taskExecutor,
+            group,
+            new CustomLocalDragboard(),
+            preferencesService
+        );
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
@@ -93,48 +143,128 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldNotShowDialogWhenGroupNameChanges() {
-        AbstractGroup oldGroup = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
-        AbstractGroup newGroup = new ExplicitGroup("newGroupName", GroupHierarchyType.INDEPENDENT, ',');
+        AbstractGroup oldGroup = new ExplicitGroup(
+            "group",
+            GroupHierarchyType.INDEPENDENT,
+            ','
+        );
+        AbstractGroup newGroup = new ExplicitGroup(
+            "newGroupName",
+            GroupHierarchyType.INDEPENDENT,
+            ','
+        );
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(
+            stateManager,
+            dialogService,
+            preferencesService,
+            taskExecutor,
+            new CustomLocalDragboard()
+        );
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
     @Test
     void shouldNotShowDialogWhenGroupsAreEqual() {
-        AbstractGroup oldGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", true, ',', true);
-        AbstractGroup newGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", true, ',', true);
+        AbstractGroup oldGroup = new WordKeywordGroup(
+            "group",
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            "keywordTest",
+            true,
+            ',',
+            true
+        );
+        AbstractGroup newGroup = new WordKeywordGroup(
+            "group",
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            "keywordTest",
+            true,
+            ',',
+            true
+        );
 
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(
+            stateManager,
+            dialogService,
+            preferencesService,
+            taskExecutor,
+            new CustomLocalDragboard()
+        );
         assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
     @Test
     void shouldShowDialogWhenKeywordDiffers() {
-        AbstractGroup oldGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", true, ',', true);
-        AbstractGroup newGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordChanged", true, ',', true);
+        AbstractGroup oldGroup = new WordKeywordGroup(
+            "group",
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            "keywordTest",
+            true,
+            ',',
+            true
+        );
+        AbstractGroup newGroup = new WordKeywordGroup(
+            "group",
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            "keywordChanged",
+            true,
+            ',',
+            true
+        );
 
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(
+            stateManager,
+            dialogService,
+            preferencesService,
+            taskExecutor,
+            new CustomLocalDragboard()
+        );
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
     @Test
     void shouldShowDialogWhenCaseSensitivyDiffers() {
-        AbstractGroup oldGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", false, ',', true);
-        AbstractGroup newGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordChanged", true, ',', true);
+        AbstractGroup oldGroup = new WordKeywordGroup(
+            "group",
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            "keywordTest",
+            false,
+            ',',
+            true
+        );
+        AbstractGroup newGroup = new WordKeywordGroup(
+            "group",
+            GroupHierarchyType.INCLUDING,
+            StandardField.KEYWORDS,
+            "keywordChanged",
+            true,
+            ',',
+            true
+        );
 
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(
+            stateManager,
+            dialogService,
+            preferencesService,
+            taskExecutor,
+            new CustomLocalDragboard()
+        );
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 }

@@ -12,13 +12,20 @@ public class PullChangesFromSharedAction extends SimpleCommand {
     public PullChangesFromSharedAction(StateManager stateManager) {
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsSharedDatabase(stateManager)));
+        this.executable.bind(
+                ActionHelper
+                    .needsDatabase(stateManager)
+                    .and(ActionHelper.needsSharedDatabase(stateManager))
+            );
     }
 
     public void execute() {
-        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-            DatabaseSynchronizer dbmsSynchronizer = databaseContext.getDBMSSynchronizer();
-            dbmsSynchronizer.pullChanges();
-        });
+        stateManager
+            .getActiveDatabase()
+            .ifPresent(databaseContext -> {
+                DatabaseSynchronizer dbmsSynchronizer =
+                    databaseContext.getDBMSSynchronizer();
+                dbmsSynchronizer.pullChanges();
+            });
     }
 }

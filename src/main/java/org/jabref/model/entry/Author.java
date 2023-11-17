@@ -2,7 +2,6 @@ package org.jabref.model.entry;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
@@ -18,7 +17,13 @@ public class Author {
      * Example: <code>authors = {Oliver Kopp and others}</code>. This is then appearing as "Oliver Kopp et al.".
      * In the context of BibTeX key generation, this is "Kopp+" (<code>+</code> for "et al.") and not "KO".
      */
-    public static final Author OTHERS = new Author("", "", null, "others", null);
+    public static final Author OTHERS = new Author(
+        "",
+        "",
+        null,
+        "others",
+        null
+    );
 
     private final String firstPart;
     private final String firstAbbr;
@@ -36,7 +41,13 @@ public class Author {
      * @param last      the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
      * @param jr        the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
      */
-    public Author(String first, String firstabbr, String von, String last, String jr) {
+    public Author(
+        String first,
+        String firstabbr,
+        String von,
+        String last,
+        String jr
+    ) {
         firstPart = addDotIfAbbreviation(removeStartAndEndBraces(first));
         firstAbbr = removeStartAndEndBraces(firstabbr);
         vonPart = removeStartAndEndBraces(von);
@@ -49,8 +60,11 @@ public class Author {
             return name;
         }
         // If only one character (uppercase letter), add a dot and return immediately:
-        if ((name.length() == 1) && Character.isLetter(name.charAt(0)) &&
-                Character.isUpperCase(name.charAt(0))) {
+        if (
+            (name.length() == 1) &&
+            Character.isLetter(name.charAt(0)) &&
+            Character.isUpperCase(name.charAt(0))
+        ) {
             return name + ".";
         }
 
@@ -65,18 +79,24 @@ public class Author {
 
             if (currentChar == '.') {
                 // A.A. -> A. A.
-                if (((i + 1) < name.length()) && Character.isUpperCase(name.charAt(i + 1))) {
+                if (
+                    ((i + 1) < name.length()) &&
+                    Character.isUpperCase(name.charAt(i + 1))
+                ) {
                     sb.append(' ');
                 }
             }
 
-            boolean currentIsUppercaseLetter = Character.isLetter(currentChar) && Character.isUpperCase(currentChar);
+            boolean currentIsUppercaseLetter =
+                Character.isLetter(currentChar) &&
+                Character.isUpperCase(currentChar);
             if (!currentIsUppercaseLetter) {
                 // No uppercase letter, hence nothing to do
                 continue;
             }
 
-            boolean lastIsLowercaseLetter = Character.isLetter(lastChar) && Character.isLowerCase(lastChar);
+            boolean lastIsLowercaseLetter =
+                Character.isLetter(lastChar) && Character.isLowerCase(lastChar);
             if (lastIsLowercaseLetter) {
                 // previous character was lowercase (probably an acronym like JabRef) -> don't change anything
                 continue;
@@ -105,12 +125,19 @@ public class Author {
             char furtherChar = Character.MIN_VALUE;
             for (int j = i + 1; j < name.length(); j++) {
                 furtherChar = name.charAt(j);
-                if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~') || (furtherChar == '.')) {
+                if (
+                    Character.isWhitespace(furtherChar) ||
+                    (furtherChar == '-') ||
+                    (furtherChar == '~') ||
+                    (furtherChar == '.')
+                ) {
                     // end of word
                     break;
                 }
 
-                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
+                boolean furtherIsUppercaseLetter =
+                    Character.isLetter(furtherChar) &&
+                    Character.isUpperCase(furtherChar);
                 if (!furtherIsUppercaseLetter) {
                     nextWordIsUppercase = false;
                     break;
@@ -145,11 +172,13 @@ public class Author {
         }
 
         if (other instanceof Author that) {
-            return Objects.equals(firstPart, that.firstPart)
-                    && Objects.equals(firstAbbr, that.firstAbbr)
-                    && Objects.equals(vonPart, that.vonPart)
-                    && Objects.equals(lastPart, that.lastPart)
-                    && Objects.equals(jrPart, that.jrPart);
+            return (
+                Objects.equals(firstPart, that.firstPart) &&
+                Objects.equals(firstAbbr, that.firstAbbr) &&
+                Objects.equals(vonPart, that.vonPart) &&
+                Objects.equals(lastPart, that.lastPart) &&
+                Objects.equals(jrPart, that.jrPart)
+            );
         }
 
         return false;
@@ -369,10 +398,18 @@ public class Author {
      */
     public Author latexFree() {
         if (latexFreeAuthor == null) {
-            String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
-            String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
-            String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
-            String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
+            String first = getFirst()
+                .map(LatexToUnicodeAdapter::format)
+                .orElse(null);
+            String firstabbr = getFirstAbbr()
+                .map(LatexToUnicodeAdapter::format)
+                .orElse(null);
+            String von = getVon()
+                .map(LatexToUnicodeAdapter::format)
+                .orElse(null);
+            String last = getLast()
+                .map(LatexToUnicodeAdapter::format)
+                .orElse(null);
             String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
             latexFreeAuthor = new Author(first, firstabbr, von, last, jr);
             latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;

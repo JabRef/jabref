@@ -1,7 +1,6 @@
 package org.jabref.logic.shared;
 
 public interface DatabaseConnectionProperties {
-
     DBMSType getType();
 
     String getDatabase();

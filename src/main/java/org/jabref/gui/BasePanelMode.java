@@ -7,5 +7,5 @@ package org.jabref.gui;
 public enum BasePanelMode {
     SHOWING_NOTHING,
     SHOWING_EDITOR,
-    WILL_SHOW_EDITOR
+    WILL_SHOW_EDITOR,
 }

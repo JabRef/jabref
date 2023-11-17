@@ -2,7 +2,6 @@ package org.jabref.logic.layout.format;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.XmlCharsMap;
 
@@ -13,7 +12,8 @@ public class XMLChars implements LayoutFormatter {
 
     private static final XmlCharsMap XML_CHARS = new XmlCharsMap();
 
-    private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<>();
+    private static final Map<String, String> ASCII_TO_XML_CHARS =
+        new HashMap<>();
 
     private boolean[] forceReplace;
 
@@ -65,7 +65,7 @@ public class XMLChars implements LayoutFormatter {
                 forceReplace[i] = true;
             }
             forceReplace[32] = false;
-            for (int i : new int[] {44, 45, 63, 64, 94, 95, 96, 124}) {
+            for (int i : new int[] { 44, 45, 63, 64, 94, 95, 96, 124 }) {
                 forceReplace[i] = true;
             }
         }

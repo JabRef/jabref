@@ -1,36 +1,39 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+import kong.unirest.json.JSONObject;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
-
-import kong.unirest.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class SciteTabViewModelTest {
 
     @Mock
     private PreferencesService preferencesService;
+
     @Mock
     private TaskExecutor taskExecutor;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        EntryEditorPreferences entryEditorPreferences = mock(
+            EntryEditorPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
         when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
-        when(preferencesService.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+        when(preferencesService.getEntryEditorPreferences())
+            .thenReturn(entryEditorPreferences);
     }
 
     @Test

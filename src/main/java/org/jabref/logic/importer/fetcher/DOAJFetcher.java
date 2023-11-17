@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -23,11 +26,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
-
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +36,12 @@ import org.slf4j.LoggerFactory;
  */
 public class DOAJFetcher implements SearchBasedParserFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DOAJFetcher.class
+    );
 
-    private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
+    private static final String SEARCH_URL =
+        "https://doaj.org/api/v1/search/articles/";
     private final ImportFormatPreferences preferences;
 
     public DOAJFetcher(ImportFormatPreferences preferences) {
@@ -53,12 +54,24 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
      * @param bibJsonEntry The JSONObject to convert
      * @return the converted BibEntry
      */
-    public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
+    public static BibEntry parseBibJSONtoBibtex(
+        JSONObject bibJsonEntry,
+        Character keywordSeparator
+    ) {
         // Fields that are directly accessible at the top level BibJson object
-        List<Field> singleFields = List.of(StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH);
+        List<Field> singleFields = List.of(
+            StandardField.YEAR,
+            StandardField.TITLE,
+            StandardField.ABSTRACT,
+            StandardField.MONTH
+        );
 
         // Fields that are accessible in the journal part of the BibJson object
-        List<Field> journalSingleFields = List.of(StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME);
+        List<Field> journalSingleFields = List.of(
+            StandardField.PUBLISHER,
+            StandardField.NUMBER,
+            StandardField.VOLUME
+        );
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
 
@@ -73,7 +86,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
+            entry.setField(
+                StandardField.AUTHOR,
+                String.join(" and ", authorList)
+            );
         } else {
             LOGGER.info("No author found.");
         }
@@ -88,10 +104,17 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         // Page numbers
         if (bibJsonEntry.has("start_page")) {
             if (bibJsonEntry.has("end_page")) {
-                entry.setField(StandardField.PAGES,
-                        bibJsonEntry.getString("start_page") + "--" + bibJsonEntry.getString("end_page"));
+                entry.setField(
+                    StandardField.PAGES,
+                    bibJsonEntry.getString("start_page") +
+                    "--" +
+                    bibJsonEntry.getString("end_page")
+                );
             } else {
-                entry.setField(StandardField.PAGES, bibJsonEntry.getString("start_page"));
+                entry.setField(
+                    StandardField.PAGES,
+                    bibJsonEntry.getString("start_page")
+                );
             }
         }
 
@@ -100,7 +123,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
             JSONObject journal = bibJsonEntry.getJSONObject("journal");
             // Journal title
             if (journal.has("title")) {
-                entry.setField(StandardField.JOURNAL, journal.getString("title").trim());
+                entry.setField(
+                    StandardField.JOURNAL,
+                    journal.getString("title").trim()
+                );
             } else {
                 LOGGER.info("No journal title found.");
             }
@@ -119,7 +145,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
-                    entry.addKeyword(keywords.getString(i).trim(), keywordSeparator);
+                    entry.addKeyword(
+                        keywords.getString(i).trim(),
+                        keywordSeparator
+                    );
                 }
             }
         }
@@ -130,11 +159,20 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
             for (int i = 0; i < identifiers.length(); i++) {
                 String type = identifiers.getJSONObject(i).getString("type");
                 if ("doi".equals(type)) {
-                    entry.setField(StandardField.DOI, identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(
+                        StandardField.DOI,
+                        identifiers.getJSONObject(i).getString("id")
+                    );
                 } else if ("pissn".equals(type)) {
-                    entry.setField(StandardField.ISSN, identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(
+                        StandardField.ISSN,
+                        identifiers.getJSONObject(i).getString("id")
+                    );
                 } else if ("eissn".equals(type)) {
-                    entry.setField(StandardField.ISSN, identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(
+                        StandardField.ISSN,
+                        identifiers.getJSONObject(i).getString("id")
+                    );
                 }
             }
         }
@@ -145,8 +183,14 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
             for (int i = 0; i < links.length(); i++) {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
-                    if ("fulltext".equals(type) && links.getJSONObject(i).has("url")) {
-                        entry.setField(StandardField.URL, links.getJSONObject(i).getString("url"));
+                    if (
+                        "fulltext".equals(type) &&
+                        links.getJSONObject(i).has("url")
+                    ) {
+                        entry.setField(
+                            StandardField.URL,
+                            links.getJSONObject(i).getString("url")
+                        );
                     }
                 }
             }
@@ -185,9 +229,15 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        DOAJFetcher.addPath(uriBuilder, new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        DOAJFetcher.addPath(
+            uriBuilder,
+            new DefaultLuceneQueryTransformer()
+                .transformLuceneQuery(luceneQuery)
+                .orElse("")
+        );
         // Number of results
         uriBuilder.addParameter("pageSize", "30");
         // Page (not needed so far)
@@ -198,15 +248,24 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     @Override
     public Parser getParser() {
         return inputStream -> {
-            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
+            String response = new BufferedReader(
+                new InputStreamReader(inputStream)
+            )
+                .lines()
+                .collect(Collectors.joining(OS.NEWLINE));
             JSONObject jsonObject = new JSONObject(response);
 
             List<BibEntry> entries = new ArrayList<>();
             if (jsonObject.has("results")) {
                 JSONArray results = jsonObject.getJSONArray("results");
                 for (int i = 0; i < results.length(); i++) {
-                    JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                    BibEntry entry = parseBibJSONtoBibtex(bibJsonEntry, preferences.bibEntryPreferences().getKeywordSeparator());
+                    JSONObject bibJsonEntry = results
+                        .getJSONObject(i)
+                        .getJSONObject("bibjson");
+                    BibEntry entry = parseBibJSONtoBibtex(
+                        bibJsonEntry,
+                        preferences.bibEntryPreferences().getKeywordSeparator()
+                    );
                     entries.add(entry);
                 }
             }

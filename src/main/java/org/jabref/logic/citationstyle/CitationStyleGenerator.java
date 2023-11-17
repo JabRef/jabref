@@ -3,12 +3,10 @@ package org.jabref.logic.citationstyle;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,18 +17,23 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationStyleGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        CitationStyleGenerator.class
+    );
     private static final CSLAdapter CSL_ADAPTER = new CSLAdapter();
 
-    private CitationStyleGenerator() {
-    }
+    private CitationStyleGenerator() {}
 
     /**
      * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, CitationStyle style, BibEntryTypesManager entryTypesManager) {
+    protected static String generateCitation(
+        BibEntry entry,
+        CitationStyle style,
+        BibEntryTypesManager entryTypesManager
+    ) {
         return generateCitation(entry, style.getSource(), entryTypesManager);
     }
 
@@ -39,8 +42,18 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, String style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(entry, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager);
+    protected static String generateCitation(
+        BibEntry entry,
+        String style,
+        BibEntryTypesManager entryTypesManager
+    ) {
+        return generateCitation(
+            entry,
+            style,
+            CitationStyleOutputFormat.HTML,
+            new BibDatabaseContext(),
+            entryTypesManager
+        );
     }
 
     /**
@@ -48,8 +61,23 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
-        return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext, entryTypesManager).stream().findFirst().orElse("");
+    public static String generateCitation(
+        BibEntry entry,
+        String style,
+        CitationStyleOutputFormat outputFormat,
+        BibDatabaseContext databaseContext,
+        BibEntryTypesManager entryTypesManager
+    ) {
+        return generateCitations(
+            Collections.singletonList(entry),
+            style,
+            outputFormat,
+            databaseContext,
+            entryTypesManager
+        )
+            .stream()
+            .findFirst()
+            .orElse("");
     }
 
     /**
@@ -57,23 +85,50 @@ public class CitationStyleGenerator {
      *
      * @implNote The citations are generated using JavaScript which may take some time, better call it from outside the main thread.
      */
-    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+    public static List<String> generateCitations(
+        List<BibEntry> bibEntries,
+        String style,
+        CitationStyleOutputFormat outputFormat,
+        BibDatabaseContext databaseContext,
+        BibEntryTypesManager entryTypesManager
+    ) {
         try {
-            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
+            return CSL_ADAPTER.makeBibliography(
+                bibEntries,
+                style,
+                outputFormat,
+                databaseContext,
+                entryTypesManager
+            );
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", e);
-            return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));
+            LOGGER.error(
+                "Could not generate BibEntry citation. The CSL engine could not create a preview for your item.",
+                e
+            );
+            return Collections.singletonList(
+                Localization.lang(
+                    "Cannot generate preview based on selected citation style."
+                )
+            );
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);
-            return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));
+            return Collections.singletonList(
+                Localization.lang(
+                    "Cannot generate preview based on selected citation style."
+                )
+            );
         } catch (TokenMgrException e) {
             LOGGER.error("Bad character inside BibEntry", e);
             // sadly one cannot easily retrieve the bad char from the TokenMgrError
-            return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style.") +
-                    outputFormat.getLineSeparator() +
-                    Localization.lang("Bad character inside entry") +
-                    outputFormat.getLineSeparator() +
-                    e.getLocalizedMessage());
+            return Collections.singletonList(
+                Localization.lang(
+                    "Cannot generate preview based on selected citation style."
+                ) +
+                outputFormat.getLineSeparator() +
+                Localization.lang("Bad character inside entry") +
+                outputFormat.getLineSeparator() +
+                e.getLocalizedMessage()
+            );
         }
     }
 }

@@ -3,7 +3,6 @@ package org.jabref.model.groups;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 
@@ -12,7 +11,6 @@ import org.jabref.model.entry.BibEntry;
  * This functionality is encoded in this interface.
  */
 public interface GroupEntryChanger {
-
     /**
      * Adds the specified entries to this group.
      *

@@ -15,10 +15,13 @@ public enum SystematicLiteratureReviewStudyEntryType implements EntryType {
         this.displayName = displayName;
     }
 
-    public static Optional<SystematicLiteratureReviewStudyEntryType> fromName(String name) {
-        return Arrays.stream(SystematicLiteratureReviewStudyEntryType.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+    public static Optional<SystematicLiteratureReviewStudyEntryType> fromName(
+        String name
+    ) {
+        return Arrays
+            .stream(SystematicLiteratureReviewStudyEntryType.values())
+            .filter(field -> field.getName().equalsIgnoreCase(name))
+            .findAny();
     }
 
     @Override

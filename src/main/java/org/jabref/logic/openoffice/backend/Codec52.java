@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.jabref.model.openoffice.style.CitationType;
 
 /**
@@ -17,19 +16,20 @@ import org.jabref.model.openoffice.style.CitationType;
  * - pageInfo does not appear here. It is not encoded in the mark name.
  */
 class Codec52 {
+
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
-            // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
-            // citationType is always "1" "2" or "3"
-            Pattern.compile(BIB_CITATION + "(\\d*)_([123])_(.*)");
+        // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
+        // citationType is always "1" "2" or "3"
+        Pattern.compile(BIB_CITATION + "(\\d*)_([123])_(.*)");
 
-    private Codec52() {
-    }
+    private Codec52() {}
 
     /**
      * This is what we get back from parsing a refMarkName.
      */
     public static class ParsedMarkName {
+
         /**
          * "", "0", "1" ...
          */
@@ -43,7 +43,11 @@ class Codec52 {
          */
         public final List<String> citationKeys;
 
-        ParsedMarkName(String index, CitationType citationType, List<String> citationKeys) {
+        ParsedMarkName(
+            String index,
+            CitationType citationType,
+            List<String> citationKeys
+        ) {
             Objects.requireNonNull(index);
             Objects.requireNonNull(citationKeys);
             this.index = index;
@@ -60,7 +64,9 @@ class Codec52 {
             case 1 -> CitationType.AUTHORYEAR_PAR;
             case 2 -> CitationType.AUTHORYEAR_INTEXT;
             case 3 -> CitationType.INVISIBLE_CIT;
-            default -> throw new IllegalArgumentException("Invalid CitationType code");
+            default -> throw new IllegalArgumentException(
+                "Invalid CitationType code"
+            );
         };
     }
 
@@ -83,17 +89,24 @@ class Codec52 {
      *                     <p>
      *                     Or the first unused in this series, after removals.
      */
-    public static String getUniqueMarkName(Set<String> usedNames,
-                                           List<String> citationKeys,
-                                           CitationType citationType) {
-
+    public static String getUniqueMarkName(
+        Set<String> usedNames,
+        List<String> citationKeys,
+        CitationType citationType
+    ) {
         String citationKeysPart = String.join(",", citationKeys);
 
         int index = 0;
         int citTypeCode = citationTypeToInt(citationType);
         String name = BIB_CITATION + '_' + citTypeCode + '_' + citationKeysPart;
         while (usedNames.contains(name)) {
-            name = BIB_CITATION + index + '_' + citTypeCode + '_' + citationKeysPart;
+            name =
+                BIB_CITATION +
+                index +
+                '_' +
+                citTypeCode +
+                '_' +
+                citationKeysPart;
             index++;
         }
         return name;
@@ -114,7 +127,9 @@ class Codec52 {
         String index = citeMatcher.group(1);
         int citTypeCode = Integer.parseInt(citeMatcher.group(2));
         CitationType citationType = citationTypeFromInt(citTypeCode);
-        return Optional.of(new Codec52.ParsedMarkName(index, citationType, keys));
+        return Optional.of(
+            new Codec52.ParsedMarkName(index, citationType, keys)
+        );
     }
 
     /**
@@ -129,9 +144,12 @@ class Codec52 {
      *
      * @param names The list to be filtered.
      */
-    public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
-        return names.stream()
-                     .filter(Codec52::isJabRefReferenceMarkName)
-                     .collect(Collectors.toList());
+    public static List<String> filterIsJabRefReferenceMarkName(
+        List<String> names
+    ) {
+        return names
+            .stream()
+            .filter(Codec52::isJabRefReferenceMarkName)
+            .collect(Collectors.toList());
     }
 }

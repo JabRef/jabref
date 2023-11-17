@@ -2,11 +2,9 @@ package org.jabref.model.entry.field;
 
 import java.util.Optional;
 import java.util.Set;
-
 import org.jabref.model.strings.StringUtil;
 
 public interface Field {
-
     /**
      * properties contains mappings to tell the EntryEditor to add a specific function to this field,
      * for instance a dropdown for selecting the month for the month field.

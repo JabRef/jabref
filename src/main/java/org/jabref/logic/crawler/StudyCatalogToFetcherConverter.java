@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -15,13 +14,16 @@ import org.jabref.model.study.StudyDatabase;
  * Converts library entries from the given study into their corresponding fetchers.
  */
 class StudyCatalogToFetcherConverter {
+
     private final List<StudyDatabase> libraryEntries;
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
-    public StudyCatalogToFetcherConverter(List<StudyDatabase> libraryEntries,
-                                          ImportFormatPreferences importFormatPreferences,
-                                          ImporterPreferences importerPreferences) {
+    public StudyCatalogToFetcherConverter(
+        List<StudyDatabase> libraryEntries,
+        ImportFormatPreferences importFormatPreferences,
+        ImporterPreferences importerPreferences
+    ) {
         this.libraryEntries = libraryEntries;
         this.importFormatPreferences = importFormatPreferences;
         this.importerPreferences = importerPreferences;
@@ -44,11 +46,14 @@ class StudyCatalogToFetcherConverter {
      * @param libraryEntries List of entries
      * @return List of fetcher instances
      */
-    private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<StudyDatabase> libraryEntries) {
-        return libraryEntries.parallelStream()
-                             .map(this::createFetcherFromLibraryEntry)
-                             .filter(Objects::nonNull)
-                             .collect(Collectors.toList());
+    private List<SearchBasedFetcher> getFetchersFromLibraryEntries(
+        List<StudyDatabase> libraryEntries
+    ) {
+        return libraryEntries
+            .parallelStream()
+            .map(this::createFetcherFromLibraryEntry)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -57,12 +62,23 @@ class StudyCatalogToFetcherConverter {
      * @param studyDatabase the entry that will be converted
      * @return An instance of the fetcher defined by the library entry.
      */
-    private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {
-        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
+    private SearchBasedFetcher createFetcherFromLibraryEntry(
+        StudyDatabase studyDatabase
+    ) {
+        Set<SearchBasedFetcher> searchBasedFetchers =
+            WebFetchers.getSearchBasedFetchers(
+                importFormatPreferences,
+                importerPreferences
+            );
         String libraryNameFromFetcher = studyDatabase.getName();
-        return searchBasedFetchers.stream()
-                                  .filter(searchBasedFetcher -> searchBasedFetcher.getName().equalsIgnoreCase(libraryNameFromFetcher))
-                                  .findAny()
-                                  .orElse(null);
+        return searchBasedFetchers
+            .stream()
+            .filter(searchBasedFetcher ->
+                searchBasedFetcher
+                    .getName()
+                    .equalsIgnoreCase(libraryNameFromFetcher)
+            )
+            .findAny()
+            .orElse(null);
     }
 }

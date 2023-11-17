@@ -9,6 +9,7 @@ import org.jabref.model.entry.identifier.DOI;
  * Will prepend "http://doi.org/" if only DOI and not an URL is given.
  */
 public class DOICheck implements LayoutFormatter {
+
     @Override
     public String format(String fieldText) {
         if (fieldText == null) {

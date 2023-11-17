@@ -2,7 +2,6 @@ package org.jabref.logic.remote;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;

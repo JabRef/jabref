@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -19,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.util.OptionalUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,15 +29,20 @@ import org.slf4j.LoggerFactory;
  */
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
-    private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile("\\n|\\r\\n|\\s");
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        IsbnFetcher.class
+    );
+    private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile(
+        "\\n|\\r\\n|\\s"
+    );
     protected final ImportFormatPreferences importFormatPreferences;
     private final List<AbstractIsbnFetcher> retryIsbnFetcher;
     private final GvkFetcher gvkIbsnFetcher;
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
+        OpenLibraryIsbnFetcher openLibraryIsbnFetcher =
+            new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIbsnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
         this.addRetryFetcher(openLibraryIsbnFetcher);
@@ -56,14 +59,18 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier)
+        throws FetcherException {
         Optional<BibEntry> bibEntry = Optional.empty();
 
         try {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             Optional<ISBN> isbn = ISBN.parse(identifier);
             if (isbn.isPresent()) {
-                bibEntry = gvkIbsnFetcher.performSearchById(isbn.get().getNormalized());
+                bibEntry =
+                    gvkIbsnFetcher.performSearchById(
+                        isbn.get().getNormalized()
+                    );
             }
         } catch (FetcherException ex) {
             LOGGER.debug("Got a fetcher exception for IBSN search", ex);
@@ -72,12 +79,19 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             }
         } finally {
             // do not move the iterator in the loop as this would always return a new one and thus create and endless loop
-            Iterator<AbstractIsbnFetcher> iterator = retryIsbnFetcher.iterator();
+            Iterator<AbstractIsbnFetcher> iterator =
+                retryIsbnFetcher.iterator();
             while (bibEntry.isEmpty() && iterator.hasNext()) {
-                LOGGER.debug("Trying using the alternate ISBN fetchers to find an entry.");
+                LOGGER.debug(
+                    "Trying using the alternate ISBN fetchers to find an entry."
+                );
 
                 AbstractIsbnFetcher fetcher = iterator.next();
-                LOGGER.debug("No entry found for ISBN {}; trying {} next.", identifier, fetcher.getName());
+                LOGGER.debug(
+                    "No entry found for ISBN {}; trying {} next.",
+                    identifier,
+                    fetcher.getName()
+                );
                 bibEntry = fetcher.performSearchById(identifier);
             }
         }
@@ -90,7 +104,8 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry)
+        throws FetcherException {
         Optional<String> isbn = entry.getField(StandardField.ISBN);
         if (isbn.isPresent()) {
             return OptionalUtil.toList(performSearchById(isbn.get()));
@@ -100,7 +115,10 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     public IsbnFetcher addRetryFetcher(AbstractIsbnFetcher retryFetcher) {
-        Objects.requireNonNull(retryFetcher, "Please provide a valid isbn fetcher.");
+        Objects.requireNonNull(
+            retryFetcher,
+            "Please provide a valid isbn fetcher."
+        );
         retryIsbnFetcher.add(retryFetcher);
         return this;
     }

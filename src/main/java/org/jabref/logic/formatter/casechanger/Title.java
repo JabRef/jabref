@@ -37,6 +37,9 @@ public final class Title {
 
     @Override
     public String toString() {
-        return words.stream().map(Word::toString).collect(Collectors.joining(" "));
+        return words
+            .stream()
+            .map(Word::toString)
+            .collect(Collectors.joining(" "));
     }
 }

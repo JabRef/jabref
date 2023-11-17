@@ -9,7 +9,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
+import org.apache.http.client.utils.URIBuilder;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -24,13 +29,6 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
-
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +38,14 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryIsbnFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        OpenLibraryIsbnFetcher.class
+    );
     private static final String BASE_URL = "https://openlibrary.org";
 
-    public OpenLibraryIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
+    public OpenLibraryIsbnFetcher(
+        ImportFormatPreferences importFormatPreferences
+    ) {
         super(importFormatPreferences);
     }
 
@@ -53,12 +55,13 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
         return new URIBuilder(BASE_URL)
-                .setPathSegments("isbn", identifier + ".json")
-                .build()
-                .toURL();
+            .setPathSegments("isbn", identifier + ".json")
+            .build()
+            .toURL();
     }
 
     @Override
@@ -80,8 +83,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
-    }
+    public void doPostCleanup(BibEntry entry) {}
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
@@ -92,25 +94,49 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
                 authors = fromWorksToAuthors(works);
             }
             entry.setField(StandardField.AUTHOR, authors);
-            entry.setField(StandardField.PAGES, item.optString("number_of_pages"));
-            entry.setField(StandardField.ISBN,
-                    Optional.ofNullable(item.optJSONArray("isbn_13")).map(array -> array.getString(0))
-                            .or(() -> Optional.ofNullable(item.optJSONArray("isbn_10")).map(array -> array.getString(0)))
-                            .orElse(""));
-            entry.setField(StandardField.TITLE,
-                    Optional.ofNullable(item.optString("full_title", null))
-                            .or(() -> Optional.ofNullable(item.optString("title", null)))
-                            .orElse(""));
+            entry.setField(
+                StandardField.PAGES,
+                item.optString("number_of_pages")
+            );
+            entry.setField(
+                StandardField.ISBN,
+                Optional
+                    .ofNullable(item.optJSONArray("isbn_13"))
+                    .map(array -> array.getString(0))
+                    .or(() ->
+                        Optional
+                            .ofNullable(item.optJSONArray("isbn_10"))
+                            .map(array -> array.getString(0))
+                    )
+                    .orElse("")
+            );
+            entry.setField(
+                StandardField.TITLE,
+                Optional
+                    .ofNullable(item.optString("full_title", null))
+                    .or(() -> Optional.ofNullable(item.optString("title", null))
+                    )
+                    .orElse("")
+            );
             entry.setField(StandardField.SUBTITLE, item.optString("subtitle"));
-            Optional<String> yearOpt = Date.parse(item.optString("publish_date")).flatMap(Date::getYear).map(
-                    Object::toString);
+            Optional<String> yearOpt = Date
+                .parse(item.optString("publish_date"))
+                .flatMap(Date::getYear)
+                .map(Object::toString);
             yearOpt.ifPresent(year -> entry.setField(StandardField.YEAR, year));
-            entry.setField(StandardField.PUBLISHER,
-                    Optional.ofNullable(item.optJSONArray("publishers")).map(array -> array.getString(0))
-                            .orElse(""));
+            entry.setField(
+                StandardField.PUBLISHER,
+                Optional
+                    .ofNullable(item.optJSONArray("publishers"))
+                    .map(array -> array.getString(0))
+                    .orElse("")
+            );
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException("CrossRef API JSON format has changed", exception);
+            throw new ParseException(
+                "CrossRef API JSON format has changed",
+                exception
+            );
         }
     }
 
@@ -118,21 +144,27 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
         if (authors == null) {
             return "";
         }
-        return IntStream.range(0, authors.length())
-                        .mapToObj(authors::getJSONObject)
-                        .map(authorObject -> toAuthor(authorObject.getString("key")))
-                        .collect(AuthorList.collect())
-                        .getAsLastFirstNamesWithAnd(false);
+        return IntStream
+            .range(0, authors.length())
+            .mapToObj(authors::getJSONObject)
+            .map(authorObject -> toAuthor(authorObject.getString("key")))
+            .collect(AuthorList.collect())
+            .getAsLastFirstNamesWithAnd(false);
     }
 
     private Author toAuthor(String key) {
-        JsonNode authorResponse = Unirest.get(BASE_URL + key + ".json").asJson().getBody();
+        JsonNode authorResponse = Unirest
+            .get(BASE_URL + key + ".json")
+            .asJson()
+            .getBody();
         if (authorResponse == null) {
             LOGGER.warn("Could not parse author");
             return new Author(null, null, null, null, null);
         }
         JSONObject result = authorResponse.getObject();
-        Optional<String> nameOptional = Optional.ofNullable(result.optString("personal_name", null)).or(() -> Optional.ofNullable(result.optString("name", null)));
+        Optional<String> nameOptional = Optional
+            .ofNullable(result.optString("personal_name", null))
+            .or(() -> Optional.ofNullable(result.optString("name", null)));
         if (nameOptional.isEmpty()) {
             LOGGER.warn("Could not parse author name");
             return new Author(null, null, null, null, null);
@@ -147,12 +179,13 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
             return "";
         }
 
-        List<Author> authors = IntStream.range(0, works.length())
-                                          .mapToObj(works::getJSONObject)
-                                          .map(obj -> obj.getString("key"))
-                                          .map(worksLink -> BASE_URL + worksLink + ".json")
-                                          .flatMap(this::fromWorkToAuthors)
-                                          .collect(Collectors.toList());
+        List<Author> authors = IntStream
+            .range(0, works.length())
+            .mapToObj(works::getJSONObject)
+            .map(obj -> obj.getString("key"))
+            .map(worksLink -> BASE_URL + worksLink + ".json")
+            .flatMap(this::fromWorkToAuthors)
+            .collect(Collectors.toList());
         return AuthorList.of(authors).getAsLastFirstNamesWithAnd(false);
     }
 
@@ -163,8 +196,11 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
             return Stream.empty();
         }
 
-        return IntStream.range(0, authors.length())
-                        .mapToObj(authors::getJSONObject)
-                        .map(authorObject -> toAuthor(authorObject.getJSONObject("author").getString("key")));
+        return IntStream
+            .range(0, authors.length())
+            .mapToObj(authors::getJSONObject)
+            .map(authorObject ->
+                toAuthor(authorObject.getJSONObject("author").getString("key"))
+            );
     }
 }

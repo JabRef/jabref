@@ -1,17 +1,15 @@
 package org.jabref.logic.citationstyle;
 
+import de.undercouch.citeproc.CSL;
+import de.undercouch.citeproc.DefaultAbbreviationProvider;
+import de.undercouch.citeproc.output.Bibliography;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-
-import de.undercouch.citeproc.CSL;
-import de.undercouch.citeproc.DefaultAbbreviationProvider;
-import de.undercouch.citeproc.output.Bibliography;
 
 /**
  * Provides an adapter class to CSL. It holds a CSL instance under the hood that is only recreated when
@@ -31,7 +29,8 @@ import de.undercouch.citeproc.output.Bibliography;
  */
 public class CSLAdapter {
 
-    private final JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();
+    private final JabRefItemDataProvider dataProvider =
+        new JabRefItemDataProvider();
     private String style;
     private CitationStyleOutputFormat format;
     private CSL cslInstance;
@@ -42,7 +41,13 @@ public class CSLAdapter {
      *
      * @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
      */
-    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+    public synchronized List<String> makeBibliography(
+        List<BibEntry> bibEntries,
+        String style,
+        CitationStyleOutputFormat outputFormat,
+        BibDatabaseContext databaseContext,
+        BibEntryTypesManager entryTypesManager
+    ) throws IOException, IllegalArgumentException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
@@ -57,16 +62,29 @@ public class CSLAdapter {
      * @param newFormat usually HTML or RTF.
      * @throws IOException An error occurred in the underlying JavaScript framework
      */
-    private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        final boolean newCslInstanceNeedsToBeCreated = (cslInstance == null) || !Objects.equals(newStyle, style);
+    private void initialize(
+        String newStyle,
+        CitationStyleOutputFormat newFormat
+    ) throws IOException {
+        final boolean newCslInstanceNeedsToBeCreated =
+            (cslInstance == null) || !Objects.equals(newStyle, style);
         if (newCslInstanceNeedsToBeCreated) {
             // lang and forceLang are set to the default values of other CSL constructors
-            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
-                    new DefaultAbbreviationProvider(), newStyle, "en-US");
+            cslInstance =
+                new CSL(
+                    dataProvider,
+                    new JabRefLocaleProvider(),
+                    new DefaultAbbreviationProvider(),
+                    newStyle,
+                    "en-US"
+                );
             style = newStyle;
         }
 
-        if (newCslInstanceNeedsToBeCreated || (!Objects.equals(newFormat, format))) {
+        if (
+            newCslInstanceNeedsToBeCreated ||
+            (!Objects.equals(newFormat, format))
+        ) {
             cslInstance.setOutputFormat(newFormat.getFormat());
             format = newFormat;
         }

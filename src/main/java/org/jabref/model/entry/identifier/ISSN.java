@@ -5,14 +5,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 public class ISSN implements Identifier {
 
-    private static final Pattern ISSN_PATTERN = Pattern.compile("^\\d{4}-\\d{3}[\\dxX]$");
-    private static final Pattern ISSN_PATTERN_NODASH = Pattern.compile("^(\\d{4})(\\d{3}[\\dxX])$");
+    private static final Pattern ISSN_PATTERN = Pattern.compile(
+        "^\\d{4}-\\d{3}[\\dxX]$"
+    );
+    private static final Pattern ISSN_PATTERN_NODASH = Pattern.compile(
+        "^(\\d{4})(\\d{3}[\\dxX])$"
+    );
 
     private final String issnString;
 

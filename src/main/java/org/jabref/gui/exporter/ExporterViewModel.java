@@ -2,7 +2,6 @@ package org.jabref.gui.exporter;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.logic.exporter.TemplateExporter;
 
 /**

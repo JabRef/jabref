@@ -3,7 +3,6 @@ package org.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -19,8 +18,15 @@ public class TypeChecker implements EntryChecker {
         }
 
         if (StandardEntryType.Proceedings == entry.getType()) {
-            return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("wrong entry type as proceedings has page numbers"), entry, StandardField.PAGES));
+            return Collections.singletonList(
+                new IntegrityMessage(
+                    Localization.lang(
+                        "wrong entry type as proceedings has page numbers"
+                    ),
+                    entry,
+                    StandardField.PAGES
+                )
+            );
         }
 
         return Collections.emptyList();

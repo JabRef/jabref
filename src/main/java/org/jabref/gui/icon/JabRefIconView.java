@@ -1,13 +1,11 @@
 package org.jabref.gui.icon;
 
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.Size;
 import javafx.css.SizeUnits;
-
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
-
-import com.tobiasdiez.easybind.EasyBind;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class JabRefIconView extends FontIcon {
@@ -25,7 +23,10 @@ public class JabRefIconView extends FontIcon {
         this.glyphSize = new SimpleObjectProperty<>(size);
 
         EasyBind.subscribe(glyph, glyph -> setIconCode(glyph.getIkon()));
-        EasyBind.subscribe(glyphSize, glyphsize -> setIconSize(glyphsize.intValue()));
+        EasyBind.subscribe(
+            glyphSize,
+            glyphsize -> setIconSize(glyphsize.intValue())
+        );
     }
 
     public JabRefIconView(IconTheme.JabRefIcons icon) {
@@ -37,7 +38,10 @@ public class JabRefIconView extends FontIcon {
         int px = (int) size.pixels(getFont());
         glyphSize.set(px);
         EasyBind.subscribe(glyph, glyph -> setIconCode(glyph.getIkon()));
-        EasyBind.subscribe(glyphSize, glyphsize -> setIconSize(glyphsize.intValue()));
+        EasyBind.subscribe(
+            glyphSize,
+            glyphsize -> setIconSize(glyphsize.intValue())
+        );
     }
 
     public JabRefIconView() {

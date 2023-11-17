@@ -8,6 +8,7 @@ import org.jabref.logic.layout.LayoutFormatter;
  * Useful for formatting Latex code.
  */
 public class RemoveTilde implements LayoutFormatter {
+
     @Override
     public String format(String fieldText) {
         StringBuilder result = new StringBuilder(fieldText.length());

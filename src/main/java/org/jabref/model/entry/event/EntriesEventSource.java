@@ -8,5 +8,5 @@ public enum EntriesEventSource {
     SHARED,
     UNDO,
     CLEANUP_TIMESTAMP,
-    SAVE_ACTION
+    SAVE_ACTION,
 }

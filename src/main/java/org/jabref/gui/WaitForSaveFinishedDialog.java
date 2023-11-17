@@ -1,9 +1,7 @@
 package org.jabref.gui;
 
 import java.util.List;
-
 import javafx.concurrent.Task;
-
 import org.jabref.logic.l10n.Localization;
 
 /**
@@ -22,7 +20,9 @@ public class WaitForSaveFinishedDialog {
             Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
+                    while (
+                        LibraryTabs.stream().anyMatch(LibraryTab::isSaving)
+                    ) {
                         if (isCancelled()) {
                             return null;
                         } else {
@@ -34,9 +34,10 @@ public class WaitForSaveFinishedDialog {
             };
 
             dialogService.showProgressDialog(
-                    Localization.lang("Please wait..."),
-                    Localization.lang("Waiting for save operation to finish") + "...",
-                    waitForSaveFinished
+                Localization.lang("Please wait..."),
+                Localization.lang("Waiting for save operation to finish") +
+                "...",
+                waitForSaveFinished
             );
         }
     }

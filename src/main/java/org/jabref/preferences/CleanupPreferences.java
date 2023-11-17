@@ -3,12 +3,10 @@ package org.jabref.preferences;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Set;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 
 public class CleanupPreferences {
@@ -28,9 +26,13 @@ public class CleanupPreferences {
         this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
     }
 
-    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreferences(
+        EnumSet<CleanupStep> activeJobs,
+        FieldFormatterCleanups formatterCleanups
+    ) {
         this.activeJobs = FXCollections.observableSet(activeJobs);
-        this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
+        this.fieldFormatterCleanups =
+            new SimpleObjectProperty<>(formatterCleanups);
     }
 
     public EnumSet<CleanupStep> getActiveJobs() {
@@ -66,11 +68,15 @@ public class CleanupPreferences {
         return fieldFormatterCleanups.get();
     }
 
-    protected ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
+    protected ObjectProperty<
+        FieldFormatterCleanups
+    > fieldFormatterCleanupsProperty() {
         return fieldFormatterCleanups;
     }
 
-    public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
+    public void setFieldFormatterCleanups(
+        FieldFormatterCleanups fieldFormatters
+    ) {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
@@ -101,6 +107,6 @@ public class CleanupPreferences {
         DO_NOT_CONVERT_TIMESTAMP,
         MOVE_PDF,
         FIX_FILE_LINKS,
-        CLEAN_UP_ISSN
+        CLEAN_UP_ISSN,
     }
 }

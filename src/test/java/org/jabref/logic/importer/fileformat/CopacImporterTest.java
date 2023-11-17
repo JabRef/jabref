@@ -1,16 +1,14 @@
 package org.jabref.logic.importer.fileformat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CopacImporterTest {
 
@@ -33,8 +31,13 @@ public class CopacImporterTest {
 
     @Test
     public void testImportEmptyEntries() throws Exception {
-        Path path = Path.of(CopacImporterTest.class.getResource("Empty.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(path).getDatabase().getEntries();
+        Path path = Path.of(
+            CopacImporterTest.class.getResource("Empty.txt").toURI()
+        );
+        List<BibEntry> entries = importer
+            .importDatabase(path)
+            .getDatabase()
+            .getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 }

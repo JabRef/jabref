@@ -1,7 +1,8 @@
 package org.jabref.logic.openoffice.action;
 
+import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.text.XTextDocument;
 import java.util.List;
-
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateBibliography;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
@@ -13,37 +14,34 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 
-import com.sun.star.lang.WrappedTargetException;
-import com.sun.star.text.XTextDocument;
-
 /**
  * Update document: citation marks and bibliography
  */
 public class Update {
 
-    private Update() {
-    }
+    private Update() {}
 
     /**
      * @return the list of unresolved citation keys
      */
-    private static List<String> updateDocument(XTextDocument doc,
-                                               OOFrontend frontend,
-                                               List<BibDatabase> databases,
-                                               OOBibStyle style,
-                                               FunctionalTextViewCursor fcursor,
-                                               boolean doUpdateBibliography,
-                                               boolean alwaysAddCitedOnPages)
-            throws
-            CreationException,
-            NoDocumentException,
-            WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
-
+    private static List<String> updateDocument(
+        XTextDocument doc,
+        OOFrontend frontend,
+        List<BibDatabase> databases,
+        OOBibStyle style,
+        FunctionalTextViewCursor fcursor,
+        boolean doUpdateBibliography,
+        boolean alwaysAddCitedOnPages
+    )
+        throws CreationException, NoDocumentException, WrappedTargetException, com.sun.star.lang.IllegalArgumentException {
         final boolean useLockControllers = true;
 
         frontend.imposeGlobalOrder(doc, fcursor);
-        OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);
+        OOProcess.produceCitationMarkers(
+            frontend.citationGroups,
+            databases,
+            style
+        );
 
         try {
             if (useLockControllers) {
@@ -53,16 +51,20 @@ public class Update {
             UpdateCitationMarkers.applyNewCitationMarkers(doc, frontend, style);
 
             if (doUpdateBibliography) {
-                UpdateBibliography.rebuildBibTextSection(doc,
-                        frontend,
-                        frontend.citationGroups.getBibliography().get(),
-                        style,
-                        alwaysAddCitedOnPages);
+                UpdateBibliography.rebuildBibTextSection(
+                    doc,
+                    frontend,
+                    frontend.citationGroups.getBibliography().get(),
+                    style,
+                    alwaysAddCitedOnPages
+                );
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
         } finally {
-            if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
+            if (
+                useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)
+            ) {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }
@@ -91,41 +93,43 @@ public class Update {
         }
     }
 
-    public static List<String> synchronizeDocument(XTextDocument doc,
-                                                   OOFrontend frontend,
-                                                   OOBibStyle style,
-                                                   FunctionalTextViewCursor fcursor,
-                                                   SyncOptions syncOptions)
-            throws
-            CreationException,
-            NoDocumentException,
-            WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
-
-        return Update.updateDocument(doc,
-                frontend,
-                syncOptions.databases,
-                style,
-                fcursor,
-                syncOptions.updateBibliography,
-                syncOptions.alwaysAddCitedOnPages);
+    public static List<String> synchronizeDocument(
+        XTextDocument doc,
+        OOFrontend frontend,
+        OOBibStyle style,
+        FunctionalTextViewCursor fcursor,
+        SyncOptions syncOptions
+    )
+        throws CreationException, NoDocumentException, WrappedTargetException, com.sun.star.lang.IllegalArgumentException {
+        return Update.updateDocument(
+            doc,
+            frontend,
+            syncOptions.databases,
+            style,
+            fcursor,
+            syncOptions.updateBibliography,
+            syncOptions.alwaysAddCitedOnPages
+        );
     }
 
     /**
      * Reread document before sync
      */
-    public static List<String> resyncDocument(XTextDocument doc,
-                                              OOBibStyle style,
-                                              FunctionalTextViewCursor fcursor,
-                                              SyncOptions syncOptions)
-            throws
-            CreationException,
-            NoDocumentException,
-            WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
-
+    public static List<String> resyncDocument(
+        XTextDocument doc,
+        OOBibStyle style,
+        FunctionalTextViewCursor fcursor,
+        SyncOptions syncOptions
+    )
+        throws CreationException, NoDocumentException, WrappedTargetException, com.sun.star.lang.IllegalArgumentException {
         OOFrontend frontend = new OOFrontend(doc);
 
-        return Update.synchronizeDocument(doc, frontend, style, fcursor, syncOptions);
+        return Update.synchronizeDocument(
+            doc,
+            frontend,
+            style,
+            fcursor,
+            syncOptions
+        );
     }
 }

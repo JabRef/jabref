@@ -8,10 +8,10 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.preferences.BibEntryPreferences;
 
 public record ImportFormatPreferences(
-        BibEntryPreferences bibEntryPreferences,
-        CitationKeyPatternPreferences citationKeyPatternPreferences,
-        FieldPreferences fieldPreferences,
-        XmpPreferences xmpPreferences,
-        DOIPreferences doiPreferences,
-        GrobidPreferences grobidPreferences) {
-}
+    BibEntryPreferences bibEntryPreferences,
+    CitationKeyPatternPreferences citationKeyPatternPreferences,
+    FieldPreferences fieldPreferences,
+    XmpPreferences xmpPreferences,
+    DOIPreferences doiPreferences,
+    GrobidPreferences grobidPreferences
+) {}

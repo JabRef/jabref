@@ -3,7 +3,6 @@ package org.jabref.logic.integrity;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
@@ -18,37 +17,62 @@ public class IntegrityCheck {
     private final FieldCheckers fieldCheckers;
     private final List<EntryChecker> entryCheckers;
 
-    public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
-                          FilePreferences filePreferences,
-                          CitationKeyPatternPreferences citationKeyPatternPreferences,
-                          JournalAbbreviationRepository journalAbbreviationRepository,
-                          boolean allowIntegerEdition) {
+    public IntegrityCheck(
+        BibDatabaseContext bibDatabaseContext,
+        FilePreferences filePreferences,
+        CitationKeyPatternPreferences citationKeyPatternPreferences,
+        JournalAbbreviationRepository journalAbbreviationRepository,
+        boolean allowIntegerEdition
+    ) {
         this.bibDatabaseContext = bibDatabaseContext;
 
-        fieldCheckers = new FieldCheckers(bibDatabaseContext,
+        fieldCheckers =
+            new FieldCheckers(
+                bibDatabaseContext,
                 filePreferences,
                 journalAbbreviationRepository,
-                allowIntegerEdition);
+                allowIntegerEdition
+            );
 
-        entryCheckers = new ArrayList<>(List.of(
-                new CitationKeyChecker(),
-                new TypeChecker(),
-                new BibStringChecker(),
-                new HTMLCharacterChecker(),
-                new EntryLinkChecker(bibDatabaseContext.getDatabase()),
-                new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
-                new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
-                new AmpersandChecker(),
-                new LatexIntegrityChecker(),
-                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)
-                ));
+        entryCheckers =
+            new ArrayList<>(
+                List.of(
+                    new CitationKeyChecker(),
+                    new TypeChecker(),
+                    new BibStringChecker(),
+                    new HTMLCharacterChecker(),
+                    new EntryLinkChecker(bibDatabaseContext.getDatabase()),
+                    new CitationKeyDeviationChecker(
+                        bibDatabaseContext,
+                        citationKeyPatternPreferences
+                    ),
+                    new CitationKeyDuplicationChecker(
+                        bibDatabaseContext.getDatabase()
+                    ),
+                    new AmpersandChecker(),
+                    new LatexIntegrityChecker(),
+                    new JournalInAbbreviationListChecker(
+                        StandardField.JOURNAL,
+                        journalAbbreviationRepository
+                    )
+                )
+            );
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.add(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8)));
+            entryCheckers.add(
+                new UTF8Checker(
+                    bibDatabaseContext
+                        .getMetaData()
+                        .getEncoding()
+                        .orElse(StandardCharsets.UTF_8)
+                )
+            );
         } else {
-            entryCheckers.addAll(List.of(
+            entryCheckers.addAll(
+                List.of(
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
-                    new BibTeXEntryTypeChecker())
+                    new BibTeXEntryTypeChecker()
+                )
             );
         }
     }

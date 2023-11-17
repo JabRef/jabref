@@ -2,7 +2,6 @@ package org.jabref.logic.layout.format;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -24,12 +23,13 @@ public class Ordinal implements LayoutFormatter {
             String result = m.group(1);
             int value = Integer.parseInt(result);
             // CHECKSTYLE:OFF
-            String ordinalString = switch (value) {
-                case 1 -> "st";
-                case 2 -> "nd";
-                case 3 -> "rd";
-                default -> "th";
-            };
+            String ordinalString =
+                switch (value) {
+                    case 1 -> "st";
+                    case 2 -> "nd";
+                    case 3 -> "rd";
+                    default -> "th";
+                };
             // CHECKSTYLE:ON
             m.appendReplacement(sb, result + ordinalString);
         }

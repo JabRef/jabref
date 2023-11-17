@@ -1,10 +1,11 @@
 package org.jabref.logic.git;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
-
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.AnyObjectId;
@@ -14,11 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class GitHandlerTest {
+
     @TempDir
     Path repositoryPath;
+
     private GitHandler gitHandler;
 
     @BeforeEach
@@ -43,9 +44,7 @@ class GitHandlerTest {
             gitHandler.createCommitOnCurrentBranch("TestCommit", false);
 
             AnyObjectId head = git.getRepository().resolve(Constants.HEAD);
-            Iterator<RevCommit> log = git.log()
-                                         .add(head)
-                                         .call().iterator();
+            Iterator<RevCommit> log = git.log().add(head).call().iterator();
             assertEquals("TestCommit", log.next().getFullMessage());
             assertEquals("Initial commit", log.next().getFullMessage());
         }

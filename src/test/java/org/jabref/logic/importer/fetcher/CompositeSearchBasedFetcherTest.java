@@ -1,14 +1,15 @@
 package org.jabref.logic.importer.fetcher;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import javafx.collections.FXCollections;
-
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -18,7 +19,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,27 +28,35 @@ import org.mockito.Answers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @FetcherTest
 @DisabledOnCIServer("Produces to many requests on CI")
 public class CompositeSearchBasedFetcherTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        CompositeSearchBasedFetcherTest.class
+    );
 
-    private ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private ImporterPreferences importerPreferences = mock(
+        ImporterPreferences.class,
+        Answers.RETURNS_DEEP_STUBS
+    );
 
     @Test
     public void createCompositeFetcherWithNullSet() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new CompositeSearchBasedFetcher(null, importerPreferences, 0));
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> new CompositeSearchBasedFetcher(null, importerPreferences, 0)
+        );
     }
 
     @Test
     public void performSearchWithoutFetchers() throws Exception {
         Set<SearchBasedFetcher> empty = new HashSet<>();
-        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, importerPreferences, Integer.MAX_VALUE);
+        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(
+            empty,
+            importerPreferences,
+            Integer.MAX_VALUE
+        );
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
@@ -57,27 +65,45 @@ public class CompositeSearchBasedFetcherTest {
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
-    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
-        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
+    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers)
+        throws Exception {
+        CompositeSearchBasedFetcher compositeFetcher =
+            new CompositeSearchBasedFetcher(
+                fetchers,
+                importerPreferences,
+                Integer.MAX_VALUE
+            );
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
         Assertions.assertEquals(queryResult, Collections.emptyList());
     }
 
-    @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
-            "Fetchers: {arguments}")
+    @ParameterizedTest(
+        name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
+        "Fetchers: {arguments}"
+    )
     @MethodSource("performSearchParameters")
-    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
-        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
+    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers)
+        throws Exception {
+        CompositeSearchBasedFetcher compositeFetcher =
+            new CompositeSearchBasedFetcher(
+                fetchers,
+                importerPreferences,
+                Integer.MAX_VALUE
+            );
         ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseMode.BIBTEX);
 
-        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
+        List<BibEntry> compositeResult = compositeFetcher.performSearch(
+            "quantum"
+        );
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
                 List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
                 fetcherResult.forEach(cleanup::doPostCleanup);
-                Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
+                Assertions.assertTrue(
+                    compositeResult.containsAll(fetcherResult)
+                );
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore, the test should not fail
@@ -94,25 +120,35 @@ public class CompositeSearchBasedFetcherTest {
      * @return A stream of Arguments wrapping set of fetchers.
      */
     static Stream<Arguments> performSearchParameters() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        ImportFormatPreferences importFormatPreferences = mock(
+            ImportFormatPreferences.class,
+            Answers.RETURNS_DEEP_STUBS
+        );
+        ImporterPreferences importerPreferences = mock(
+            ImporterPreferences.class
+        );
+        when(importerPreferences.getApiKeys())
+            .thenReturn(FXCollections.emptyObservableSet());
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(
-                new ArXivFetcher(importFormatPreferences),
-                new INSPIREFetcher(importFormatPreferences),
-                new GvkFetcher(importFormatPreferences),
-                new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
-                new MathSciNet(importFormatPreferences),
-                new ZbMATH(importFormatPreferences),
-                new GoogleScholar(importFormatPreferences),
-                new DBLPFetcher(importFormatPreferences),
-                new SpringerFetcher(importerPreferences),
-                new CrossRef(),
-                new CiteSeer(),
-                new DOAJFetcher(importFormatPreferences),
-                new IEEE(importFormatPreferences, importerPreferences));
+            new ArXivFetcher(importFormatPreferences),
+            new INSPIREFetcher(importFormatPreferences),
+            new GvkFetcher(importFormatPreferences),
+            new AstrophysicsDataSystem(
+                importFormatPreferences,
+                importerPreferences
+            ),
+            new MathSciNet(importFormatPreferences),
+            new ZbMATH(importFormatPreferences),
+            new GoogleScholar(importFormatPreferences),
+            new DBLPFetcher(importFormatPreferences),
+            new SpringerFetcher(importerPreferences),
+            new CrossRef(),
+            new CiteSeer(),
+            new DOAJFetcher(importFormatPreferences),
+            new IEEE(importFormatPreferences, importerPreferences)
+        );
 
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.

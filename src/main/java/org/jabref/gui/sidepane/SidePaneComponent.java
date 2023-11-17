@@ -8,13 +8,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
 public class SidePaneComponent extends BorderPane {
+
     private final SidePaneType sidePaneType;
     private final SimpleCommand closeCommand;
     private final SimpleCommand moveUpCommand;
@@ -23,11 +23,13 @@ public class SidePaneComponent extends BorderPane {
 
     private HBox buttonContainer;
 
-    public SidePaneComponent(SidePaneType sidePaneType,
-                             SimpleCommand closeCommand,
-                             SimpleCommand moveUpCommand,
-                             SimpleCommand moveDownCommand,
-                             SidePaneContentFactory contentFactory) {
+    public SidePaneComponent(
+        SidePaneType sidePaneType,
+        SimpleCommand closeCommand,
+        SimpleCommand moveUpCommand,
+        SimpleCommand moveDownCommand,
+        SidePaneContentFactory contentFactory
+    ) {
         this.sidePaneType = sidePaneType;
         this.closeCommand = closeCommand;
         this.moveUpCommand = moveUpCommand;
@@ -40,7 +42,12 @@ public class SidePaneComponent extends BorderPane {
         getStyleClass().add("sidePaneComponent");
         setTop(createHeaderView());
         setCenter(contentFactory.create(sidePaneType));
-        VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);
+        VBox.setVgrow(
+            this,
+            sidePaneType == SidePaneType.GROUPS
+                ? Priority.ALWAYS
+                : Priority.NEVER
+        );
     }
 
     private Node createHeaderView() {
@@ -53,7 +60,9 @@ public class SidePaneComponent extends BorderPane {
         upButton.setOnAction(e -> moveUpCommand.execute());
 
         Button downButton = IconTheme.JabRefIcons.DOWN.asButton();
-        downButton.setTooltip(new Tooltip(Localization.lang("Move panel down")));
+        downButton.setTooltip(
+            new Tooltip(Localization.lang("Move panel down"))
+        );
         downButton.setOnAction(e -> moveDownCommand.execute());
 
         this.buttonContainer = new HBox();

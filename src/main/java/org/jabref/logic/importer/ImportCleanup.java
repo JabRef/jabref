@@ -1,12 +1,10 @@
 package org.jabref.logic.importer;
 
 import java.util.Collection;
-
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
 public interface ImportCleanup {
-
     static ImportCleanup targeting(BibDatabaseMode mode) {
         return switch (mode) {
             case BIBTEX -> new ImportCleanupBibtex();

@@ -10,7 +10,12 @@ public class UndoChangeEvent {
     private final boolean canRedo;
     private final String redoDescription;
 
-    public UndoChangeEvent(boolean canUndo, String undoDescription, boolean canRedo, String redoDescription) {
+    public UndoChangeEvent(
+        boolean canUndo,
+        String undoDescription,
+        boolean canRedo,
+        String redoDescription
+    ) {
         this.canUndo = canUndo;
         this.undoDescription = undoDescription;
         this.canRedo = canRedo;

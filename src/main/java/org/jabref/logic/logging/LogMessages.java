@@ -2,7 +2,6 @@ package org.jabref.logic.logging;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.tinylog.core.LogEntry;
 
 /**
@@ -13,10 +12,10 @@ public class LogMessages {
 
     private static LogMessages instance = new LogMessages();
 
-    private final ObservableList<LogEntry> messages = FXCollections.observableArrayList();
+    private final ObservableList<LogEntry> messages =
+        FXCollections.observableArrayList();
 
-    private LogMessages() {
-    }
+    private LogMessages() {}
 
     public static LogMessages getInstance() {
         return instance;

@@ -2,7 +2,6 @@ package org.jabref.model.entry.types;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.StandardField;
@@ -22,9 +21,14 @@ public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
      * </ul>
      */
     private static final BibEntryType STUDY_ENTRY = new BibEntryTypeBuilder()
-            .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)
-            .withRequiredFields(StandardField.AUTHOR, new UnknownField("lastsearchdate"), new UnknownField("name"), new UnknownField("researchquestions"))
-            .build();
+        .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)
+        .withRequiredFields(
+            StandardField.AUTHOR,
+            new UnknownField("lastsearchdate"),
+            new UnknownField("name"),
+            new UnknownField("researchquestions")
+        )
+        .build();
 
     /**
      * Entry type for the queries within the study definition file
@@ -34,8 +38,11 @@ public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
      * <li>Optional fields:</li>
      * </ul>
      */
-    private static final BibEntryType SEARCH_QUERY_ENTRY = new BibEntryTypeBuilder()
-            .withType(SystematicLiteratureReviewStudyEntryType.SEARCH_QUERY_ENTRY)
+    private static final BibEntryType SEARCH_QUERY_ENTRY =
+        new BibEntryTypeBuilder()
+            .withType(
+                SystematicLiteratureReviewStudyEntryType.SEARCH_QUERY_ENTRY
+            )
             .withRequiredFields(new UnknownField("query"))
             .build();
 
@@ -48,13 +55,19 @@ public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
      * </ul>
      */
     private static final BibEntryType LIBRARY_ENTRY = new BibEntryTypeBuilder()
-            .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)
-            .withRequiredFields(new UnknownField("name"), new UnknownField("enabled"))
-            .withImportantFields(StandardField.COMMENT)
-            .build();
+        .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)
+        .withRequiredFields(
+            new UnknownField("name"),
+            new UnknownField("enabled")
+        )
+        .withImportantFields(StandardField.COMMENT)
+        .build();
 
-    public static final List<BibEntryType> ALL = Arrays.asList(STUDY_ENTRY, SEARCH_QUERY_ENTRY, LIBRARY_ENTRY);
+    public static final List<BibEntryType> ALL = Arrays.asList(
+        STUDY_ENTRY,
+        SEARCH_QUERY_ENTRY,
+        LIBRARY_ENTRY
+    );
 
-    private SystematicLiteratureReviewStudyEntryTypeDefinitions() {
-    }
+    private SystematicLiteratureReviewStudyEntryTypeDefinitions() {}
 }

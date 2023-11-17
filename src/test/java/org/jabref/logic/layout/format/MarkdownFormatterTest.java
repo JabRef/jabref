@@ -1,11 +1,11 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class MarkdownFormatterTest {
 
@@ -18,12 +18,19 @@ class MarkdownFormatterTest {
 
     @Test
     void formatWhenFormattingPlainTextThenReturnsTextWrappedInParagraph() {
-        assertEquals("<p>Hello World</p>", markdownFormatter.format("Hello World"));
+        assertEquals(
+            "<p>Hello World</p>",
+            markdownFormatter.format("Hello World")
+        );
     }
 
     @Test
     void formatWhenFormattingComplexMarkupThenReturnsOnlyOneLine() {
-        assertFalse(markdownFormatter.format("Markup\n\n* list item one\n* list item 2\n\n rest").contains("\n"));
+        assertFalse(
+            markdownFormatter
+                .format("Markup\n\n* list item one\n* list item 2\n\n rest")
+                .contains("\n")
+        );
     }
 
     @Test
@@ -33,7 +40,13 @@ class MarkdownFormatterTest {
 
     @Test
     void formatWhenFormattingNullThenThrowsException() {
-        Exception exception = assertThrows(NullPointerException.class, () -> markdownFormatter.format(null));
-        assertEquals("Field Text should not be null, when handed to formatter", exception.getMessage());
+        Exception exception = assertThrows(
+            NullPointerException.class,
+            () -> markdownFormatter.format(null)
+        );
+        assertEquals(
+            "Field Text should not be null, when handed to formatter",
+            exception.getMessage()
+        );
     }
 }

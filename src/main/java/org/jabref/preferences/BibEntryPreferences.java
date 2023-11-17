@@ -4,6 +4,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class BibEntryPreferences {
+
     private final ObjectProperty<Character> keywordSeparator;
 
     public BibEntryPreferences(Character keywordSeparator) {

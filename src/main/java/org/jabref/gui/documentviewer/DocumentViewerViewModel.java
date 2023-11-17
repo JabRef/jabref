@@ -1,10 +1,10 @@
 package org.jabref.gui.documentviewer;
 
+import com.tobiasdiez.easybind.EasyBind;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -16,53 +16,67 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
-
-import com.tobiasdiez.easybind.EasyBind;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DocumentViewerViewModel.class
+    );
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
-    private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
+    private final ObjectProperty<DocumentViewModel> currentDocument =
+        new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty();
-    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> currentPage =
+        new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
-    public DocumentViewerViewModel(StateManager stateManager, PreferencesService preferencesService) {
+    public DocumentViewerViewModel(
+        StateManager stateManager,
+        PreferencesService preferencesService
+    ) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.preferencesService = Objects.requireNonNull(preferencesService);
 
-        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
-            // Switch to currently selected entry in live mode
-            if (isLiveMode()) {
-                setCurrentEntries(this.stateManager.getSelectedEntries());
-            }
-        });
+        this.stateManager.getSelectedEntries()
+            .addListener(
+                (ListChangeListener<? super BibEntry>) c -> {
+                    // Switch to currently selected entry in live mode
+                    if (isLiveMode()) {
+                        setCurrentEntries(
+                            this.stateManager.getSelectedEntries()
+                        );
+                    }
+                }
+            );
 
         this.liveMode.addListener((observable, oldValue, newValue) -> {
-            // Switch to currently selected entry if mode is changed to live
-            if ((oldValue != newValue) && newValue) {
-                setCurrentEntries(this.stateManager.getSelectedEntries());
-            }
-        });
+                // Switch to currently selected entry if mode is changed to live
+                if ((oldValue != newValue) && newValue) {
+                    setCurrentEntries(this.stateManager.getSelectedEntries());
+                }
+            });
 
         // we need to wrap this in run later so that the max pages number is correctly shown
-        Platform.runLater(() -> maxPages.bindBidirectional(
-            EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
+        Platform.runLater(() ->
+            maxPages.bindBidirectional(
+                EasyBind
+                    .wrapNullable(currentDocument)
+                    .selectProperty(DocumentViewModel::maxPagesProperty)
+            )
+        );
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
@@ -98,11 +112,13 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private void setCurrentEntry(BibEntry entry) {
-        stateManager.getActiveDatabase().ifPresent(database -> {
-            List<LinkedFile> linkedFiles = entry.getFiles();
-            // We don't need to switch to the first file, this is done automatically in the UI part
-            files.setValue(FXCollections.observableArrayList(linkedFiles));
-        });
+        stateManager
+            .getActiveDatabase()
+            .ifPresent(database -> {
+                List<LinkedFile> linkedFiles = entry.getFiles();
+                // We don't need to switch to the first file, this is done automatically in the UI part
+                files.setValue(FXCollections.observableArrayList(linkedFiles));
+            });
     }
 
     private void setCurrentDocument(Path path) {
@@ -118,9 +134,15 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void switchToFile(LinkedFile file) {
         if (file != null) {
-            stateManager.getActiveDatabase()
-                        .flatMap(database -> file.findIn(database, preferencesService.getFilePreferences()))
-                        .ifPresent(this::setCurrentDocument);
+            stateManager
+                .getActiveDatabase()
+                .flatMap(database ->
+                    file.findIn(
+                        database,
+                        preferencesService.getFilePreferences()
+                    )
+                )
+                .ifPresent(this::setCurrentDocument);
         }
     }
 

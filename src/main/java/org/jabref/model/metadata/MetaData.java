@@ -1,5 +1,8 @@
 package org.jabref.model.metadata;
 
+import com.google.common.eventbus.EventBus;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
+import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -8,10 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
@@ -24,10 +25,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
-
-import com.google.common.eventbus.EventBus;
-import com.tobiasdiez.easybind.optional.OptionalBinding;
-import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,16 +48,22 @@ public class MetaData {
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
-    public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
+    public static final String SEPARATOR_STRING = String.valueOf(
+        SEPARATOR_CHARACTER
+    );
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MetaData.class
+    );
 
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
-    private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
+    private final ObjectProperty<GroupTreeNode> groupsRoot =
+        new SimpleObjectProperty<>(null);
+    private final OptionalBinding<GroupTreeNode> groupsRootBinding =
+        new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
     private SaveOrder saveOrder;
     private String defaultCiteKeyPattern;
@@ -104,8 +107,12 @@ public class MetaData {
     public void setGroups(GroupTreeNode root) {
         Objects.requireNonNull(root);
         groupsRoot.setValue(root);
-        root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
-        root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        root.subscribeToDescendantChanged(groupTreeNode ->
+            groupsRootBinding.invalidate()
+        );
+        root.subscribeToDescendantChanged(groupTreeNode ->
+            eventBus.post(new GroupUpdatedEvent(this))
+        );
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }
@@ -113,9 +120,12 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
+    public AbstractCitationKeyPattern getCiteKeyPattern(
+        GlobalCitationKeyPattern globalPattern
+    ) {
         Objects.requireNonNull(globalPattern);
-        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
+        AbstractCitationKeyPattern bibtexKeyPattern =
+            new DatabaseCitationKeyPattern(globalPattern);
 
         // Add stored key patterns
         citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
@@ -133,16 +143,23 @@ public class MetaData {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
-        Map<EntryType, List<String>> nonDefaultPatterns = bibtexKeyPattern.getPatterns();
+        Map<EntryType, List<String>> nonDefaultPatterns =
+            bibtexKeyPattern.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public void setCiteKeyPattern(List<String> defaultValue, Map<EntryType, List<String>> nonDefaultPatterns) {
+    public void setCiteKeyPattern(
+        List<String> defaultValue,
+        Map<EntryType, List<String>> nonDefaultPatterns
+    ) {
         // Remove all patterns from metadata
         citeKeyPatterns.clear();
 
         // Set new value if it is not a default value
-        for (Map.Entry<EntryType, List<String>> pattern : nonDefaultPatterns.entrySet()) {
+        for (Map.Entry<
+            EntryType,
+            List<String>
+        > pattern : nonDefaultPatterns.entrySet()) {
             citeKeyPatterns.put(pattern.getKey(), pattern.getValue().get(0));
         }
 
@@ -237,7 +254,10 @@ public class MetaData {
     }
 
     public void setUserFileDirectory(String user, String path) {
-        userFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        userFileDirectory.put(
+            Objects.requireNonNull(user),
+            Objects.requireNonNull(path)
+        );
         postChange();
     }
 
@@ -251,7 +271,10 @@ public class MetaData {
     }
 
     public void setLatexFileDirectory(String user, Path path) {
-        laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        laTexFileDirectory.put(
+            Objects.requireNonNull(user),
+            Objects.requireNonNull(path)
+        );
         postChange();
     }
 
@@ -312,7 +335,9 @@ public class MetaData {
     /**
      * Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
      */
-    public void setEncodingExplicitlySupplied(boolean encodingExplicitlySupplied) {
+    public void setEncodingExplicitlySupplied(
+        boolean encodingExplicitlySupplied
+    ) {
         this.encodingExplicitlySupplied = encodingExplicitlySupplied;
     }
 
@@ -371,30 +396,88 @@ public class MetaData {
             return false;
         }
         MetaData metaData = (MetaData) o;
-        return (isProtected == metaData.isProtected)
-                && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
-                && Objects.equals(encoding, metaData.encoding)
-                && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
-                && Objects.equals(saveOrder, metaData.saveOrder)
-                && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
-                && Objects.equals(userFileDirectory, metaData.userFileDirectory)
-                && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
-                && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions)
-                && (mode == metaData.mode)
-                && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
-                && Objects.equals(contentSelectors, metaData.contentSelectors)
-                && Objects.equals(versionDBStructure, metaData.versionDBStructure);
+        return (
+            (isProtected == metaData.isProtected) &&
+            Objects.equals(
+                groupsRoot.getValue(),
+                metaData.groupsRoot.getValue()
+            ) &&
+            Objects.equals(encoding, metaData.encoding) &&
+            Objects.equals(
+                encodingExplicitlySupplied,
+                metaData.encodingExplicitlySupplied
+            ) &&
+            Objects.equals(saveOrder, metaData.saveOrder) &&
+            Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns) &&
+            Objects.equals(userFileDirectory, metaData.userFileDirectory) &&
+            Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory) &&
+            Objects.equals(
+                defaultCiteKeyPattern,
+                metaData.defaultCiteKeyPattern
+            ) &&
+            Objects.equals(saveActions, metaData.saveActions) &&
+            (mode == metaData.mode) &&
+            Objects.equals(
+                defaultFileDirectory,
+                metaData.defaultFileDirectory
+            ) &&
+            Objects.equals(contentSelectors, metaData.contentSelectors) &&
+            Objects.equals(versionDBStructure, metaData.versionDBStructure)
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, versionDBStructure);
+        return Objects.hash(
+            isProtected,
+            groupsRoot.getValue(),
+            encoding,
+            encodingExplicitlySupplied,
+            saveOrder,
+            citeKeyPatterns,
+            userFileDirectory,
+            laTexFileDirectory,
+            defaultCiteKeyPattern,
+            saveActions,
+            mode,
+            defaultFileDirectory,
+            contentSelectors,
+            versionDBStructure
+        );
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return (
+            "MetaData [citeKeyPatterns=" +
+            citeKeyPatterns +
+            ", userFileDirectory=" +
+            userFileDirectory +
+            ", laTexFileDirectory=" +
+            laTexFileDirectory +
+            ", groupsRoot=" +
+            groupsRoot +
+            ", encoding=" +
+            encoding +
+            ", saveOrderConfig=" +
+            saveOrder +
+            ", defaultCiteKeyPattern=" +
+            defaultCiteKeyPattern +
+            ", saveActions=" +
+            saveActions +
+            ", mode=" +
+            mode +
+            ", isProtected=" +
+            isProtected +
+            ", defaultFileDirectory=" +
+            defaultFileDirectory +
+            ", contentSelectors=" +
+            contentSelectors +
+            ", encodingExplicitlySupplied=" +
+            encodingExplicitlySupplied +
+            ", VersionDBStructure=" +
+            versionDBStructure +
+            "]"
+        );
     }
 }

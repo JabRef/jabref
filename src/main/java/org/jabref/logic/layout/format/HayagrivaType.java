@@ -16,7 +16,6 @@ public class HayagrivaType implements LayoutFormatter {
             case WWW, Online -> "web";
             case Proceedings -> "proceedings";
             case Reference -> "reference";
-
             default -> "Misc";
         };
     }

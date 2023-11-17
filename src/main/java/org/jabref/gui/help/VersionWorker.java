@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -14,7 +13,6 @@ import org.jabref.logic.util.Version;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +26,9 @@ import org.slf4j.LoggerFactory;
  */
 public class VersionWorker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VersionWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        VersionWorker.class
+    );
 
     /**
      * The current version of the installed JabRef
@@ -40,10 +40,12 @@ public class VersionWorker {
     private final InternalPreferences internalPreferences;
     private final FilePreferences filePreferences;
 
-    public VersionWorker(Version installedVersion,
-                         DialogService dialogService,
-                         TaskExecutor taskExecutor,
-                         PreferencesService preferencesService) {
+    public VersionWorker(
+        Version installedVersion,
+        DialogService dialogService,
+        TaskExecutor taskExecutor,
+        PreferencesService preferencesService
+    ) {
         this.installedVersion = Objects.requireNonNull(installedVersion);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
@@ -65,10 +67,11 @@ public class VersionWorker {
             return;
         }
 
-        BackgroundTask.wrap(this::getNewVersion)
-                      .onSuccess(version -> showUpdateInfo(version, true))
-                      .onFailure(exception -> showConnectionError(exception, true))
-                      .executeWith(taskExecutor);
+        BackgroundTask
+            .wrap(this::getNewVersion)
+            .onSuccess(version -> showUpdateInfo(version, true))
+            .onFailure(exception -> showConnectionError(exception, true))
+            .executeWith(taskExecutor);
     }
 
     public void checkForNewVersionDelayed() {
@@ -76,20 +79,32 @@ public class VersionWorker {
             return;
         }
 
-        BackgroundTask.wrap(this::getNewVersion)
-                      .onSuccess(version -> showUpdateInfo(version, false))
-                      .onFailure(exception -> showConnectionError(exception, false))
-                      .scheduleWith(taskExecutor, 30, TimeUnit.SECONDS);
+        BackgroundTask
+            .wrap(this::getNewVersion)
+            .onSuccess(version -> showUpdateInfo(version, false))
+            .onFailure(exception -> showConnectionError(exception, false))
+            .scheduleWith(taskExecutor, 30, TimeUnit.SECONDS);
     }
 
     /**
      * Prints the connection problem to the status bar and shows a dialog if it was executed manually
      */
-    private void showConnectionError(Exception exception, boolean manualExecution) {
+    private void showConnectionError(
+        Exception exception,
+        boolean manualExecution
+    ) {
         if (manualExecution) {
-            String couldNotConnect = Localization.lang("Could not connect to the update server.");
-            String tryLater = Localization.lang("Please try again later and/or check your network connection.");
-            dialogService.showErrorDialogAndWait(Localization.lang("Error"), couldNotConnect + "\n" + tryLater, exception);
+            String couldNotConnect = Localization.lang(
+                "Could not connect to the update server."
+            );
+            String tryLater = Localization.lang(
+                "Please try again later and/or check your network connection."
+            );
+            dialogService.showErrorDialogAndWait(
+                Localization.lang("Error"),
+                couldNotConnect + "\n" + tryLater,
+                exception
+            );
         }
         LOGGER.debug("Could not connect to the update server.", exception);
     }
@@ -98,16 +113,37 @@ public class VersionWorker {
      * Prints up-to-date to the status bar (and shows a dialog it was executed manually) if there is now new version.
      * Shows a "New Version" Dialog to the user if there is.
      */
-    private void showUpdateInfo(Optional<Version> newerVersion, boolean manualExecution) {
+    private void showUpdateInfo(
+        Optional<Version> newerVersion,
+        boolean manualExecution
+    ) {
         // no new version could be found, only respect the ignored version on automated version checks
-        if (newerVersion.isEmpty() || (newerVersion.get().equals(internalPreferences.getIgnoredVersion()) && !manualExecution)) {
+        if (
+            newerVersion.isEmpty() ||
+            (newerVersion
+                    .get()
+                    .equals(internalPreferences.getIgnoredVersion()) &&
+                !manualExecution)
+        ) {
             if (manualExecution) {
-                dialogService.notify(Localization.lang("JabRef is up-to-date."));
+                dialogService.notify(
+                    Localization.lang("JabRef is up-to-date.")
+                );
             }
         } else {
             // notify the user about a newer version
-            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, filePreferences))
-                             .orElse(true)) {
+            if (
+                dialogService
+                    .showCustomDialogAndWait(
+                        new NewVersionDialog(
+                            installedVersion,
+                            newerVersion.get(),
+                            dialogService,
+                            filePreferences
+                        )
+                    )
+                    .orElse(true)
+            ) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }
         }

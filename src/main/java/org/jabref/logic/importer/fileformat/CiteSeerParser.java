@@ -5,19 +5,18 @@ import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
-
 public class CiteSeerParser {
 
-    public List<BibEntry> parseCiteSeerResponse(JSONArray jsonResponse) throws ParseException {
+    public List<BibEntry> parseCiteSeerResponse(JSONArray jsonResponse)
+        throws ParseException {
         List<BibEntry> response = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
         for (int i = 0; i < jsonResponse.length(); ++i) {
@@ -40,9 +39,18 @@ public class CiteSeerParser {
         bibEntry.setField(StandardField.TITLE, jsonObj.optString("title"));
         bibEntry.setField(StandardField.VENUE, jsonObj.optString("venue"));
         bibEntry.setField(StandardField.YEAR, jsonObj.optString("year"));
-        bibEntry.setField(StandardField.PUBLISHER, jsonObj.optString("publisher"));
-        bibEntry.setField(StandardField.ABSTRACT, jsonObj.optString("abstract"));
-        bibEntry.setField(StandardField.AUTHOR, parseAuthors(Optional.ofNullable(jsonObj.optJSONArray("authors"))));
+        bibEntry.setField(
+            StandardField.PUBLISHER,
+            jsonObj.optString("publisher")
+        );
+        bibEntry.setField(
+            StandardField.ABSTRACT,
+            jsonObj.optString("abstract")
+        );
+        bibEntry.setField(
+            StandardField.AUTHOR,
+            parseAuthors(Optional.ofNullable(jsonObj.optJSONArray("authors")))
+        );
         bibEntry.setField(StandardField.JOURNAL, jsonObj.optString("journal"));
         bibEntry.setField(StandardField.URL, jsonObj.optString("source"));
         return bibEntry;
@@ -56,9 +64,15 @@ public class CiteSeerParser {
         JSONArray authorsArray = authorsOpt.get();
         StringBuilder authorsStringBuilder = new StringBuilder();
         for (int i = 0; i < authorsArray.length() - 1; i++) {
-            authorsStringBuilder.append(StringUtil.shaveString(authorsArray.getString(i))).append(separator);
+            authorsStringBuilder
+                .append(StringUtil.shaveString(authorsArray.getString(i)))
+                .append(separator);
         }
-        authorsStringBuilder.append(authorsArray.getString(authorsArray.length() - 1));
-        return new AuthorListParser().parse(authorsStringBuilder.toString()).getAsLastFirstNamesWithAnd(false);
+        authorsStringBuilder.append(
+            authorsArray.getString(authorsArray.length() - 1)
+        );
+        return new AuthorListParser()
+            .parse(authorsStringBuilder.toString())
+            .getAsLastFirstNamesWithAnd(false);
     }
 }

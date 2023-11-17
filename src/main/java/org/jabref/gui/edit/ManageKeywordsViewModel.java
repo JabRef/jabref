@@ -1,13 +1,12 @@
 package org.jabref.gui.edit;
 
+import com.tobiasdiez.easybind.EasyBind;
 import java.util.List;
 import java.util.Optional;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
@@ -17,17 +16,22 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.preferences.BibEntryPreferences;
 
-import com.tobiasdiez.easybind.EasyBind;
-
 public class ManageKeywordsViewModel {
 
     private final List<BibEntry> entries;
-    private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
+    private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser =
+        new KeywordList();
     private final BibEntryPreferences bibEntryPreferences;
-    private final ObjectProperty<ManageKeywordsDisplayType> displayType = new SimpleObjectProperty<>(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);
+    private final ObjectProperty<ManageKeywordsDisplayType> displayType =
+        new SimpleObjectProperty<>(
+            ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES
+        );
     private final ObservableList<String> keywords;
 
-    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List<BibEntry> entries) {
+    public ManageKeywordsViewModel(
+        BibEntryPreferences bibEntryPreferences,
+        List<BibEntry> entries
+    ) {
         this.bibEntryPreferences = bibEntryPreferences;
         this.entries = entries;
         this.keywords = FXCollections.observableArrayList();
@@ -50,23 +54,35 @@ public class ManageKeywordsViewModel {
 
         if (type == ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES) {
             for (BibEntry entry : entries) {
-                KeywordList separatedKeywords = entry.getKeywords(keywordSeparator);
-                sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
+                KeywordList separatedKeywords = entry.getKeywords(
+                    keywordSeparator
+                );
+                sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(
+                    separatedKeywords
+                );
             }
         } else if (type == ManageKeywordsDisplayType.CONTAINED_IN_ANY_ENTRY) {
             // all keywords from first entry have to be added
             BibEntry firstEntry = entries.get(0);
-            KeywordList separatedKeywords = firstEntry.getKeywords(keywordSeparator);
-            sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
+            KeywordList separatedKeywords = firstEntry.getKeywords(
+                keywordSeparator
+            );
+            sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(
+                separatedKeywords
+            );
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
             for (BibEntry entry : entries) {
                 separatedKeywords = entry.getKeywords(keywordSeparator);
-                sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
+                sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(
+                    separatedKeywords
+                );
             }
         } else {
-            throw new IllegalStateException("DisplayType " + type + " not handled");
+            throw new IllegalStateException(
+                "DisplayType " + type + " not handled"
+            );
         }
         for (Keyword keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
             keywords.add(keyword.get());
@@ -87,7 +103,9 @@ public class ManageKeywordsViewModel {
         // build keywordsToAdd and userSelectedKeywords in parallel
         for (String keyword : keywords) {
             userSelectedKeywords.add(keyword);
-            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
+            if (
+                !sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)
+            ) {
                 keywordsToAdd.add(keyword);
             }
         }
@@ -104,15 +122,24 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        NamedCompound ce = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
+        NamedCompound ce = updateKeywords(
+            entries,
+            keywordsToAdd,
+            keywordsToRemove
+        );
         // TODO: bp.getUndoManager().addEdit(ce);
     }
 
-    private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
-                                         KeywordList keywordsToRemove) {
+    private NamedCompound updateKeywords(
+        List<BibEntry> entries,
+        KeywordList keywordsToAdd,
+        KeywordList keywordsToRemove
+    ) {
         Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
+        NamedCompound ce = new NamedCompound(
+            Localization.lang("Update keywords")
+        );
         for (BibEntry entry : entries) {
             KeywordList keywords = entry.getKeywords(keywordSeparator);
 
@@ -121,8 +148,13 @@ public class ManageKeywordsViewModel {
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
-            change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+            Optional<FieldChange> change = entry.putKeywords(
+                keywords,
+                keywordSeparator
+            );
+            change.ifPresent(fieldChange ->
+                ce.addEdit(new UndoableFieldChange(fieldChange))
+            );
         }
         ce.end();
         return ce;

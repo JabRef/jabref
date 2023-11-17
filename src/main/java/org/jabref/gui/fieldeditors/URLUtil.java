@@ -6,18 +6,18 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.preferences.FilePreferences;
 
 public class URLUtil {
+
     private static final String URL_EXP = "^(https?|ftp)://.+";
 
     // Detect Google search URL
-    private static final String GOOGLE_SEARCH_EXP = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
+    private static final String GOOGLE_SEARCH_EXP =
+        "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
 
-    private URLUtil() {
-    }
+    private URLUtil() {}
 
     /**
      * Cleans URLs returned by Google search.
@@ -53,7 +53,10 @@ public class URLUtil {
                 if (pair.startsWith("url=")) {
                     String value = pair.substring(pair.indexOf('=') + 1);
 
-                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8);
+                    String decode = URLDecoder.decode(
+                        value,
+                        StandardCharsets.UTF_8
+                    );
                     // url?
                     if (decode.matches(URL_EXP)) {
                         return decode;
@@ -91,13 +94,23 @@ public class URLUtil {
      * @param link The link
      * @return The suffix, excluding the dot (e.g. "pdf")
      */
-    public static Optional<String> getSuffix(final String link, FilePreferences filePreferences) {
+    public static Optional<String> getSuffix(
+        final String link,
+        FilePreferences filePreferences
+    ) {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
             URL url = new URL(link);
-            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
-                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
+            if (
+                (url.getQuery() != null) &&
+                (url.getQuery().length() < (link.length() - 1))
+            ) {
+                strippedLink =
+                    link.substring(
+                        0,
+                        link.length() - url.getQuery().length() - 1
+                    );
             }
         } catch (MalformedURLException e) {
             // Don't report this error, since this getting the suffix is a non-critical
@@ -106,12 +119,17 @@ public class URLUtil {
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
         int strippedLinkIndex = strippedLink.lastIndexOf('.');
-        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
+        if (
+            (strippedLinkIndex <= 0) ||
+            (strippedLinkIndex == (strippedLink.length() - 1))
+        ) {
             suffix = null;
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, filePreferences)) {
+        if (
+            !ExternalFileTypes.isExternalFileTypeByExt(suffix, filePreferences)
+        ) {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             int index = link.lastIndexOf('.');
@@ -119,7 +137,12 @@ public class URLUtil {
                 // No occurrence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
+                if (
+                    strippedLink
+                        .substring(strippedLinkIndex + 1)
+                        .indexOf('/') >=
+                    1
+                ) {
                     return Optional.empty();
                 } else {
                     return Optional.of(suffix); // return the first one we found, anyway.

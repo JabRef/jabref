@@ -1,10 +1,9 @@
-
 package org.jabref.logic.formatter.bibtexfields;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RemoveNewlinesFormatterTest {
 
@@ -38,6 +37,9 @@ public class RemoveNewlinesFormatterTest {
     @Test
     public void removePlatformSpecificNewLine() {
         String newLine = String.format("%n");
-        assertEquals("linebreak on current platform", formatter.format("linebreak on" + newLine + "current platform"));
+        assertEquals(
+            "linebreak on current platform",
+            formatter.format("linebreak on" + newLine + "current platform")
+        );
     }
 }

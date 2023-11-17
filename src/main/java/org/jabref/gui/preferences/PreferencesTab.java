@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
-
 import javafx.scene.Node;
 
 /**
@@ -10,7 +9,6 @@ import javafx.scene.Node;
  * It needs to extend from Component.
  */
 public interface PreferencesTab {
-
     Node getBuilder();
 
     /**

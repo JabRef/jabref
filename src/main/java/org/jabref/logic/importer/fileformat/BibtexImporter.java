@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -20,7 +19,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.util.FileUpdateMonitor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +27,9 @@ import org.slf4j.LoggerFactory;
  */
 public class BibtexImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        BibtexImporter.class
+    );
 
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
@@ -37,7 +37,10 @@ public class BibtexImporter extends Importer {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
 
-    public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public BibtexImporter(
+        ImportFormatPreferences importFormatPreferences,
+        FileUpdateMonitor fileMonitor
+    ) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
     }
@@ -62,14 +65,29 @@ public class BibtexImporter extends Importer {
         CharsetDecoder decoder = result.encoding().newDecoder();
         decoder.onMalformedInput(CodingErrorAction.REPLACE);
 
-        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
-             BufferedReader reader = new BufferedReader(inputStreamReader)) {
+        try (
+            InputStreamReader inputStreamReader = new InputStreamReader(
+                Files.newInputStream(filePath),
+                decoder
+            );
+            BufferedReader reader = new BufferedReader(inputStreamReader)
+        ) {
             ParserResult parserResult = this.importDatabase(reader);
             parserResult.getMetaData().setEncoding(result.encoding());
-            parserResult.getMetaData().setEncodingExplicitlySupplied(result.encodingExplicitlySupplied());
+            parserResult
+                .getMetaData()
+                .setEncodingExplicitlySupplied(
+                    result.encodingExplicitlySupplied()
+                );
             parserResult.setPath(filePath);
             if (parserResult.getMetaData().getMode().isEmpty()) {
-                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
+                parserResult
+                    .getMetaData()
+                    .setMode(
+                        BibDatabaseModeDetection.inferMode(
+                            parserResult.getDatabase()
+                        )
+                    );
             }
             return parserResult;
         }
@@ -83,7 +101,8 @@ public class BibtexImporter extends Importer {
      * Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
      * If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
      */
-    private static EncodingResult getEncodingResult(Path filePath) throws IOException {
+    private static EncodingResult getEncodingResult(Path filePath)
+        throws IOException {
         // We want to check if there is a JabRef encoding heading in the file, because that would tell us
         // which character encoding is used.
 
@@ -93,7 +112,9 @@ public class BibtexImporter extends Importer {
 
         Charset detectedCharset;
         try (InputStream inputStream = Files.newInputStream(filePath)) {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(
+                inputStream
+            );
             bufferedInputStream.mark(8192);
             detectedCharset = getCharset(bufferedInputStream);
             bufferedInputStream.reset();
@@ -102,7 +123,12 @@ public class BibtexImporter extends Importer {
 
         Charset encoding;
         boolean encodingExplicitlySupplied;
-        try (BufferedReader reader = Files.newBufferedReader(filePath, detectedCharset)) {
+        try (
+            BufferedReader reader = Files.newBufferedReader(
+                filePath,
+                detectedCharset
+            )
+        ) {
             Optional<Charset> suppliedEncoding = getSuppliedEncoding(reader);
             LOGGER.debug("Supplied encoding: {}", suppliedEncoding);
             encodingExplicitlySupplied = suppliedEncoding.isPresent();
@@ -111,20 +137,27 @@ public class BibtexImporter extends Importer {
             encoding = suppliedEncoding.orElse(detectedCharset);
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
-        EncodingResult result = new EncodingResult(encoding, encodingExplicitlySupplied);
+        EncodingResult result = new EncodingResult(
+            encoding,
+            encodingExplicitlySupplied
+        );
         return result;
     }
 
-    private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
-    }
+    private record EncodingResult(
+        Charset encoding,
+        boolean encodingExplicitlySupplied
+    ) {}
 
     /**
      * This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
      * reader manually to the metadata
      */
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
+        return new BibtexParser(importFormatPreferences, fileMonitor)
+            .parse(reader);
     }
 
     @Override
@@ -145,7 +178,9 @@ public class BibtexImporter extends Importer {
     /**
      * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
      */
-    private static Optional<Charset> getSuppliedEncoding(BufferedReader reader) {
+    private static Optional<Charset> getSuppliedEncoding(
+        BufferedReader reader
+    ) {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -168,9 +203,16 @@ public class BibtexImporter extends Importer {
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length(), atSymbolIndex);
+                        encoding =
+                            line.substring(
+                                SaveConfiguration.ENCODING_PREFIX.length(),
+                                atSymbolIndex
+                            );
                     } else {
-                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length());
+                        encoding =
+                            line.substring(
+                                SaveConfiguration.ENCODING_PREFIX.length()
+                            );
                     }
 
                     return Optional.of(Charset.forName(encoding));

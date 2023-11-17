@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -27,23 +26,30 @@ import org.jabref.model.entry.types.StandardEntryType;
  */
 public class OvidImporter extends Importer {
 
-    private static final Pattern OVID_SOURCE_PATTERN = Pattern
-            .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+    private static final Pattern OVID_SOURCE_PATTERN = Pattern.compile(
+        "Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])"
+    );
 
-    private static final Pattern OVID_SOURCE_PATTERN_NO_ISSUE = Pattern
-            .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+    private static final Pattern OVID_SOURCE_PATTERN_NO_ISSUE = Pattern.compile(
+        "Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])"
+    );
 
     private static final Pattern OVID_SOURCE_PATTERN_2 = Pattern.compile(
-            "([ \\w&\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)");
+        "([ \\w&\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)"
+    );
 
     private static final Pattern INCOLLECTION_PATTERN = Pattern.compile(
-            "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. "
-                    + "([\\w, ]+): ([\\w, ]+)");
+        "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. " +
+        "([\\w, ]+): ([\\w, ]+)"
+    );
     private static final Pattern BOOK_PATTERN = Pattern.compile(
-            "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)");
+        "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)"
+    );
 
     private static final String OVID_PATTERN_STRING = "<[0-9]+>";
-    private static final Pattern OVID_PATTERN = Pattern.compile(OVID_PATTERN_STRING);
+    private static final Pattern OVID_PATTERN = Pattern.compile(
+        OVID_PATTERN_STRING
+    );
 
     private static final int MAX_ITEMS = 50;
 
@@ -63,7 +69,8 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader)
+        throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < MAX_ITEMS)) {
@@ -76,7 +83,8 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader)
+        throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String line;
@@ -99,9 +107,10 @@ public class OvidImporter extends Importer {
                 String content = field.substring(linebreak).trim();
 
                 // Check if this is the author field (due to a minor special treatment for this field):
-                boolean isAuthor = (fieldName.indexOf("Author") == 0)
-                        && !fieldName.contains("Author Keywords")
-                        && !fieldName.contains("Author e-mail");
+                boolean isAuthor =
+                    (fieldName.indexOf("Author") == 0) &&
+                    !fieldName.contains("Author Keywords") &&
+                    !fieldName.contains("Author e-mail");
 
                 // Remove unnecessary dots at the end of lines, unless this is the author field,
                 // in which case a dot at the end could be significant:
@@ -120,32 +129,60 @@ public class OvidImporter extends Importer {
                     h.put(new UnknownField("chaptertitle"), content);
                 } else if (fieldName.startsWith("Source")) {
                     Matcher matcher;
-                    if ((matcher = OvidImporter.OVID_SOURCE_PATTERN.matcher(content)).find()) {
+                    if (
+                        (matcher =
+                                OvidImporter.OVID_SOURCE_PATTERN.matcher(
+                                    content
+                                )).find()
+                    ) {
                         h.put(StandardField.JOURNAL, matcher.group(1));
                         h.put(StandardField.VOLUME, matcher.group(2));
                         h.put(StandardField.ISSUE, matcher.group(3));
                         h.put(StandardField.PAGES, matcher.group(4));
                         h.put(StandardField.YEAR, matcher.group(5));
-                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) { // may be missing the issue
+                    } else if (
+                        (matcher =
+                                OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(
+                                    content
+                                )).find()
+                    ) { // may be missing the issue
                         h.put(StandardField.JOURNAL, matcher.group(1));
                         h.put(StandardField.VOLUME, matcher.group(2));
                         h.put(StandardField.PAGES, matcher.group(3));
                         h.put(StandardField.YEAR, matcher.group(4));
-                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {
+                    } else if (
+                        (matcher =
+                                OvidImporter.OVID_SOURCE_PATTERN_2.matcher(
+                                    content
+                                )).find()
+                    ) {
                         h.put(StandardField.JOURNAL, matcher.group(1));
                         h.put(StandardField.VOLUME, matcher.group(2));
                         h.put(StandardField.ISSUE, matcher.group(3));
                         h.put(StandardField.MONTH, matcher.group(4));
                         h.put(StandardField.YEAR, matcher.group(5));
                         h.put(StandardField.PAGES, matcher.group(6));
-                    } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {
-                        h.put(StandardField.EDITOR, matcher.group(1).replace(" (Ed)", ""));
+                    } else if (
+                        (matcher =
+                                OvidImporter.INCOLLECTION_PATTERN.matcher(
+                                    content
+                                )).find()
+                    ) {
+                        h.put(
+                            StandardField.EDITOR,
+                            matcher.group(1).replace(" (Ed)", "")
+                        );
                         h.put(StandardField.YEAR, matcher.group(2));
                         h.put(StandardField.BOOKTITLE, matcher.group(3));
                         h.put(StandardField.PAGES, matcher.group(4));
                         h.put(StandardField.ADDRESS, matcher.group(5));
                         h.put(StandardField.PUBLISHER, matcher.group(6));
-                    } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {
+                    } else if (
+                        (matcher =
+                                OvidImporter.BOOK_PATTERN.matcher(
+                                    content
+                                )).find()
+                    ) {
                         h.put(StandardField.YEAR, matcher.group(1));
                         h.put(StandardField.PAGES, matcher.group(2));
                         h.put(StandardField.ADDRESS, matcher.group(3));
@@ -153,7 +190,10 @@ public class OvidImporter extends Importer {
                     }
                     // Add double hyphens to page ranges:
                     if (h.get(StandardField.PAGES) != null) {
-                        h.put(StandardField.PAGES, h.get(StandardField.PAGES).replace("-", "--"));
+                        h.put(
+                            StandardField.PAGES,
+                            h.get(StandardField.PAGES).replace("-", "--")
+                        );
                     }
                 } else if ("Abstract".equals(fieldName)) {
                     h.put(StandardField.ABSTRACT, content);
@@ -196,13 +236,21 @@ public class OvidImporter extends Importer {
             }
 
             // Set the entrytype properly:
-            EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;
+            EntryType entryType = h.containsKey(InternalField.TYPE_HEADER)
+                ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER))
+                : BibEntry.DEFAULT_TYPE;
             h.remove(InternalField.TYPE_HEADER);
-            if (entryType.equals(StandardEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
+            if (
+                entryType.equals(StandardEntryType.Book) &&
+                h.containsKey(new UnknownField("chaptertitle"))
+            ) {
                 // This means we have an "incollection" entry.
                 entryType = StandardEntryType.InCollection;
                 // Move the "chaptertitle" to just "title":
-                h.put(StandardField.TITLE, h.remove(new UnknownField("chaptertitle")));
+                h.put(
+                    StandardField.TITLE,
+                    h.remove(new UnknownField("chaptertitle"))
+                );
             }
             BibEntry b = new BibEntry(entryType);
             b.setField(h);
@@ -222,7 +270,10 @@ public class OvidImporter extends Importer {
     private static String fixNames(String content) {
         String names;
         if (content.indexOf(';') > 0) { // LN FN; [LN FN;]*
-            names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replace(";", " and");
+            names =
+                content
+                    .replaceAll("[^\\.A-Za-z,;\\- ]", "")
+                    .replace(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split(" {2}");
             StringBuilder sb = new StringBuilder();

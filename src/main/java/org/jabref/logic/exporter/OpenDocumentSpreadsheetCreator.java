@@ -19,36 +19,45 @@ import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OpenDocumentSpreadsheetCreator extends Exporter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        OpenDocumentSpreadsheetCreator.class
+    );
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super("ods", Localization.lang("OpenDocument spreadsheet"), StandardFileType.ODS);
+        super(
+            "ods",
+            Localization.lang("OpenDocument spreadsheet"),
+            StandardFileType.ODS
+        );
     }
 
-    private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {
-
-        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
+    private static void storeOpenDocumentSpreadsheetFile(
+        Path file,
+        InputStream source
+    ) throws IOException {
+        try (
+            ZipOutputStream out = new ZipOutputStream(
+                new BufferedOutputStream(Files.newOutputStream(file))
+            )
+        ) {
             // addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
@@ -74,22 +83,43 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
 
             // Add manifest (required for OOo 2.0) and "meta.xml": These are in the
             // resource/ods directory, and are copied verbatim into the zip file.
-            OpenDocumentSpreadsheetCreator.addResourceFile("meta.xml", "/resource/ods/meta.xml", out);
+            OpenDocumentSpreadsheetCreator.addResourceFile(
+                "meta.xml",
+                "/resource/ods/meta.xml",
+                out
+            );
 
-            OpenDocumentSpreadsheetCreator.addResourceFile("META-INF/manifest.xml", "/resource/ods/manifest.xml", out);
+            OpenDocumentSpreadsheetCreator.addResourceFile(
+                "META-INF/manifest.xml",
+                "/resource/ods/manifest.xml",
+                out
+            );
         }
     }
 
-    private static void exportOpenDocumentSpreadsheet(Path file, BibDatabase database, List<BibEntry> entries)
-            throws IOException {
-
+    private static void exportOpenDocumentSpreadsheet(
+        Path file,
+        BibDatabase database,
+        List<BibEntry> entries
+    ) throws IOException {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
-        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, entries);
+        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(
+            tmpFile,
+            database,
+            entries
+        );
 
         // Then add the content to the zip file:
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
-            OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
+        try (
+            BufferedInputStream in = new BufferedInputStream(
+                new FileInputStream(tmpFile)
+            )
+        ) {
+            OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(
+                file,
+                in
+            );
         }
         // Delete the temporary file:
         if (!tmpFile.delete()) {
@@ -98,22 +128,43 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext, final Path file,
-                       List<BibEntry> entries) throws IOException {
+    public void export(
+        final BibDatabaseContext databaseContext,
+        final Path file,
+        List<BibEntry> entries
+    ) throws IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exists
-            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(file, databaseContext.getDatabase(), entries);
+            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(
+                file,
+                databaseContext.getDatabase(),
+                entries
+            );
         }
     }
 
-    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
-        OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
+    private static void exportOpenDocumentSpreadsheetXML(
+        File tmpFile,
+        BibDatabase database,
+        List<BibEntry> entries
+    ) {
+        OpenDocumentRepresentation od = new OpenDocumentRepresentation(
+            database,
+            entries
+        );
 
-        try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
+        try (
+            Writer ps = new OutputStreamWriter(
+                new FileOutputStream(tmpFile),
+                StandardCharsets.UTF_8
+            )
+        ) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            Transformer trans = TransformerFactory
+                .newInstance()
+                .newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
         } catch (Exception e) {
@@ -121,7 +172,11 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         }
     }
 
-    private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {
+    private static void addResourceFile(
+        String name,
+        String resource,
+        ZipOutputStream out
+    ) throws IOException {
         ZipEntry zipEntry = new ZipEntry(name);
         out.putNextEntry(zipEntry);
         OpenDocumentSpreadsheetCreator.addFromResource(resource, out);

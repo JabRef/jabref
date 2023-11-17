@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
@@ -14,6 +13,7 @@ import org.jabref.model.util.OptionalUtil;
  * The "proxy" is configured using the field to handle and the value checker to apply.
  */
 public class FieldChecker implements EntryChecker {
+
     protected final Field field;
     private final ValueChecker checker;
 
@@ -29,6 +29,10 @@ public class FieldChecker implements EntryChecker {
             return Collections.emptyList();
         }
 
-        return OptionalUtil.toList(checker.checkValue(value.get()).map(message -> new IntegrityMessage(message, entry, field)));
+        return OptionalUtil.toList(
+            checker
+                .checkValue(value.get())
+                .map(message -> new IntegrityMessage(message, entry, field))
+        );
     }
 }

@@ -1,16 +1,14 @@
 package org.jabref.logic.importer;
 
+import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
+
 import java.util.Collections;
 import java.util.List;
-
-import org.jabref.model.entry.BibEntry;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
-
-import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Searches web resources for bibliographic information based on a free-text query.
@@ -20,7 +18,6 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
  * </p>
  */
 public interface SearchBasedFetcher extends WebFetcher {
-
     /**
      * This method is used to send complex queries using fielded search.
      *
@@ -35,7 +32,8 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @param searchQuery query string that can be parsed into a lucene query
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    default List<BibEntry> performSearch(String searchQuery) throws FetcherException {
+    default List<BibEntry> performSearch(String searchQuery)
+        throws FetcherException {
         if (searchQuery.isBlank()) {
             return Collections.emptyList();
         }
@@ -45,7 +43,9 @@ public interface SearchBasedFetcher extends WebFetcher {
         try {
             queryNode = parser.parse(searchQuery, NO_EXPLICIT_FIELD);
         } catch (QueryNodeParseException e) {
-            throw new FetcherException("An error occurred when parsing the query");
+            throw new FetcherException(
+                "An error occurred when parsing the query"
+            );
         }
 
         return this.performSearch(queryNode);

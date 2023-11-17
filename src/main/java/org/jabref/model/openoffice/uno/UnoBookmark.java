@@ -1,7 +1,5 @@
 package org.jabref.model.openoffice.uno;
 
-import java.util.Optional;
-
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -11,24 +9,26 @@ import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import java.util.Optional;
 
 public class UnoBookmark {
 
-    private UnoBookmark() {
-    }
+    private UnoBookmark() {}
 
     /**
      * Provides access to bookmarks by name.
      */
     public static XNameAccess getNameAccess(XTextDocument doc)
-            throws
-            NoDocumentException {
-
-        XBookmarksSupplier supplier = UnoCast.cast(XBookmarksSupplier.class, doc).get();
+        throws NoDocumentException {
+        XBookmarksSupplier supplier = UnoCast
+            .cast(XBookmarksSupplier.class, doc)
+            .get();
         try {
             return supplier.getBookmarks();
         } catch (DisposedException ex) {
-            throw new NoDocumentException("UnoBookmark.getNameAccess failed with" + ex);
+            throw new NoDocumentException(
+                "UnoBookmark.getNameAccess failed with" + ex
+            );
         }
     }
 
@@ -38,13 +38,14 @@ public class UnoBookmark {
      * @param name The name of the bookmark to find.
      * @return The XTextRange for the bookmark, or Optional.empty().
      */
-    public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
-            throws
-            WrappedTargetException,
-            NoDocumentException {
-
+    public static Optional<XTextRange> getAnchor(
+        XTextDocument doc,
+        String name
+    ) throws WrappedTargetException, NoDocumentException {
         XNameAccess nameAccess = getNameAccess(doc);
-        return UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
+        return UnoNameAccess
+            .getTextContentByName(nameAccess, name)
+            .map(XTextContent::getAnchor);
     }
 
     /**
@@ -58,24 +59,33 @@ public class UnoBookmark {
      * @return The XNamed interface of the bookmark.
      * result.getName() should be checked by the caller, because its name may differ from the one requested.
      */
-    public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
-            throws
-            CreationException {
-        return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.Bookmark", name, range, absorb);
+    public static XNamed create(
+        XTextDocument doc,
+        String name,
+        XTextRange range,
+        boolean absorb
+    ) throws CreationException {
+        return UnoNamed.insertNamedTextContent(
+            doc,
+            "com.sun.star.text.Bookmark",
+            name,
+            range,
+            absorb
+        );
     }
 
     /**
      * Remove the named bookmark if it exists.
      */
     public static void removeIfExists(XTextDocument doc, String name)
-            throws
-            NoDocumentException,
-            WrappedTargetException {
-
+        throws NoDocumentException, WrappedTargetException {
         XNameAccess marks = UnoBookmark.getNameAccess(doc);
 
         if (marks.hasByName(name)) {
-            Optional<XTextContent> mark = UnoNameAccess.getTextContentByName(marks, name);
+            Optional<XTextContent> mark = UnoNameAccess.getTextContentByName(
+                marks,
+                name
+            );
             if (mark.isEmpty()) {
                 return;
             }

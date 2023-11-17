@@ -2,10 +2,8 @@ package org.jabref.logic.util;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +11,11 @@ import org.slf4j.LoggerFactory;
  * A dynamic web view store. This is used primarily to prevent UI freezes while constructing web view instances.
  */
 public class WebViewStore {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebViewStore.class);
-    private final static Queue<WebView> WEB_VIEWS = new ArrayDeque<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        WebViewStore.class
+    );
+    private static final Queue<WebView> WEB_VIEWS = new ArrayDeque<>();
     private static boolean isInitialized = false;
     private static Configuration config;
 
@@ -73,9 +74,9 @@ public class WebViewStore {
     }
 
     public record Configuration(
-            int numberOfPreloadedInstances,
-            int minimumNumberOfInstances) {
-
+        int numberOfPreloadedInstances,
+        int minimumNumberOfInstances
+    ) {
         /**
          * @return The number of web view instances to be loaded at application startup
          */

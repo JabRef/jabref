@@ -6,11 +6,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
 
 public class WorkspacePreferences {
+
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
@@ -22,25 +22,30 @@ public class WorkspacePreferences {
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
 
-    public WorkspacePreferences(Language language,
-                                boolean shouldOverrideDefaultFontSize,
-                                int mainFontSize,
-                                int defaultFontSize,
-                                Theme theme,
-                                boolean themeSyncOs,
-                                boolean shouldOpenLastEdited,
-                                boolean showAdvancedHints,
-                                boolean warnAboutDuplicatesInInspection,
-                                boolean confirmDelete) {
+    public WorkspacePreferences(
+        Language language,
+        boolean shouldOverrideDefaultFontSize,
+        int mainFontSize,
+        int defaultFontSize,
+        Theme theme,
+        boolean themeSyncOs,
+        boolean shouldOpenLastEdited,
+        boolean showAdvancedHints,
+        boolean warnAboutDuplicatesInInspection,
+        boolean confirmDelete
+    ) {
         this.language = new SimpleObjectProperty<>(language);
-        this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
+        this.shouldOverrideDefaultFontSize =
+            new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
-        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
+        this.shouldOpenLastEdited =
+            new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
-        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
+        this.warnAboutDuplicatesInInspection =
+            new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
     }
 
@@ -140,8 +145,12 @@ public class WorkspacePreferences {
         return warnAboutDuplicatesInInspection;
     }
 
-    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
-        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
+    public void setWarnAboutDuplicatesInInspection(
+        boolean warnAboutDuplicatesInInspection
+    ) {
+        this.warnAboutDuplicatesInInspection.set(
+                warnAboutDuplicatesInInspection
+            );
     }
 
     public boolean shouldConfirmDelete() {

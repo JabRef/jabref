@@ -1,15 +1,13 @@
 package org.jabref.logic.util;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import java.util.Optional;
-
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
-
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 
 /**
  * Filters change events and only relays major changes.
@@ -36,11 +34,17 @@ public class CoarseChangeFilter {
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
         if (event instanceof FieldChangedEvent fieldChange) {
             // If editing has started
-            boolean isNewEdit = lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
+            boolean isNewEdit =
+                lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
 
-            boolean isChangedField = lastFieldChanged.filter(f -> !f.equals(fieldChange.getField())).isPresent();
-            boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
-            boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
+            boolean isChangedField = lastFieldChanged
+                .filter(f -> !f.equals(fieldChange.getField()))
+                .isPresent();
+            boolean isChangedEntry = lastEntryChanged
+                .filter(e -> !e.equals(fieldChange.getBibEntry()))
+                .isPresent();
+            boolean isEditChanged =
+                !isNewEdit && (isChangedField || isChangedEntry);
             // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
             boolean isMajorChange = fieldChange.getMajorCharacterChange() > 1;
 

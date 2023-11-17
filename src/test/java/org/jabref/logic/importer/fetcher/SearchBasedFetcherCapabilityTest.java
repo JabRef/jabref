@@ -1,23 +1,21 @@
 package org.jabref.logic.importer.fetcher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Defines the set of capability tests that each tests a given search capability, e.g. author based search.
@@ -26,16 +24,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and b) the queries sent to the fetchers can be debugged directly without a route through to some fetcher code.
  */
 interface SearchBasedFetcherCapabilityTest {
-
     /**
      * Test whether the library API supports author field search.
      */
     @Test
     default void supportsAuthorSearch() throws Exception {
-        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        StringJoiner queryBuilder = new StringJoiner(
+            "\" AND author:\"",
+            "author:\"",
+            "\""
+        );
         getTestAuthors().forEach(queryBuilder::add);
 
-        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
+        List<BibEntry> result = getFetcher()
+            .performSearch(queryBuilder.toString());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
@@ -43,7 +45,12 @@ interface SearchBasedFetcherCapabilityTest {
             String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
 
             // The co-authors differ, thus we check for the author present at all papers
-            getTestAuthors().forEach(expectedAuthor -> Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
+            getTestAuthors()
+                .forEach(expectedAuthor ->
+                    Assertions.assertTrue(
+                        author.contains(expectedAuthor.replace("\"", ""))
+                    )
+                );
         });
     }
 
@@ -52,16 +59,21 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearSearch() throws Exception {
-        List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
+        List<BibEntry> result = getFetcher()
+            .performSearch("year:" + getTestYear());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
-        List<String> differentYearsInResult = result.stream()
-                                                    .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
-                                                    .filter(Optional::isPresent)
-                                                    .map(Optional::get)
-                                                    .distinct()
-                                                    .collect(Collectors.toList());
+        List<String> differentYearsInResult = result
+            .stream()
+            .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .distinct()
+            .collect(Collectors.toList());
 
-        assertEquals(Collections.singletonList(getTestYear().toString()), differentYearsInResult);
+        assertEquals(
+            Collections.singletonList(getTestYear().toString()),
+            differentYearsInResult
+        );
     }
 
     /**
@@ -71,14 +83,16 @@ interface SearchBasedFetcherCapabilityTest {
     default void supportsYearRangeSearch() throws Exception {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
-        List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
+        List<BibEntry> result = getFetcher()
+            .performSearch("year-range:2018-2020");
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
-        List<String> differentYearsInResult = result.stream()
-                                                    .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
-                                                    .filter(Optional::isPresent)
-                                                    .map(Optional::get)
-                                                    .distinct()
-                                                    .collect(Collectors.toList());
+        List<String> differentYearsInResult = result
+            .stream()
+            .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .distinct()
+            .collect(Collectors.toList());
         assertFalse(result.isEmpty());
         assertTrue(yearsInYearRange.containsAll(differentYearsInResult));
     }
@@ -91,13 +105,16 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsJournalSearch() throws Exception {
-        List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
+        List<BibEntry> result = getFetcher()
+            .performSearch("journal:\"" + getTestJournal() + "\"");
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
             assertTrue(bibEntry.hasField(StandardField.JOURNAL));
-            String journal = bibEntry.getField(StandardField.JOURNAL).orElse("");
+            String journal = bibEntry
+                .getField(StandardField.JOURNAL)
+                .orElse("");
             assertTrue(journal.contains(getTestJournal().replace("\"", "")));
         });
     }

@@ -1,12 +1,10 @@
 package org.jabref.gui.fieldeditors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -20,16 +18,24 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
-    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public LinkedEntriesEditorViewModel(
+        Field field,
+        SuggestionProvider<?> suggestionProvider,
+        BibDatabaseContext databaseContext,
+        FieldCheckers fieldCheckers,
+        UndoManager undoManager
+    ) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
-
         this.databaseContext = databaseContext;
-        linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
+        linkedEntries =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
         BindingsHelper.bindContentBidirectional(
-                linkedEntries,
-                text,
-                EntryLinkList::serialize,
-                newText -> EntryLinkList.parse(newText, databaseContext.getDatabase()));
+            linkedEntries,
+            text,
+            EntryLinkList::serialize,
+            newText ->
+                EntryLinkList.parse(newText, databaseContext.getDatabase())
+        );
     }
 
     public ListProperty<ParsedEntryLink> linkedEntriesProperty() {

@@ -1,22 +1,21 @@
 package org.jabref.gui.libraryproperties.constants;
 
-import java.util.regex.Pattern;
-
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import org.jabref.logic.l10n.Localization;
-
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import java.util.regex.Pattern;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import org.jabref.logic.l10n.Localization;
 
 public class ConstantsItemModel {
 
-    private final static Pattern IS_NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
+    private static final Pattern IS_NUMBER = Pattern.compile(
+        "-?\\d+(\\.\\d+)?"
+    );
 
     private final StringProperty labelProperty = new SimpleStringProperty();
     private final StringProperty contentProperty = new SimpleStringProperty();
@@ -29,9 +28,18 @@ public class ConstantsItemModel {
         this.labelProperty.setValue(label);
         this.contentProperty.setValue(content);
 
-        labelValidator = new FunctionBasedValidator<>(this.labelProperty, ConstantsItemModel::validateLabel);
-        contentValidator = new FunctionBasedValidator<>(this.contentProperty, ConstantsItemModel::validateContent);
-        combinedValidator = new CompositeValidator(labelValidator, contentValidator);
+        labelValidator =
+            new FunctionBasedValidator<>(
+                this.labelProperty,
+                ConstantsItemModel::validateLabel
+            );
+        contentValidator =
+            new FunctionBasedValidator<>(
+                this.contentProperty,
+                ConstantsItemModel::validateContent
+            );
+        combinedValidator =
+            new CompositeValidator(labelValidator, contentValidator);
     }
 
     public ValidationStatus labelValidation() {
@@ -66,13 +74,25 @@ public class ConstantsItemModel {
         if (input == null) {
             return ValidationMessage.error("May not be null");
         } else if (input.trim().isEmpty()) {
-            return ValidationMessage.error(Localization.lang("Please enter the string's label"));
+            return ValidationMessage.error(
+                Localization.lang("Please enter the string's label")
+            );
         } else if (IS_NUMBER.matcher(input).matches()) {
-            return ValidationMessage.error(Localization.lang("The label of the string cannot be a number."));
+            return ValidationMessage.error(
+                Localization.lang("The label of the string cannot be a number.")
+            );
         } else if (input.contains("#")) {
-            return ValidationMessage.error(Localization.lang("The label of the string cannot contain the '#' character."));
+            return ValidationMessage.error(
+                Localization.lang(
+                    "The label of the string cannot contain the '#' character."
+                )
+            );
         } else if (input.contains(" ")) {
-            return ValidationMessage.error(Localization.lang("The label of the string cannot contain spaces."));
+            return ValidationMessage.error(
+                Localization.lang(
+                    "The label of the string cannot contain spaces."
+                )
+            );
         } else {
             return null; // everything is ok
         }
@@ -80,9 +100,13 @@ public class ConstantsItemModel {
 
     private static ValidationMessage validateContent(String input) {
         if (input == null) {
-            return ValidationMessage.error(Localization.lang("Must not be empty!"));
+            return ValidationMessage.error(
+                Localization.lang("Must not be empty!")
+            );
         } else if (input.trim().isEmpty()) {
-            return ValidationMessage.error(Localization.lang("Must not be empty!"));
+            return ValidationMessage.error(
+                Localization.lang("Must not be empty!")
+            );
         } else {
             return null; // everything is ok
         }

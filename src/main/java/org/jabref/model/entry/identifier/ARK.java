@@ -16,6 +16,7 @@ import java.util.Optional;
  * </p>
  */
 public class ARK extends EprintIdentifier {
+
     private final String ark;
 
     private ARK(String ark) {
@@ -35,6 +36,8 @@ public class ARK extends EprintIdentifier {
 
     @Override
     public Optional<URI> getExternalURI() {
-        return Optional.of(URI.create("https://n2t.net/ark:/" + getNormalized()));
+        return Optional.of(
+            URI.create("https://n2t.net/ark:/" + getNormalized())
+        );
     }
 }

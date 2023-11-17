@@ -1,26 +1,24 @@
 package org.jabref.logic.formatter;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.jabref.logic.cleanup.Formatter;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import org.jabref.logic.formatter.minifier.TruncateFormatter;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.formatter.minifier.TruncateFormatter;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class FormatterTest {
 
@@ -28,9 +26,15 @@ class FormatterTest {
 
     @BeforeAll
     static void setUp() {
-        protectedTermsLoader = new ProtectedTermsLoader(
-                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
-                        Collections.emptyList(), Collections.emptyList()));
+        protectedTermsLoader =
+            new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(
+                    ProtectedTermsLoader.getInternalLists(),
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    Collections.emptyList()
+                )
+            );
     }
 
     /**
@@ -40,14 +44,21 @@ class FormatterTest {
     @Test
     public void allFormatterKeysAreUnique() {
         // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282
-        assertEquals(Collections.emptyList(),
-                getFormatters().collect(Collectors.groupingBy(
-                                       Formatter::getKey,
-                        Collectors.counting()))
-                               .entrySet().stream()
-                               .filter(e -> e.getValue() > 1)
-                               .map(Map.Entry::getKey)
-                               .collect(Collectors.toList()));
+        assertEquals(
+            Collections.emptyList(),
+            getFormatters()
+                .collect(
+                    Collectors.groupingBy(
+                        Formatter::getKey,
+                        Collectors.counting()
+                    )
+                )
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList())
+        );
     }
 
     @ParameterizedTest

@@ -9,7 +9,9 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
  * and removes other LaTeX commands without handling them.
  */
-public class LatexToUnicodeFormatter extends Formatter implements LayoutFormatter {
+public class LatexToUnicodeFormatter
+    extends Formatter
+    implements LayoutFormatter {
 
     @Override
     public String getName() {
@@ -28,7 +30,9 @@ public class LatexToUnicodeFormatter extends Formatter implements LayoutFormatte
 
     @Override
     public String getDescription() {
-        return Localization.lang("Converts LaTeX encoding to Unicode characters.");
+        return Localization.lang(
+            "Converts LaTeX encoding to Unicode characters."
+        );
     }
 
     @Override

@@ -7,7 +7,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
@@ -27,14 +26,17 @@ public class Password {
      * @param phrase Phrase which should be encrypted or decrypted
      * @param key    Key which is used to improve symmetric encryption
      */
-    public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    public Password(char[] phrase, String key)
+        throws NoSuchAlgorithmException, NoSuchPaddingException {
         this(new String(phrase), key);
     }
 
-    public Password(String phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    public Password(String phrase, String key)
+        throws NoSuchAlgorithmException, NoSuchPaddingException {
         this.phrase = phrase.getBytes();
         this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        this.secretKey = new SecretKeySpec(get128BitHash(key.getBytes()), "AES");
+        this.secretKey =
+            new SecretKeySpec(get128BitHash(key.getBytes()), "AES");
         this.ivSpec = new IvParameterSpec("ThisIsA128BitKey".getBytes());
     }
 
@@ -43,9 +45,13 @@ public class Password {
      *
      * @return Encrypted phrase/password
      */
-    public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
+    public String encrypt()
+        throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
-        return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), StandardCharsets.UTF_8);
+        return new String(
+            Base64.getEncoder().encode(cipher.doFinal(phrase)),
+            StandardCharsets.UTF_8
+        );
     }
 
     /**
@@ -53,15 +59,20 @@ public class Password {
      *
      * @return Decrypted phrase/password
      */
-    public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
+    public String decrypt()
+        throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
-        return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)), StandardCharsets.UTF_8);
+        return new String(
+            cipher.doFinal(Base64.getDecoder().decode(phrase)),
+            StandardCharsets.UTF_8
+        );
     }
 
     /**
      * Returns a 128 bit hash using SHA-256.
      */
-    private byte[] get128BitHash(byte[] byteArrayToHash) throws NoSuchAlgorithmException {
+    private byte[] get128BitHash(byte[] byteArrayToHash)
+        throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(byteArrayToHash);
         return Arrays.copyOf(messageDigest.digest(), 16); // return 128 bit

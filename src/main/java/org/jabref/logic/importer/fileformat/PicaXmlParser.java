@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
@@ -17,7 +15,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -27,18 +24,23 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class PicaXmlParser implements Parser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        PicaXmlParser.class
+    );
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream)
+        throws ParseException {
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder dbuild = DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
         } catch (
-                ParserConfigurationException |
-                SAXException |
-                IOException exception) {
+            ParserConfigurationException | SAXException | IOException exception
+        ) {
             throw new ParseException(exception);
         }
     }
@@ -49,7 +51,9 @@ public class PicaXmlParser implements Parser {
         // used for creating test cases
         // XMLUtil.printDocument(content);
 
-        Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
+        Element root = (Element) content
+            .getElementsByTagName("zs:searchRetrieveResponse")
+            .item(0);
         Element srwrecords = getChild("zs:records", root);
         if (srwrecords == null) {
             // no records found -> return empty list
@@ -290,7 +294,9 @@ public class PicaXmlParser implements Parser {
             }
 
             // Wenn eine Verlagsdiss vorliegt
-            if (entryType.equals(StandardEntryType.PhdThesis) && (isbn != null)) {
+            if (
+                entryType.equals(StandardEntryType.PhdThesis) && (isbn != null)
+            ) {
                 entryType = StandardEntryType.Book;
             }
 
@@ -309,8 +315,12 @@ public class PicaXmlParser implements Parser {
             }
 
             // URLs behandeln
-            if ("009P".equals(tag) && ("03".equals(datafield.getAttribute("occurrence"))
-                    || "05".equals(datafield.getAttribute("occurrence"))) && (url == null)) {
+            if (
+                "009P".equals(tag) &&
+                ("03".equals(datafield.getAttribute("occurrence")) ||
+                    "05".equals(datafield.getAttribute("occurrence"))) &&
+                (url == null)
+            ) {
                 url = getSubfield("a", datafield);
             }
         }
@@ -378,7 +388,8 @@ public class PicaXmlParser implements Parser {
             // there could be the edge case that the string is only one character long, therefore, this special treatment
             // this is Apache commons lang StringUtils.capitalize (https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringUtils.html#capitalize%28java.lang.String%29), but we don't want to add an additional dependency  ('org.apache.commons:commons-lang3:3.4')
             StringBuilder newSubtitle = new StringBuilder(
-                    Character.toString(Character.toUpperCase(subtitle.charAt(0))));
+                Character.toString(Character.toUpperCase(subtitle.charAt(0)))
+            );
             if (subtitle.length() > 1) {
                 newSubtitle.append(subtitle.substring(1));
             }
@@ -432,7 +443,9 @@ public class PicaXmlParser implements Parser {
 
         if ("article".equals(entryType.getName()) && (journal != null)) {
             result.setField(StandardField.JOURNAL, journal);
-        } else if ("incollection".equals(entryType.getName()) && (booktitle != null)) {
+        } else if (
+            "incollection".equals(entryType.getName()) && (booktitle != null)
+        ) {
             result.setField(StandardField.BOOKTITLE, booktitle);
         }
 

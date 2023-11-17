@@ -1,15 +1,13 @@
 package org.jabref.logic.integrity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Collections;
 import java.util.List;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TypeCheckerTest {
 
@@ -27,6 +25,15 @@ public class TypeCheckerTest {
     void proceedingsDoesNotHavePageNumbers() {
         entry = new BibEntry(StandardEntryType.Proceedings);
         entry.setField(StandardField.PAGES, "11--15");
-        assertEquals(List.of(new IntegrityMessage("wrong entry type as proceedings has page numbers", entry, StandardField.PAGES)), checker.check(entry));
+        assertEquals(
+            List.of(
+                new IntegrityMessage(
+                    "wrong entry type as proceedings has page numbers",
+                    entry,
+                    StandardField.PAGES
+                )
+            ),
+            checker.check(entry)
+        );
     }
 }

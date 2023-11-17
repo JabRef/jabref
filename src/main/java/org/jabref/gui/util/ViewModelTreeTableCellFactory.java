@@ -7,7 +7,6 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
-
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
 
@@ -16,35 +15,45 @@ import org.jabref.model.strings.StringUtil;
  *
  * @param <S> view model
  */
-public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColumn<S, S>, TreeTableCell<S, S>> {
+public class ViewModelTreeTableCellFactory<S>
+    implements Callback<TreeTableColumn<S, S>, TreeTableCell<S, S>> {
 
     private Callback<S, String> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<S, String> toTooltip;
 
-    public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
+    public ViewModelTreeTableCellFactory<S> withText(
+        Callback<S, String> toText
+    ) {
         this.toText = toText;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withGraphic(Callback<S, Node> toGraphic) {
+    public ViewModelTreeTableCellFactory<S> withGraphic(
+        Callback<S, Node> toGraphic
+    ) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withIcon(Callback<S, JabRefIcon> toIcon) {
+    public ViewModelTreeTableCellFactory<S> withIcon(
+        Callback<S, JabRefIcon> toIcon
+    ) {
         this.toGraphic = viewModel -> toIcon.call(viewModel).getGraphicNode();
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withTooltip(Callback<S, String> toTooltip) {
+    public ViewModelTreeTableCellFactory<S> withTooltip(
+        Callback<S, String> toTooltip
+    ) {
         this.toTooltip = toTooltip;
         return this;
     }
 
     public ViewModelTreeTableCellFactory<S> withOnMouseClickedEvent(
-            Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
+        Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent
+    ) {
         this.toOnMouseClickedEvent = toOnMouseClickedEvent;
         return this;
     }
@@ -74,7 +83,9 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                         }
                     }
                     if (toOnMouseClickedEvent != null) {
-                        setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
+                        setOnMouseClicked(
+                            toOnMouseClickedEvent.call(viewModel)
+                        );
                     }
                 }
             }
@@ -82,7 +93,9 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
     }
 
     public void install(TreeTableColumn<S, S> column) {
-        column.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
+        column.setCellValueFactory(cellData ->
+            cellData.getValue().valueProperty()
+        );
         column.setCellFactory(this);
     }
 }

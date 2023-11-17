@@ -5,7 +5,12 @@ import java.util.Objects;
 import java.util.Set;
 
 public class UserSpecificCommentField implements Field {
-    private static final Set<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM);
+
+    private static final Set<FieldProperty> PROPERTIES = EnumSet.of(
+        FieldProperty.COMMENT,
+        FieldProperty.MULTILINE_TEXT,
+        FieldProperty.VERBATIM
+    );
     private final String name;
 
     public UserSpecificCommentField(String username) {
@@ -46,8 +51,6 @@ public class UserSpecificCommentField implements Field {
 
     @Override
     public String toString() {
-        return "UnknownCommentField{" +
-                "name='" + name + '\'' +
-                '}';
+        return "UnknownCommentField{" + "name='" + name + '\'' + '}';
     }
 }

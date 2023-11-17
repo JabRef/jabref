@@ -1,16 +1,19 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
-
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 
 public class BibEntryRelationsRepository {
+
     private final SemanticScholarFetcher fetcher;
     private final BibEntryRelationsCache cache;
 
-    public BibEntryRelationsRepository(SemanticScholarFetcher fetcher, BibEntryRelationsCache cache) {
+    public BibEntryRelationsRepository(
+        SemanticScholarFetcher fetcher,
+        BibEntryRelationsCache cache
+    ) {
         this.fetcher = fetcher;
         this.cache = cache;
     }

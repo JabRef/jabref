@@ -10,17 +10,33 @@ import org.jabref.preferences.PreferencesService;
  * configured Kindle email
  */
 public class SendAsKindleEmailAction extends SendAsEMailAction {
+
     private final PreferencesService preferencesService;
 
-    public SendAsKindleEmailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager, TaskExecutor taskExecutor) {
+    public SendAsKindleEmailAction(
+        DialogService dialogService,
+        PreferencesService preferencesService,
+        StateManager stateManager,
+        TaskExecutor taskExecutor
+    ) {
         super(dialogService, preferencesService, stateManager, taskExecutor);
         this.preferencesService = preferencesService;
-        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager).and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)));
+        this.executable.bind(
+                ActionHelper
+                    .needsEntriesSelected(stateManager)
+                    .and(
+                        ActionHelper.hasLinkedFileForSelectedEntries(
+                            stateManager
+                        )
+                    )
+            );
     }
 
     @Override
     protected String getEmailAddress() {
-        return preferencesService.getExternalApplicationsPreferences().getKindleEmail();
+        return preferencesService
+            .getExternalApplicationsPreferences()
+            .getKindleEmail();
     }
 
     @Override

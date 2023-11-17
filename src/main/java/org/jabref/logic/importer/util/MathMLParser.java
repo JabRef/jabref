@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
@@ -16,13 +15,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MathMLParser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);
-    private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MathMLParser.class
+    );
+    private static final String XSLT_FILE_PATH =
+        "/xslt/mathml_latex/mmltex.xsl";
 
     /**
      * Parses the MathML element into its corresponding
@@ -43,10 +45,16 @@ public class MathMLParser {
             Source xmlSource = new StreamSource(new StringReader(xmlContent));
 
             URL xsltResource = MathMLParser.class.getResource(XSLT_FILE_PATH);
-            Source xsltSource = new StreamSource(Objects.requireNonNull(xsltResource).openStream(), xsltResource.toURI().toASCIIString());
+            Source xsltSource = new StreamSource(
+                Objects.requireNonNull(xsltResource).openStream(),
+                xsltResource.toURI().toASCIIString()
+            );
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer(xsltSource);
+            TransformerFactory transformerFactory =
+                TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer(
+                xsltSource
+            );
 
             StringWriter writer = new StringWriter();
             Result result = new StreamResult(writer);
@@ -66,4 +74,3 @@ public class MathMLParser {
         return latexResult;
     }
 }
-

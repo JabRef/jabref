@@ -13,7 +13,10 @@ public class AppendWordsStrategy implements AutoCompletionStrategy {
         return determinePrefixAndReturnRemainder(input, getDelimiter());
     }
 
-    private AutoCompletionInput determinePrefixAndReturnRemainder(String input, String delimiter) {
+    private AutoCompletionInput determinePrefixAndReturnRemainder(
+        String input,
+        String delimiter
+    ) {
         int index = input.toLowerCase(Locale.ROOT).lastIndexOf(delimiter);
         if (index >= 0) {
             String prefix = input.substring(0, index + delimiter.length());

@@ -1,7 +1,7 @@
 package org.jabref.gui.maintable.columns;
 
+import com.google.common.collect.MoreCollectors;
 import javafx.beans.value.ObservableValue;
-
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -10,8 +10,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.UnknownField;
-
-import com.google.common.collect.MoreCollectors;
 
 /**
  * A column that displays the text-value of the field
@@ -28,12 +26,15 @@ public class FieldColumn extends MainTableColumn<String> {
         setCellValueFactory(param -> getFieldValue(param.getValue()));
 
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                .withText(text -> text)
-                .install(this);
+            .withText(text -> text)
+            .install(this);
 
         if (fields.hasExactlyOne()) {
             // comparator can't parse more than one value
-            Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
+            Field field = fields
+                .getFields()
+                .stream()
+                .collect(MoreCollectors.onlyElement());
 
             if ((field instanceof UnknownField) || field.isNumeric()) {
                 this.setComparator(new NumericFieldComparator());
@@ -53,7 +54,9 @@ public class FieldColumn extends MainTableColumn<String> {
         return fields.getDisplayName();
     }
 
-    private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
+    private ObservableValue<String> getFieldValue(
+        BibEntryTableViewModel entry
+    ) {
         if (fields.isEmpty()) {
             return null;
         } else {

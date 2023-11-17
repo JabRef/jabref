@@ -1,11 +1,9 @@
 package org.jabref.gui.fieldeditors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
-
+import javax.swing.undo.UndoManager;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
@@ -21,24 +19,45 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
     private final TextInputControl textInput;
     private final UiThreadStringProperty decoratedStringProperty;
 
-    public PersonsEditor(final Field field,
-                         final SuggestionProvider<?> suggestionProvider,
-                         final PreferencesService preferencesService,
-                         final FieldCheckers fieldCheckers,
-                         final boolean isMultiLine,
-                         final UndoManager undoManager) {
-        this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferencesService.getAutoCompletePreferences(), fieldCheckers, undoManager);
+    public PersonsEditor(
+        final Field field,
+        final SuggestionProvider<?> suggestionProvider,
+        final PreferencesService preferencesService,
+        final FieldCheckers fieldCheckers,
+        final boolean isMultiLine,
+        final UndoManager undoManager
+    ) {
+        this.viewModel =
+            new PersonsEditorViewModel(
+                field,
+                suggestionProvider,
+                preferencesService.getAutoCompletePreferences(),
+                fieldCheckers,
+                undoManager
+            );
 
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
 
-        decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
+        decoratedStringProperty =
+            new UiThreadStringProperty(viewModel.textProperty());
         textInput.textProperty().bindBidirectional(decoratedStringProperty);
-        ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput));
+        ((ContextMenuAddable) textInput).initContextMenu(
+                EditorMenus.getNameMenu(textInput)
+            );
         this.getChildren().add(textInput);
 
-        AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
+        AutoCompletionTextInputBinding.autoComplete(
+            textInput,
+            viewModel::complete,
+            viewModel.getAutoCompletionConverter(),
+            viewModel.getAutoCompletionStrategy()
+        );
 
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
+        new EditorValidator(preferencesService)
+            .configureValidation(
+                viewModel.getFieldValidator().getValidationStatus(),
+                textInput
+            );
     }
 
     @Override

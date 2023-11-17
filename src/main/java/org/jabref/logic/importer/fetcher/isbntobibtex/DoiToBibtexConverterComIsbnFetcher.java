@@ -7,7 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
+import org.apache.http.client.utils.URIBuilder;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -19,18 +22,17 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
-
 /**
  * Fetcher for ISBN using <a href="https://doi-to-bibtex-converter.herokuapp.com">doi-to-bibtex-converter.herokuapp</a>.
  */
 public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
-    private static final String BASE_URL = "https://doi-to-bibtex-converter.herokuapp.com";
 
-    public DoiToBibtexConverterComIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
+    private static final String BASE_URL =
+        "https://doi-to-bibtex-converter.herokuapp.com";
+
+    public DoiToBibtexConverterComIsbnFetcher(
+        ImportFormatPreferences importFormatPreferences
+    ) {
         super(importFormatPreferences);
     }
 
@@ -40,14 +42,15 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
         return new URIBuilder(BASE_URL)
-                .setPathSegments("getInfo.php")
-                .setParameter("query", identifier)
-                .setParameter("format", "json")
-                .build()
-                .toURL();
+            .setPathSegments("getInfo.php")
+            .setParameter("query", identifier)
+            .setParameter("format", "json")
+            .build()
+            .toURL();
     }
 
     @Override
@@ -69,8 +72,7 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
-    }
+    public void doPostCleanup(BibEntry entry) {}
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
@@ -78,31 +80,60 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
             var type = getElementFromJSONArrayByKey(data, "type");
 
             BibEntry entry = new BibEntry(evaluateBibEntryTypeFromString(type));
-            entry.setField(StandardField.AUTHOR, getElementFromJSONArrayByKey(data, "author"));
-            entry.setField(StandardField.PAGES, getElementFromJSONArrayByKey(data, "pagecount"));
-            entry.setField(StandardField.ISBN, getElementFromJSONArrayByKey(data, "isbn"));
-            entry.setField(StandardField.TITLE, getElementFromJSONArrayByKey(data, "title"));
-            entry.setField(StandardField.YEAR, getElementFromJSONArrayByKey(data, "year"));
-            entry.setField(StandardField.MONTH, getElementFromJSONArrayByKey(data, "month"));
-            entry.setField(StandardField.DAY, getElementFromJSONArrayByKey(data, "day"));
+            entry.setField(
+                StandardField.AUTHOR,
+                getElementFromJSONArrayByKey(data, "author")
+            );
+            entry.setField(
+                StandardField.PAGES,
+                getElementFromJSONArrayByKey(data, "pagecount")
+            );
+            entry.setField(
+                StandardField.ISBN,
+                getElementFromJSONArrayByKey(data, "isbn")
+            );
+            entry.setField(
+                StandardField.TITLE,
+                getElementFromJSONArrayByKey(data, "title")
+            );
+            entry.setField(
+                StandardField.YEAR,
+                getElementFromJSONArrayByKey(data, "year")
+            );
+            entry.setField(
+                StandardField.MONTH,
+                getElementFromJSONArrayByKey(data, "month")
+            );
+            entry.setField(
+                StandardField.DAY,
+                getElementFromJSONArrayByKey(data, "day")
+            );
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException("CrossRef API JSON format has changed", exception);
+            throw new ParseException(
+                "CrossRef API JSON format has changed",
+                exception
+            );
         }
     }
 
-    private String getElementFromJSONArrayByKey(JSONArray jsonArray, String key) {
-        return IntStream.range(0, jsonArray.length())
-                        .mapToObj(jsonArray::getJSONObject)
-                        .map(obj -> obj.getString(key))
-                        .findFirst()
-                        .orElse("");
+    private String getElementFromJSONArrayByKey(
+        JSONArray jsonArray,
+        String key
+    ) {
+        return IntStream
+            .range(0, jsonArray.length())
+            .mapToObj(jsonArray::getJSONObject)
+            .map(obj -> obj.getString(key))
+            .findFirst()
+            .orElse("");
     }
 
     private StandardEntryType evaluateBibEntryTypeFromString(String type) {
-        return Stream.of(StandardEntryType.values())
-                     .filter(entryType -> entryType.name().equalsIgnoreCase(type))
-                     .findAny()
-                     .orElse(StandardEntryType.Book);
+        return Stream
+            .of(StandardEntryType.values())
+            .filter(entryType -> entryType.name().equalsIgnoreCase(type))
+            .findAny()
+            .orElse(StandardEntryType.Book);
     }
 }

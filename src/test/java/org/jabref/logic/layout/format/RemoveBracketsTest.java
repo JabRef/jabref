@@ -1,13 +1,13 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.jabref.logic.layout.LayoutFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class RemoveBracketsTest {
+
     private LayoutFormatter formatter;
 
     @BeforeEach
@@ -31,7 +31,8 @@ public class RemoveBracketsTest {
     }
 
     @Test
-    public void bracePairWithEscapedBackslashCorrectlyRemoved() throws Exception {
+    public void bracePairWithEscapedBackslashCorrectlyRemoved()
+        throws Exception {
         assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
     }
 

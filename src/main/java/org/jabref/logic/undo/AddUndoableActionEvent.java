@@ -5,7 +5,12 @@ package org.jabref.logic.undo;
  */
 public class AddUndoableActionEvent extends UndoChangeEvent {
 
-    public AddUndoableActionEvent(boolean canUndo, String undoDescription, boolean canRedo, String redoDescription) {
+    public AddUndoableActionEvent(
+        boolean canUndo,
+        String undoDescription,
+        boolean canRedo,
+        String redoDescription
+    ) {
         super(canUndo, undoDescription, canRedo, redoDescription);
     }
 }

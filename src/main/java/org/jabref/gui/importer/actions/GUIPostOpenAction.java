@@ -13,7 +13,6 @@ import org.jabref.logic.importer.ParserResult;
  * flexible manner.
  */
 public interface GUIPostOpenAction {
-
     /**
      * This method is queried in order to find out whether the action needs to be
      * performed or not.

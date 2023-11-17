@@ -65,7 +65,3 @@ public class ScholarArchiveQueryTransformer extends AbstractQueryTransformer {
         return "publication.startDate:[" + startYear + " TO " + endYear + "]";
     }
 }
-
-
-
-

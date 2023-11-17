@@ -11,10 +11,8 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.model.TreeNode;
 
 /**
@@ -22,7 +20,8 @@ import org.jabref.model.TreeNode;
  * Nodes with a common parent are added as direct children.
  * For example, the list { A > A1, A > A2, B } is transformed into the forest { A > A1, A2, B}.
  */
-public class TreeCollector<T> implements Collector<T, ObservableList<T>, ObservableList<T>> {
+public class TreeCollector<T>
+    implements Collector<T, ObservableList<T>, ObservableList<T>> {
 
     private Function<T, List<T>> getChildren;
     private BiConsumer<T, T> addChild;
@@ -33,17 +32,24 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
      * @param addChild    a function that adds the second argument as a child to the first-specified node
      * @param equivalence a function that tells us whether two nodes are equivalent
      */
-    private TreeCollector(Function<T, List<T>> getChildren, BiConsumer<T, T> addChild, BiPredicate<T, T> equivalence) {
+    private TreeCollector(
+        Function<T, List<T>> getChildren,
+        BiConsumer<T, T> addChild,
+        BiPredicate<T, T> equivalence
+    ) {
         this.getChildren = getChildren;
         this.addChild = addChild;
         this.equivalence = equivalence;
     }
 
-    public static <T extends TreeNode<T>> TreeCollector<T> mergeIntoTree(BiPredicate<T, T> equivalence) {
+    public static <T extends TreeNode<T>> TreeCollector<T> mergeIntoTree(
+        BiPredicate<T, T> equivalence
+    ) {
         return new TreeCollector<>(
-                TreeNode::getChildren,
-                (parent, child) -> child.moveTo(parent),
-                equivalence);
+            TreeNode::getChildren,
+            (parent, child) -> child.moveTo(parent),
+            equivalence
+        );
     }
 
     @Override
@@ -56,9 +62,9 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
         return (alreadyProcessed, newItem) -> {
             // Check if the node is already in the tree
             Optional<T> sameItemInTree = alreadyProcessed
-                    .stream()
-                    .filter(item -> equivalence.test(item, newItem))
-                    .findFirst();
+                .stream()
+                .filter(item -> equivalence.test(item, newItem))
+                .findFirst();
             if (sameItemInTree.isPresent()) {
                 for (T child : new ArrayList<>(getChildren.apply(newItem))) {
                     merge(sameItemInTree.get(), child);
@@ -71,9 +77,10 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
 
     private void merge(T target, T node) {
         Optional<T> sameItemInTree = getChildren
-                .apply(target).stream()
-                .filter(item -> equivalence.test(item, node))
-                .findFirst();
+            .apply(target)
+            .stream()
+            .filter(item -> equivalence.test(item, node))
+            .findFirst();
         if (sameItemInTree.isPresent()) {
             // We need to copy the list because the #addChild method might remove the child from its own parent
             for (T child : new ArrayList<>(getChildren.apply(node))) {
@@ -101,6 +108,9 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
 
     @Override
     public Set<Characteristics> characteristics() {
-        return EnumSet.of(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
+        return EnumSet.of(
+            Characteristics.UNORDERED,
+            Characteristics.IDENTITY_FINISH
+        );
     }
 }

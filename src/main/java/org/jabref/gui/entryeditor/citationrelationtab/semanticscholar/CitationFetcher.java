@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 import java.util.List;
-
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 
@@ -9,7 +8,6 @@ import org.jabref.model.entry.BibEntry;
  * Searches web resources for citing related articles based on a {@link BibEntry}.
  */
 public interface CitationFetcher {
-
     /**
      * Possible search methods
      */

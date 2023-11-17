@@ -6,5 +6,5 @@ package org.jabref.gui.util;
 public enum DroppingMouseLocation {
     BOTTOM,
     CENTER,
-    TOP
+    TOP,
 }

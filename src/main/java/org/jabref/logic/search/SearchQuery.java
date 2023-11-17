@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
@@ -39,14 +38,17 @@ public class SearchQuery implements SearchMatcher {
         JAVASCRIPT {
             @Override
             String format(String regex) {
-                return JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(regex).replaceAll("\\\\$0");
+                return JAVASCRIPT_ESCAPED_CHARS_PATTERN
+                    .matcher(regex)
+                    .replaceAll("\\\\$0");
             }
         };
 
         /**
          * Regex pattern for escaping special characters in javascript regular expressions
          */
-        private static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[.*+?^${}()|\\[\\]\\\\/]");
+        private static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN =
+            Pattern.compile("[.*+?^${}()|\\[\\]\\\\/]");
 
         /**
          * Attempt to escape all regex special characters.
@@ -61,7 +63,10 @@ public class SearchQuery implements SearchMatcher {
     private EnumSet<SearchRules.SearchFlags> searchFlags;
     private final SearchRule rule;
 
-    public SearchQuery(String query, EnumSet<SearchRules.SearchFlags> searchFlags) {
+    public SearchQuery(
+        String query,
+        EnumSet<SearchRules.SearchFlags> searchFlags
+    ) {
         this.query = Objects.requireNonNull(query);
         this.searchFlags = searchFlags;
         this.rule = SearchRules.getSearchRuleByQuery(query, searchFlags);
@@ -69,7 +74,12 @@ public class SearchQuery implements SearchMatcher {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s)", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription());
+        return String.format(
+            "\"%s\" (%s, %s)",
+            getQuery(),
+            getCaseSensitiveDescription(),
+            getRegularExpressionDescription()
+        );
     }
 
     @Override
@@ -102,10 +112,12 @@ public class SearchQuery implements SearchMatcher {
     }
 
     public String localize() {
-        return String.format("\"%s\" (%s, %s)",
-                getQuery(),
-                getLocalizedCaseSensitiveDescription(),
-                getLocalizedRegularExpressionDescription());
+        return String.format(
+            "\"%s\" (%s, %s)",
+            getQuery(),
+            getLocalizedCaseSensitiveDescription(),
+            getLocalizedRegularExpressionDescription()
+        );
     }
 
     private String getLocalizedCaseSensitiveDescription() {
@@ -182,12 +194,16 @@ public class SearchQuery implements SearchMatcher {
             // Reformat string when we are looking for a literal match
             joiner = joiner.map(escapeMode::format);
         }
-        String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
+        String searchPattern = joiner.collect(
+            Collectors.joining(")|(", "(", ")")
+        );
 
         if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
             return Optional.of(Pattern.compile(searchPattern));
         } else {
-            return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
+            return Optional.of(
+                Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE)
+            );
         }
     }
 

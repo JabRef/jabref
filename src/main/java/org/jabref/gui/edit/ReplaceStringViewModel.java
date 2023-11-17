@@ -2,12 +2,10 @@ package org.jabref.gui.edit;
 
 import java.util.Objects;
 import java.util.Set;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.NamedCompound;
@@ -18,6 +16,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class ReplaceStringViewModel extends AbstractViewModel {
+
     private boolean allFieldReplace;
     private String findString;
     private String replaceString;
@@ -27,7 +26,8 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private StringProperty findStringProperty = new SimpleStringProperty();
     private StringProperty replaceStringProperty = new SimpleStringProperty();
     private StringProperty fieldStringProperty = new SimpleStringProperty();
-    private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
+    private BooleanProperty allFieldReplaceProperty =
+        new SimpleBooleanProperty();
     private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
     public ReplaceStringViewModel(LibraryTab libraryTab) {
@@ -42,7 +42,9 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
-        final NamedCompound compound = new NamedCompound(Localization.lang("Replace string"));
+        final NamedCompound compound = new NamedCompound(
+            Localization.lang("Replace string")
+        );
         int counter = 0;
         if (selOnly) {
             for (BibEntry bibEntry : this.panel.getSelectedEntries()) {
@@ -74,7 +76,11 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         return counter;
     }
 
-    private int replaceField(BibEntry entry, Field field, NamedCompound compound) {
+    private int replaceField(
+        BibEntry entry,
+        Field field,
+        NamedCompound compound
+    ) {
         if (!entry.hasField(field)) {
             return 0;
         }

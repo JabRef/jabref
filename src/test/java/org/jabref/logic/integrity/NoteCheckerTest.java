@@ -1,15 +1,13 @@
 package org.jabref.logic.integrity;
 
-import java.util.Optional;
-
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.util.Optional;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class NoteCheckerTest {
 
@@ -43,7 +41,10 @@ public class NoteCheckerTest {
 
     @Test
     void bibLaTexAcceptsNoteWithFirstCapitalLetter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("Lorem ipsum"));
+        assertEquals(
+            Optional.empty(),
+            checkerBiblatex.checkValue("Lorem ipsum")
+        );
     }
 
     @Test
@@ -53,6 +54,9 @@ public class NoteCheckerTest {
 
     @Test
     void bibLaTexAcceptsFirstLowercaseLetter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
+        assertEquals(
+            Optional.empty(),
+            checkerBiblatex.checkValue("lorem ipsum")
+        );
     }
 }

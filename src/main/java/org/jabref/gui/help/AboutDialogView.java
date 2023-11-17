@@ -1,9 +1,10 @@
 package org.jabref.gui.help;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
-
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
@@ -12,29 +13,38 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
-
 public class AboutDialogView extends BaseDialog<Void> {
 
-    @FXML private ButtonType copyVersionButton;
-    @FXML private TextArea textAreaVersions;
+    @FXML
+    private ButtonType copyVersionButton;
 
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
-    @Inject private ClipBoardManager clipBoardManager;
-    @Inject private BuildInfo buildInfo;
+    @FXML
+    private TextArea textAreaVersions;
+
+    @Inject
+    private DialogService dialogService;
+
+    @Inject
+    private PreferencesService preferencesService;
+
+    @Inject
+    private ClipBoardManager clipBoardManager;
+
+    @Inject
+    private BuildInfo buildInfo;
 
     private AboutDialogViewModel viewModel;
 
     public AboutDialogView() {
         this.setTitle(Localization.lang("About JabRef"));
 
-        ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+        ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
+        ControlHelper.setAction(
+            copyVersionButton,
+            getDialogPane(),
+            event -> copyVersionToClipboard()
+        );
     }
 
     public AboutDialogViewModel getViewModel() {
@@ -43,7 +53,13 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new AboutDialogViewModel(dialogService, preferencesService, clipBoardManager, buildInfo);
+        viewModel =
+            new AboutDialogViewModel(
+                dialogService,
+                preferencesService,
+                clipBoardManager,
+                buildInfo
+            );
 
         textAreaVersions.setText(viewModel.getVersionInfo());
         this.setResizable(false);

@@ -13,7 +13,9 @@ public class LocalizationKeyParams {
         this.key = LocalizationKey.fromKey(key);
         this.params = Arrays.asList(params);
         if (this.params.size() > 10) {
-            throw new IllegalStateException("Translations can only have at most 10 parameters");
+            throw new IllegalStateException(
+                "Translations can only have at most 10 parameters"
+            );
         }
     }
 
@@ -22,7 +24,11 @@ public class LocalizationKeyParams {
 
         for (int i = 0; i < params.size(); i++) {
             String param = params.get(i);
-            translation = translation.replaceAll("%" + i, Matcher.quoteReplacement(param));
+            translation =
+                translation.replaceAll(
+                    "%" + i,
+                    Matcher.quoteReplacement(param)
+                );
         }
 
         return translation;

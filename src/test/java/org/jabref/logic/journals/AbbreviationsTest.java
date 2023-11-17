@@ -1,9 +1,9 @@
 package org.jabref.logic.journals;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AbbreviationsTest {
 
@@ -16,11 +16,17 @@ class AbbreviationsTest {
 
     @Test
     void getNextAbbreviationAbbreviatesJournalTitle() {
-        assertEquals("2D Mater.", repository.getNextAbbreviation("2D Materials").get());
+        assertEquals(
+            "2D Mater.",
+            repository.getNextAbbreviation("2D Materials").get()
+        );
     }
 
     @Test
     void getNextAbbreviationConvertsAbbreviationToDotlessAbbreviation() {
-        assertEquals("2D Mater", repository.getNextAbbreviation("2D Mater.").get());
+        assertEquals(
+            "2D Mater",
+            repository.getNextAbbreviation("2D Mater.").get()
+        );
     }
 }

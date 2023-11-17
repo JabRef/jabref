@@ -3,10 +3,8 @@ package org.jabref.model.metadata;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,9 @@ import org.slf4j.LoggerFactory;
  */
 public class SaveOrder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        SaveOrder.class
+    );
 
     private final OrderType orderType;
     private final List<SortCriterion> sortCriteria;
@@ -45,7 +45,10 @@ public class SaveOrder {
             orderType = OrderType.valueOf(data.get(0).toUpperCase());
         } catch (IllegalArgumentException ex) {
             if (data.size() > 1 && data.size() % 2 == 1) {
-                LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
+                LOGGER.warn(
+                    "Could not parse sort order: {} - trying to parse the sort criteria",
+                    data.get(0)
+                );
                 orderType = OrderType.SPECIFIED;
             } else {
                 LOGGER.warn("Could not parse sort order: {}", data.get(0));
@@ -58,7 +61,12 @@ public class SaveOrder {
 
         List<SortCriterion> sortCriteria = new ArrayList<>(data.size() / 2);
         for (int index = 1; index < data.size(); index = index + 2) {
-            sortCriteria.add(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
+            sortCriteria.add(
+                new SortCriterion(
+                    FieldFactory.parseField(data.get(index)),
+                    data.get(index + 1)
+                )
+            );
         }
         this.sortCriteria = sortCriteria;
     }
@@ -85,8 +93,10 @@ public class SaveOrder {
             return true;
         }
         if (o instanceof SaveOrder that) {
-            return Objects.equals(sortCriteria, that.sortCriteria) &&
-                    Objects.equals(orderType, that.orderType);
+            return (
+                Objects.equals(sortCriteria, that.sortCriteria) &&
+                Objects.equals(orderType, that.orderType)
+            );
         }
         return false;
     }
@@ -98,9 +108,14 @@ public class SaveOrder {
 
     @Override
     public String toString() {
-        return "SaveOrderConfig{" + "orderType=" + orderType.toString() +
-                ", sortCriteria=" + sortCriteria +
-                '}';
+        return (
+            "SaveOrderConfig{" +
+            "orderType=" +
+            orderType.toString() +
+            ", sortCriteria=" +
+            sortCriteria +
+            '}'
+        );
     }
 
     /**
@@ -147,9 +162,15 @@ public class SaveOrder {
 
         @Override
         public String toString() {
-            return "SortCriterion{" + "field='" + field + '\'' +
-                    ", descending=" + descending +
-                    '}';
+            return (
+                "SortCriterion{" +
+                "field='" +
+                field +
+                '\'' +
+                ", descending=" +
+                descending +
+                '}'
+            );
         }
 
         @Override
@@ -161,8 +182,10 @@ public class SaveOrder {
                 return false;
             }
             SortCriterion that = (SortCriterion) o;
-            return Objects.equals(descending, that.descending) &&
-                    Objects.equals(field, that.field);
+            return (
+                Objects.equals(descending, that.descending) &&
+                Objects.equals(field, that.field)
+            );
         }
 
         @Override
@@ -187,7 +210,10 @@ public class SaveOrder {
             return name;
         }
 
-        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+        public static SaveOrder.OrderType fromBooleans(
+            boolean saveInSpecifiedOrder,
+            boolean saveInOriginalOrder
+        ) {
             SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;
             if (saveInSpecifiedOrder) {
                 orderType = SaveOrder.OrderType.SPECIFIED;

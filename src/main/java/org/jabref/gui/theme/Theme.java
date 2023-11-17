@@ -12,7 +12,9 @@ import java.util.Optional;
 public class Theme {
 
     public enum Type {
-        DEFAULT, EMBEDDED, CUSTOM
+        DEFAULT,
+        EMBEDDED,
+        CUSTOM,
     }
 
     public static final String BASE_CSS = "Base.css";
@@ -40,7 +42,7 @@ public class Theme {
             }
         } else {
             this.additionalStylesheet = StyleSheet.create(name);
-             if (this.additionalStylesheet.isPresent()) {
+            if (this.additionalStylesheet.isPresent()) {
                 this.type = Type.CUSTOM;
                 this.name = name;
             } else {
@@ -111,9 +113,6 @@ public class Theme {
 
     @Override
     public String toString() {
-        return "Theme{" +
-                "type=" + type +
-                ", name='" + name + '\'' +
-                '}';
+        return "Theme{" + "type=" + type + ", name='" + name + '\'' + '}';
     }
 }

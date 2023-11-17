@@ -1,10 +1,5 @@
 package org.jabref.model.openoffice.uno;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyAttribute;
@@ -19,6 +14,10 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,19 +28,25 @@ import org.slf4j.LoggerFactory;
  */
 public class UnoUserDefinedProperty {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UnoUserDefinedProperty.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        UnoUserDefinedProperty.class
+    );
 
-    private UnoUserDefinedProperty() {
-    }
+    private UnoUserDefinedProperty() {}
 
-    public static Optional<XPropertyContainer> getPropertyContainer(XTextDocument doc) {
-        return UnoTextDocument.getDocumentProperties(doc).map(XDocumentProperties::getUserDefinedProperties);
+    public static Optional<XPropertyContainer> getPropertyContainer(
+        XTextDocument doc
+    ) {
+        return UnoTextDocument
+            .getDocumentProperties(doc)
+            .map(XDocumentProperties::getUserDefinedProperties);
     }
 
     public static List<String> getListOfNames(XTextDocument doc) {
-        return UnoUserDefinedProperty.getPropertyContainer(doc)
-                                      .map(UnoProperties::getPropertyNames)
-                                      .orElse(new ArrayList<>());
+        return UnoUserDefinedProperty
+            .getPropertyContainer(doc)
+            .map(UnoProperties::getPropertyNames)
+            .orElse(new ArrayList<>());
     }
 
     /**
@@ -49,16 +54,23 @@ public class UnoUserDefinedProperty {
      * @return The value of the property or Optional.empty()
      * These properties are used to store extra data about individual citation. In particular, the `pageInfo` part.
      */
-    public static Optional<String> getStringValue(XTextDocument doc, String property)
-            throws
-            WrappedTargetException {
-        Optional<XPropertySet> propertySet = UnoUserDefinedProperty.getPropertyContainer(doc)
-                                                                    .flatMap(UnoProperties::asPropertySet);
+    public static Optional<String> getStringValue(
+        XTextDocument doc,
+        String property
+    ) throws WrappedTargetException {
+        Optional<XPropertySet> propertySet = UnoUserDefinedProperty
+            .getPropertyContainer(doc)
+            .flatMap(UnoProperties::asPropertySet);
         if (propertySet.isEmpty()) {
-            throw new java.lang.IllegalArgumentException("getting UserDefinedProperties as XPropertySet failed");
+            throw new java.lang.IllegalArgumentException(
+                "getting UserDefinedProperties as XPropertySet failed"
+            );
         }
         try {
-            String value = propertySet.get().getPropertyValue(property).toString();
+            String value = propertySet
+                .get()
+                .getPropertyValue(property)
+                .toString();
             return Optional.ofNullable(value);
         } catch (UnknownPropertyException ex) {
             return Optional.empty();
@@ -69,27 +81,36 @@ public class UnoUserDefinedProperty {
      * @param property Name of a custom document property in the current document. Created if does not exist yet.
      * @param value    The value to be stored.
      */
-    public static void setStringProperty(XTextDocument doc, String property, String value)
-            throws
-            IllegalTypeException,
-            PropertyVetoException,
-            WrappedTargetException {
-
+    public static void setStringProperty(
+        XTextDocument doc,
+        String property,
+        String value
+    )
+        throws IllegalTypeException, PropertyVetoException, WrappedTargetException {
         Objects.requireNonNull(property);
         Objects.requireNonNull(value);
 
-        Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
+        Optional<XPropertyContainer> container =
+            UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
-            throw new java.lang.IllegalArgumentException("UnoUserDefinedProperty.getPropertyContainer failed");
+            throw new java.lang.IllegalArgumentException(
+                "UnoUserDefinedProperty.getPropertyContainer failed"
+            );
         }
 
-        Optional<XPropertySet> propertySet = container.flatMap(UnoProperties::asPropertySet);
+        Optional<XPropertySet> propertySet = container.flatMap(
+            UnoProperties::asPropertySet
+        );
         if (propertySet.isEmpty()) {
-            throw new java.lang.IllegalArgumentException("asPropertySet failed");
+            throw new java.lang.IllegalArgumentException(
+                "asPropertySet failed"
+            );
         }
 
-        XPropertySetInfo propertySetInfo = propertySet.get().getPropertySetInfo();
+        XPropertySetInfo propertySetInfo = propertySet
+            .get()
+            .getPropertySetInfo();
 
         if (propertySetInfo.hasPropertyByName(property)) {
             try {
@@ -101,9 +122,17 @@ public class UnoUserDefinedProperty {
         }
 
         try {
-            container.get().addProperty(property, PropertyAttribute.REMOVEABLE, new Any(Type.STRING, value));
+            container
+                .get()
+                .addProperty(
+                    property,
+                    PropertyAttribute.REMOVEABLE,
+                    new Any(Type.STRING, value)
+                );
         } catch (PropertyExistException ex) {
-            throw new java.lang.IllegalStateException("Caught PropertyExistException for property assumed not to exist");
+            throw new java.lang.IllegalStateException(
+                "Caught PropertyExistException for property assumed not to exist"
+            );
         }
     }
 
@@ -113,22 +142,27 @@ public class UnoUserDefinedProperty {
      *                 Logs warning if does not exist.
      */
     public static void remove(XTextDocument doc, String property)
-            throws
-            NotRemoveableException {
-
+        throws NotRemoveableException {
         Objects.requireNonNull(property);
 
-        Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
+        Optional<XPropertyContainer> container =
+            UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
-            throw new java.lang.IllegalArgumentException("getUserDefinedPropertiesAsXPropertyContainer failed");
+            throw new java.lang.IllegalArgumentException(
+                "getUserDefinedPropertiesAsXPropertyContainer failed"
+            );
         }
 
         try {
             container.get().removeProperty(property);
         } catch (UnknownPropertyException ex) {
-            LOGGER.warn(String.format("UnoUserDefinedProperty.remove(%s) This property was not there to remove",
-                    property));
+            LOGGER.warn(
+                String.format(
+                    "UnoUserDefinedProperty.remove(%s) This property was not there to remove",
+                    property
+                )
+            );
         }
     }
 
@@ -138,15 +172,16 @@ public class UnoUserDefinedProperty {
      *                 Keep silent if property did not exist.
      */
     public static void removeIfExists(XTextDocument doc, String property)
-            throws
-            NotRemoveableException {
-
+        throws NotRemoveableException {
         Objects.requireNonNull(property);
 
-        Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
+        Optional<XPropertyContainer> container =
+            UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
-            throw new java.lang.IllegalArgumentException("getUserDefinedPropertiesAsXPropertyContainer failed");
+            throw new java.lang.IllegalArgumentException(
+                "getUserDefinedPropertiesAsXPropertyContainer failed"
+            );
         }
 
         try {

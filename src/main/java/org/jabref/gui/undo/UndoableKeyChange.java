@@ -28,9 +28,11 @@ public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("change key from %0 to %1",
-                StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
-                StringUtil.boldHTML(newValue, Localization.lang("undefined")));
+        return Localization.lang(
+            "change key from %0 to %1",
+            StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
+            StringUtil.boldHTML(newValue, Localization.lang("undefined"))
+        );
     }
 
     @Override

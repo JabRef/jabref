@@ -8,7 +8,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
@@ -28,17 +29,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-
 /**
  * Fetches data from the INSPIRE database.
  */
-public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
+public class INSPIREFetcher
+    implements SearchBasedParserFetcher, EntryBasedFetcher {
 
-    private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
-    private static final String INSPIRE_DOI_HOST = "https://inspirehep.net/api/doi/";
-    private static final String INSPIRE_ARXIV_HOST = "https://inspirehep.net/api/arxiv/";
+    private static final String INSPIRE_HOST =
+        "https://inspirehep.net/api/literature/";
+    private static final String INSPIRE_DOI_HOST =
+        "https://inspirehep.net/api/doi/";
+    private static final String INSPIRE_ARXIV_HOST =
+        "https://inspirehep.net/api/arxiv/";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -57,9 +59,15 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery)
+        throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(INSPIRE_HOST);
-        uriBuilder.addParameter("q", new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter(
+            "q",
+            new DefaultLuceneQueryTransformer()
+                .transformLuceneQuery(luceneQuery)
+                .orElse("")
+        );
         return uriBuilder.build().toURL();
     }
 
@@ -73,12 +81,24 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     @Override
     public void doPostCleanup(BibEntry entry) {
         // Remove strange "SLACcitation" field
-        new FieldFormatterCleanup(new UnknownField("SLACcitation"), new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(
+            new UnknownField("SLACcitation"),
+            new ClearFormatter()
+        )
+            .cleanup(entry);
 
         // Remove braces around content of "title" field
-        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(
+            StandardField.TITLE,
+            new RemoveBracesFormatter()
+        )
+            .cleanup(entry);
 
-        new FieldFormatterCleanup(StandardField.TITLE, new LatexToUnicodeFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(
+            StandardField.TITLE,
+            new LatexToUnicodeFormatter()
+        )
+            .cleanup(entry);
     }
 
     @Override
@@ -87,14 +107,20 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry)
+        throws FetcherException {
         List<BibEntry> results = new ArrayList<>();
         Optional<String> doi = entry.getField(StandardField.DOI);
-        Optional<String> archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);
+        Optional<String> archiveprefix = entry.getFieldOrAlias(
+            StandardField.ARCHIVEPREFIX
+        );
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
         String url;
 
-        if (archiveprefix.filter("arxiv"::equals).isPresent() && eprint.isPresent()) {
+        if (
+            archiveprefix.filter("arxiv"::equals).isPresent() &&
+            eprint.isPresent()
+        ) {
             url = INSPIRE_ARXIV_HOST + eprint.get();
         } else if (doi.isPresent()) {
             url = INSPIRE_DOI_HOST + doi.get();
