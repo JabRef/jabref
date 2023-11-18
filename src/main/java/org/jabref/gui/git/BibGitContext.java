@@ -1,4 +1,4 @@
-package org.jabref.model.git;
+package org.jabref.model.database;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents everything related to a BIB file.
  *
- * <p> The entries are stored in Git, the other data in MetaData
+ * <p> The entries are stored in BibDatabase, the other data in MetaData
  * and the options relevant for this file in Defaults.
  * </p>
  * <p>
@@ -35,11 +35,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
-public class GitContext {
+public class BibGitContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
-    private final Git database;
     private MetaData metaData;
 
     /**
@@ -51,25 +50,25 @@ public class GitContext {
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
-    public GitContext() {
-        this(new Git());
+    public BibGitContext() {
+        this(new BibDatabase());
     }
 
-    public GitContext(Git database) {
+    public BibGitContext(BibDatabase database) {
         this(database, new MetaData());
     }
 
-    public GitContext(Git database, MetaData metaData) {
+    public BibGitContext(BibDatabase database, MetaData metaData) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public GitContext(Git database, MetaData metaData, Path path) {
+    public BibGitContext(BibDatabase database, MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public GitContext(Git database, MetaData metaData, Path path, DatabaseLocation location) {
+    public BibGitContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
         Objects.requireNonNull(location);
         this.path = path;
@@ -79,11 +78,11 @@ public class GitContext {
         }
     }
 
-    public GitMode getMode() {
-        return metaData.getMode().orElse(GitMode.BIBLATEX);
+    public BibDatabaseMode getMode() {
+        return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
-    public void setMode(GitMode bibDatabaseMode) {
+    public void setMode(BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
@@ -104,7 +103,7 @@ public class GitContext {
         this.path = null;
     }
 
-    public Git getDatabase() {
+    public BibDatabase getDatabase() {
         return database;
     }
 
@@ -117,7 +116,7 @@ public class GitContext {
     }
 
     public boolean isBiblatexMode() {
-        return getMode() == GitMode.BIBLATEX;
+        return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
     /**
@@ -254,7 +253,7 @@ public class GitContext {
 
     @Override
     public String toString() {
-        return "GitContext{" +
+        return "BibGitContext{" +
                 "metaData=" + metaData +
                 ", mode=" + getMode() +
                 ", databasePath=" + getDatabasePath() +

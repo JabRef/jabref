@@ -323,8 +323,11 @@ public class GitHandler {
             } catch (GitAPIException e) {
                 if (e.getMessage().equals("origin: not found")) {
                     LOGGER.info("No remote repository detected. Push skipped.");
+                } else if (e.getMessage().equals("HEAD is detached")) {
+                    throw new IOException("HEAD is detached");
                 } else {
                     LOGGER.info("Failed to pull");
+                    System.out.println(e.getMessage());
                     throw new RuntimeException(e);
                 }
             }

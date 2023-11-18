@@ -26,6 +26,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.git.GitCredentialsDialogView;
+import org.jabref.gui.git.GitChangesResolverDialog;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
@@ -337,8 +338,8 @@ public class SaveDatabaseAction {
         if (preferences.getGitPreferences().getAutoSync()) {
             try {
                 git.pullOnCurrentBranch();
-            } catch (IOException ex) {
-                if (ex.getMessage().equals("No git credentials")) {
+            } catch (IOException ex1) {
+                if (ex1.getMessage().equals("No git credentials")) {
                     GitCredentialsDialogView gitCredentialsDialogView = new GitCredentialsDialogView();
 
                     gitCredentialsDialogView.showGitCredentialsDialog();
@@ -349,9 +350,21 @@ public class SaveDatabaseAction {
                     );
 
                     git.setCredentialsProvider(credentialsProvider);
-                    git.pullOnCurrentBranch();
-                } else {
-                    throw new IOException(ex.getMessage());
+                    try {
+                        git.pullOnCurrentBranch();
+                    } catch (IOException ex2) {
+                        if (ex2.getMessage().equals("HEAD is detached")) {
+                            GitChangesResolverDialog GitChangesResolverDialog = new GitChangesResolverDialog(Path filePath);
+                        } else {
+                            throw new RuntimeException(ex2.getMessage());
+                        }
+                    }
+                    
+                } else if (ex1.getMessage().equals("HEAD is detached")) {
+                    GitChangesResolverDialog GitChangesResolverDialog = new GitChangesResolverDialog();
+                } 
+                else {
+                    throw new IOException(ex1.getMessage());
                 }
             }
             git.pushCommitsToRemoteRepository();
