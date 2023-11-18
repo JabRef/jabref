@@ -29,25 +29,18 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
-            } else if (
-                !incommand &&
-                ((currentCharacter == '{') || (currentCharacter == '}'))
-            ) {
+            } else if (!incommand && ((currentCharacter == '{') || (currentCharacter == '}'))) {
                 // Swallow the brace.
             } else if (
                 Character.isLetter(currentCharacter) ||
-                StringUtil.SPECIAL_COMMAND_CHARS.contains(
-                    String.valueOf(currentCharacter)
-                )
+                StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(currentCharacter))
             ) {
                 escaped = false;
                 if (incommand) {
                     currentCommand.append(currentCharacter);
                     if (
                         (currentCommand.length() == 1) &&
-                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
-                            currentCommand.toString()
-                        )
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
                     ) {
                         // This indicates that we are in a command of the type \^o or \~{n}
                         incommand = false;
@@ -67,15 +60,11 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
             } else {
                 if (
                     !incommand ||
-                    (!Character.isWhitespace(currentCharacter) &&
-                        (currentCharacter != '{'))
+                    (!Character.isWhitespace(currentCharacter) && (currentCharacter != '{'))
                 ) {
                     cleanedField.append(currentCharacter);
                 } else {
-                    if (
-                        !Character.isWhitespace(currentCharacter) &&
-                        (currentCharacter != '{')
-                    ) {
+                    if (!Character.isWhitespace(currentCharacter) && (currentCharacter != '{')) {
                         // do not append the opening brace of a command parameter
                         // do not append the whitespace character
                         cleanedField.append(currentCharacter);
@@ -84,9 +73,7 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
                         // eat up all whitespace characters
                         while (
                             currentFieldPosition + 1 < field.length() &&
-                            Character.isWhitespace(
-                                field.charAt(currentFieldPosition + 1)
-                            )
+                            Character.isWhitespace(field.charAt(currentFieldPosition + 1))
                         ) {
                             currentFieldPosition++;
                         }

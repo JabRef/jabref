@@ -28,9 +28,6 @@ class LanguageTest {
 
     @Test
     void convertToKnownLocaleNull() {
-        assertThrows(
-            NullPointerException.class,
-            () -> Language.convertToSupportedLocale(null)
-        );
+        assertThrows(NullPointerException.class, () -> Language.convertToSupportedLocale(null));
     }
 }

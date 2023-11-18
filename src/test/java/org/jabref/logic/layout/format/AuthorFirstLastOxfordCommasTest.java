@@ -18,10 +18,7 @@ public class AuthorFirstLastOxfordCommasTest {
         assertEquals("", a.format(""));
 
         // Single Names
-        assertEquals(
-            "Van Something Someone",
-            a.format("Someone, Van Something")
-        );
+        assertEquals("Van Something Someone", a.format("Someone, Van Something"));
 
         // Two names
         assertEquals(

@@ -45,41 +45,23 @@ public class KeyChangeListenerTest {
 
     @Test
     public void testCrossrefChanged() {
-        assertEquals(
-            Optional.of("Entry4"),
-            entry1.getField(StandardField.CROSSREF)
-        );
+        assertEquals(Optional.of("Entry4"), entry1.getField(StandardField.CROSSREF));
         entry4.setCitationKey("Banana");
-        assertEquals(
-            Optional.of("Banana"),
-            entry1.getField(StandardField.CROSSREF)
-        );
+        assertEquals(Optional.of("Banana"), entry1.getField(StandardField.CROSSREF));
     }
 
     @Test
     public void testRelatedChanged() {
-        assertEquals(
-            Optional.of("Entry1,Entry3"),
-            entry2.getField(StandardField.RELATED)
-        );
+        assertEquals(Optional.of("Entry1,Entry3"), entry2.getField(StandardField.RELATED));
         entry1.setCitationKey("Banana");
-        assertEquals(
-            Optional.of("Banana,Entry3"),
-            entry2.getField(StandardField.RELATED)
-        );
+        assertEquals(Optional.of("Banana,Entry3"), entry2.getField(StandardField.RELATED));
     }
 
     @Test
     public void testRelatedChangedInSameEntry() {
-        assertEquals(
-            Optional.of("Entry1,Entry2,Entry3"),
-            entry3.getField(StandardField.RELATED)
-        );
+        assertEquals(Optional.of("Entry1,Entry2,Entry3"), entry3.getField(StandardField.RELATED));
         entry3.setCitationKey("Banana");
-        assertEquals(
-            Optional.of("Entry1,Entry2,Banana"),
-            entry3.getField(StandardField.RELATED)
-        );
+        assertEquals(Optional.of("Entry1,Entry2,Banana"), entry3.getField(StandardField.RELATED));
     }
 
     @Test
@@ -97,10 +79,7 @@ public class KeyChangeListenerTest {
     @Test
     public void testRelatedEntryRemoved() {
         db.removeEntry(entry1);
-        assertEquals(
-            Optional.of("Entry3"),
-            entry2.getField(StandardField.RELATED)
-        );
+        assertEquals(Optional.of("Entry3"), entry2.getField(StandardField.RELATED));
     }
 
     @Test

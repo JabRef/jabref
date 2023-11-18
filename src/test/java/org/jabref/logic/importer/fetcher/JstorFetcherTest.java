@@ -36,10 +36,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
             "Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test"
         )
         .withField(StandardField.ISSN, "11763647, 14364522")
-        .withField(
-            StandardField.JOURNAL,
-            "Journal of Educational Technology & Society"
-        )
+        .withField(StandardField.JOURNAL, "Journal of Educational Technology & Society")
         .withField(
             StandardField.ABSTRACT,
             "ABSTRACT Test anxiety was a commonly known or assumed factor that could greatly influence performance of test takers. With the employment of designed questionnaires and computer-based spoken English test, this paper explored test anxiety manifestation of Chinese college students from both macro and micro aspects, and found out that the major anxiety in computer-based spoken English test was spoken English test anxiety, which consisted of test anxiety and communication apprehension. Regard to proximal test anxiety, the causes listed in proper order as low spoken English abilities, lack of speaking techniques, anxiety from the evaluative process and inadaptability with computer-based spoken English test format. As to distal anxiety causes, attitude toward learning spoken English and self-evaluation of speaking abilities were significantly negatively correlated with test anxiety. Besides, as test anxiety significantly associated often with test performance, a look at pedagogical implications has been discussed in this paper."
@@ -71,10 +68,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
         .withField(StandardField.NUMBER, "3")
         .withField(StandardField.PAGES, "225--236")
         .withField(StandardField.VOLUME, "106")
-        .withField(
-            StandardField.URL,
-            "http://www.jstor.org/stable/10.1086/501484"
-        )
+        .withField(StandardField.URL, "http://www.jstor.org/stable/10.1086/501484")
         .withField(StandardField.YEAR, "2006");
 
     @Test
@@ -101,21 +95,14 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
         );
         assertEquals(
             Optional.of(doiEntry),
-            fetcher.performSearchById(
-                "https://www.jstor.org/stable/10.1086/501484?seq=1"
-            )
+            fetcher.performSearchById("https://www.jstor.org/stable/10.1086/501484?seq=1")
         );
     }
 
     @Test
     void fetchPDF() throws Exception {
         Optional<URL> url = fetcher.findFullText(bibEntry);
-        assertEquals(
-            Optional.of(
-                new URL("https://www.jstor.org/stable/pdf/90002164.pdf")
-            ),
-            url
-        );
+        assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
     }
 
     @Override

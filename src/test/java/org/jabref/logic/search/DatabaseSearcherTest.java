@@ -48,11 +48,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testNoMatchesFromEmptyDatabaseWithInvalidSearchExpression() {
-        List<BibEntry> matches = new DatabaseSearcher(
-            INVALID_SEARCH_QUERY,
-            database
-        )
-            .getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(INVALID_SEARCH_QUERY, database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -121,10 +117,7 @@ public class DatabaseSearcherTest {
             )
         );
 
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(
-            query,
-            database
-        );
+        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
     }
@@ -142,8 +135,7 @@ public class DatabaseSearcherTest {
                 SearchRules.SearchFlags.REGULAR_EXPRESSION
             )
         );
-        List<BibEntry> matches = new DatabaseSearcher(query, database)
-            .getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(query, database).getMatches();
 
         assertEquals(Collections.singletonList(entry), matches);
     }
@@ -164,15 +156,9 @@ public class DatabaseSearcherTest {
                 SearchRules.SearchFlags.REGULAR_EXPRESSION
             )
         );
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(
-            query,
-            database
-        );
+        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertEquals(
-            Collections.singletonList(entry),
-            databaseSearcher.getMatches()
-        );
+        assertEquals(Collections.singletonList(entry), databaseSearcher.getMatches());
     }
 
     @Test
@@ -188,10 +174,7 @@ public class DatabaseSearcherTest {
                 SearchRules.SearchFlags.REGULAR_EXPRESSION
             )
         );
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(
-            query,
-            database
-        );
+        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
     }
@@ -208,10 +191,7 @@ public class DatabaseSearcherTest {
                 SearchRules.SearchFlags.REGULAR_EXPRESSION
             )
         );
-        DatabaseSearcher databaseSearcher = new DatabaseSearcher(
-            query,
-            database
-        );
+        DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
     }

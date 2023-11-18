@@ -76,10 +76,7 @@ public class MedlineFetcherTest {
                 .withField(StandardField.ISSN, "1472-6882")
                 .withField(new UnknownField("issn-linking"), "1472-6882")
                 .withField(StandardField.ISSUE, "1")
-                .withField(
-                    StandardField.JOURNAL,
-                    "BMC complementary and alternative medicine"
-                )
+                .withField(StandardField.JOURNAL, "BMC complementary and alternative medicine")
                 .withField(
                     StandardField.KEYWORDS,
                     "CAC; Dendrophtoe pentandra; IL-22; MPO; Proliferation; p53"
@@ -223,18 +220,14 @@ public class MedlineFetcherTest {
 
     @Test
     public void testWithLuceneQueryAuthorDate() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch(
-            "author:vigmond AND year:2021"
-        );
+        List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year:2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(18, entryList.size());
     }
 
     @Test
     public void testWithLuceneQueryAuthorDateRange() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch(
-            "author:vigmond AND year-range:2020-2021"
-        );
+        List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year-range:2020-2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(28, entryList.size());
     }
@@ -243,18 +236,13 @@ public class MedlineFetcherTest {
     public void testInvalidSearchTerm() throws Exception {
         assertThrows(
             FetcherClientException.class,
-            () ->
-                fetcher.performSearchById(
-                    "this.is.a.invalid.search.term.for.the.medline.fetcher"
-                )
+            () -> fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher")
         );
     }
 
     @Test
     public void testEmptyEntryList() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch(
-            "java is fantastic and awesome "
-        );
+        List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
         assertEquals(Collections.emptyList(), entryList);
     }
 

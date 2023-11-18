@@ -42,34 +42,20 @@ public class CitationsDisplay extends ListView<Citation> {
             basePath.set(item.getPath().getRoot());
         }
 
-        Node citationIcon =
-            IconTheme.JabRefIcons.LATEX_COMMENT.getGraphicNode();
-        Text contextText = new Text(
-            LatexToUnicodeAdapter.format(item.getContext())
-        );
-        contextText
-            .wrappingWidthProperty()
-            .bind(this.widthProperty().subtract(85));
+        Node citationIcon = IconTheme.JabRefIcons.LATEX_COMMENT.getGraphicNode();
+        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
+        contextText.wrappingWidthProperty().bind(this.widthProperty().subtract(85));
         HBox contextBox = new HBox(8, citationIcon, contextText);
         contextBox.getStyleClass().add("contextBox");
 
         Label fileNameLabel = new Label(
             String.format("%s", basePath.get().relativize(item.getPath()))
         );
-        fileNameLabel.setGraphic(
-            IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode()
-        );
+        fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());
         Label positionLabel = new Label(
-            String.format(
-                "(%s:%s-%s)",
-                item.getLine(),
-                item.getColStart(),
-                item.getColEnd()
-            )
+            String.format("(%s:%s-%s)", item.getLine(), item.getColStart(), item.getColEnd())
         );
-        positionLabel.setGraphic(
-            IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode()
-        );
+        positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());
         HBox dataBox = new HBox(5, fileNameLabel, positionLabel);
 
         return new VBox(contextBox, dataBox);

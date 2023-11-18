@@ -38,9 +38,7 @@ import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 
 public class Formatters {
 
-    private static final Pattern TRUNCATE_PATTERN = Pattern.compile(
-        "\\Atruncate\\d+\\z"
-    );
+    private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
 
     private Formatters() {}
 
@@ -116,10 +114,7 @@ public class Formatters {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
-            return getAll()
-                .stream()
-                .filter(f -> f.getKey().equals(modifier))
-                .findAny();
+            return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
         }
     }
 }

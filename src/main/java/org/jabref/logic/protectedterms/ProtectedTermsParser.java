@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProtectedTermsParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ProtectedTermsParser.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsParser.class);
 
     private final List<String> terms = new ArrayList<>();
     private String description = Localization.lang(
@@ -30,10 +28,7 @@ public class ProtectedTermsParser {
 
     private String location;
 
-    public void readTermsFromResource(
-        String resourceFileName,
-        String descriptionString
-    ) {
+    public void readTermsFromResource(String resourceFileName, String descriptionString) {
         try {
             Path path = Path.of(
                 Objects
@@ -87,10 +82,7 @@ public class ProtectedTermsParser {
         return line;
     }
 
-    public ProtectedTermsList getProtectTermsList(
-        boolean enabled,
-        boolean internal
-    ) {
+    public ProtectedTermsList getProtectTermsList(boolean enabled, boolean internal) {
         ProtectedTermsList termList = new ProtectedTermsList(
             description,
             terms,

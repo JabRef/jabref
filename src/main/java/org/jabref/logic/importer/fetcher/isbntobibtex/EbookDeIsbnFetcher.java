@@ -18,8 +18,7 @@ import org.jabref.model.entry.field.StandardField;
  */
 public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
 
-    private static final String BASE_URL =
-        "https://www.ebook.de/de/tools/isbn2bibtex";
+    private static final String BASE_URL = "https://www.ebook.de/de/tools/isbn2bibtex";
 
     public EbookDeIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
@@ -34,10 +33,7 @@ public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
     public URL getUrlForIdentifier(String identifier)
         throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
-        return new URIBuilder(BASE_URL)
-            .addParameter("isbn", identifier)
-            .build()
-            .toURL();
+        return new URIBuilder(BASE_URL).addParameter("isbn", identifier).build().toURL();
     }
 
     @Override
@@ -50,20 +46,11 @@ public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
         entry
             .getField(StandardField.PAGETOTAL)
             .ifPresent(pages ->
-                entry.setField(
-                    StandardField.PAGETOTAL,
-                    pages.replaceAll("[\\D]", "")
-                )
+                entry.setField(StandardField.PAGETOTAL, pages.replaceAll("[\\D]", ""))
             );
-        new FieldFormatterCleanup(
-            StandardField.PAGETOTAL,
-            new NormalizePagesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.AUTHOR,
-            new NormalizeNamesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter())
             .cleanup(entry);
     }
 }

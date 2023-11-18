@@ -12,15 +12,12 @@ import org.jabref.model.entry.field.StandardField;
 
 public class ISBN implements Identifier {
 
-    private static final Pattern ISBN_PATTERN = Pattern.compile(
-        "^(\\d{9}[\\dxX]|\\d{13})$"
-    );
+    private static final Pattern ISBN_PATTERN = Pattern.compile("^(\\d{9}[\\dxX]|\\d{13})$");
 
     private final String isbnString;
 
     public ISBN(String isbnString) {
-        this.isbnString =
-            Objects.requireNonNull(isbnString).trim().replace("-", "");
+        this.isbnString = Objects.requireNonNull(isbnString).trim().replace("-", "");
     }
 
     public static Optional<ISBN> parse(String input) {
@@ -104,9 +101,7 @@ public class ISBN implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(
-                new URI("https://www.worldcat.org/isbn/" + isbnString)
-            );
+            return Optional.of(new URI("https://www.worldcat.org/isbn/" + isbnString));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

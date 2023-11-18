@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
 
 class SlrGitHandlerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SlrGitHandlerTest.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandlerTest.class);
 
     @TempDir
     Path repositoryPath;
@@ -43,9 +41,7 @@ class SlrGitHandlerTest {
 
         gitHandler.checkoutBranch("branch1");
         Files.createDirectory(Path.of(repositoryPath.toString(), "TestFolder"));
-        Files.createFile(
-            Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt")
-        );
+        Files.createFile(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"));
         Files.writeString(
             Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"),
             "This is a new line of text\n"
@@ -56,17 +52,12 @@ class SlrGitHandlerTest {
         Files.writeString(
             Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"),
             "This is a new line of text 2\n" +
-            Files.readString(
-                Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt")
-            )
+            Files.readString(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"))
         );
         gitHandler.createCommitOnCurrentBranch("Commit 2 on branch1", false);
 
         LOGGER.debug(gitHandler.calculatePatchOfNewSearchResults("branch1"));
-        assertEquals(
-            expectedPatch,
-            gitHandler.calculatePatchOfNewSearchResults("branch1")
-        );
+        assertEquals(expectedPatch, gitHandler.calculatePatchOfNewSearchResults("branch1"));
     }
 
     @Test
@@ -104,10 +95,7 @@ class SlrGitHandlerTest {
         gitHandler.createCommitOnCurrentBranch("Commit on branch2.", false);
 
         gitHandler.checkoutBranch("branch1");
-        gitHandler.appendLatestSearchResultsOntoCurrentBranch(
-            "TestMessage",
-            "branch2"
-        );
+        gitHandler.appendLatestSearchResultsOntoCurrentBranch("TestMessage", "branch2");
 
         assertEquals(
             "This is a new line of text",

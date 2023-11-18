@@ -102,10 +102,7 @@ public class UnitsToLatexFormatter extends Formatter {
         }
 
         // Replace the hyphen in 12-bit etc with a non-breaking hyphen, will also avoid bad casing of 12-Bit
-        String result = text.replaceAll(
-            "([0-9,\\.]+)-([Bb][Ii][Tt])",
-            "$1\\\\mbox\\{-\\}$2"
-        );
+        String result = text.replaceAll("([0-9,\\.]+)-([Bb][Ii][Tt])", "$1\\\\mbox\\{-\\}$2");
 
         // Replace the space in 12 bit etc with a non-breaking space, will also avoid bad casing of 12 Bit
         result = result.replaceAll("([0-9,\\.]+) ([Bb][Ii][Tt])", "$1~$2");
@@ -113,18 +110,9 @@ public class UnitsToLatexFormatter extends Formatter {
         // For each word in the list
         for (String listOfWord : prefixUnitCombinations) {
             // Add {} if the character before is a space, -, /, (, [, or } or if it is at the start of the string but not if it is followed by a }
-            result =
-                result.replaceAll("([0-9])(" + listOfWord + ")", "$1\\{$2\\}"); // Only add brackets to keep case
-            result =
-                result.replaceAll(
-                    "([0-9])-(" + listOfWord + ")",
-                    "$1\\\\mbox\\{-\\}\\{$2\\}"
-                ); // Replace hyphen with non-break hyphen
-            result =
-                result.replaceAll(
-                    "([0-9]) (" + listOfWord + ")",
-                    "$1~\\{$2\\}"
-                ); // Replace space with a hard space
+            result = result.replaceAll("([0-9])(" + listOfWord + ")", "$1\\{$2\\}"); // Only add brackets to keep case
+            result = result.replaceAll("([0-9])-(" + listOfWord + ")", "$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
+            result = result.replaceAll("([0-9]) (" + listOfWord + ")", "$1~\\{$2\\}"); // Replace space with a hard space
         }
 
         return result;

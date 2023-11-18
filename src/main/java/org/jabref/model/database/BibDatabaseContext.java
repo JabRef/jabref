@@ -35,9 +35,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -65,11 +63,7 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(
-        BibDatabase database,
-        MetaData metaData,
-        Path path
-    ) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
@@ -135,15 +129,8 @@ public class BibDatabaseContext {
     public boolean isStudy() {
         return this.getDatabasePath()
             .map(path ->
-                path
-                    .getFileName()
-                    .toString()
-                    .equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
-                Files.exists(
-                    path.resolveSibling(
-                        StudyRepository.STUDY_DEFINITION_FILE_NAME
-                    )
-                )
+                path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME))
             )
             .orElse(false);
     }
@@ -174,34 +161,24 @@ public class BibDatabaseContext {
         // 1. Metadata user-specific directory
         metaData
             .getUserFileDirectory(preferences.getUserAndHost())
-            .ifPresent(userFileDirectory ->
-                fileDirs.add(getFileDirectoryPath(userFileDirectory))
-            );
+            .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
 
         // 2. Metadata general directory
         metaData
             .getDefaultFileDirectory()
-            .ifPresent(metaDataDirectory ->
-                fileDirs.add(getFileDirectoryPath(metaDataDirectory))
-            );
+            .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. BIB file directory or Main file directory
         // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
         // (in the metadata of the bib file)
-        if (
-            fileDirs.isEmpty() &&
-            preferences.shouldStoreFilesRelativeToBibFile()
-        ) {
+        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath()
                 .ifPresent(dbPath -> {
                     Path parentPath = dbPath.getParent();
                     if (parentPath == null) {
                         parentPath = Path.of(System.getProperty("user.dir"));
                     }
-                    Objects.requireNonNull(
-                        parentPath,
-                        "BibTeX database parent path is null"
-                    );
+                    Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
                     fileDirs.add(parentPath);
                 });
         } else {
@@ -209,10 +186,7 @@ public class BibDatabaseContext {
             preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
-        return fileDirs
-            .stream()
-            .map(Path::toAbsolutePath)
-            .collect(Collectors.toList());
+        return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
     }
 
     /**
@@ -221,10 +195,7 @@ public class BibDatabaseContext {
      * @return the path - or an empty optional, if none of the directories exists
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
-        return getFileDirectories(preferences)
-            .stream()
-            .filter(Files::exists)
-            .findFirst();
+        return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();
     }
 
     private Path getFileDirectoryPath(String directoryName) {
@@ -233,11 +204,7 @@ public class BibDatabaseContext {
         // the file path of this BIB file:
         Optional<Path> databaseFile = getDatabasePath();
         if (!directory.isAbsolute() && databaseFile.isPresent()) {
-            return databaseFile
-                .get()
-                .getParent()
-                .resolve(directory)
-                .normalize();
+            return databaseFile.get().getParent().resolve(directory).normalize();
         }
         return directory;
     }
@@ -264,10 +231,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (
-            Objects.nonNull(dbmsListener) &&
-            (location == DatabaseLocation.SHARED)
-        ) {
+        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
             dbmsListener.shutdown();
         }
@@ -284,15 +248,8 @@ public class BibDatabaseContext {
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            indexPath =
-                appData.resolve(
-                    String.valueOf(this.getDatabasePath().get().hashCode())
-                );
-            LOGGER.debug(
-                "Index path for {} is {}",
-                getDatabasePath().get(),
-                indexPath
-            );
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
         }
 

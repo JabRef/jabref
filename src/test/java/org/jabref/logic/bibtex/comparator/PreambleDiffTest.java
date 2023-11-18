@@ -12,26 +12,20 @@ import org.junit.jupiter.api.Test;
 
 public class PreambleDiffTest {
 
-    private final BibDatabaseContext originalDataBaseContext = mock(
-        BibDatabaseContext.class
-    );
-    private final BibDatabaseContext newDataBaseContext = mock(
-        BibDatabaseContext.class
-    );
+    private final BibDatabaseContext originalDataBaseContext = mock(BibDatabaseContext.class);
+    private final BibDatabaseContext newDataBaseContext = mock(BibDatabaseContext.class);
     private final BibDatabase originalDataBase = mock(BibDatabase.class);
     private final BibDatabase newDataBase = mock(BibDatabase.class);
 
     @BeforeEach
     void setUp() {
-        when(originalDataBaseContext.getDatabase())
-            .thenReturn(originalDataBase);
+        when(originalDataBaseContext.getDatabase()).thenReturn(originalDataBase);
         when(newDataBaseContext.getDatabase()).thenReturn(newDataBase);
     }
 
     @Test
     void compareSamePreambleTest() {
-        when(originalDataBase.getPreamble())
-            .thenReturn(Optional.of("preamble"));
+        when(originalDataBase.getPreamble()).thenReturn(Optional.of("preamble"));
         when(newDataBase.getPreamble()).thenReturn(Optional.of("preamble"));
 
         assertEquals(
@@ -42,10 +36,8 @@ public class PreambleDiffTest {
 
     @Test
     void compareDifferentPreambleTest() {
-        when(originalDataBase.getPreamble())
-            .thenReturn(Optional.of("preamble"));
-        when(newDataBase.getPreamble())
-            .thenReturn(Optional.of("otherPreamble"));
+        when(originalDataBase.getPreamble()).thenReturn(Optional.of("preamble"));
+        when(newDataBase.getPreamble()).thenReturn(Optional.of("otherPreamble"));
 
         Optional<PreambleDiff> expected = Optional.of(
             new PreambleDiff("preamble", "otherPreamble")

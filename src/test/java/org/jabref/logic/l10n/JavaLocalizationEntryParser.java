@@ -19,24 +19,19 @@ class JavaLocalizationEntryParser {
         "\\("
     );
 
-    private static final Pattern LOCALIZATION_MENU_START_PATTERN =
-        Pattern.compile(
-            "Localization" +
-            INFINITE_WHITESPACE +
-            DOT +
-            INFINITE_WHITESPACE +
-            "menuTitle" +
-            INFINITE_WHITESPACE +
-            "\\("
-        );
-    private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile(
-        "\\\\\""
+    private static final Pattern LOCALIZATION_MENU_START_PATTERN = Pattern.compile(
+        "Localization" +
+        INFINITE_WHITESPACE +
+        DOT +
+        INFINITE_WHITESPACE +
+        "menuTitle" +
+        INFINITE_WHITESPACE +
+        "\\("
     );
+    private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile("\\\\\"");
 
     private static final String QUOTATION_PLACEHOLDER = "QUOTATIONPLACEHOLDER";
-    private static final Pattern QUOTATION_SYMBOL_PATTERN = Pattern.compile(
-        QUOTATION_PLACEHOLDER
-    );
+    private static final Pattern QUOTATION_SYMBOL_PATTERN = Pattern.compile(QUOTATION_PLACEHOLDER);
 
     public static List<String> getLanguageKeysInString(
         String content,

@@ -20,8 +20,7 @@ import org.mockito.Answers;
 
 @Disabled("Page https://doi-to-bibtex-converter.herokuapp.com is down")
 @FetcherTest
-public class DoiToBibtexConverterComIsbnFetcherTest
-    extends AbstractIsbnFetcherTest {
+public class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @BeforeEach
     public void setUp() {
@@ -46,10 +45,7 @@ public class DoiToBibtexConverterComIsbnFetcherTest
     @Test
     @Override
     public void testName() {
-        assertEquals(
-            "ISBN (doi-to-bibtex-converter.herokuapp.com)",
-            fetcher.getName()
-        );
+        assertEquals("ISBN (doi-to-bibtex-converter.herokuapp.com)", fetcher.getName());
     }
 
     @Test
@@ -72,17 +68,12 @@ public class DoiToBibtexConverterComIsbnFetcherTest
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
             .withField(StandardField.TITLE, "Repository")
             .withField(StandardField.ISBN, "9783110702125")
-            .withField(
-                StandardField.AUTHOR,
-                "Hans-Joachim Habermann and Frank Leymann"
-            )
+            .withField(StandardField.AUTHOR, "Hans-Joachim Habermann and Frank Leymann")
             .withField(StandardField.PAGES, "294")
             .withField(StandardField.YEAR, "2020")
             .withField(StandardField.DAY, "12")
             .withField(StandardField.MONTH, "10");
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "9783110702125"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9783110702125");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -104,9 +95,6 @@ public class DoiToBibtexConverterComIsbnFetcherTest
 
     @Test
     public void searchByIdFailedWithShortISBN() throws FetcherException {
-        assertThrows(
-            FetcherClientException.class,
-            () -> fetcher.performSearchById("0321356683")
-        );
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("0321356683"));
     }
 }

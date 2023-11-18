@@ -85,10 +85,7 @@ class StringUtilTest {
     @Test
     void testGetCorrectFileName() {
         assertEquals("aa.bib", StringUtil.getCorrectFileName("aa", "bib"));
-        assertEquals(
-            ".login.bib",
-            StringUtil.getCorrectFileName(".login", "bib")
-        );
+        assertEquals(".login.bib", StringUtil.getCorrectFileName(".login", "bib"));
         assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "bib"));
         assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "BIB"));
         assertEquals("a.bib", StringUtil.getCorrectFileName("a", "bib"));
@@ -107,10 +104,7 @@ class StringUtilTest {
         assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{ABC}"));
         assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{{ABC}}"));
         assertEquals("{abc}", StringUtil.removeBracesAroundCapitals("{abc}"));
-        assertEquals(
-            "ABCDEF",
-            StringUtil.removeBracesAroundCapitals("{ABC}{DEF}")
-        );
+        assertEquals("ABCDEF", StringUtil.removeBracesAroundCapitals("{ABC}{DEF}"));
     }
 
     @Test
@@ -119,10 +113,7 @@ class StringUtilTest {
         assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("{ABC}"));
         assertEquals("abc", StringUtil.putBracesAroundCapitals("abc"));
         assertEquals("#ABC#", StringUtil.putBracesAroundCapitals("#ABC#"));
-        assertEquals(
-            "{ABC} def {EFG}",
-            StringUtil.putBracesAroundCapitals("ABC def EFG")
-        );
+        assertEquals("{ABC} def {EFG}", StringUtil.putBracesAroundCapitals("ABC def EFG"));
     }
 
     @Test
@@ -166,22 +157,13 @@ class StringUtilTest {
     @Test
     void testGetPart() {
         // Get word between braces
-        assertEquals(
-            "{makes}",
-            StringUtil.getPart("Practice {makes} perfect", 8, false)
-        );
+        assertEquals("{makes}", StringUtil.getPart("Practice {makes} perfect", 8, false));
         // When the string is empty and start Index equal zero
         assertEquals("", StringUtil.getPart("", 0, false));
         // When the word are in between close curly bracket
-        assertEquals(
-            "",
-            StringUtil.getPart("A closed mouth catches no }flies}", 25, false)
-        );
+        assertEquals("", StringUtil.getPart("A closed mouth catches no }flies}", 25, false));
         // Get the word from the end of the sentence
-        assertEquals(
-            "bite",
-            StringUtil.getPart("Barking dogs seldom bite", 19, true)
-        );
+        assertEquals("bite", StringUtil.getPart("Barking dogs seldom bite", 19, true));
     }
 
     @Test
@@ -204,20 +186,9 @@ class StringUtilTest {
             "aaaaa bbbbb" + newline + "\tccccc",
             StringUtil.wrap("aaaaa bbbbb ccccc", 11, newline)
         );
+        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12, newline));
         assertEquals(
-            "aaaaa bbbbb ccccc",
-            StringUtil.wrap("aaaaa bbbbb ccccc", 12, newline)
-        );
-        assertEquals(
-            "aaaaa" +
-            newline +
-            "\t" +
-            newline +
-            "\tbbbbb" +
-            newline +
-            "\t" +
-            newline +
-            "\tccccc",
+            "aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
             StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, newline)
         );
         assertEquals(
@@ -235,15 +206,7 @@ class StringUtilTest {
             StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, newline)
         );
         assertEquals(
-            "aaaaa" +
-            newline +
-            "\t" +
-            newline +
-            "\tbbbbb" +
-            newline +
-            "\t" +
-            newline +
-            "\tccccc",
+            "aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
             StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, newline)
         );
     }
@@ -320,26 +283,17 @@ class StringUtilTest {
 
     @Test
     void testIntValueOfExceptionIfStringContainsLetter() {
-        assertThrows(
-            NumberFormatException.class,
-            () -> StringUtil.intValueOf("12A2")
-        );
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf("12A2"));
     }
 
     @Test
     void testIntValueOfExceptionIfStringNull() {
-        assertThrows(
-            NumberFormatException.class,
-            () -> StringUtil.intValueOf(null)
-        );
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(null));
     }
 
     @Test
     void testIntValueOfExceptionfIfStringEmpty() {
-        assertThrows(
-            NumberFormatException.class,
-            () -> StringUtil.intValueOf("")
-        );
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(""));
     }
 
     @Test
@@ -351,18 +305,12 @@ class StringUtilTest {
 
     @Test
     void testIntValueOfWithNullLongString() {
-        assertEquals(
-            Optional.of(1234567890),
-            StringUtil.intValueOfOptional("1234567890")
-        );
+        assertEquals(Optional.of(1234567890), StringUtil.intValueOfOptional("1234567890"));
     }
 
     @Test
     void testIntValueOfWithNullStartWithZeros() {
-        assertEquals(
-            Optional.of(1234),
-            StringUtil.intValueOfOptional("001234")
-        );
+        assertEquals(Optional.of(1234), StringUtil.intValueOfOptional("001234"));
     }
 
     @Test
@@ -387,14 +335,8 @@ class StringUtilTest {
 
     @Test
     void testLimitStringLengthLimiting() {
-        assertEquals(
-            "TestTes...",
-            StringUtil.limitStringLength("TestTestTestTestTest", 10)
-        );
-        assertEquals(
-            10,
-            StringUtil.limitStringLength("TestTestTestTestTest", 10).length()
-        );
+        assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
+        assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
     }
 
     @Test
@@ -404,14 +346,8 @@ class StringUtilTest {
 
     @Test
     void testReplaceSpecialCharacters() {
-        assertEquals(
-            "Hallo Arger",
-            StringUtil.replaceSpecialCharacters("Hallo Arger")
-        );
-        assertEquals(
-            "aaAeoeeee",
-            StringUtil.replaceSpecialCharacters("åÄöéèë")
-        );
+        assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
+        assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
     }
 
     @Test
@@ -483,10 +419,7 @@ class StringUtilTest {
     @ParameterizedTest
     @MethodSource("getQuoteStringIfSpaceIsContainedData")
     void testGuoteStringIfSpaceIsContained(String expected, String source) {
-        assertEquals(
-            expected,
-            StringUtil.quoteStringIfSpaceIsContained(source)
-        );
+        assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
     }
 
     @Test

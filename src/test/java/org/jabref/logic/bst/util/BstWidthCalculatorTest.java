@@ -50,10 +50,7 @@ public class BstWidthCalculatorTest {
             Arguments.of(778, "{\\oe}"),
             Arguments.of(3390, "Hi {\\oe   }Hi "),
             Arguments.of(444, "{\\'e}"),
-            Arguments.of(
-                19762,
-                "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot"
-            ),
+            Arguments.of(19762, "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot"),
             Arguments.of(7861, "{\\'{E}}douard Masterly"),
             Arguments.of(
                 30514,

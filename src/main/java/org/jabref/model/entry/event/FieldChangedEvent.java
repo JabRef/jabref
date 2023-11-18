@@ -32,8 +32,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        this.majorCharacterChange =
-            computeMajorCharacterChange(oldValue, newValue);
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
     /**
@@ -41,33 +40,23 @@ public class FieldChangedEvent extends EntryChangedEvent {
      * @param field    Name of field which has been changed
      * @param newValue new field value
      */
-    public FieldChangedEvent(
-        BibEntry bibEntry,
-        Field field,
-        String newValue,
-        String oldValue
-    ) {
+    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue) {
         super(bibEntry);
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        this.majorCharacterChange =
-            computeMajorCharacterChange(oldValue, newValue);
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
     /**
      * @param location Location affected by this event
      */
-    public FieldChangedEvent(
-        FieldChange fieldChange,
-        EntriesEventSource location
-    ) {
+    public FieldChangedEvent(FieldChange fieldChange, EntriesEventSource location) {
         super(fieldChange.getEntry(), location);
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
-        this.majorCharacterChange =
-            computeMajorCharacterChange(oldValue, newValue);
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
@@ -82,10 +71,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
             return newValue.length();
         } else if ((newValue == null) && (oldValue != null)) {
             return oldValue.length();
-        } else if (
-            (oldValue.length() == newValue.length()) &&
-            !oldValue.equals(newValue)
-        ) {
+        } else if ((oldValue.length() == newValue.length()) && !oldValue.equals(newValue)) {
             return newValue.length();
         } else {
             return Math.abs(newValue.length() - oldValue.length());

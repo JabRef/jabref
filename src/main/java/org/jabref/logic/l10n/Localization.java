@@ -51,15 +51,10 @@ public class Localization {
      */
     public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
-            System.err.println(
-                "Messages are not initialized before accessing key: " + key
-            );
+            System.err.println("Messages are not initialized before accessing key: " + key);
             setLanguage(Language.ENGLISH);
         }
-        var stringParams = Arrays
-            .stream(params)
-            .map(Object::toString)
-            .toArray(String[]::new);
+        var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
         return lookup(localizedMessages, key, stringParams);
     }
 
@@ -70,9 +65,7 @@ public class Localization {
      * @param language Language identifier like "en", "de", etc.
      */
     public static void setLanguage(Language language) {
-        Optional<Locale> knownLanguage = Language.convertToSupportedLocale(
-            language
-        );
+        Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (knownLanguage.isEmpty()) {
             LoggerFactory
@@ -87,11 +80,7 @@ public class Localization {
         }
         // avoid reinitialization of the language bundles
         final Locale langLocale = knownLanguage.get();
-        if (
-            (locale != null) &&
-            locale.equals(langLocale) &&
-            locale.equals(defaultLocale)
-        ) {
+        if ((locale != null) && locale.equals(langLocale) && locale.equals(defaultLocale)) {
             return;
         }
         locale = langLocale;
@@ -134,14 +123,8 @@ public class Localization {
      * @param locale Localization to use.
      */
     private static void createResourceBundles(Locale locale) {
-        ResourceBundle messages = ResourceBundle.getBundle(
-            RESOURCE_PREFIX,
-            locale
-        );
-        Objects.requireNonNull(
-            messages,
-            "Could not load " + RESOURCE_PREFIX + " resource."
-        );
+        ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale);
+        Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
         localizedMessages = new LocalizationBundle(createLookupMap(messages));
     }
 
@@ -151,12 +134,8 @@ public class Localization {
      * @param baseBundle JabRef language bundle with keys and values for translations.
      * @return Lookup map for the baseBundle.
      */
-    private static Map<String, String> createLookupMap(
-        ResourceBundle baseBundle
-    ) {
-        final ArrayList<String> baseKeys = Collections.list(
-            baseBundle.getKeys()
-        );
+    private static Map<String, String> createLookupMap(ResourceBundle baseBundle) {
+        final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
         return new HashMap<>(
             baseKeys
                 .stream()
@@ -179,16 +158,10 @@ public class Localization {
      * @param params The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
      */
-    private static String lookup(
-        LocalizationBundle bundle,
-        String key,
-        String... params
-    ) {
+    private static String lookup(LocalizationBundle bundle, String key, String... params) {
         Objects.requireNonNull(key);
 
-        String translation = bundle.containsKey(key)
-            ? bundle.getString(key)
-            : "";
+        String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
             LoggerFactory
                 .getLogger(Localization.class)
@@ -199,8 +172,7 @@ public class Localization {
                 );
             translation = key;
         }
-        return new LocalizationKeyParams(translation, params)
-            .replacePlaceholders();
+        return new LocalizationKeyParams(translation, params).replacePlaceholders();
     }
 
     /**

@@ -12,14 +12,11 @@ import java.util.regex.Pattern;
  */
 public class LatexToUnicodeAdapter {
 
-    private static final Pattern UNDERSCORE_MATCHER = Pattern.compile(
-        "_(?!\\{)"
-    );
+    private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
 
     private static final String REPLACEMENT_CHAR = "\uFFFD";
 
-    private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER =
-        Pattern.compile(REPLACEMENT_CHAR);
+    private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
 
     /**
      * Attempts to resolve all LaTeX in the String.
@@ -29,8 +26,7 @@ public class LatexToUnicodeAdapter {
      */
     public static String format(String inField) {
         Objects.requireNonNull(inField);
-        return parse(inField)
-            .orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
+        return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
     }
 
     /**
@@ -41,16 +37,12 @@ public class LatexToUnicodeAdapter {
      */
     public static Optional<String> parse(String inField) {
         Objects.requireNonNull(inField);
-        String toFormat = UNDERSCORE_MATCHER
-            .matcher(inField)
-            .replaceAll(REPLACEMENT_CHAR);
+        String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
         var parsingResult = LaTeX2Unicode.parse(toFormat);
         if (parsingResult instanceof Parsed.Success) {
             String text = parsingResult.get().value();
             toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
-            return Optional.of(
-                UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_")
-            );
+            return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_"));
         }
         return Optional.empty();
     }

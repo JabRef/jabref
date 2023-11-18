@@ -33,9 +33,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseAwt("Requires AWT to send an email")
 public abstract class SendAsEMailAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SendAsEMailAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
@@ -67,17 +65,12 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     }
 
     private String sendEmail() throws Exception {
-        if (
-            !Desktop.isDesktopSupported() ||
-            stateManager.getActiveDatabase().isEmpty()
-        ) {
+        if (!Desktop.isDesktopSupported() || stateManager.getActiveDatabase().isEmpty()) {
             return Localization.lang("Error creating email");
         }
 
         if (stateManager.getSelectedEntries().isEmpty()) {
-            return Localization.lang(
-                "This operation requires one or more entries to be selected."
-            );
+            return Localization.lang("This operation requires one or more entries to be selected.");
         }
 
         List<BibEntry> entries = stateManager.getSelectedEntries();
@@ -116,14 +109,10 @@ public abstract class SendAsEMailAction extends SimpleCommand {
             .getExternalApplicationsPreferences()
             .shouldAutoOpenEmailAttachmentsFolder();
 
-        BibDatabaseContext databaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         List<Path> fileList = FileUtil.getListOfLinkedFiles(
             entries,
-            databaseContext.getFileDirectories(
-                preferencesService.getFilePreferences()
-            )
+            databaseContext.getFileDirectories(preferencesService.getFilePreferences())
         );
 
         List<String> attachments = new ArrayList<>();

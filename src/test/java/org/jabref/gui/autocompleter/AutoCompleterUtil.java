@@ -4,9 +4,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public class AutoCompleterUtil {
 
-    public static AutoCompletionBinding.ISuggestionRequest getRequest(
-        String text
-    ) {
+    public static AutoCompletionBinding.ISuggestionRequest getRequest(String text) {
         return new AutoCompletionBinding.ISuggestionRequest() {
             @Override
             public boolean isCancelled() {

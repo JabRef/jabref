@@ -20,10 +20,8 @@ public class PushToApplicationPreferences {
         String emacsArguments,
         String vimServer
     ) {
-        this.activeApplicationName =
-            new SimpleStringProperty(activeApplicationName);
-        this.commandPaths =
-            new SimpleMapProperty<>(FXCollections.observableMap(commandPaths));
+        this.activeApplicationName = new SimpleStringProperty(activeApplicationName);
+        this.commandPaths = new SimpleMapProperty<>(FXCollections.observableMap(commandPaths));
         this.emacsArguments = new SimpleStringProperty(emacsArguments);
         this.vimServer = new SimpleStringProperty(vimServer);
     }

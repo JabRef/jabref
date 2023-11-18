@@ -19,14 +19,9 @@ public class PushToTexShop extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.TEXSHOP;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PushToTexShop.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
-    public PushToTexShop(
-        DialogService dialogService,
-        PreferencesService preferencesService
-    ) {
+    public PushToTexShop(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 
@@ -41,11 +36,7 @@ public class PushToTexShop extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(
-        BibDatabaseContext database,
-        List<BibEntry> entries,
-        String keyString
-    ) {
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -57,13 +48,8 @@ public class PushToTexShop extends AbstractPushToApplication {
                 .get(this.getDisplayName());
 
         try {
-            LOGGER.debug(
-                "TexShop string: {}",
-                String.join(" ", getCommandLine(keyString))
-            );
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                getCommandLine(keyString)
-            );
+            LOGGER.debug("TexShop string: {}", String.join(" ", getCommandLine(keyString)));
+            ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(
@@ -78,11 +64,7 @@ public class PushToTexShop extends AbstractPushToApplication {
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException excep) {
-            LOGGER.warn(
-                "Error: Could not call executable '{}'",
-                commandPath,
-                excep
-            );
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
         }
     }
@@ -111,9 +93,7 @@ public class PushToTexShop extends AbstractPushToApplication {
         } else {
             dialogService.showInformationDialogAndWait(
                 Localization.lang("Push to application"),
-                Localization.lang(
-                    "Pushing citations to TeXShop is only possible on macOS!"
-                )
+                Localization.lang("Pushing citations to TeXShop is only possible on macOS!")
             );
             return new String[] {};
         }

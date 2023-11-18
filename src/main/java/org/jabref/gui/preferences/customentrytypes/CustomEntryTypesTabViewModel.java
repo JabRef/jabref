@@ -38,15 +38,13 @@ import org.jabref.preferences.PreferencesService;
 
 public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
-    private final ObservableList<Field> fieldsForAdding =
-        FXCollections.observableArrayList(
-            FieldFactory.getStandardFieldsWithCitationKey()
-        );
+    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(
+        FieldFactory.getStandardFieldsWithCitationKey()
+    );
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType =
         new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
-    private final ObjectProperty<Field> newFieldToAdd =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields =
         FXCollections.observableArrayList(extractor ->
             new Observable[] { extractor.entryType(), extractor.fields() }
@@ -86,21 +84,15 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 entryTypeToAdd,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(
-                    Localization.lang(
-                        "Entry type cannot be empty. Please enter a name."
-                    )
+                    Localization.lang("Entry type cannot be empty. Please enter a name.")
                 )
             );
         fieldValidator =
             new FunctionBasedValidator<>(
                 newFieldToAdd,
-                input ->
-                    (input != null) &&
-                    StringUtil.isNotBlank(input.getDisplayName()),
+                input -> (input != null) && StringUtil.isNotBlank(input.getDisplayName()),
                 ValidationMessage.error(
-                    Localization.lang(
-                        "Field cannot be empty. Please enter a name."
-                    )
+                    Localization.lang("Field cannot be empty. Please enter a name.")
                 )
             );
     }
@@ -110,20 +102,12 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         if (!this.entryTypesWithFields.isEmpty()) {
             this.entryTypesWithFields.clear();
         }
-        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(
-            bibDatabaseMode
-        );
+        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
-            if (
-                entryTypesManager.isCustomType(
-                    entryType.getType(),
-                    bibDatabaseMode
-                )
-            ) {
-                viewModel =
-                    new CustomEntryTypeViewModel(entryType, isMultiline);
+            if (entryTypesManager.isCustomType(entryType.getType(), bibDatabaseMode)) {
+                viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);
             } else {
                 viewModel = new EntryTypeViewModel(entryType, isMultiline);
             }
@@ -157,40 +141,26 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 .map(FieldViewModel::toBibField)
                 .collect(Collectors.toList());
 
-            BibEntryType newType = new BibEntryType(
-                type.getType(),
-                fields,
-                required
-            );
+            BibEntryType newType = new BibEntryType(type.getType(), fields, required);
             entryTypesManager.addCustomOrModifiedType(newType, bibDatabaseMode);
         }
 
         for (var entryType : entryTypesToDelete) {
-            entryTypesManager.removeCustomOrModifiedEntryType(
-                entryType,
-                bibDatabaseMode
-            );
+            entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 
-        preferencesService
-            .getFieldPreferences()
-            .setNonWrappableFields(multilineFields);
+        preferencesService.getFieldPreferences().setNonWrappableFields(multilineFields);
         preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
     public EntryTypeViewModel addNewCustomEntryType() {
-        EntryType newentryType = new UnknownEntryType(
-            entryTypeToAdd.getValue()
-        );
+        EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(
             newentryType,
             new ArrayList<>(),
             Collections.emptyList()
         );
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(
-            type,
-            isMultiline
-        );
+        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
         this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");
 
@@ -229,15 +199,11 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public boolean displayNameExists(String displayName) {
-        ObservableList<FieldViewModel> entryFields =
-            this.selectedEntryType.getValue().fields();
+        ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         return entryFields
             .stream()
             .anyMatch(fieldViewModel ->
-                fieldViewModel
-                    .displayNameProperty()
-                    .getValue()
-                    .equals(displayName)
+                fieldViewModel.displayNameProperty().getValue().equals(displayName)
             );
     }
 

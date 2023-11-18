@@ -19,8 +19,6 @@ public interface NamedRangeManager {
 
     List<String> getUsedNames(XTextDocument doc) throws NoDocumentException;
 
-    Optional<NamedRange> getNamedRangeFromDocument(
-        XTextDocument doc,
-        String markName
-    ) throws NoDocumentException, WrappedTargetException;
+    Optional<NamedRange> getNamedRangeFromDocument(XTextDocument doc, String markName)
+        throws NoDocumentException, WrappedTargetException;
 }

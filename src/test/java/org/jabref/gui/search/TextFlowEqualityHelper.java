@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class TextFlowEqualityHelper {
 
-    public static void assertEquals(
-        List<Text> expectedTexts,
-        TextFlow description
-    ) {
+    public static void assertEquals(List<Text> expectedTexts, TextFlow description) {
         if (expectedTexts.size() != description.getChildren().size()) {
             Assertions.assertEquals(expectedTexts, description.getChildren());
             return;
@@ -21,15 +18,8 @@ public class TextFlowEqualityHelper {
             // the strings contain not only the text but also the font and other properties
             // so comparing them compares the Text object as a whole
             // the equals method is not implemented...
-            if (
-                !expectedText
-                    .toString()
-                    .equals(description.getChildren().get(i).toString())
-            ) {
-                Assertions.assertEquals(
-                    expectedTexts,
-                    description.getChildren()
-                );
+            if (!expectedText.toString().equals(description.getChildren().get(i).toString())) {
+                Assertions.assertEquals(expectedTexts, description.getChildren());
                 return;
             }
         }

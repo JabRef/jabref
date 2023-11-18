@@ -89,26 +89,14 @@ public class FieldFormatterCleanupTest {
             fieldMap.get(StandardField.BOOKTITLE).toUpperCase(),
             entry.getField(StandardField.BOOKTITLE).get()
         );
-        assertEquals(
-            fieldMap.get(StandardField.YEAR),
-            entry.getField(StandardField.YEAR).get()
-        );
-        assertEquals(
-            fieldMap.get(StandardField.MONTH),
-            entry.getField(StandardField.MONTH).get()
-        );
+        assertEquals(fieldMap.get(StandardField.YEAR), entry.getField(StandardField.YEAR).get());
+        assertEquals(fieldMap.get(StandardField.MONTH), entry.getField(StandardField.MONTH).get());
         assertEquals(
             fieldMap.get(StandardField.ABSTRACT).toUpperCase(),
             entry.getField(StandardField.ABSTRACT).get()
         );
-        assertEquals(
-            fieldMap.get(StandardField.DOI),
-            entry.getField(StandardField.DOI).get()
-        );
-        assertEquals(
-            fieldMap.get(StandardField.ISSN),
-            entry.getField(StandardField.ISSN).get()
-        );
+        assertEquals(fieldMap.get(StandardField.DOI), entry.getField(StandardField.DOI).get());
+        assertEquals(fieldMap.get(StandardField.ISSN), entry.getField(StandardField.ISSN).get());
     }
 
     @Test
@@ -120,10 +108,7 @@ public class FieldFormatterCleanupTest {
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
 
-        assertEquals(
-            "François-Marie Arouet",
-            entry.getField(InternalField.KEY_FIELD).get()
-        );
+        assertEquals("François-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
     }
 
     @Test
@@ -135,10 +120,7 @@ public class FieldFormatterCleanupTest {
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
 
-        assertEquals(
-            "François-Marie Arouet",
-            entry.getField(InternalField.KEY_FIELD).get()
-        );
+        assertEquals("François-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
     }
 
     @Test
@@ -150,9 +132,6 @@ public class FieldFormatterCleanupTest {
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
 
-        assertEquals(
-            "Fran{\\c{c}}ois-Marie Arouet",
-            entry.getField(InternalField.KEY_FIELD).get()
-        );
+        assertEquals("Fran{\\c{c}}ois-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
     }
 }

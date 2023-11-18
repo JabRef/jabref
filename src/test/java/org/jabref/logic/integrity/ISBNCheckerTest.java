@@ -27,10 +27,7 @@ public class ISBNCheckerTest {
 
     @Test
     void isbnDoesNotAcceptRandomInput() {
-        assertNotEquals(
-            Optional.empty(),
-            checker.checkValue("Some other stuff")
-        );
+        assertNotEquals(Optional.empty(), checker.checkValue("Some other stuff"));
     }
 
     @Test
@@ -51,10 +48,7 @@ public class ISBNCheckerTest {
                 Optional.of(Localization.lang("incorrect control digit")),
                 "978-0-306-40615-2"
             ),
-            Arguments.of(
-                Optional.of(Localization.lang("incorrect format")),
-                "978_0_306_40615_7"
-            )
+            Arguments.of(Optional.of(Localization.lang("incorrect format")), "978_0_306_40615_7")
         );
     }
 }

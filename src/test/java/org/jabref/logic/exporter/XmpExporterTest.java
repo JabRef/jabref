@@ -37,11 +37,7 @@ public class XmpExporterTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Alan Turing");
 
-        exporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        exporter.export(databaseContext, file, Collections.singletonList(entry));
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected =
             """
@@ -65,8 +61,7 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void writeMultipleEntriesInASingleFile(@TempDir Path testFolder)
-        throws Exception {
+    public void writeMultipleEntriesInASingleFile(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
@@ -77,11 +72,7 @@ public class XmpExporterTest {
         entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
         entryArmbrust.setCitationKey("Armbrust2010");
 
-        exporter.export(
-            databaseContext,
-            file,
-            Arrays.asList(entryTuring, entryArmbrust)
-        );
+        exporter.export(databaseContext, file, Arrays.asList(entryTuring, entryArmbrust));
 
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
@@ -125,35 +116,24 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void writeMultipleEntriesInDifferentFiles(@TempDir Path testFolder)
-        throws Exception {
+    public void writeMultipleEntriesInDifferentFiles(@TempDir Path testFolder) throws Exception {
         // set path to the one where the exporter produces several files
-        Path file = testFolder.resolve(
-            XmpExporter.XMP_SPLIT_DIRECTORY_INDICATOR
-        );
+        Path file = testFolder.resolve(XmpExporter.XMP_SPLIT_DIRECTORY_INDICATOR);
         Files.createFile(file);
 
-        BibEntry entryTuring = new BibEntry()
-            .withField(StandardField.AUTHOR, "Alan Turing");
+        BibEntry entryTuring = new BibEntry().withField(StandardField.AUTHOR, "Alan Turing");
         BibEntry entryArmbrust = new BibEntry()
             .withField(StandardField.AUTHOR, "Michael Armbrust")
             .withCitationKey("Armbrust2010");
 
-        exporter.export(
-            databaseContext,
-            file,
-            List.of(entryTuring, entryArmbrust)
-        );
+        exporter.export(databaseContext, file, List.of(entryTuring, entryArmbrust));
 
         // Nothing written in given file
         List<String> lines = Files.readAllLines(file);
         assertEquals(Collections.emptyList(), lines);
 
         // turing contains the turing entry only
-        Path fileTuring = Path.of(
-            file.getParent().toString(),
-            entryTuring.getId() + "_null.xmp"
-        );
+        Path fileTuring = Path.of(file.getParent().toString(), entryTuring.getId() + "_null.xmp");
         // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String actualTuring = String.join("\n", Files.readAllLines(fileTuring));
         String expectedTuring =
@@ -182,10 +162,7 @@ public class XmpExporterTest {
             entryArmbrust.getId() + "_Armbrust2010.xmp"
         );
         // we are using \n to join, so we need it in the expected string as well, \r\n would fail
-        String actualArmbrust = String.join(
-            "\n",
-            Files.readAllLines(fileArmbrust)
-        );
+        String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust));
         String expectedArmbrust =
             """
               <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -213,27 +190,17 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder)
-        throws Exception {
+    public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
         when(xmpPreferences.getXmpPrivacyFilter())
-            .thenReturn(
-                FXCollections.observableSet(
-                    Collections.singleton(StandardField.AUTHOR)
-                )
-            );
+            .thenReturn(FXCollections.observableSet(Collections.singleton(StandardField.AUTHOR)));
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.AUTHOR, "Alan Turing");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Alan Turing");
 
-        exporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        exporter.export(databaseContext, file, Collections.singletonList(entry));
 
         String actual = String.join("\n", Files.readAllLines(file));
         String expected =

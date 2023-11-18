@@ -13,9 +13,7 @@ import org.jabref.logic.l10n.Localization;
 
 public class ConstantsItemModel {
 
-    private static final Pattern IS_NUMBER = Pattern.compile(
-        "-?\\d+(\\.\\d+)?"
-    );
+    private static final Pattern IS_NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
 
     private final StringProperty labelProperty = new SimpleStringProperty();
     private final StringProperty contentProperty = new SimpleStringProperty();
@@ -29,17 +27,10 @@ public class ConstantsItemModel {
         this.contentProperty.setValue(content);
 
         labelValidator =
-            new FunctionBasedValidator<>(
-                this.labelProperty,
-                ConstantsItemModel::validateLabel
-            );
+            new FunctionBasedValidator<>(this.labelProperty, ConstantsItemModel::validateLabel);
         contentValidator =
-            new FunctionBasedValidator<>(
-                this.contentProperty,
-                ConstantsItemModel::validateContent
-            );
-        combinedValidator =
-            new CompositeValidator(labelValidator, contentValidator);
+            new FunctionBasedValidator<>(this.contentProperty, ConstantsItemModel::validateContent);
+        combinedValidator = new CompositeValidator(labelValidator, contentValidator);
     }
 
     public ValidationStatus labelValidation() {
@@ -74,24 +65,18 @@ public class ConstantsItemModel {
         if (input == null) {
             return ValidationMessage.error("May not be null");
         } else if (input.trim().isEmpty()) {
-            return ValidationMessage.error(
-                Localization.lang("Please enter the string's label")
-            );
+            return ValidationMessage.error(Localization.lang("Please enter the string's label"));
         } else if (IS_NUMBER.matcher(input).matches()) {
             return ValidationMessage.error(
                 Localization.lang("The label of the string cannot be a number.")
             );
         } else if (input.contains("#")) {
             return ValidationMessage.error(
-                Localization.lang(
-                    "The label of the string cannot contain the '#' character."
-                )
+                Localization.lang("The label of the string cannot contain the '#' character.")
             );
         } else if (input.contains(" ")) {
             return ValidationMessage.error(
-                Localization.lang(
-                    "The label of the string cannot contain spaces."
-                )
+                Localization.lang("The label of the string cannot contain spaces.")
             );
         } else {
             return null; // everything is ok
@@ -100,13 +85,9 @@ public class ConstantsItemModel {
 
     private static ValidationMessage validateContent(String input) {
         if (input == null) {
-            return ValidationMessage.error(
-                Localization.lang("Must not be empty!")
-            );
+            return ValidationMessage.error(Localization.lang("Must not be empty!"));
         } else if (input.trim().isEmpty()) {
-            return ValidationMessage.error(
-                Localization.lang("Must not be empty!")
-            );
+            return ValidationMessage.error(Localization.lang("Must not be empty!"));
         } else {
             return null; // everything is ok
         }

@@ -44,12 +44,9 @@ class SourceTabTest {
     @Start
     public void onStart(Stage stage) {
         area = new CodeArea();
-        area.appendText(
-            "some example\n text to go here\n across a couple of \n lines...."
-        );
+        area.appendText("some example\n text to go here\n across a couple of \n lines....");
         StateManager stateManager = mock(StateManager.class);
-        when(stateManager.activeSearchQueryProperty())
-            .thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(
             Collections.emptyList(),
             Collections.emptyList()
@@ -58,10 +55,7 @@ class SourceTabTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields())
             .thenReturn(FXCollections.emptyObservableList());
@@ -110,9 +104,7 @@ class SourceTabTest {
         // Switch to different tab & update entry
         robot.interact(() -> pane.getSelectionModel().select(1));
         robot.interact(() -> stage.setWidth(600));
-        robot.interact(() ->
-            entry.setField(new UnknownField("test"), "new value")
-        );
+        robot.interact(() -> entry.setField(new UnknownField("test"), "new value"));
 
         // No exception should be thrown
         robot.interrupt(100);

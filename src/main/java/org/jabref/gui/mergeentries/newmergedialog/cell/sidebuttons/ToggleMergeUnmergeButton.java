@@ -17,15 +17,12 @@ import org.jabref.model.entry.field.Field;
 
 public class ToggleMergeUnmergeButton extends Button {
 
-    private final ObjectProperty<FieldState> fieldState =
-        new SimpleObjectProperty<>(FieldState.UNMERGED);
-    private final BooleanProperty canMerge = new SimpleBooleanProperty(
-        Boolean.TRUE
+    private final ObjectProperty<FieldState> fieldState = new SimpleObjectProperty<>(
+        FieldState.UNMERGED
     );
+    private final BooleanProperty canMerge = new SimpleBooleanProperty(Boolean.TRUE);
 
-    private final ActionFactory actionFactory = new ActionFactory(
-        Globals.getKeyPrefs()
-    );
+    private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
 
     private final Field field;
 
@@ -40,20 +37,12 @@ public class ToggleMergeUnmergeButton extends Button {
 
     private void configureMergeButton() {
         ToggleMergeCommand mergeCommand = new ToggleMergeCommand();
-        actionFactory.configureIconButton(
-            mergeCommand.mergeAction,
-            mergeCommand,
-            this
-        );
+        actionFactory.configureIconButton(mergeCommand.mergeAction, mergeCommand, this);
     }
 
     private void configureUnmergeButton() {
         ToggleMergeCommand unmergeCommand = new ToggleMergeCommand();
-        actionFactory.configureIconButton(
-            unmergeCommand.unmergeAction,
-            unmergeCommand,
-            this
-        );
+        actionFactory.configureIconButton(unmergeCommand.unmergeAction, unmergeCommand, this);
     }
 
     public ObjectProperty<FieldState> fieldStateProperty() {

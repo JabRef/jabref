@@ -19,8 +19,7 @@ public class BibDatabaseFilesTest {
 
     @BeforeEach
     public void setUp() {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -29,21 +28,14 @@ public class BibDatabaseFilesTest {
             FileInputStream stream = new FileInputStream(
                 "src/test/resources/org/jabref/util/twente.bib"
             );
-            InputStreamReader fr = new InputStreamReader(
-                stream,
-                StandardCharsets.UTF_8
-            )
+            InputStreamReader fr = new InputStreamReader(stream, StandardCharsets.UTF_8)
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(fr);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 
             BibDatabase db = result.getDatabase();
 
             assertEquals("Arvind", db.resolveForStrings("#Arvind#"));
-            assertEquals(
-                "Patterson, David",
-                db.resolveForStrings("#Patterson#")
-            );
+            assertEquals("Patterson, David", db.resolveForStrings("#Patterson#"));
             assertEquals(
                 "Arvind and Patterson, David",
                 db.resolveForStrings("#Arvind# and #Patterson#")

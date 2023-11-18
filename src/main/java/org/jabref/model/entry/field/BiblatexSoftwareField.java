@@ -43,20 +43,13 @@ public enum BiblatexSoftwareField implements Field {
         this.properties = EnumSet.of(first, rest);
     }
 
-    BiblatexSoftwareField(
-        String name,
-        FieldProperty first,
-        FieldProperty... rest
-    ) {
+    BiblatexSoftwareField(String name, FieldProperty first, FieldProperty... rest) {
         this.name = name;
         this.displayName = null;
         this.properties = EnumSet.of(first, rest);
     }
 
-    public static <T> Optional<BiblatexSoftwareField> fromName(
-        T type,
-        String name
-    ) {
+    public static <T> Optional<BiblatexSoftwareField> fromName(T type, String name) {
         if (!(type instanceof BiblatexSoftwareEntryType)) {
             return Optional.empty();
         }

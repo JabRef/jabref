@@ -21,12 +21,9 @@ import org.jabref.logic.importer.fileformat.PicaXmlParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-public class GvkFetcher
-    extends AbstractIsbnFetcher
-    implements SearchBasedParserFetcher {
+public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParserFetcher {
 
-    private static final String URL_PATTERN =
-        "https://sru.k10plus.de/opac-de-627?";
+    private static final String URL_PATTERN = "https://sru.k10plus.de/opac-de-627?";
 
     /**
      * Searchkeys are used to specify a search request. For example "tit" stands for "title".
@@ -68,9 +65,7 @@ public class GvkFetcher
         uriBuilder.addParameter("operation", "searchRetrieve");
         uriBuilder.addParameter(
             "query",
-            new GVKQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new GVKQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
@@ -109,20 +104,11 @@ public class GvkFetcher
         entry
             .getField(StandardField.PAGETOTAL)
             .ifPresent(pages ->
-                entry.setField(
-                    StandardField.PAGETOTAL,
-                    pages.replaceAll("[\\D]", "")
-                )
+                entry.setField(StandardField.PAGETOTAL, pages.replaceAll("[\\D]", ""))
             );
-        new FieldFormatterCleanup(
-            StandardField.PAGETOTAL,
-            new NormalizePagesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.AUTHOR,
-            new NormalizeNamesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter())
             .cleanup(entry);
     }
 }

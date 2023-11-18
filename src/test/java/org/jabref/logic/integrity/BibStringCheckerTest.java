@@ -20,28 +20,16 @@ public class BibStringCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideAcceptedInputs")
-    void acceptsAllowedInputs(
-        List<IntegrityMessage> expected,
-        Field field,
-        String value
-    ) {
+    void acceptsAllowedInputs(List<IntegrityMessage> expected, Field field, String value) {
         entry.setField(field, value);
         assertEquals(expected, checker.check(entry));
     }
 
     private static Stream<Arguments> provideAcceptedInputs() {
         return Stream.of(
-            Arguments.of(
-                Collections.emptyList(),
-                StandardField.TITLE,
-                "Not a single hash mark"
-            ),
+            Arguments.of(Collections.emptyList(), StandardField.TITLE, "Not a single hash mark"),
             Arguments.of(Collections.emptyList(), StandardField.MONTH, "#jan#"),
-            Arguments.of(
-                Collections.emptyList(),
-                StandardField.AUTHOR,
-                "#einstein# and #newton#"
-            )
+            Arguments.of(Collections.emptyList(), StandardField.AUTHOR, "#einstein# and #newton#")
         );
     }
 
@@ -50,11 +38,7 @@ public class BibStringCheckerTest {
         entry.setField(StandardField.MONTH, "#jan");
         assertEquals(
             List.of(
-                new IntegrityMessage(
-                    "odd number of unescaped '#'",
-                    entry,
-                    StandardField.MONTH
-                )
+                new IntegrityMessage("odd number of unescaped '#'", entry, StandardField.MONTH)
             ),
             checker.check(entry)
         );
@@ -65,11 +49,7 @@ public class BibStringCheckerTest {
         entry.setField(StandardField.AUTHOR, "#einstein# #amp; #newton#");
         assertEquals(
             List.of(
-                new IntegrityMessage(
-                    "odd number of unescaped '#'",
-                    entry,
-                    StandardField.AUTHOR
-                )
+                new IntegrityMessage("odd number of unescaped '#'", entry, StandardField.AUTHOR)
             ),
             checker.check(entry)
         );

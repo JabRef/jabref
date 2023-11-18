@@ -15,9 +15,7 @@ public class AbbreviationChecker implements EntryChecker {
     private final JournalAbbreviationRepository abbreviationRepository;
     private final Set<Field> fields = FieldFactory.getBookNameFields();
 
-    public AbbreviationChecker(
-        JournalAbbreviationRepository abbreviationRepository
-    ) {
+    public AbbreviationChecker(JournalAbbreviationRepository abbreviationRepository) {
         this.abbreviationRepository = abbreviationRepository;
     }
 

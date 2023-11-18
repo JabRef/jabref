@@ -7,8 +7,7 @@ import java.util.List;
  * This is an abstract implementation of ParamLayoutFormatter, which provides some
  * functionality for the handling of argument strings.
  */
-public abstract class AbstractParamLayoutFormatter
-    implements ParamLayoutFormatter {
+public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatter {
 
     private static final char SEPARATOR = ',';
 
@@ -26,10 +25,7 @@ public abstract class AbstractParamLayoutFormatter
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < arg.length(); i++) {
-            if (
-                (arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR) &&
-                !escaped
-            ) {
+            if ((arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR) && !escaped) {
                 parts.add(current.toString());
                 current = new StringBuilder();
             } else if (arg.charAt(i) == '\\') {

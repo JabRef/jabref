@@ -12,9 +12,7 @@ public class DBMSConnectionTest {
 
     @ParameterizedTest
     @EnumSource(DBMSType.class)
-    public void getConnectionFailsWhenconnectingToInvalidHost(
-        DBMSType dbmsType
-    ) {
+    public void getConnectionFailsWhenconnectingToInvalidHost(DBMSType dbmsType) {
         assertThrows(
             SQLException.class,
             () ->

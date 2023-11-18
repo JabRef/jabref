@@ -37,9 +37,7 @@ public class EscapeAmpersandsFormatter extends Formatter {
                 if (!inCommandOption) {
                     commandName.append(c);
                 }
-            } else if (
-                Character.isWhitespace(c) && (inCommand || inCommandOption)
-            ) {
+            } else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
                 // Whitespace
             } else if (inCommandName) {
                 // This means the command name is ended.
@@ -63,9 +61,7 @@ public class EscapeAmpersandsFormatter extends Formatter {
                 if ("begin".contentEquals(commandName)) {
                     nestedEnvironments++;
                 }
-                if (
-                    (nestedEnvironments > 0) && "end".contentEquals(commandName)
-                ) {
+                if ((nestedEnvironments > 0) && "end".contentEquals(commandName)) {
                     nestedEnvironments--;
                 }
 

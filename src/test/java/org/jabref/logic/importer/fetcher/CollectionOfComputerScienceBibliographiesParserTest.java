@@ -22,20 +22,16 @@ import org.mockito.Answers;
 public class CollectionOfComputerScienceBibliographiesParserTest {
 
     @Test
-    public void parseEntriesReturnsEmptyListIfXmlHasNoResults()
-        throws Exception {
+    public void parseEntriesReturnsEmptyListIfXmlHasNoResults() throws Exception {
         parseXmlAndCheckResults(
             "collection_of_computer_science_bibliographies_empty_result.xml",
             Collections.emptyList()
         );
     }
 
-    @Disabled(
-        "Parse/fetcher remote side does not return anything valid for the link"
-    )
+    @Disabled("Parse/fetcher remote side does not return anything valid for the link")
     @Test
-    public void parseEntriesReturnsOneBibEntryInListIfXmlHasSingleResult()
-        throws Exception {
+    public void parseEntriesReturnsOneBibEntryInListIfXmlHasSingleResult() throws Exception {
         parseXmlAndCheckResults(
             "collection_of_computer_science_bibliographies_single_result.xml",
             Collections.singletonList(
@@ -56,27 +52,18 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
         );
     }
 
-    private void parseXmlAndCheckResults(
-        String xmlName,
-        List<String> resourceNames
-    ) throws Exception {
+    private void parseXmlAndCheckResults(String xmlName, List<String> resourceNames)
+        throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         InputStream is =
-            CollectionOfComputerScienceBibliographiesParserTest.class.getResourceAsStream(
-                    xmlName
-                );
+            CollectionOfComputerScienceBibliographiesParserTest.class.getResourceAsStream(xmlName);
         CollectionOfComputerScienceBibliographiesParser parser =
-            new CollectionOfComputerScienceBibliographiesParser(
-                importFormatPreferences
-            );
+            new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
         List<BibEntry> entries = parser.parseEntries(is);
         assertEquals(resourceNames.size(), entries.size());
         assertNotNull(entries);

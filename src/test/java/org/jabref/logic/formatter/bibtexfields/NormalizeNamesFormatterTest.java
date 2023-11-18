@@ -45,9 +45,7 @@ public class NormalizeNamesFormatterTest {
 
         assertEquals(
             "Alver, Morten and Alver, Morten O. and Alfredsen, J. A. and Olsen, Y. Y.",
-            formatter.format(
-                "Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y."
-            )
+            formatter.format("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y.")
         );
 
         assertEquals(
@@ -57,9 +55,7 @@ public class NormalizeNamesFormatterTest {
 
         assertEquals(
             "Kolb, Stefan and Lenhard, J{\\\"o}rg and Wirtz, Guido",
-            formatter.format(
-                "Kolb, Stefan and J{\\\"o}rg Lenhard and Wirtz, Guido"
-            )
+            formatter.format("Kolb, Stefan and J{\\\"o}rg Lenhard and Wirtz, Guido")
         );
     }
 
@@ -84,9 +80,7 @@ public class NormalizeNamesFormatterTest {
     public void threeAuthorsSeperatedByAnd() {
         assertEquals(
             "Kolb, Stefan and Lenhard, J{\\\"o}rg and Wirtz, Guido",
-            formatter.format(
-                "Stefan Kolb and J{\\\"o}rg Lenhard and Guido Wirtz"
-            )
+            formatter.format("Stefan Kolb and J{\\\"o}rg Lenhard and Guido Wirtz")
         );
     }
 
@@ -137,19 +131,14 @@ public class NormalizeNamesFormatterTest {
 
     @Test
     public void lastThenJuniorThenFirst() {
-        assertEquals(
-            "Name, della, first",
-            formatter.format("Name, della, first")
-        );
+        assertEquals("Name, della, first", formatter.format("Name, della, first"));
     }
 
     @Test
     public void testConcatenationOfAuthorsWithCommas() {
         assertEquals(
             "Ali Babar, M. and Dingsøyr, T. and Lago, P. and van der Vliet, H.",
-            formatter.format(
-                "Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H."
-            )
+            formatter.format("Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.")
         );
         assertEquals("Ali Babar, M.", formatter.format("Ali Babar, M."));
     }
@@ -226,9 +215,7 @@ public class NormalizeNamesFormatterTest {
     public void testAvoidPreposition() {
         assertEquals(
             "von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin",
-            formatter.format(
-                "Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger"
-            )
+            formatter.format("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger")
         );
     }
 
@@ -236,9 +223,7 @@ public class NormalizeNamesFormatterTest {
     public void testPreposition() {
         assertEquals(
             "von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin",
-            formatter.format(
-                "Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger"
-            )
+            formatter.format("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger")
         );
     }
 
@@ -254,9 +239,7 @@ public class NormalizeNamesFormatterTest {
     public void testAvoidNameAffixes() {
         assertEquals(
             "der Barbar, Canon and der Große, Alexander and der Alexander, Peter",
-            formatter.format(
-                "Canon der Barbar, Alexander der Große, Peter der Alexander"
-            )
+            formatter.format("Canon der Barbar, Alexander der Große, Peter der Alexander")
         );
     }
 
@@ -288,15 +271,11 @@ public class NormalizeNamesFormatterTest {
         );
         assertEquals(
             "Last, First and Last2, First2 and Last3, First3 and Last4, First4",
-            formatter.format(
-                "Last, First; Last2, First2; Last3, First3; First4 Last4"
-            )
+            formatter.format("Last, First; Last2, First2; Last3, First3; First4 Last4")
         );
         assertEquals(
             "Last and Last2, First2 and Last3, First3 and Last4, First4",
-            formatter.format(
-                "Last; Last2, First2; Last3, First3; Last4, First4"
-            )
+            formatter.format("Last; Last2, First2; Last3, First3; Last4, First4")
         );
     }
 }

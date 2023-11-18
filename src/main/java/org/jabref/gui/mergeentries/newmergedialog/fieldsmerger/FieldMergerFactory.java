@@ -23,8 +23,7 @@ public class FieldMergerFactory {
             return new FileMerger();
         } else {
             throw new IllegalArgumentException(
-                "No implementation found for merging the given field: " +
-                field.getDisplayName()
+                "No implementation found for merging the given field: " + field.getDisplayName()
             );
         }
     }

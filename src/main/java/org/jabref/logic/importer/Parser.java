@@ -12,12 +12,7 @@ import org.jabref.model.entry.BibEntry;
 public interface Parser {
     List<BibEntry> parseEntries(InputStream inputStream) throws ParseException;
 
-    default List<BibEntry> parseEntries(String dataString)
-        throws ParseException {
-        return parseEntries(
-            new ByteArrayInputStream(
-                dataString.getBytes(StandardCharsets.UTF_8)
-            )
-        );
+    default List<BibEntry> parseEntries(String dataString) throws ParseException {
+        return parseEntries(new ByteArrayInputStream(dataString.getBytes(StandardCharsets.UTF_8)));
     }
 }

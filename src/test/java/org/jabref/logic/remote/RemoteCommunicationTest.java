@@ -65,10 +65,7 @@ class RemoteCommunicationTest {
 
     @Test
     void commandLineArgumentMultiLinePassedToServer() {
-        final String[] message = new String[] {
-            "my message\n second line",
-            "second \r and third",
-        };
+        final String[] message = new String[] { "my message\n second line", "second \r and third" };
 
         client.sendCommandLineArguments(message);
 

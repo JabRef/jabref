@@ -18,9 +18,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     public static final String FETCHER_NAME = "Search Selected";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CompositeSearchBasedFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
     private Set<SearchBasedFetcher> fetchers;
     private final int maximumNumberOfReturnedResults;
@@ -31,9 +29,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
         int maximumNumberOfReturnedResults
     ) throws IllegalArgumentException {
         if (searchBasedFetchers == null) {
-            throw new IllegalArgumentException(
-                "The set of searchBasedFetchers must not be null!"
-            );
+            throw new IllegalArgumentException("The set of searchBasedFetchers must not be null!");
         }
 
         fetchers =
@@ -46,9 +42,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                     importerPreferences
                         .getCatalogs()
                         .stream()
-                        .anyMatch(
-                            (name -> name.equals(searchBasedFetcher.getName()))
-                        )
+                        .anyMatch((name -> name.equals(searchBasedFetcher.getName())))
                 )
                 .collect(Collectors.toSet());
         this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
@@ -65,22 +59,16 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers
             .parallelStream()
             .flatMap(searchBasedFetcher -> {
                 try {
-                    return searchBasedFetcher
-                        .performSearch(luceneQuery)
-                        .stream();
+                    return searchBasedFetcher.performSearch(luceneQuery).stream();
                 } catch (FetcherException e) {
                     LOGGER.warn(
-                        String.format(
-                            "%s API request failed",
-                            searchBasedFetcher.getName()
-                        ),
+                        String.format("%s API request failed", searchBasedFetcher.getName()),
                         e
                     );
                     return Stream.empty();

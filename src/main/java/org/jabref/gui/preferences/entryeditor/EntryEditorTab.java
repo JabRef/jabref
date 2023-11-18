@@ -68,15 +68,10 @@ public class EntryEditorTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new EntryEditorTabViewModel(dialogService, preferencesService);
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferencesService);
 
-        openOnNewEntry
-            .selectedProperty()
-            .bindBidirectional(viewModel.openOnNewEntryProperty());
-        defaultSource
-            .selectedProperty()
-            .bindBidirectional(viewModel.defaultSourceProperty());
+        openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
+        defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
         enableRelatedArticlesTab
             .selectedProperty()
             .bindBidirectional(viewModel.enableRelatedArticlesTabProperty());
@@ -86,25 +81,17 @@ public class EntryEditorTab
         enableLatexCitationsTab
             .selectedProperty()
             .bindBidirectional(viewModel.enableLatexCitationsTabProperty());
-        enableValidation
-            .selectedProperty()
-            .bindBidirectional(viewModel.enableValidationProperty());
+        enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
         allowIntegerEdition
             .selectedProperty()
             .bindBidirectional(viewModel.allowIntegerEditionProperty());
-        journalPopupEnabled
-            .selectedProperty()
-            .bindBidirectional(viewModel.journalPopupProperty());
+        journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
         autoLinkFilesEnabled
             .selectedProperty()
             .bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
-        enableSciteTab
-            .selectedProperty()
-            .bindBidirectional(viewModel.enableSciteTabProperty());
+        enableSciteTab.selectedProperty().bindBidirectional(viewModel.enableSciteTabProperty());
 
-        fieldsTextArea
-            .textProperty()
-            .bindBidirectional(viewModel.fieldsProperty());
+        fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
         ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
         actionFactory.configureIconButton(

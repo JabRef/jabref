@@ -38,53 +38,31 @@ public class FieldCheckers {
         JournalAbbreviationRepository abbreviationRepository,
         boolean allowIntegerEdition
     ) {
-        ArrayListMultimap<Field, ValueChecker> fieldCheckers =
-            ArrayListMultimap.create(50, 10);
+        ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (Field field : FieldFactory.getPersonNameFields()) {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleChecker());
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
-        fieldCheckers.put(
-            StandardField.TITLE,
-            new TitleChecker(databaseContext)
-        );
+        fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
         fieldCheckers.put(StandardField.DOI, new DoiValidityChecker());
         fieldCheckers.put(
             StandardField.EDITION,
             new EditionChecker(databaseContext, allowIntegerEdition)
         );
-        fieldCheckers.put(
-            StandardField.FILE,
-            new FileChecker(databaseContext, filePreferences)
-        );
-        fieldCheckers.put(
-            StandardField.HOWPUBLISHED,
-            new HowPublishedChecker(databaseContext)
-        );
+        fieldCheckers.put(StandardField.FILE, new FileChecker(databaseContext, filePreferences));
+        fieldCheckers.put(StandardField.HOWPUBLISHED, new HowPublishedChecker(databaseContext));
         fieldCheckers.put(StandardField.ISBN, new ISBNChecker());
         fieldCheckers.put(StandardField.ISSN, new ISSNChecker());
-        fieldCheckers.put(
-            StandardField.MONTH,
-            new MonthChecker(databaseContext)
-        );
-        fieldCheckers.put(
-            StandardField.MONTHFILED,
-            new MonthChecker(databaseContext)
-        );
+        fieldCheckers.put(StandardField.MONTH, new MonthChecker(databaseContext));
+        fieldCheckers.put(StandardField.MONTHFILED, new MonthChecker(databaseContext));
         fieldCheckers.put(StandardField.NOTE, new NoteChecker(databaseContext));
-        fieldCheckers.put(
-            StandardField.PAGES,
-            new PagesChecker(databaseContext)
-        );
+        fieldCheckers.put(StandardField.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(StandardField.URL, new UrlChecker());
         fieldCheckers.put(StandardField.YEAR, new YearChecker());
         fieldCheckers.put(StandardField.KEY, new ValidCitationKeyChecker());
-        fieldCheckers.put(
-            InternalField.KEY_FIELD,
-            new ValidCitationKeyChecker()
-        );
+        fieldCheckers.put(InternalField.KEY_FIELD, new ValidCitationKeyChecker());
 
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(StandardField.DATE, new DateChecker());

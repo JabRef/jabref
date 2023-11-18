@@ -27,13 +27,7 @@ class SaveOrderPanelViewModelTest {
         viewModel = new SaveOrderConfigPanelViewModel();
         viewModel
             .sortCriteriaProperty()
-            .addAll(
-                List.of(
-                    sortCriterionKey,
-                    sortCriterionAuthor,
-                    sortCriterionTitle
-                )
-            );
+            .addAll(List.of(sortCriterionKey, sortCriterionAuthor, sortCriterionTitle));
     }
 
     @Test

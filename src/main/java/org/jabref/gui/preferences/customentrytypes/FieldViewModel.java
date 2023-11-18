@@ -18,8 +18,7 @@ public class FieldViewModel {
     private final StringProperty displayName = new SimpleStringProperty("");
     private final BooleanProperty required = new SimpleBooleanProperty();
     private final BooleanProperty multiline = new SimpleBooleanProperty();
-    private final ObjectProperty<FieldPriority> priorityProperty =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<FieldPriority> priorityProperty = new SimpleObjectProperty<>();
 
     public FieldViewModel(
         Field field,

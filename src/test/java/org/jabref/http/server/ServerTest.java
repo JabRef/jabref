@@ -53,16 +53,12 @@ abstract class ServerTest extends JerseyTest {
         );
     }
 
-    protected void addPreferencesToResourceConfig(
-        ResourceConfig resourceConfig
-    ) {
+    protected void addPreferencesToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(
             new AbstractBinder() {
                 @Override
                 protected void configure() {
-                    bind(preferencesService)
-                        .to(PreferencesService.class)
-                        .ranked(2);
+                    bind(preferencesService).to(PreferencesService.class).ranked(2);
                 }
             }
         );
@@ -72,10 +68,7 @@ abstract class ServerTest extends JerseyTest {
         when(guiPreferences.getLastFilesOpened())
             .thenReturn(
                 FXCollections.observableArrayList(
-                    files
-                        .stream()
-                        .map(file -> file.path.toString())
-                        .collect(Collectors.toList())
+                    files.stream().map(file -> file.path.toString()).collect(Collectors.toList())
                 )
             );
     }
@@ -83,27 +76,23 @@ abstract class ServerTest extends JerseyTest {
     private static void initializePreferencesService() {
         preferencesService = mock(PreferencesService.class);
 
-        ImportFormatPreferences importFormatPreferences = mock(
-            ImportFormatPreferences.class
-        );
-        when(preferencesService.getImportFormatPreferences())
-            .thenReturn(importFormatPreferences);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
 
-        BibEntryPreferences bibEntryPreferences = mock(
-            BibEntryPreferences.class
-        );
-        when(importFormatPreferences.bibEntryPreferences())
-            .thenReturn(bibEntryPreferences);
+        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+        when(importFormatPreferences.bibEntryPreferences()).thenReturn(bibEntryPreferences);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
         FieldPreferences fieldWriterPreferences = mock(FieldPreferences.class);
-        when(preferencesService.getFieldPreferences())
-            .thenReturn(fieldWriterPreferences);
+        when(preferencesService.getFieldPreferences()).thenReturn(fieldWriterPreferences);
         when(fieldWriterPreferences.shouldResolveStrings()).thenReturn(false);
 
         // defaults are in {@link org.jabref.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
-        FieldPreferences fieldContentFormatterPreferences =
-            new FieldPreferences(false, List.of(), List.of());
+        FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(
+            false,
+            List.of(),
+            List.of()
+        );
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences())
             .thenReturn(fieldContentFormatterPreferences);
@@ -113,9 +102,7 @@ abstract class ServerTest extends JerseyTest {
 
         when(guiPreferences.getLastFilesOpened())
             .thenReturn(
-                FXCollections.observableArrayList(
-                    TestBibFile.GENERAL_SERVER_TEST.path.toString()
-                )
+                FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path.toString())
             );
     }
 }

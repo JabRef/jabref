@@ -67,14 +67,8 @@ public class HTMLCharsTest {
         assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
         assertEquals("<b>hallo</b>", layout.format("{\\bf hallo}"));
 
-        assertEquals(
-            "<sup>hallo</sup>",
-            layout.format("\\textsuperscript{hallo}")
-        );
-        assertEquals(
-            "<sub>hallo</sub>",
-            layout.format("\\textsubscript{hallo}")
-        );
+        assertEquals("<sup>hallo</sup>", layout.format("\\textsuperscript{hallo}"));
+        assertEquals("<sub>hallo</sub>", layout.format("\\textsubscript{hallo}"));
 
         assertEquals("<u>hallo</u>", layout.format("\\underline{hallo}"));
         assertEquals("<s>hallo</s>", layout.format("\\sout{hallo}"));

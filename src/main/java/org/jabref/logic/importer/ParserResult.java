@@ -39,11 +39,7 @@ public class ParserResult {
         this(database, new MetaData(), new HashSet<>());
     }
 
-    public ParserResult(
-        BibDatabase database,
-        MetaData metaData,
-        Set<BibEntryType> entryTypes
-    ) {
+    public ParserResult(BibDatabase database, MetaData metaData, Set<BibEntryType> entryTypes) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.entryTypes = Objects.requireNonNull(entryTypes);
@@ -59,8 +55,7 @@ public class ParserResult {
     private static String getErrorMessage(Exception exception) {
         String errorMessage = exception.getLocalizedMessage();
         if (exception.getCause() != null) {
-            errorMessage +=
-            " Caused by: " + exception.getCause().getLocalizedMessage();
+            errorMessage += " Caused by: " + exception.getCause().getLocalizedMessage();
         }
         return errorMessage;
     }

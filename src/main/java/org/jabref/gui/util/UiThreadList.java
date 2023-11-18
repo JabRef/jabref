@@ -10,18 +10,14 @@ import org.slf4j.LoggerFactory;
 
 class UiThreadList<T> extends TransformationList<T, T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UiThreadList.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UiThreadList.class);
 
     public UiThreadList(ObservableList<? extends T> source) {
         super(source);
     }
 
     @Override
-    protected void sourceChanged(
-        ListChangeListener.Change<? extends T> change
-    ) {
+    protected void sourceChanged(ListChangeListener.Change<? extends T> change) {
         if (Platform.isFxApplicationThread()) {
             fireChange(change);
         } else {

@@ -55,9 +55,7 @@ import org.slf4j.LoggerFactory;
 
 public class MainTable extends TableView<BibEntryTableViewModel> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MainTable.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -96,8 +94,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
         UndoManager undoManager = libraryTab.getUndoManager();
-        MainTablePreferences mainTablePreferences =
-            preferencesService.getMainTablePreferences();
+        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler =
             new ImportHandler(
@@ -185,19 +182,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
 
         // Enable sorting
-        model
-            .getEntriesFilteredAndSorted()
-            .comparatorProperty()
-            .bind(this.comparatorProperty());
+        model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
-        this.getStylesheets()
-            .add(MainTable.class.getResource("MainTable.css").toExternalForm());
+        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(
-            this,
-            mainTablePreferences.getColumnPreferences()
-        )
+        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences())
             .addListeners();
 
         setupKeyBindings(keyBindingRepository);
@@ -211,16 +201,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         database.getDatabase().registerListener(this);
 
-        MainTableColumnFactory rightClickMenuFactory =
-            new MainTableColumnFactory(
-                database,
-                preferencesService,
-                preferencesService.getMainTableColumnPreferences(),
-                libraryTab.getUndoManager(),
-                dialogService,
-                stateManager,
-                taskExecutor
-            );
+        MainTableColumnFactory rightClickMenuFactory = new MainTableColumnFactory(
+            database,
+            preferencesService,
+            preferencesService.getMainTableColumnPreferences(),
+            libraryTab.getUndoManager(),
+            dialogService,
+            stateManager,
+            taskExecutor
+        );
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
@@ -252,9 +241,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             .stream()
             .filter(item ->
                 Optional
-                    .ofNullable(
-                        sortedColumn.getCellObservableValue(item).getValue()
-                    )
+                    .ofNullable(sortedColumn.getCellObservableValue(item).getValue())
                     .map(Object::toString)
                     .orElse("")
                     .toLowerCase()
@@ -269,9 +256,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     @Subscribe
     public void listen(EntriesAddedEvent event) {
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-            clearAndSelect(event.getFirstEntry())
-        );
+        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getFirstEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
@@ -296,10 +281,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     )
                 );
             } catch (IOException e) {
-                LOGGER.error(
-                    "Error while copying selected entries to clipboard",
-                    e
-                );
+                LOGGER.error("Error while copying selected entries to clipboard", e);
             }
         }
     }
@@ -343,8 +325,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         return;
                     }
 
-                    Optional<KeyBinding> keyBinding =
-                        keyBindings.mapToKeyBinding(event);
+                    Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
                     if (keyBinding.isPresent()) {
                         switch (keyBinding.get()) {
                             case SELECT_FIRST_ENTRY:
@@ -429,10 +410,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
         for (BibEntry entry : entriesToAdd) {
-            importHandler.importEntryWithDuplicateCheck(
-                database,
-                (BibEntry) entry.clone()
-            );
+            importHandler.importEntryWithDuplicateCheck(database, (BibEntry) entry.clone());
         }
     }
 
@@ -535,9 +513,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     switch (event.getTransferMode()) {
                         case LINK -> {
                             LOGGER.debug("Mode LINK"); // shift on win or no modifier
-                            importHandler
-                                .getLinker()
-                                .addFilesToEntry(entry, files);
+                            importHandler.getLinker().addFilesToEntry(entry, files);
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
@@ -580,9 +556,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .stream()
                 .map(File::toPath)
                 .collect(Collectors.toList());
-            importHandler
-                .importFilesInBackground(files)
-                .executeWith(taskExecutor);
+            importHandler.importFilesInBackground(files).executeWith(taskExecutor);
 
             success = true;
         }
@@ -591,9 +565,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         event.consume();
     }
 
-    public void addSelectionListener(
-        ListChangeListener<? super BibEntryTableViewModel> listener
-    ) {
+    public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
         getSelectionModel().getSelectedItems().addListener(listener);
     }
 

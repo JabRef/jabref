@@ -20,14 +20,10 @@ public class JournalAbbreviationRepository {
 
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
-    private final Map<String, Abbreviation> fullToAbbreviationObject =
-        new HashMap<>();
-    private final Map<String, Abbreviation> abbreviationToAbbreviationObject =
-        new HashMap<>();
-    private final Map<String, Abbreviation> dotlessToAbbreviationObject =
-        new HashMap<>();
-    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject =
-        new HashMap<>();
+    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
+    private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
+    private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
+    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
 
     /**
@@ -44,26 +40,19 @@ public class JournalAbbreviationRepository {
             mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
             mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
                 String abbrevationString = abbreviation.getAbbreviation();
-                String shortestUniqueAbbreviation =
-                    abbreviation.getShortestUniqueAbbreviation();
+                String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
                 Abbreviation newAbbreviation = new Abbreviation(
                     name,
                     abbrevationString,
                     shortestUniqueAbbreviation
                 );
                 fullToAbbreviationObject.put(name, newAbbreviation);
-                abbreviationToAbbreviationObject.put(
-                    abbrevationString,
-                    newAbbreviation
-                );
+                abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
                 dotlessToAbbreviationObject.put(
                     newAbbreviation.getDotlessAbbreviation(),
                     newAbbreviation
                 );
-                shortestUniqueToAbbreviationObject.put(
-                    shortestUniqueAbbreviation,
-                    newAbbreviation
-                );
+                shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
         }
     }
@@ -72,11 +61,7 @@ public class JournalAbbreviationRepository {
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public JournalAbbreviationRepository() {
-        Abbreviation newAbbreviation = new Abbreviation(
-            "Demonstration",
-            "Demo",
-            "Dem"
-        );
+        Abbreviation newAbbreviation = new Abbreviation("Demonstration", "Demo", "Dem");
         fullToAbbreviationObject.put("Demonstration", newAbbreviation);
         abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
         dotlessToAbbreviationObject.put("Demo", newAbbreviation);
@@ -92,10 +77,7 @@ public class JournalAbbreviationRepository {
         );
     }
 
-    private static boolean isMatchedAbbreviated(
-        String name,
-        Abbreviation abbreviation
-    ) {
+    private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
         boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
         if (isExpanded) {
             return false;
@@ -115,9 +97,7 @@ public class JournalAbbreviationRepository {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
-        String journal = journalName
-            .trim()
-            .replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
         return (
             customAbbreviations
                 .stream()
@@ -137,15 +117,11 @@ public class JournalAbbreviationRepository {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
-        String journal = journalName
-            .trim()
-            .replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
         return (
             customAbbreviations
                 .stream()
-                .anyMatch(abbreviation ->
-                    isMatchedAbbreviated(journal, abbreviation)
-                ) ||
+                .anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation)) ||
             abbreviationToAbbreviationObject.containsKey(journal) ||
             dotlessToAbbreviationObject.containsKey(journal) ||
             shortestUniqueToAbbreviationObject.containsKey(journal)
@@ -159,9 +135,7 @@ public class JournalAbbreviationRepository {
      */
     public Optional<Abbreviation> get(String input) {
         // Clean up input: trim and unescape ampersand
-        String journal = input
-            .trim()
-            .replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations
             .stream()
@@ -173,19 +147,9 @@ public class JournalAbbreviationRepository {
 
         return Optional
             .ofNullable(fullToAbbreviationObject.get(journal))
-            .or(() ->
-                Optional.ofNullable(
-                    abbreviationToAbbreviationObject.get(journal)
-                )
-            )
-            .or(() ->
-                Optional.ofNullable(dotlessToAbbreviationObject.get(journal))
-            )
-            .or(() ->
-                Optional.ofNullable(
-                    shortestUniqueToAbbreviationObject.get(journal)
-                )
-            );
+            .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
+            .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
+            .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
@@ -201,9 +165,7 @@ public class JournalAbbreviationRepository {
         return customAbbreviations;
     }
 
-    public void addCustomAbbreviations(
-        Collection<Abbreviation> abbreviationsToAdd
-    ) {
+    public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
         abbreviationsToAdd.forEach(this::addCustomAbbreviation);
     }
 

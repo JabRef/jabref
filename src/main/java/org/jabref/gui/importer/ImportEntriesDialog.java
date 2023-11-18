@@ -85,10 +85,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * @param database the database to import into
      * @param task     the task executed for parsing the selected files(s).
      */
-    public ImportEntriesDialog(
-        BibDatabaseContext database,
-        BackgroundTask<ParserResult> task
-    ) {
+    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
         ViewLoader.view(this).load().setAsDialogPane(this);
@@ -169,17 +166,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             .bind(libraryListView.getSelectionModel().selectedItemProperty());
         stateManager
             .getActiveDatabase()
-            .ifPresent(database1 ->
-                libraryListView.getSelectionModel().select(database1)
-            );
+            .ifPresent(database1 -> libraryListView.getSelectionModel().select(database1));
 
-        PseudoClass entrySelected = PseudoClass.getPseudoClass(
-            "entry-selected"
-        );
+        PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
         new ViewModelListCellFactory<BibEntry>()
             .withGraphic(entry -> {
-                ToggleButton addToggle =
-                    IconTheme.JabRefIcons.ADD.asToggleButton();
+                ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                 EasyBind.subscribe(
                     addToggle.selectedProperty(),
                     selected -> {
@@ -190,18 +182,14 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                                     .getGraphicNode()
                             );
                         } else {
-                            addToggle.setGraphic(
-                                IconTheme.JabRefIcons.ADD.getGraphicNode()
-                            );
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                         }
                     }
                 );
                 addToggle.getStyleClass().add("addEntryButton");
                 addToggle
                     .selectedProperty()
-                    .bindBidirectional(
-                        entriesListView.getItemBooleanProperty(entry)
-                    );
+                    .bindBidirectional(entriesListView.getItemBooleanProperty(entry));
                 HBox separator = new HBox();
                 HBox.setHgrow(separator, Priority.SOMETIMES);
                 Node entryNode = getEntryNode(entry);
@@ -213,8 +201,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     .wrap(() -> viewModel.hasDuplicate(entry))
                     .onSuccess(duplicateFound -> {
                         if (duplicateFound) {
-                            Button duplicateButton =
-                                IconTheme.JabRefIcons.DUPLICATE.asButton();
+                            Button duplicateButton = IconTheme.JabRefIcons.DUPLICATE.asButton();
                             duplicateButton.setTooltip(
                                 new Tooltip(
                                     Localization.lang(
@@ -222,9 +209,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                                     )
                                 )
                             );
-                            duplicateButton.setOnAction(event ->
-                                viewModel.resolveDuplicate(entry)
-                            );
+                            duplicateButton.setOnAction(event -> viewModel.resolveDuplicate(entry));
                             container.getChildren().add(1, duplicateButton);
                         }
                     })
@@ -243,43 +228,26 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             .withOnMouseClickedEvent((entry, event) ->
                 entriesListView.getCheckModel().toggleCheckState(entry)
             )
-            .withPseudoClass(
-                entrySelected,
-                entriesListView::getItemBooleanProperty
-            )
+            .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
             .install(entriesListView);
 
         selectedItems
             .textProperty()
-            .bind(
-                Bindings
-                    .size(entriesListView.getCheckModel().getCheckedItems())
-                    .asString()
-            );
-        totalItems
-            .textProperty()
-            .bind(Bindings.size(entriesListView.getItems()).asString());
+            .bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
+        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
     private Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
-        Label authors = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse("")
-        );
+        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
         authors.getStyleClass().add("authors");
-        Label title = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("")
-        );
+        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
         title.getStyleClass().add("title");
-        Label year = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse("")
-        );
+        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
-        Label journal = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("")
-        );
+        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
         journal.getStyleClass().add("journal");
 
         VBox entryContainer = new VBox(
@@ -290,9 +258,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         entry
             .getFieldOrAliasLatexFree(StandardField.ABSTRACT)
             .ifPresent(summaryText -> {
-                TextFlowLimited summary = new TextFlowLimited(
-                    new Text(summaryText)
-                );
+                TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
                 summary.getStyleClass().add("summary");
                 entryContainer.getChildren().add(summary);
             });

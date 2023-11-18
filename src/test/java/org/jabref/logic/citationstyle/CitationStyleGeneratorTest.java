@@ -20,8 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class CitationStyleGeneratorTest {
 
-    private final BibEntryTypesManager bibEntryTypesManager =
-        new BibEntryTypesManager();
+    private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
     @Test
     void testACMCitation() {
@@ -62,11 +61,7 @@ class CitationStyleGeneratorTest {
         List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
         CitationStyle style = styleList
             .stream()
-            .filter(e ->
-                "American Psychological Association 7th edition".equals(
-                        e.getTitle()
-                    )
-            )
+            .filter(e -> "American Psychological Association 7th edition".equals(e.getTitle()))
             .findAny()
             .orElse(null);
         String citation = CitationStyleGenerator.generateCitation(
@@ -200,10 +195,7 @@ class CitationStyleGeneratorTest {
         String expectedCitation =
             "[1]B. Smith, B. Jones, and J. Williams, “Famous quote: “&TitleTest&” - that is it,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n";
         BibEntry entry = TestEntry.getTestEntry();
-        entry.setField(
-            StandardField.TITLE,
-            "Famous quote: “&TitleTest&” - that is it"
-        );
+        entry.setField(StandardField.TITLE, "Famous quote: “&TitleTest&” - that is it");
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
@@ -258,10 +250,7 @@ class CitationStyleGeneratorTest {
                 "[1]F. Last and J. Doe, no. 28.\n",
                 BibDatabaseMode.BIBTEX,
                 new BibEntry(StandardEntryType.Article)
-                    .withField(
-                        StandardField.AUTHOR,
-                        "Last, First and\nDoe, Jane"
-                    )
+                    .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                     .withField(StandardField.NUMBER, "28"),
                 "ieee.csl"
             ),
@@ -269,10 +258,7 @@ class CitationStyleGeneratorTest {
                 "[1]F. Last and J. Doe, no. 7.\n",
                 BibDatabaseMode.BIBLATEX,
                 new BibEntry(StandardEntryType.Article)
-                    .withField(
-                        StandardField.AUTHOR,
-                        "Last, First and\nDoe, Jane"
-                    )
+                    .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                     .withField(StandardField.ISSUE, "7"),
                 "ieee.csl"
             ),
@@ -280,10 +266,7 @@ class CitationStyleGeneratorTest {
                 "[1]F. Last and J. Doe, no. 28.\n",
                 BibDatabaseMode.BIBLATEX,
                 new BibEntry(StandardEntryType.Article)
-                    .withField(
-                        StandardField.AUTHOR,
-                        "Last, First and Doe, Jane"
-                    )
+                    .withField(StandardField.AUTHOR, "Last, First and Doe, Jane")
                     .withField(StandardField.NUMBER, "28"),
                 "ieee.csl"
             ),
@@ -291,10 +274,7 @@ class CitationStyleGeneratorTest {
                 "[1]F. Last and J. Doe, no. 28.\n",
                 BibDatabaseMode.BIBLATEX,
                 new BibEntry(StandardEntryType.Article)
-                    .withField(
-                        StandardField.AUTHOR,
-                        "Last, First and\nDoe, Jane"
-                    )
+                    .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                     .withField(StandardField.ISSUE, "7")
                     .withField(StandardField.NUMBER, "28"),
                 "ieee.csl"
@@ -303,10 +283,7 @@ class CitationStyleGeneratorTest {
                 "[1]F. Last and J. Doe, no. 7, Art. no. e0270533.\n",
                 BibDatabaseMode.BIBLATEX,
                 new BibEntry(StandardEntryType.Article)
-                    .withField(
-                        StandardField.AUTHOR,
-                        "Last, First and\nDoe, Jane"
-                    )
+                    .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                     .withField(StandardField.ISSUE, "7")
                     .withField(StandardField.EID, "e0270533"),
                 "ieee.csl"
@@ -315,10 +292,7 @@ class CitationStyleGeneratorTest {
                 "[1]F. Last and J. Doe, no. 33, pp. 7–8.\n",
                 BibDatabaseMode.BIBLATEX,
                 new BibEntry(StandardEntryType.Article)
-                    .withField(
-                        StandardField.AUTHOR,
-                        "Last, First and\nDoe, Jane"
-                    )
+                    .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                     .withField(StandardField.PAGES, "7--8")
                     .withField(StandardField.ISSUE, "33"),
                 "ieee.csl"
@@ -331,10 +305,7 @@ class CitationStyleGeneratorTest {
                     .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
                     .withField(StandardField.NUMBER, "3number")
                     .withField(StandardField.PAGES, "45--67")
-                    .withField(
-                        StandardField.TITLE,
-                        "volume + issue + number + pages"
-                    )
+                    .withField(StandardField.TITLE, "volume + issue + number + pages")
                     .withField(StandardField.VOLUME, "1")
                     .withField(
                         StandardField.COMMENT,
@@ -480,10 +451,7 @@ class CitationStyleGeneratorTest {
                     .withField(StandardField.JOURNAL, "BibTeX Journal")
                     .withField(StandardField.NUMBER, "3number")
                     .withField(StandardField.PAGES, "45--67")
-                    .withField(
-                        StandardField.TITLE,
-                        "eid + issue + number + pages"
-                    )
+                    .withField(StandardField.TITLE, "eid + issue + number + pages")
                     .withField(StandardField.EID, "6eid")
                     .withField(StandardField.ISSUE, "9issue"),
                 "apa.csl"
@@ -518,10 +486,7 @@ class CitationStyleGeneratorTest {
                 new BibEntry(StandardEntryType.Article)
                     .withField(StandardField.AUTHOR, "Foo, Bar")
                     .withField(StandardField.JOURNALTITLE, "Bib(La)TeX Journal")
-                    .withField(
-                        StandardField.TITLE,
-                        "volume + issue + number + pages + eid"
-                    )
+                    .withField(StandardField.TITLE, "volume + issue + number + pages + eid")
                     .withField(StandardField.EID, "6eid")
                     .withField(StandardField.ISSUE, "9issue")
                     .withField(StandardField.NUMBER, "3number")
@@ -536,10 +501,7 @@ class CitationStyleGeneratorTest {
                 new BibEntry(StandardEntryType.Article)
                     .withField(StandardField.AUTHOR, "Foo, Bar")
                     .withField(StandardField.JOURNALTITLE, "Bib(La)TeX Journal")
-                    .withField(
-                        StandardField.TITLE,
-                        "volume + issue + pages + eid"
-                    )
+                    .withField(StandardField.TITLE, "volume + issue + pages + eid")
                     .withField(StandardField.EID, "Article 6eid")
                     .withField(StandardField.ISSUE, "9issue")
                     .withField(StandardField.PAGES, "45--67")
@@ -552,10 +514,7 @@ class CitationStyleGeneratorTest {
                 new BibEntry(StandardEntryType.Article)
                     .withField(StandardField.AUTHOR, "Foo, Bar")
                     .withField(StandardField.JOURNALTITLE, "Bib(La)TeX Journal")
-                    .withField(
-                        StandardField.TITLE,
-                        "volume + number + pages + eid"
-                    )
+                    .withField(StandardField.TITLE, "volume + number + pages + eid")
                     .withField(StandardField.EID, "6eid")
                     .withField(StandardField.NUMBER, "3number")
                     .withField(StandardField.PAGES, "45--67")
@@ -603,10 +562,7 @@ class CitationStyleGeneratorTest {
                 new BibEntry(StandardEntryType.Article)
                     .withField(StandardField.AUTHOR, "Foo, Bar")
                     .withField(StandardField.JOURNALTITLE, "Bib(La)TeX Journal")
-                    .withField(
-                        StandardField.TITLE,
-                        "eid + issue + number + pages"
-                    )
+                    .withField(StandardField.TITLE, "eid + issue + number + pages")
                     .withField(StandardField.EID, "6eid")
                     .withField(StandardField.ISSUE, "9issue")
                     .withField(StandardField.NUMBER, "3number")
@@ -711,12 +667,8 @@ class CitationStyleGeneratorTest {
 
     @ParameterizedTest
     @MethodSource
-    void testCslMapping(
-        String expected,
-        BibDatabaseMode mode,
-        BibEntry entry,
-        String cslFileName
-    ) throws Exception {
+    void testCslMapping(String expected, BibDatabaseMode mode, BibEntry entry, String cslFileName)
+        throws Exception {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(
             new BibDatabase(List.of(entry))
         );
@@ -724,10 +676,7 @@ class CitationStyleGeneratorTest {
 
         String citation = CitationStyleGenerator.generateCitation(
             entry,
-            CitationStyle
-                .createCitationStyleFromFile(cslFileName)
-                .orElseThrow()
-                .getSource(),
+            CitationStyle.createCitationStyleFromFile(cslFileName).orElseThrow().getSource(),
             CitationStyleOutputFormat.TEXT,
             bibDatabaseContext,
             bibEntryTypesManager

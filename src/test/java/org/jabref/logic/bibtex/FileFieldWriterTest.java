@@ -35,22 +35,10 @@ public class FileFieldWriterTest {
 
     private static Stream<Arguments> getEncodingTestData() {
         return Stream.of(
-            Arguments.of(
-                "a:b;c:d",
-                new String[][] { { "a", "b" }, { "c", "d" } }
-            ),
-            Arguments.of(
-                "a:;c:d",
-                new String[][] { { "a", "" }, { "c", "d" } }
-            ),
-            Arguments.of(
-                "a:" + null + ";c:d",
-                new String[][] { { "a", null }, { "c", "d" } }
-            ),
-            Arguments.of(
-                "a:\\:b;c\\;:d",
-                new String[][] { { "a", ":b" }, { "c;", "d" } }
-            )
+            Arguments.of("a:b;c:d", new String[][] { { "a", "b" }, { "c", "d" } }),
+            Arguments.of("a:;c:d", new String[][] { { "a", "" }, { "c", "d" } }),
+            Arguments.of("a:" + null + ";c:d", new String[][] { { "a", null }, { "c", "d" } }),
+            Arguments.of("a:\\:b;c\\;:d", new String[][] { { "a", ":b" }, { "c;", "d" } })
         );
     }
 
@@ -62,14 +50,7 @@ public class FileFieldWriterTest {
 
     @Test
     public void testFileFieldWriterGetStringRepresentation() {
-        LinkedFile file = new LinkedFile(
-            "test",
-            Path.of("X:\\Users\\abc.pdf"),
-            "PDF"
-        );
-        assertEquals(
-            "test:X\\:/Users/abc.pdf:PDF",
-            FileFieldWriter.getStringRepresentation(file)
-        );
+        LinkedFile file = new LinkedFile("test", Path.of("X:\\Users\\abc.pdf"), "PDF");
+        assertEquals("test:X\\:/Users/abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
     }
 }

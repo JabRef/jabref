@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because it needs access to aux parser")
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        TexGroup.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
     private final Path filePath;
     private Set<String> keysUsedInAux;
@@ -65,9 +63,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
             auxParser,
             fileMonitor,
             metaData,
-            System.getProperty("user.name") +
-            '-' +
-            InetAddress.getLocalHost().getHostName()
+            System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName()
         );
     }
 
@@ -79,14 +75,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         FileUpdateMonitor fileMonitor,
         MetaData metaData
     ) throws IOException {
-        TexGroup group = new TexGroup(
-            name,
-            context,
-            filePath,
-            auxParser,
-            fileMonitor,
-            metaData
-        );
+        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
         fileMonitor.addListenerForFile(group.getFilePathResolved(), group);
         return group;
     }
@@ -120,10 +109,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
             keysUsedInAux = auxResult.getUniqueKeys();
         }
 
-        return entry
-            .getCitationKey()
-            .map(keysUsedInAux::contains)
-            .orElse(false);
+        return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
     }
 
     @Override
@@ -208,9 +194,6 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        return metaData
-            .getLatexFileDirectory(user)
-            .map(List::of)
-            .orElse(Collections.emptyList());
+        return metaData.getLatexFileDirectory(user).map(List::of).orElse(Collections.emptyList());
     }
 }

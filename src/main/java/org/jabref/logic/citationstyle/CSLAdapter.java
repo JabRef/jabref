@@ -29,8 +29,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
  */
 public class CSLAdapter {
 
-    private final JabRefItemDataProvider dataProvider =
-        new JabRefItemDataProvider();
+    private final JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();
     private String style;
     private CitationStyleOutputFormat format;
     private CSL cslInstance;
@@ -62,10 +61,8 @@ public class CSLAdapter {
      * @param newFormat usually HTML or RTF.
      * @throws IOException An error occurred in the underlying JavaScript framework
      */
-    private void initialize(
-        String newStyle,
-        CitationStyleOutputFormat newFormat
-    ) throws IOException {
+    private void initialize(String newStyle, CitationStyleOutputFormat newFormat)
+        throws IOException {
         final boolean newCslInstanceNeedsToBeCreated =
             (cslInstance == null) || !Objects.equals(newStyle, style);
         if (newCslInstanceNeedsToBeCreated) {
@@ -81,10 +78,7 @@ public class CSLAdapter {
             style = newStyle;
         }
 
-        if (
-            newCslInstanceNeedsToBeCreated ||
-            (!Objects.equals(newFormat, format))
-        ) {
+        if (newCslInstanceNeedsToBeCreated || (!Objects.equals(newFormat, format))) {
             cslInstance.setOutputFormat(newFormat.getFormat());
             format = newFormat;
         }

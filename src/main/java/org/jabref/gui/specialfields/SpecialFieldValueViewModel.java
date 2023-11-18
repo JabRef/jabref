@@ -43,9 +43,7 @@ public class SpecialFieldValueViewModel {
             case RANK_3 -> Localization.lang("Three stars");
             case RANK_4 -> Localization.lang("Four stars");
             case RANK_5 -> Localization.lang("Five stars");
-            case CLEAR_READ_STATUS -> Localization.lang(
-                "No read status information"
-            );
+            case CLEAR_READ_STATUS -> Localization.lang("No read status information");
             case READ -> Localization.lang("Read status read");
             case SKIMMED -> Localization.lang("Read status skimmed");
             case RELEVANT -> Localization.lang("Toggle relevance");

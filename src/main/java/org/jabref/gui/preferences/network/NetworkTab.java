@@ -82,10 +82,7 @@ public class NetworkTab
     private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
 
     @FXML
-    private TableColumn<
-        CustomCertificateViewModel,
-        String
-    > certSignatureAlgorithm;
+    private TableColumn<CustomCertificateViewModel, String> certSignatureAlgorithm;
 
     @FXML
     private TableColumn<CustomCertificateViewModel, String> certValidFrom;
@@ -102,8 +99,7 @@ public class NetworkTab
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public NetworkTab() {
         ViewLoader.view(this).root(this).load();
@@ -115,76 +111,43 @@ public class NetworkTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new NetworkTabViewModel(dialogService, preferencesService);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
 
-        versionCheck
-            .selectedProperty()
-            .bindBidirectional(viewModel.versionCheckProperty());
+        versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
 
-        proxyUse
-            .selectedProperty()
-            .bindBidirectional(viewModel.proxyUseProperty());
-        proxyHostnameLabel
-            .disableProperty()
-            .bind(proxyUse.selectedProperty().not());
-        proxyHostname
-            .textProperty()
-            .bindBidirectional(viewModel.proxyHostnameProperty());
+        proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
+        proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());
+        proxyHostname.textProperty().bindBidirectional(viewModel.proxyHostnameProperty());
         proxyHostname.disableProperty().bind(proxyUse.selectedProperty().not());
-        proxyPortLabel
-            .disableProperty()
-            .bind(proxyUse.selectedProperty().not());
-        proxyPort
-            .textProperty()
-            .bindBidirectional(viewModel.proxyPortProperty());
+        proxyPortLabel.disableProperty().bind(proxyUse.selectedProperty().not());
+        proxyPort.textProperty().bindBidirectional(viewModel.proxyPortProperty());
         proxyPort.disableProperty().bind(proxyUse.selectedProperty().not());
         proxyUseAuthentication
             .selectedProperty()
             .bindBidirectional(viewModel.proxyUseAuthenticationProperty());
-        proxyUseAuthentication
-            .disableProperty()
-            .bind(proxyUse.selectedProperty().not());
+        proxyUseAuthentication.disableProperty().bind(proxyUse.selectedProperty().not());
 
         BooleanBinding proxyCustomAndAuthentication = proxyUse
             .selectedProperty()
             .and(proxyUseAuthentication.selectedProperty());
-        proxyUsernameLabel
-            .disableProperty()
-            .bind(proxyCustomAndAuthentication.not());
-        proxyUsername
-            .textProperty()
-            .bindBidirectional(viewModel.proxyUsernameProperty());
-        proxyUsername
-            .disableProperty()
-            .bind(proxyCustomAndAuthentication.not());
-        proxyPasswordLabel
-            .disableProperty()
-            .bind(proxyCustomAndAuthentication.not());
-        proxyPassword
-            .textProperty()
-            .bindBidirectional(viewModel.proxyPasswordProperty());
-        proxyPassword
-            .disableProperty()
-            .bind(proxyCustomAndAuthentication.not());
+        proxyUsernameLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyUsername.textProperty().bindBidirectional(viewModel.proxyUsernameProperty());
+        proxyUsername.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyPasswordLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
+        proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyPersistPassword
             .selectedProperty()
             .bindBidirectional(viewModel.proxyPersistPasswordProperty());
         proxyPersistPassword
             .disableProperty()
-            .bind(
-                proxyCustomAndAuthentication
-                    .and(viewModel.passwordPersistAvailable())
-                    .not()
-            );
+            .bind(proxyCustomAndAuthentication.and(viewModel.passwordPersistAvailable()).not());
         EasyBind.subscribe(
             viewModel.passwordPersistAvailable(),
             available -> {
                 if (!available) {
                     persistentTooltipWrapper.setTooltip(
-                        new Tooltip(
-                            Localization.lang("Credential store not available.")
-                        )
+                        new Tooltip(Localization.lang("Credential store not available."))
                     );
                 } else {
                     persistentTooltipWrapper.setTooltip(null);
@@ -192,21 +155,12 @@ public class NetworkTab
             }
         );
 
-        proxyPassword.setRight(
-            IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode()
-        );
+        proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
         proxyPassword
             .getRight()
-            .addEventFilter(
-                MouseEvent.MOUSE_PRESSED,
-                this::proxyPasswordReveal
-            );
-        proxyPassword
-            .getRight()
-            .addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
-        proxyPassword
-            .getRight()
-            .addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
+            .addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);
+        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
+        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
@@ -228,11 +182,8 @@ public class NetworkTab
             );
         });
 
-        certSerialNumber.setCellValueFactory(data ->
-            data.getValue().serialNumberProperty()
-        );
-        certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty()
-        );
+        certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());
+        certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty());
         certSignatureAlgorithm.setCellValueFactory(data ->
             data.getValue().signatureAlgorithmProperty()
         );
@@ -247,27 +198,19 @@ public class NetworkTab
             EasyBind.map(data.getValue().validToProperty(), this::formatDate)
         );
 
-        customCertificatesTable
-            .itemsProperty()
-            .set(viewModel.customCertificateListProperty());
+        customCertificatesTable.itemsProperty().set(viewModel.customCertificateListProperty());
 
         actionsColumn.setCellValueFactory(cellData ->
             new SimpleStringProperty(cellData.getValue().getThumbprint())
         );
         new ValueTableCellFactory<CustomCertificateViewModel, String>()
-            .withGraphic(name ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
-            .withTooltip(name ->
-                Localization.lang("Remove formatter '%0'", name)
-            )
+            .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+            .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
             .withOnMouseClickedEvent(thumbprint ->
                 evt ->
                     viewModel
                         .customCertificateListProperty()
-                        .removeIf(cert ->
-                            cert.getThumbprint().equals(thumbprint)
-                        )
+                        .removeIf(cert -> cert.getThumbprint().equals(thumbprint))
             )
             .install(actionsColumn);
     }

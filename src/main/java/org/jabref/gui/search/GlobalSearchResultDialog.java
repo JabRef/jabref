@@ -69,9 +69,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             taskExecutor
         );
         previewViewer.setLayout(
-            preferencesService
-                .getPreviewPreferences()
-                .getSelectedPreviewLayout()
+            preferencesService.getPreviewPreferences().getSelectedPreviewLayout()
         );
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(
@@ -89,15 +87,11 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             taskExecutor
         );
 
-        resultsTable
-            .getColumns()
-            .removeIf(SpecialFieldColumn.class::isInstance);
+        resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
         resultsTable.getSelectionModel().selectFirst();
 
         if (resultsTable.getSelectionModel().getSelectedItem() != null) {
-            previewViewer.setEntry(
-                resultsTable.getSelectionModel().getSelectedItem().getEntry()
-            );
+            previewViewer.setEntry(resultsTable.getSelectionModel().getSelectedItem().getEntry());
         }
 
         resultsTable
@@ -135,15 +129,11 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                 event -> {
                     getDialogPane()
                         .setPrefHeight(
-                            preferencesService
-                                .getSearchPreferences()
-                                .getSearchWindowHeight()
+                            preferencesService.getSearchPreferences().getSearchWindowHeight()
                         );
                     getDialogPane()
                         .setPrefWidth(
-                            preferencesService
-                                .getSearchPreferences()
-                                .getSearchWindowWidth()
+                            preferencesService.getSearchPreferences().getSearchWindowWidth()
                         );
                 }
             );
@@ -154,12 +144,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             .addEventHandler(
                 WindowEvent.WINDOW_HIDDEN,
                 event -> {
-                    preferencesService
-                        .getSearchPreferences()
-                        .setSearchWindowHeight(getHeight());
-                    preferencesService
-                        .getSearchPreferences()
-                        .setSearchWindowWidth(getWidth());
+                    preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
+                    preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
                 }
             );
     }

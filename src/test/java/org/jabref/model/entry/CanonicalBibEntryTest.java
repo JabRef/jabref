@@ -28,8 +28,7 @@ class CanonicalBibEntryTest {
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "def");
         e.setField(StandardField.JOURNAL, "hij");
-        String canonicalRepresentation =
-            CanonicalBibEntry.getCanonicalRepresentation(e);
+        String canonicalRepresentation = CanonicalBibEntry.getCanonicalRepresentation(e);
         assertEquals(
             "@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def},\n  _jabref_shared = {sharedId: -1, version: 1}\n}",
             canonicalRepresentation
@@ -41,8 +40,7 @@ class CanonicalBibEntryTest {
         BibEntry e = new BibEntry(StandardEntryType.Article);
         e.setCitationKey("key");
         e.setField(StandardField.ABSTRACT, "line 1\nline 2");
-        String canonicalRepresentation =
-            CanonicalBibEntry.getCanonicalRepresentation(e);
+        String canonicalRepresentation = CanonicalBibEntry.getCanonicalRepresentation(e);
         assertEquals(
             "@article{key,\n  abstract = {line 1\nline 2},\n  _jabref_shared = {sharedId: -1, version: 1}\n}",
             canonicalRepresentation

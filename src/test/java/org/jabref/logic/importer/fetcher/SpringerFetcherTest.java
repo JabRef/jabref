@@ -23,16 +23,14 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @FetcherTest
-class SpringerFetcherTest
-    implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     SpringerFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         fetcher = new SpringerFetcher(importerPreferences);
     }
 
@@ -74,19 +72,13 @@ class SpringerFetcherTest
             .withField(StandardField.DATE, "2021-09-09")
             .withField(StandardField.DOI, "10.1186/s13174-021-00140-z")
             .withField(StandardField.ISSN, "1867-4828")
-            .withField(
-                StandardField.JOURNAL,
-                "Journal of Internet Services and Applications"
-            )
+            .withField(StandardField.JOURNAL, "Journal of Internet Services and Applications")
             .withField(StandardField.MONTH, "#sep#")
             .withField(StandardField.PAGES, "1--33")
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.VOLUME, "12")
             .withField(StandardField.PUBLISHER, "Springer")
-            .withField(
-                StandardField.TITLE,
-                "Being a Mentor in open source projects"
-            )
+            .withField(StandardField.TITLE, "Being a Mentor in open source projects")
             .withField(StandardField.YEAR, "2021")
             .withField(
                 StandardField.FILE,
@@ -105,10 +97,7 @@ class SpringerFetcherTest
             .withField(StandardField.DATE, "2019-04-15")
             .withField(StandardField.DOI, "10.1007/s10606-018-9335-z")
             .withField(StandardField.ISSN, "0925-9724")
-            .withField(
-                StandardField.JOURNAL,
-                "Computer Supported Cooperative Work (CSCW)"
-            )
+            .withField(StandardField.JOURNAL, "Computer Supported Cooperative Work (CSCW)")
             .withField(StandardField.MONTH, "#apr#")
             .withField(StandardField.PAGES, "247--290")
             .withField(StandardField.NUMBER, "1-2")
@@ -181,17 +170,9 @@ class SpringerFetcherTest
                 "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment."
             );
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch(
-            "JabRef Social Barriers Steinmacher"
-        );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
         assertEquals(
-            List.of(
-                articleTagThatIssue,
-                fourthArticle,
-                thirdArticle,
-                firstArticle,
-                secondArticle
-            ),
+            List.of(articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle),
             fetchedEntries
         );
     }
@@ -216,31 +197,14 @@ class SpringerFetcherTest
                     }""";
 
         JSONObject jsonObject = new JSONObject(jsonString);
-        BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(
-            jsonObject
-        );
-        assertEquals(
-            Optional.of("1992"),
-            bibEntry.getField(StandardField.YEAR)
-        );
+        BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(jsonObject);
+        assertEquals(Optional.of("1992"), bibEntry.getField(StandardField.YEAR));
         assertEquals(Optional.of("5"), bibEntry.getField(StandardField.NUMBER));
-        assertEquals(
-            Optional.of("#sep#"),
-            bibEntry.getField(StandardField.MONTH)
-        );
-        assertEquals(
-            Optional.of("10.1007/BF01201962"),
-            bibEntry.getField(StandardField.DOI)
-        );
+        assertEquals(Optional.of("#sep#"), bibEntry.getField(StandardField.MONTH));
+        assertEquals(Optional.of("10.1007/BF01201962"), bibEntry.getField(StandardField.DOI));
         assertEquals(Optional.of("8"), bibEntry.getField(StandardField.VOLUME));
-        assertEquals(
-            Optional.of("Springer"),
-            bibEntry.getField(StandardField.PUBLISHER)
-        );
-        assertEquals(
-            Optional.of("1992-09-01"),
-            bibEntry.getField(StandardField.DATE)
-        );
+        assertEquals(Optional.of("Springer"), bibEntry.getField(StandardField.PUBLISHER));
+        assertEquals(Optional.of("1992-09-01"), bibEntry.getField(StandardField.DATE));
     }
 
     @Test
@@ -249,9 +213,7 @@ class SpringerFetcherTest
     }
 
     @Test
-    @Disabled(
-        "Year search is currently broken, because the API returns mutliple years."
-    )
+    @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
     public void supportsYearSearch() {}
 
@@ -290,9 +252,7 @@ class SpringerFetcherTest
                 "The iSchool Inclusion Institute (i3) is a Research Experience for Undergraduates (REU) program in the US designed to address underrepresentation in the information sciences. i3 is a year-long, cohort-based program that prepares undergraduate students for graduate school in information science and is rooted in a research and leadership development curriculum. Using data from six years of i3 cohorts, we present in this paper a qualitative and quantitative evaluation of the program in terms of student learning, research production, and graduate school enrollment. We find that students who participate in i3 report significant learning gains in information-science- and graduate-school-related areas and that 52% of i3 participants enroll in graduate school, over 2 $$\\times $$ × the national average. Based on these and additional results, we distill recommendations for future implementations of similar programs to address underrepresentation in information science."
             );
 
-        List<BibEntry> resultPhrase = fetcher.performSearch(
-            "author:\"Redmiles David\""
-        );
+        List<BibEntry> resultPhrase = fetcher.performSearch("author:\"Redmiles David\"");
         List<BibEntry> result = fetcher.performSearch("author:Redmiles David");
 
         // Phrase search should be a subset of the normal search result.
@@ -303,9 +263,7 @@ class SpringerFetcherTest
 
     @Test
     public void supportsBooleanANDSearch() throws Exception {
-        List<BibEntry> resultJustByAuthor = fetcher.performSearch(
-            "author:\"Redmiles, David\""
-        );
+        List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
         List<BibEntry> result = fetcher.performSearch(
             "author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\""
         );
@@ -324,8 +282,7 @@ class SpringerFetcherTest
             .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .forEach(authorField -> assertTrue(authorField.contains("Redmiles"))
-            );
+            .forEach(authorField -> assertTrue(authorField.contains("Redmiles")));
     }
 
     @Override
@@ -335,11 +292,7 @@ class SpringerFetcherTest
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of(
-            "Steinmacher, Igor",
-            "Gerosa, Marco",
-            "Conte, Tayana U."
-        );
+        return List.of("Steinmacher, Igor", "Gerosa, Marco", "Conte, Tayana U.");
     }
 
     @Override

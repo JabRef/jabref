@@ -46,9 +46,7 @@ public class GrobidService {
     public GrobidService(GrobidPreferences grobidPreferences) {
         this.grobidPreferences = grobidPreferences;
         if (!grobidPreferences.isGrobidEnabled()) {
-            throw new UnsupportedOperationException(
-                "Grobid was used but not enabled."
-            );
+            throw new UnsupportedOperationException("Grobid was used but not enabled.");
         }
     }
 
@@ -67,10 +65,7 @@ public class GrobidService {
             .connect(grobidPreferences.getGrobidURL() + "/api/processCitation")
             .header("Accept", MediaTypes.APPLICATION_BIBTEX)
             .data("citations", rawCitation)
-            .data(
-                "consolidateCitations",
-                String.valueOf(consolidateCitations.getCode())
-            )
+            .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
             .method(Connection.Method.POST)
             .ignoreContentType(true)
             .timeout(100_000)
@@ -80,19 +75,12 @@ public class GrobidService {
         if (
             httpResponse == null ||
             "@misc{-1,\n  author = {}\n}\n".equals(httpResponse) ||
-            httpResponse.equals(
-                "@misc{-1,\n  author = {" + rawCitation + "}\n}\n"
-            )
+            httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")
         ) { // This filters empty BibTeX entries
-            throw new IOException(
-                "The GROBID server response does not contain anything."
-            );
+            throw new IOException("The GROBID server response does not contain anything.");
         }
 
-        return BibtexParser.singleFromString(
-            httpResponse,
-            importFormatPreferences
-        );
+        return BibtexParser.singleFromString(httpResponse, importFormatPreferences);
     }
 
     public List<BibEntry> processPDF(
@@ -100,9 +88,7 @@ public class GrobidService {
         ImportFormatPreferences importFormatPreferences
     ) throws IOException, ParseException {
         Connection.Response response = Jsoup
-            .connect(
-                grobidPreferences.getGrobidURL() + "/api/processHeaderDocument"
-            )
+            .connect(grobidPreferences.getGrobidURL() + "/api/processHeaderDocument")
             .header("Accept", MediaTypes.APPLICATION_BIBTEX)
             .data("input", filePath.toString(), Files.newInputStream(filePath))
             .method(Connection.Method.POST)
@@ -112,13 +98,8 @@ public class GrobidService {
 
         String httpResponse = response.body();
 
-        if (
-            httpResponse == null ||
-            "@misc{-1,\n  author = {}\n}\n".equals(httpResponse)
-        ) { // This filters empty BibTeX entries
-            throw new IOException(
-                "The GROBID server response does not contain anything."
-            );
+        if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse)) { // This filters empty BibTeX entries
+            throw new IOException("The GROBID server response does not contain anything.");
         }
 
         BibtexParser parser = new BibtexParser(importFormatPreferences);

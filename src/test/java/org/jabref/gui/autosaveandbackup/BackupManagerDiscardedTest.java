@@ -58,8 +58,7 @@ class BackupManagerDiscardedTest {
                 BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA,
                 false
             );
-        preferencesService =
-            mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
 
         saveDatabase();
 
@@ -75,13 +74,7 @@ class BackupManagerDiscardedTest {
     }
 
     private void saveDatabase() throws IOException {
-        try (
-            Writer writer = new AtomicFileWriter(
-                testBib,
-                StandardCharsets.UTF_8,
-                false
-            )
-        ) {
+        try (Writer writer = new AtomicFileWriter(testBib, StandardCharsets.UTF_8, false)) {
             BibWriter bibWriter = new BibWriter(
                 writer,
                 bibDatabaseContext.getDatabase().getNewLineSeparator()
@@ -110,8 +103,7 @@ class BackupManagerDiscardedTest {
     }
 
     @Test
-    public void noDiscardingAChangeLeadsToNewerBackupBeReported()
-        throws Exception {
+    public void noDiscardingAChangeLeadsToNewerBackupBeReported() throws Exception {
         databaseModification();
         makeBackup();
         assertTrue(BackupManager.backupFileDiffers(testBib, backupDir));
@@ -126,8 +118,7 @@ class BackupManagerDiscardedTest {
     }
 
     @Test
-    public void discardingAChangeLeadsToNewerBackupToBeIgnored()
-        throws Exception {
+    public void discardingAChangeLeadsToNewerBackupToBeIgnored() throws Exception {
         databaseModification();
         makeBackup();
         backupManager.discardBackup(backupDir);

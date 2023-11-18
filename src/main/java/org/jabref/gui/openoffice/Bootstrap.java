@@ -73,58 +73,29 @@ public class Bootstrap {
     private static final Random RANDOM_PIPE_NAME = new Random();
     private static boolean M_LOADED_JUH = false;
 
-    private static void insertBasicFactories(
-        XSet xSet,
-        XImplementationLoader xImpLoader
-    ) throws Exception {
+    private static void insertBasicFactories(XSet xSet, XImplementationLoader xImpLoader)
+        throws Exception {
         // insert the factory of the loader
-        xSet.insert(
-            xImpLoader.activate(
-                "com.sun.star.comp.loader.JavaLoader",
-                null,
-                null,
-                null
-            )
-        );
+        xSet.insert(xImpLoader.activate("com.sun.star.comp.loader.JavaLoader", null, null, null));
 
         // insert the factory of the URLResolver
         xSet.insert(
-            xImpLoader.activate(
-                "com.sun.star.comp.urlresolver.UrlResolver",
-                null,
-                null,
-                null
-            )
+            xImpLoader.activate("com.sun.star.comp.urlresolver.UrlResolver", null, null, null)
         );
 
         // insert the bridgefactory
         xSet.insert(
-            xImpLoader.activate(
-                "com.sun.star.comp.bridgefactory.BridgeFactory",
-                null,
-                null,
-                null
-            )
+            xImpLoader.activate("com.sun.star.comp.bridgefactory.BridgeFactory", null, null, null)
         );
 
         // insert the connector
         xSet.insert(
-            xImpLoader.activate(
-                "com.sun.star.comp.connections.Connector",
-                null,
-                null,
-                null
-            )
+            xImpLoader.activate("com.sun.star.comp.connections.Connector", null, null, null)
         );
 
         // insert the acceptor
         xSet.insert(
-            xImpLoader.activate(
-                "com.sun.star.comp.connections.Acceptor",
-                null,
-                null,
-                null
-            )
+            xImpLoader.activate("com.sun.star.comp.connections.Acceptor", null, null, null)
         );
     }
 
@@ -146,12 +117,7 @@ public class Bootstrap {
      * @since LibreOffice 5.1
      */
     public static String[] getDefaultOptions() {
-        return new String[] {
-            "--nologo",
-            "--nodefault",
-            "--norestore",
-            "--nolockcheck",
-        };
+        return new String[] { "--nologo", "--nodefault", "--norestore", "--nolockcheck" };
     }
 
     /**
@@ -164,9 +130,7 @@ public class Bootstrap {
     public static XComponentContext createInitialComponentContext(
         Hashtable<String, Object> context_entries
     ) throws Exception {
-        return createInitialComponentContext(
-            (Map<String, Object>) context_entries
-        );
+        return createInitialComponentContext((Map<String, Object>) context_entries);
     }
 
     /**
@@ -185,10 +149,7 @@ public class Bootstrap {
             XImplementationLoader.class,
             new JavaLoader()
         );
-        XInitialization xInit = UnoRuntime.queryInterface(
-            XInitialization.class,
-            xImpLoader
-        );
+        XInitialization xInit = UnoRuntime.queryInterface(XInitialization.class, xImpLoader);
         Object[] args = new Object[] { xSMgr };
         xInit.initialize(args);
 
@@ -202,10 +163,7 @@ public class Bootstrap {
             new ComponentContextEntry(null, xSMgr)
         );
         // ... xxx todo: add standard entries
-        XComponentContext xContext = new ComponentContext(
-            context_entries,
-            null
-        );
+        XComponentContext xContext = new ComponentContext(context_entries, null);
 
         xSMgr.setDefaultContext(xContext);
 
@@ -224,12 +182,10 @@ public class Bootstrap {
      * @return a freshly bootstrapped service manager
      * @throws Exception if things go awry.
      */
-    public static XMultiServiceFactory createSimpleServiceManager()
-        throws Exception {
+    public static XMultiServiceFactory createSimpleServiceManager() throws Exception {
         return UnoRuntime.queryInterface(
             XMultiServiceFactory.class,
-            createInitialComponentContext((Map<String, Object>) null)
-                .getServiceManager()
+            createInitialComponentContext((Map<String, Object>) null).getServiceManager()
         );
     }
 
@@ -242,12 +198,8 @@ public class Bootstrap {
      * <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
      * @throws Exception if things go awry.
      */
-    public static XComponentContext defaultBootstrap_InitialComponentContext()
-        throws Exception {
-        return defaultBootstrap_InitialComponentContext(
-            (String) null,
-            (Map<String, String>) null
-        );
+    public static XComponentContext defaultBootstrap_InitialComponentContext() throws Exception {
+        return defaultBootstrap_InitialComponentContext((String) null, (Map<String, String>) null);
     }
 
     /**
@@ -288,19 +240,14 @@ public class Bootstrap {
         if (null != bootstrap_parameters) {
             pairs = new String[2 * bootstrap_parameters.size()];
             int n = 0;
-            for (Map.Entry<
-                String,
-                String
-            > bootstrap_parameter : bootstrap_parameters.entrySet()) {
+            for (Map.Entry<String, String> bootstrap_parameter : bootstrap_parameters.entrySet()) {
                 pairs[n++] = bootstrap_parameter.getKey();
                 pairs[n++] = bootstrap_parameter.getValue();
             }
         }
 
         if (!M_LOADED_JUH) {
-            if (
-                "The Android Project".equals(System.getProperty("java.vendor"))
-            ) {
+            if ("The Android Project".equals(System.getProperty("java.vendor"))) {
                 // Find out if we are configured with DISABLE_DYNLOADING or
                 // not. Try to load the lo-bootstrap shared library which
                 // won't exist in the DISABLE_DYNLOADING case. (And which will
@@ -318,26 +265,16 @@ public class Bootstrap {
                 }
 
                 if (!disable_dynloading) {
-                    NativeLibraryLoader.loadLibrary(
-                        Bootstrap.class.getClassLoader(),
-                        "juh"
-                    );
+                    NativeLibraryLoader.loadLibrary(Bootstrap.class.getClassLoader(), "juh");
                 }
             } else {
-                NativeLibraryLoader.loadLibrary(
-                    Bootstrap.class.getClassLoader(),
-                    "juh"
-                );
+                NativeLibraryLoader.loadLibrary(Bootstrap.class.getClassLoader(), "juh");
             }
             M_LOADED_JUH = true;
         }
         return UnoRuntime.queryInterface(
             XComponentContext.class,
-            cppuhelper_bootstrap(
-                ini_file,
-                pairs,
-                Bootstrap.class.getClassLoader()
-            )
+            cppuhelper_bootstrap(ini_file, pairs, Bootstrap.class.getClassLoader())
         );
     }
 
@@ -354,8 +291,7 @@ public class Bootstrap {
      * @throws BootstrapException if things go awry.
      * @since UDK 3.1.0
      */
-    public static XComponentContext bootstrap(Path ooPath)
-        throws BootstrapException {
+    public static XComponentContext bootstrap(Path ooPath) throws BootstrapException {
         String[] defaultArgArray = getDefaultOptions();
         return bootstrap(defaultArgArray, ooPath);
     }
@@ -396,8 +332,7 @@ public class Bootstrap {
             pipe(p.getErrorStream(), System.err, "CE> ");
 
             // initial service manager
-            XMultiComponentFactory xLocalServiceManager =
-                xLocalContext.getServiceManager();
+            XMultiComponentFactory xLocalServiceManager = xLocalContext.getServiceManager();
             if (xLocalServiceManager == null) {
                 throw new BootstrapException("no initial service manager!");
             }
@@ -407,19 +342,14 @@ public class Bootstrap {
 
             // connection string
             String sConnect =
-                "uno:socket,host=localhost,port=2083" +
-                ";urp;StarOffice.ComponentContext";
+                "uno:socket,host=localhost,port=2083" + ";urp;StarOffice.ComponentContext";
 
             // wait until office is started
             for (int i = 0;; ++i) {
                 try {
                     // try to connect to office
                     Object context = xUrlResolver.resolve(sConnect);
-                    xContext =
-                        UnoRuntime.queryInterface(
-                            XComponentContext.class,
-                            context
-                        );
+                    xContext = UnoRuntime.queryInterface(XComponentContext.class, context);
                     if (xContext == null) {
                         throw new BootstrapException("no component context!");
                     }
@@ -444,11 +374,7 @@ public class Bootstrap {
         return xContext;
     }
 
-    private static void pipe(
-        final InputStream in,
-        final PrintStream out,
-        final String prefix
-    ) {
+    private static void pipe(final InputStream in, final PrintStream out, final String prefix) {
         new Thread("Pipe: " + prefix) {
             @Override
             public void run() {

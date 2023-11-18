@@ -34,8 +34,7 @@ import org.jbibtex.Key;
  */
 public class JabRefItemDataProvider implements ItemDataProvider {
 
-    private static final BibTeXConverter BIBTEX_CONVERTER =
-        new BibTeXConverter();
+    private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
 
     private final StringJsonBuilderFactory stringJsonBuilderFactory;
 
@@ -111,8 +110,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         );
 
         // Not every field is already generated into latex free fields
-        RemoveNewlinesFormatter removeNewlinesFormatter =
-            new RemoveNewlinesFormatter();
+        RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
 
         Optional<BibEntryType> entryType = entryTypesManager.enrich(
             bibEntry.getType(),
@@ -125,9 +123,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
             // See BibTeXConverter
             if (bibDatabaseContext.isBiblatexMode()) {
                 // Map "number" to CSL "issue", unless no number exists
-                Optional<String> numberField = bibEntry.getField(
-                    StandardField.NUMBER
-                );
+                Optional<String> numberField = bibEntry.getField(StandardField.NUMBER);
                 numberField.ifPresent(number -> {
                     bibEntry.setField(StandardField.ISSUE, number);
                     bibEntry.clearField(StandardField.NUMBER);
@@ -152,11 +148,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
                 bibEntry
                     .getField(StandardField.PAGES)
                     .ifPresent(pages -> {
-                        if (
-                            pages
-                                .toLowerCase(Locale.ROOT)
-                                .startsWith("article ")
-                        ) {
+                        if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
                             pages = pages.substring("Article ".length());
                             bibEntry.setField(StandardField.NUMBER, pages);
                         }
@@ -173,9 +165,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         }
 
         Set<Field> fields = new LinkedHashSet<>(
-            entryType
-                .map(BibEntryType::getAllFields)
-                .orElse(bibEntry.getFields())
+            entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields())
         );
         fields.addAll(bibEntry.getFields());
         for (Field key : fields) {
@@ -186,16 +176,9 @@ public class JabRefItemDataProvider implements ItemDataProvider {
                 .ifPresent(value -> {
                     if (StandardField.MONTH == key) {
                         // Change month from #mon# to mon because CSL does not support the former format
-                        value =
-                            bibEntry
-                                .getMonth()
-                                .map(Month::getShortName)
-                                .orElse(value);
+                        value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                     }
-                    bibTeXEntry.addField(
-                        new Key(key.getName()),
-                        new DigitStringValue(value)
-                    );
+                    bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
                 });
         }
         return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
@@ -208,11 +191,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         BibDatabaseContext bibDatabaseContext,
         BibEntryTypesManager entryTypesManager
     ) {
-        this.setData(
-                bibDatabaseContext.getEntries(),
-                bibDatabaseContext,
-                entryTypesManager
-            );
+        this.setData(bibDatabaseContext.getEntries(), bibDatabaseContext, entryTypesManager);
     }
 
     public void setData(
@@ -237,23 +216,14 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         return data
             .stream()
             .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-            .map(entry ->
-                bibEntryToCSLItemData(
-                    entry,
-                    bibDatabaseContext,
-                    entryTypesManager
-                )
-            )
+            .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
             .findFirst()
             .orElse(null);
     }
 
     @Override
     public Collection<String> getIds() {
-        return data
-            .stream()
-            .map(entry -> entry.getCitationKey().orElse(""))
-            .toList();
+        return data.stream().map(entry -> entry.getCitationKey().orElse("")).toList();
     }
 
     public String toJson() {
@@ -261,16 +231,8 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         this.setData(entries, bibDatabaseContext, entryTypesManager);
         return entries
             .stream()
-            .map(entry ->
-                bibEntryToCSLItemData(
-                    entry,
-                    bibDatabaseContext,
-                    entryTypesManager
-                )
-            )
-            .map(item ->
-                item.toJson(stringJsonBuilderFactory.createJsonBuilder())
-            )
+            .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
+            .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
             .map(String.class::cast)
             .collect(Collectors.joining(",", "[", "]"));
     }

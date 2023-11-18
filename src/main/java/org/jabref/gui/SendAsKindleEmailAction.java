@@ -24,19 +24,13 @@ public class SendAsKindleEmailAction extends SendAsEMailAction {
         this.executable.bind(
                 ActionHelper
                     .needsEntriesSelected(stateManager)
-                    .and(
-                        ActionHelper.hasLinkedFileForSelectedEntries(
-                            stateManager
-                        )
-                    )
+                    .and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager))
             );
     }
 
     @Override
     protected String getEmailAddress() {
-        return preferencesService
-            .getExternalApplicationsPreferences()
-            .getKindleEmail();
+        return preferencesService.getExternalApplicationsPreferences().getKindleEmail();
     }
 
     @Override

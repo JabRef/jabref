@@ -32,39 +32,26 @@ public class ZipFileChooser extends BaseDialog<Path> {
     public ZipFileChooser(FileSystem zipFile) throws IOException {
         setTitle(Localization.lang("Select file from ZIP-archive"));
 
-        TableView<Path> table = new TableView<>(
-            getSelectableZipEntries(zipFile)
-        );
-        TableColumn<Path, String> nameColumn = new TableColumn<>(
-            Localization.lang("Name")
-        );
+        TableView<Path> table = new TableView<>(getSelectableZipEntries(zipFile));
+        TableColumn<Path, String> nameColumn = new TableColumn<>(Localization.lang("Name"));
         TableColumn<Path, String> modifiedColumn = new TableColumn<>(
             Localization.lang("Last modified")
         );
-        TableColumn<Path, Number> sizeColumn = new TableColumn<>(
-            Localization.lang("Size")
-        );
+        TableColumn<Path, Number> sizeColumn = new TableColumn<>(Localization.lang("Size"));
         table.getColumns().add(nameColumn);
         table.getColumns().add(modifiedColumn);
         table.getColumns().add(sizeColumn);
-        nameColumn.setCellValueFactory(data ->
-            new ReadOnlyStringWrapper(data.getValue().toString())
+        nameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().toString())
         );
         modifiedColumn.setCellValueFactory(data -> {
             try {
                 return new ReadOnlyStringWrapper(
                     ZonedDateTime
                         .ofInstant(
-                            Files
-                                .getLastModifiedTime(data.getValue())
-                                .toInstant(),
+                            Files.getLastModifiedTime(data.getValue()).toInstant(),
                             ZoneId.systemDefault()
                         )
-                        .format(
-                            DateTimeFormatter.ofLocalizedDateTime(
-                                FormatStyle.MEDIUM
-                            )
-                        )
+                        .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
                 );
             } catch (IOException e) {
                 // Ignore
@@ -83,9 +70,7 @@ public class ZipFileChooser extends BaseDialog<Path> {
 
         getDialogPane().setContent(table);
 
-        getDialogPane()
-            .getButtonTypes()
-            .setAll(ButtonType.OK, ButtonType.CANCEL);
+        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
@@ -102,16 +87,12 @@ public class ZipFileChooser extends BaseDialog<Path> {
      * @param zipFile ZIP-File
      * @return entries that can be selected
      */
-    private static ObservableList<Path> getSelectableZipEntries(
-        FileSystem zipFile
-    ) throws IOException {
+    private static ObservableList<Path> getSelectableZipEntries(FileSystem zipFile)
+        throws IOException {
         Path rootDir = zipFile.getRootDirectories().iterator().next();
 
         return FXCollections.observableArrayList(
-            Files
-                .walk(rootDir)
-                .filter(file -> file.endsWith(".class"))
-                .collect(Collectors.toList())
+            Files.walk(rootDir).filter(file -> file.endsWith(".class")).collect(Collectors.toList())
         );
     }
 }

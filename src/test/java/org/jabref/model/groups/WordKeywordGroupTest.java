@@ -61,30 +61,21 @@ public class WordKeywordGroupTest {
 
     @Test
     public void containsFindsWordInSentence() throws Exception {
-        entry.setField(
-            StandardField.KEYWORDS,
-            "Some sentence containing test word"
-        );
+        entry.setField(StandardField.KEYWORDS, "Some sentence containing test word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
     public void containsFindsWordInCommaSeparatedList() throws Exception {
-        entry.setField(
-            StandardField.KEYWORDS,
-            "Some,list,containing,test,word"
-        );
+        entry.setField(StandardField.KEYWORDS, "Some,list,containing,test,word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
     public void containsFindsWordInSemicolonSeparatedList() throws Exception {
-        entry.setField(
-            StandardField.KEYWORDS,
-            "Some;list;containing;test;word"
-        );
+        entry.setField(StandardField.KEYWORDS, "Some;list;containing;test;word");
 
         assertTrue(testGroup.contains(entry));
     }
@@ -98,10 +89,7 @@ public class WordKeywordGroupTest {
 
     @Test
     public void containsFindsComplexWordInSentence() throws Exception {
-        entry.setField(
-            StandardField.KEYWORDS,
-            "Some sentence containing \\H2O word"
-        );
+        entry.setField(StandardField.KEYWORDS, "Some sentence containing \\H2O word");
 
         assertTrue(waterGroup.contains(entry));
     }
@@ -114,12 +102,8 @@ public class WordKeywordGroupTest {
     }
 
     @Test
-    public void containsDoesNotFindsWordInSentenceIfCaseDiffers()
-        throws Exception {
-        entry.setField(
-            StandardField.KEYWORDS,
-            "Some sentence containing Test word"
-        );
+    public void containsDoesNotFindsWordInSentenceIfCaseDiffers() throws Exception {
+        entry.setField(StandardField.KEYWORDS, "Some sentence containing Test word");
 
         assertFalse(testCaseSensitiveGroup.contains(entry));
     }
@@ -128,10 +112,7 @@ public class WordKeywordGroupTest {
     public void addChangesFieldIfEmptyBefore() throws Exception {
         testGroup.add(entry);
 
-        assertEquals(
-            Optional.of("test"),
-            entry.getField(StandardField.KEYWORDS)
-        );
+        assertEquals(Optional.of("test"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -139,10 +120,7 @@ public class WordKeywordGroupTest {
         entry.setField(StandardField.KEYWORDS, "bla, blubb");
         testGroup.add(entry);
 
-        assertEquals(
-            Optional.of("bla, blubb, test"),
-            entry.getField(StandardField.KEYWORDS)
-        );
+        assertEquals(Optional.of("bla, blubb, test"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -150,10 +128,7 @@ public class WordKeywordGroupTest {
         entry.setField(StandardField.KEYWORDS, "test, blubb");
         testGroup.add(entry);
 
-        assertEquals(
-            Optional.of("test, blubb"),
-            entry.getField(StandardField.KEYWORDS)
-        );
+        assertEquals(Optional.of("test, blubb"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -161,10 +136,7 @@ public class WordKeywordGroupTest {
         entry.setField(StandardField.KEYWORDS, "something");
         testGroup.remove(entry);
 
-        assertEquals(
-            Optional.of("something"),
-            entry.getField(StandardField.KEYWORDS)
-        );
+        assertEquals(Optional.of("something"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -172,9 +144,6 @@ public class WordKeywordGroupTest {
         entry.setField(StandardField.KEYWORDS, "test, blubb");
         testGroup.remove(entry);
 
-        assertEquals(
-            Optional.of("blubb"),
-            entry.getField(StandardField.KEYWORDS)
-        );
+        assertEquals(Optional.of("blubb"), entry.getField(StandardField.KEYWORDS));
     }
 }

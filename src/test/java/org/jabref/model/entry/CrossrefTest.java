@@ -76,10 +76,7 @@ class CrossrefTest {
     private static Stream<Arguments> authorInheritanceSource() {
         return Stream.of(
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.InBook),
-            Arguments.of(
-                StandardEntryType.MvBook,
-                StandardEntryType.BookInBook
-            ),
+            Arguments.of(StandardEntryType.MvBook, StandardEntryType.BookInBook),
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.SuppBook),
             Arguments.of(StandardEntryType.Book, StandardEntryType.InBook),
             Arguments.of(StandardEntryType.Book, StandardEntryType.BookInBook),
@@ -111,39 +108,15 @@ class CrossrefTest {
         return Stream.of(
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.Book),
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.InBook),
-            Arguments.of(
-                StandardEntryType.MvBook,
-                StandardEntryType.BookInBook
-            ),
+            Arguments.of(StandardEntryType.MvBook, StandardEntryType.BookInBook),
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.SuppBook),
-            Arguments.of(
-                StandardEntryType.MvCollection,
-                StandardEntryType.Collection
-            ),
-            Arguments.of(
-                StandardEntryType.MvCollection,
-                StandardEntryType.InCollection
-            ),
-            Arguments.of(
-                StandardEntryType.MvCollection,
-                StandardEntryType.SuppCollection
-            ),
-            Arguments.of(
-                StandardEntryType.MvProceedings,
-                StandardEntryType.Proceedings
-            ),
-            Arguments.of(
-                StandardEntryType.MvProceedings,
-                StandardEntryType.InProceedings
-            ),
-            Arguments.of(
-                StandardEntryType.MvReference,
-                StandardEntryType.Reference
-            ),
-            Arguments.of(
-                StandardEntryType.MvReference,
-                StandardEntryType.InReference
-            )
+            Arguments.of(StandardEntryType.MvCollection, StandardEntryType.Collection),
+            Arguments.of(StandardEntryType.MvCollection, StandardEntryType.InCollection),
+            Arguments.of(StandardEntryType.MvCollection, StandardEntryType.SuppCollection),
+            Arguments.of(StandardEntryType.MvProceedings, StandardEntryType.Proceedings),
+            Arguments.of(StandardEntryType.MvProceedings, StandardEntryType.InProceedings),
+            Arguments.of(StandardEntryType.MvReference, StandardEntryType.Reference),
+            Arguments.of(StandardEntryType.MvReference, StandardEntryType.InReference)
         );
     }
 
@@ -172,22 +145,10 @@ class CrossrefTest {
             Arguments.of(StandardEntryType.Book, StandardEntryType.InBook),
             Arguments.of(StandardEntryType.Book, StandardEntryType.BookInBook),
             Arguments.of(StandardEntryType.Book, StandardEntryType.SuppBook),
-            Arguments.of(
-                StandardEntryType.Collection,
-                StandardEntryType.InCollection
-            ),
-            Arguments.of(
-                StandardEntryType.Collection,
-                StandardEntryType.SuppCollection
-            ),
-            Arguments.of(
-                StandardEntryType.Reference,
-                StandardEntryType.InReference
-            ),
-            Arguments.of(
-                StandardEntryType.Proceedings,
-                StandardEntryType.InProceedings
-            )
+            Arguments.of(StandardEntryType.Collection, StandardEntryType.InCollection),
+            Arguments.of(StandardEntryType.Collection, StandardEntryType.SuppCollection),
+            Arguments.of(StandardEntryType.Reference, StandardEntryType.InReference),
+            Arguments.of(StandardEntryType.Proceedings, StandardEntryType.InProceedings)
         );
     }
 
@@ -209,14 +170,8 @@ class CrossrefTest {
 
     private static Stream<Arguments> journalTitleInheritanceSource() {
         return Stream.of(
-            Arguments.of(
-                IEEETranEntryType.Periodical,
-                StandardEntryType.Article
-            ),
-            Arguments.of(
-                IEEETranEntryType.Periodical,
-                StandardEntryType.SuppPeriodical
-            )
+            Arguments.of(IEEETranEntryType.Periodical, StandardEntryType.Article),
+            Arguments.of(IEEETranEntryType.Periodical, StandardEntryType.SuppPeriodical)
         );
     }
 
@@ -226,90 +181,38 @@ class CrossrefTest {
         parent.setType(parentType);
         child.setType(childType);
 
-        assertTrue(
-            child.getResolvedFieldOrAlias(StandardField.TITLE, db).isEmpty()
-        );
-        assertTrue(
-            child.getResolvedFieldOrAlias(StandardField.SUBTITLE, db).isEmpty()
-        );
-        assertTrue(
-            child
-                .getResolvedFieldOrAlias(StandardField.TITLEADDON, db)
-                .isEmpty()
-        );
-        assertTrue(
-            child
-                .getResolvedFieldOrAlias(StandardField.SHORTTITLE, db)
-                .isEmpty()
-        );
+        assertTrue(child.getResolvedFieldOrAlias(StandardField.TITLE, db).isEmpty());
+        assertTrue(child.getResolvedFieldOrAlias(StandardField.SUBTITLE, db).isEmpty());
+        assertTrue(child.getResolvedFieldOrAlias(StandardField.TITLEADDON, db).isEmpty());
+        assertTrue(child.getResolvedFieldOrAlias(StandardField.SHORTTITLE, db).isEmpty());
     }
 
     private static Stream<Arguments> noTitleInheritanceSource() {
         return Stream.of(
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.Book),
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.InBook),
-            Arguments.of(
-                StandardEntryType.MvBook,
-                StandardEntryType.BookInBook
-            ),
+            Arguments.of(StandardEntryType.MvBook, StandardEntryType.BookInBook),
             Arguments.of(StandardEntryType.MvBook, StandardEntryType.SuppBook),
-            Arguments.of(
-                StandardEntryType.MvCollection,
-                StandardEntryType.Collection
-            ),
-            Arguments.of(
-                StandardEntryType.MvCollection,
-                StandardEntryType.InCollection
-            ),
-            Arguments.of(
-                StandardEntryType.MvCollection,
-                StandardEntryType.SuppCollection
-            ),
-            Arguments.of(
-                StandardEntryType.MvProceedings,
-                StandardEntryType.Proceedings
-            ),
-            Arguments.of(
-                StandardEntryType.MvProceedings,
-                StandardEntryType.InProceedings
-            ),
-            Arguments.of(
-                StandardEntryType.MvReference,
-                StandardEntryType.Reference
-            ),
-            Arguments.of(
-                StandardEntryType.MvReference,
-                StandardEntryType.InReference
-            ),
+            Arguments.of(StandardEntryType.MvCollection, StandardEntryType.Collection),
+            Arguments.of(StandardEntryType.MvCollection, StandardEntryType.InCollection),
+            Arguments.of(StandardEntryType.MvCollection, StandardEntryType.SuppCollection),
+            Arguments.of(StandardEntryType.MvProceedings, StandardEntryType.Proceedings),
+            Arguments.of(StandardEntryType.MvProceedings, StandardEntryType.InProceedings),
+            Arguments.of(StandardEntryType.MvReference, StandardEntryType.Reference),
+            Arguments.of(StandardEntryType.MvReference, StandardEntryType.InReference),
             Arguments.of(StandardEntryType.Book, StandardEntryType.InBook),
             Arguments.of(StandardEntryType.Book, StandardEntryType.BookInBook),
             Arguments.of(StandardEntryType.Book, StandardEntryType.SuppBook),
-            Arguments.of(
-                StandardEntryType.Collection,
-                StandardEntryType.InCollection
-            ),
-            Arguments.of(
-                StandardEntryType.Collection,
-                StandardEntryType.SuppCollection
-            ),
-            Arguments.of(
-                StandardEntryType.Reference,
-                StandardEntryType.InReference
-            ),
-            Arguments.of(
-                StandardEntryType.Proceedings,
-                StandardEntryType.InProceedings
-            )
+            Arguments.of(StandardEntryType.Collection, StandardEntryType.InCollection),
+            Arguments.of(StandardEntryType.Collection, StandardEntryType.SuppCollection),
+            Arguments.of(StandardEntryType.Reference, StandardEntryType.InReference),
+            Arguments.of(StandardEntryType.Proceedings, StandardEntryType.InProceedings)
         );
     }
 
     @ParameterizedTest
     @MethodSource("sameNameInheritance")
-    void sameNameInheritance(
-        EntryType parentType,
-        EntryType childType,
-        StandardField field
-    ) {
+    void sameNameInheritance(EntryType parentType, EntryType childType, StandardField field) {
         parent.setType(parentType);
         child.setType(childType);
 

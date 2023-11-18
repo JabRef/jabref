@@ -20,10 +20,7 @@ public class EscapeDollarSignFormatter extends Formatter {
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-        return value.replaceAll(
-            "(?<!\\\\)\\$",
-            Matcher.quoteReplacement("\\$")
-        );
+        return value.replaceAll("(?<!\\\\)\\$", Matcher.quoteReplacement("\\$"));
     }
 
     @Override

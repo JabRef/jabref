@@ -15,18 +15,17 @@ import org.jabref.preferences.PreferencesService;
 
 public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 
-    private final ListProperty<ExporterViewModel> exporters =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<ExporterViewModel> selectedExporters =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
+    private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
 
-    public CustomExporterTabViewModel(
-        PreferencesService preferences,
-        DialogService dialogService
-    ) {
+    public CustomExporterTabViewModel(PreferencesService preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
@@ -52,10 +51,8 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addExporter() {
-        CreateModifyExporterDialogView dialog =
-            new CreateModifyExporterDialogView(null);
-        Optional<ExporterViewModel> exporter =
-            dialogService.showCustomDialogAndWait(dialog);
+        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(null);
+        Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {
             exporters.add(exporter.get());
         }
@@ -67,10 +64,10 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
         }
 
         ExporterViewModel exporterToModify = selectedExporters.get(0);
-        CreateModifyExporterDialogView dialog =
-            new CreateModifyExporterDialogView(exporterToModify);
-        Optional<ExporterViewModel> exporter =
-            dialogService.showCustomDialogAndWait(dialog);
+        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(
+            exporterToModify
+        );
+        Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {
             exporters.remove(exporterToModify);
             exporters.add(exporter.get());

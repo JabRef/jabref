@@ -35,9 +35,6 @@ public class UpperCaseFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(
-            "KDE {Amarok}",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("KDE {Amarok}", formatter.format(formatter.getExampleInput()));
     }
 }

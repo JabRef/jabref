@@ -12,9 +12,7 @@ class LibrariesResourceTest extends ServerTest {
 
     @Override
     protected Application configure() {
-        ResourceConfig resourceConfig = new ResourceConfig(
-            LibrariesResource.class
-        );
+        ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
         addPreferencesToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
     }
@@ -39,9 +37,6 @@ class LibrariesResourceTest extends ServerTest {
             .stream()
             .map(file -> file.id)
             .collect(Collectors.joining("\",\"", "[\"", "\"]"));
-        assertEquals(
-            expected,
-            target("/libraries").request().get(String.class)
-        );
+        assertEquals(expected, target("/libraries").request().get(String.class));
     }
 }

@@ -40,10 +40,7 @@ public class BibtexStringTest {
 
     @Test
     public void clonedBibtexStringEqualsOriginalString() {
-        BibtexString bibtexString = new BibtexString(
-            "AAA",
-            "An alternative action"
-        );
+        BibtexString bibtexString = new BibtexString("AAA", "An alternative action");
         bibtexString.setId("ID");
 
         BibtexString clone = (BibtexString) bibtexString.clone();
@@ -80,10 +77,7 @@ public class BibtexStringTest {
     @Test
     public void modifyingACloneDoesNotModifyTheOriginalEntry() {
         // Instantiate
-        BibtexString original = new BibtexString(
-            "AAA",
-            "An alternative action"
-        );
+        BibtexString original = new BibtexString("AAA", "An alternative action");
         original.setId("ID");
 
         BibtexString clone = (BibtexString) original.clone();

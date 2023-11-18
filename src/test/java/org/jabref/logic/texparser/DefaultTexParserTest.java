@@ -19,25 +19,16 @@ public class DefaultTexParserTest {
     private static final String UNKNOWN = "UnknownKey";
 
     private void testMatchCite(String key, String citeString) {
-        LatexParserResult latexParserResult = new DefaultLatexParser()
-            .parse(citeString);
+        LatexParserResult latexParserResult = new DefaultLatexParser().parse(citeString);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.addKey(
-            key,
-            Path.of(""),
-            1,
-            0,
-            citeString.length(),
-            citeString
-        );
+        expectedParserResult.addKey(key, Path.of(""), 1, 0, citeString.length(), citeString);
 
         assertEquals(expectedParserResult, latexParserResult);
     }
 
     private void testNonMatchCite(String citeString) {
-        LatexParserResult latexParserResult = new DefaultLatexParser()
-            .parse(citeString);
+        LatexParserResult latexParserResult = new DefaultLatexParser().parse(citeString);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         assertEquals(expectedParserResult, latexParserResult);
@@ -65,38 +56,20 @@ public class DefaultTexParserTest {
     public void testTwoCitationsSameLine() {
         String citeString = "\\citep{Einstein1920c} and \\citep{Einstein1920a}";
 
-        LatexParserResult latexParserResult = new DefaultLatexParser()
-            .parse(citeString);
+        LatexParserResult latexParserResult = new DefaultLatexParser().parse(citeString);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.addKey(
-            EINSTEIN_C,
-            Path.of(""),
-            1,
-            0,
-            21,
-            citeString
-        );
-        expectedParserResult.addKey(
-            EINSTEIN_A,
-            Path.of(""),
-            1,
-            26,
-            47,
-            citeString
-        );
+        expectedParserResult.addKey(EINSTEIN_C, Path.of(""), 1, 0, 21, citeString);
+        expectedParserResult.addKey(EINSTEIN_A, Path.of(""), 1, 26, 47, citeString);
 
         assertEquals(expectedParserResult, latexParserResult);
     }
 
     @Test
     public void testFileEncodingUtf8() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("utf-8.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
@@ -114,12 +87,9 @@ public class DefaultTexParserTest {
 
     @Test
     public void testFileEncodingIso88591() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
@@ -138,12 +108,9 @@ public class DefaultTexParserTest {
 
     @Test
     public void testFileEncodingIso885915() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
@@ -162,23 +129,15 @@ public class DefaultTexParserTest {
 
     @Test
     public void testFileEncodingForThreeFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("utf-8.tex").toURI()
-        );
-        Path texFile2 = Path.of(
-            DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI()
-        );
-        Path texFile3 = Path.of(
-            DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
+        Path texFile2 = Path.of(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
+        Path texFile3 = Path.of(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser()
             .parse(Arrays.asList(texFile, texFile2, texFile3));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult
-            .getFileList()
-            .addAll(Arrays.asList(texFile, texFile2, texFile3));
+        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2, texFile3));
         expectedParserResult.addKey(
             "anykey",
             texFile,
@@ -209,35 +168,15 @@ public class DefaultTexParserTest {
 
     @Test
     public void testSingleFile() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("paper.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
-        expectedParserResult.addBibFile(
-            texFile,
-            texFile.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addKey(
-            EINSTEIN,
-            texFile,
-            4,
-            0,
-            19,
-            "\\cite{Einstein1920}"
-        );
-        expectedParserResult.addKey(
-            DARWIN,
-            texFile,
-            5,
-            0,
-            17,
-            "\\cite{Darwin1888}."
-        );
+        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
+        expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
         expectedParserResult.addKey(
             EINSTEIN,
             texFile,
@@ -260,44 +199,18 @@ public class DefaultTexParserTest {
 
     @Test
     public void testTwoFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("paper.tex").toURI()
-        );
-        Path texFile2 = Path.of(
-            DefaultTexParserTest.class.getResource("paper2.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
+        Path texFile2 = Path.of(DefaultTexParserTest.class.getResource("paper2.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser()
             .parse(Arrays.asList(texFile, texFile2));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult
-            .getFileList()
-            .addAll(Arrays.asList(texFile, texFile2));
-        expectedParserResult.addBibFile(
-            texFile,
-            texFile.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addBibFile(
-            texFile2,
-            texFile2.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addKey(
-            EINSTEIN,
-            texFile,
-            4,
-            0,
-            19,
-            "\\cite{Einstein1920}"
-        );
-        expectedParserResult.addKey(
-            DARWIN,
-            texFile,
-            5,
-            0,
-            17,
-            "\\cite{Darwin1888}."
-        );
+        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2));
+        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
+        expectedParserResult.addBibFile(texFile2, texFile2.getParent().resolve("origin.bib"));
+        expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
         expectedParserResult.addKey(
             EINSTEIN,
             texFile,
@@ -344,37 +257,16 @@ public class DefaultTexParserTest {
 
     @Test
     public void testDuplicateFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("paper.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser()
             .parse(Arrays.asList(texFile, texFile));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult
-            .getFileList()
-            .addAll(Arrays.asList(texFile, texFile));
-        expectedParserResult.addBibFile(
-            texFile,
-            texFile.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addKey(
-            EINSTEIN,
-            texFile,
-            4,
-            0,
-            19,
-            "\\cite{Einstein1920}"
-        );
-        expectedParserResult.addKey(
-            DARWIN,
-            texFile,
-            5,
-            0,
-            17,
-            "\\cite{Darwin1888}."
-        );
+        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile));
+        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
+        expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
         expectedParserResult.addKey(
             EINSTEIN,
             texFile,
@@ -397,19 +289,13 @@ public class DefaultTexParserTest {
 
     @Test
     public void testUnknownKey() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("unknown_key.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("unknown_key.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
-        expectedParserResult.addBibFile(
-            texFile,
-            texFile.getParent().resolve("origin.bib")
-        );
+        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(
             DARWIN,
             texFile,
@@ -442,8 +328,7 @@ public class DefaultTexParserTest {
     public void testFileNotFound() {
         Path texFile = Path.of("file_not_found.tex");
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
@@ -453,52 +338,20 @@ public class DefaultTexParserTest {
 
     @Test
     public void testNestedFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            DefaultTexParserTest.class.getResource("nested.tex").toURI()
-        );
-        Path texFile2 = Path.of(
-            DefaultTexParserTest.class.getResource("nested2.tex").toURI()
-        );
-        Path texFile3 = Path.of(
-            DefaultTexParserTest.class.getResource("paper.tex").toURI()
-        );
+        Path texFile = Path.of(DefaultTexParserTest.class.getResource("nested.tex").toURI());
+        Path texFile2 = Path.of(DefaultTexParserTest.class.getResource("nested2.tex").toURI());
+        Path texFile3 = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
-        expectedParserResult
-            .getNestedFiles()
-            .addAll(Arrays.asList(texFile2, texFile3));
-        expectedParserResult.addBibFile(
-            texFile,
-            texFile.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addBibFile(
-            texFile2,
-            texFile2.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addBibFile(
-            texFile3,
-            texFile3.getParent().resolve("origin.bib")
-        );
-        expectedParserResult.addKey(
-            EINSTEIN,
-            texFile3,
-            4,
-            0,
-            19,
-            "\\cite{Einstein1920}"
-        );
-        expectedParserResult.addKey(
-            DARWIN,
-            texFile3,
-            5,
-            0,
-            17,
-            "\\cite{Darwin1888}."
-        );
+        expectedParserResult.getNestedFiles().addAll(Arrays.asList(texFile2, texFile3));
+        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
+        expectedParserResult.addBibFile(texFile2, texFile2.getParent().resolve("origin.bib"));
+        expectedParserResult.addBibFile(texFile3, texFile3.getParent().resolve("origin.bib"));
+        expectedParserResult.addKey(EINSTEIN, texFile3, 4, 0, 19, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile3, 5, 0, 17, "\\cite{Darwin1888}.");
         expectedParserResult.addKey(
             EINSTEIN,
             texFile3,

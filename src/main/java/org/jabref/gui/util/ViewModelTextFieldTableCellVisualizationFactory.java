@@ -20,8 +20,7 @@ import javafx.util.StringConverter;
 public class ViewModelTextFieldTableCellVisualizationFactory<S, T>
     implements Callback<TableColumn<S, T>, TableCell<S, T>> {
 
-    private static final PseudoClass INVALID_PSEUDO_CLASS =
-        PseudoClass.getPseudoClass("invalid");
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
 
     private Function<S, ValidationStatus> validationStatusProperty;
     private StringConverter<T> stringConverter;
@@ -33,10 +32,7 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T>
         return this;
     }
 
-    public void install(
-        TableColumn<S, T> column,
-        StringConverter<T> stringConverter
-    ) {
+    public void install(TableColumn<S, T> column, StringConverter<T> stringConverter) {
         column.setCellFactory(this);
         this.stringConverter = stringConverter;
     }
@@ -76,9 +72,7 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T>
                             (hbox.getChildren().size() > 1) &&
                             hbox.getChildren().get(1) instanceof TextField
                         ) {
-                            return Optional.of(
-                                (TextField) hbox.getChildren().get(1)
-                            );
+                            return Optional.of((TextField) hbox.getChildren().get(1));
                         }
                     }
                     return Optional.empty();
@@ -92,11 +86,7 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T>
                 subscriptions.forEach(Subscription::unsubscribe);
                 subscriptions.clear();
 
-                if (
-                    empty ||
-                    getTableRow() == null ||
-                    getTableRow().getItem() == null
-                ) {
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
@@ -108,18 +98,13 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T>
                         validationStatusProperty
                             .apply(viewModel)
                             .getHighestMessage()
-                            .ifPresent(message ->
-                                setTooltip(new Tooltip(message.getMessage()))
-                            );
+                            .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
 
                         subscriptions.add(
                             BindingsHelper.includePseudoClassWhen(
                                 this,
                                 INVALID_PSEUDO_CLASS,
-                                validationStatusProperty
-                                    .apply(viewModel)
-                                    .validProperty()
-                                    .not()
+                                validationStatusProperty.apply(viewModel).validProperty().not()
                             )
                         );
                     }

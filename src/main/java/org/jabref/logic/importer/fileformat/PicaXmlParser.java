@@ -25,22 +25,15 @@ import org.xml.sax.SAXException;
 
 public class PicaXmlParser implements Parser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PicaXmlParser.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream)
-        throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory
-                .newInstance()
-                .newDocumentBuilder();
+            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
-        } catch (
-            ParserConfigurationException | SAXException | IOException exception
-        ) {
+        } catch (ParserConfigurationException | SAXException | IOException exception) {
             throw new ParseException(exception);
         }
     }
@@ -51,9 +44,7 @@ public class PicaXmlParser implements Parser {
         // used for creating test cases
         // XMLUtil.printDocument(content);
 
-        Element root = (Element) content
-            .getElementsByTagName("zs:searchRetrieveResponse")
-            .item(0);
+        Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
         Element srwrecords = getChild("zs:records", root);
         if (srwrecords == null) {
             // no records found -> return empty list
@@ -294,9 +285,7 @@ public class PicaXmlParser implements Parser {
             }
 
             // Wenn eine Verlagsdiss vorliegt
-            if (
-                entryType.equals(StandardEntryType.PhdThesis) && (isbn != null)
-            ) {
+            if (entryType.equals(StandardEntryType.PhdThesis) && (isbn != null)) {
                 entryType = StandardEntryType.Book;
             }
 
@@ -443,9 +432,7 @@ public class PicaXmlParser implements Parser {
 
         if ("article".equals(entryType.getName()) && (journal != null)) {
             result.setField(StandardField.JOURNAL, journal);
-        } else if (
-            "incollection".equals(entryType.getName()) && (booktitle != null)
-        ) {
+        } else if ("incollection".equals(entryType.getName()) && (booktitle != null)) {
             result.setField(StandardField.BOOKTITLE, booktitle);
         }
 

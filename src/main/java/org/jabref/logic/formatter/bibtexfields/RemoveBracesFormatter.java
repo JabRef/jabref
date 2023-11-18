@@ -42,9 +42,7 @@ public class RemoveBracesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Removes braces encapsulating the complete field content."
-        );
+        return Localization.lang("Removes braces encapsulating the complete field content.");
     }
 
     @Override

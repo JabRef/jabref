@@ -6,8 +6,7 @@ import java.util.Optional;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
-class SpringerQueryTransformerTest
-    extends InfixTransformerTest<SpringerQueryTransformer> {
+class SpringerQueryTransformerTest extends InfixTransformerTest<SpringerQueryTransformer> {
 
     @Override
     public String getAuthorPrefix() {
@@ -39,8 +38,7 @@ class SpringerQueryTransformerTest
         String queryString = "year:2015";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
 
         Optional<String> expected = Optional.of("date:2015*");
         assertEquals(expected, searchQuery);
@@ -51,8 +49,7 @@ class SpringerQueryTransformerTest
         String queryString = "year-range:2012-2015";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
 
         Optional<String> expected = Optional.of(
             "date:2012* OR date:2013* OR date:2014* OR date:2015*"

@@ -38,22 +38,21 @@ public class BiblatexAPAEntryTypeDefinitions {
         )
         .build();
 
-    private static final BibEntryType LEGADMINMATERIAL =
-        new BibEntryTypeBuilder()
-            .withType(BiblatexApaEntryType.Legadminmaterial)
-            .withImportantFields(
-                StandardField.NUMBER,
-                StandardField.SHORTTITLE,
-                StandardField.NOTE,
-                StandardField.KEYWORDS
-            )
-            .withRequiredFields(
-                StandardField.TITLE,
-                BiblatexApaField.CITATION,
-                StandardField.URL,
-                StandardField.DATE
-            )
-            .build();
+    private static final BibEntryType LEGADMINMATERIAL = new BibEntryTypeBuilder()
+        .withType(BiblatexApaEntryType.Legadminmaterial)
+        .withImportantFields(
+            StandardField.NUMBER,
+            StandardField.SHORTTITLE,
+            StandardField.NOTE,
+            StandardField.KEYWORDS
+        )
+        .withRequiredFields(
+            StandardField.TITLE,
+            BiblatexApaField.CITATION,
+            StandardField.URL,
+            StandardField.DATE
+        )
+        .build();
 
     private static final BibEntryType CONSTITUTION = new BibEntryTypeBuilder()
         .withType(BiblatexApaEntryType.Constitution)

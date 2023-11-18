@@ -36,8 +36,6 @@ public class ARK extends EprintIdentifier {
 
     @Override
     public Optional<URI> getExternalURI() {
-        return Optional.of(
-            URI.create("https://n2t.net/ark:/" + getNormalized())
-        );
+        return Optional.of(URI.create("https://n2t.net/ark:/" + getNormalized()));
     }
 }

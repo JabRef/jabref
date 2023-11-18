@@ -33,10 +33,7 @@ import org.jabref.model.entry.field.UnknownField;
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
  */
 public class ZbMATH
-    implements
-        SearchBasedParserFetcher,
-        IdBasedParserFetcher,
-        EntryBasedParserFetcher {
+    implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
 
     private final ImportFormatPreferences preferences;
 
@@ -52,17 +49,13 @@ public class ZbMATH
     @Override
     public URL getURLForEntry(BibEntry entry)
         throws URISyntaxException, MalformedURLException, FetcherException {
-        Optional<String> zblidInEntry = entry.getField(
-            StandardField.ZBL_NUMBER
-        );
+        Optional<String> zblidInEntry = entry.getField(StandardField.ZBL_NUMBER);
         if (zblidInEntry.isPresent()) {
             // zbmath id is already present
             return getUrlForIdentifier(zblidInEntry.get());
         }
 
-        URIBuilder uriBuilder = new URIBuilder(
-            "https://zbmath.org/citationmatching/match"
-        );
+        URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/citationmatching/match");
         uriBuilder.addParameter("n", "1"); // return only the best matching entry
         uriBuilder.addParameter("m", "5"); // return only entries with a score of at least 5
 
@@ -107,10 +100,7 @@ public class ZbMATH
         HttpResponse<JsonNode> response = Unirest.get(urlString).asJson();
         String zblid = null;
         if (response.getStatus() == 200) {
-            JSONArray result = response
-                .getBody()
-                .getObject()
-                .getJSONArray("results");
+            JSONArray result = response.getBody().getObject().getJSONArray("results");
             if (!result.isEmpty()) {
                 zblid = result.getJSONObject(0).get("zbl_id").toString();
             }
@@ -126,14 +116,10 @@ public class ZbMATH
     @Override
     public URL getURLForQuery(QueryNode luceneQuery)
         throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(
-            "https://zbmath.org/bibtexoutput/"
-        );
+        URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
         uriBuilder.addParameter(
             "q",
-            new ZbMathQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new ZbMathQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         ); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
@@ -143,9 +129,7 @@ public class ZbMATH
     @Override
     public URL getUrlForIdentifier(String identifier)
         throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(
-            "https://zbmath.org/bibtexoutput/"
-        );
+        URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
         String query = "an:".concat(identifier); // use an: to search for a zbMATH identifier
         uriBuilder.addParameter("q", query);
         uriBuilder.addParameter("start", "0"); // start index
@@ -160,22 +144,10 @@ public class ZbMATH
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new MoveFieldCleanup(
-            new UnknownField("msc2010"),
-            StandardField.KEYWORDS
-        )
+        new MoveFieldCleanup(new UnknownField("msc2010"), StandardField.KEYWORDS).cleanup(entry);
+        new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveBracesFormatter())
             .cleanup(entry);
-        new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL)
-            .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.JOURNAL,
-            new RemoveBracesFormatter()
-        )
-            .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.TITLE,
-            new RemoveBracesFormatter()
-        )
-            .cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
     }
 }

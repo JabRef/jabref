@@ -13,8 +13,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-public class LibraryPropertiesView
-    extends BaseDialog<LibraryPropertiesViewModel> {
+public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel> {
 
     @FXML
     private TabPane tabPane;
@@ -63,9 +62,7 @@ public class LibraryPropertiesView
             scrollPane.setFitToWidth(true);
             tabPane.getTabs().add(new Tab(pane.getTabName(), scrollPane));
             if (pane instanceof AbstractPropertiesTabView<?> propertiesTab) {
-                propertiesTab
-                    .prefHeightProperty()
-                    .bind(tabPane.tabMaxHeightProperty());
+                propertiesTab.prefHeightProperty().bind(tabPane.tabMaxHeightProperty());
                 propertiesTab.prefWidthProperty().bind(tabPane.widthProperty());
                 propertiesTab.getStyleClass().add("propertiesTab");
             }

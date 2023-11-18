@@ -33,12 +33,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ScienceDirect.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
-    private static final String API_URL =
-        "https://api.elsevier.com/content/article/doi/";
+    private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
     private static final String FETCHER_NAME = "ScienceDirect";
 
@@ -52,9 +49,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
         if (doi.isEmpty()) {
             // Full text fetching works only if a DOI is present
             return Optional.empty();
@@ -73,10 +68,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             .get();
 
         // Retrieve PDF link from meta data (most recent)
-        Elements metaLinks = html.getElementsByAttributeValue(
-            "name",
-            "citation_pdf_url"
-        );
+        Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
         if (!metaLinks.isEmpty()) {
             String link = metaLinks.first().attr("content");
             return Optional.of(new URL(link));
@@ -112,27 +104,14 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             String linkToPdf = pdfDownload.getString("linkToPdf");
             URL url = new URL(urlFromDoi);
             fullLinkToPdf =
-                String.format(
-                    "%s://%s%s",
-                    url.getProtocol(),
-                    url.getAuthority(),
-                    linkToPdf
-                );
+                String.format("%s://%s%s", url.getProtocol(), url.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
-            JSONObject queryParamsObject = urlMetadata.getJSONObject(
-                "queryParams"
-            );
+            JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
             String queryParameters = queryParamsObject
                 .keySet()
                 .stream()
-                .map(key ->
-                    String.format(
-                        "%s=%s",
-                        key,
-                        queryParamsObject.getString(key)
-                    )
-                )
+                .map(key -> String.format("%s=%s", key, queryParamsObject.getString(key)))
                 .collect(Collectors.joining("&"));
             fullLinkToPdf =
                 String.format(
@@ -147,10 +126,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
-        LOGGER.info(
-            "Fulltext PDF found at ScienceDirect at {}.",
-            fullLinkToPdf
-        );
+        LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
         try {
             return Optional.of(new URL(fullLinkToPdf));
         } catch (MalformedURLException e) {
@@ -170,10 +146,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest
                 .get(request)
-                .header(
-                    "X-ELS-APIKey",
-                    importerPreferences.getApiKey(getName()).orElse(API_KEY)
-                )
+                .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(API_KEY))
                 .queryString("httpAccept", "application/json")
                 .asJson();
 

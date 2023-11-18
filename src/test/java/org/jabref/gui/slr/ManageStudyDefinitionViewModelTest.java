@@ -24,10 +24,8 @@ class ManageStudyDefinitionViewModelTest {
     @BeforeEach
     void setUp() {
         // code taken from org.jabref.logic.importer.WebFetchersTest.setUp
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importerPreferences =
-            mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         dialogService = mock(DialogService.class);
     }
 
@@ -43,10 +41,7 @@ class ManageStudyDefinitionViewModelTest {
             List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
-                new StudyCatalogItem(
-                    "Bibliotheksverbund Bayern (Experimental)",
-                    false
-                ),
+                new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyCatalogItem("Biodiversity Heritage", false),
                 new StudyCatalogItem("CiteSeerX", false),
                 new StudyCatalogItem("Crossref", false),
@@ -78,10 +73,7 @@ class ManageStudyDefinitionViewModelTest {
             List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
-                new StudyCatalogItem(
-                    "Bibliotheksverbund Bayern (Experimental)",
-                    false
-                ),
+                new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyCatalogItem("Biodiversity Heritage", false),
                 new StudyCatalogItem("CiteSeerX", false),
                 new StudyCatalogItem("Crossref", false),
@@ -105,19 +97,9 @@ class ManageStudyDefinitionViewModelTest {
         );
     }
 
-    private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(
-        Path tempDir
-    ) {
-        List<StudyDatabase> databases = List.of(
-            new StudyDatabase("ACM Portal", true)
-        );
-        Study study = new Study(
-            List.of("Name"),
-            "title",
-            List.of("Q1"),
-            List.of(),
-            databases
-        );
+    private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
+        List<StudyDatabase> databases = List.of(new StudyDatabase("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("Q1"), List.of(), databases);
         return new ManageStudyDefinitionViewModel(
             study,
             tempDir,

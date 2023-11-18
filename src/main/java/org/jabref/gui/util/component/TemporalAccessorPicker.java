@@ -44,8 +44,9 @@ public class TemporalAccessorPicker extends DatePicker {
     private final ObjectProperty<TemporalAccessor> temporalAccessorValue =
         new SimpleObjectProperty<>(null);
 
-    private final DateTimeFormatter defaultFormatter =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern(
+        "yyyy-MM-dd HH:mm"
+    );
     private final ObjectProperty<StringConverter<TemporalAccessor>> converter =
         new SimpleObjectProperty<>(null);
 
@@ -71,11 +72,7 @@ public class TemporalAccessorPicker extends DatePicker {
                             Globals.getKeyPrefs()
                         )
                     );
-                TextInputControlBehavior.showContextMenu(
-                    getEditor(),
-                    contextMenu,
-                    event
-                );
+                TextInputControlBehavior.showContextMenu(getEditor(), contextMenu, event);
             });
     }
 
@@ -113,45 +110,34 @@ public class TemporalAccessorPicker extends DatePicker {
         }
     }
 
-    public final ObjectProperty<
-        StringConverter<TemporalAccessor>
-    > stringConverterProperty() {
+    public final ObjectProperty<StringConverter<TemporalAccessor>> stringConverterProperty() {
         return converter;
     }
 
     public final StringConverter<TemporalAccessor> getStringConverter() {
-        StringConverter<TemporalAccessor> newConverter =
-            new StringConverter<>() {
-                @Override
-                public String toString(TemporalAccessor value) {
-                    return defaultFormatter.format(value);
-                }
+        StringConverter<TemporalAccessor> newConverter = new StringConverter<>() {
+            @Override
+            public String toString(TemporalAccessor value) {
+                return defaultFormatter.format(value);
+            }
 
-                @Override
-                public TemporalAccessor fromString(String value) {
-                    if (StringUtil.isNotBlank(value)) {
-                        try {
-                            return defaultFormatter.parse(value);
-                        } catch (DateTimeParseException exception) {
-                            return Date
-                                .parse(value)
-                                .map(Date::toTemporalAccessor)
-                                .orElse(null);
-                        }
-                    } else {
-                        return null;
+            @Override
+            public TemporalAccessor fromString(String value) {
+                if (StringUtil.isNotBlank(value)) {
+                    try {
+                        return defaultFormatter.parse(value);
+                    } catch (DateTimeParseException exception) {
+                        return Date.parse(value).map(Date::toTemporalAccessor).orElse(null);
                     }
+                } else {
+                    return null;
                 }
-            };
-        return Objects.requireNonNullElseGet(
-            stringConverterProperty().get(),
-            () -> newConverter
-        );
+            }
+        };
+        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> newConverter);
     }
 
-    public final void setStringConverter(
-        StringConverter<TemporalAccessor> value
-    ) {
+    public final void setStringConverter(StringConverter<TemporalAccessor> value) {
         stringConverterProperty().set(value);
     }
 
@@ -159,9 +145,7 @@ public class TemporalAccessorPicker extends DatePicker {
         return temporalAccessorValue.get();
     }
 
-    public void setTemporalAccessorValue(
-        TemporalAccessor temporalAccessorValue
-    ) {
+    public void setTemporalAccessorValue(TemporalAccessor temporalAccessorValue) {
         this.temporalAccessorValue.set(temporalAccessorValue);
     }
 
@@ -176,9 +160,7 @@ public class TemporalAccessorPicker extends DatePicker {
             TemporalAccessor value = getTemporalAccessorValue();
 
             // Keeps the original text when it is an invalid date
-            return value != null
-                ? getStringConverter().toString(value)
-                : getEditor().getText();
+            return value != null ? getStringConverter().toString(value) : getEditor().getText();
         }
 
         @Override

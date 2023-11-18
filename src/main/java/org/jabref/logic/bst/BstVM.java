@@ -64,10 +64,7 @@ public class BstVM {
      * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
      * @return list of references in plain text form
      */
-    public String render(
-        Collection<BibEntry> bibEntries,
-        BibDatabase bibDatabase
-    ) {
+    public String render(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
         Objects.requireNonNull(bibEntries);
 
         List<BstEntry> entries = new ArrayList<>(bibEntries.size());
@@ -77,24 +74,14 @@ public class BstVM {
 
         StringBuilder resultBuffer = new StringBuilder();
 
-        BstVMContext bstVMContext = new BstVMContext(
-            entries,
-            bibDatabase,
-            path
-        );
+        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase, path);
         bstVMContext
             .functions()
-            .putAll(
-                new BstFunctions(bstVMContext, resultBuffer)
-                    .getBuiltInFunctions()
-            );
+            .putAll(new BstFunctions(bstVMContext, resultBuffer).getBuiltInFunctions());
         bstVMContext.integers().put("entry.max$", Integer.MAX_VALUE);
         bstVMContext.integers().put("global.max$", Integer.MAX_VALUE);
 
-        BstVMVisitor bstVMVisitor = new BstVMVisitor(
-            bstVMContext,
-            resultBuffer
-        );
+        BstVMVisitor bstVMVisitor = new BstVMVisitor(bstVMContext, resultBuffer);
         bstVMVisitor.visit(tree);
 
         latestContext = bstVMContext;
@@ -118,8 +105,7 @@ public class BstVM {
 
     private static class ThrowingErrorListener extends BaseErrorListener {
 
-        public static final ThrowingErrorListener INSTANCE =
-            new ThrowingErrorListener();
+        public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
 
         @Override
         public void syntaxError(

@@ -9,19 +9,13 @@ public class HTMLUnicodeConversionMaps {
     // The symbols can be seen at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
     // http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
     // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
-    public static final Map<String, String> HTML_LATEX_CONVERSION_MAP =
-        new HashMap<>();
+    public static final Map<String, String> HTML_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
-    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS =
-        new HashMap<>();
-    public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP =
-        new HashMap<>();
-    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP =
-        new HashMap<>();
-    public static final Map<String, String> LATEX_HTML_CONVERSION_MAP =
-        new HashMap<>();
-    public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP =
-        new HashMap<>();
+    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
+    public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
 
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
@@ -864,13 +858,8 @@ public class HTMLUnicodeConversionMaps {
                             "&" + aConversionList[1] + ";"
                         );
                     }
-                } else if (
-                    !(aConversionList[0].isEmpty()) && !strippedLaTeX.isEmpty()
-                ) {
-                    LATEX_HTML_CONVERSION_MAP.put(
-                        strippedLaTeX,
-                        "&#" + aConversionList[0] + ";"
-                    );
+                } else if (!(aConversionList[0].isEmpty()) && !strippedLaTeX.isEmpty()) {
+                    LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
                 }
                 if (!(aConversionList[0].isEmpty())) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(
@@ -879,34 +868,21 @@ public class HTMLUnicodeConversionMaps {
                     );
                     if (Integer.decode(aConversionList[0]) > 128) {
                         String unicodeSymbol = String.valueOf(
-                            Character.toChars(
-                                Integer.decode(aConversionList[0])
-                            )
+                            Character.toChars(Integer.decode(aConversionList[0]))
                         );
-                        UNICODE_LATEX_CONVERSION_MAP.put(
-                            unicodeSymbol,
-                            aConversionList[2]
-                        );
+                        UNICODE_LATEX_CONVERSION_MAP.put(unicodeSymbol, aConversionList[2]);
                         if (!strippedLaTeX.isEmpty()) {
-                            LATEX_UNICODE_CONVERSION_MAP.put(
-                                strippedLaTeX,
-                                unicodeSymbol
-                            );
+                            LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, unicodeSymbol);
                         }
                     }
                 }
             }
         }
         for (String[] anAccentList : ACCENT_LIST) {
-            ESCAPED_ACCENTS.put(
-                Integer.decode(anAccentList[0]),
-                anAccentList[1]
-            );
+            ESCAPED_ACCENTS.put(Integer.decode(anAccentList[0]), anAccentList[1]);
             UNICODE_ESCAPED_ACCENTS.put(
                 anAccentList[1],
-                String.valueOf(
-                    Character.toChars(Integer.decode(anAccentList[0]))
-                )
+                String.valueOf(Character.toChars(Integer.decode(anAccentList[0])))
             );
         }
         // Manually added values which are killed by cleanLaTeX

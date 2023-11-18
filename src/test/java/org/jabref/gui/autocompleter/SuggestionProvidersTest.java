@@ -35,40 +35,26 @@ class SuggestionProvidersTest {
             StandardField.PUBLISHER,
             SpecialField.PRINTED
         );
-        AutoCompletePreferences autoCompletePreferences =
-            new AutoCompletePreferences(
-                true,
-                AutoCompleteFirstNameMode.BOTH,
-                AutoCompletePreferences.NameFormat.BOTH,
-                completeFields
-            );
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(
+            true,
+            AutoCompleteFirstNameMode.BOTH,
+            AutoCompletePreferences.NameFormat.BOTH,
+            completeFields
+        );
         this.suggestionProviders =
-            new SuggestionProviders(
-                database,
-                abbreviationRepository,
-                autoCompletePreferences
-            );
+            new SuggestionProviders(database, abbreviationRepository, autoCompletePreferences);
     }
 
     private static Stream<Arguments> getTestPairs() {
         return Stream.of(
             // a person
-            Arguments.of(
-                PersonNameSuggestionProvider.class,
-                StandardField.AUTHOR
-            ),
+            Arguments.of(PersonNameSuggestionProvider.class, StandardField.AUTHOR),
             // a single entry field
             Arguments.of(BibEntrySuggestionProvider.class, StandardField.XREF),
             // multi entry fieldg
-            Arguments.of(
-                JournalsSuggestionProvider.class,
-                StandardField.JOURNAL
-            ),
+            Arguments.of(JournalsSuggestionProvider.class, StandardField.JOURNAL),
             // TODO: We should offer pre-configured publishers
-            Arguments.of(
-                JournalsSuggestionProvider.class,
-                StandardField.PUBLISHER
-            ),
+            Arguments.of(JournalsSuggestionProvider.class, StandardField.PUBLISHER),
             // TODO: Auto completion should be aware of possible values of special fields
             Arguments.of(WordSuggestionProvider.class, SpecialField.PRINTED)
         );
@@ -80,10 +66,7 @@ class SuggestionProvidersTest {
         Class<SuggestionProvider<BibEntry>> expected,
         Field field
     ) {
-        assertEquals(
-            expected,
-            suggestionProviders.getForField(field).getClass()
-        );
+        assertEquals(expected, suggestionProviders.getForField(field).getClass());
     }
 
     @Test

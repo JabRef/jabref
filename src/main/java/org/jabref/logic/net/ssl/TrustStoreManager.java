@@ -28,9 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class TrustStoreManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        TrustStoreManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);
     private static final String STORE_PASSWORD = "changeit";
 
     private final Path storePath;
@@ -42,21 +40,11 @@ public class TrustStoreManager {
         createTruststoreFileIfNotExist(storePath);
         try {
             store = KeyStore.getInstance(KeyStore.getDefaultType());
-            store.load(
-                new FileInputStream(storePath.toFile()),
-                STORE_PASSWORD.toCharArray()
-            );
+            store.load(new FileInputStream(storePath.toFile()), STORE_PASSWORD.toCharArray());
         } catch (
-            CertificateException
-            | IOException
-            | NoSuchAlgorithmException
-            | KeyStoreException e
+            CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException e
         ) {
-            LOGGER.warn(
-                "Error while loading trust store from: {}",
-                storePath.toAbsolutePath(),
-                e
-            );
+            LOGGER.warn("Error while loading trust store from: {}", storePath.toAbsolutePath(), e);
         }
     }
 
@@ -65,20 +53,13 @@ public class TrustStoreManager {
         Objects.requireNonNull(certPath);
 
         try {
-            CertificateFactory certificateFactory =
-                CertificateFactory.getInstance("X509");
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
             store.setCertificateEntry(
                 alias,
-                certificateFactory.generateCertificate(
-                    new FileInputStream(certPath.toFile())
-                )
+                certificateFactory.generateCertificate(new FileInputStream(certPath.toFile()))
             );
         } catch (KeyStoreException | CertificateException | IOException e) {
-            LOGGER.warn(
-                "Error while adding a new certificate to the truststore: {}",
-                alias,
-                e
-            );
+            LOGGER.warn("Error while adding a new certificate to the truststore: {}", alias, e);
         }
     }
 
@@ -87,11 +68,7 @@ public class TrustStoreManager {
         try {
             store.deleteEntry(alias);
         } catch (KeyStoreException e) {
-            LOGGER.warn(
-                "Error while deleting certificate entry with alias: {}",
-                alias,
-                e
-            );
+            LOGGER.warn("Error while deleting certificate entry with alias: {}", alias, e);
         }
     }
 
@@ -100,11 +77,7 @@ public class TrustStoreManager {
         try {
             return store.isCertificateEntry(alias);
         } catch (KeyStoreException e) {
-            LOGGER.warn(
-                "Error while checking certificate existence: {}",
-                alias,
-                e
-            );
+            LOGGER.warn("Error while checking certificate existence: {}", alias, e);
         }
         return false;
     }
@@ -129,15 +102,9 @@ public class TrustStoreManager {
 
     public void flush() {
         try {
-            store.store(
-                Files.newOutputStream(storePath),
-                STORE_PASSWORD.toCharArray()
-            );
+            store.store(Files.newOutputStream(storePath), STORE_PASSWORD.toCharArray());
         } catch (
-            KeyStoreException
-            | IOException
-            | NoSuchAlgorithmException
-            | CertificateException e
+            KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e
         ) {
             LOGGER.warn("Error while flushing trust store", e);
         }
@@ -154,10 +121,7 @@ public class TrustStoreManager {
      * Deletes all custom certificates, Custom certificates are certificates with alias that ends with {@code [custom]}
      */
     public void clearCustomCertificates() {
-        aliases()
-            .stream()
-            .filter(this::isCustomCertificate)
-            .forEach(this::deleteCertificate);
+        aliases().stream().filter(this::isCustomCertificate).forEach(this::deleteCertificate);
         flush();
     }
 
@@ -175,11 +139,7 @@ public class TrustStoreManager {
         try {
             return (X509Certificate) store.getCertificate(alias);
         } catch (KeyStoreException e) {
-            LOGGER.warn(
-                "Error while getting certificate of alias: {}",
-                alias,
-                e
-            );
+            LOGGER.warn("Error while getting certificate of alias: {}", alias, e);
         }
         return null;
     }
@@ -195,8 +155,7 @@ public class TrustStoreManager {
             LOGGER.debug("Trust store path: {}", storePath.toAbsolutePath());
             if (Files.notExists(storePath)) {
                 Path storeResourcePath = Path.of(
-                    TrustStoreManager.class.getResource("/ssl/truststore.jks")
-                        .toURI()
+                    TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI()
                 );
                 Files.createDirectories(storePath.getParent());
                 Files.copy(storeResourcePath, storePath);
@@ -276,10 +235,8 @@ public class TrustStoreManager {
             }
 
             @Override
-            public void checkServerTrusted(
-                X509Certificate[] chain,
-                String authType
-            ) throws CertificateException {
+            public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
                 try {
                     customTrustManager.checkServerTrusted(chain, authType);
                 } catch (CertificateException e) {
@@ -289,10 +246,8 @@ public class TrustStoreManager {
             }
 
             @Override
-            public void checkClientTrusted(
-                X509Certificate[] chain,
-                String authType
-            ) throws CertificateException {
+            public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
                 // If you're planning to use client-cert auth,
                 // do the same as checking the server.
                 jreTrustManager.checkClientTrusted(chain, authType);
@@ -300,17 +255,14 @@ public class TrustStoreManager {
         };
     }
 
-    private static void setSystemTrustManager(
-        X509TrustManager mergedTrustManager
-    ) throws NoSuchAlgorithmException, KeyManagementException {
+    private static void setSystemTrustManager(X509TrustManager mergedTrustManager)
+        throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[] { mergedTrustManager }, null);
 
         // You don't have to set this as the default context,
         // it depends on the library you're using.
         SSLContext.setDefault(sslContext);
-        HttpsURLConnection.setDefaultSSLSocketFactory(
-            sslContext.getSocketFactory()
-        );
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 }

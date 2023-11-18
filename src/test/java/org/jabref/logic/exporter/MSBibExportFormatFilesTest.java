@@ -40,9 +40,7 @@ public class MSBibExportFormatFilesTest {
         resourceDir =
             Path
                 .of(
-                    MSBibExportFormatFilesTest.class.getResource(
-                            "MsBibExportFormatTest1.bib"
-                        )
+                    MSBibExportFormatFilesTest.class.getResource("MsBibExportFormatTest1.bib")
                         .toURI()
                 )
                 .getParent();
@@ -99,9 +97,7 @@ public class MSBibExportFormatFilesTest {
             isSimilarTo(actual)
                 .ignoreWhitespace()
                 .normalizeWhitespace()
-                .withNodeMatcher(
-                    new DefaultNodeMatcher(ElementSelectors.byNameAndText)
-                )
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
         );
     }
 }

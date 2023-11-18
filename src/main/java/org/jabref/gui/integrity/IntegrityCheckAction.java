@@ -56,17 +56,13 @@ public class IntegrityCheckAction extends SimpleCommand {
             preferencesService.getFilePreferences(),
             preferencesService.getCitationKeyPatternPreferences(),
             abbreviationRepository,
-            preferencesService
-                .getEntryEditorPreferences()
-                .shouldAllowIntegerEditionBibtex()
+            preferencesService.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
         );
 
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
             protected List<IntegrityMessage> call() {
-                ObservableList<BibEntry> entries = database
-                    .getDatabase()
-                    .getEntries();
+                ObservableList<BibEntry> entries = database.getDatabase().getEntries();
                 List<IntegrityMessage> result = new ArrayList<>(
                     check.checkDatabase(database.getDatabase())
                 );
@@ -89,18 +85,12 @@ public class IntegrityCheckAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
                 dialogService.showCustomDialogAndWait(
-                    new IntegrityCheckDialog(
-                        messages,
-                        frame.getCurrentLibraryTab()
-                    )
+                    new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab())
                 );
             }
         });
         task.setOnFailed(event ->
-            dialogService.showErrorDialogAndWait(
-                "Integrity check failed.",
-                task.getException()
-            )
+            dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException())
         );
 
         dialogService.showProgressDialog(

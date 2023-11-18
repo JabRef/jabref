@@ -48,9 +48,7 @@ public abstract class AbstractCitationKeyPattern {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(
-            "AbstractCitationKeyPattern{"
-        );
+        final StringBuilder sb = new StringBuilder("AbstractCitationKeyPattern{");
         sb.append("defaultPattern=").append(defaultPattern);
         sb.append(", data=").append(data);
         sb.append('}');
@@ -67,8 +65,7 @@ public abstract class AbstractCitationKeyPattern {
         }
         AbstractCitationKeyPattern that = (AbstractCitationKeyPattern) o;
         return (
-            Objects.equals(defaultPattern, that.defaultPattern) &&
-            Objects.equals(data, that.data)
+            Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data)
         );
     }
 
@@ -124,8 +121,7 @@ public abstract class AbstractCitationKeyPattern {
      */
     public void setDefaultValue(String bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
-        this.defaultPattern =
-            AbstractCitationKeyPattern.split(bibtexKeyPattern);
+        this.defaultPattern = AbstractCitationKeyPattern.split(bibtexKeyPattern);
     }
 
     public Set<EntryType> getAllKeys() {

@@ -53,9 +53,7 @@ public class IconTheme {
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
     public static final Color SELECTED_COLOR = Color.web("#50618F");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        IconTheme.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
         IconTheme.class.getResource("/images/Icons.properties"),
         "/images/external/"
@@ -72,12 +70,8 @@ public class IconTheme {
         }
         return ICON_NAMES
             .stream()
-            .filter(icon ->
-                icon.toString().equals(code.toUpperCase(Locale.ENGLISH))
-            )
-            .map(internalMat ->
-                new InternalMaterialDesignIcon(internalMat).withColor(color)
-            )
+            .filter(icon -> icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
+            .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color))
             .findFirst();
     }
 
@@ -86,9 +80,7 @@ public class IconTheme {
     }
 
     private static void loadAllIkons() {
-        ServiceLoader<IkonProvider> providers = ServiceLoader.load(
-            IkonProvider.class
-        );
+        ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
 
         for (IkonProvider provider : providers) {
             ICON_NAMES.addAll(allOf(provider.getIkon()));
@@ -141,10 +133,7 @@ public class IconTheme {
      * @return A Map containing all key-value pairs found.
      */
     // FIXME: prefix can be removed?!
-    private static Map<String, String> readIconThemeFile(
-        URL url,
-        String prefix
-    ) {
+    private static Map<String, String> readIconThemeFile(URL url, String prefix) {
         Objects.requireNonNull(url, "url");
         Objects.requireNonNull(prefix, "prefix");
 
@@ -152,10 +141,7 @@ public class IconTheme {
 
         try (
             BufferedReader in = new BufferedReader(
-                new InputStreamReader(
-                    url.openStream(),
-                    StandardCharsets.ISO_8859_1
-                )
+                new InputStreamReader(url.openStream(), StandardCharsets.ISO_8859_1)
             )
         ) {
             String line;

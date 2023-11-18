@@ -31,10 +31,7 @@ public class FieldColumn extends MainTableColumn<String> {
 
         if (fields.hasExactlyOne()) {
             // comparator can't parse more than one value
-            Field field = fields
-                .getFields()
-                .stream()
-                .collect(MoreCollectors.onlyElement());
+            Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
 
             if ((field instanceof UnknownField) || field.isNumeric()) {
                 this.setComparator(new NumericFieldComparator());
@@ -54,9 +51,7 @@ public class FieldColumn extends MainTableColumn<String> {
         return fields.getDisplayName();
     }
 
-    private ObservableValue<String> getFieldValue(
-        BibEntryTableViewModel entry
-    ) {
+    private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
         if (fields.isEmpty()) {
             return null;
         } else {

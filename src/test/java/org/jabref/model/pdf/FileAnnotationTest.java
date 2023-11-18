@@ -49,9 +49,6 @@ public class FileAnnotationTest {
             Optional.empty()
         );
 
-        assertEquals(
-            "this is an annotation that is very long and g...",
-            fileAnnotation.toString()
-        );
+        assertEquals("this is an annotation that is very long and g...", fileAnnotation.toString());
     }
 }

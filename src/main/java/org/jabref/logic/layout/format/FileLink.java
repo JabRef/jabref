@@ -57,10 +57,7 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = fileDirectories;
         }
 
-        return link
-            .findIn(dirs)
-            .map(path -> path.normalize().toString())
-            .orElse(link.getLink());
+        return link.findIn(dirs).map(path -> path.normalize().toString()).orElse(link.getLink());
     }
 
     /**

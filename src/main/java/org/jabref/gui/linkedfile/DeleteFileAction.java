@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteFileAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DeleteFileAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteFileAction.class);
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -54,9 +52,7 @@ public class DeleteFileAction extends SimpleCommand {
 
         if (toBeDeleted.isEmpty()) {
             dialogService.notify(
-                Localization.lang(
-                    "This operation requires selected linked files."
-                )
+                Localization.lang("This operation requires selected linked files.")
             );
             return;
         }
@@ -65,8 +61,7 @@ public class DeleteFileAction extends SimpleCommand {
         String dialogContent;
 
         if (toBeDeleted.size() != 1) {
-            dialogTitle =
-                Localization.lang("Delete %0 files", toBeDeleted.size());
+            dialogTitle = Localization.lang("Delete %0 files", toBeDeleted.size());
             dialogContent =
                 Localization.lang(
                     "Delete %0 files permanently from disk, or just remove the files from the entry? " +
@@ -80,11 +75,7 @@ public class DeleteFileAction extends SimpleCommand {
                 .findIn(databaseContext, preferences.getFilePreferences());
 
             if (file.isPresent()) {
-                dialogTitle =
-                    Localization.lang(
-                        "Delete '%0'",
-                        file.get().getFileName().toString()
-                    );
+                dialogTitle = Localization.lang("Delete '%0'", file.get().getFileName().toString());
                 dialogContent =
                     Localization.lang(
                         "Delete '%0' permanently from disk, or just remove the file from the entry? " +
@@ -106,18 +97,15 @@ public class DeleteFileAction extends SimpleCommand {
             Localization.lang("Remove from entry"),
             ButtonBar.ButtonData.YES
         );
-        ButtonType deleteFromEntry = new ButtonType(
-            Localization.lang("Delete from disk")
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(
+            Alert.AlertType.INFORMATION,
+            dialogTitle,
+            dialogContent,
+            removeFromEntry,
+            deleteFromEntry,
+            ButtonType.CANCEL
         );
-        Optional<ButtonType> buttonType =
-            dialogService.showCustomButtonDialogAndWait(
-                Alert.AlertType.INFORMATION,
-                dialogTitle,
-                dialogContent,
-                removeFromEntry,
-                deleteFromEntry,
-                ButtonType.CANCEL
-            );
 
         if (buttonType.isPresent()) {
             if (buttonType.get().equals(removeFromEntry)) {
@@ -136,10 +124,7 @@ public class DeleteFileAction extends SimpleCommand {
      * @param toBeDeleted the files to be deleted
      * @param deleteFromDisk if true, the files are deleted from disk, otherwise they are only removed from the entry
      */
-    private void deleteFiles(
-        List<LinkedFileViewModel> toBeDeleted,
-        boolean deleteFromDisk
-    ) {
+    private void deleteFiles(List<LinkedFileViewModel> toBeDeleted, boolean deleteFromDisk) {
         for (LinkedFileViewModel fileViewModel : toBeDeleted) {
             if (fileViewModel.getFile().isOnlineLink()) {
                 viewModel.removeFileLink(fileViewModel);
@@ -160,10 +145,7 @@ public class DeleteFileAction extends SimpleCommand {
     public void deleteFileFromDisk(LinkedFileViewModel fileViewModel) {
         LinkedFile linkedFile = fileViewModel.getFile();
 
-        Optional<Path> file = linkedFile.findIn(
-            databaseContext,
-            preferences.getFilePreferences()
-        );
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
             LOGGER.warn("Could not find file {}", linkedFile.getLink());
@@ -177,18 +159,11 @@ public class DeleteFileAction extends SimpleCommand {
                     Localization.lang("Cannot delete file"),
                     Localization.lang("File permission error")
                 );
-                LOGGER.warn(
-                    "File permission error while deleting: {}",
-                    linkedFile,
-                    ex
-                );
+                LOGGER.warn("File permission error while deleting: {}", linkedFile, ex);
             }
         } else {
             dialogService.notify(
-                Localization.lang(
-                    "Error accessing file '%0'.",
-                    linkedFile.getLink()
-                )
+                Localization.lang("Error accessing file '%0'.", linkedFile.getLink())
             );
         }
     }

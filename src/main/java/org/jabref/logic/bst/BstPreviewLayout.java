@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class BstPreviewLayout implements PreviewLayout {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BstPreviewLayout.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
 
     private final String name;
 
@@ -30,24 +28,19 @@ public class BstPreviewLayout implements PreviewLayout {
         name = path.getFileName().toString();
         if (!Files.exists(path)) {
             LOGGER.error("File {} not found", path.toAbsolutePath());
-            error =
-                Localization.lang("Error opening file '%0'", path.toString());
+            error = Localization.lang("Error opening file '%0'", path.toString());
             return;
         }
         try {
             bstVM = new BstVM(path);
         } catch (Exception e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
-            error =
-                Localization.lang("Error opening file '%0'", path.toString());
+            error = Localization.lang("Error opening file '%0'", path.toString());
         }
     }
 
     @Override
-    public String generatePreview(
-        BibEntry originalEntry,
-        BibDatabaseContext databaseContext
-    ) {
+    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
         if (error != null) {
             return error;
         }

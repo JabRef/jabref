@@ -45,9 +45,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
         ViewLoader.view(this).load().setAsContent(this.getDialogPane());
 
-        this.getDialogPane()
-            .getButtonTypes()
-            .addAll(ButtonType.APPLY, ButtonType.CANCEL);
+        this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
         this.setResizable(false);
         this.setTitle(Localization.lang("Edit file link"));
 
@@ -69,21 +67,15 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
                 dialogService,
                 preferences.getFilePreferences()
             );
-        fileType
-            .itemsProperty()
-            .bindBidirectional(viewModel.externalFileTypeProperty());
+        fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         new ViewModelListCellFactory<ExternalFileType>()
             .withIcon(ExternalFileType::getIcon)
             .withText(ExternalFileType::getName)
             .install(fileType);
 
-        description
-            .textProperty()
-            .bindBidirectional(viewModel.descriptionProperty());
+        description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());
-        fileType
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedExternalFileTypeProperty());
+        fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
     }
 
     @FXML

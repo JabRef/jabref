@@ -30,9 +30,7 @@ public class ReplaceTabsBySpaceFormater extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Replace tabs with space in the field content."
-        );
+        return Localization.lang("Replace tabs with space in the field content.");
     }
 
     @Override

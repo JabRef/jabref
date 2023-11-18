@@ -52,10 +52,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
 
-    public IntegrityCheckDialog(
-        List<IntegrityMessage> messages,
-        LibraryTab libraryTab
-    ) {
+    public IntegrityCheckDialog(List<IntegrityMessage> messages, LibraryTab libraryTab) {
         this.messages = messages;
         this.libraryTab = libraryTab;
         this.setTitle(Localization.lang("Check integrity"));
@@ -66,19 +63,14 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    private void onSelectionChanged(
-        ListChangeListener.Change<? extends IntegrityMessage> change
-    ) {
+    private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
         if (change.next()) {
             change
                 .getAddedSubList()
                 .stream()
                 .findFirst()
                 .ifPresent(message ->
-                    libraryTab.editEntryAndFocusField(
-                        message.getEntry(),
-                        message.getField()
-                    )
+                    libraryTab.editEntryAndFocusField(message.getEntry(), message.getField())
                 );
         }
     }
@@ -91,20 +83,13 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new IntegrityCheckDialogViewModel(messages);
 
-        messagesTable
-            .getSelectionModel()
-            .getSelectedItems()
-            .addListener(this::onSelectionChanged);
+        messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
         keyColumn.setCellValueFactory(row ->
-            new ReadOnlyStringWrapper(
-                row.getValue().getEntry().getCitationKey().orElse("")
-            )
+            new ReadOnlyStringWrapper(row.getValue().getEntry().getCitationKey().orElse(""))
         );
         fieldColumn.setCellValueFactory(row ->
-            new ReadOnlyStringWrapper(
-                row.getValue().getField().getDisplayName()
-            )
+            new ReadOnlyStringWrapper(row.getValue().getField().getDisplayName())
         );
         messageColumn.setCellValueFactory(row ->
             new ReadOnlyStringWrapper(row.getValue().getMessage())

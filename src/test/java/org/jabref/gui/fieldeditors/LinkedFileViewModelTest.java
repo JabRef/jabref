@@ -61,9 +61,7 @@ class LinkedFileViewModelTest {
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final PreferencesService preferences = mock(
-        PreferencesService.class
-    );
+    private final PreferencesService preferences = mock(PreferencesService.class);
     private CookieManager cookieManager;
 
     @BeforeEach
@@ -77,14 +75,11 @@ class LinkedFileViewModelTest {
         when(filePreferences.getExternalFileTypes())
             .thenReturn(
                 FXCollections.observableSet(
-                    new TreeSet<>(
-                        ExternalFileTypes.getDefaultExternalFileTypes()
-                    )
+                    new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())
                 )
             );
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(preferences.getXmpPreferences())
-            .thenReturn(mock(XmpPreferences.class));
+        when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
 
@@ -242,11 +237,9 @@ class LinkedFileViewModelTest {
 
     @Test
     void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
 
         URL url = new URL("https://www.google.com/");
@@ -264,20 +257,17 @@ class LinkedFileViewModelTest {
 
         viewModel.download();
 
-        verify(dialogService, atLeastOnce())
-            .notify("Downloaded website as an HTML file.");
+        verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
     }
 
     @FetcherTest
     @Test
     void downloadOfFileReplacesLink(@TempDir Path tempFolder) throws Exception {
-        linkedFile =
-            new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
+        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
         entry.setFiles(new ArrayList<>(List.of(linkedFile)));
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(databaseContext.getFirstExistingFileDir(any()))
-            .thenReturn(Optional.of(tempFolder));
+        when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
@@ -301,8 +291,7 @@ class LinkedFileViewModelTest {
     @FetcherTest
     @Test
     void downloadDoesNotOverwriteFileTypeExtension() throws Exception {
-        linkedFile =
-            new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
+        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
@@ -342,11 +331,9 @@ class LinkedFileViewModelTest {
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
 
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
         databaseContext.setDatabasePath(tempFile);
 
@@ -419,8 +406,7 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         when(databaseContext.getFirstExistingFileDir(filePreferences))
             .thenReturn(Optional.of(tempFile.getParent()));
 
@@ -441,8 +427,7 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         when(databaseContext.getFirstExistingFileDir(filePreferences))
             .thenReturn(Optional.of(tempFile.getParent()));
 
@@ -468,27 +453,22 @@ class LinkedFileViewModelTest {
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
     void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
-        Optional<ExternalFileType> test =
-            ExternalFileTypes.getExternalFileTypeByMimeType(
-                "text/html; charset=UTF-8",
-                filePreferences
-            );
+        Optional<ExternalFileType> test = ExternalFileTypes.getExternalFileTypeByMimeType(
+            "text/html; charset=UTF-8",
+            filePreferences
+        );
         String actual = test.get().toString();
         assertEquals("URL", actual);
     }
 
     @Test
     @FetcherTest
-    void downloadPdfFileWhenLinkedFilePointsToPdfUrl()
-        throws MalformedURLException {
-        linkedFile =
-            new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
+    void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
+        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
         databaseContext.setDatabasePath(tempFile);
 

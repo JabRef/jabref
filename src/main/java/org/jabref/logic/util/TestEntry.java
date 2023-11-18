@@ -12,10 +12,7 @@ public class TestEntry {
     public static BibEntry getTestEntry() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setCitationKey("Smith2016");
-        entry.setField(
-            StandardField.AUTHOR,
-            "Smith, Bill and Jones, Bob and Williams, Jeff"
-        );
+        entry.setField(StandardField.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         entry.setField(StandardField.EDITOR, "Taylor, Phil");
         entry.setField(StandardField.TITLE, "Title of the test entry");
         entry.setField(StandardField.NUMBER, "3");
@@ -41,10 +38,7 @@ public class TestEntry {
             "Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non " +
             "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         );
-        entry.putKeywords(
-            Arrays.asList("KeyWord1", "KeyWord2", "KeyWord3", "Keyword4"),
-            ';'
-        );
+        entry.putKeywords(Arrays.asList("KeyWord1", "KeyWord2", "KeyWord3", "Keyword4"), ';');
 
         return entry;
     }
@@ -52,10 +46,7 @@ public class TestEntry {
     public static BibEntry getTestEntryBook() {
         BibEntry entry = new BibEntry(StandardEntryType.Book);
         entry.setCitationKey("Harrer2018");
-        entry.setField(
-            StandardField.AUTHOR,
-            "Simon Harrer and Jörg Lenhard and Linus Dietz"
-        );
+        entry.setField(StandardField.AUTHOR, "Simon Harrer and Jörg Lenhard and Linus Dietz");
         entry.setField(StandardField.EDITOR, "Andrea Steward");
         entry.setField(StandardField.TITLE, "Java by Comparison");
         entry.setField(StandardField.YEAR, "2018");

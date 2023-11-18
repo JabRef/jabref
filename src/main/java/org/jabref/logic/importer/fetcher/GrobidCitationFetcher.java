@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        GrobidCitationFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
 
     private final ImportFormatPreferences importFormatPreferences;
     private final GrobidService grobidService;
@@ -51,8 +49,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * @return A BibTeX string if extraction is successful
      * @throws FetcherException
      */
-    private Optional<BibEntry> parseUsingGrobid(String plainText)
-        throws FetcherException {
+    private Optional<BibEntry> parseUsingGrobid(String plainText) throws FetcherException {
         try {
             return grobidService.processCitation(
                 plainText,
@@ -80,15 +77,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String searchQuery)
-        throws FetcherException {
+    public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         List<BibEntry> collect;
         try {
             collect =
                 Arrays
-                    .stream(
-                        searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+")
-                    )
+                    .stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                     .map(String::trim)
                     .filter(str -> !str.isBlank())
                     .map(Unchecked.function(this::parseUsingGrobid))
@@ -105,8 +99,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * Not used
      */
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         return Collections.emptyList();
     }
 }

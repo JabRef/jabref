@@ -25,18 +25,14 @@ class JsonReaderTest {
         Assertions.assertThrows(
             ParseException.class,
             () -> {
-                JsonReader.toJsonObject(
-                    new ByteArrayInputStream("invalid JSON".getBytes())
-                );
+                JsonReader.toJsonObject(new ByteArrayInputStream("invalid JSON".getBytes()));
             }
         );
     }
 
     @Test
     void emptyStringResultsInEmptyObject() throws Exception {
-        JSONObject result = JsonReader.toJsonObject(
-            new ByteArrayInputStream("".getBytes())
-        );
+        JSONObject result = JsonReader.toJsonObject(new ByteArrayInputStream("".getBytes()));
         assertEquals("{}", result.toString());
     }
 
@@ -46,9 +42,7 @@ class JsonReaderTest {
         Assertions.assertThrows(
             ParseException.class,
             () -> {
-                JsonReader.toJsonObject(
-                    new ByteArrayInputStream("[]".getBytes())
-                );
+                JsonReader.toJsonObject(new ByteArrayInputStream("[]".getBytes()));
             }
         );
     }
@@ -56,9 +50,7 @@ class JsonReaderTest {
     @Test
     void exampleJsonResultsInSameJson() throws Exception {
         String input = "{\"name\":\"test\"}";
-        JSONObject result = JsonReader.toJsonObject(
-            new ByteArrayInputStream(input.getBytes())
-        );
+        JSONObject result = JsonReader.toJsonObject(new ByteArrayInputStream(input.getBytes()));
         assertEquals(input, result.toString());
     }
 }

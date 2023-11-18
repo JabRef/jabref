@@ -29,14 +29,10 @@ class GroupDialogViewModelTest {
     private Path temporaryFolder;
     private BibDatabaseContext bibDatabaseContext;
     private final MetaData metaData = mock(MetaData.class);
-    private final GroupsPreferences groupsPreferences = mock(
-        GroupsPreferences.class
-    );
+    private final GroupsPreferences groupsPreferences = mock(GroupsPreferences.class);
     private final DialogService dialogService = mock(DialogService.class);
     private final AbstractGroup group = mock(AbstractGroup.class);
-    private final PreferencesService preferencesService = mock(
-        PreferencesService.class
-    );
+    private final PreferencesService preferencesService = mock(PreferencesService.class);
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {
@@ -47,14 +43,11 @@ class GroupDialogViewModelTest {
 
         when(preferencesService.getBibEntryPreferences())
             .thenReturn(mock(BibEntryPreferences.class));
-        when(preferencesService.getBibEntryPreferences().getKeywordSeparator())
-            .thenReturn(',');
-        when(preferencesService.getFilePreferences())
-            .thenReturn(mock(FilePreferences.class));
+        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         when(preferencesService.getFilePreferences().getUserAndHost())
             .thenReturn("MockedUser-mockedhost");
-        when(preferencesService.getGroupsPreferences())
-            .thenReturn(groupsPreferences);
+        when(preferencesService.getGroupsPreferences()).thenReturn(groupsPreferences);
 
         bibDatabaseContext.setMetaData(metaData);
 
@@ -82,9 +75,7 @@ class GroupDialogViewModelTest {
 
     @Test
     void validateNonExistingAbsolutePath() {
-        var notAnAuxFile = temporaryFolder
-            .resolve("notanauxfile.aux")
-            .toAbsolutePath();
+        var notAnAuxFile = temporaryFolder.resolve("notanauxfile.aux").toAbsolutePath();
         viewModel.texGroupFilePathProperty().setValue(notAnAuxFile.toString());
         assertFalse(viewModel.texGroupFilePathValidatonStatus().isValid());
     }
@@ -115,21 +106,13 @@ class GroupDialogViewModelTest {
                 new DummyFileUpdateMonitor()
             );
 
-        assertEquals(
-            groupHierarchyType,
-            viewModel.groupHierarchySelectedProperty().getValue()
-        );
+        assertEquals(groupHierarchyType, viewModel.groupHierarchySelectedProperty().getValue());
     }
 
     @Test
     void testDefaultHierarchicalContext() throws Exception {
-        GroupHierarchyType defaultHierarchicalContext =
-            GroupHierarchyType.REFINING;
-        when(
-            preferencesService
-                .getGroupsPreferences()
-                .getDefaultHierarchicalContext()
-        )
+        GroupHierarchyType defaultHierarchicalContext = GroupHierarchyType.REFINING;
+        when(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext())
             .thenReturn(defaultHierarchicalContext);
         viewModel =
             new GroupDialogViewModel(

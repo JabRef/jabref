@@ -25,9 +25,7 @@ public class MSBibConverter {
         // memorize original type
         result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType().getName());
         // define new type
-        String msBibType = MSBibMapping
-            .getMSBibEntryType(entry.getType())
-            .name();
+        String msBibType = MSBibMapping.getMSBibEntryType(entry.getType()).name();
         result.fields.put("SourceType", msBibType);
 
         for (Field field : entry.getFields()) {
@@ -55,44 +53,33 @@ public class MSBibConverter {
 
         // TODO: currently this can never happen
         if ("SoundRecording".equals(msBibType)) {
-            result.albumTitle =
-                entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
+            result.albumTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
         }
 
         // TODO: currently this can never happen
         if ("Interview".equals(msBibType)) {
-            result.broadcastTitle =
-                entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
+            result.broadcastTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
         }
 
-        result.number =
-            entry.getFieldLatexFree(StandardField.NUMBER).orElse(null);
+        result.number = entry.getFieldLatexFree(StandardField.NUMBER).orElse(null);
 
         if (entry.getType().equals(IEEETranEntryType.Patent)) {
-            result.patentNumber =
-                entry.getFieldLatexFree(StandardField.NUMBER).orElse(null);
+            result.patentNumber = entry.getFieldLatexFree(StandardField.NUMBER).orElse(null);
             result.number = null;
         }
 
-        result.day =
-            entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);
+        result.day = entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);
         result.month = entry.getMonth().map(Month::getFullName).orElse(null);
 
         if (!entry.getFieldLatexFree(StandardField.YEAR).isPresent()) {
-            result.year =
-                entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);
+            result.year = entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);
         }
-        result.journalName =
-            entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);
+        result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);
 
         // Value must be converted
         entry
             .getFieldLatexFree(StandardField.LANGUAGE)
-            .ifPresent(lang ->
-                result.fields.put(
-                    "LCID",
-                    String.valueOf(MSBibMapping.getLCID(lang))
-                )
+            .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang)))
             );
         StringBuilder sbNumber = new StringBuilder();
         entry
@@ -113,18 +100,14 @@ public class MSBibConverter {
             result.standardNumber = null;
         }
 
-        result.address =
-            entry.getFieldOrAliasLatexFree(StandardField.ADDRESS).orElse(null);
+        result.address = entry.getFieldOrAliasLatexFree(StandardField.ADDRESS).orElse(null);
 
         if (entry.getFieldLatexFree(StandardField.TYPE).isPresent()) {
-            result.thesisType =
-                entry.getFieldLatexFree(StandardField.TYPE).get();
+            result.thesisType = entry.getFieldLatexFree(StandardField.TYPE).get();
         } else {
             if (entry.getType().equals(StandardEntryType.TechReport)) {
                 result.thesisType = "Tech. rep.";
-            } else if (
-                entry.getType().equals(StandardEntryType.MastersThesis)
-            ) {
+            } else if (entry.getType().equals(StandardEntryType.MastersThesis)) {
                 result.thesisType = "Master's thesis";
             } else if (entry.getType().equals(StandardEntryType.PhdThesis)) {
                 result.thesisType = "Ph.D. dissertation";
@@ -134,12 +117,8 @@ public class MSBibConverter {
         }
 
         // TODO: currently this can never happen
-        if (
-            "InternetSite".equals(msBibType) ||
-            "DocumentFromInternetSite".equals(msBibType)
-        ) {
-            result.internetSiteTitle =
-                entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
+        if ("InternetSite".equals(msBibType) || "DocumentFromInternetSite".equals(msBibType)) {
+            result.internetSiteTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
         }
 
         // TODO: currently only Misc can happen
@@ -148,46 +127,36 @@ public class MSBibConverter {
             "Art".equals(msBibType) ||
             "Misc".equals(msBibType)
         ) {
-            result.publicationTitle =
-                entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
+            result.publicationTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
         }
 
         if (entry.getType().equals(IEEETranEntryType.Patent)) {
             entry
                 .getField(StandardField.AUTHOR)
                 .ifPresent(authors ->
-                    result.inventors =
-                        getAuthors(entry, authors, StandardField.AUTHOR)
+                    result.inventors = getAuthors(entry, authors, StandardField.AUTHOR)
                 );
         } else {
             entry
                 .getField(StandardField.AUTHOR)
                 .ifPresent(authors ->
-                    result.authors =
-                        getAuthors(entry, authors, StandardField.AUTHOR)
+                    result.authors = getAuthors(entry, authors, StandardField.AUTHOR)
                 );
         }
         entry
             .getField(StandardField.EDITOR)
-            .ifPresent(editors ->
-                result.editors =
-                    getAuthors(entry, editors, StandardField.EDITOR)
+            .ifPresent(editors -> result.editors = getAuthors(entry, editors, StandardField.EDITOR)
             );
         entry
             .getField(StandardField.TRANSLATOR)
             .ifPresent(translator ->
-                result.translators =
-                    getAuthors(entry, translator, StandardField.EDITOR)
+                result.translators = getAuthors(entry, translator, StandardField.EDITOR)
             );
 
         return result;
     }
 
-    private static List<MsBibAuthor> getAuthors(
-        BibEntry entry,
-        String authors,
-        Field field
-    ) {
+    private static List<MsBibAuthor> getAuthors(BibEntry entry, String authors, Field field) {
         List<MsBibAuthor> result = new ArrayList<>();
         boolean corporate = false;
         // Only one corporate author is supported

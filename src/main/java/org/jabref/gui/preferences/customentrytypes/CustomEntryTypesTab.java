@@ -99,11 +99,7 @@ public class CustomEntryTypesTab
         BibDatabaseMode mode = stateManager
             .getActiveDatabase()
             .map(BibDatabaseContext::getMode)
-            .orElse(
-                preferencesService
-                    .getLibraryPreferences()
-                    .getDefaultBibDatabaseMode()
-            );
+            .orElse(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
         BibEntryTypesManager entryTypesRepository =
             preferencesService.getCustomEntryTypesRepository();
 
@@ -134,11 +130,7 @@ public class CustomEntryTypesTab
                 addNewEntryType,
                 true
             );
-            visualizer.initVisualization(
-                viewModel.fieldValidationStatus(),
-                addNewField,
-                true
-            );
+            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
         });
     }
 
@@ -179,9 +171,7 @@ public class CustomEntryTypesTab
                 if (type instanceof CustomEntryTypeViewModel) {
                     return evt ->
                         viewModel.removeEntryType(
-                            entryTypesTable
-                                .getSelectionModel()
-                                .getSelectedItem()
+                            entryTypesTable.getSelectionModel().getSelectedItem()
                         );
                 } else {
                     return evt -> {};
@@ -192,9 +182,7 @@ public class CustomEntryTypesTab
         viewModel
             .selectedEntryTypeProperty()
             .bind(entryTypesTable.getSelectionModel().selectedItemProperty());
-        viewModel
-            .entryTypeToAddProperty()
-            .bindBidirectional(addNewEntryType.textProperty());
+        viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
 
         EasyBind.subscribe(
             viewModel.selectedEntryTypeProperty(),
@@ -210,32 +198,23 @@ public class CustomEntryTypesTab
     }
 
     private void setupFieldsTable() {
-        fieldNameColumn.setCellValueFactory(item ->
-            item.getValue().displayNameProperty()
-        );
+        fieldNameColumn.setCellValueFactory(item -> item.getValue().displayNameProperty());
         fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         fieldNameColumn.setEditable(true);
         fieldNameColumn.setOnEditCommit(
             (TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
                 String newDisplayName = event.getNewValue();
                 if (newDisplayName.isBlank()) {
-                    dialogService.notify(
-                        Localization.lang("Name cannot be empty")
-                    );
+                    dialogService.notify(Localization.lang("Name cannot be empty"));
                     event.getTableView().edit(-1, null);
                     event.getTableView().refresh();
                     return;
                 }
 
                 FieldViewModel fieldViewModel = event.getRowValue();
-                String currentDisplayName = fieldViewModel
-                    .displayNameProperty()
-                    .getValue();
-                EntryTypeViewModel selectedEntryType = viewModel
-                    .selectedEntryTypeProperty()
-                    .get();
-                ObservableList<FieldViewModel> entryFields =
-                    selectedEntryType.fields();
+                String currentDisplayName = fieldViewModel.displayNameProperty().getValue();
+                EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
+                ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
                 // The first predicate will check if the user input the original field name or doesn't edit anything after double click
                 boolean fieldExists =
                     !newDisplayName.equals(currentDisplayName) &&
@@ -249,32 +228,21 @@ public class CustomEntryTypesTab
                     );
                     event.getTableView().edit(-1, null);
                 } else {
-                    fieldViewModel
-                        .displayNameProperty()
-                        .setValue(newDisplayName);
+                    fieldViewModel.displayNameProperty().setValue(newDisplayName);
                 }
                 event.getTableView().refresh();
             }
         );
 
-        fieldTypeColumn.setCellFactory(
-            CheckBoxTableCell.forTableColumn(fieldTypeColumn)
-        );
-        fieldTypeColumn.setCellValueFactory(item ->
-            item.getValue().requiredProperty()
-        );
+        fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
+        fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(
             CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn)
         );
-        fieldTypeMultilineColumn.setCellValueFactory(item ->
-            item.getValue().multilineProperty()
-        );
-        makeRotatedColumnHeader(
-            fieldTypeMultilineColumn,
-            Localization.lang("Multiline")
-        );
+        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
+        makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);
@@ -284,20 +252,12 @@ public class CustomEntryTypesTab
         );
 
         new ValueTableCellFactory<FieldViewModel, String>()
-            .withGraphic(item ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
+            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
             .withTooltip(name ->
-                Localization.lang(
-                    "Remove field %0 from currently selected entry type",
-                    name
-                )
+                Localization.lang("Remove field %0 from currently selected entry type", name)
             )
             .withOnMouseClickedEvent(item ->
-                evt ->
-                    viewModel.removeField(
-                        fields.getSelectionModel().getSelectedItem()
-                    )
+                evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem())
             )
             .install(fieldTypeActionColumn);
 
@@ -311,24 +271,16 @@ public class CustomEntryTypesTab
         addNewField.setItems(viewModel.fieldsForAdding());
         addNewField.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
 
-        viewModel
-            .newFieldToAddProperty()
-            .bindBidirectional(addNewField.valueProperty());
+        viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
         // since the enabled/disabled state of addNewFieldButton won't update otherwise
         EasyBind.subscribe(
             addNewField.getEditor().textProperty(),
-            text ->
-                addNewField.setValue(
-                    FieldsUtil.FIELD_STRING_CONVERTER.fromString(text)
-                )
+            text -> addNewField.setValue(FieldsUtil.FIELD_STRING_CONVERTER.fromString(text))
         );
     }
 
-    private void makeRotatedColumnHeader(
-        TableColumn<?, ?> column,
-        String text
-    ) {
+    private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
         Label label = new Label();
         label.setText(text);
         label.setRotate(-90);
@@ -373,9 +325,7 @@ public class CustomEntryTypesTab
         DragEvent event
     ) {
         if (localDragboard.hasType(FieldViewModel.class)) {
-            FieldViewModel field = localDragboard.getValue(
-                FieldViewModel.class
-            );
+            FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
             fields.getItems().remove(field);
 
             if (row.isEmpty()) {

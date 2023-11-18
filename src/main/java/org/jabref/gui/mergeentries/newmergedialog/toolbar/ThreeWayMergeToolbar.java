@@ -53,10 +53,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @Inject
     private PreferencesService preferencesService;
 
-    private final ObjectProperty<DiffMethod> diffHighlightingMethod =
-        new SimpleObjectProperty<>();
-    private final BooleanProperty onlyShowChangedFields =
-        new SimpleBooleanProperty();
+    private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
+    private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -104,9 +102,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         );
 
         highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());
-        highlightCharactersRadioButtons
-            .disableProperty()
-            .bind(notShowDiffProperty());
+        highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());
 
         diffHighlightingMethodToggleGroup
             .selectedToggleProperty()
@@ -127,13 +123,9 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         onlyShowChangedFieldsCheck
             .selectedProperty()
             .bindBidirectional(
-                preferencesService
-                    .getGuiPreferences()
-                    .mergeShowChangedFieldOnlyProperty()
+                preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty()
             );
-        onlyShowChangedFields.bind(
-            onlyShowChangedFieldsCheck.selectedProperty()
-        );
+        onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
 
         loadSavedConfiguration();
     }
@@ -141,18 +133,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private void loadSavedConfiguration() {
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
-        PlainTextOrDiff plainTextOrDiffPreference =
-            guiPreferences.getMergeShouldShowDiff()
-                ? PlainTextOrDiff.Diff
-                : PlainTextOrDiff.PLAIN_TEXT;
-        plainTextOrDiffComboBox
-            .getSelectionModel()
-            .select(plainTextOrDiffPreference);
+        PlainTextOrDiff plainTextOrDiffPreference = guiPreferences.getMergeShouldShowDiff()
+            ? PlainTextOrDiff.Diff
+            : PlainTextOrDiff.PLAIN_TEXT;
+        plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
 
-        DiffView diffViewPreference =
-            guiPreferences.getMergeShouldShowUnifiedDiff()
-                ? DiffView.UNIFIED
-                : DiffView.SPLIT;
+        DiffView diffViewPreference = guiPreferences.getMergeShouldShowUnifiedDiff()
+            ? DiffView.UNIFIED
+            : DiffView.SPLIT;
         diffViewComboBox.getSelectionModel().select(diffViewPreference);
 
         diffHighlightingMethodToggleGroup.selectToggle(
@@ -165,19 +153,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     public void saveToolbarConfiguration() {
         preferencesService
             .getGuiPreferences()
-            .setMergeShouldShowDiff(
-                plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff
-            );
+            .setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
         preferencesService
             .getGuiPreferences()
-            .setMergeShouldShowUnifiedDiff(
-                diffViewComboBox.getValue() == DiffView.UNIFIED
-            );
+            .setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
 
-        boolean highlightWordsRadioButtonValue =
-            diffHighlightingMethodToggleGroup
-                .getSelectedToggle()
-                .equals(highlightWordsRadioButton);
+        boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup
+            .getSelectedToggle()
+            .equals(highlightWordsRadioButton);
         preferencesService
             .getGuiPreferences()
             .setMergeHighlightWords(highlightWordsRadioButtonValue);

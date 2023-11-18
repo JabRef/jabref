@@ -31,12 +31,8 @@ import org.junit.jupiter.api.Test;
 public class CopyMoreActionTest {
 
     private final DialogService dialogService = spy(DialogService.class);
-    private final ClipBoardManager clipBoardManager = mock(
-        ClipBoardManager.class
-    );
-    private final PreferencesService preferencesService = mock(
-        PreferencesService.class
-    );
+    private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
+    private final PreferencesService preferencesService = mock(PreferencesService.class);
     private final JournalAbbreviationRepository abbreviationRepository = mock(
         JournalAbbreviationRepository.class
     );
@@ -60,10 +56,7 @@ public class CopyMoreActionTest {
                 .withField(StandardField.TITLE, title)
                 .withField(StandardField.YEAR, "2020")
                 .withField(StandardField.DOI, "10.1145/3377811.3380330")
-                .withField(
-                    StandardField.SUBTITLE,
-                    "cognitive biases and software development"
-                )
+                .withField(StandardField.SUBTITLE, "cognitive biases and software development")
                 .withCitationKey("abc");
         titles.add(title);
         keys.add("abc");
@@ -73,8 +66,7 @@ public class CopyMoreActionTest {
     @Test
     public void testExecuteOnFail() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
-        when(stateManager.getSelectedEntries())
-            .thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         copyMoreAction =
             new CopyMoreAction(
                 StandardActions.COPY_TITLE,
@@ -94,14 +86,14 @@ public class CopyMoreActionTest {
     public void testExecuteCopyTitleWithNoTitle() {
         BibEntry entryWithNoTitle = (BibEntry) entry.clone();
         entryWithNoTitle.clearField(StandardField.TITLE);
-        ObservableList<BibEntry> entriesWithNoTitles =
-            FXCollections.observableArrayList(entryWithNoTitle);
+        ObservableList<BibEntry> entriesWithNoTitles = FXCollections.observableArrayList(
+            entryWithNoTitle
+        );
         BibDatabaseContext databaseContext = new BibDatabaseContext(
             new BibDatabase(entriesWithNoTitles)
         );
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoTitles);
         copyMoreAction =
             new CopyMoreAction(
@@ -116,23 +108,20 @@ public class CopyMoreActionTest {
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
         verify(dialogService, times(1))
-            .notify(
-                Localization.lang("None of the selected entries have titles.")
-            );
+            .notify(Localization.lang("None of the selected entries have titles."));
     }
 
     @Test
     public void testExecuteCopyTitleOnPartialSuccess() {
         BibEntry entryWithNoTitle = (BibEntry) entry.clone();
         entryWithNoTitle.clearField(StandardField.TITLE);
-        ObservableList<BibEntry> mixedEntries =
-            FXCollections.observableArrayList(entryWithNoTitle, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(
-            new BibDatabase(mixedEntries)
+        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(
+            entryWithNoTitle,
+            entry
         );
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
         copyMoreAction =
             new CopyMoreAction(
@@ -159,14 +148,12 @@ public class CopyMoreActionTest {
 
     @Test
     public void testExecuteCopyTitleOnSuccess() {
-        ObservableList<BibEntry> entriesWithTitles =
-            FXCollections.observableArrayList(entry);
+        ObservableList<BibEntry> entriesWithTitles = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(
             new BibDatabase(entriesWithTitles)
         );
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithTitles);
         copyMoreAction =
             new CopyMoreAction(
@@ -194,14 +181,14 @@ public class CopyMoreActionTest {
     public void testExecuteCopyKeyWithNoKey() {
         BibEntry entryWithNoKey = (BibEntry) entry.clone();
         entryWithNoKey.clearCiteKey();
-        ObservableList<BibEntry> entriesWithNoKeys =
-            FXCollections.observableArrayList(entryWithNoKey);
+        ObservableList<BibEntry> entriesWithNoKeys = FXCollections.observableArrayList(
+            entryWithNoKey
+        );
         BibDatabaseContext databaseContext = new BibDatabaseContext(
             new BibDatabase(entriesWithNoKeys)
         );
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoKeys);
         copyMoreAction =
             new CopyMoreAction(
@@ -216,25 +203,20 @@ public class CopyMoreActionTest {
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
         verify(dialogService, times(1))
-            .notify(
-                Localization.lang(
-                    "None of the selected entries have citation keys."
-                )
-            );
+            .notify(Localization.lang("None of the selected entries have citation keys."));
     }
 
     @Test
     public void testExecuteCopyKeyOnPartialSuccess() {
         BibEntry entryWithNoKey = (BibEntry) entry.clone();
         entryWithNoKey.clearCiteKey();
-        ObservableList<BibEntry> mixedEntries =
-            FXCollections.observableArrayList(entryWithNoKey, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(
-            new BibDatabase(mixedEntries)
+        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(
+            entryWithNoKey,
+            entry
         );
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
         copyMoreAction =
             new CopyMoreAction(
@@ -261,14 +243,12 @@ public class CopyMoreActionTest {
 
     @Test
     public void testExecuteCopyKeyOnSuccess() {
-        ObservableList<BibEntry> entriesWithKeys =
-            FXCollections.observableArrayList(entry);
+        ObservableList<BibEntry> entriesWithKeys = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(
             new BibDatabase(entriesWithKeys)
         );
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithKeys);
         copyMoreAction =
             new CopyMoreAction(
@@ -296,14 +276,14 @@ public class CopyMoreActionTest {
     public void testExecuteCopyDoiWithNoDoi() {
         BibEntry entryWithNoDoi = (BibEntry) entry.clone();
         entryWithNoDoi.clearField(StandardField.DOI);
-        ObservableList<BibEntry> entriesWithNoDois =
-            FXCollections.observableArrayList(entryWithNoDoi);
+        ObservableList<BibEntry> entriesWithNoDois = FXCollections.observableArrayList(
+            entryWithNoDoi
+        );
         BibDatabaseContext databaseContext = new BibDatabaseContext(
             new BibDatabase(entriesWithNoDois)
         );
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoDois);
         copyMoreAction =
             new CopyMoreAction(
@@ -318,23 +298,20 @@ public class CopyMoreActionTest {
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
         verify(dialogService, times(1))
-            .notify(
-                Localization.lang("None of the selected entries have DOIs.")
-            );
+            .notify(Localization.lang("None of the selected entries have DOIs."));
     }
 
     @Test
     public void testExecuteCopyDoiOnPartialSuccess() {
         BibEntry entryWithNoDoi = (BibEntry) entry.clone();
         entryWithNoDoi.clearField(StandardField.DOI);
-        ObservableList<BibEntry> mixedEntries =
-            FXCollections.observableArrayList(entryWithNoDoi, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(
-            new BibDatabase(mixedEntries)
+        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(
+            entryWithNoDoi,
+            entry
         );
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
         copyMoreAction =
             new CopyMoreAction(
@@ -361,14 +338,12 @@ public class CopyMoreActionTest {
 
     @Test
     public void testExecuteCopyDoiOnSuccess() {
-        ObservableList<BibEntry> entriesWithDois =
-            FXCollections.observableArrayList(entry);
+        ObservableList<BibEntry> entriesWithDois = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(
             new BibDatabase(entriesWithDois)
         );
 
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithDois);
         copyMoreAction =
             new CopyMoreAction(

@@ -23,9 +23,7 @@ public abstract class AutomaticGroup extends AbstractGroup {
 
     public abstract Set<GroupTreeNode> createSubgroups(BibEntry entry);
 
-    public ObservableList<GroupTreeNode> createSubgroups(
-        ObservableList<BibEntry> entries
-    ) {
+    public ObservableList<GroupTreeNode> createSubgroups(ObservableList<BibEntry> entries) {
         // TODO: Propagate changes to entry list (however: there is no flatMap and collect as TransformationList)
         return entries
             .stream()

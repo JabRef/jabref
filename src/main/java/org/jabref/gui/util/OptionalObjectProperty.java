@@ -9,8 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 /**
  * Similar to {@link com.tobiasdiez.easybind.monadic.MonadicObservableValue}
  */
-public class OptionalObjectProperty<T>
-    extends SimpleObjectProperty<Optional<T>> {
+public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>> {
 
     private OptionalObjectProperty(Optional<T> initialValue) {
         super(initialValue);

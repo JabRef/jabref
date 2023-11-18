@@ -15,8 +15,7 @@ public class JournalAbbreviationPreferences {
         List<String> externalJournalLists,
         boolean useFJournalField
     ) {
-        this.externalJournalLists =
-            FXCollections.observableArrayList(externalJournalLists);
+        this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
     }
 

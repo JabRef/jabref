@@ -9,8 +9,7 @@ import javafx.scene.control.ToggleGroup;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 
-public class AdvancedCiteDialogView
-    extends BaseDialog<AdvancedCiteDialogViewModel> {
+public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewModel> {
 
     @FXML
     private TextField pageInfo;
@@ -43,12 +42,8 @@ public class AdvancedCiteDialogView
     private void initialize() {
         viewModel = new AdvancedCiteDialogViewModel();
 
-        inPar
-            .selectedProperty()
-            .bindBidirectional(viewModel.citeInParProperty());
-        inText
-            .selectedProperty()
-            .bindBidirectional(viewModel.citeInTextProperty());
+        inPar.selectedProperty().bindBidirectional(viewModel.citeInParProperty());
+        inText.selectedProperty().bindBidirectional(viewModel.citeInTextProperty());
         pageInfo.textProperty().bindBidirectional(viewModel.pageInfoProperty());
     }
 }

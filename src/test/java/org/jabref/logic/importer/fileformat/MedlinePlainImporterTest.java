@@ -36,8 +36,7 @@ class MedlinePlainImporterTest {
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name ->
-            name.startsWith("MedlinePlainImporterTest") &&
-            name.endsWith(FILE_ENDING);
+            name.startsWith("MedlinePlainImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -57,10 +56,7 @@ class MedlinePlainImporterTest {
 
     @Test
     void testGetDescription() {
-        assertEquals(
-            "Importer for the MedlinePlain format.",
-            importer.getDescription()
-        );
+        assertEquals("Importer for the MedlinePlain format.", importer.getDescription());
     }
 
     @ParameterizedTest
@@ -75,19 +71,13 @@ class MedlinePlainImporterTest {
     }
 
     @Test
-    void testImportMultipleEntriesInSingleFile()
-        throws IOException, URISyntaxException {
+    void testImportMultipleEntriesInSingleFile() throws IOException, URISyntaxException {
         Path inputFile = Path.of(
-            MedlinePlainImporter.class.getResource(
-                    "MedlinePlainImporterTestMultipleEntries.txt"
-                )
+            MedlinePlainImporter.class.getResource("MedlinePlainImporterTestMultipleEntries.txt")
                 .toURI()
         );
 
-        List<BibEntry> entries = importer
-            .importDatabase(inputFile)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> entries = importer.importDatabase(inputFile).getDatabase().getEntries();
         BibEntry testEntry = entries.get(0);
 
         assertEquals(7, entries.size());
@@ -106,14 +96,8 @@ class MedlinePlainImporterTest {
 
         testEntry = entries.get(1);
         assertEquals(StandardEntryType.Conference, testEntry.getType());
-        assertEquals(
-            Optional.of("06"),
-            testEntry.getField(StandardField.MONTH)
-        );
-        assertEquals(
-            Optional.empty(),
-            testEntry.getField(StandardField.AUTHOR)
-        );
+        assertEquals(Optional.of("06"), testEntry.getField(StandardField.MONTH));
+        assertEquals(Optional.empty(), testEntry.getField(StandardField.AUTHOR));
         assertEquals(Optional.empty(), testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(2);
@@ -157,8 +141,7 @@ class MedlinePlainImporterTest {
     }
 
     @Test
-    void testImportSingleEntriesInSingleFiles()
-        throws IOException, URISyntaxException {
+    void testImportSingleEntriesInSingleFiles() throws IOException, URISyntaxException {
         List<String> testFiles = Arrays.asList(
             "MedlinePlainImporterTestCompleteEntry",
             "MedlinePlainImporterTestMultiAbstract",
@@ -174,23 +157,12 @@ class MedlinePlainImporterTest {
         }
     }
 
-    private void assertImportOfMedlineFileEqualsBibtexFile(
-        String medlineFile,
-        String bibtexFile
-    ) throws IOException, URISyntaxException {
-        Path file = Path.of(
-            MedlinePlainImporter.class.getResource(medlineFile).toURI()
-        );
+    private void assertImportOfMedlineFileEqualsBibtexFile(String medlineFile, String bibtexFile)
+        throws IOException, URISyntaxException {
+        Path file = Path.of(MedlinePlainImporter.class.getResource(medlineFile).toURI());
 
-        try (
-            InputStream nis = MedlinePlainImporter.class.getResourceAsStream(
-                    bibtexFile
-                )
-        ) {
-            List<BibEntry> entries = importer
-                .importDatabase(file)
-                .getDatabase()
-                .getEntries();
+        try (InputStream nis = MedlinePlainImporter.class.getResourceAsStream(bibtexFile)) {
+            List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
             assertNotNull(entries);
             assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(nis, entries.get(0));
@@ -276,10 +248,7 @@ class MedlinePlainImporterTest {
                 "\n" +
                 "Comment16"
             );
-            assertEquals(
-                Collections.singletonList(expectedEntry),
-                actualEntries
-            );
+            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 
@@ -298,45 +267,29 @@ class MedlinePlainImporterTest {
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setField(StandardField.KEYWORDS, "Female, Male");
 
-            assertEquals(
-                Collections.singletonList(expectedEntry),
-                actualEntries
-            );
+            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 
     @Test
     void testWithNbibFile() throws IOException, URISyntaxException {
         Path file = Path.of(
-            MedlinePlainImporter.class.getResource("NbibImporterTest.nbib")
-                .toURI()
+            MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI()
         );
 
-        List<BibEntry> entries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntryAssert.assertEquals(
-            MedlinePlainImporter.class,
-            "NbibImporterTest.bib",
-            entries
-        );
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
     }
 
     @Test
     void testWithMultipleEntries() throws IOException, URISyntaxException {
         Path file = Path.of(
-            MedlinePlainImporter.class.getResource(
-                    "MedlinePlainImporterStringOutOfBounds.txt"
-                )
+            MedlinePlainImporter.class.getResource("MedlinePlainImporterStringOutOfBounds.txt")
                 .toURI()
         );
 
-        List<BibEntry> entries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntryAssert.assertEquals(
             MedlinePlainImporter.class,
@@ -348,16 +301,11 @@ class MedlinePlainImporterTest {
     @Test
     void testInvalidFormat() throws URISyntaxException, IOException {
         Path file = Path.of(
-            MedlinePlainImporter.class.getResource(
-                    "MedlinePlainImporterTestInvalidFormat.xml"
-                )
+            MedlinePlainImporter.class.getResource("MedlinePlainImporterTestInvalidFormat.xml")
                 .toURI()
         );
 
-        List<BibEntry> entries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(Collections.emptyList(), entries);
     }
@@ -399,10 +347,7 @@ class MedlinePlainImporterTest {
             expectedEntry.setType(StandardEntryType.Article);
             expectedEntry.setField(StandardField.KEYWORDS, "Female");
 
-            assertEquals(
-                Collections.singletonList(expectedEntry),
-                actualEntries
-            );
+            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 

@@ -10,8 +10,7 @@ public interface FileUpdateMonitor {
      * @param file The file to monitor.
      * @throws IOException if the file does not exist.
      */
-    void addListenerForFile(Path file, FileUpdateListener listener)
-        throws IOException;
+    void addListenerForFile(Path file, FileUpdateListener listener) throws IOException;
 
     /**
      * Removes a listener from the monitor.

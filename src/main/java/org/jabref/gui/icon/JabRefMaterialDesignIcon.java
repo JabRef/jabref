@@ -40,17 +40,13 @@ public enum JabRefMaterialDesignIcon implements Ikon {
         this.code = code;
     }
 
-    public static JabRefMaterialDesignIcon findByDescription(
-        String description
-    ) {
+    public static JabRefMaterialDesignIcon findByDescription(String description) {
         for (JabRefMaterialDesignIcon font : values()) {
             if (font.getDescription().equals(description)) {
                 return font;
             }
         }
-        throw new IllegalArgumentException(
-            "Icon description '" + description + "' is invalid!"
-        );
+        throw new IllegalArgumentException("Icon description '" + description + "' is invalid!");
     }
 
     @Override

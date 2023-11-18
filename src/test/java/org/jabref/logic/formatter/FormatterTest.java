@@ -47,12 +47,7 @@ class FormatterTest {
         assertEquals(
             Collections.emptyList(),
             getFormatters()
-                .collect(
-                    Collectors.groupingBy(
-                        Formatter::getKey,
-                        Collectors.counting()
-                    )
-                )
+                .collect(Collectors.groupingBy(Formatter::getKey, Collectors.counting()))
                 .entrySet()
                 .stream()
                 .filter(e -> e.getValue() > 1)

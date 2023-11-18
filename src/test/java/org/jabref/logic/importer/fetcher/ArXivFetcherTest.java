@@ -38,8 +38,7 @@ import org.mockito.Answers;
 import org.mockito.Mockito;
 
 @FetcherTest
-class ArXivFetcherTest
-    implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private static ImportFormatPreferences importFormatPreferences;
 
@@ -54,12 +53,8 @@ class ArXivFetcherTest
 
     @BeforeAll
     static void setUp() {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         // Used during DOI fetch process
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields())
             .thenReturn(
@@ -86,10 +81,7 @@ class ArXivFetcherTest
         mainOriginalPaper =
             new BibEntry(StandardEntryType.Article)
                 // ArXiv-original fields
-                .withField(
-                    StandardField.AUTHOR,
-                    "Joeran Beel and Andrew Collins and Akiko Aizawa"
-                )
+                .withField(StandardField.AUTHOR, "Joeran Beel and Andrew Collins and Akiko Aizawa")
                 .withField(
                     StandardField.TITLE,
                     "The Architecture of Mr. DLib's Scientific Recommender-System API"
@@ -100,16 +92,10 @@ class ArXivFetcherTest
                     "Recommender systems in academia are not widely available. This may be in part due to the difficulty and cost of developing and maintaining recommender systems. Many operators of academic products such as digital libraries and reference managers avoid this effort, although a recommender system could provide significant benefits to their users. In this paper, we introduce Mr. DLib's \"Recommendations as-a-Service\" (RaaS) API that allows operators of academic products to easily integrate a scientific recommender system into their products. Mr. DLib generates recommendations for research articles but in the future, recommendations may include call for papers, grants, etc. Operators of academic products can request recommendations from Mr. DLib and display these recommendations to their users. Mr. DLib can be integrated in just a few hours or days; creating an equivalent recommender system from scratch would require several months for an academic operator. Mr. DLib has been used by GESIS Sowiport and by the reference manager JabRef. Mr. DLib is open source and its goal is to facilitate the application of, and research on, scientific recommender systems. In this paper, we present the motivation for Mr. DLib, the architecture and details about the effectiveness. Mr. DLib has delivered 94m recommendations over a span of two years with an average click-through rate of 0.12%."
                 )
                 .withField(StandardField.EPRINT, "1811.10364")
-                .withField(
-                    StandardField.FILE,
-                    ":http\\://arxiv.org/pdf/1811.10364v1:PDF"
-                )
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1811.10364v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "cs.IR")
-                .withField(
-                    StandardField.KEYWORDS,
-                    "cs.IR, cs.AI, cs.DL, cs.LG"
-                );
+                .withField(StandardField.KEYWORDS, "cs.IR, cs.AI, cs.DL, cs.LG");
 
         mainResultPaper =
             new BibEntry(StandardEntryType.Article)
@@ -125,10 +111,7 @@ class ArXivFetcherTest
                     "Recommender systems in academia are not widely available. This may be in part due to the difficulty and cost of developing and maintaining recommender systems. Many operators of academic products such as digital libraries and reference managers avoid this effort, although a recommender system could provide significant benefits to their users. In this paper, we introduce Mr. DLib's \"Recommendations as-a-Service\" (RaaS) API that allows operators of academic products to easily integrate a scientific recommender system into their products. Mr. DLib generates recommendations for research articles but in the future, recommendations may include call for papers, grants, etc. Operators of academic products can request recommendations from Mr. DLib and display these recommendations to their users. Mr. DLib can be integrated in just a few hours or days; creating an equivalent recommender system from scratch would require several months for an academic operator. Mr. DLib has been used by GESIS Sowiport and by the reference manager JabRef. Mr. DLib is open source and its goal is to facilitate the application of, and research on, scientific recommender systems. In this paper, we present the motivation for Mr. DLib, the architecture and details about the effectiveness. Mr. DLib has delivered 94m recommendations over a span of two years with an average click-through rate of 0.12%."
                 )
                 .withField(StandardField.EPRINT, "1811.10364")
-                .withField(
-                    StandardField.FILE,
-                    ":http\\://arxiv.org/pdf/1811.10364v1:PDF"
-                )
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1811.10364v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "cs.IR")
                 //              .withField(StandardField.KEYWORDS, "cs.IR, cs.AI, cs.DL, cs.LG")
@@ -139,10 +122,7 @@ class ArXivFetcherTest
                     new UnknownField("copyright"),
                     "arXiv.org perpetual, non-exclusive license"
                 )
-                .withField(
-                    (InternalField.KEY_FIELD),
-                    "https://doi.org/10.48550/arxiv.1811.10364"
-                )
+                .withField((InternalField.KEY_FIELD), "https://doi.org/10.48550/arxiv.1811.10364")
                 .withField(StandardField.YEAR, "2018")
                 .withField(
                     StandardField.KEYWORDS,
@@ -181,10 +161,7 @@ class ArXivFetcherTest
                 )
                 .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
                 .withField(StandardField.EPRINT, "2003.04601")
-                .withField(
-                    StandardField.FILE,
-                    ":http\\://arxiv.org/pdf/2003.04601v1:PDF"
-                )
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(
@@ -215,18 +192,12 @@ class ArXivFetcherTest
                 .withField(StandardField.EPRINT, "1405.2249")
                 .withField(StandardField.EPRINTCLASS, "math-ph")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
-                .withField(
-                    StandardField.FILE,
-                    ":http\\://arxiv.org/pdf/1405.2249v1:PDF"
-                )
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1405.2249v1:PDF")
                 .withField(
                     StandardField.KEYWORDS,
                     "Mathematical Physics (math-ph), Differential Geometry (math.DG), Symplectic Geometry (math.SG), FOS: Physical sciences, FOS: Mathematics, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42"
                 )
-                .withField(
-                    InternalField.KEY_FIELD,
-                    "https://doi.org/10.48550/arxiv.1405.2249"
-                )
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1405.2249")
                 .withField(
                     new UnknownField("copyright"),
                     "arXiv.org perpetual, non-exclusive license"
@@ -240,12 +211,7 @@ class ArXivFetcherTest
 
     public List<String> getInputTestAuthors() {
         return Arrays
-            .stream(
-                mainOriginalPaper
-                    .getField(StandardField.AUTHOR)
-                    .get()
-                    .split("and")
-            )
+            .stream(mainOriginalPaper.getField(StandardField.AUTHOR).get().split("and"))
             .map(String::trim)
             .collect(Collectors.toList());
     }
@@ -253,12 +219,7 @@ class ArXivFetcherTest
     @Override
     public List<String> getTestAuthors() {
         return Arrays
-            .stream(
-                mainResultPaper
-                    .getField(StandardField.AUTHOR)
-                    .get()
-                    .split("and")
-            )
+            .stream(mainResultPaper.getField(StandardField.AUTHOR).get().split("and"))
             .map(String::trim)
             .collect(Collectors.toList());
     }
@@ -276,15 +237,10 @@ class ArXivFetcherTest
     @Test
     @Override
     public void supportsAuthorSearch() throws FetcherException {
-        StringJoiner queryBuilder = new StringJoiner(
-            "\" AND author:\"",
-            "author:\"",
-            "\""
-        );
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getInputTestAuthors().forEach(queryBuilder::add);
 
-        List<BibEntry> result = getFetcher()
-            .performSearch(queryBuilder.toString());
+        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
@@ -294,25 +250,17 @@ class ArXivFetcherTest
             // The co-authors differ, thus we check for the author present at all papers
             getTestAuthors()
                 .forEach(expectedAuthor ->
-                    Assertions.assertTrue(
-                        author.contains(expectedAuthor.replace("\"", ""))
-                    )
+                    Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", "")))
                 );
         });
     }
 
     @Test
-    public void noSupportsAuthorSearchWithLastFirstName()
-        throws FetcherException {
-        StringJoiner queryBuilder = new StringJoiner(
-            "\" AND author:\"",
-            "author:\"",
-            "\""
-        );
+    public void noSupportsAuthorSearchWithLastFirstName() throws FetcherException {
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
-        List<BibEntry> result = getFetcher()
-            .performSearch(queryBuilder.toString());
+        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertEquals(List.of(), result);
@@ -325,19 +273,13 @@ class ArXivFetcherTest
 
     @Test
     void findFullTextRejectsNullParameter() {
-        assertThrows(
-            NullPointerException.class,
-            () -> fetcher.findFullText(null)
-        );
+        assertThrows(NullPointerException.class, () -> fetcher.findFullText(null));
     }
 
     @Test
     void findFullTextByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1529/biophysj.104.047340");
-        entry.setField(
-            StandardField.TITLE,
-            "Pause Point Spectra in DNA Constant-Force Unzipping"
-        );
+        entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
         assertEquals(
             Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")),
@@ -376,10 +318,7 @@ class ArXivFetcherTest
 
     @Test
     void findFullTextByTitle() throws IOException {
-        entry.setField(
-            StandardField.TITLE,
-            "Pause Point Spectra in DNA Constant-Force Unzipping"
-        );
+        entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
         assertEquals(
             Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")),
@@ -401,8 +340,7 @@ class ArXivFetcherTest
     }
 
     @Test
-    void findFullTextByTitleWithColonAndJournalWithoutEprint()
-        throws IOException {
+    void findFullTextByTitleWithColonAndJournalWithoutEprint() throws IOException {
         entry.setField(
             StandardField.TITLE,
             "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example"
@@ -431,10 +369,7 @@ class ArXivFetcherTest
 
     @Test
     void findFullTextByTitleAndPartOfAuthor() throws IOException {
-        entry.setField(
-            StandardField.TITLE,
-            "Pause Point Spectra in DNA Constant-Force Unzipping"
-        );
+        entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
 
         assertEquals(
@@ -444,8 +379,7 @@ class ArXivFetcherTest
     }
 
     @Test
-    void findFullTextByTitleWithCurlyBracketAndPartOfAuthor()
-        throws IOException {
+    void findFullTextByTitleWithCurlyBracketAndPartOfAuthor() throws IOException {
         entry.setField(
             StandardField.TITLE,
             "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}"
@@ -473,10 +407,7 @@ class ArXivFetcherTest
     @Test
     void findFullTextByDOINotAvailableInCatalog() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/0370-2693(77)90015-6");
-        entry.setField(
-            StandardField.TITLE,
-            "Superspace formulation of supergravity"
-        );
+        entry.setField(StandardField.TITLE, "Superspace formulation of supergravity");
 
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
@@ -525,15 +456,9 @@ class ArXivFetcherTest
                 StandardField.ABSTRACT,
                 "Multi-electron production is studied at high electron transverse momentum in positron- and electron-proton collisions using the H1 detector at HERA. The data correspond to an integrated luminosity of 115 pb-1. Di-electron and tri-electron event yields are measured. Cross sections are derived in a restricted phase space region dominated by photon-photon collisions. In general good agreement is found with the Standard Model predictions. However, for electron pair invariant masses above 100 GeV, three di-electron events and three tri-electron events are observed, compared to Standard Model expectations of 0.30 \\pm 0.04 and 0.23 \\pm 0.04, respectively."
             )
-            .withField(
-                StandardField.PUBLISHER,
-                "Springer Science and Business Media {LLC}"
-            )
+            .withField(StandardField.PUBLISHER, "Springer Science and Business Media {LLC}")
             .withField(StandardField.EPRINT, "hep-ex/0307015")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/hep-ex/0307015v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/hep-ex/0307015v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "hep-ex")
             .withField(
@@ -548,34 +473,22 @@ class ArXivFetcherTest
                 "Assumed arXiv.org perpetual, non-exclusive license to distribute this article for submissions made before January 2004"
             );
 
-        assertEquals(
-            Optional.of(expected),
-            fetcher.performSearchById("hep-ex/0307015")
-        );
+        assertEquals(Optional.of(expected), fetcher.performSearchById("hep-ex/0307015"));
     }
 
     @Test
     void searchEntryByIdWith4DigitsAndVersion() throws Exception {
-        assertEquals(
-            Optional.of(sliceTheoremPaper),
-            fetcher.performSearchById("1405.2249v1")
-        );
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249v1"));
     }
 
     @Test
     void searchEntryByIdWith4Digits() throws Exception {
-        assertEquals(
-            Optional.of(sliceTheoremPaper),
-            fetcher.performSearchById("1405.2249")
-        );
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249"));
     }
 
     @Test
     void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
-        assertEquals(
-            Optional.of(sliceTheoremPaper),
-            fetcher.performSearchById("arXiv:1405.2249")
-        );
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv:1405.2249"));
     }
 
     @Test
@@ -607,10 +520,7 @@ class ArXivFetcherTest
     void searchIdentifierForSlicePaper() throws Exception {
         sliceTheoremPaper.clearField(StandardField.EPRINT);
 
-        assertEquals(
-            ArXivIdentifier.parse("1405.2249"),
-            fetcher.findIdentifier(sliceTheoremPaper)
-        );
+        assertEquals(ArXivIdentifier.parse("1405.2249"), fetcher.findIdentifier(sliceTheoremPaper));
     }
 
     @Test
@@ -638,9 +548,7 @@ class ArXivFetcherTest
     void searchWithHttpsUrlNotTrimmed() throws Exception {
         assertEquals(
             Optional.of(sliceTheoremPaper),
-            fetcher.performSearchById(
-                "https : // arxiv . org / abs / 1405 . 2249 "
-            )
+            fetcher.performSearchById("https : // arxiv . org / abs / 1405 . 2249 ")
         );
     }
 
@@ -667,9 +575,7 @@ class ArXivFetcherTest
             "title:Taxonomy AND title:of AND title:Distributed"
         );
         // Phrase search result has to be subset of the default search result
-        assertTrue(
-            resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch)
-        );
+        assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
     }
 
     /**
@@ -679,10 +585,7 @@ class ArXivFetcherTest
     @Test
     public void supportsPhraseSearchAndMatchesExact() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.AUTHOR,
-                "Rafrastara, Fauzi Adi and Deyu, Qi"
-            )
+            .withField(StandardField.AUTHOR, "Rafrastara, Fauzi Adi and Deyu, Qi")
             .withField(
                 StandardField.TITLE,
                 "A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review"
@@ -696,34 +599,22 @@ class ArXivFetcherTest
             )
             .withField(StandardField.EPRINT, "2009.10618")
             .withField(StandardField.DOI, "10.48550/ARXIV.2009.10618")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/2009.10618v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2009.10618v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "cs.DC")
             .withField(
                 StandardField.KEYWORDS,
                 "Distributed / Parallel / Cluster Computing (cs.DC), Machine Learning (cs.LG), FOS: Computer and information sciences"
             )
-            .withField(
-                InternalField.KEY_FIELD,
-                "https://doi.org/10.48550/arxiv.2009.10618"
-            )
-            .withField(
-                new UnknownField("copyright"),
-                "arXiv.org perpetual, non-exclusive license"
-            );
+            .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2009.10618")
+            .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch(
             "title:\"Taxonomy of Distributed\""
         );
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
-        assertEquals(
-            Collections.singletonList(expected),
-            resultWithPhraseSearch
-        );
+        assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
     }
 
     @Test
@@ -751,10 +642,7 @@ class ArXivFetcherTest
             )
             .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
             .withField(StandardField.EPRINT, "2003.04601")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/2003.04601v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "q-bio.TO")
             .withField(
@@ -762,10 +650,7 @@ class ArXivFetcherTest
                 "Tissues and Organs (q-bio.TO), FOS: Biological sciences"
             )
             .withField(InternalField.KEY_FIELD, "B_scher_2020")
-            .withField(
-                new UnknownField("copyright"),
-                "arXiv.org perpetual, non-exclusive license"
-            );
+            .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
         List<BibEntry> result = fetcher.performSearch(
             "author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\""
@@ -776,8 +661,7 @@ class ArXivFetcherTest
     }
 
     @Test
-    public void retrievePureArxivEntryWhenAllDOIFetchingFails()
-        throws FetcherException {
+    public void retrievePureArxivEntryWhenAllDOIFetchingFails() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
             .withField(
                 StandardField.AUTHOR,
@@ -788,48 +672,32 @@ class ArXivFetcherTest
                 "Interrogating the Escherichia coli cell cycle by cell dimension perturbations"
             )
             .withField(StandardField.DATE, "2017-01-03")
-            .withField(
-                StandardField.JOURNAL,
-                "PNAS December 27, 2016 vol. 113 no. 52 15000-15005"
-            )
+            .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
             .withField(
                 StandardField.ABSTRACT,
                 "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation."
             )
             .withField(StandardField.DOI, "10.1073/pnas.1617932114")
             .withField(StandardField.EPRINT, "1701.00587")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/1701.00587v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "q-bio.CB")
             .withField(StandardField.KEYWORDS, "q-bio.CB");
 
-        DoiFetcher modifiedDoiFetcher = Mockito.spy(
-            new DoiFetcher(importFormatPreferences)
-        );
+        DoiFetcher modifiedDoiFetcher = Mockito.spy(new DoiFetcher(importFormatPreferences));
         when(modifiedDoiFetcher.performSearchById("10.1073/pnas.1617932114"))
-            .thenThrow(
-                new FetcherException("Could not fetch user-assigned DOI")
-            );
+            .thenThrow(new FetcherException("Could not fetch user-assigned DOI"));
         when(modifiedDoiFetcher.performSearchById("10.48550/arXiv.1701.00587"))
-            .thenThrow(
-                new FetcherException("Could not fetch ArXiv-assigned DOI")
-            );
+            .thenThrow(new FetcherException("Could not fetch ArXiv-assigned DOI"));
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(
             new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher)
         );
-        assertEquals(
-            Optional.of(expected),
-            modifiedArXivFetcher.performSearchById("1701.00587")
-        );
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
     }
 
     @Test
-    public void canReplicateArXivOnlySearchByPassingNullParameter()
-        throws FetcherException {
+    public void canReplicateArXivOnlySearchByPassingNullParameter() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
             .withField(
                 StandardField.AUTHOR,
@@ -840,32 +708,20 @@ class ArXivFetcherTest
                 "Interrogating the Escherichia coli cell cycle by cell dimension perturbations"
             )
             .withField(StandardField.DATE, "2017-01-03")
-            .withField(
-                StandardField.JOURNAL,
-                "PNAS December 27, 2016 vol. 113 no. 52 15000-15005"
-            )
+            .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
             .withField(
                 StandardField.ABSTRACT,
                 "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation."
             )
             .withField(StandardField.DOI, "10.1073/pnas.1617932114")
             .withField(StandardField.EPRINT, "1701.00587")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/1701.00587v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "q-bio.CB")
             .withField(StandardField.KEYWORDS, "q-bio.CB");
 
-        ArXivFetcher modifiedArXivFetcher = new ArXivFetcher(
-            importFormatPreferences,
-            null
-        );
-        assertEquals(
-            Optional.of(expected),
-            modifiedArXivFetcher.performSearchById("1701.00587")
-        );
+        ArXivFetcher modifiedArXivFetcher = new ArXivFetcher(importFormatPreferences, null);
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
     }
 
     @Test
@@ -881,52 +737,30 @@ class ArXivFetcherTest
                 "Interrogating the Escherichia coli cell cycle by cell dimension perturbations"
             )
             .withField(StandardField.DATE, "2017-01-03")
-            .withField(
-                StandardField.JOURNAL,
-                "PNAS December 27, 2016 vol. 113 no. 52 15000-15005"
-            )
+            .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
             .withField(
                 StandardField.ABSTRACT,
                 "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation."
             )
             .withField(StandardField.DOI, "10.1073/pnas.1617932114")
             .withField(StandardField.EPRINT, "1701.00587")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/1701.00587v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "q-bio.CB")
-            .withField(
-                StandardField.KEYWORDS,
-                "Cell Behavior (q-bio.CB), FOS: Biological sciences"
-            )
-            .withField(
-                new UnknownField("copyright"),
-                "arXiv.org perpetual, non-exclusive license"
-            )
-            .withField(
-                InternalField.KEY_FIELD,
-                "https://doi.org/10.48550/arxiv.1701.00587"
-            )
+            .withField(StandardField.KEYWORDS, "Cell Behavior (q-bio.CB), FOS: Biological sciences")
+            .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license")
+            .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1701.00587")
             .withField(StandardField.YEAR, "2017")
             .withField(StandardField.PUBLISHER, "arXiv");
 
-        DoiFetcher modifiedDoiFetcher = Mockito.spy(
-            new DoiFetcher(importFormatPreferences)
-        );
+        DoiFetcher modifiedDoiFetcher = Mockito.spy(new DoiFetcher(importFormatPreferences));
         when(modifiedDoiFetcher.performSearchById("10.1073/pnas.1617932114"))
-            .thenThrow(
-                new FetcherException("Could not fetch user-assigned DOI")
-            );
+            .thenThrow(new FetcherException("Could not fetch user-assigned DOI"));
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(
             new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher)
         );
-        assertEquals(
-            Optional.of(expected),
-            modifiedArXivFetcher.performSearchById("1701.00587")
-        );
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
     }
 
     @Test
@@ -942,20 +776,14 @@ class ArXivFetcherTest
                 "Interrogating the Escherichia coli cell cycle by cell dimension perturbations"
             )
             .withField(StandardField.DATE, "2017-01-03")
-            .withField(
-                StandardField.JOURNAL,
-                "PNAS December 27, 2016 vol. 113 no. 52 15000-15005"
-            )
+            .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
             .withField(
                 StandardField.ABSTRACT,
                 "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation."
             )
             .withField(StandardField.DOI, "10.1073/pnas.1617932114")
             .withField(StandardField.EPRINT, "1701.00587")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/1701.00587v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "q-bio.CB")
             .withField(StandardField.KEYWORDS, "q-bio.CB")
@@ -963,27 +791,17 @@ class ArXivFetcherTest
             .withField(StandardField.YEAR, "2016")
             .withField(StandardField.VOLUME, "113")
             .withField(InternalField.KEY_FIELD, "Zheng_2016")
-            .withField(
-                StandardField.PUBLISHER,
-                "Proceedings of the National Academy of Sciences"
-            )
+            .withField(StandardField.PUBLISHER, "Proceedings of the National Academy of Sciences")
             .withField(StandardField.PAGES, "15000--15005")
             .withField(StandardField.NUMBER, "52");
 
-        DoiFetcher modifiedDoiFetcher = Mockito.spy(
-            new DoiFetcher(importFormatPreferences)
-        );
+        DoiFetcher modifiedDoiFetcher = Mockito.spy(new DoiFetcher(importFormatPreferences));
         when(modifiedDoiFetcher.performSearchById("10.48550/arXiv.1701.00587"))
-            .thenThrow(
-                new FetcherException("Could not fetch ArXiv-assigned DOI")
-            );
+            .thenThrow(new FetcherException("Could not fetch ArXiv-assigned DOI"));
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(
             new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher)
         );
-        assertEquals(
-            Optional.of(expected),
-            modifiedArXivFetcher.performSearchById("1701.00587")
-        );
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
     }
 }

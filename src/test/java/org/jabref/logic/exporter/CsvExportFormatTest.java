@@ -33,10 +33,7 @@ public class CsvExportFormatTest {
                 "openoffice-csv",
                 "openoffice",
                 StandardFileType.CSV,
-                mock(
-                    LayoutFormatterPreferences.class,
-                    Answers.RETURNS_DEEP_STUBS
-                ),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder()
             );
 
@@ -49,12 +46,10 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForSingleAuthor(@TempDir Path testFolder)
-        throws Exception {
+    public void testPerformExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.AUTHOR, "Someone, Van Something");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Someone, Van Something");
         List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, path, entries);
@@ -68,8 +63,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForMultipleAuthors(@TempDir Path testFolder)
-        throws Exception {
+    public void testPerformExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry()
@@ -90,12 +84,10 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForSingleEditor(@TempDir Path testFolder)
-        throws Exception {
+    public void testPerformExportForSingleEditor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.EDITOR, "Someone, Van Something");
+        BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "Someone, Van Something");
         List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), entries);
@@ -109,8 +101,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForMultipleEditors(@TempDir Path testFolder)
-        throws Exception {
+    public void testPerformExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry()

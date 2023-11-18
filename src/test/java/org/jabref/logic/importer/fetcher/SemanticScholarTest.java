@@ -28,16 +28,11 @@ import org.junit.jupiter.api.Test;
 @FetcherTest
 public class SemanticScholarTest implements PagedSearchFetcherTest {
 
-    private static final String DOI =
-        "10.23919/IFIPNetworking52078.2021.9472772";
+    private static final String DOI = "10.23919/IFIPNetworking52078.2021.9472772";
 
-    private final ImporterPreferences importerPreferences = mock(
-        ImporterPreferences.class
-    );
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
 
-    private final BibEntry IGOR_NEWCOMERS = new BibEntry(
-        StandardEntryType.Article
-    )
+    private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.Article)
         .withField(
             StandardField.AUTHOR,
             "Igor Steinmacher and T. Conte and Christoph Treude and M. Gerosa"
@@ -52,10 +47,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             StandardField.URL,
             "https://www.semanticscholar.org/paper/4bea2b4029a895bf898701329409e5a784fc2090"
         )
-        .withField(
-            StandardField.VENUE,
-            "International Conference on Software Engineering"
-        );
+        .withField(StandardField.VENUE, "International Conference on Software Engineering");
 
     private SemanticScholar fetcher;
     private BibEntry entry;
@@ -83,10 +75,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     void fullTextFindByDOI() throws Exception {
         entry.withField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
-            Optional.of(
-                new URI("https://europepmc.org/articles/pmc4907333?pdf=render")
-                    .toURL()
-            ),
+            Optional.of(new URI("https://europepmc.org/articles/pmc4907333?pdf=render").toURL()),
             fetcher.findFullText(entry)
         );
     }
@@ -102,8 +91,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                     .toURL()
             ),
             fetcher.findFullText(
-                new BibEntry()
-                    .withField(StandardField.DOI, "10.3390/healthcare9020206")
+                new BibEntry().withField(StandardField.DOI, "10.3390/healthcare9020206")
             )
         );
     }
@@ -182,8 +170,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             "Slice theorem for Fréchet group actions and covariant symplectic"
         );
         // Abstract should not be included in JabRef tests
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        );
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 
@@ -193,8 +180,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers"
         );
         // Abstract should not be included in JabRef tests
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        );
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
     }
 
@@ -204,8 +190,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             "\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\""
         );
         // Abstract should not be included in JabRef tests
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        );
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
     }
 
@@ -217,10 +202,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     public void findByEntry() throws Exception {
         BibEntry barrosEntry = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.TITLE,
-                "Formalising BPMN Service Interaction Patterns"
-            )
+            .withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns")
             .withField(
                 StandardField.AUTHOR,
                 "Chiara Muzi and Luise Pufahl and Lorenzo Rossi and M. Weske and F. Tiezzi"
@@ -231,15 +213,9 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                 StandardField.URL,
                 "https://www.semanticscholar.org/paper/3bb026fd67db7d8e0e25de3189d6b7031b12783e"
             )
-            .withField(
-                StandardField.VENUE,
-                "The Practice of Enterprise Modeling"
-            );
+            .withField(StandardField.VENUE, "The Practice of Enterprise Modeling");
 
-        entry.withField(
-            StandardField.TITLE,
-            "Formalising BPMN Service Interaction Patterns"
-        );
+        entry.withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns");
         BibEntry actual = fetcher.performSearch(entry).get(0);
         // Abstract should not be included in JabRef tests
         actual.clearField(StandardField.ABSTRACT);

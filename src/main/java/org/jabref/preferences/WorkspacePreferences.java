@@ -41,8 +41,7 @@ public class WorkspacePreferences {
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
-        this.shouldOpenLastEdited =
-            new SimpleBooleanProperty(shouldOpenLastEdited);
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection =
             new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
@@ -145,12 +144,8 @@ public class WorkspacePreferences {
         return warnAboutDuplicatesInInspection;
     }
 
-    public void setWarnAboutDuplicatesInInspection(
-        boolean warnAboutDuplicatesInInspection
-    ) {
-        this.warnAboutDuplicatesInInspection.set(
-                warnAboutDuplicatesInInspection
-            );
+    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
+        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
     }
 
     public boolean shouldConfirmDelete() {

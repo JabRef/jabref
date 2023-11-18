@@ -20,28 +20,23 @@ import org.slf4j.LoggerFactory;
  */
 public class JabRefExecutorService {
 
-    public static final JabRefExecutorService INSTANCE =
-        new JabRefExecutorService();
+    public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        JabRefExecutorService.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefExecutorService.class);
 
-    private final ExecutorService executorService =
-        Executors.newCachedThreadPool(r -> {
-            Thread thread = new Thread(r);
-            thread.setName("JabRef CachedThreadPool");
-            thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
-            return thread;
-        });
+    private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("JabRef CachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
+        return thread;
+    });
 
-    private final ExecutorService lowPriorityExecutorService =
-        Executors.newCachedThreadPool(r -> {
-            Thread thread = new Thread(r);
-            thread.setName("JabRef LowPriorityCachedThreadPool");
-            thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
-            return thread;
-        });
+    private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("JabRef LowPriorityCachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
+        return thread;
+    });
 
     private final Timer timer = new Timer("timer", true);
 
@@ -107,13 +102,8 @@ public class JabRefExecutorService {
         }
     }
 
-    public void executeInterruptableTask(
-        final Runnable runnable,
-        String taskName
-    ) {
-        this.lowPriorityExecutorService.execute(
-                new NamedRunnable(taskName, runnable)
-            );
+    public void executeInterruptableTask(final Runnable runnable, String taskName) {
+        this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
     }
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
@@ -205,10 +195,7 @@ public class JabRefExecutorService {
                         executorService.toString()
                     );
                 } else {
-                    LOGGER.error(
-                        "{} did not terminate",
-                        executorService.toString()
-                    );
+                    LOGGER.error("{} did not terminate", executorService.toString());
                 }
             }
         } catch (InterruptedException ie) {

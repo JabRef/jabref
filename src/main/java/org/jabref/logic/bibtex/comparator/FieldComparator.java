@@ -66,11 +66,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     private FieldType determineFieldType() {
         if (InternalField.TYPE_HEADER == this.fields.getPrimary()) {
             return FieldType.TYPE;
-        } else if (
-            this.fields.getPrimary()
-                .getProperties()
-                .contains(FieldProperty.PERSON_NAMES)
-        ) {
+        } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
         } else if (StandardField.YEAR == this.fields.getPrimary()) {
             return FieldType.YEAR;

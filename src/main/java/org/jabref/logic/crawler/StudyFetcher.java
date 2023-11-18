@@ -20,18 +20,14 @@ import org.slf4j.LoggerFactory;
  */
 class StudyFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        StudyFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(StudyFetcher.class);
     private static final int MAX_AMOUNT_OF_RESULTS_PER_FETCHER = 100;
 
     private final List<SearchBasedFetcher> activeFetchers;
     private final List<String> searchQueries;
 
-    StudyFetcher(
-        List<SearchBasedFetcher> activeFetchers,
-        List<String> searchQueries
-    ) throws IllegalArgumentException {
+    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<String> searchQueries)
+        throws IllegalArgumentException {
         this.searchQueries = searchQueries;
         this.activeFetchers = activeFetchers;
     }
@@ -61,8 +57,7 @@ class StudyFetcher {
     private List<FetchResult> performSearchOnQuery(String searchQuery) {
         return activeFetchers
             .parallelStream()
-            .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher)
-            )
+            .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
@@ -75,28 +70,19 @@ class StudyFetcher {
             List<BibEntry> fetchResult = new ArrayList<>();
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
                 int pages = (int) Math.ceil(
-                    ((double) MAX_AMOUNT_OF_RESULTS_PER_FETCHER) /
-                    basedFetcher.getPageSize()
+                    ((double) MAX_AMOUNT_OF_RESULTS_PER_FETCHER) / basedFetcher.getPageSize()
                 );
                 for (int page = 0; page < pages; page++) {
                     fetchResult.addAll(
-                        basedFetcher
-                            .performSearchPaged(searchQuery, page)
-                            .getContent()
+                        basedFetcher.performSearchPaged(searchQuery, page).getContent()
                     );
                 }
             } else {
                 fetchResult = fetcher.performSearch(searchQuery);
             }
-            return new FetchResult(
-                fetcher.getName(),
-                new BibDatabase(fetchResult)
-            );
+            return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
         } catch (FetcherException e) {
-            LOGGER.warn(
-                String.format("%s API request failed", fetcher.getName()),
-                e
-            );
+            LOGGER.warn(String.format("%s API request failed", fetcher.getName()), e);
             return null;
         }
     }

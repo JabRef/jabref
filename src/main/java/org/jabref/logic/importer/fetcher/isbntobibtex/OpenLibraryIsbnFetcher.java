@@ -38,14 +38,10 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OpenLibraryIsbnFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryIsbnFetcher.class);
     private static final String BASE_URL = "https://openlibrary.org";
 
-    public OpenLibraryIsbnFetcher(
-        ImportFormatPreferences importFormatPreferences
-    ) {
+    public OpenLibraryIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
     }
 
@@ -94,10 +90,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
                 authors = fromWorksToAuthors(works);
             }
             entry.setField(StandardField.AUTHOR, authors);
-            entry.setField(
-                StandardField.PAGES,
-                item.optString("number_of_pages")
-            );
+            entry.setField(StandardField.PAGES, item.optString("number_of_pages"));
             entry.setField(
                 StandardField.ISBN,
                 Optional
@@ -114,8 +107,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
                 StandardField.TITLE,
                 Optional
                     .ofNullable(item.optString("full_title", null))
-                    .or(() -> Optional.ofNullable(item.optString("title", null))
-                    )
+                    .or(() -> Optional.ofNullable(item.optString("title", null)))
                     .orElse("")
             );
             entry.setField(StandardField.SUBTITLE, item.optString("subtitle"));
@@ -133,10 +125,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
             );
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException(
-                "CrossRef API JSON format has changed",
-                exception
-            );
+            throw new ParseException("CrossRef API JSON format has changed", exception);
         }
     }
 
@@ -153,10 +142,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     private Author toAuthor(String key) {
-        JsonNode authorResponse = Unirest
-            .get(BASE_URL + key + ".json")
-            .asJson()
-            .getBody();
+        JsonNode authorResponse = Unirest.get(BASE_URL + key + ".json").asJson().getBody();
         if (authorResponse == null) {
             LOGGER.warn("Could not parse author");
             return new Author(null, null, null, null, null);
@@ -199,8 +185,6 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
         return IntStream
             .range(0, authors.length())
             .mapToObj(authors::getJSONObject)
-            .map(authorObject ->
-                toAuthor(authorObject.getJSONObject("author").getString("key"))
-            );
+            .map(authorObject -> toAuthor(authorObject.getJSONObject("author").getString("key")));
     }
 }

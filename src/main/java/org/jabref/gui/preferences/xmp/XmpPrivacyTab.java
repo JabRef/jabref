@@ -44,8 +44,7 @@ public class XmpPrivacyTab
     @FXML
     private Button addField;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public XmpPrivacyTab() {
         ViewLoader.view(this).root(this).load();
@@ -58,50 +57,29 @@ public class XmpPrivacyTab
 
     public void initialize() {
         this.viewModel =
-            new XmpPrivacyTabViewModel(
-                dialogService,
-                preferencesService.getXmpPreferences()
-            );
+            new XmpPrivacyTabViewModel(dialogService, preferencesService.getXmpPreferences());
 
-        enableXmpFilter
-            .selectedProperty()
-            .bindBidirectional(viewModel.xmpFilterEnabledProperty());
-        filterList
-            .disableProperty()
-            .bind(viewModel.xmpFilterEnabledProperty().not());
-        addFieldName
-            .disableProperty()
-            .bind(viewModel.xmpFilterEnabledProperty().not());
-        addField
-            .disableProperty()
-            .bind(viewModel.xmpFilterEnabledProperty().not());
+        enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
+        filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
+        addFieldName.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
+        addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
 
         fieldColumn.setSortable(true);
         fieldColumn.setReorderable(false);
-        fieldColumn.setCellValueFactory(cellData ->
-            BindingsHelper.constantOf(cellData.getValue())
-        );
+        fieldColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue()));
         new ValueTableCellFactory<Field, Field>()
             .withText(FieldsUtil::getNameWithType)
             .install(fieldColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData ->
-            BindingsHelper.constantOf(cellData.getValue())
+        actionsColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue())
         );
         new ValueTableCellFactory<Field, Field>()
-            .withGraphic(item ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
-            .withTooltip(item ->
-                Localization.lang("Remove") + " " + item.getName()
-            )
+            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+            .withTooltip(item -> Localization.lang("Remove") + " " + item.getName())
             .withOnMouseClickedEvent(item ->
-                evt ->
-                    viewModel.removeFilter(
-                        filterList.getFocusModel().getFocusedItem()
-                    )
+                evt -> viewModel.removeFilter(filterList.getFocusModel().getFocusedItem())
             )
             .install(actionsColumn);
 
@@ -109,9 +87,7 @@ public class XmpPrivacyTab
             KeyEvent.KEY_PRESSED,
             event -> {
                 if (event.getCode() == KeyCode.DELETE) {
-                    viewModel.removeFilter(
-                        filterList.getSelectionModel().getSelectedItem()
-                    );
+                    viewModel.removeFilter(filterList.getSelectionModel().getSelectedItem());
                     event.consume();
                 }
             }
@@ -124,9 +100,7 @@ public class XmpPrivacyTab
             .withText(FieldsUtil::getNameWithType)
             .install(addFieldName);
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
-        addFieldName
-            .valueProperty()
-            .bindBidirectional(viewModel.addFieldNameProperty());
+        addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
         addFieldName.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addFieldName.addEventFilter(
             KeyEvent.KEY_PRESSED,

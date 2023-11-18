@@ -83,10 +83,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storePrefs();
-                return tvStyles
-                    .getSelectionModel()
-                    .getSelectedItem()
-                    .getStyle();
+                return tvStyles.getSelectionModel().getSelectedItem().getStyle();
             }
             return null;
         });
@@ -95,12 +92,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     @FXML
     private void initialize() {
-        viewModel =
-            new StyleSelectDialogViewModel(
-                dialogService,
-                loader,
-                preferencesService
-            );
+        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
         previewArticle =
             new PreviewViewer(
@@ -126,18 +118,10 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
-        colName.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
-        colJournals.setCellValueFactory(cellData ->
-            cellData.getValue().journalsProperty()
-        );
-        colFile.setCellValueFactory(cellData ->
-            cellData.getValue().fileProperty()
-        );
-        colDeleteIcon.setCellValueFactory(cellData ->
-            cellData.getValue().internalStyleProperty()
-        );
+        colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());
+        colFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
+        colDeleteIcon.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<StyleSelectItemViewModel, Boolean>()
             .withGraphic(internalStyle -> {
@@ -182,16 +166,12 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
                 tvStyles.getSelectionModel().select(style);
                 previewArticle.setLayout(
                     new TextBasedPreviewLayout(
-                        style
-                            .getStyle()
-                            .getReferenceFormat(StandardEntryType.Article)
+                        style.getStyle().getReferenceFormat(StandardEntryType.Article)
                     )
                 );
                 previewBook.setLayout(
                     new TextBasedPreviewLayout(
-                        style
-                            .getStyle()
-                            .getReferenceFormat(StandardEntryType.Book)
+                        style.getStyle().getReferenceFormat(StandardEntryType.Book)
                     )
                 );
             }

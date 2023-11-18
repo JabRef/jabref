@@ -12,9 +12,7 @@ import org.jabref.model.entry.field.FieldProperty;
 public class HTMLCharacterChecker implements EntryChecker {
 
     // Detect any HTML encoded character
-    private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile(
-        "&[#\\p{Alnum}]+;"
-    );
+    private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
@@ -22,12 +20,8 @@ public class HTMLCharacterChecker implements EntryChecker {
             .getFieldMap()
             .entrySet()
             .stream()
-            .filter(field ->
-                !field.getKey().getProperties().contains(FieldProperty.VERBATIM)
-            )
-            .filter(field ->
-                HTML_CHARACTER_PATTERN.matcher(field.getValue()).find()
-            )
+            .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
+            .filter(field -> HTML_CHARACTER_PATTERN.matcher(field.getValue()).find())
             .map(field ->
                 new IntegrityMessage(
                     Localization.lang("HTML encoded character found"),

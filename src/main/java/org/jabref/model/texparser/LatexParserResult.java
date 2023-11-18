@@ -61,10 +61,7 @@ public class LatexParserResult {
      * Return a collection of citations using a BibEntry as reference.
      */
     public Collection<Citation> getCitationsByKey(BibEntry entry) {
-        return entry
-            .getCitationKey()
-            .map(this::getCitationsByKey)
-            .orElse(Collections.emptyList());
+        return entry.getCitationKey().map(this::getCitationsByKey).orElse(Collections.emptyList());
     }
 
     /**
@@ -88,14 +85,7 @@ public class LatexParserResult {
     /**
      * Add a citation to the citations multimap.
      */
-    public void addKey(
-        String key,
-        Path file,
-        int lineNumber,
-        int start,
-        int end,
-        String line
-    ) {
+    public void addKey(String key, Path file, int lineNumber, int start, int end, String line) {
         Citation citation = new Citation(file, lineNumber, start, end, line);
         citations.put(key, citation);
     }

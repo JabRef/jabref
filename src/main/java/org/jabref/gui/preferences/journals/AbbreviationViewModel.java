@@ -16,12 +16,10 @@ public class AbbreviationViewModel {
 
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty abbreviation = new SimpleStringProperty("");
-    private final StringProperty shortestUniqueAbbreviation =
-        new SimpleStringProperty("");
+    private final StringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
 
     // Used when a "null" abbreviation object is added
-    private final BooleanProperty pseudoAbbreviation =
-        new SimpleBooleanProperty();
+    private final BooleanProperty pseudoAbbreviation = new SimpleBooleanProperty();
 
     public AbbreviationViewModel(Abbreviation abbreviationObject) {
         this.pseudoAbbreviation.set(abbreviationObject == null);
@@ -39,19 +37,13 @@ public class AbbreviationViewModel {
             if (shortestUniqueAbbreviationIsDefaultValue) {
                 this.shortestUniqueAbbreviation.set("");
             } else {
-                this.shortestUniqueAbbreviation.setValue(
-                        shortestUniqueAbbreviationOfAbbreviation
-                    );
+                this.shortestUniqueAbbreviation.setValue(shortestUniqueAbbreviationOfAbbreviation);
             }
         }
     }
 
     public Abbreviation getAbbreviationObject() {
-        return new Abbreviation(
-            getName(),
-            getAbbreviation(),
-            getShortestUniqueAbbreviation()
-        );
+        return new Abbreviation(getName(), getAbbreviation(), getShortestUniqueAbbreviation());
     }
 
     public String getName() {
@@ -74,9 +66,7 @@ public class AbbreviationViewModel {
         return shortestUniqueAbbreviation.get();
     }
 
-    public void setShortestUniqueAbbreviation(
-        String shortestUniqueAbbreviation
-    ) {
+    public void setShortestUniqueAbbreviation(String shortestUniqueAbbreviation) {
         this.shortestUniqueAbbreviation.set(shortestUniqueAbbreviation);
     }
 
@@ -112,8 +102,7 @@ public class AbbreviationViewModel {
         return (
             getName().equals(that.getName()) &&
             getAbbreviation().equals(that.getAbbreviation()) &&
-            getShortestUniqueAbbreviation()
-                .equals(that.getShortestUniqueAbbreviation()) &&
+            getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation()) &&
             (isPseudoAbbreviation() == that.isPseudoAbbreviation())
         );
     }
@@ -131,13 +120,9 @@ public class AbbreviationViewModel {
     public boolean containsCaseIndependent(String searchTerm) {
         searchTerm = searchTerm.toLowerCase(Locale.ROOT);
         return (
-            this.abbreviation.get()
-                .toLowerCase(Locale.ROOT)
-                .contains(searchTerm) ||
+            this.abbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm) ||
             this.name.get().toLowerCase(Locale.ROOT).contains(searchTerm) ||
-            this.shortestUniqueAbbreviation.get()
-                .toLowerCase(Locale.ROOT)
-                .contains(searchTerm)
+            this.shortestUniqueAbbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm)
         );
     }
 }

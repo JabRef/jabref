@@ -22,12 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 @FetcherTest
-class IEEETest
-    implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
-    private final BibEntry IGOR_NEWCOMERS = new BibEntry(
-        StandardEntryType.InProceedings
-    )
+    private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
         .withField(
             StandardField.AUTHOR,
             "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa"
@@ -68,16 +65,10 @@ class IEEETest
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        ImporterPreferences importerPreferences = mock(
-            ImporterPreferences.class
-        );
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
         entry = new BibEntry();
@@ -98,10 +89,7 @@ class IEEETest
 
     @Test
     void findByDocumentUrl() throws Exception {
-        entry.setField(
-            StandardField.URL,
-            "https://ieeexplore.ieee.org/document/7421926/"
-        );
+        entry.setField(StandardField.URL, "https://ieeexplore.ieee.org/document/7421926/");
         assertEquals(
             Optional.of(
                 new URL(
@@ -147,10 +135,7 @@ class IEEETest
     @Test
     void findByDOIButNotURL() throws Exception {
         entry.setField(StandardField.DOI, "10.1109/ACCESS.2016.2535486");
-        entry.setField(
-            StandardField.URL,
-            "http://dx.doi.org/10.1109/ACCESS.2016.2535486"
-        );
+        entry.setField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
         assertEquals(
             Optional.of(
                 new URL(
@@ -163,10 +148,7 @@ class IEEETest
 
     @Test
     void notFoundByURL() throws Exception {
-        entry.setField(
-            StandardField.URL,
-            "http://dx.doi.org/10.1109/ACCESS.2016.2535486"
-        );
+        entry.setField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 
@@ -179,10 +161,7 @@ class IEEETest
     @Test
     void searchResultHasNoKeywordTerms() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.AUTHOR,
-                "Shatakshi Sharma and Bhim Singh and Sukumar Mishra"
-            )
+            .withField(StandardField.AUTHOR, "Shatakshi Sharma and Bhim Singh and Sukumar Mishra")
             .withField(StandardField.DATE, "April 2020")
             .withField(StandardField.YEAR, "2020")
             .withField(StandardField.DOI, "10.1109/TII.2019.2935531")
@@ -192,10 +171,7 @@ class IEEETest
             )
             .withField(StandardField.ISSUE, "4")
             .withField(StandardField.ISSN, "1941-0050")
-            .withField(
-                StandardField.JOURNALTITLE,
-                "IEEE Transactions on Industrial Informatics"
-            )
+            .withField(StandardField.JOURNALTITLE, "IEEE Transactions on Industrial Informatics")
             .withField(StandardField.PAGES, "2346--2356")
             .withField(StandardField.PUBLISHER, "IEEE")
             .withField(
@@ -208,11 +184,8 @@ class IEEETest
                 "Batteries, Generators, Economics, Power quality, State of charge, Harmonic analysis, Control systems, Battery, diesel generator (DG), distributed generation, power quality, photovoltaic (PV), voltage source converter (VSC)"
             );
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch(
-            "article_number:8801912"
-        ); // article number
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        ); // Remove abstract due to copyright);
+        List<BibEntry> fetchedEntries = fetcher.performSearch("article_number:8801912"); // article number
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
@@ -222,8 +195,7 @@ class IEEETest
             "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers"
         );
         // Abstract should not be included in JabRef tests
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        );
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
     }
 
@@ -233,8 +205,7 @@ class IEEETest
             "\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\""
         );
         // Abstract should not be included in JabRef tests
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        );
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
     }
 

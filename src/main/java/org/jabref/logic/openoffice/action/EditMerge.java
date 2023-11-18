@@ -29,9 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class EditMerge {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        EditMerge.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditMerge.class);
 
     private EditMerge() {}
 
@@ -49,10 +47,7 @@ public class EditMerge {
         try {
             UnoScreenRefresh.lockControllers(doc);
 
-            List<JoinableGroupData> joinableGroups = EditMerge.scan(
-                doc,
-                frontend
-            );
+            List<JoinableGroupData> joinableGroups = EditMerge.scan(doc, frontend);
 
             for (JoinableGroupData joinableGroupData : joinableGroups) {
                 List<CitationGroup> groups = joinableGroupData.group;
@@ -63,17 +58,13 @@ public class EditMerge {
                     .collect(Collectors.toList());
 
                 CitationType citationType = groups.get(0).citationType;
-                List<Optional<OOText>> pageInfos =
-                    frontend.backend.combinePageInfos(groups);
+                List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
 
                 frontend.removeCitationGroups(groups, doc);
                 XTextCursor textCursor = joinableGroupData.groupCursor;
                 textCursor.setString(""); // Also remove the spaces between.
 
-                List<String> citationKeys = OOListUtil.map(
-                    newCitations,
-                    Citation::getCitationKey
-                );
+                List<String> citationKeys = OOListUtil.map(newCitations, Citation::getCitationKey);
 
                 /* insertSpaceAfter: no, it is already there (or could be) */
                 boolean insertSpaceAfter = false;
@@ -188,10 +179,7 @@ public class EditMerge {
             }
 
             // Sanity check: the current range should start later than the previous.
-            int textOrder = UnoTextRange.compareStarts(
-                state.prevRange,
-                currentRange
-            );
+            int textOrder = UnoTextRange.compareStarts(state.prevRange, currentRange);
             if (textOrder != -1) {
                 String msg = String.format(
                     "MergeCitationGroups:" +
@@ -216,16 +204,8 @@ public class EditMerge {
         Objects.requireNonNull(state.currentGroupCursor);
 
         // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
-        if (
-            UnoTextRange.compareEnds(
-                state.cursorBetween,
-                state.currentGroupCursor
-            ) !=
-            0
-        ) {
-            LOGGER.warn(
-                "MergeCitationGroups: cursorBetween.end != currentGroupCursor.end"
-            );
+        if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
+            LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
             throw new IllegalStateException("MergeCitationGroups failed");
         }
 
@@ -239,21 +219,14 @@ public class EditMerge {
             .getText()
             .createTextCursorByRange(state.cursorBetween.getEnd());
 
-        while (
-            couldExpand &&
-            (UnoTextRange.compareEnds(state.cursorBetween, rangeStart) < 0)
-        ) {
+        while (couldExpand && (UnoTextRange.compareEnds(state.cursorBetween, rangeStart) < 0)) {
             //
             // Check that we only walk through inline whitespace.
             //
             couldExpand = thisCharCursor.goRight((short) 1, true);
             String thisChar = thisCharCursor.getString();
             thisCharCursor.collapseToEnd();
-            if (
-                thisChar.isEmpty() ||
-                "\n".equals(thisChar) ||
-                !thisChar.trim().isEmpty()
-            ) {
+            if (thisChar.isEmpty() || "\n".equals(thisChar) || !thisChar.trim().isEmpty()) {
                 couldExpand = false;
                 if (!thisChar.isEmpty()) {
                     thisCharCursor.goLeft((short) 1, false);
@@ -264,13 +237,7 @@ public class EditMerge {
             state.currentGroupCursor.goRight((short) 1, true);
 
             // These two should move in sync:
-            if (
-                UnoTextRange.compareEnds(
-                    state.cursorBetween,
-                    state.currentGroupCursor
-                ) !=
-                0
-            ) {
+            if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
                 LOGGER.warn(
                     "MergeCitationGroups: cursorBetween.end != currentGroupCursor.end (during expand)"
                 );
@@ -302,33 +269,19 @@ public class EditMerge {
 
         // Set up cursorBetween to start at currentRange.getEnd()
         XTextRange rangeEnd = currentRange.getEnd();
-        state.cursorBetween =
-            currentRange.getText().createTextCursorByRange(rangeEnd);
+        state.cursorBetween = currentRange.getText().createTextCursorByRange(rangeEnd);
 
         // If new group, create currentGroupCursor
         if (isNewGroup) {
             state.currentGroupCursor =
-                currentRange
-                    .getText()
-                    .createTextCursorByRange(currentRange.getStart());
+                currentRange.getText().createTextCursorByRange(currentRange.getStart());
         }
 
         // include currentRange in currentGroupCursor
-        state.currentGroupCursor.goRight(
-            (short) (currentRange.getString().length()),
-            true
-        );
+        state.currentGroupCursor.goRight((short) (currentRange.getString().length()), true);
 
-        if (
-            UnoTextRange.compareEnds(
-                state.cursorBetween,
-                state.currentGroupCursor
-            ) !=
-            0
-        ) {
-            LOGGER.warn(
-                "MergeCitationGroups: cursorBetween.end != currentGroupCursor.end"
-            );
+        if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
+            LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
             throw new IllegalStateException("MergeCitationGroups failed");
         }
 
@@ -340,18 +293,15 @@ public class EditMerge {
     /**
      * Scan the document for joinable groups. Return those found.
      */
-    private static List<JoinableGroupData> scan(
-        XTextDocument doc,
-        OOFrontend frontend
-    ) throws NoDocumentException, WrappedTargetException {
+    private static List<JoinableGroupData> scan(XTextDocument doc, OOFrontend frontend)
+        throws NoDocumentException, WrappedTargetException {
         List<JoinableGroupData> result = new ArrayList<>();
 
-        List<CitationGroup> groups =
-            frontend.getCitationGroupsSortedWithinPartitions(
-                doc,
-                false
-                /* mapFootnotesToFootnoteMarks */
-            );
+        List<CitationGroup> groups = frontend.getCitationGroupsSortedWithinPartitions(
+            doc,
+            false
+            /* mapFootnotesToFootnoteMarks */
+        );
         if (groups.isEmpty()) {
             return result;
         }
@@ -373,18 +323,12 @@ public class EditMerge {
              *
              * Can it start a new group?
              */
-            boolean canStartGroup =
-                group.citationType == CitationType.AUTHORYEAR_PAR;
+            boolean canStartGroup = group.citationType == CitationType.AUTHORYEAR_PAR;
 
             if (!addToGroup) {
                 // close currentGroup
                 if (state.currentGroup.size() > 1) {
-                    result.add(
-                        new JoinableGroupData(
-                            state.currentGroup,
-                            state.currentGroupCursor
-                        )
-                    );
+                    result.add(new JoinableGroupData(state.currentGroup, state.currentGroupCursor));
                 }
                 // Start a new, empty group
                 state.reset();
@@ -397,12 +341,7 @@ public class EditMerge {
 
         // close currentGroup
         if (state.currentGroup.size() > 1) {
-            result.add(
-                new JoinableGroupData(
-                    state.currentGroup,
-                    state.currentGroupCursor
-                )
-            );
+            result.add(new JoinableGroupData(state.currentGroup, state.currentGroupCursor));
         }
         return result;
     }

@@ -33,18 +33,13 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ResearchGate
-    implements FulltextFetcher, EntryBasedFetcher, SearchBasedFetcher {
+public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ResearchGate.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResearchGate.class);
     private static final String HOST = "https://www.researchgate.net/";
-    private static final String GOOGLE_SEARCH =
-        "https://www.google.com/search?q=";
+    private static final String GOOGLE_SEARCH = "https://www.google.com/search?q=";
     private static final String GOOGLE_SITE = "%20site:researchgate.net";
-    private static final String SEARCH =
-        "https://www.researchgate.net/search.Search.html?";
+    private static final String SEARCH = "https://www.researchgate.net/search.Search.html?";
     private static final String SEARCH_FOR_BIB_ENTRY =
         "https://www.researchgate.net/lite.publication.PublicationDownloadCitationModal.downloadCitation.html?fileType=BibTeX&citation=citationAndAbstract&publicationUid=";
     private final ImportFormatPreferences formatPreferences;
@@ -64,8 +59,7 @@ public class ResearchGate
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public Optional<URL> findFullText(BibEntry entry)
-        throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
 
         Document html;
@@ -76,10 +70,7 @@ public class ResearchGate
             return Optional.empty();
         }
         Elements eLink = html.getElementsByTag("section");
-        String link = eLink
-            .select("a[href^=https]")
-            .select("a[href$=.pdf]")
-            .attr("href");
+        String link = eLink.select("a[href^=https]").select("a[href$=.pdf]").attr("href");
         LOGGER.debug("PDF link: {}", link);
 
         if (link.contains("researchgate.net")) {
@@ -88,13 +79,10 @@ public class ResearchGate
         return Optional.empty();
     }
 
-    private Document getHTML(BibEntry entry)
-        throws FetcherException, IOException {
+    private Document getHTML(BibEntry entry) throws FetcherException, IOException {
         // DOI search
         Optional<String> title = entry.getField(StandardField.TITLE);
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         // Retrieve PDF link
         Optional<String> linkForSearch;
@@ -127,8 +115,7 @@ public class ResearchGate
         throw new FetcherException("Could not find a pdf");
     }
 
-    Optional<String> getURLByString(String query)
-        throws IOException, NullPointerException {
+    Optional<String> getURLByString(String query) throws IOException, NullPointerException {
         URIBuilder source;
         String link;
         try {
@@ -161,8 +148,7 @@ public class ResearchGate
         return Optional.of(link);
     }
 
-    Optional<String> getURLByDoi(DOI doi)
-        throws IOException, NullPointerException {
+    Optional<String> getURLByDoi(DOI doi) throws IOException, NullPointerException {
         String link;
         try {
             URIBuilder source = new URIBuilder(SEARCH);
@@ -177,11 +163,7 @@ public class ResearchGate
                 .ignoreHttpErrors(true)
                 .get();
 
-            link =
-                Objects
-                    .requireNonNull(html.getElementById("search"))
-                    .select("a")
-                    .attr("href");
+            link = Objects.requireNonNull(html.getElementById("search")).select("a").attr("href");
         } catch (URISyntaxException e) {
             return Optional.empty();
         }
@@ -199,11 +181,8 @@ public class ResearchGate
      * @throws URISyntaxException from {@link URIBuilder}'s build() method
      * @throws IOException        from {@link Connection}'s get() method
      */
-    private Document getPage(QueryNode luceneQuery)
-        throws URISyntaxException, IOException {
-        String query = new DefaultQueryTransformer()
-            .transformLuceneQuery(luceneQuery)
-            .orElse("");
+    private Document getPage(QueryNode luceneQuery) throws URISyntaxException, IOException {
+        String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder source = new URIBuilder(SEARCH);
         source.addParameter("type", "publication");
         source.addParameter("query", query);
@@ -228,26 +207,19 @@ public class ResearchGate
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         Document html;
         try {
             html = getPage(luceneQuery);
             // ResearchGate's server blocks when too many request are made
-            if (
-                !html
-                    .getElementsByClass("nova-legacy-v-publication-item__title")
-                    .hasText()
-            ) {
+            if (!html.getElementsByClass("nova-legacy-v-publication-item__title").hasText()) {
                 throw new FetcherException("ResearchGate server unavailable");
             }
         } catch (URISyntaxException | IOException e) {
             throw new FetcherException("URL is not correct", e);
         }
 
-        Elements sol = html.getElementsByClass(
-            "nova-legacy-v-publication-item__title"
-        );
+        Elements sol = html.getElementsByClass("nova-legacy-v-publication-item__title");
         List<String> urls = sol
             .select("a")
             .eachAttr("href")
@@ -262,9 +234,7 @@ public class ResearchGate
             .map(idStream -> SEARCH_FOR_BIB_ENTRY + idStream)
             .map(this::getInputStream)
             .filter(Objects::nonNull)
-            .map(stream ->
-                stream.lines().collect(Collectors.joining(OS.NEWLINE))
-            )
+            .map(stream -> stream.lines().collect(Collectors.joining(OS.NEWLINE)))
             .toList();
 
         List<BibEntry> list = new ArrayList<>();
@@ -304,8 +274,7 @@ public class ResearchGate
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();
         if (title.isEmpty()) {
             return new ArrayList<>();

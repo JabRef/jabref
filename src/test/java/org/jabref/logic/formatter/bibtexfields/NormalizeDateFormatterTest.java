@@ -134,9 +134,6 @@ public class NormalizeDateFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(
-            "2003-11-29",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("2003-11-29", formatter.format(formatter.getExampleInput()));
     }
 }

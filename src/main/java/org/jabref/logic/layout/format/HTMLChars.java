@@ -60,9 +60,7 @@ public class HTMLChars implements LayoutFormatter {
                     currentCommand.append(c);
                     testCharCom:if (
                         (currentCommand.length() == 1) &&
-                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
-                            currentCommand.toString()
-                        )
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
                     ) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -83,9 +81,7 @@ public class HTMLChars implements LayoutFormatter {
                         }
                         String result = HTML_CHARS.get(command + commandBody);
 
-                        sb.append(
-                            Objects.requireNonNullElse(result, commandBody)
-                        );
+                        sb.append(Objects.requireNonNullElse(result, commandBody));
 
                         incommand = false;
                         escaped = false;
@@ -98,18 +94,14 @@ public class HTMLChars implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            sb.append(
-                                Objects.requireNonNullElse(result, command)
-                            );
+                            sb.append(Objects.requireNonNullElse(result, command));
                         }
                     }
                 }
             } else {
                 if (!incommand) {
                     sb.append(c);
-                } else if (
-                    Character.isWhitespace(c) || (c == '{') || (c == '}')
-                ) {
+                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
                     String command = currentCommand.toString();
 
                     // Test if we are dealing with a formatting

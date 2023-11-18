@@ -25,10 +25,7 @@ public class ReplaceStringViewModelTest {
     @BeforeEach
     void setUp() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.AUTHOR,
-                "Shatakshi Sharma and Bhim Singh and Sukumar Mishra"
-            )
+            .withField(StandardField.AUTHOR, "Shatakshi Sharma and Bhim Singh and Sukumar Mishra")
             .withField(StandardField.DATE, "April 2020")
             .withField(StandardField.YEAR, "2020")
             .withField(StandardField.DOI, "10.1109/TII.2019.2935531")
@@ -38,10 +35,7 @@ public class ReplaceStringViewModelTest {
             )
             .withField(StandardField.ISSUE, "4")
             .withField(StandardField.ISSN, "1941-0050")
-            .withField(
-                StandardField.JOURNALTITLE,
-                "IEEE Transactions on Industrial Informatics"
-            )
+            .withField(StandardField.JOURNALTITLE, "IEEE Transactions on Industrial Informatics")
             .withField(StandardField.PAGES, "2346--2356")
             .withField(StandardField.PUBLISHER, "IEEE")
             .withField(
@@ -89,21 +83,11 @@ public class ReplaceStringViewModelTest {
         boolean allFieldReplace,
         int expectedResult
     ) {
-        viewModel
-            .findStringProperty()
-            .bind(new SimpleStringProperty(findString));
-        viewModel
-            .replaceStringProperty()
-            .bind(new SimpleStringProperty(replaceString));
-        viewModel
-            .fieldStringProperty()
-            .bind(new SimpleStringProperty(fieldString));
-        viewModel
-            .selectOnlyProperty()
-            .bind(new SimpleBooleanProperty(selectOnly));
-        viewModel
-            .allFieldReplaceProperty()
-            .bind(new SimpleBooleanProperty(allFieldReplace));
+        viewModel.findStringProperty().bind(new SimpleStringProperty(findString));
+        viewModel.replaceStringProperty().bind(new SimpleStringProperty(replaceString));
+        viewModel.fieldStringProperty().bind(new SimpleStringProperty(fieldString));
+        viewModel.selectOnlyProperty().bind(new SimpleBooleanProperty(selectOnly));
+        viewModel.allFieldReplaceProperty().bind(new SimpleBooleanProperty(allFieldReplace));
         assertEquals(expectedResult, viewModel.replace());
     }
 }

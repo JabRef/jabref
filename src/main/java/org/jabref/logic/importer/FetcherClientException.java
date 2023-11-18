@@ -11,11 +11,7 @@ public class FetcherClientException extends FetcherException {
         super(errorMessage, cause);
     }
 
-    public FetcherClientException(
-        String errorMessage,
-        Throwable cause,
-        int statusCode
-    ) {
+    public FetcherClientException(String errorMessage, Throwable cause, int statusCode) {
         super(errorMessage, cause);
         this.statusCode = statusCode;
     }
@@ -24,11 +20,7 @@ public class FetcherClientException extends FetcherException {
         super(errorMessage);
     }
 
-    public FetcherClientException(
-        String errorMessage,
-        String localizedMessage,
-        Throwable cause
-    ) {
+    public FetcherClientException(String errorMessage, String localizedMessage, Throwable cause) {
         super(errorMessage, localizedMessage, cause);
     }
 

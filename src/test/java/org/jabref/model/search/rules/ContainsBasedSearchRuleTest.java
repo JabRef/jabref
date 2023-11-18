@@ -19,28 +19,24 @@ public class ContainsBasedSearchRuleTest {
         .withField(StandardField.TITLE, "Marine finfish larviculture in Europe")
         .withField(StandardField.YEAR, "2001")
         .withField(StandardField.AUTHOR, "Kevin Shields");
-    private final ContainsBasedSearchRule bsCaseSensitive =
-        new ContainsBasedSearchRule(
-            EnumSet.of(
-                SearchRules.SearchFlags.CASE_SENSITIVE,
-                SearchRules.SearchFlags.REGULAR_EXPRESSION
-            )
-        );
-    private final ContainsBasedSearchRule bsCaseInsensitive =
-        new ContainsBasedSearchRule(
-            EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)
-        );
-    private final RegexBasedSearchRule bsCaseSensitiveRegexp =
-        new RegexBasedSearchRule(
-            EnumSet.of(
-                SearchRules.SearchFlags.CASE_SENSITIVE,
-                SearchRules.SearchFlags.REGULAR_EXPRESSION
-            )
-        );
-    private final RegexBasedSearchRule bsCaseInsensitiveRegexp =
-        new RegexBasedSearchRule(
-            EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)
-        );
+    private final ContainsBasedSearchRule bsCaseSensitive = new ContainsBasedSearchRule(
+        EnumSet.of(
+            SearchRules.SearchFlags.CASE_SENSITIVE,
+            SearchRules.SearchFlags.REGULAR_EXPRESSION
+        )
+    );
+    private final ContainsBasedSearchRule bsCaseInsensitive = new ContainsBasedSearchRule(
+        EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)
+    );
+    private final RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(
+        EnumSet.of(
+            SearchRules.SearchFlags.CASE_SENSITIVE,
+            SearchRules.SearchFlags.REGULAR_EXPRESSION
+        )
+    );
+    private final RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(
+        EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)
+    );
 
     @Test
     public void testContentOfSingleField() {

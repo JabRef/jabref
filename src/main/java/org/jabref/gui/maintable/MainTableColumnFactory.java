@@ -45,9 +45,7 @@ public class MainTableColumnFactory {
 
     public static final String STYLE_ICON_COLUMN = "column-icon";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MainTableColumnFactory.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
     private final ColumnPreferences columnPreferences;
@@ -77,9 +75,7 @@ public class MainTableColumnFactory {
         this.stateManager = stateManager;
     }
 
-    public TableColumn<BibEntryTableViewModel, ?> createColumn(
-        MainTableColumnModel column
-    ) {
+    public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
             case INDEX:
@@ -104,9 +100,7 @@ public class MainTableColumnFactory {
                 break;
             case SPECIALFIELD:
                 if (!column.getQualifier().isBlank()) {
-                    Field field = FieldFactory.parseField(
-                        column.getQualifier()
-                    );
+                    Field field = FieldFactory.parseField(column.getQualifier());
                     if (field instanceof SpecialField) {
                         returnColumn = createSpecialFieldColumn(column);
                     } else {
@@ -129,8 +123,7 @@ public class MainTableColumnFactory {
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
-        List<TableColumn<BibEntryTableViewModel, ?>> columns =
-            new ArrayList<>();
+        List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columnPreferences
             .getColumns()
@@ -153,25 +146,15 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(
         MainTableColumnModel columnModel
     ) {
-        TableColumn<BibEntryTableViewModel, String> column =
-            new MainTableColumn<>(columnModel);
+        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
         Node header = new Text("#");
         header.getStyleClass().add("mainTable-header");
-        Tooltip.install(
-            header,
-            new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName())
-        );
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
         column.setCellValueFactory(cellData ->
             new ReadOnlyObjectWrapper<>(
-                String.valueOf(
-                    cellData
-                        .getTableView()
-                        .getItems()
-                        .indexOf(cellData.getValue()) +
-                    1
-                )
+                String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)
             )
         );
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -187,21 +170,16 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn(
         MainTableColumnModel columnModel
     ) {
-        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column =
-            new MainTableColumn<>(columnModel);
-        Node headerGraphic =
-            IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
-        Tooltip.install(
-            headerGraphic,
-            new Tooltip(Localization.lang("Group color"))
+        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(
+            columnModel
         );
+        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
         column.setResizable(false);
-        column.setCellValueFactory(cellData ->
-            cellData.getValue().getMatchedGroups()
-        );
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
             .withGraphic(this::createGroupColorRegion)
             .install(column);
@@ -245,9 +223,7 @@ public class MainTableColumnFactory {
                 .map(AbstractGroup::getName)
                 .collect(Collectors.joining(", "));
             Tooltip tooltip = new Tooltip(
-                Localization.lang(
-                    "Entry is contained in the following groups:"
-                ) +
+                Localization.lang("Entry is contained in the following groups:") +
                 "\n" +
                 matchedGroupsString
             );
@@ -269,10 +245,9 @@ public class MainTableColumnFactory {
     /**
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
-    private TableColumn<
-        BibEntryTableViewModel,
-        Map<Field, String>
-    > createIdentifierColumn(MainTableColumnModel columnModel) {
+    private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(
+        MainTableColumnModel columnModel
+    ) {
         return new LinkedIdentifierColumn(
             columnModel,
             cellFactory,
@@ -290,21 +265,16 @@ public class MainTableColumnFactory {
         BibEntryTableViewModel,
         Optional<SpecialFieldValueViewModel>
     > createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(
-            columnModel,
-            preferencesService,
-            undoManager
-        );
+        return new SpecialFieldColumn(columnModel, preferencesService, undoManager);
     }
 
     /**
      * Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
      * #createExtraFileColumn(MainTableColumnModel)} createExtraFileColumn} does, this creates one single column collecting all file links.
      */
-    private TableColumn<
-        BibEntryTableViewModel,
-        List<LinkedFile>
-    > createFilesColumn(MainTableColumnModel columnModel) {
+    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(
+        MainTableColumnModel columnModel
+    ) {
         return new FileColumn(
             columnModel,
             database,
@@ -317,10 +287,9 @@ public class MainTableColumnFactory {
     /**
      * Creates a column for all the linked files of a single file type.
      */
-    private TableColumn<
-        BibEntryTableViewModel,
-        List<LinkedFile>
-    > createExtraFileColumn(MainTableColumnModel columnModel) {
+    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(
+        MainTableColumnModel columnModel
+    ) {
         return new FileColumn(
             columnModel,
             database,

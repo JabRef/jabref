@@ -14,9 +14,7 @@ public class AboutAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         dialogService.showCustomDialog(aboutDialogView);
     }
 

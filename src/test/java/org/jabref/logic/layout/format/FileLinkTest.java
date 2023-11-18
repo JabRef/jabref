@@ -21,18 +21,11 @@ public class FileLinkTest {
 
     @ParameterizedTest
     @MethodSource("provideFileLinks")
-    void formatFileLinks(
-        String formattedFileLink,
-        String originalFileLink,
-        String desiredDocType
-    ) {
+    void formatFileLinks(String formattedFileLink, String originalFileLink, String desiredDocType) {
         if (!desiredDocType.isEmpty()) {
             fileLinkLayoutFormatter.setArgument(desiredDocType);
         }
-        assertEquals(
-            formattedFileLink,
-            fileLinkLayoutFormatter.format(originalFileLink)
-        );
+        assertEquals(formattedFileLink, fileLinkLayoutFormatter.format(originalFileLink));
     }
 
     private static Stream<Arguments> provideFileLinks() {
@@ -41,21 +34,9 @@ public class FileLinkTest {
             Arguments.of("", null, ""),
             Arguments.of("test.pdf", "test.pdf", ""),
             Arguments.of("test.pdf", "paper:test.pdf:PDF", ""),
-            Arguments.of(
-                "test.pdf",
-                "paper:test.pdf:PDF;presentation:pres.ppt:PPT",
-                ""
-            ),
-            Arguments.of(
-                "pres.ppt",
-                "paper:test.pdf:PDF;presentation:pres.ppt:PPT",
-                "ppt"
-            ),
-            Arguments.of(
-                "",
-                "paper:test.pdf:PDF;presentation:pres.ppt:PPT",
-                "doc"
-            )
+            Arguments.of("test.pdf", "paper:test.pdf:PDF;presentation:pres.ppt:PPT", ""),
+            Arguments.of("pres.ppt", "paper:test.pdf:PDF;presentation:pres.ppt:PPT", "ppt"),
+            Arguments.of("", "paper:test.pdf:PDF;presentation:pres.ppt:PPT", "doc")
         );
     }
 }

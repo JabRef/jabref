@@ -61,9 +61,7 @@ public class SaveConfiguration {
         return saveType;
     }
 
-    public SaveConfiguration withSaveType(
-        BibDatabaseWriter.SaveType newSaveType
-    ) {
+    public SaveConfiguration withSaveType(BibDatabaseWriter.SaveType newSaveType) {
         this.saveType = newSaveType;
         return this;
     }

@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MrDLibImporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
     private String recommendationsHeading;
     private String recommendationsDescription;
@@ -49,8 +47,7 @@ public class MrDLibImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader input) throws IOException {
         parse(input);
         return parserResult;
     }
@@ -118,9 +115,7 @@ public class MrDLibImporter extends Importer {
         List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
 
         // Get recommendations from response and populate bib entries
-        JSONObject recommendationsJson = recommendationSetJson.getJSONObject(
-            "recommendations"
-        );
+        JSONObject recommendationsJson = recommendationSetJson.getJSONObject("recommendations");
         Iterator<String> keys = recommendationsJson.keys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -129,11 +124,7 @@ public class MrDLibImporter extends Importer {
         }
 
         // Sort bib entries according to rank
-        rankedBibEntries.sort(
-                (
-                    RankedBibEntry rankedBibEntry1,
-                    RankedBibEntry rankedBibEntry2
-                ) ->
+        rankedBibEntries.sort((RankedBibEntry rankedBibEntry1, RankedBibEntry rankedBibEntry2) ->
             rankedBibEntry1.rank.compareTo(rankedBibEntry2.rank)
         );
         List<BibEntry> bibEntries = rankedBibEntries
@@ -148,9 +139,7 @@ public class MrDLibImporter extends Importer {
         recommendationsHeading = label.getString("label-text");
         recommendationsDescription = label.getString("label-description");
         recommendationSetId =
-            recommendationSetJson
-                .getBigInteger("recommendation_set_id")
-                .toString();
+            recommendationSetJson.getBigInteger("recommendation_set_id").toString();
     }
 
     /**
@@ -169,25 +158,16 @@ public class MrDLibImporter extends Importer {
         String title = isRecommendationFieldPresent(recommendation, "title")
             ? recommendation.getString("title")
             : "";
-        String year = isRecommendationFieldPresent(
-                recommendation,
-                "published_year"
-            )
+        String year = isRecommendationFieldPresent(recommendation, "published_year")
             ? Integer.toString(recommendation.getInt("published_year"))
             : "";
-        String journal = isRecommendationFieldPresent(
-                recommendation,
-                "published_in"
-            )
+        String journal = isRecommendationFieldPresent(recommendation, "published_in")
             ? recommendation.getString("published_in")
             : "";
         String url = isRecommendationFieldPresent(recommendation, "url")
             ? recommendation.getString("url")
             : "";
-        Integer rank = isRecommendationFieldPresent(
-                recommendation,
-                "recommendation_id"
-            )
+        Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id")
             ? recommendation.getInt("recommendation_id")
             : 100;
 
@@ -201,10 +181,7 @@ public class MrDLibImporter extends Importer {
         return new RankedBibEntry(current, rank);
     }
 
-    private Boolean isRecommendationFieldPresent(
-        JSONObject recommendation,
-        String field
-    ) {
+    private Boolean isRecommendationFieldPresent(JSONObject recommendation, String field) {
         return recommendation.has(field) && !recommendation.isNull(field);
     }
 

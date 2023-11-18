@@ -63,18 +63,13 @@ public class CrossRef
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         entry
             .getFieldLatexFree(StandardField.TITLE)
-            .ifPresent(title ->
-                uriBuilder.addParameter("query.bibliographic", title)
-            );
+            .ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
         entry
             .getFieldLatexFree(StandardField.AUTHOR)
-            .ifPresent(author -> uriBuilder.addParameter("query.author", author)
-            );
+            .ifPresent(author -> uriBuilder.addParameter("query.author", author));
         entry
             .getFieldLatexFree(StandardField.YEAR)
-            .ifPresent(year ->
-                uriBuilder.addParameter("filter", "from-pub-date:" + year)
-            );
+            .ifPresent(year -> uriBuilder.addParameter("filter", "from-pub-date:" + year));
         uriBuilder.addParameter("rows", "20"); // = API default
         uriBuilder.addParameter("offset", "0"); // start at beginning
         return uriBuilder.build().toURL();
@@ -86,9 +81,7 @@ public class CrossRef
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter(
             "query",
-            new DefaultQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
         return uriBuilder.build().toURL();
     }
@@ -134,16 +127,8 @@ public class CrossRef
     @Override
     public void doPostCleanup(BibEntry entry) {
         // Sometimes the fetched entry returns the title also in the subtitle field; in this case only keep the title field
-        if (
-            entry
-                .getField(StandardField.TITLE)
-                .equals(entry.getField(StandardField.SUBTITLE))
-        ) {
-            new FieldFormatterCleanup(
-                StandardField.SUBTITLE,
-                new ClearFormatter()
-            )
-                .cleanup(entry);
+        if (entry.getField(StandardField.TITLE).equals(entry.getField(StandardField.SUBTITLE))) {
+            new FieldFormatterCleanup(StandardField.SUBTITLE, new ClearFormatter()).cleanup(entry);
         }
     }
 
@@ -165,10 +150,7 @@ public class CrossRef
                     .map(array -> array.optString(0))
                     .orElse("")
             );
-            entry.setField(
-                StandardField.AUTHOR,
-                toAuthors(item.optJSONArray("author"))
-            );
+            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")));
             entry.setField(
                 StandardField.YEAR,
                 Optional
@@ -180,21 +162,12 @@ public class CrossRef
                     .orElse("")
             );
             entry.setField(StandardField.DOI, item.getString("DOI"));
-            entry.setField(
-                StandardField.JOURNAL,
-                item.optString("container-title")
-            );
-            entry.setField(
-                StandardField.PUBLISHER,
-                item.optString("publisher")
-            );
+            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
+            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
             entry.setField(StandardField.NUMBER, item.optString("issue"));
             entry.setField(
                 StandardField.KEYWORDS,
-                Optional
-                    .ofNullable(item.optJSONArray("subject"))
-                    .map(this::getKeywords)
-                    .orElse("")
+                Optional.ofNullable(item.optJSONArray("subject")).map(this::getKeywords).orElse("")
             );
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
@@ -207,10 +180,7 @@ public class CrossRef
             );
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException(
-                "CrossRef API JSON format has changed",
-                exception
-            );
+            throw new ParseException("CrossRef API JSON format has changed", exception);
         }
     }
 
@@ -237,16 +207,12 @@ public class CrossRef
     }
 
     private EntryType convertType(String type) {
-        return "journal-article".equals(type)
-            ? StandardEntryType.Article
-            : StandardEntryType.Misc;
+        return "journal-article".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     @Override
-    public Optional<DOI> extractIdentifier(
-        BibEntry inputEntry,
-        List<BibEntry> fetchedEntries
-    ) throws FetcherException {
+    public Optional<DOI> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries)
+        throws FetcherException {
         final String entryTitle = REMOVE_BRACES_FORMATTER.format(
             inputEntry.getFieldLatexFree(StandardField.TITLE).orElse("")
         );
@@ -255,9 +221,7 @@ public class CrossRef
         for (BibEntry fetchedEntry : fetchedEntries) {
             // currently only title-based comparison
             // title
-            Optional<String> dataTitle = fetchedEntry.getField(
-                StandardField.TITLE
-            );
+            Optional<String> dataTitle = fetchedEntry.getField(StandardField.TITLE);
 
             if (
                 OptionalUtil.isPresentAnd(
@@ -270,9 +234,7 @@ public class CrossRef
 
             // subtitle
             // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
-            Optional<String> dataSubtitle = fetchedEntry.getField(
-                StandardField.SUBTITLE
-            );
+            Optional<String> dataSubtitle = fetchedEntry.getField(StandardField.SUBTITLE);
             Optional<String> dataWithSubTitle = OptionalUtil.combine(
                 dataTitle,
                 dataSubtitle,
@@ -281,11 +243,7 @@ public class CrossRef
             if (
                 OptionalUtil.isPresentAnd(
                     dataWithSubTitle,
-                    titleWithSubtitle ->
-                        stringSimilarity.isSimilar(
-                            entryTitle,
-                            titleWithSubtitle
-                        )
+                    titleWithSubtitle -> stringSimilarity.isSimilar(entryTitle, titleWithSubtitle)
                 )
             ) {
                 return fetchedEntry.getDOI();

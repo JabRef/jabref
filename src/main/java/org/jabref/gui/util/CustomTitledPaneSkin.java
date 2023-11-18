@@ -89,8 +89,7 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
     public CustomTitledPaneSkin(TitledPane control) {
         super(control);
         title = (Region) Objects.requireNonNull(control.lookup(".title"));
-        arrowButton =
-            (Region) Objects.requireNonNull(title.lookup(".arrow-button"));
+        arrowButton = (Region) Objects.requireNonNull(title.lookup(".arrow-button"));
         arrow = (Region) Objects.requireNonNull(arrowButton.lookup(".arrow"));
         text = (Text) Objects.requireNonNull(title.lookup(".text"));
 
@@ -100,19 +99,11 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
         rotate.pivotYProperty().bind(arrow.heightProperty().divide(2.0));
         rotate
             .angleProperty()
-            .bind(
-                Bindings
-                    .when(control.expandedProperty())
-                    .then(-180.0)
-                    .otherwise(90.0)
-            );
+            .bind(Bindings.when(control.expandedProperty()).then(-180.0).otherwise(90.0));
 
         arrow.getTransforms().add(rotate);
 
-        registerChangeListener(
-            control.graphicProperty(),
-            ov -> adjustTitleLayout()
-        );
+        registerChangeListener(control.graphicProperty(), ov -> adjustTitleLayout());
     }
 
     /* ********************************************************
@@ -150,10 +141,7 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
             Bindings.createDoubleBinding(
                 () ->
                     switch (getSkinnable().getAlignment()) {
-                        case TOP_CENTER,
-                            CENTER,
-                            BOTTOM_CENTER,
-                            BASELINE_CENTER -> 0.0;
+                        case TOP_CENTER, CENTER, BOTTOM_CENTER, BASELINE_CENTER -> 0.0;
                         default -> -(arrowButton.getWidth());
                     },
                 getSkinnable().alignmentProperty(),
@@ -211,31 +199,26 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
 
     private static class StyleableProperties {
 
-        private static final CssMetaData<TitledPane, ArrowSide> ARROW_SIDE =
-            new CssMetaData<>(
-                "-fx-arrow-side",
-                getEnumConverter(ArrowSide.class),
-                ArrowSide.LEFT
-            ) {
-                @Override
-                public boolean isSettable(TitledPane styleable) {
-                    Property<?> prop = (Property<?>) getStyleableProperty(
-                        styleable
-                    );
-                    return (prop != null) && !prop.isBound();
-                }
+        private static final CssMetaData<TitledPane, ArrowSide> ARROW_SIDE = new CssMetaData<>(
+            "-fx-arrow-side",
+            getEnumConverter(ArrowSide.class),
+            ArrowSide.LEFT
+        ) {
+            @Override
+            public boolean isSettable(TitledPane styleable) {
+                Property<?> prop = (Property<?>) getStyleableProperty(styleable);
+                return (prop != null) && !prop.isBound();
+            }
 
-                @Override
-                public StyleableProperty<ArrowSide> getStyleableProperty(
-                    TitledPane styleable
-                ) {
-                    Skin<?> skin = styleable.getSkin();
-                    if (skin instanceof CustomTitledPaneSkin paneSkin) {
-                        return paneSkin.arrowSide;
-                    }
-                    return null;
+            @Override
+            public StyleableProperty<ArrowSide> getStyleableProperty(TitledPane styleable) {
+                Skin<?> skin = styleable.getSkin();
+                if (skin instanceof CustomTitledPaneSkin paneSkin) {
+                    return paneSkin.arrowSide;
                 }
-            };
+                return null;
+            }
+        };
 
         private static final List<CssMetaData<?, ?>> CSS_META_DATA;
 

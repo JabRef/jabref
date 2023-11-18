@@ -34,8 +34,7 @@ public class InspecImporterTest {
     }
 
     private static Stream<String> nonInspecfileNames() throws IOException {
-        Predicate<String> fileName = name ->
-            !name.startsWith("InspecImportTest");
+        Predicate<String> fileName = name -> !name.startsWith("InspecImportTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -46,15 +45,13 @@ public class InspecImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormatAccept(String fileName)
-        throws IOException {
+    public void testIsRecognizedFormatAccept(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("nonInspecfileNames")
-    public void testIsRecognizedFormatReject(String fileName)
-        throws IOException {
+    public void testIsRecognizedFormatReject(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
@@ -84,45 +81,24 @@ public class InspecImporterTest {
     @Test
     public void importConferencePaperGivesInproceedings() throws IOException {
         String testInput =
-            "Record.*INSPEC.*\n" +
-            "\n" +
-            "RT ~ Conference-Paper\n" +
-            "AU ~ Prechelt, Lutz";
+            "Record.*INSPEC.*\n" + "\n" + "RT ~ Conference-Paper\n" + "AU ~ Prechelt, Lutz";
         BibEntry expectedEntry = new BibEntry(StandardEntryType.InProceedings);
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
 
-        try (
-            BufferedReader reader = new BufferedReader(
-                new StringReader(testInput)
-            )
-        ) {
-            List<BibEntry> entries = importer
-                .importDatabase(reader)
-                .getDatabase()
-                .getEntries();
+        try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
+            List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(Collections.singletonList(expectedEntry), entries);
         }
     }
 
     @Test
     public void importMiscGivesMisc() throws IOException {
-        String testInput =
-            "Record.*INSPEC.*\n" +
-            "\n" +
-            "AU ~ Prechelt, Lutz \n" +
-            "RT ~ Misc";
+        String testInput = "Record.*INSPEC.*\n" + "\n" + "AU ~ Prechelt, Lutz \n" + "RT ~ Misc";
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc);
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
 
-        try (
-            BufferedReader reader = new BufferedReader(
-                new StringReader(testInput)
-            )
-        ) {
-            List<BibEntry> entries = importer
-                .importDatabase(reader)
-                .getDatabase()
-                .getEntries();
+        try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
+            List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             assertEquals(expectedEntry, entry);

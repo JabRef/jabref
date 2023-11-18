@@ -14,9 +14,7 @@ public class BooktitleChecker implements ValueChecker {
         }
 
         if (value.toLowerCase(Locale.ENGLISH).endsWith("conference on")) {
-            return Optional.of(
-                Localization.lang("booktitle ends with 'conference on'")
-            );
+            return Optional.of(Localization.lang("booktitle ends with 'conference on'"));
         }
 
         return Optional.empty();

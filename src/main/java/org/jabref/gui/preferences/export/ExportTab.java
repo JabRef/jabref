@@ -24,8 +24,7 @@ public class ExportTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new ExportTabViewModel(preferencesService.getExportPreferences());
+        this.viewModel = new ExportTabViewModel(preferencesService.getExportPreferences());
 
         exportOrderPanel
             .saveInOriginalProperty()
@@ -36,12 +35,8 @@ public class ExportTab
         exportOrderPanel
             .saveInSpecifiedOrderProperty()
             .bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        exportOrderPanel
-            .sortableFieldsProperty()
-            .bind(viewModel.sortableFieldsProperty());
-        exportOrderPanel
-            .sortCriteriaProperty()
-            .bindBidirectional(viewModel.sortCriteriaProperty());
+        exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
+        exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
     }
 }

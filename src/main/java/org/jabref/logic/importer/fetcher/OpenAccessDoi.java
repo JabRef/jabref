@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenAccessDoi implements FulltextFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FulltextFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetcher.class);
 
     private static final String API_URL = "https://api.oadoi.org/v2/";
 
@@ -33,9 +31,7 @@ public class OpenAccessDoi implements FulltextFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (!doi.isPresent()) {
             return Optional.empty();
@@ -72,10 +68,7 @@ public class OpenAccessDoi implements FulltextFetcher {
                 try {
                     return Optional.of(new URL(url));
                 } catch (MalformedURLException e) {
-                    LOGGER.debug(
-                        "Could not determine URL to fetch full text from",
-                        e
-                    );
+                    LOGGER.debug("Could not determine URL to fetch full text from", e);
                     return Optional.empty();
                 }
             });

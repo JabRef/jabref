@@ -18,9 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class RebuildFulltextSearchIndexAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final StateManager stateManager;
     private final GetCurrentLibraryTab currentLibraryTab;
@@ -62,17 +60,13 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
         databaseContext = stateManager.getActiveDatabase().get();
         boolean confirm = dialogService.showConfirmationDialogAndWait(
             Localization.lang("Rebuild fulltext search index"),
-            Localization.lang(
-                "Rebuild fulltext search index for current library?"
-            )
+            Localization.lang("Rebuild fulltext search index for current library?")
         );
         if (!confirm) {
             shouldContinue = false;
             return;
         }
-        dialogService.notify(
-            Localization.lang("Rebuilding fulltext search index...")
-        );
+        dialogService.notify(Localization.lang("Rebuilding fulltext search index..."));
     }
 
     private void rebuildIndex() {
@@ -87,14 +81,9 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             currentLibraryTab
                 .get()
                 .getIndexingTaskManager()
-                .updateIndex(
-                    PdfIndexer.of(databaseContext, filePreferences),
-                    databaseContext
-                );
+                .updateIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext);
         } catch (IOException e) {
-            dialogService.notify(
-                Localization.lang("Failed to access fulltext search index")
-            );
+            dialogService.notify(Localization.lang("Failed to access fulltext search index"));
             LOGGER.error("Failed to access fulltext search index", e);
         }
     }

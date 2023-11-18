@@ -26,9 +26,7 @@ public class MainTableColumnModel {
 
     public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MainTableColumnModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
 
     public enum Type {
         INDEX("index", Localization.lang("Index")),
@@ -79,8 +77,7 @@ public class MainTableColumnModel {
         }
     }
 
-    private final ObjectProperty<Type> typeProperty =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
     private final StringProperty qualifierProperty = new SimpleStringProperty();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final ObjectProperty<TableColumn.SortType> sortTypeProperty =
@@ -217,18 +214,12 @@ public class MainTableColumnModel {
         if (typeProperty.getValue() != that.typeProperty.getValue()) {
             return false;
         }
-        return Objects.equals(
-            qualifierProperty.getValue(),
-            that.qualifierProperty.getValue()
-        );
+        return Objects.equals(qualifierProperty.getValue(), that.qualifierProperty.getValue());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            typeProperty.getValue(),
-            qualifierProperty.getValue()
-        );
+        return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
     }
 
     /**
@@ -239,18 +230,12 @@ public class MainTableColumnModel {
      */
     public static MainTableColumnModel parse(String rawColumnName) {
         Objects.requireNonNull(rawColumnName);
-        String[] splittedName = rawColumnName.split(
-            COLUMNS_QUALIFIER_DELIMITER.toString()
-        );
+        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
         Type type = Type.fromString(splittedName[0]);
         String qualifier = "";
 
-        if (
-            (type == Type.NORMALFIELD) ||
-            (type == Type.SPECIALFIELD) ||
-            (type == Type.EXTRAFILE)
-        ) {
+        if ((type == Type.NORMALFIELD) || (type == Type.SPECIALFIELD) || (type == Type.EXTRAFILE)) {
             if (splittedName.length == 1) {
                 qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
             } else {

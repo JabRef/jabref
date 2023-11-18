@@ -14,9 +14,7 @@ import org.jabref.logic.crawler.StudyYamlParser;
  *
  * The file is parsed using by {@link StudyYamlParser}
  */
-@JsonPropertyOrder(
-    { "authors", "title", "research-questions", "queries", "databases" }
-)
+@JsonPropertyOrder({ "authors", "title", "research-questions", "queries", "databases" })
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {

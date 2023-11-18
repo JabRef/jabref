@@ -37,11 +37,7 @@ public class Update {
         final boolean useLockControllers = true;
 
         frontend.imposeGlobalOrder(doc, fcursor);
-        OOProcess.produceCitationMarkers(
-            frontend.citationGroups,
-            databases,
-            style
-        );
+        OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);
 
         try {
             if (useLockControllers) {
@@ -62,9 +58,7 @@ public class Update {
 
             return frontend.citationGroups.getUnresolvedKeys();
         } finally {
-            if (
-                useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)
-            ) {
+            if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }
@@ -124,12 +118,6 @@ public class Update {
         throws CreationException, NoDocumentException, WrappedTargetException, com.sun.star.lang.IllegalArgumentException {
         OOFrontend frontend = new OOFrontend(doc);
 
-        return Update.synchronizeDocument(
-            doc,
-            frontend,
-            style,
-            fcursor,
-            syncOptions
-        );
+        return Update.synchronizeDocument(doc, frontend, style, fcursor, syncOptions);
     }
 }

@@ -19,11 +19,7 @@ public class StudyYamlParser {
      */
     public Study parseStudyYamlFile(Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        try (
-            InputStream fileInputStream = new FileInputStream(
-                studyYamlFile.toFile()
-            )
-        ) {
+        try (InputStream fileInputStream = new FileInputStream(studyYamlFile.toFile())) {
             return yamlMapper.readValue(fileInputStream, Study.class);
         }
     }
@@ -31,8 +27,7 @@ public class StudyYamlParser {
     /**
      * Writes the given study instance into a yaml file to the given path
      */
-    public void writeStudyYamlFile(Study study, Path studyYamlFile)
-        throws IOException {
+    public void writeStudyYamlFile(Study study, Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(
             new YAMLFactory()
                 .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)

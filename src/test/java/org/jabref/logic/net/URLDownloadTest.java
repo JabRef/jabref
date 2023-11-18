@@ -23,18 +23,13 @@ import org.slf4j.LoggerFactory;
 @FetcherTest
 public class URLDownloadTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        URLDownloadTest.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
     public void testStringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        assertTrue(
-            dl.asString().contains("Google"),
-            "google.com should contain google"
-        );
+        assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
@@ -70,8 +65,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile()
-        throws IOException {
+    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws IOException {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
@@ -126,55 +120,36 @@ public class URLDownloadTest {
 
     @Test
     public void testCheckConnectionFail() throws MalformedURLException {
-        URLDownload nonsense = new URLDownload(
-            new URL("http://nonsenseadddress")
-        );
+        URLDownload nonsense = new URLDownload(new URL("http://nonsenseadddress"));
 
         assertThrows(UnirestException.class, nonsense::canBeReached);
     }
 
     @Test
     public void connectTimeoutIsNeverNull() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(
-            new URL("http://www.example.com")
-        );
+        URLDownload urlDownload = new URLDownload(new URL("http://www.example.com"));
         assertNotNull(
             urlDownload.getConnectTimeout(),
             "there's a non-null default by the constructor"
         );
 
         urlDownload.setConnectTimeout(null);
-        assertNotNull(
-            urlDownload.getConnectTimeout(),
-            "no null value can be set"
-        );
+        assertNotNull(urlDownload.getConnectTimeout(), "no null value can be set");
     }
 
     @Test
-    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException()
-        throws Exception {
-        URLDownload urlDownload = new URLDownload(
-            new URL("http://httpstat.us/503")
-        );
+    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
 
-        Exception exception = assertThrows(
-            IOException.class,
-            urlDownload::asString
-        );
+        Exception exception = assertThrows(IOException.class, urlDownload::asString);
         assertInstanceOf(FetcherServerException.class, exception.getCause());
     }
 
     @Test
-    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException()
-        throws Exception {
-        URLDownload urlDownload = new URLDownload(
-            new URL("http://httpstat.us/429")
-        );
+    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
 
-        Exception exception = assertThrows(
-            IOException.class,
-            urlDownload::asString
-        );
+        Exception exception = assertThrows(IOException.class, urlDownload::asString);
         assertInstanceOf(FetcherClientException.class, exception.getCause());
     }
 }

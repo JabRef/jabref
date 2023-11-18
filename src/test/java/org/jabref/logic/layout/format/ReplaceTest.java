@@ -38,19 +38,13 @@ public class ReplaceTest {
     @Test
     public void testNoArgumentSet() {
         ParamLayoutFormatter a = new Replace();
-        assertEquals(
-            "Bob Bruce and Jolly Jumper",
-            a.format("Bob Bruce and Jolly Jumper")
-        );
+        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
     public void testNoProperArgument() {
         ParamLayoutFormatter a = new Replace();
         a.setArgument("Eds.");
-        assertEquals(
-            "Bob Bruce and Jolly Jumper",
-            a.format("Bob Bruce and Jolly Jumper")
-        );
+        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
     }
 }

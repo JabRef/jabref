@@ -12,18 +12,12 @@ public class UrlCheckerTest {
 
     @Test
     void urlFieldAcceptsHttpAddress() {
-        assertEquals(
-            Optional.empty(),
-            checker.checkValue("http://www.google.com")
-        );
+        assertEquals(Optional.empty(), checker.checkValue("http://www.google.com"));
     }
 
     @Test
     void urlFieldAcceptsFullLocalPath() {
-        assertEquals(
-            Optional.empty(),
-            checker.checkValue("file://c:/asdf/asdf")
-        );
+        assertEquals(Optional.empty(), checker.checkValue("file://c:/asdf/asdf"));
     }
 
     @Test

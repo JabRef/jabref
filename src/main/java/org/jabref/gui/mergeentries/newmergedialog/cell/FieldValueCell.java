@@ -39,15 +39,12 @@ import org.slf4j.LoggerFactory;
  */
 public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(
-        FieldValueCell.class
-    );
+    public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueCell.class);
 
     public static final String DEFAULT_STYLE_CLASS = "merge-field-value";
     public static final String SELECTION_BOX_STYLE_CLASS = "selection-box";
 
-    private static final PseudoClass SELECTED_PSEUDO_CLASS =
-        PseudoClass.getPseudoClass("selected");
+    private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
     private final PreferencesService preferencesService;
 
@@ -62,11 +59,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private final HBox actionsContainer = new HBox();
     private final FieldValueCellViewModel viewModel;
 
-    public FieldValueCell(
-        String text,
-        int rowIndex,
-        PreferencesService preferencesService
-    ) {
+    public FieldValueCell(String text, int rowIndex, PreferencesService preferencesService) {
         super(text, rowIndex);
         this.preferencesService = preferencesService;
         this.factory = new ActionFactory(Globals.getKeyPrefs());
@@ -112,26 +105,20 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         // Workarounds
         preventTextSelectionViaMouseEvents();
 
-        label
-            .prefHeightProperty()
-            .bind(label.totalHeightEstimateProperty().orElseConst(-1d));
+        label.prefHeightProperty().bind(label.totalHeightEstimateProperty().orElseConst(-1d));
 
         // Fix text area consuming scroll events before they reach the outer scrollable
         label.addEventFilter(
             ScrollEvent.SCROLL,
             e -> {
                 e.consume();
-                FieldValueCell.this.fireEvent(
-                        e.copyFor(e.getSource(), FieldValueCell.this)
-                    );
+                FieldValueCell.this.fireEvent(e.copyFor(e.getSource(), FieldValueCell.this));
             }
         );
     }
 
     private void initializeActions() {
-        actionsContainer
-            .getChildren()
-            .setAll(createOpenLinkButton(), createCopyButton());
+        actionsContainer.getChildren().setAll(createOpenLinkButton(), createCopyButton());
         actionsContainer.setAlignment(Pos.TOP_CENTER);
         actionsContainer.setPrefWidth(28);
     }
@@ -167,10 +154,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
         Button openLinkButton = factory.createIconButton(
             () -> Localization.lang("Open Link"),
-            new OpenExternalLinkAction(
-                getText(),
-                preferencesService.getFilePreferences()
-            )
+            new OpenExternalLinkAction(getText(), preferencesService.getFilePreferences())
         );
         openLinkButton.setGraphic(openLinkIcon);
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -182,8 +166,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
                 EasyBind.map(
                     textProperty(),
                     input ->
-                        StringUtil.isNotBlank(input) &&
-                        (URLUtil.isURL(input) || DOI.isValid(input))
+                        StringUtil.isNotBlank(input) && (URLUtil.isURL(input) || DOI.isValid(input))
                 )
             );
 

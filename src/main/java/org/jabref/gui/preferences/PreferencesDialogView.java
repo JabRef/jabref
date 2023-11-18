@@ -27,8 +27,7 @@ import org.jabref.preferences.PreferencesService;
  * PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
  * ok.
  */
-public class PreferencesDialogView
-    extends BaseDialog<PreferencesDialogViewModel> {
+public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
     @FXML
     private CustomTextField searchBox;
@@ -85,16 +84,9 @@ public class PreferencesDialogView
 
     @FXML
     private void initialize() {
-        viewModel =
-            new PreferencesDialogViewModel(
-                dialogService,
-                preferencesService,
-                frame
-            );
+        viewModel = new PreferencesDialogViewModel(dialogService, preferencesService, frame);
 
-        preferenceTabList
-            .itemsProperty()
-            .setValue(viewModel.getPreferenceTabs());
+        preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
         // The list view does not respect the listener for the dialog and needs its own
         preferenceTabList.setOnKeyReleased(key -> {
@@ -126,17 +118,11 @@ public class PreferencesDialogView
         EasyBind.subscribe(
             preferenceTabList.getSelectionModel().selectedItemProperty(),
             tab -> {
-                if (
-                    tab instanceof AbstractPreferenceTabView<?> preferencesTab
-                ) {
-                    preferencesContainer.setContent(
-                        preferencesTab.getBuilder()
-                    );
+                if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
+                    preferencesContainer.setContent(preferencesTab.getBuilder());
                     preferencesTab
                         .prefWidthProperty()
-                        .bind(
-                            preferencesContainer.widthProperty().subtract(10d)
-                        );
+                        .bind(preferencesContainer.widthProperty().subtract(10d));
                     preferencesTab.getStyleClass().add("preferencesTab");
                 } else {
                     preferencesContainer.setContent(null);
@@ -149,9 +135,7 @@ public class PreferencesDialogView
             .withText(PreferencesTab::getTabName)
             .install(preferenceTabList);
 
-        memoryStickMode
-            .selectedProperty()
-            .bindBidirectional(viewModel.getMemoryStickProperty());
+        memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
         viewModel.setValues();
     }

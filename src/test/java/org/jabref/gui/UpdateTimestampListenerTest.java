@@ -35,8 +35,7 @@ class UpdateTimestampListenerTest {
         preferencesMock = mock(PreferencesService.class);
         timestampPreferencesMock = mock(TimestampPreferences.class);
 
-        when(preferencesMock.getTimestampPreferences())
-            .thenReturn(timestampPreferencesMock);
+        when(preferencesMock.getTimestampPreferences()).thenReturn(timestampPreferencesMock);
     }
 
     @Test
@@ -44,8 +43,7 @@ class UpdateTimestampListenerTest {
         final boolean includeTimestamp = true;
 
         when(timestampPreferencesMock.now()).thenReturn(newDate);
-        when(timestampPreferencesMock.shouldAddModificationDate())
-            .thenReturn(includeTimestamp);
+        when(timestampPreferencesMock.shouldAddModificationDate()).thenReturn(includeTimestamp);
 
         bibEntry.setField(StandardField.MODIFICATIONDATE, baseDate);
 
@@ -71,8 +69,7 @@ class UpdateTimestampListenerTest {
         final boolean includeTimestamp = false;
 
         when(timestampPreferencesMock.now()).thenReturn(newDate);
-        when(timestampPreferencesMock.shouldAddModificationDate())
-            .thenReturn(includeTimestamp);
+        when(timestampPreferencesMock.shouldAddModificationDate()).thenReturn(includeTimestamp);
 
         bibEntry.setField(StandardField.MODIFICATIONDATE, baseDate);
 

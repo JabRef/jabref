@@ -10,8 +10,7 @@ public class LayoutFormatterPreferences {
 
     private final NameFormatterPreferences nameFormatterPreferences;
     private final StringProperty mainFileDirectoryProperty;
-    private final Map<String, String> customExportNameFormatters =
-        new HashMap<>();
+    private final Map<String, String> customExportNameFormatters = new HashMap<>();
 
     public LayoutFormatterPreferences(
         NameFormatterPreferences nameFormatterPreferences,
@@ -30,19 +29,14 @@ public class LayoutFormatterPreferences {
     }
 
     public Optional<String> getCustomExportNameFormatter(String formatterName) {
-        return Optional.ofNullable(
-            customExportNameFormatters.get(formatterName)
-        );
+        return Optional.ofNullable(customExportNameFormatters.get(formatterName));
     }
 
     public void clearCustomExportNameFormatters() {
         customExportNameFormatters.clear();
     }
 
-    public void putCustomExportNameFormatter(
-        String formatterName,
-        String contents
-    ) {
+    public void putCustomExportNameFormatter(String formatterName, String contents) {
         customExportNameFormatters.put(formatterName, contents);
     }
 }

@@ -33,9 +33,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testGetProtectedTerms() throws URISyntaxException {
-        List<ProtectedTermsList> backupList = new ArrayList<>(
-            loader.getProtectedTermsLists()
-        );
+        List<ProtectedTermsList> backupList = new ArrayList<>(loader.getProtectedTermsLists());
 
         for (ProtectedTermsList list : backupList) {
             loader.removeProtectedTermsList(list);
@@ -77,8 +75,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testReadProtectedTermsListFromFileReadsDescription()
-        throws URISyntaxException {
+    void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException {
         Path file = Path.of(
             ProtectedTermsLoader.class.getResource(
                     "/org/jabref/logic/protectedterms/namedterms.terms"
@@ -86,14 +83,12 @@ class ProtectedTermsLoaderTest {
                 .toURI()
         );
 
-        ProtectedTermsList list =
-            ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals("Term list", list.getDescription());
     }
 
     @Test
-    void testReadProtectedTermsListFromFileDisabledWorks()
-        throws URISyntaxException {
+    void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException {
         Path file = Path.of(
             ProtectedTermsLoader.class.getResource(
                     "/org/jabref/logic/protectedterms/namedterms.terms"
@@ -101,14 +96,12 @@ class ProtectedTermsLoaderTest {
                 .toURI()
         );
 
-        ProtectedTermsList list =
-            ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
         assertFalse(list.isEnabled());
     }
 
     @Test
-    void testReadProtectedTermsListFromFileEnabledWorks()
-        throws URISyntaxException {
+    void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException {
         Path file = Path.of(
             ProtectedTermsLoader.class.getResource(
                     "/org/jabref/logic/protectedterms/namedterms.terms"
@@ -116,14 +109,12 @@ class ProtectedTermsLoaderTest {
                 .toURI()
         );
 
-        ProtectedTermsList list =
-            ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertTrue(list.isEnabled());
     }
 
     @Test
-    void testReadProtectedTermsListFromFileIsNotInternalList()
-        throws URISyntaxException {
+    void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException {
         Path file = Path.of(
             ProtectedTermsLoader.class.getResource(
                     "/org/jabref/logic/protectedterms/namedterms.terms"
@@ -131,8 +122,7 @@ class ProtectedTermsLoaderTest {
                 .toURI()
         );
 
-        ProtectedTermsList list =
-            ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertFalse(list.isInternalList());
     }
 
@@ -145,12 +135,9 @@ class ProtectedTermsLoaderTest {
                 )
                 .toURI()
         );
-        ProtectedTermsList list =
-            ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals(
-            Localization.lang(
-                "The text after the last line starting with # will be used"
-            ),
+            Localization.lang("The text after the last line starting with # will be used"),
             list.getDescription()
         );
     }

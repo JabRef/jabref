@@ -28,10 +28,7 @@ class EntryLinkCheckerTest {
 
     @Test
     void testEntryLinkChecker() {
-        assertThrows(
-            NullPointerException.class,
-            () -> new EntryLinkChecker(null)
-        );
+        assertThrows(NullPointerException.class, () -> new EntryLinkChecker(null));
     }
 
     @Test

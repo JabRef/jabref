@@ -27,27 +27,18 @@ public class BibDatabaseDiff {
     ) {
         metaDataDiff =
             MetaDataDiff
-                .compare(
-                    originalDatabase.getMetaData(),
-                    newDatabase.getMetaData()
-                )
+                .compare(originalDatabase.getMetaData(), newDatabase.getMetaData())
                 .orElse(null);
-        preambleDiff =
-            PreambleDiff.compare(originalDatabase, newDatabase).orElse(null);
+        preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase).orElse(null);
         bibStringDiffs =
-            BibStringDiff.compare(
-                originalDatabase.getDatabase(),
-                newDatabase.getDatabase()
-            );
+            BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
 
         // Sort both databases according to a common sort key.
         EntryComparator comparator = getEntryComparator();
         List<BibEntry> originalEntriesSorted = originalDatabase
             .getDatabase()
             .getEntriesSorted(comparator);
-        List<BibEntry> newEntriesSorted = newDatabase
-            .getDatabase()
-            .getEntriesSorted(comparator);
+        List<BibEntry> newEntriesSorted = newDatabase.getDatabase().getEntriesSorted(comparator);
 
         if (!includeEmptyEntries) {
             originalEntriesSorted.removeIf(BibEntry::isEmpty);
@@ -55,23 +46,13 @@ public class BibDatabaseDiff {
         }
 
         entryDiffs =
-            compareEntries(
-                originalEntriesSorted,
-                newEntriesSorted,
-                originalDatabase.getMode()
-            );
+            compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode());
     }
 
     private static EntryComparator getEntryComparator() {
-        EntryComparator comparator = new EntryComparator(
-            false,
-            true,
-            StandardField.TITLE
-        );
-        comparator =
-            new EntryComparator(false, true, StandardField.AUTHOR, comparator);
-        comparator =
-            new EntryComparator(false, true, StandardField.YEAR, comparator);
+        EntryComparator comparator = new EntryComparator(false, true, StandardField.TITLE);
+        comparator = new EntryComparator(false, true, StandardField.AUTHOR, comparator);
+        comparator = new EntryComparator(false, true, StandardField.YEAR, comparator);
         return comparator;
     }
 
@@ -109,9 +90,7 @@ public class BibDatabaseDiff {
         }
 
         // Now we've found all exact matches, look through the remaining entries, looking for close matches.
-        DuplicateCheck duplicateCheck = new DuplicateCheck(
-            new BibEntryTypesManager()
-        );
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
@@ -136,12 +115,7 @@ public class BibDatabaseDiff {
                 duplicateCheck.isDuplicate(originalEntry, bestEntry, mode)
             ) {
                 used.add(bestMatchIndex);
-                differences.add(
-                    new BibEntryDiff(
-                        originalEntry,
-                        newEntries.get(bestMatchIndex)
-                    )
-                );
+                differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));
             } else {
                 differences.add(new BibEntryDiff(originalEntry, null));
             }
@@ -157,10 +131,7 @@ public class BibDatabaseDiff {
         return differences;
     }
 
-    private static boolean hasEqualCitationKey(
-        BibEntry oneEntry,
-        BibEntry twoEntry
-    ) {
+    private static boolean hasEqualCitationKey(BibEntry oneEntry, BibEntry twoEntry) {
         return (
             oneEntry.hasCitationKey() &&
             twoEntry.hasCitationKey() &&
@@ -168,10 +139,7 @@ public class BibDatabaseDiff {
         );
     }
 
-    public static BibDatabaseDiff compare(
-        BibDatabaseContext base,
-        BibDatabaseContext changed
-    ) {
+    public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
         return new BibDatabaseDiff(base, changed, false);
     }
 

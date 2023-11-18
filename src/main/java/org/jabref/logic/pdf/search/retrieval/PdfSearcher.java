@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public final class PdfSearcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final Directory indexDirectory;
 
@@ -37,11 +35,8 @@ public final class PdfSearcher {
         this.indexDirectory = indexDirectory;
     }
 
-    public static PdfSearcher of(BibDatabaseContext databaseContext)
-        throws IOException {
-        return new PdfSearcher(
-            new NIOFSDirectory(databaseContext.getFulltextIndexPath())
-        );
+    public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
+        return new PdfSearcher(new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
     }
 
     /**
@@ -51,17 +46,10 @@ public final class PdfSearcher {
      * @param maxHits      number of maximum search results, must be positive
      * @return a result set of all documents that have matches in any fields
      */
-    public PdfSearchResults search(
-        final String searchString,
-        final int maxHits
-    ) throws IOException {
+    public PdfSearchResults search(final String searchString, final int maxHits)
+        throws IOException {
         if (
-            StringUtil.isBlank(
-                Objects.requireNonNull(
-                    searchString,
-                    "The search string was null!"
-                )
-            )
+            StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))
         ) {
             return new PdfSearchResults();
         }
@@ -74,19 +62,13 @@ public final class PdfSearcher {
         List<SearchResult> resultDocs = new LinkedList<>();
 
         if (!DirectoryReader.indexExists(indexDirectory)) {
-            LOGGER.debug(
-                "Index directory {} does not yet exist",
-                indexDirectory
-            );
+            LOGGER.debug("Index directory {} does not yet exist", indexDirectory);
             return new PdfSearchResults();
         }
 
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            Query query = new MultiFieldQueryParser(
-                PDF_FIELDS,
-                new EnglishStemAnalyzer()
-            )
+            Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer())
                 .parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
             for (ScoreDoc scoreDoc : results.scoreDocs) {
@@ -94,11 +76,7 @@ public final class PdfSearcher {
             }
             return new PdfSearchResults(resultDocs);
         } catch (ParseException e) {
-            LOGGER.warn(
-                "Could not parse query: '{}'!\n{}",
-                searchString,
-                e.getMessage()
-            );
+            LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
             return new PdfSearchResults();
         }
     }

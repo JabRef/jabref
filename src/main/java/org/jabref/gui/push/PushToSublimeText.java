@@ -21,14 +21,9 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.SUBLIME_TEXT;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PushToSublimeText.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
-    public PushToSublimeText(
-        DialogService dialogService,
-        PreferencesService preferencesService
-    ) {
+    public PushToSublimeText(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 
@@ -43,11 +38,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(
-        BibDatabaseContext database,
-        List<BibEntry> entries,
-        String keyString
-    ) {
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -64,13 +55,8 @@ public class PushToSublimeText extends AbstractPushToApplication {
             return;
         }
         try {
-            LOGGER.debug(
-                "Sublime string: {}",
-                String.join(" ", getCommandLine(keyString))
-            );
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                getCommandLine(keyString)
-            );
+            LOGGER.debug("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
+            ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();
             Map<String, String> envs = processBuilder.environment();
             envs.put("PATH", Path.of(commandPath).getParent().toString());
@@ -88,11 +74,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException excep) {
-            LOGGER.warn(
-                "Error: Could not call executable '{}'",
-                commandPath,
-                excep
-            );
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
         }
     }

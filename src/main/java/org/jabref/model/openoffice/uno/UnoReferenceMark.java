@@ -23,18 +23,13 @@ public class UnoReferenceMark {
      *                             <p>
      *                             Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
      */
-    public static XNameAccess getNameAccess(XTextDocument doc)
-        throws NoDocumentException {
-        XReferenceMarksSupplier supplier = UnoCast
-            .cast(XReferenceMarksSupplier.class, doc)
-            .get();
+    public static XNameAccess getNameAccess(XTextDocument doc) throws NoDocumentException {
+        XReferenceMarksSupplier supplier = UnoCast.cast(XReferenceMarksSupplier.class, doc).get();
 
         try {
             return supplier.getReferenceMarks();
         } catch (DisposedException ex) {
-            throw new NoDocumentException(
-                "UnoReferenceMarks.getNameAccess failed with" + ex
-            );
+            throw new NoDocumentException("UnoReferenceMarks.getNameAccess failed with" + ex);
         }
     }
 
@@ -43,8 +38,7 @@ public class UnoReferenceMark {
      * <p>
      * Empty list for nothing.
      */
-    public static List<String> getListOfNames(XTextDocument doc)
-        throws NoDocumentException {
+    public static List<String> getListOfNames(XTextDocument doc) throws NoDocumentException {
         XNameAccess nameAccess = UnoReferenceMark.getNameAccess(doc);
         String[] names = nameAccess.getElementNames();
         if (names == null) {
@@ -63,10 +57,7 @@ public class UnoReferenceMark {
         XNameAccess xReferenceMarks = UnoReferenceMark.getNameAccess(doc);
 
         if (xReferenceMarks.hasByName(name)) {
-            Optional<XTextContent> mark = UnoNameAccess.getTextContentByName(
-                xReferenceMarks,
-                name
-            );
+            Optional<XTextContent> mark = UnoNameAccess.getTextContentByName(xReferenceMarks, name);
             if (mark.isEmpty()) {
                 return;
             }
@@ -81,10 +72,8 @@ public class UnoReferenceMark {
     /**
      * @return reference mark as XTextContent, Optional.empty if not found.
      */
-    public static Optional<XTextContent> getAsTextContent(
-        XTextDocument doc,
-        String name
-    ) throws NoDocumentException, WrappedTargetException {
+    public static Optional<XTextContent> getAsTextContent(XTextDocument doc, String name)
+        throws NoDocumentException, WrappedTargetException {
         XNameAccess nameAccess = UnoReferenceMark.getNameAccess(doc);
         return UnoNameAccess.getTextContentByName(nameAccess, name);
     }
@@ -92,13 +81,9 @@ public class UnoReferenceMark {
     /**
      * XTextRange for the named reference mark, Optional.empty if not found.
      */
-    public static Optional<XTextRange> getAnchor(
-        XTextDocument doc,
-        String name
-    ) throws NoDocumentException, WrappedTargetException {
-        return UnoReferenceMark
-            .getAsTextContent(doc, name)
-            .map(XTextContent::getAnchor);
+    public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
+        throws NoDocumentException, WrappedTargetException {
+        return UnoReferenceMark.getAsTextContent(doc, name).map(XTextContent::getAnchor);
     }
 
     /**
@@ -111,12 +96,8 @@ public class UnoReferenceMark {
      * @param name  For the reference mark.
      * @param range Cursor marking the location or range for the reference mark.
      */
-    public static XNamed create(
-        XTextDocument doc,
-        String name,
-        XTextRange range,
-        boolean absorb
-    ) throws CreationException {
+    public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
+        throws CreationException {
         return UnoNamed.insertNamedTextContent(
             doc,
             "com.sun.star.text.ReferenceMark",

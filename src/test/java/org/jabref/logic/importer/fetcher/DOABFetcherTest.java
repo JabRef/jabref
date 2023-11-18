@@ -52,14 +52,8 @@ public class DOABFetcherTest {
                 new BibEntry(StandardEntryType.Book)
                     .withField(StandardField.ISBN, "9789085551201")
                     .withField(StandardField.AUTHOR, "Ronald Snijder")
-                    .withField(
-                        StandardField.TITLE,
-                        "The deliverance of open access books"
-                    )
-                    .withField(
-                        StandardField.SUBTITLE,
-                        "Examining usage and dissemination"
-                    )
+                    .withField(StandardField.TITLE, "The deliverance of open access books")
+                    .withField(StandardField.SUBTITLE, "Examining usage and dissemination")
                     .withField(StandardField.DOI, "10.26530/OAPEN_1004809")
                     .withField(StandardField.PAGES, "234")
                     .withField(StandardField.DATE, "2019")
@@ -77,18 +71,12 @@ public class DOABFetcherTest {
                         "Open Access, Monographs, OAPEN Library, " +
                         "Directory of Open Access Books"
                     )
-                    .withField(
-                        StandardField.PUBLISHER,
-                        "Amsterdam University Press"
-                    ),
+                    .withField(StandardField.PUBLISHER, "Amsterdam University Press"),
                 "the deliverance of open access books"
             ),
             Arguments.of(
                 new BibEntry(StandardEntryType.Book)
-                    .withField(
-                        StandardField.EDITOR,
-                        "Andrew Perrin and Loren T. Stuckenbruck"
-                    )
+                    .withField(StandardField.EDITOR, "Andrew Perrin and Loren T. Stuckenbruck")
                     .withField(
                         StandardField.TITLE,
                         "Four Kingdom Motifs before and beyond the Book of Daniel"
@@ -111,18 +99,9 @@ public class DOABFetcherTest {
             ),
             Arguments.of(
                 new BibEntry(StandardEntryType.Book)
-                    .withField(
-                        StandardField.EDITOR,
-                        "Felipe Gonzalez Toro and Antonios Tsourdos"
-                    )
-                    .withField(
-                        StandardField.TITLE,
-                        "UAV Sensors for Environmental Monitoring"
-                    )
-                    .withField(
-                        StandardField.DOI,
-                        "10.3390/books978-3-03842-754-4"
-                    )
+                    .withField(StandardField.EDITOR, "Felipe Gonzalez Toro and Antonios Tsourdos")
+                    .withField(StandardField.TITLE, "UAV Sensors for Environmental Monitoring")
+                    .withField(StandardField.DOI, "10.3390/books978-3-03842-754-4")
                     .withField(StandardField.PAGES, "670")
                     .withField(StandardField.DATE, "2018")
                     .withField(
@@ -174,8 +153,7 @@ public class DOABFetcherTest {
 
     @ParameterizedTest
     @MethodSource
-    public void testPerformSearch(BibEntry expected, String query)
-        throws FetcherException {
+    public void testPerformSearch(BibEntry expected, String query) throws FetcherException {
         List<BibEntry> entries = fetcher.performSearch(query);
         // We must not contain abstracts in our code base; thus we remove the abstracts from the fetched results
         entries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));

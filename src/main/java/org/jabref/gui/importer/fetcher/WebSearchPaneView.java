@@ -26,9 +26,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class WebSearchPaneView extends VBox {
 
-    private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass(
-        "invalid"
-    );
+    private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");
 
     private final WebSearchPaneViewModel viewModel;
     private final PreferencesService preferences;
@@ -41,12 +39,7 @@ public class WebSearchPaneView extends VBox {
     ) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.viewModel =
-            new WebSearchPaneViewModel(
-                preferences,
-                dialogService,
-                stateManager
-            );
+        this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
         initialize();
     }
 
@@ -56,16 +49,12 @@ public class WebSearchPaneView extends VBox {
             .withText(SearchBasedFetcher::getName)
             .install(fetchers);
         fetchers.itemsProperty().bind(viewModel.fetchersProperty());
-        fetchers
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedFetcherProperty());
+        fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
 
         // Create help button for currently selected fetcher
         StackPane helpButtonContainer = new StackPane();
-        ActionFactory factory = new ActionFactory(
-            preferences.getKeyBindingRepository()
-        );
+        ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
         EasyBind.subscribe(
             viewModel.selectedFetcherProperty(),
             fetcher -> {
@@ -95,20 +84,10 @@ public class WebSearchPaneView extends VBox {
         EasyBind.subscribe(
             viewModel.queryValidationStatus().validProperty(),
             valid -> {
-                if (
-                    !valid &&
-                    viewModel
-                        .queryValidationStatus()
-                        .getHighestMessage()
-                        .isPresent()
-                ) {
+                if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
                     query.setTooltip(
                         new Tooltip(
-                            viewModel
-                                .queryValidationStatus()
-                                .getHighestMessage()
-                                .get()
-                                .getMessage()
+                            viewModel.queryValidationStatus().getHighestMessage().get().getMessage()
                         )
                     );
                     query.pseudoClassStateChanged(QUERY_INVALID, true);

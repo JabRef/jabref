@@ -38,25 +38,15 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        ImporterPreferences importerPreferences = mock(
-            ImporterPreferences.class
-        );
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 
-        fetcher =
-            new AstrophysicsDataSystem(
-                importFormatPreferences,
-                importerPreferences
-            );
+        fetcher = new AstrophysicsDataSystem(importFormatPreferences, importerPreferences);
 
         diezSliceTheoremEntry =
             new BibEntry(StandardEntryType.Article)
                 .withCitationKey("2018arXiv181204698D")
-                .withField(
-                    StandardField.AUTHOR,
-                    "Diez, Tobias and Rudolph, Gerd"
-                )
+                .withField(StandardField.AUTHOR, "Diez, Tobias and Rudolph, Gerd")
                 .withField(
                     StandardField.TITLE,
                     "Slice theorem and orbit type stratification in infinite dimensions"
@@ -86,18 +76,12 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         famaeyMcGaughEntry =
             new BibEntry(StandardEntryType.Article)
                 .withCitationKey("2012LRR....15...10F")
-                .withField(
-                    StandardField.AUTHOR,
-                    "Famaey, Beno{\\^\\i}t and McGaugh, Stacy S."
-                )
+                .withField(StandardField.AUTHOR, "Famaey, Beno{\\^\\i}t and McGaugh, Stacy S.")
                 .withField(
                     StandardField.TITLE,
                     "Modified Newtonian Dynamics (MOND): Observational Phenomenology and Relativistic Extensions"
                 )
-                .withField(
-                    StandardField.JOURNAL,
-                    "Living Reviews in Relativity"
-                )
+                .withField(StandardField.JOURNAL, "Living Reviews in Relativity")
                 .withField(StandardField.YEAR, "2012")
                 .withField(StandardField.VOLUME, "15")
                 .withField(StandardField.MONTH, "#sep#")
@@ -174,10 +158,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
                     StandardField.ABSTRACT,
                     "If Jupiter's and Saturn's fluid interiors were inviscid and adiabatic,         any steady zonal motion would take the form of differentially         rotating cylinders concentric about the planetary axis of         rotation. B. A. Smith et al. [ Science215, 504-537 (1982)]         showed that Saturn's observed zonal wind profile extends a         significant distance below cloud base. Further extension into         the interior occurs if the values of the eddy viscosity and         superadiabaticity are small. We estimate these values using a         scaling analysis of deep convection in the presence of         differential rotation. The differential rotation inhibits the         convection and reduces the effective eddy viscosity. Viscous         dissipation of zonal mean kinetic energy is then within the         bounds set by the internal heat source. The differential         rotation increases the superadiabaticity, but not so much as to         eliminate the cylindrical structure of the flow. Very large         departures from adiabaticity, necessary for decoupling the         atmosphere and interior, do not occur. Using our scaling         analysis we develop the anelastic equations that describe         motions in Jupiter's and Saturn's interiors. A simple problem is         solved, that of an adiabatic fluid with a steady zonal wind         varying as a function of cylindrical radius. Low zonal         wavenumber perturbations are two dimensional (independent of the         axial coordinate) and obey a modified barotropic stability         equation. The parameter analogous to {\\ensuremath{\\beta}} is         negative and is three to four times larger than the         {\\ensuremath{\\beta}} for thin atmospheres. Jupiter's and         Saturn's observed zonal wind profiles are close to marginal         stability according to this deep sphere criterion, but are         several times supercritical according to the thin atmosphere         criterion."
                 )
-                .withField(
-                    StandardField.AUTHOR,
-                    "Ingersoll, A.~P. and Pollard, D."
-                )
+                .withField(StandardField.AUTHOR, "Ingersoll, A.~P. and Pollard, D.")
                 .withField(StandardField.DOI, "10.1016/0019-1035(82)90169-5")
                 .withField(StandardField.JOURNAL, "\\icarus")
                 .withField(
@@ -237,9 +218,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch(
-            "Diez slice theorem Lie"
-        );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
         assertFalse(fetchedEntries.isEmpty());
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
@@ -259,11 +238,8 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @Test
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.12942/lrr-2012-10"
-        );
-        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)
-        ); // Remove abstract due to copyright
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
@@ -275,77 +251,46 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @Test
     public void testPerformSearchByIdInvalidDoi() throws Exception {
-        assertEquals(
-            Optional.empty(),
-            fetcher.performSearchById("this.doi.will.fail")
-        );
+        assertEquals(Optional.empty(), fetcher.performSearchById("this.doi.will.fail"));
     }
 
     @Test
     public void testPerformSearchBySunWelchEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.1038/nmat3160"
-        );
-        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)
-        ); // Remove abstract due to copyright
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByXiongSunEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.1109/TGRS.2006.890567"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567");
         assertEquals(Optional.of(xiongSunEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByIngersollPollardEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.1016/0019-1035(82)90169-5"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5");
         assertEquals(Optional.of(ingersollPollardEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByLuceyPaulEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "2000JGR...10520297L"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
     }
 
     @Test
     public void performSearchByQueryPaged_searchLimitsSize() throws Exception {
         Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
-        assertEquals(
-            fetcher.getPageSize(),
-            page.getSize(),
-            "fetcher return wrong page size"
-        );
+        assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher return wrong page size");
     }
 
     @Test
-    public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages()
-        throws Exception {
-        Page<BibEntry> page = fetcher.performSearchPaged(
-            "author:\"ThisAuthorWillNotBeFound\"",
-            0
-        );
-        Page<BibEntry> page5 = fetcher.performSearchPaged(
-            "author:\"ThisAuthorWillNotBeFound\"",
-            5
-        );
-        assertEquals(
-            0,
-            page.getSize(),
-            "fetcher doesnt return empty pages for invalid author"
-        );
-        assertEquals(
-            0,
-            page5.getSize(),
-            "fetcher doesnt return empty pages for invalid author"
-        );
+    public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
+        Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
+        assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");
+        assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
     }
 
     @Override

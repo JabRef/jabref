@@ -32,32 +32,20 @@ import org.slf4j.LoggerFactory;
  */
 public class PdfMergeMetadataImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PdfMergeMetadataImporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(
-        ImportFormatPreferences importFormatPreferences
-    ) {
+    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = new ArrayList<>();
-        this.metadataImporters.add(
-                new PdfVerbatimBibTextImporter(importFormatPreferences)
-            );
-        this.metadataImporters.add(
-                new PdfEmbeddedBibFileImporter(importFormatPreferences)
-            );
+        this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
+        this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            this.metadataImporters.add(
-                    new PdfGrobidImporter(importFormatPreferences)
-                );
+            this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        this.metadataImporters.add(
-                new PdfXmpImporter(importFormatPreferences.xmpPreferences())
-            );
+        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter());
     }
 
@@ -67,8 +55,7 @@ public class PdfMergeMetadataImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
             "PdfMergeMetadataImporter does not support importDatabase(BufferedReader reader)." +
@@ -107,9 +94,7 @@ public class PdfMergeMetadataImporter extends Importer {
             if (candidate.hasField(StandardField.DOI)) {
                 try {
                     new DoiFetcher(importFormatPreferences)
-                        .performSearchById(
-                            candidate.getField(StandardField.DOI).get()
-                        )
+                        .performSearchById(candidate.getField(StandardField.DOI).get())
                         .ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error(
@@ -124,9 +109,7 @@ public class PdfMergeMetadataImporter extends Importer {
                     new IsbnFetcher(importFormatPreferences)
                         // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
-                        .performSearchById(
-                            candidate.getField(StandardField.ISBN).get()
-                        )
+                        .performSearchById(candidate.getField(StandardField.ISBN).get())
                         .ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error(
@@ -144,9 +127,7 @@ public class PdfMergeMetadataImporter extends Importer {
                 entry.setType(candidate.getType());
             }
             Set<Field> presentFields = entry.getFields();
-            for (Map.Entry<Field, String> fieldEntry : candidate
-                .getFieldMap()
-                .entrySet()) {
+            for (Map.Entry<Field, String> fieldEntry : candidate.getFieldMap().entrySet()) {
                 // Don't merge FILE fields that point to a stored file as we set that to filePath anyway.
                 // Nevertheless, retain online links.
                 if (
@@ -165,9 +146,7 @@ public class PdfMergeMetadataImporter extends Importer {
             }
         }
 
-        entry.addFile(
-            new LinkedFile("", filePath, StandardFileType.PDF.getName())
-        );
+        entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
         return new ParserResult(List.of(entry));
     }
 
@@ -207,13 +186,9 @@ public class PdfMergeMetadataImporter extends Importer {
         }
 
         @Override
-        public List<BibEntry> performSearch(BibEntry entry)
-            throws FetcherException {
+        public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
             for (LinkedFile file : entry.getFiles()) {
-                Optional<Path> filePath = file.findIn(
-                    databaseContext,
-                    filePreferences
-                );
+                Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
                     try {
                         ParserResult result = importDatabase(filePath.get());

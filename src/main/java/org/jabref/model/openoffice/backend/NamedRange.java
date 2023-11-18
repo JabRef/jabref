@@ -39,12 +39,10 @@ public interface NamedRange {
     /**
      * Remove brackets, but if the result would become empty, leave them; if the result would be a single character, leave the left bracket.
      */
-    void cleanFillCursor(XTextDocument doc)
-        throws NoDocumentException, WrappedTargetException;
+    void cleanFillCursor(XTextDocument doc) throws NoDocumentException, WrappedTargetException;
 
     /**
      * Note: create is in NamedRangeManager
      */
-    void removeFromDocument(XTextDocument doc)
-        throws WrappedTargetException, NoDocumentException;
+    void removeFromDocument(XTextDocument doc) throws WrappedTargetException, NoDocumentException;
 }

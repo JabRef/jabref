@@ -30,8 +30,7 @@ import org.jabref.preferences.PreferencesService;
 /**
  * A column that displays a SpecialField
  */
-public class SpecialFieldColumn
-    extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
+public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
     private final PreferencesService preferencesService;
     private final UndoManager undoManager;
@@ -45,9 +44,7 @@ public class SpecialFieldColumn
         this.preferencesService = preferencesService;
         this.undoManager = undoManager;
 
-        SpecialField specialField = (SpecialField) FieldFactory.parseField(
-            model.getQualifier()
-        );
+        SpecialField specialField = (SpecialField) FieldFactory.parseField(model.getQualifier());
         SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(
             specialField,
             preferencesService,
@@ -55,10 +52,7 @@ public class SpecialFieldColumn
         );
 
         Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
-        Tooltip.install(
-            headerGraphic,
-            new Tooltip(specialFieldViewModel.getLocalization())
-        );
+        Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
         this.setGraphic(headerGraphic);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
 
@@ -68,17 +62,11 @@ public class SpecialFieldColumn
                 SpecialFieldsPreferences.COLUMN_RANKING_WIDTH
             );
             this.setResizable(false);
-            new OptionalValueTableCellFactory<
-                BibEntryTableViewModel,
-                SpecialFieldValueViewModel
-            >()
+            new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
                 .withGraphic(this::createSpecialRating)
                 .install(this);
         } else {
-            MainTableColumnFactory.setExactWidth(
-                this,
-                ColumnPreferences.ICON_COLUMN_WIDTH
-            );
+            MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
             this.setResizable(false);
 
             if (specialField.isSingleValueField()) {
@@ -106,18 +94,13 @@ public class SpecialFieldColumn
                         createSpecialFieldIcon(value, specialFieldViewModel)
                     )
                     .withMenu((entry, value) ->
-                        createSpecialFieldMenu(
-                            entry.getEntry(),
-                            specialFieldViewModel
-                        )
+                        createSpecialFieldMenu(entry.getEntry(), specialFieldViewModel)
                     )
                     .install(this);
             }
         }
 
-        this.setCellValueFactory(cellData ->
-                cellData.getValue().getSpecialField(specialField)
-            );
+        this.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
 
         if (specialField == SpecialField.RANKING) {
             this.setComparator(new RankingFieldComparator());
@@ -143,10 +126,7 @@ public class SpecialFieldColumn
         ranking.addEventFilter(
             MouseEvent.MOUSE_CLICKED,
             event -> {
-                if (
-                    event.getButton().equals(MouseButton.PRIMARY) &&
-                    event.getClickCount() == 2
-                ) {
+                if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
                     ranking.setRating(0);
                     event.consume();
                 } else if (event.getButton().equals(MouseButton.SECONDARY)) {
@@ -158,11 +138,7 @@ public class SpecialFieldColumn
         EasyBind.subscribe(
             ranking.ratingProperty(),
             rating ->
-                new SpecialFieldViewModel(
-                    SpecialField.RANKING,
-                    preferencesService,
-                    undoManager
-                )
+                new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
                     .setSpecialFieldValue(
                         entry.getEntry(),
                         SpecialFieldValue.getRating(rating.intValue())
@@ -172,10 +148,7 @@ public class SpecialFieldColumn
         return ranking;
     }
 
-    private ContextMenu createSpecialFieldMenu(
-        BibEntry entry,
-        SpecialFieldViewModel specialField
-    ) {
+    private ContextMenu createSpecialFieldMenu(BibEntry entry, SpecialFieldViewModel specialField) {
         ContextMenu contextMenu = new ContextMenu();
 
         for (SpecialFieldValueViewModel value : specialField.getValues()) {
@@ -183,8 +156,7 @@ public class SpecialFieldColumn
                 value.getMenuString(),
                 value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null)
             );
-            menuItem.setOnAction(event ->
-                specialField.setSpecialFieldValue(entry, value.getValue())
+            menuItem.setOnAction(event -> specialField.setSpecialFieldValue(entry, value.getValue())
             );
             contextMenu.getItems().add(menuItem);
         }

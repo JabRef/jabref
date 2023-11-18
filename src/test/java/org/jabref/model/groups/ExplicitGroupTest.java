@@ -19,28 +19,15 @@ class ExplicitGroupTest {
 
     @BeforeEach
     void setUp() {
-        group =
-            new ExplicitGroup(
-                "myExplicitGroup",
-                GroupHierarchyType.INDEPENDENT,
-                ','
-            );
-        group2 =
-            new ExplicitGroup(
-                "myExplicitGroup2",
-                GroupHierarchyType.INCLUDING,
-                ','
-            );
+        group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        group2 = new ExplicitGroup("myExplicitGroup2", GroupHierarchyType.INCLUDING, ',');
         entry = new BibEntry();
     }
 
     @Test
     void addSingleGroupToEmptyBibEntryChangesGroupsField() {
         group.add(entry);
-        assertEquals(
-            Optional.of("myExplicitGroup"),
-            entry.getField(StandardField.GROUPS)
-        );
+        assertEquals(Optional.of("myExplicitGroup"), entry.getField(StandardField.GROUPS));
     }
 
     @Test
@@ -67,10 +54,7 @@ class ExplicitGroupTest {
     void addDuplicateGroupDoesNotChangeGroupsField() throws Exception {
         entry.setField(StandardField.GROUPS, "myExplicitGroup");
         group.add(entry);
-        assertEquals(
-            Optional.of("myExplicitGroup"),
-            entry.getField(StandardField.GROUPS)
-        );
+        assertEquals(Optional.of("myExplicitGroup"), entry.getField(StandardField.GROUPS));
     }
 
     @Test

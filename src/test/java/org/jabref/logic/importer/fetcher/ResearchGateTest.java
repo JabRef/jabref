@@ -36,40 +36,28 @@ public class ResearchGateTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher =
-            new ResearchGate(
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
-            );
+        fetcher = new ResearchGate(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         entry = new BibEntry(StandardEntryType.InProceedings);
         entry.setField(StandardField.DOI, "10.1109/CSAC.2005.42");
-        entry.setField(
-            StandardField.TITLE,
-            "Paranoid: a global secure file access control system"
-        );
+        entry.setField(StandardField.TITLE, "Paranoid: a global secure file access control system");
     }
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFoundByDOI() throws IOException, FetcherException {
-        assertEquals(
-            Optional.of(new URL(URL_PDF)),
-            fetcher.findFullText(entry)
-        );
+        assertEquals(Optional.of(new URL(URL_PDF)), fetcher.findFullText(entry));
     }
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextNotFoundByDOI() throws IOException, FetcherException {
-        BibEntry entry2 = new BibEntry()
-            .withField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
+        BibEntry entry2 = new BibEntry().withField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
         assertEquals(Optional.empty(), fetcher.findFullText(entry2));
     }
 
     @Test
     void getDocumentByTitle() throws IOException, NullPointerException {
-        Optional<String> source = fetcher.getURLByString(
-            entry.getTitle().get()
-        );
+        Optional<String> source = fetcher.getURLByString(entry.getTitle().get());
         assertTrue(source.isPresent() && source.get().startsWith(URL_PAGE));
     }
 
@@ -128,10 +116,7 @@ public class ResearchGateTest {
                 "Microbiology: A Short Overview on Application, and Perspectives",
                 NO_EXPLICIT_FIELD
             );
-        assertEquals(
-            Optional.of(master),
-            fetcher.performSearch(queryNode).stream().findFirst()
-        );
+        assertEquals(Optional.of(master), fetcher.performSearch(queryNode).stream().findFirst());
     }
 
     @Test
@@ -139,10 +124,7 @@ public class ResearchGateTest {
         BibEntry entryZaffar = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("inproceedings")
             .withField(StandardField.ISBN, "0-7695-2461-3")
-            .withField(
-                StandardField.TITLE,
-                "Looking Back at the Bell-La Padula Model"
-            )
+            .withField(StandardField.TITLE, "Looking Back at the Bell-La Padula Model")
             .withField(StandardField.MONTH, "01")
             .withField(StandardField.PAGES, "15 pp. - 351")
             .withField(StandardField.DOI, "10.1109/CSAC.2005.37")
@@ -184,10 +166,7 @@ public class ResearchGateTest {
                 .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406")
         );
 
-        Optional<BibEntry> actual = fetcher
-            .performSearch(entryInput)
-            .stream()
-            .findFirst();
+        Optional<BibEntry> actual = fetcher.performSearch(entryInput).stream().findFirst();
         assertEquals(expected, actual);
     }
 }

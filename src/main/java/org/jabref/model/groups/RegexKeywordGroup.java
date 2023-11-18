@@ -24,24 +24,16 @@ public class RegexKeywordGroup extends KeywordGroup {
         this.pattern = compilePattern(searchExpression, caseSensitive);
     }
 
-    private static Pattern compilePattern(
-        String searchExpression,
-        boolean caseSensitive
-    ) {
+    private static Pattern compilePattern(String searchExpression, boolean caseSensitive) {
         return caseSensitive
             ? Pattern.compile("\\b" + searchExpression + "\\b")
-            : Pattern.compile(
-                "\\b" + searchExpression + "\\b",
-                Pattern.CASE_INSENSITIVE
-            );
+            : Pattern.compile("\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
     }
 
     @Override
     public boolean contains(BibEntry entry) {
         Optional<String> content = entry.getField(searchField);
-        return content
-            .map(value -> pattern.matcher(value).find())
-            .orElse(false);
+        return content.map(value -> pattern.matcher(value).find()).orElse(false);
     }
 
     @Override

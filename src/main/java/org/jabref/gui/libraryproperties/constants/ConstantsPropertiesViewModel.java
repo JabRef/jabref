@@ -25,8 +25,9 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
 
     private static final String NEW_STRING_LABEL = "NewString"; // must not contain spaces
 
-    private final ListProperty<ConstantsItemModel> stringsListProperty =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ConstantsItemModel> stringsListProperty = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
 
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
 
@@ -44,16 +45,12 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
 
-        ObservableList<ObservableValue<Boolean>> allValidProperty =
-            EasyBind.map(
-                stringsListProperty,
-                ConstantsItemModel::combinedValidationValidProperty
-            );
+        ObservableList<ObservableValue<Boolean>> allValidProperty = EasyBind.map(
+            stringsListProperty,
+            ConstantsItemModel::combinedValidationValidProperty
+        );
         validProperty.bind(
-            EasyBind.combine(
-                allValidProperty,
-                stream -> stream.allMatch(valid -> valid)
-            )
+            EasyBind.combine(allValidProperty, stream -> stream.allMatch(valid -> valid))
         );
     }
 
@@ -92,19 +89,12 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     public void resortStrings() {
         // Resort the strings list in the same order as setValues() does
         stringsListProperty.sort(
-            Comparator.comparing(c ->
-                c.labelProperty().get().toLowerCase(Locale.ROOT)
-            )
+            Comparator.comparing(c -> c.labelProperty().get().toLowerCase(Locale.ROOT))
         );
     }
 
-    private ConstantsItemModel convertFromBibTexString(
-        BibtexString bibtexString
-    ) {
-        return new ConstantsItemModel(
-            bibtexString.getName(),
-            bibtexString.getContent()
-        );
+    private ConstantsItemModel convertFromBibTexString(BibtexString bibtexString) {
+        return new ConstantsItemModel(bibtexString.getName(), bibtexString.getContent());
     }
 
     @Override
@@ -119,9 +109,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
             );
     }
 
-    private BibtexString fromBibtexStringViewModel(
-        ConstantsItemModel viewModel
-    ) {
+    private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {
         String label = viewModel.labelProperty().getValue();
         String content = viewModel.contentProperty().getValue();
         return new BibtexString(label, content);
@@ -135,8 +123,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.STRING_EDITOR, dialogService, filePreferences)
-            .execute();
+        new HelpAction(HelpFile.STRING_EDITOR, dialogService, filePreferences).execute();
     }
 
     public ListProperty<ConstantsItemModel> stringsListProperty() {

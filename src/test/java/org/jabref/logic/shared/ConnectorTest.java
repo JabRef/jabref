@@ -12,15 +12,11 @@ public class ConnectorTest {
 
     public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType)
         throws SQLException, InvalidDBMSConnectionPropertiesException {
-        DBMSConnectionProperties properties = getTestConnectionProperties(
-            dbmsType
-        );
+        DBMSConnectionProperties properties = getTestConnectionProperties(dbmsType);
         return new DBMSConnection(properties);
     }
 
-    public static DBMSConnectionProperties getTestConnectionProperties(
-        DBMSType dbmsType
-    ) {
+    public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
         switch (dbmsType) {
             case MYSQL:
                 return new DBMSConnectionPropertiesBuilder()
@@ -54,8 +50,7 @@ public class ConnectorTest {
                     .setUseSSL(false)
                     .createDBMSConnectionProperties();
             default:
-                return new DBMSConnectionPropertiesBuilder()
-                    .createDBMSConnectionProperties();
+                return new DBMSConnectionPropertiesBuilder().createDBMSConnectionProperties();
         }
     }
 }

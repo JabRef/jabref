@@ -25,15 +25,10 @@ class ConstantsPropertiesViewModelTest {
         filePreferences = mock(FilePreferences.class);
     }
 
-    @DisplayName(
-        "Check that the list of strings is sorted according to their keys"
-    )
+    @DisplayName("Check that the list of strings is sorted according to their keys")
     @Test
     void testStringsListPropertySorting() {
-        BibtexString string1 = new BibtexString(
-            "TSE",
-            "Transactions on Software Engineering"
-        );
+        BibtexString string1 = new BibtexString("TSE", "Transactions on Software Engineering");
         BibtexString string2 = new BibtexString(
             "ICSE",
             "International Conference on Software Engineering"
@@ -73,17 +68,9 @@ class ConstantsPropertiesViewModelTest {
             filePreferences
         );
         var stringsList = model.stringsListProperty();
+        stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
         stringsList.add(
-            new ConstantsItemModel(
-                "TSE",
-                "Transactions on Software Engineering"
-            )
-        );
-        stringsList.add(
-            new ConstantsItemModel(
-                "ICSE",
-                "International Conference on Software Engineering"
-            )
+            new ConstantsItemModel("ICSE", "International Conference on Software Engineering")
         );
 
         model.resortStrings();

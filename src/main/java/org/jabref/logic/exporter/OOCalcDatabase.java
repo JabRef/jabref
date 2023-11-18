@@ -25,12 +25,8 @@ import org.w3c.dom.Text;
 
 class OOCalcDatabase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OOCalcDatabase.class
-    );
-    private static final Field REPORT_TYPE_FIELD = new UnknownField(
-        "reporttype"
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OOCalcDatabase.class);
+    private static final Field REPORT_TYPE_FIELD = new UnknownField("reporttype");
 
     private final List<BibEntry> entries = new ArrayList<>();
     private final List<Field> toExportFields = Stream
@@ -58,11 +54,7 @@ class OOCalcDatabase {
     public Document getDOMrepresentation() {
         Document document = null;
         try {
-            document =
-                DocumentBuilderFactory
-                    .newInstance()
-                    .newDocumentBuilder()
-                    .newDocument();
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element root = createRootElement(document);
             Element body = document.createElement("office:body");
             Element table = createTableElement(document);
@@ -85,21 +77,14 @@ class OOCalcDatabase {
     private void addEntryRow(BibEntry entry, Element table, Document document) {
         final Element row = document.createElement("table:table-row");
 
-        addTableCell(
-            document,
-            row,
-            new GetOpenOfficeType().format(entry.getType().getName())
-        );
+        addTableCell(document, row, new GetOpenOfficeType().format(entry.getType().getName()));
         toExportFields.forEach(field -> {
             if (field.equals(StandardField.TITLE)) {
                 addTableCell(
                     document,
                     row,
                     new RemoveWhitespace()
-                        .format(
-                            new RemoveBrackets()
-                                .format(getField(entry, StandardField.TITLE))
-                        )
+                        .format(new RemoveBrackets().format(getField(entry, StandardField.TITLE)))
                 );
             } else {
                 addTableCell(document, row, getField(entry, field));
@@ -151,11 +136,7 @@ class OOCalcDatabase {
         return root;
     }
 
-    private static void addTableCell(
-        Document doc,
-        Element parent,
-        String content
-    ) {
+    private static void addTableCell(Document doc, Element parent, String content) {
         Element cell = doc.createElement("table:table-cell");
         Element text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);

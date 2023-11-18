@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SaveOrder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SaveOrder.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);
 
     private final OrderType orderType;
     private final List<SortCriterion> sortCriteria;
@@ -62,10 +60,7 @@ public class SaveOrder {
         List<SortCriterion> sortCriteria = new ArrayList<>(data.size() / 2);
         for (int index = 1; index < data.size(); index = index + 2) {
             sortCriteria.add(
-                new SortCriterion(
-                    FieldFactory.parseField(data.get(index)),
-                    data.get(index + 1)
-                )
+                new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1))
             );
         }
         this.sortCriteria = sortCriteria;
@@ -163,13 +158,7 @@ public class SaveOrder {
         @Override
         public String toString() {
             return (
-                "SortCriterion{" +
-                "field='" +
-                field +
-                '\'' +
-                ", descending=" +
-                descending +
-                '}'
+                "SortCriterion{" + "field='" + field + '\'' + ", descending=" + descending + '}'
             );
         }
 
@@ -183,8 +172,7 @@ public class SaveOrder {
             }
             SortCriterion that = (SortCriterion) o;
             return (
-                Objects.equals(descending, that.descending) &&
-                Objects.equals(field, that.field)
+                Objects.equals(descending, that.descending) && Objects.equals(field, that.field)
             );
         }
 

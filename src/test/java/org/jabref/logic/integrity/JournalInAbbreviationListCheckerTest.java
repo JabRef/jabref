@@ -21,16 +21,10 @@ public class JournalInAbbreviationListCheckerTest {
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository =
-            JournalAbbreviationLoader.loadBuiltInRepository();
-        abbreviationRepository.addCustomAbbreviation(
-            new Abbreviation("IEEE Software", "IEEE SW")
-        );
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("IEEE Software", "IEEE SW"));
         checker =
-            new JournalInAbbreviationListChecker(
-                StandardField.JOURNAL,
-                abbreviationRepository
-            );
+            new JournalInAbbreviationListChecker(StandardField.JOURNAL, abbreviationRepository);
         checkerb =
             new JournalInAbbreviationListChecker(
                 StandardField.JOURNALTITLE,

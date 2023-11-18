@@ -42,9 +42,7 @@ import org.slf4j.LoggerFactory;
 // The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OpenDatabaseAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
 
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
@@ -91,10 +89,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param libraryTab The BasePanel where the database is shown.
      * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(
-        LibraryTab libraryTab,
-        ParserResult result
-    ) {
+    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 action.performAction(libraryTab, result);
@@ -105,17 +100,15 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(getInitialDirectory())
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(StandardFileType.BIBTEX_DB)
+            .withDefaultExtension(StandardFileType.BIBTEX_DB)
+            .withInitialDirectory(getInitialDirectory())
+            .build();
 
-        List<Path> filesToOpen =
-            dialogService.showFileOpenDialogAndGetMultipleFiles(
-                fileDialogConfiguration
-            );
+        List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(
+            fileDialogConfiguration
+        );
         openFiles(filesToOpen);
     }
 
@@ -124,9 +117,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getLibraryTabs().isEmpty()) {
-            return preferencesService
-                .getFilePreferences()
-                .getWorkingDirectory();
+            return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame
                 .getCurrentLibraryTab()
@@ -134,11 +125,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .getDatabasePath();
             return databasePath
                 .map(Path::getParent)
-                .orElse(
-                    preferencesService
-                        .getFilePreferences()
-                        .getWorkingDirectory()
-                );
+                .orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
 
@@ -164,23 +151,13 @@ public class OpenDatabaseAction extends SimpleCommand {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (
-            Iterator<Path> iterator = filesToOpen.iterator();
-            iterator.hasNext();
-        ) {
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getLibraryTabs().size(); i++) {
                 LibraryTab libraryTab = frame.getLibraryTabAt(i);
                 if (
-                    (libraryTab
-                            .getBibDatabaseContext()
-                            .getDatabasePath()
-                            .isPresent()) &&
-                    libraryTab
-                        .getBibDatabaseContext()
-                        .getDatabasePath()
-                        .get()
-                        .equals(file)
+                    (libraryTab.getBibDatabaseContext().getDatabasePath().isPresent()) &&
+                    libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)
                 ) {
                     iterator.remove();
                     removed++;
@@ -198,9 +175,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
-            FileHistory fileHistory = preferencesService
-                .getGuiPreferences()
-                .getFileHistory();
+            FileHistory fileHistory = preferencesService.getGuiPreferences().getFileHistory();
             filesToOpen.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
@@ -224,9 +199,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             return;
         }
 
-        BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() ->
-            loadDatabase(file)
-        );
+        BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         // The backgroundTask is executed within the method createLibraryTab
         LibraryTab newTab = LibraryTab.createLibraryTab(
             backgroundTask,
@@ -248,12 +221,8 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        preferencesService
-            .getFilePreferences()
-            .setWorkingDirectory(fileToLoad.getParent());
-        Path backupDir = preferencesService
-            .getFilePreferences()
-            .getBackupDirectory();
+        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
+        Path backupDir = preferencesService.getFilePreferences().getBackupDirectory();
 
         ParserResult parserResult = null;
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
@@ -283,9 +252,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
             if (parserResult.hasWarnings()) {
                 String content =
-                    Localization.lang(
-                        "Please check your library file for wrong syntax."
-                    ) +
+                    Localization.lang("Please check your library file for wrong syntax.") +
                     "\n\n" +
                     parserResult.getErrorMessage();
                 DefaultTaskExecutor.runInJavaFXThread(() ->
@@ -325,10 +292,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     Map.of(),
                     Map.of(
                         "NumberOfEntries",
-                        (double) libraryTab
-                            .getBibDatabaseContext()
-                            .getDatabase()
-                            .getEntryCount()
+                        (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount()
                     )
                 )
             );

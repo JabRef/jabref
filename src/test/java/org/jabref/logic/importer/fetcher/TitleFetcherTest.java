@@ -22,10 +22,7 @@ public class TitleFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher =
-            new TitleFetcher(
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
-            );
+        fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBischof2009 = new BibEntry();
         bibEntryBischof2009.setType(StandardEntryType.InProceedings);

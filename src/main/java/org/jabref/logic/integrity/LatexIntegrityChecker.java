@@ -34,9 +34,7 @@ import uk.ac.ed.ph.snuggletex.definitions.CoreErrorGroup;
  */
 public class LatexIntegrityChecker implements EntryChecker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SnuggleSession.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleSession.class);
     private static final SnuggleEngine ENGINE = new SnuggleEngine();
     private static final SnuggleSession SESSION;
     private static final ResourceBundle ERROR_MESSAGES = ENGINE
@@ -47,24 +45,8 @@ public class LatexIntegrityChecker implements EntryChecker {
 
     static {
         SnugglePackage snugglePackage = ENGINE.getPackages().get(0);
-        snugglePackage.addComplexCommand(
-            "textgreater",
-            false,
-            0,
-            TEXT_MODE_ONLY,
-            null,
-            null,
-            null
-        );
-        snugglePackage.addComplexCommand(
-            "textless",
-            false,
-            0,
-            TEXT_MODE_ONLY,
-            null,
-            null,
-            null
-        );
+        snugglePackage.addComplexCommand("textgreater", false, 0, TEXT_MODE_ONLY, null, null, null);
+        snugglePackage.addComplexCommand("textless", false, 0, TEXT_MODE_ONLY, null, null, null);
         snugglePackage.addComplexCommand(
             "textbackslash",
             false,
@@ -74,15 +56,7 @@ public class LatexIntegrityChecker implements EntryChecker {
             null,
             null
         );
-        snugglePackage.addComplexCommand(
-            "textbar",
-            false,
-            0,
-            TEXT_MODE_ONLY,
-            null,
-            null,
-            null
-        );
+        snugglePackage.addComplexCommand("textbar", false, 0, TEXT_MODE_ONLY, null, null, null);
         // ENGINE.getPackages().get(0).addComplexCommandOneArg()
         // engine.getPackages().get(0).addComplexCommandOneArg("text", false, ALL_MODES,LR, StyleDeclarationInterpretation.NORMALSIZE, null, TextFlowContext.ALLOW_INLINE);
 
@@ -99,21 +73,13 @@ public class LatexIntegrityChecker implements EntryChecker {
             .getFieldMap()
             .entrySet()
             .stream()
-            .filter(field ->
-                !field.getKey().getProperties().contains(FieldProperty.VERBATIM)
-            )
+            .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
             .flatMap(LatexIntegrityChecker::getUnescapedAmpersandsWithCount)
             // Exclude all DOM building errors as this functionality is not used.
             .filter(pair ->
-                !pair
-                    .getValue()
-                    .getErrorCode()
-                    .getErrorGroup()
-                    .equals(CoreErrorGroup.TDE)
+                !pair.getValue().getErrorCode().getErrorGroup().equals(CoreErrorGroup.TDE)
             )
-            .filter(pair ->
-                !EXCLUDED_ERRORS.contains(pair.getValue().getErrorCode())
-            )
+            .filter(pair -> !EXCLUDED_ERRORS.contains(pair.getValue().getErrorCode()))
             .map(pair ->
                 new IntegrityMessage(
                     errorMessageFormatHelper(
@@ -127,9 +93,9 @@ public class LatexIntegrityChecker implements EntryChecker {
             .toList();
     }
 
-    private static Stream<
-        Pair<Field, InputError>
-    > getUnescapedAmpersandsWithCount(Map.Entry<Field, String> entry) {
+    private static Stream<Pair<Field, InputError>> getUnescapedAmpersandsWithCount(
+        Map.Entry<Field, String> entry
+    ) {
         SESSION.reset();
         SnuggleInput input = new SnuggleInput(entry.getValue());
         try {
@@ -152,14 +118,10 @@ public class LatexIntegrityChecker implements EntryChecker {
         ErrorCode snuggleTexErrorCode,
         Object... arguments
     ) {
-        String snuggletexMessagePattern =
-            LatexIntegrityChecker.ERROR_MESSAGES.getString(
-                snuggleTexErrorCode.getName()
-            );
-        String snuggletexErrorMessage = MessageFormat.format(
-            snuggletexMessagePattern,
-            arguments
+        String snuggletexMessagePattern = LatexIntegrityChecker.ERROR_MESSAGES.getString(
+            snuggleTexErrorCode.getName()
         );
+        String snuggletexErrorMessage = MessageFormat.format(snuggletexMessagePattern, arguments);
         return Localization.lang("LaTeX Warning: %0", snuggletexErrorMessage);
     }
 }

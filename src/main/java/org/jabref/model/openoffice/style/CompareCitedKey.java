@@ -13,10 +13,7 @@ public class CompareCitedKey implements Comparator<ComparableCitedKey> {
     Comparator<BibEntry> entryComparator;
     boolean unresolvedComesFirst;
 
-    CompareCitedKey(
-        Comparator<BibEntry> entryComparator,
-        boolean unresolvedComesFirst
-    ) {
+    CompareCitedKey(Comparator<BibEntry> entryComparator, boolean unresolvedComesFirst) {
         this.entryComparator = entryComparator;
         this.unresolvedComesFirst = unresolvedComesFirst;
     }

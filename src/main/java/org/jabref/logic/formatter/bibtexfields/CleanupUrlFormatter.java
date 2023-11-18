@@ -18,9 +18,7 @@ import org.jabref.logic.l10n.Localization;
 public class CleanupUrlFormatter extends Formatter {
 
     // This regexp find "url=" or "to=" parameter in full link and get text after them
-    private static final Pattern PATTERN_URL = Pattern.compile(
-        "(?:url|to)=([^&]*)"
-    );
+    private static final Pattern PATTERN_URL = Pattern.compile("(?:url|to)=([^&]*)");
 
     @Override
     public String getName() {
@@ -50,9 +48,7 @@ public class CleanupUrlFormatter extends Formatter {
      */
     @Override
     public String format(String url) {
-        var toDecode = Objects
-            .requireNonNull(url, "Null url")
-            .replaceAll("\\+", "%2b");
+        var toDecode = Objects.requireNonNull(url, "Null url").replaceAll("\\+", "%2b");
         Matcher matcher = PATTERN_URL.matcher(toDecode);
         if (matcher.find()) {
             return URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8);

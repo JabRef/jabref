@@ -62,55 +62,34 @@ class CleanupWorkerTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfPath.toAbsolutePath().toString());
-        BibDatabaseContext context = new BibDatabaseContext(
-            new BibDatabase(),
-            metaData
-        );
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         context.setDatabasePath(bibFolder.resolve("test.bib"));
 
-        FilePreferences fileDirPrefs = mock(
-            FilePreferences.class,
-            Answers.RETURNS_SMART_NULLS
-        );
+        FilePreferences fileDirPrefs = mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS);
         // Search and store files relative to bib file overwrites all other dirs
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-        worker =
-            new CleanupWorker(
-                context,
-                fileDirPrefs,
-                mock(TimestampPreferences.class)
-            );
+        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class));
     }
 
     @Test
     void cleanupWithNullPresetThrowsException() {
-        assertThrows(
-            NullPointerException.class,
-            () -> worker.cleanup(null, new BibEntry())
-        );
+        assertThrows(NullPointerException.class, () -> worker.cleanup(null, new BibEntry()));
     }
 
     @Test
     void cleanupNullEntryThrowsException() {
-        assertThrows(
-            NullPointerException.class,
-            () -> worker.cleanup(emptyPreset, null)
-        );
+        assertThrows(NullPointerException.class, () -> worker.cleanup(emptyPreset, null));
     }
 
     @Test
-    void cleanupDoesNothingByDefault(@TempDir Path bibFolder)
-        throws IOException {
+    void cleanupDoesNothingByDefault(@TempDir Path bibFolder) throws IOException {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("Toot");
         entry.setField(StandardField.PDF, "aPdfFile");
         entry.setField(new UnknownField("some"), "1st");
-        entry.setField(
-            StandardField.DOI,
-            "http://dx.doi.org/10.1016/0001-8708(80)90035-3"
-        );
+        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
         entry.setField(StandardField.MONTH, "01");
         entry.setField(StandardField.PAGES, "1-2");
         entry.setField(StandardField.DATE, "01/1999");
@@ -126,10 +105,7 @@ class CleanupWorkerTest {
         Path path = bibFolder.resolve("ARandomlyNamedFile");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
-        entry.setField(
-            StandardField.FILE,
-            FileFieldWriter.getStringRepresentation(fileField)
-        );
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         List<FieldChange> changes = worker.cleanup(emptyPreset, entry);
         assertEquals(Collections.emptyList(), changes);
@@ -145,10 +121,7 @@ class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         assertEquals(Optional.empty(), entry.getField(StandardField.PDF));
-        assertEquals(
-            Optional.of("aPdfFile:aPdfFile:PDF"),
-            entry.getField(StandardField.FILE)
-        );
+        assertEquals(Optional.of("aPdfFile:aPdfFile:PDF"), entry.getField(StandardField.FILE));
     }
 
     @Test
@@ -161,10 +134,7 @@ class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         assertEquals(Optional.empty(), entry.getField(StandardField.PDF));
-        assertEquals(
-            Optional.of("aPsFile:aPsFile:PostScript"),
-            entry.getField(StandardField.FILE)
-        );
+        assertEquals(Optional.of("aPsFile:aPsFile:PostScript"), entry.getField(StandardField.FILE));
     }
 
     @Test
@@ -173,10 +143,7 @@ class CleanupWorkerTest {
             CleanupPreferences.CleanupStep.CLEAN_UP_DOI
         );
         BibEntry entry = new BibEntry();
-        entry.setField(
-            StandardField.DOI,
-            "http://dx.doi.org/10.1016/0001-8708(80)90035-3"
-        );
+        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         worker.cleanup(preset, entry);
         assertEquals(
@@ -191,10 +158,7 @@ class CleanupWorkerTest {
             CleanupPreferences.CleanupStep.CLEAN_UP_DOI
         );
         BibEntry entry = new BibEntry();
-        entry.setField(
-            StandardField.DOI,
-            "http://dx.doi.org/10.1016/0001-8708(80)90035-3"
-        );
+        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         List<FieldChange> changes = worker.cleanup(preset, entry);
 
@@ -213,10 +177,7 @@ class CleanupWorkerTest {
             CleanupPreferences.CleanupStep.CLEAN_UP_DOI
         );
         BibEntry entry = new BibEntry();
-        entry.setField(
-            StandardField.URL,
-            "http://dx.doi.org/10.1016/0001-8708(80)90035-3"
-        );
+        entry.setField(StandardField.URL, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         worker.cleanup(preset, entry);
         assertEquals(
@@ -232,20 +193,12 @@ class CleanupWorkerTest {
             CleanupPreferences.CleanupStep.CLEAN_UP_DOI
         );
         BibEntry entry = new BibEntry();
-        entry.setField(
-            StandardField.URL,
-            "http://dx.doi.org/10.1016/0001-8708(80)90035-3"
-        );
+        entry.setField(StandardField.URL, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         List<FieldChange> changes = worker.cleanup(preset, entry);
         List<FieldChange> changeList = new ArrayList<>();
         changeList.add(
-            new FieldChange(
-                entry,
-                StandardField.DOI,
-                null,
-                "10.1016/0001-8708(80)90035-3"
-            )
+            new FieldChange(entry, StandardField.DOI, null, "10.1016/0001-8708(80)90035-3")
         );
         changeList.add(
             new FieldChange(
@@ -264,10 +217,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.MONTH,
-                        new NormalizeMonthFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter())
                 )
             )
         );
@@ -284,10 +234,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.PAGES,
-                        new NormalizePagesFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter())
                 )
             )
         );
@@ -304,10 +251,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.DATE,
-                        new NormalizeDateFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter())
                 )
             )
         );
@@ -315,10 +259,7 @@ class CleanupWorkerTest {
         entry.setField(StandardField.DATE, "01/1999");
 
         worker.cleanup(preset, entry);
-        assertEquals(
-            Optional.of("1999-01"),
-            entry.getField(StandardField.DATE)
-        );
+        assertEquals(Optional.of("1999-01"), entry.getField(StandardField.DATE));
     }
 
     @Test
@@ -334,32 +275,18 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupMoveFilesMovesFileFromSubfolder(@TempDir Path bibFolder)
-        throws IOException {
-        CleanupPreferences preset = new CleanupPreferences(
-            CleanupPreferences.CleanupStep.MOVE_PDF
-        );
+    void cleanupMoveFilesMovesFileFromSubfolder(@TempDir Path bibFolder) throws IOException {
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.MOVE_PDF);
 
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
         Files.createDirectory(path);
         Path tempFile = Files.createFile(path.resolve("test.pdf"));
         BibEntry entry = new BibEntry();
-        LinkedFile fileField = new LinkedFile(
-            "",
-            tempFile.toAbsolutePath(),
-            ""
-        );
-        entry.setField(
-            StandardField.FILE,
-            FileFieldWriter.getStringRepresentation(fileField)
-        );
+        LinkedFile fileField = new LinkedFile("", tempFile.toAbsolutePath(), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
-        LinkedFile newFileField = new LinkedFile(
-            "",
-            tempFile.getFileName(),
-            ""
-        );
+        LinkedFile newFileField = new LinkedFile("", tempFile.getFileName(), "");
         assertEquals(
             Optional.of(FileFieldWriter.getStringRepresentation(newFileField)),
             entry.getField(StandardField.FILE)
@@ -367,8 +294,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupRelativePathsConvertAbsoluteToRelativePath()
-        throws IOException {
+    void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
         CleanupPreferences preset = new CleanupPreferences(
             CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE
         );
@@ -377,10 +303,7 @@ class CleanupWorkerTest {
         Files.createFile(path);
         BibEntry entry = new BibEntry();
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
-        entry.setField(
-            StandardField.FILE,
-            FileFieldWriter.getStringRepresentation(fileField)
-        );
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
         LinkedFile newFileField = new LinkedFile("", path.getFileName(), "");
@@ -400,10 +323,7 @@ class CleanupWorkerTest {
         Files.createFile(path);
         BibEntry entry = new BibEntry().withCitationKey("Toot");
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
-        entry.setField(
-            StandardField.FILE,
-            FileFieldWriter.getStringRepresentation(fileField)
-        );
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
         LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
@@ -419,10 +339,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.TITLE,
-                        new HtmlToLatexFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter())
                 )
             )
         );
@@ -430,10 +347,7 @@ class CleanupWorkerTest {
         entry.setField(StandardField.TITLE, "&Epsilon;");
 
         worker.cleanup(preset, entry);
-        assertEquals(
-            Optional.of("{{$\\Epsilon$}}"),
-            entry.getField(StandardField.TITLE)
-        );
+        assertEquals(Optional.of("{{$\\Epsilon$}}"), entry.getField(StandardField.TITLE));
     }
 
     @Test
@@ -442,10 +356,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.TITLE,
-                        new UnitsToLatexFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.TITLE, new UnitsToLatexFormatter())
                 )
             )
         );
@@ -466,10 +377,7 @@ class CleanupWorkerTest {
                 Collections.emptyList()
             )
         );
-        assertNotEquals(
-            Collections.emptyList(),
-            protectedTermsLoader.getProtectedTerms()
-        );
+        assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
         CleanupPreferences preset = new CleanupPreferences(
             new FieldFormatterCleanups(
                 true,
@@ -485,10 +393,7 @@ class CleanupWorkerTest {
         entry.setField(StandardField.TITLE, "AlGaAs");
 
         worker.cleanup(preset, entry);
-        assertEquals(
-            Optional.of("{AlGaAs}"),
-            entry.getField(StandardField.TITLE)
-        );
+        assertEquals(Optional.of("{AlGaAs}"), entry.getField(StandardField.TITLE));
     }
 
     @Test
@@ -497,10 +402,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.TITLE,
-                        new LatexCleanupFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.TITLE, new LatexCleanupFormatter())
                 )
             )
         );
@@ -508,10 +410,7 @@ class CleanupWorkerTest {
         entry.setField(StandardField.TITLE, "$\\alpha$$\\beta$");
 
         worker.cleanup(preset, entry);
-        assertEquals(
-            Optional.of("$\\alpha\\beta$"),
-            entry.getField(StandardField.TITLE)
-        );
+        assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField(StandardField.TITLE));
     }
 
     @Test
@@ -524,10 +423,7 @@ class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         assertEquals(Optional.empty(), entry.getField(StandardField.ADDRESS));
-        assertEquals(
-            Optional.of("test"),
-            entry.getField(StandardField.LOCATION)
-        );
+        assertEquals(Optional.of("test"), entry.getField(StandardField.LOCATION));
     }
 
     @Test
@@ -540,10 +436,7 @@ class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         assertEquals(Optional.empty(), entry.getField(StandardField.JOURNAL));
-        assertEquals(
-            Optional.of("test"),
-            entry.getField(StandardField.JOURNALTITLE)
-        );
+        assertEquals(Optional.of("test"), entry.getField(StandardField.JOURNALTITLE));
     }
 
     @Test
@@ -552,10 +445,7 @@ class CleanupWorkerTest {
             new FieldFormatterCleanups(
                 false,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.MONTH,
-                        new NormalizeMonthFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter())
                 )
             )
         );

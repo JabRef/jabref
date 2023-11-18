@@ -13,27 +13,15 @@ public class LocalizationKeyParamsTest {
 
     @ParameterizedTest
     @MethodSource("provideTestData")
-    public void testReplacePlaceholders(
-        String expected,
-        LocalizationKeyParams input
-    ) {
+    public void testReplacePlaceholders(String expected, LocalizationKeyParams input) {
         assertEquals(expected, input.replacePlaceholders());
     }
 
     private static Stream<Arguments> provideTestData() {
         return Stream.of(
-            Arguments.of(
-                "biblatex mode",
-                new LocalizationKeyParams("biblatex mode")
-            ),
-            Arguments.of(
-                "biblatex mode",
-                new LocalizationKeyParams("%0 mode", "biblatex")
-            ),
-            Arguments.of(
-                "C:\\bla mode",
-                new LocalizationKeyParams("%0 mode", "C:\\bla")
-            ),
+            Arguments.of("biblatex mode", new LocalizationKeyParams("biblatex mode")),
+            Arguments.of("biblatex mode", new LocalizationKeyParams("%0 mode", "biblatex")),
+            Arguments.of("C:\\bla mode", new LocalizationKeyParams("%0 mode", "C:\\bla")),
             Arguments.of(
                 "What \n : %e %c a b",
                 new LocalizationKeyParams("What \n : %e %c %0 %1", "a", "b")

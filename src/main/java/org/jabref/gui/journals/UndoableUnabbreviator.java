@@ -14,9 +14,7 @@ public class UndoableUnabbreviator {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public UndoableUnabbreviator(
-        JournalAbbreviationRepository journalAbbreviationRepository
-    ) {
+    public UndoableUnabbreviator(JournalAbbreviationRepository journalAbbreviationRepository) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
@@ -56,23 +54,16 @@ public class UndoableUnabbreviator {
             return false; // Cannot unabbreviate unabbreviated name.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository
-            .get(text)
-            .get();
+        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
         String newText = abbreviation.getName();
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
         return true;
     }
 
-    public boolean restoreFromFJournal(
-        BibEntry entry,
-        Field field,
-        CompoundEdit ce
-    ) {
+    public boolean restoreFromFJournal(BibEntry entry, Field field, CompoundEdit ce) {
         if (
-            (StandardField.JOURNAL != field &&
-                StandardField.JOURNALTITLE != field) ||
+            (StandardField.JOURNAL != field && StandardField.JOURNALTITLE != field) ||
             !entry.hasField(AMSField.FJOURNAL)
         ) {
             return false;
@@ -82,9 +73,7 @@ public class UndoableUnabbreviator {
         String newText = entry.getField(AMSField.FJOURNAL).get().trim();
 
         entry.setField(AMSField.FJOURNAL, "");
-        ce.addEdit(
-            new UndoableFieldChange(entry, AMSField.FJOURNAL, newText, "")
-        );
+        ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, newText, ""));
 
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));

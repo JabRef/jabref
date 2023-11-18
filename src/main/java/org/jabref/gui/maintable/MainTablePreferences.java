@@ -6,10 +6,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class MainTablePreferences {
 
     private final ColumnPreferences columnPreferences;
-    private final BooleanProperty resizeColumnsToFit =
-        new SimpleBooleanProperty();
-    private final BooleanProperty extraFileColumnsEnabled =
-        new SimpleBooleanProperty();
+    private final BooleanProperty resizeColumnsToFit = new SimpleBooleanProperty();
+    private final BooleanProperty extraFileColumnsEnabled = new SimpleBooleanProperty();
 
     public MainTablePreferences(
         ColumnPreferences columnPreferences,

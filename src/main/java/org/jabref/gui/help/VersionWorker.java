@@ -26,9 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class VersionWorker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        VersionWorker.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(VersionWorker.class);
 
     /**
      * The current version of the installed JabRef
@@ -89,14 +87,9 @@ public class VersionWorker {
     /**
      * Prints the connection problem to the status bar and shows a dialog if it was executed manually
      */
-    private void showConnectionError(
-        Exception exception,
-        boolean manualExecution
-    ) {
+    private void showConnectionError(Exception exception, boolean manualExecution) {
         if (manualExecution) {
-            String couldNotConnect = Localization.lang(
-                "Could not connect to the update server."
-            );
+            String couldNotConnect = Localization.lang("Could not connect to the update server.");
             String tryLater = Localization.lang(
                 "Please try again later and/or check your network connection."
             );
@@ -113,22 +106,14 @@ public class VersionWorker {
      * Prints up-to-date to the status bar (and shows a dialog it was executed manually) if there is now new version.
      * Shows a "New Version" Dialog to the user if there is.
      */
-    private void showUpdateInfo(
-        Optional<Version> newerVersion,
-        boolean manualExecution
-    ) {
+    private void showUpdateInfo(Optional<Version> newerVersion, boolean manualExecution) {
         // no new version could be found, only respect the ignored version on automated version checks
         if (
             newerVersion.isEmpty() ||
-            (newerVersion
-                    .get()
-                    .equals(internalPreferences.getIgnoredVersion()) &&
-                !manualExecution)
+            (newerVersion.get().equals(internalPreferences.getIgnoredVersion()) && !manualExecution)
         ) {
             if (manualExecution) {
-                dialogService.notify(
-                    Localization.lang("JabRef is up-to-date.")
-                );
+                dialogService.notify(Localization.lang("JabRef is up-to-date."));
             }
         } else {
             // notify the user about a newer version

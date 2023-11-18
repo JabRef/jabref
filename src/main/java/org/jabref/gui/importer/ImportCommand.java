@@ -42,9 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ImportCommand extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ImportCommand.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCommand.class);
 
     public enum ImportMethod {
         AS_NEW,
@@ -89,21 +87,14 @@ public class ImportCommand extends SimpleCommand {
         );
         SortedSet<Importer> importers = importFormatReader.getImportFormats();
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileFilterConverter.ANY_FILE)
-                .addExtensionFilter(
-                    FileFilterConverter.forAllImporters(importers)
-                )
-                .addExtensionFilter(
-                    FileFilterConverter.importerToExtensionFilter(importers)
-                )
-                .withInitialDirectory(
-                    preferencesService
-                        .getImporterPreferences()
-                        .getImportWorkingDirectory()
-                )
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(FileFilterConverter.ANY_FILE)
+            .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
+            .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
+            .withInitialDirectory(
+                preferencesService.getImporterPreferences().getImportWorkingDirectory()
+            )
+            .build();
         dialogService
             .showFileOpenDialog(fileDialogConfiguration)
             .ifPresent(path ->
@@ -123,10 +114,7 @@ public class ImportCommand extends SimpleCommand {
         if (!Files.exists(file)) {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("Import"),
-                Localization.lang("File not found") +
-                ": '" +
-                file.getFileName() +
-                "'."
+                Localization.lang("File not found") + ": '" + file.getFileName() + "'."
             );
 
             return;
@@ -153,9 +141,7 @@ public class ImportCommand extends SimpleCommand {
                 .onFailure(ex -> {
                     LOGGER.error("Error importing", ex);
                     dialogService.notify(
-                        Localization.lang(
-                            "Error importing. See the error log for details."
-                        )
+                        Localization.lang("Error importing. See the error log for details.")
                     );
                 })
                 .executeWith(taskExecutor);
@@ -171,20 +157,16 @@ public class ImportCommand extends SimpleCommand {
         }
 
         // Set last working dir for import
-        preferencesService
-            .getImporterPreferences()
-            .setImportWorkingDirectory(file.getParent());
+        preferencesService.getImporterPreferences().setImportWorkingDirectory(file.getParent());
     }
 
     /**
      * @throws IOException of a specified importer
      */
-    private ParserResult doImport(List<Path> files, Importer importFormat)
-        throws IOException {
+    private ParserResult doImport(List<Path> files, Importer importFormat) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
         // We import all files and collect their results
-        List<ImportFormatReader.UnknownFormatImport> imports =
-            new ArrayList<>();
+        List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
         ImportFormatReader importFormatReader = new ImportFormatReader(
             preferencesService.getImporterPreferences(),
             preferencesService.getImportFormatPreferences(),
@@ -213,17 +195,13 @@ public class ImportCommand extends SimpleCommand {
                     });
                     // This import method never throws an IOException
                     imports.add(
-                        importFormatReader.importUnknownFormat(
-                            filename,
-                            fileUpdateMonitor
-                        )
+                        importFormatReader.importUnknownFormat(filename, fileUpdateMonitor)
                     );
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (
                             ((importer.get() instanceof PdfGrobidImporter) ||
-                                (importer.get() instanceof
-                                    PdfMergeMetadataImporter)) &&
+                                (importer.get() instanceof PdfMergeMetadataImporter)) &&
                             GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(
                                 dialogService,
                                 preferencesService.getGrobidPreferences()
@@ -232,29 +210,21 @@ public class ImportCommand extends SimpleCommand {
                             importFormatReader.reset();
                         }
                         dialogService.notify(
-                            Localization.lang(
-                                "Importing in %0 format",
-                                importer.get().getName()
-                            ) +
+                            Localization.lang("Importing in %0 format", importer.get().getName()) +
                             "..."
                         );
                     });
                     // Specific importer
                     ParserResult pr = importer.get().importDatabase(filename);
                     imports.add(
-                        new ImportFormatReader.UnknownFormatImport(
-                            importer.get().getName(),
-                            pr
-                        )
+                        new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr)
                     );
                 }
             } catch (ImportException ex) {
                 DefaultTaskExecutor.runAndWaitInJavaFXThread(() ->
                     dialogService.showWarningDialogAndWait(
                         Localization.lang("Import error"),
-                        Localization.lang(
-                            "Please check your library file for wrong syntax."
-                        ) +
+                        Localization.lang("Please check your library file for wrong syntax.") +
                         "\n\n" +
                         ex.getLocalizedMessage()
                     )
@@ -281,9 +251,7 @@ public class ImportCommand extends SimpleCommand {
     /**
      * TODO: Move this to logic package. Blocked by undo functionality.
      */
-    public ParserResult mergeImportResults(
-        List<ImportFormatReader.UnknownFormatImport> imports
-    ) {
+    public ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibDatabase resultDatabase = new BibDatabase();
         ParserResult result = new ParserResult(resultDatabase);
 
@@ -292,18 +260,12 @@ public class ImportCommand extends SimpleCommand {
                 continue;
             }
             ParserResult parserResult = importResult.parserResult();
-            resultDatabase.insertEntries(
-                parserResult.getDatabase().getEntries()
-            );
+            resultDatabase.insertEntries(parserResult.getDatabase().getEntries());
 
-            if (
-                ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format())
-            ) {
+            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format())) {
                 // additional treatment of BibTeX
                 new DatabaseMerger(
-                    preferencesService
-                        .getBibEntryPreferences()
-                        .getKeywordSeparator()
+                    preferencesService.getBibEntryPreferences().getKeywordSeparator()
                 )
                     .mergeMetaData(
                         result.getMetaData(),

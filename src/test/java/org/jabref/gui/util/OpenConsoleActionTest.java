@@ -17,26 +17,19 @@ import org.junit.jupiter.api.Test;
 public class OpenConsoleActionTest {
 
     private final StateManager stateManager = mock(StateManager.class);
-    private final PreferencesService preferences = mock(
-        PreferencesService.class
-    );
+    private final PreferencesService preferences = mock(PreferencesService.class);
     private final BibDatabaseContext current = mock(BibDatabaseContext.class);
     private final BibDatabaseContext other = mock(BibDatabaseContext.class);
 
     @BeforeEach
     public void setup() {
-        when(stateManager.activeDatabaseProperty())
-            .thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(current));
     }
 
     @Test
     public void newActionGetsCurrentDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(
-            stateManager,
-            preferences,
-            null
-        );
+        OpenConsoleAction action = new OpenConsoleAction(stateManager, preferences, null);
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();
         verify(current, times(1)).getDatabasePath();

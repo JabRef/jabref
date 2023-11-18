@@ -20,8 +20,6 @@ public class KeywordMerger implements FieldMerger {
     @Override
     public String merge(String keywordsA, String keywordsB) {
         Character delimiter = bibEntryPreferences.getKeywordSeparator();
-        return KeywordList
-            .merge(keywordsA, keywordsB, delimiter)
-            .getAsString(delimiter);
+        return KeywordList.merge(keywordsA, keywordsB, delimiter).getAsString(delimiter);
     }
 }

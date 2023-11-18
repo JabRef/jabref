@@ -93,9 +93,7 @@ public class MainToolBar extends ToolBar {
             pushToApplicationCommand.getAction(),
             pushToApplicationCommand
         );
-        pushToApplicationCommand.registerReconfigurable(
-            pushToApplicationButton
-        );
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
 
@@ -146,50 +144,27 @@ public class MainToolBar extends ToolBar {
                     ),
                     factory.createIconButton(
                         StandardActions.NEW_ENTRY,
-                        new NewEntryAction(
-                            frame,
-                            dialogService,
-                            preferencesService,
-                            stateManager
-                        )
+                        new NewEntryAction(frame, dialogService, preferencesService, stateManager)
                     ),
                     createNewEntryFromIdButton(),
                     factory.createIconButton(
                         StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT,
-                        new ExtractBibtexAction(
-                            dialogService,
-                            preferencesService,
-                            stateManager
-                        )
+                        new ExtractBibtexAction(dialogService, preferencesService, stateManager)
                     ),
                     factory.createIconButton(
                         StandardActions.DELETE_ENTRY,
-                        new EditAction(
-                            StandardActions.DELETE_ENTRY,
-                            frame,
-                            stateManager
-                        )
+                        new EditAction(StandardActions.DELETE_ENTRY, frame, stateManager)
                     )
                 ),
                 new Separator(Orientation.VERTICAL),
                 new HBox(
                     factory.createIconButton(
                         StandardActions.UNDO,
-                        new UndoRedoAction(
-                            StandardActions.UNDO,
-                            frame,
-                            dialogService,
-                            stateManager
-                        )
+                        new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)
                     ),
                     factory.createIconButton(
                         StandardActions.REDO,
-                        new UndoRedoAction(
-                            StandardActions.REDO,
-                            frame,
-                            dialogService,
-                            stateManager
-                        )
+                        new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)
                     ),
                     factory.createIconButton(
                         StandardActions.CUT,
@@ -197,19 +172,11 @@ public class MainToolBar extends ToolBar {
                     ),
                     factory.createIconButton(
                         StandardActions.COPY,
-                        new EditAction(
-                            StandardActions.COPY,
-                            frame,
-                            stateManager
-                        )
+                        new EditAction(StandardActions.COPY, frame, stateManager)
                     ),
                     factory.createIconButton(
                         StandardActions.PASTE,
-                        new EditAction(
-                            StandardActions.PASTE,
-                            frame,
-                            stateManager
-                        )
+                        new EditAction(StandardActions.PASTE, frame, stateManager)
                     )
                 ),
                 new Separator(Orientation.VERTICAL),
@@ -263,30 +230,23 @@ public class MainToolBar extends ToolBar {
     Button createNewEntryFromIdButton() {
         Button newEntryFromIdButton = new Button();
 
-        newEntryFromIdButton.setGraphic(
-            IconTheme.JabRefIcons.IMPORT.getGraphicNode()
-        );
+        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
         newEntryFromIdButton.getStyleClass().setAll("icon-button");
         newEntryFromIdButton.setFocusTraversable(false);
-        newEntryFromIdButton
-            .disableProperty()
-            .bind(ActionHelper.needsDatabase(stateManager).not());
+        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId =
-                new GenerateEntryFromIdDialog(
-                    frame.getCurrentLibraryTab(),
-                    dialogService,
-                    preferencesService,
-                    taskExecutor,
-                    stateManager
-                );
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(
+                frame.getCurrentLibraryTab(),
+                dialogService,
+                preferencesService,
+                taskExecutor,
+                stateManager
+            );
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
                 entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
-                entryFromIdPopOver.setArrowLocation(
-                    PopOver.ArrowLocation.TOP_CENTER
-                );
+                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
                 entryFromIdPopOver.show(newEntryFromIdButton);
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
@@ -298,9 +258,7 @@ public class MainToolBar extends ToolBar {
                 entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             }
         });
-        newEntryFromIdButton.setTooltip(
-            new Tooltip(Localization.lang("Import by ID"))
-        );
+        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
 
         return newEntryFromIdButton;
     }
@@ -310,12 +268,8 @@ public class MainToolBar extends ToolBar {
         indicator.getStyleClass().add("progress-indicatorToolbar");
         indicator.progressProperty().bind(stateManager.getTasksProgress());
 
-        Tooltip someTasksRunning = new Tooltip(
-            Localization.lang("Background Tasks are running")
-        );
-        Tooltip noTasksRunning = new Tooltip(
-            Localization.lang("Background Tasks are done")
-        );
+        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
+        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
         indicator.setTooltip(noTasksRunning);
         stateManager
             .getAnyTaskRunning()
@@ -342,33 +296,21 @@ public class MainToolBar extends ToolBar {
                     indicator.setPrefWidth(newValue.doubleValue());
                 }
                 if (newValue.doubleValue() > 0) {
-                    Rectangle clip = new Rectangle(
-                        newValue.doubleValue(),
-                        newValue.doubleValue()
-                    );
+                    Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
                     indicator.setClip(clip);
                 }
             });
 
         indicator.setOnMouseClicked(event -> {
-            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<
-                Task<?>
-            >();
-            EasyBind.bindContent(
-                taskProgressView.getTasks(),
-                stateManager.getBackgroundTasks()
-            );
+            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<Task<?>>();
+            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
             if (progressViewPopOver == null) {
                 progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(
-                    Localization.lang("Background Tasks")
-                );
-                progressViewPopOver.setArrowLocation(
-                    PopOver.ArrowLocation.RIGHT_TOP
-                );
+                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
                 progressViewPopOver.setContentNode(taskProgressView);
                 progressViewPopOver.show(indicator);
             } else if (progressViewPopOver.isShowing()) {

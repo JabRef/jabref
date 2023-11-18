@@ -78,11 +78,7 @@ public class NameFormatter implements LayoutFormatter {
 
     private String parameter = NameFormatter.DEFAULT_FORMAT;
 
-    private static String format(
-        String toFormat,
-        AuthorList al,
-        String[] formats
-    ) {
+    private static String format(String toFormat, AuthorList al, String[] formats) {
         StringBuilder sb = new StringBuilder();
 
         int n = al.getNumberOfAuthors();
@@ -90,9 +86,7 @@ public class NameFormatter implements LayoutFormatter {
         for (int i = 1; i <= al.getNumberOfAuthors(); i++) {
             for (int j = 1; j < formats.length; j += 2) {
                 if ("*".equals(formats[j])) {
-                    sb.append(
-                        BstNameFormatter.formatName(toFormat, i, formats[j + 1])
-                    );
+                    sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));
                     break;
                 } else {
                     String[] range = formats[j].split("\\.\\.");
@@ -118,13 +112,7 @@ public class NameFormatter implements LayoutFormatter {
                     }
 
                     if ((s <= i) && (i <= e)) {
-                        sb.append(
-                            BstNameFormatter.formatName(
-                                toFormat,
-                                i,
-                                formats[j + 1]
-                            )
-                        );
+                        sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));
                         break;
                     }
                 }
@@ -155,9 +143,7 @@ public class NameFormatter implements LayoutFormatter {
             if ("*".equals(formatString[0])) {
                 return format(toFormat, al, formatString);
             } else {
-                if (
-                    al.getNumberOfAuthors() <= Integer.parseInt(formatString[0])
-                ) {
+                if (al.getNumberOfAuthors() <= Integer.parseInt(formatString[0])) {
                     return format(toFormat, al, formatString);
                 }
             }
@@ -174,9 +160,7 @@ public class NameFormatter implements LayoutFormatter {
         this.parameter = parameter;
     }
 
-    public static Map<String, String> getNameFormatters(
-        NameFormatterPreferences prefs
-    ) {
+    public static Map<String, String> getNameFormatters(NameFormatterPreferences prefs) {
         Objects.requireNonNull(prefs);
 
         Map<String, String> result = new HashMap<>();

@@ -148,10 +148,7 @@ public class BibtexString implements Cloneable {
         if (parsedSerialization != null) {
             try {
                 // get the text before the string
-                String prolog = parsedSerialization.substring(
-                    0,
-                    parsedSerialization.indexOf('@')
-                );
+                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
                 return prolog;
             } catch (StringIndexOutOfBoundsException ignore) {
                 // if this occurs a broken parsed serialization has been set, so just do nothing
@@ -193,12 +190,6 @@ public class BibtexString implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            hasChanged,
-            name,
-            content,
-            type,
-            parsedSerialization
-        );
+        return Objects.hash(hasChanged, name, content, type, parsedSerialization);
     }
 }

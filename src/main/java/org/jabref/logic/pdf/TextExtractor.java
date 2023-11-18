@@ -56,10 +56,7 @@ public final class TextExtractor {
                 );
                 stripperByArea.extractRegions(page);
 
-                markedText =
-                    markedText.concat(
-                        stripperByArea.getTextForRegion("markedRegion")
-                    );
+                markedText = markedText.concat(stripperByArea.getTextForRegion("markedRegion"));
             } catch (IllegalArgumentException e) {
                 throw new IOException("Cannot read annotation coordinates!", e);
             }
@@ -68,10 +65,7 @@ public final class TextExtractor {
         return markedText.trim();
     }
 
-    private Rectangle2D calculateSegmentBoundingBox(
-        COSArray quadsArray,
-        int segmentPointer
-    ) {
+    private Rectangle2D calculateSegmentBoundingBox(COSArray quadsArray, int segmentPointer) {
         // Extract coordinate values
         float upperLeftX = toFloat(quadsArray.get(segmentPointer));
         float upperLeftY = toFloat(quadsArray.get(segmentPointer + 1));
@@ -97,8 +91,6 @@ public final class TextExtractor {
         if (cosNumber instanceof COSInteger) {
             return ((COSInteger) cosNumber).floatValue();
         }
-        throw new IllegalArgumentException(
-            "The number type of the annotation is not supported!"
-        );
+        throw new IllegalArgumentException("The number type of the annotation is not supported!");
     }
 }

@@ -98,11 +98,7 @@ public class BiblatexEntryTypeDefinitions {
             StandardField.URL,
             StandardField.URLDATE
         )
-        .withRequiredFields(
-            StandardField.AUTHOR,
-            StandardField.TITLE,
-            StandardField.DATE
-        )
+        .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
         .withDetailFields(
             StandardField.EDITOR,
             StandardField.EDITORA,
@@ -162,11 +158,7 @@ public class BiblatexEntryTypeDefinitions {
             StandardField.URL,
             StandardField.URLDATE
         )
-        .withRequiredFields(
-            StandardField.AUTHOR,
-            StandardField.TITLE,
-            StandardField.DATE
-        )
+        .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
         .withDetailFields(
             StandardField.EDITOR,
             StandardField.EDITORA,
@@ -355,11 +347,7 @@ public class BiblatexEntryTypeDefinitions {
             StandardField.URL,
             StandardField.URLDATE
         )
-        .withRequiredFields(
-            StandardField.EDITOR,
-            StandardField.TITLE,
-            StandardField.DATE
-        )
+        .withRequiredFields(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE)
         .withDetailFields(
             StandardField.EDITORA,
             StandardField.EDITORB,
@@ -417,11 +405,7 @@ public class BiblatexEntryTypeDefinitions {
             StandardField.URL,
             StandardField.URLDATE
         )
-        .withRequiredFields(
-            StandardField.EDITOR,
-            StandardField.TITLE,
-            StandardField.DATE
-        )
+        .withRequiredFields(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE)
         .withDetailFields(
             StandardField.EDITORA,
             StandardField.EDITORB,
@@ -706,11 +690,7 @@ public class BiblatexEntryTypeDefinitions {
             StandardField.URL,
             StandardField.URLDATE
         )
-        .withRequiredFields(
-            StandardField.EDITOR,
-            StandardField.TITLE,
-            StandardField.DATE
-        )
+        .withRequiredFields(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE)
         .withDetailFields(
             StandardField.EDITORA,
             StandardField.EDITORB,
@@ -1046,11 +1026,7 @@ public class BiblatexEntryTypeDefinitions {
             StandardField.URL,
             StandardField.URLDATE
         )
-        .withRequiredFields(
-            StandardField.AUTHOR,
-            StandardField.TITLE,
-            StandardField.DATE
-        )
+        .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
         .withDetailFields(
             StandardField.SUBTITLE,
             StandardField.TITLEADDON,

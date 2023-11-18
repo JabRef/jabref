@@ -24,23 +24,13 @@ public class UnoStyle {
         String familyName,
         String styleName
     ) throws WrappedTargetException {
-        XStyleFamiliesSupplier fss = UnoCast
-            .cast(XStyleFamiliesSupplier.class, doc)
-            .get();
-        XNameAccess families = UnoCast
-            .cast(XNameAccess.class, fss.getStyleFamilies())
-            .get();
+        XStyleFamiliesSupplier fss = UnoCast.cast(XStyleFamiliesSupplier.class, doc).get();
+        XNameAccess families = UnoCast.cast(XNameAccess.class, fss.getStyleFamilies()).get();
         XNameContainer xFamily;
         try {
-            xFamily =
-                UnoCast
-                    .cast(XNameContainer.class, families.getByName(familyName))
-                    .get();
+            xFamily = UnoCast.cast(XNameContainer.class, families.getByName(familyName)).get();
         } catch (NoSuchElementException ex) {
-            String msg = String.format(
-                "Style family name '%s' is not recognized",
-                familyName
-            );
+            String msg = String.format("Style family name '%s' is not recognized", familyName);
             throw new java.lang.IllegalArgumentException(msg, ex);
         }
 
@@ -52,17 +42,13 @@ public class UnoStyle {
         }
     }
 
-    public static Optional<XStyle> getParagraphStyle(
-        XTextDocument doc,
-        String styleName
-    ) throws WrappedTargetException {
+    public static Optional<XStyle> getParagraphStyle(XTextDocument doc, String styleName)
+        throws WrappedTargetException {
         return getStyleFromFamily(doc, PARAGRAPH_STYLES, styleName);
     }
 
-    public static Optional<XStyle> getCharacterStyle(
-        XTextDocument doc,
-        String styleName
-    ) throws WrappedTargetException {
+    public static Optional<XStyle> getCharacterStyle(XTextDocument doc, String styleName)
+        throws WrappedTargetException {
         return getStyleFromFamily(doc, CHARACTER_STYLES, styleName);
     }
 
@@ -74,17 +60,13 @@ public class UnoStyle {
         return getStyleFromFamily(doc, familyName, name).map(XStyle::getName);
     }
 
-    public static Optional<String> getInternalNameOfParagraphStyle(
-        XTextDocument doc,
-        String name
-    ) throws WrappedTargetException {
+    public static Optional<String> getInternalNameOfParagraphStyle(XTextDocument doc, String name)
+        throws WrappedTargetException {
         return getInternalNameOfStyle(doc, PARAGRAPH_STYLES, name);
     }
 
-    public static Optional<String> getInternalNameOfCharacterStyle(
-        XTextDocument doc,
-        String name
-    ) throws WrappedTargetException {
+    public static Optional<String> getInternalNameOfCharacterStyle(XTextDocument doc, String name)
+        throws WrappedTargetException {
         return getInternalNameOfStyle(doc, CHARACTER_STYLES, name);
     }
 }

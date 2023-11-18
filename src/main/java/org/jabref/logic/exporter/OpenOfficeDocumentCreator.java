@@ -32,23 +32,16 @@ import org.slf4j.LoggerFactory;
 
 public class OpenOfficeDocumentCreator extends Exporter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OpenOfficeDocumentCreator.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeDocumentCreator.class);
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super(
-            "oocalc",
-            "Old OpenOffice/LibreOffice Calc format",
-            StandardFileType.SXC
-        );
+        super("oocalc", "Old OpenOffice/LibreOffice Calc format", StandardFileType.SXC);
     }
 
-    private static void storeOpenOfficeFile(Path file, InputStream source)
-        throws Exception {
+    private static void storeOpenOfficeFile(Path file, InputStream source) throws Exception {
         try (
             ZipOutputStream out = new ZipOutputStream(
                 new BufferedOutputStream(Files.newOutputStream(file))
@@ -89,18 +82,10 @@ public class OpenOfficeDocumentCreator extends Exporter {
     ) throws Exception {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
-        OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(
-            tmpFile,
-            database,
-            entries
-        );
+        OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
-        try (
-            BufferedInputStream in = new BufferedInputStream(
-                new FileInputStream(tmpFile)
-            )
-        ) {
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
             OpenOfficeDocumentCreator.storeOpenOfficeFile(file, in);
         }
 
@@ -142,9 +127,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
         ) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory
-                .newInstance()
-                .newTransformer();
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
         } catch (Exception e) {
@@ -152,11 +135,8 @@ public class OpenOfficeDocumentCreator extends Exporter {
         }
     }
 
-    private static void addResourceFile(
-        String name,
-        String resource,
-        ZipOutputStream out
-    ) throws IOException {
+    private static void addResourceFile(String name, String resource, ZipOutputStream out)
+        throws IOException {
         ZipEntry zipEntry = new ZipEntry(name);
         out.putNextEntry(zipEntry);
         OpenOfficeDocumentCreator.addFromResource(resource, out);

@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PersistenceVisualStateTable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PersistenceVisualStateTable.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceVisualStateTable.class);
 
     protected final TableView<BibEntryTableViewModel> table;
     protected final ColumnPreferences preferences;
@@ -31,15 +29,12 @@ public class PersistenceVisualStateTable {
     }
 
     public void addListeners() {
-        table
-            .getColumns()
-            .addListener((InvalidationListener) obs -> updateColumns());
+        table.getColumns().addListener((InvalidationListener) obs -> updateColumns());
         table
             .getSortOrder()
             .addListener(
-                (ListChangeListener<
-                        ? super TableColumn<BibEntryTableViewModel, ?>
-                    >) obs -> updateSortOrder()
+                (ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>>) obs ->
+                    updateSortOrder()
             );
 
         // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,

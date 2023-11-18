@@ -58,10 +58,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     private EditExternalFileTypeViewModel viewModel;
 
-    public EditExternalFileTypeEntryDialog(
-        ExternalFileTypeItemViewModel item,
-        String dialogTitle
-    ) {
+    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
         this.item = item;
 
         this.setTitle(dialogTitle);
@@ -88,16 +85,10 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         customApplication
             .selectedProperty()
             .bindBidirectional(viewModel.customApplicationSelectedProperty());
-        selectedApplication
-            .disableProperty()
-            .bind(viewModel.defaultApplicationSelectedProperty());
-        btnBrowse
-            .disableProperty()
-            .bind(viewModel.defaultApplicationSelectedProperty());
+        selectedApplication.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
+        btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
 
-        extension
-            .textProperty()
-            .bindBidirectional(viewModel.extensionProperty());
+        extension.textProperty().bindBidirectional(viewModel.extensionProperty());
         name.textProperty().bindBidirectional(viewModel.nameProperty());
         mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());
         selectedApplication
@@ -110,9 +101,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         dialogService
             .showFileOpenDialog(fileDialogConfiguration)
             .ifPresent(path ->
-                viewModel
-                    .selectedApplicationProperty()
-                    .setValue(path.toAbsolutePath().toString())
+                viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString())
             );
     }
 }

@@ -20,20 +20,13 @@ class PdfContentImporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(
-            new PdfContentImporter(),
-            fileName
-        );
+        ImporterTestEngine.testIsRecognizedFormat(new PdfContentImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     @Disabled("bib file does not contain linked file")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            new PdfContentImporter(),
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(new PdfContentImporter(), fileName, FILE_ENDING);
     }
 }

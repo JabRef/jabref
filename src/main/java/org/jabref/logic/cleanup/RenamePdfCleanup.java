@@ -18,9 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class RenamePdfCleanup implements CleanupJob {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RenamePdfCleanup.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenamePdfCleanup.class);
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
@@ -58,11 +56,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (IOException exception) {
-                LOGGER.error(
-                    "Error while renaming file {}",
-                    file.getLink(),
-                    exception
-                );
+                LOGGER.error("Error while renaming file {}", file.getLink(), exception);
             }
         }
 

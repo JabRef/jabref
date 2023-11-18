@@ -34,13 +34,10 @@ import org.tinylog.Logger;
  *
  * @see <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
  */
-public class BiodiversityLibrary
-    implements SearchBasedParserFetcher, CustomizableKeyFetcher {
+public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
 
-    private static final String API_KEY = new BuildInfo()
-        .biodiversityHeritageApiKey;
-    private static final String BASE_URL =
-        "https://www.biodiversitylibrary.org/api3";
+    private static final String API_KEY = new BuildInfo().biodiversityHeritageApiKey;
+    private static final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
     private static final String RESPONSE_FORMAT = "json";
     private static final String TEST_URL_WITHOUT_API_KEY =
         "https://www.biodiversitylibrary.org/api3?apikey=";
@@ -65,10 +62,7 @@ public class BiodiversityLibrary
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {
         URIBuilder baseURI = new URIBuilder(BASE_URL);
-        baseURI.addParameter(
-            "apikey",
-            importerPreferences.getApiKey(getName()).orElse(API_KEY)
-        );
+        baseURI.addParameter("apikey", importerPreferences.getApiKey(getName()).orElse(API_KEY));
         baseURI.addParameter("format", RESPONSE_FORMAT);
 
         return baseURI.build().toURL();
@@ -110,62 +104,35 @@ public class BiodiversityLibrary
             if (item.getString("BHLType").equals("Part")) {
                 URL url = getPartMetadataURL(item.getString("PartID"));
                 JSONObject itemsDetails = getDetails(url);
-                entry.setField(
-                    StandardField.LANGUAGE,
-                    itemsDetails.optString("Language", "")
-                );
+                entry.setField(StandardField.LANGUAGE, itemsDetails.optString("Language", ""));
 
-                entry.setField(
-                    StandardField.DOI,
-                    itemsDetails.optString("Doi", "")
-                );
+                entry.setField(StandardField.DOI, itemsDetails.optString("Doi", ""));
 
                 entry.setField(
                     StandardField.PUBLISHER,
                     itemsDetails.optString("PublisherName", "")
                 );
-                entry.setField(
-                    StandardField.DATE,
-                    itemsDetails.optString("Date", "")
-                );
-                entry.setField(
-                    StandardField.VOLUME,
-                    itemsDetails.optString("Volume", "")
-                );
-                entry.setField(
-                    StandardField.URL,
-                    itemsDetails.optString("PartUrl", "")
-                );
+                entry.setField(StandardField.DATE, itemsDetails.optString("Date", ""));
+                entry.setField(StandardField.VOLUME, itemsDetails.optString("Volume", ""));
+                entry.setField(StandardField.URL, itemsDetails.optString("PartUrl", ""));
             }
 
             if (item.getString("BHLType").equals("Item")) {
                 URL url = getItemMetadataURL(item.getString("ItemID"));
                 JSONObject itemsDetails = getDetails(url);
-                entry.setField(
-                    StandardField.EDITOR,
-                    itemsDetails.optString("Sponsor", "")
-                );
+                entry.setField(StandardField.EDITOR, itemsDetails.optString("Sponsor", ""));
                 entry.setField(
                     StandardField.PUBLISHER,
                     itemsDetails.optString("HoldingInstitution", "")
                 );
-                entry.setField(
-                    StandardField.LANGUAGE,
-                    itemsDetails.optString("Language", "")
-                );
-                entry.setField(
-                    StandardField.URL,
-                    itemsDetails.optString("ItemUrl", "")
-                );
+                entry.setField(StandardField.LANGUAGE, itemsDetails.optString("Language", ""));
+                entry.setField(StandardField.URL, itemsDetails.optString("ItemUrl", ""));
                 if (
                     itemsDetails.has("Date") &&
                     !entry.hasField(StandardField.DATE) &&
                     !entry.hasField(StandardField.YEAR)
                 ) {
-                    entry.setField(
-                        StandardField.DATE,
-                        itemsDetails.getString("Date")
-                    );
+                    entry.setField(StandardField.DATE, itemsDetails.getString("Date"));
                 }
             }
         }
@@ -183,30 +150,15 @@ public class BiodiversityLibrary
         }
         entry.setField(StandardField.TITLE, item.optString("Title", ""));
 
-        entry.setField(
-            StandardField.AUTHOR,
-            toAuthors(item.optJSONArray("Authors"))
-        );
+        entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("Authors")));
 
         entry.setField(StandardField.PAGES, item.optString("PageRange", ""));
-        entry.setField(
-            StandardField.LOCATION,
-            item.optString("PublisherPlace", "")
-        );
-        entry.setField(
-            StandardField.PUBLISHER,
-            item.optString("PublisherName", "")
-        );
+        entry.setField(StandardField.LOCATION, item.optString("PublisherPlace", ""));
+        entry.setField(StandardField.PUBLISHER, item.optString("PublisherName", ""));
 
         entry.setField(StandardField.DATE, item.optString("Date", ""));
-        entry.setField(
-            StandardField.YEAR,
-            item.optString("PublicationDate", "")
-        );
-        entry.setField(
-            StandardField.JOURNALTITLE,
-            item.optString("ContainerTitle", "")
-        );
+        entry.setField(StandardField.YEAR, item.optString("PublicationDate", ""));
+        entry.setField(StandardField.JOURNALTITLE, item.optString("ContainerTitle", ""));
         entry.setField(StandardField.VOLUME, item.optString("Volume", ""));
 
         return entry;
@@ -221,9 +173,7 @@ public class BiodiversityLibrary
         return IntStream
             .range(0, authors.length())
             .mapToObj(authors::getJSONObject)
-            .map(author ->
-                new Author(author.optString("Name", ""), "", "", "", "")
-            )
+            .map(author -> new Author(author.optString("Name", ""), "", "", "", ""))
             .collect(AuthorList.collect())
             .getAsFirstLastNamesWithAnd();
     }
@@ -248,13 +198,8 @@ public class BiodiversityLibrary
                 BibEntry entry = jsonResultToBibEntry(item);
                 try {
                     entry = parseBibJSONtoBibtex(item, entry);
-                } catch (
-                    JSONException | IOException | URISyntaxException exception
-                ) {
-                    throw new ParseException(
-                        "Error when parsing entry",
-                        exception
-                    );
+                } catch (JSONException | IOException | URISyntaxException exception) {
+                    throw new ParseException("Error when parsing entry", exception);
                 }
                 entries.add(entry);
             }
@@ -267,8 +212,7 @@ public class BiodiversityLibrary
     public URL getURLForQuery(QueryNode luceneQuery)
         throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
-        BiodiversityLibraryTransformer transformer =
-            new BiodiversityLibraryTransformer();
+        BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();
         uriBuilder.addParameter("op", "PublicationSearch");
         uriBuilder.addParameter("searchtype", "C");
         uriBuilder.addParameter(

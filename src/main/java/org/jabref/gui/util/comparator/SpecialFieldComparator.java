@@ -4,8 +4,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 
-public class SpecialFieldComparator
-    implements Comparator<Optional<SpecialFieldValueViewModel>> {
+public class SpecialFieldComparator implements Comparator<Optional<SpecialFieldValueViewModel>> {
 
     @Override
     public int compare(

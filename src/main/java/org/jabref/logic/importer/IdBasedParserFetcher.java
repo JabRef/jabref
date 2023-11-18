@@ -54,16 +54,12 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
     }
 
     @Override
-    default Optional<BibEntry> performSearchById(String identifier)
-        throws FetcherException {
+    default Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
 
-        try (
-            InputStream stream = getUrlDownload(getUrlForIdentifier(identifier))
-                .asInputStream()
-        ) {
+        try (InputStream stream = getUrlDownload(getUrlForIdentifier(identifier)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {

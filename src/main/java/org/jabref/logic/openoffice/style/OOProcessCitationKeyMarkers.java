@@ -15,10 +15,7 @@ class OOProcessCitationKeyMarkers {
      *  Produce citation markers for the case when the citation
      *  markers are the citation keys themselves, separated by commas.
      */
-    static void produceCitationMarkers(
-        CitationGroups citationGroups,
-        OOBibStyle style
-    ) {
+    static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
         assert style.isCitationKeyCiteMarkers();
 
         citationGroups.createPlainBibliographySortedByComparator(
@@ -30,10 +27,7 @@ class OOProcessCitationKeyMarkers {
                 style.getCitationGroupMarkupBefore() +
                 String.join(
                     ",",
-                    OOListUtil.map(
-                        group.getCitationsInLocalOrder(),
-                        Citation::getCitationKey
-                    )
+                    OOListUtil.map(group.getCitationsInLocalOrder(), Citation::getCitationKey)
                 ) +
                 style.getCitationGroupMarkupAfter();
             group.setCitationMarker(Optional.of(OOText.fromString(citMarker)));

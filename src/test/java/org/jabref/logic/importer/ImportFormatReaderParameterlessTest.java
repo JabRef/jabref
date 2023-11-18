@@ -29,27 +29,16 @@ class ImportFormatReaderParameterlessTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        reader =
-            new ImportFormatReader(
-                importerPreferences,
-                importFormatPreferences,
-                fileMonitor
-            );
+        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, fileMonitor);
     }
 
     @Test
-    void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound()
-        throws Exception {
+    void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
         Path file = Path.of(
-            ImportFormatReaderParameterlessTest.class.getResource(
-                    "fileformat/emptyFile.xml"
-                )
+            ImportFormatReaderParameterlessTest.class.getResource("fileformat/emptyFile.xml")
                 .toURI()
         );
-        assertThrows(
-            ImportException.class,
-            () -> reader.importUnknownFormat(file, fileMonitor)
-        );
+        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
     }
 
     @Test
@@ -62,18 +51,14 @@ class ImportFormatReaderParameterlessTest {
 
     @Test
     void importUnknownFormatThrowsExceptionIfDataIsNull() {
-        assertThrows(
-            NullPointerException.class,
-            () -> reader.importUnknownFormat(null)
-        );
+        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null));
     }
 
     @Test
     void importFromFileWithUnknownFormatThrowsException() {
         assertThrows(
             ImportException.class,
-            () ->
-                reader.importFromFile("someunknownformat", Path.of("somepath"))
+            () -> reader.importFromFile("someunknownformat", Path.of("somepath"))
         );
     }
 }

@@ -25,8 +25,7 @@ public class SidePane extends VBox {
 
     // These bindings need to be stored, otherwise they are garbage collected
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final Map<SidePaneType, BooleanBinding> visibleBindings =
-        new HashMap<>();
+    private final Map<SidePaneType, BooleanBinding> visibleBindings = new HashMap<>();
 
     public SidePane(
         LibraryTabContainer tabContainer,

@@ -45,17 +45,13 @@ public class ChangeEntryTypeMenu {
 
     public ContextMenu asContextMenu() {
         ContextMenu menu = new ContextMenu();
-        menu
-            .getItems()
-            .setAll(getMenuItems(entries, bibDatabaseContext, undoManager));
+        menu.getItems().setAll(getMenuItems(entries, bibDatabaseContext, undoManager));
         return menu;
     }
 
     public Menu asSubMenu() {
         Menu menu = new Menu(Localization.lang("Change entry type"));
-        menu
-            .getItems()
-            .setAll(getMenuItems(entries, bibDatabaseContext, undoManager));
+        menu.getItems().setAll(getMenuItems(entries, bibDatabaseContext, undoManager));
         return menu;
     }
 
@@ -83,9 +79,7 @@ public class ChangeEntryTypeMenu {
                 entries,
                 undoManager
             )
-                .ifPresent(subMenu ->
-                    items.addAll(new SeparatorMenuItem(), subMenu)
-                );
+                .ifPresent(subMenu -> items.addAll(new SeparatorMenuItem(), subMenu));
         } else {
             // Default BibTeX
             createSubMenu(
@@ -97,15 +91,8 @@ public class ChangeEntryTypeMenu {
                 .ifPresent(items::add);
 
             // IEEETran
-            createSubMenu(
-                "IEEETran",
-                IEEETranEntryTypeDefinitions.ALL,
-                entries,
-                undoManager
-            )
-                .ifPresent(subMenu ->
-                    items.addAll(new SeparatorMenuItem(), subMenu)
-                );
+            createSubMenu("IEEETran", IEEETranEntryTypeDefinitions.ALL, entries, undoManager)
+                .ifPresent(subMenu -> items.addAll(new SeparatorMenuItem(), subMenu));
 
             // Custom types
             createSubMenu(
@@ -114,9 +101,7 @@ public class ChangeEntryTypeMenu {
                 entries,
                 undoManager
             )
-                .ifPresent(subMenu ->
-                    items.addAll(new SeparatorMenuItem(), subMenu)
-                );
+                .ifPresent(subMenu -> items.addAll(new SeparatorMenuItem(), subMenu));
         }
 
         return items;
@@ -132,9 +117,7 @@ public class ChangeEntryTypeMenu {
 
         if (!entryTypes.isEmpty()) {
             subMenu = factory.createMenu(() -> text);
-            subMenu
-                .getItems()
-                .addAll(fromEntryTypes(entryTypes, entries, undoManager));
+            subMenu.getItems().addAll(fromEntryTypes(entryTypes, entries, undoManager));
         }
 
         return Optional.ofNullable(subMenu);

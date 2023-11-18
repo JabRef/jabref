@@ -88,8 +88,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         HashMap<Field, String> entryMap = new HashMap<>();
@@ -99,19 +98,13 @@ public class CffImporter extends Importer {
         HashMap<String, Field> fieldMap = getFieldMappings();
         for (Map.Entry<String, String> property : citation.values.entrySet()) {
             if (fieldMap.containsKey(property.getKey())) {
-                entryMap.put(
-                    fieldMap.get(property.getKey()),
-                    property.getValue()
-                );
+                entryMap.put(fieldMap.get(property.getKey()), property.getValue());
             } else if ("type".equals(property.getKey())) {
                 if ("dataset".equals(property.getValue())) {
                     entryType = StandardEntryType.Dataset;
                 }
             } else if (getUnmappedFields().contains(property.getKey())) {
-                entryMap.put(
-                    new UnknownField(property.getKey()),
-                    property.getValue()
-                );
+                entryMap.put(new UnknownField(property.getKey()), property.getValue());
             }
         }
 
@@ -135,9 +128,7 @@ public class CffImporter extends Importer {
         entryMap.put(StandardField.AUTHOR, authorStr);
 
         // Select DOI to keep
-        if (
-            (entryMap.get(StandardField.DOI) == null) && (citation.ids != null)
-        ) {
+        if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
             List<CffIdentifier> doiIds = citation.ids
                 .stream()
                 .filter(id -> "doi".equals(id.type))
@@ -179,8 +170,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation;
 

@@ -23,8 +23,7 @@ public class DoiDecodeCleanupTest {
 
     private static Stream<Arguments> provideDoiForAllLowers() {
         UnknownField unknownField = new UnknownField("ee");
-        BibEntry doiResult = new BibEntry()
-            .withField(StandardField.DOI, "10.18726/2018_3");
+        BibEntry doiResult = new BibEntry().withField(StandardField.DOI, "10.18726/2018_3");
 
         return Stream.of(
             // cleanup for Doi field only
@@ -40,10 +39,7 @@ public class DoiDecodeCleanupTest {
             Arguments.of(
                 doiResult,
                 new BibEntry()
-                    .withField(
-                        StandardField.DOI,
-                        "10.18726/2018%7B%5Ctextunderscore%7D3"
-                    )
+                    .withField(StandardField.DOI, "10.18726/2018%7B%5Ctextunderscore%7D3")
                     .withField(
                         StandardField.URL,
                         "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3"
@@ -61,33 +57,17 @@ public class DoiDecodeCleanupTest {
             Arguments.of(
                 new BibEntry()
                     .withField(StandardField.DOI, "10.18726/2018_3")
-                    .withField(
-                        StandardField.NOTE,
-                        "This is a random note to this Doi"
-                    )
-                    .withField(
-                        unknownField,
-                        "This is a random ee field for this Doi"
-                    ),
+                    .withField(StandardField.NOTE, "This is a random note to this Doi")
+                    .withField(unknownField, "This is a random ee field for this Doi"),
                 new BibEntry()
                     .withField(StandardField.DOI, "10.18726/2018_3")
-                    .withField(
-                        StandardField.NOTE,
-                        "This is a random note to this Doi"
-                    )
-                    .withField(
-                        unknownField,
-                        "This is a random ee field for this Doi"
-                    )
+                    .withField(StandardField.NOTE, "This is a random note to this Doi")
+                    .withField(unknownField, "This is a random ee field for this Doi")
             ),
             // cleanup with spaced Doi
             Arguments.of(
                 doiResult,
-                new BibEntry()
-                    .withField(
-                        StandardField.DOI,
-                        "10.18726/2018%7B%5Ctextunderscore%7D3"
-                    )
+                new BibEntry().withField(StandardField.DOI, "10.18726/2018%7B%5Ctextunderscore%7D3")
             ),
             // cleanup just Note field with URL
             Arguments.of(

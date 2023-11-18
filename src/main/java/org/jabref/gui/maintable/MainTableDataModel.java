@@ -27,9 +27,7 @@ public class MainTableDataModel {
 
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
-    private final ObjectProperty<
-        MainTableFieldValueFormatter
-    > fieldValueFormatter;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final GroupsPreferences groupsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
@@ -40,30 +38,20 @@ public class MainTableDataModel {
         StateManager stateManager
     ) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
-        this.nameDisplayPreferences =
-            preferencesService.getNameDisplayPreferences();
+        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
         this.fieldValueFormatter =
             new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(
-                    nameDisplayPreferences,
-                    bibDatabaseContext
-                )
+                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext)
             );
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(
             context.getDatabase().getEntries()
         );
-        ObservableList<BibEntryTableViewModel> entriesViewModel =
-            EasyBind.mapBacked(
-                allEntries,
-                entry ->
-                    new BibEntryTableViewModel(
-                        entry,
-                        bibDatabaseContext,
-                        fieldValueFormatter
-                    )
-            );
+        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(
+            allEntries,
+            entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter)
+        );
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered
@@ -73,8 +61,7 @@ public class MainTableDataModel {
                     stateManager.activeGroupProperty(),
                     stateManager.activeSearchQueryProperty(),
                     groupsPreferences.groupViewModeProperty(),
-                    (groups, query, groupViewMode) ->
-                        entry -> isMatched(groups, query, entry)
+                    (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry)
                 )
             );
 
@@ -90,18 +77,11 @@ public class MainTableDataModel {
         Optional<SearchQuery> query,
         BibEntryTableViewModel entry
     ) {
-        return (
-            isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry)
-        );
+        return (isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry));
     }
 
-    private boolean isMatchedBySearch(
-        Optional<SearchQuery> query,
-        BibEntryTableViewModel entry
-    ) {
-        return query
-            .map(matcher -> matcher.isMatch(entry.getEntry()))
-            .orElse(true);
+    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
+        return query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
     }
 
     private boolean isMatchedByGroup(
@@ -113,9 +93,7 @@ public class MainTableDataModel {
             .orElse(true);
     }
 
-    private Optional<MatcherSet> createGroupMatcher(
-        List<GroupTreeNode> selectedGroups
-    ) {
+    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, show all entries
             return Optional.empty();
@@ -139,10 +117,7 @@ public class MainTableDataModel {
 
     public void refresh() {
         this.fieldValueFormatter.setValue(
-                new MainTableFieldValueFormatter(
-                    nameDisplayPreferences,
-                    bibDatabaseContext
-                )
+                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext)
             );
     }
 }

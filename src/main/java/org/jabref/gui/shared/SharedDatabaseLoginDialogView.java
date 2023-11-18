@@ -108,26 +108,17 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(
-            connectButton,
-            this.getDialogPane(),
-            event -> openDatabase()
-        );
-        Button btnConnect = (Button) this.getDialogPane()
-            .lookupButton(connectButton);
+        ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
+        Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         // must be set here, because in initialize the button is still null
-        btnConnect
-            .disableProperty()
-            .bind(viewModel.formValidation().validProperty().not());
+        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
         btnConnect
             .textProperty()
             .bind(
                 EasyBind.map(
                     viewModel.loadingProperty(),
                     loading ->
-                        loading
-                            ? Localization.lang("Connecting...")
-                            : Localization.lang("Connect")
+                        loading ? Localization.lang("Connecting...") : Localization.lang("Connect")
                 )
             );
     }
@@ -164,78 +155,39 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         user.textProperty().bindBidirectional(viewModel.userProperty());
         password.textProperty().bindBidirectional(viewModel.passwordProperty());
         port.textProperty().bindBidirectional(viewModel.portProperty());
-        serverTimezone
-            .textProperty()
-            .bindBidirectional(viewModel.serverTimezoneProperty());
-        databaseType
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedDbmstypeProperty());
+        serverTimezone.textProperty().bindBidirectional(viewModel.serverTimezoneProperty());
+        databaseType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());
 
         folder.textProperty().bindBidirectional(viewModel.folderProperty());
         browseButton.disableProperty().bind(viewModel.autosaveProperty().not());
         folder.disableProperty().bind(viewModel.autosaveProperty().not());
-        autosave
-            .selectedProperty()
-            .bindBidirectional(viewModel.autosaveProperty());
+        autosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
 
         useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
 
-        fileKeystore
-            .textProperty()
-            .bindBidirectional(viewModel.keyStoreProperty());
+        fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());
 
         browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
-        passwordKeystore
-            .disableProperty()
-            .bind(viewModel.useSSLProperty().not());
-        passwordKeystore
-            .textProperty()
-            .bindBidirectional(viewModel.keyStorePasswordProperty());
-        rememberPassword
-            .selectedProperty()
-            .bindBidirectional(viewModel.rememberPasswordProperty());
+        passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
+        passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
+        rememberPassword.selectedProperty().bindBidirectional(viewModel.rememberPasswordProperty());
 
         // Must be executed after the initialization of the view, otherwise it doesn't work
         Platform.runLater(() -> {
-            visualizer.initVisualization(
-                viewModel.dbValidation(),
-                database,
-                true
-            );
-            visualizer.initVisualization(
-                viewModel.hostValidation(),
-                host,
-                true
-            );
-            visualizer.initVisualization(
-                viewModel.portValidation(),
-                port,
-                true
-            );
-            visualizer.initVisualization(
-                viewModel.userValidation(),
-                user,
-                true
-            );
+            visualizer.initVisualization(viewModel.dbValidation(), database, true);
+            visualizer.initVisualization(viewModel.hostValidation(), host, true);
+            visualizer.initVisualization(viewModel.portValidation(), port, true);
+            visualizer.initVisualization(viewModel.userValidation(), user, true);
 
             EasyBind.subscribe(
                 autosave.selectedProperty(),
-                selected ->
-                    visualizer.initVisualization(
-                        viewModel.folderValidation(),
-                        folder,
-                        true
-                    )
+                selected -> visualizer.initVisualization(viewModel.folderValidation(), folder, true)
             );
 
             EasyBind.subscribe(
                 useSSL.selectedProperty(),
                 selected ->
-                    visualizer.initVisualization(
-                        viewModel.keystoreValidation(),
-                        fileKeystore,
-                        true
-                    )
+                    visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true)
             );
         });
     }

@@ -29,9 +29,8 @@ public class ImporterTestEngine {
      * @return A collection with the names of files in the test folder
      * @throws IOException if there is a problem when trying to read the files in the file system
      */
-    public static Collection<String> getTestFiles(
-        Predicate<String> fileNamePredicate
-    ) throws IOException {
+    public static Collection<String> getTestFiles(Predicate<String> fileNamePredicate)
+        throws IOException {
         try (Stream<Path> stream = Files.list(Path.of(TEST_RESOURCES))) {
             return stream
                 .map(path -> path.getFileName().toString())
@@ -40,25 +39,18 @@ public class ImporterTestEngine {
         }
     }
 
-    public static void testIsRecognizedFormat(
-        Importer importer,
-        String fileName
-    ) throws IOException {
+    public static void testIsRecognizedFormat(Importer importer, String fileName)
+        throws IOException {
         Assertions.assertTrue(importer.isRecognizedFormat(getPath(fileName)));
     }
 
-    public static void testIsNotRecognizedFormat(
-        Importer importer,
-        String fileName
-    ) throws IOException {
+    public static void testIsNotRecognizedFormat(Importer importer, String fileName)
+        throws IOException {
         Assertions.assertFalse(importer.isRecognizedFormat(getPath(fileName)));
     }
 
-    public static void testImportEntries(
-        Importer importer,
-        String fileName,
-        String fileType
-    ) throws IOException, ImportException {
+    public static void testImportEntries(Importer importer, String fileName, String fileType)
+        throws IOException, ImportException {
         ParserResult parserResult = importer.importDatabase(getPath(fileName));
         if (parserResult.isInvalid()) {
             throw new ImportException(parserResult.getErrorMessage());
@@ -73,18 +65,14 @@ public class ImporterTestEngine {
 
     private static Path getPath(String fileName) throws IOException {
         try {
-            return Path.of(
-                ImporterTestEngine.class.getResource(fileName).toURI()
-            );
+            return Path.of(ImporterTestEngine.class.getResource(fileName).toURI());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
     }
 
-    public static void testImportMalformedFiles(
-        Importer importer,
-        String fileName
-    ) throws IOException {
+    public static void testImportMalformedFiles(Importer importer, String fileName)
+        throws IOException {
         List<BibEntry> entries = importer
             .importDatabase(getPath(fileName))
             .getDatabase()

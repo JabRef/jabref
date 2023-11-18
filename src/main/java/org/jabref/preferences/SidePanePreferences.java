@@ -21,10 +21,8 @@ public class SidePanePreferences {
         int webSearchFetcherSelected
     ) {
         this.visiblePanes = FXCollections.observableSet(visiblePanes);
-        this.preferredPositions =
-            FXCollections.observableMap(preferredPositions);
-        this.webSearchFetcherSelected =
-            new SimpleIntegerProperty(webSearchFetcherSelected);
+        this.preferredPositions = FXCollections.observableMap(preferredPositions);
+        this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
     public ObservableSet<SidePaneType> visiblePanes() {

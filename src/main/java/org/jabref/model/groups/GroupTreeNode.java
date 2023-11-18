@@ -76,11 +76,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemoveFromOldGroup =
-            shouldRemovePreviousAssignments &&
-            (oldGroup instanceof GroupEntryChanger);
+            shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
         boolean shouldAddToNewGroup =
-            shouldKeepPreviousAssignments &&
-            (newGroup instanceof GroupEntryChanger);
+            shouldKeepPreviousAssignments && (newGroup instanceof GroupEntryChanger);
         if (shouldAddToNewGroup || shouldRemoveFromOldGroup) {
             List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase
                 .stream()
@@ -130,9 +128,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             (originalContext != GroupHierarchyType.INCLUDING)
         ) {
             // noinspection OptionalGetWithoutIsPresent
-            searchRule.addRule(
-                getParent().get().getSearchMatcher(originalContext)
-            );
+            searchRule.addRule(getParent().get().getSearchMatcher(originalContext));
         }
         return searchRule;
     }
@@ -147,8 +143,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
         GroupTreeNode that = (GroupTreeNode) o;
         return (
-            Objects.equals(group, that.group) &&
-            Objects.equals(getChildren(), that.getChildren())
+            Objects.equals(group, that.group) && Objects.equals(getChildren(), that.getChildren())
         );
     }
 
@@ -157,10 +152,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return Objects.hash(group);
     }
 
-    public List<GroupTreeNode> getContainingGroups(
-        List<BibEntry> entries,
-        boolean requireAll
-    ) {
+    public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
         List<GroupTreeNode> groups = new ArrayList<>();
 
         // Add myself if I contain the entries
@@ -245,10 +237,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public List<BibEntry> findMatches(List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
-        return entries
-            .stream()
-            .filter(matcher::isMatch)
-            .collect(Collectors.toList());
+        return entries.stream().filter(matcher::isMatch).collect(Collectors.toList());
     }
 
     /**

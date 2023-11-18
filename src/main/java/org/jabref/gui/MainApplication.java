@@ -36,13 +36,7 @@ public class MainApplication extends Application {
     public void start(Stage mainStage) {
         FallbackExceptionHandler.installExceptionHandler();
         Globals.startBackgroundTasks();
-        new JabRefGUI(
-            mainStage,
-            parserResults,
-            isBlank,
-            preferences,
-            fileUpdateMonitor
-        );
+        new JabRefGUI(mainStage, parserResults, isBlank, preferences, fileUpdateMonitor);
     }
 
     @Override

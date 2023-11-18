@@ -9,38 +9,25 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class PreamblePropertiesViewModel implements PropertiesTabViewModel {
 
-    private final StringProperty preambleProperty = new SimpleStringProperty(
-        ""
-    );
+    private final StringProperty preambleProperty = new SimpleStringProperty("");
 
     private final BibDatabaseContext databaseContext;
     private final UndoManager undoManager;
 
-    PreamblePropertiesViewModel(
-        BibDatabaseContext databaseContext,
-        UndoManager undoManager
-    ) {
+    PreamblePropertiesViewModel(BibDatabaseContext databaseContext, UndoManager undoManager) {
         this.undoManager = undoManager;
         this.databaseContext = databaseContext;
     }
 
     @Override
     public void setValues() {
-        preambleProperty.setValue(
-            databaseContext.getDatabase().getPreamble().orElse("")
-        );
+        preambleProperty.setValue(databaseContext.getDatabase().getPreamble().orElse(""));
     }
 
     @Override
     public void storeSettings() {
         String newPreamble = preambleProperty.getValue();
-        if (
-            !databaseContext
-                .getDatabase()
-                .getPreamble()
-                .orElse("")
-                .equals(newPreamble)
-        ) {
+        if (!databaseContext.getDatabase().getPreamble().orElse("").equals(newPreamble)) {
             undoManager.addEdit(
                 new UndoablePreambleChange(
                     databaseContext.getDatabase(),

@@ -19,10 +19,7 @@ public class ManageCitations {
         return frontend.getCitationEntries(doc);
     }
 
-    public static void applyCitationEntries(
-        XTextDocument doc,
-        List<CitationEntry> citationEntries
-    )
+    public static void applyCitationEntries(XTextDocument doc, List<CitationEntry> citationEntries)
         throws NoDocumentException, PropertyVetoException, IllegalTypeException, WrappedTargetException, IllegalArgumentException {
         OOFrontend frontend = new OOFrontend(doc);
         frontend.applyCitationEntries(doc, citationEntries);

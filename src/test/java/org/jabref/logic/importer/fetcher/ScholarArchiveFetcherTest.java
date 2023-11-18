@@ -23,10 +23,7 @@ public class ScholarArchiveFetcherTest {
         fetcher = new ScholarArchiveFetcher();
         bibEntry =
             new BibEntry(StandardEntryType.InCollection)
-                .withField(
-                    StandardField.TITLE,
-                    "Query expansion using associated queries"
-                )
+                .withField(StandardField.TITLE, "Query expansion using associated queries")
                 .withField(
                     StandardField.AUTHOR,
                     "Billerbeck, Bodo and Scholer, Falk and Williams, Hugh E. and Zobel, Justin"
@@ -54,8 +51,7 @@ public class ScholarArchiveFetcherTest {
     @Test
     public void performSearchReturnsExpectedResults() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("query");
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)
-        );
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertTrue(
             fetchedEntries.contains(bibEntry),
             "Found the following entries " + fetchedEntries

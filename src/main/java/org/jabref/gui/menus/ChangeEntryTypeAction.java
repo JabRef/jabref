@@ -19,29 +19,18 @@ public class ChangeEntryTypeAction extends SimpleCommand {
     private final UndoManager undoManager;
     private final ReadOnlyStringWrapper statusMessageProperty;
 
-    public ChangeEntryTypeAction(
-        EntryType type,
-        List<BibEntry> entries,
-        UndoManager undoManager
-    ) {
+    public ChangeEntryTypeAction(EntryType type, List<BibEntry> entries, UndoManager undoManager) {
         this.type = type;
         this.entries = entries;
         this.undoManager = undoManager;
-        this.statusMessageProperty =
-            new ReadOnlyStringWrapper(EntryTypeView.getDescription(type));
+        this.statusMessageProperty = new ReadOnlyStringWrapper(EntryTypeView.getDescription(type));
     }
 
     @Override
     public void execute() {
-        NamedCompound compound = new NamedCompound(
-            Localization.lang("Change entry type")
-        );
+        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
         entries.forEach(e ->
-            e
-                .setType(type)
-                .ifPresent(change ->
-                    compound.addEdit(new UndoableChangeType(change))
-                )
+            e.setType(type).ifPresent(change -> compound.addEdit(new UndoableChangeType(change)))
         );
         undoManager.addEdit(compound);
     }

@@ -332,14 +332,8 @@ public class VersionTest {
     public void alphaShouldBeUpdatedToStables() {
         Version alpha = Version.parse("2.8-alpha");
         Version stable = Version.parse("2.8");
-        List<Version> availableVersions = Arrays.asList(
-            Version.parse("2.8-beta"),
-            stable
-        );
-        assertEquals(
-            Optional.of(stable),
-            alpha.shouldBeUpdatedTo(availableVersions)
-        );
+        List<Version> availableVersions = Arrays.asList(Version.parse("2.8-beta"), stable);
+        assertEquals(Optional.of(stable), alpha.shouldBeUpdatedTo(availableVersions));
     }
 
     @Test
@@ -358,9 +352,6 @@ public class VersionTest {
     @FetcherTest
     @DisabledOnCIServer("GitHub puts a low rate limit on unauthenticated calls")
     public void getAllAvailableVersionsReturnsSomething() throws Exception {
-        assertNotEquals(
-            Collections.emptyList(),
-            Version.getAllAvailableVersions()
-        );
+        assertNotEquals(Collections.emptyList(), Version.getAllAvailableVersions());
     }
 }

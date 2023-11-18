@@ -45,9 +45,7 @@ public class OrFields implements Comparable<OrFields> {
 
     @Override
     public int compareTo(OrFields o) {
-        return FieldFactory
-            .serializeOrFields(this)
-            .compareTo(FieldFactory.serializeOrFields(o));
+        return FieldFactory.serializeOrFields(this).compareTo(FieldFactory.serializeOrFields(o));
     }
 
     public boolean hasExactlyOne() {

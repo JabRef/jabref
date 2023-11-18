@@ -17,8 +17,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 @ExtendWith(ApplicationExtension.class)
 public class FileHistoryMenuTest {
 
-    private static final String BIBTEX_LIBRARY_PATH =
-        "src/test/resources/org/jabref/";
+    private static final String BIBTEX_LIBRARY_PATH = "src/test/resources/org/jabref/";
 
     private FileHistoryMenu fileHistoryMenu;
 
@@ -34,15 +33,12 @@ public class FileHistoryMenuTest {
     @BeforeEach
     public void setUp() {
         openMocks(this);
-        fileHistoryMenu =
-            new FileHistoryMenu(fileHistory, dialogService, openDatabaseAction);
+        fileHistoryMenu = new FileHistoryMenu(fileHistory, dialogService, openDatabaseAction);
     }
 
     @Test
     void recentLibrariesAreCleared() {
-        fileHistoryMenu.newFile(
-            Path.of(BIBTEX_LIBRARY_PATH.concat("bibtexFiles/test.bib"))
-        );
+        fileHistoryMenu.newFile(Path.of(BIBTEX_LIBRARY_PATH.concat("bibtexFiles/test.bib")));
 
         fileHistoryMenu.clearLibrariesHistory();
         assertTrue(fileHistoryMenu.isDisable());

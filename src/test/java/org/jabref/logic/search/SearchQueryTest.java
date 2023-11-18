@@ -31,18 +31,14 @@ public class SearchQueryTest {
         );
         assertEquals(
             "\"asdf\" (case insensitive, plain text)",
-            new SearchQuery("asdf", EnumSet.noneOf(SearchFlags.class))
-                .toString()
+            new SearchQuery("asdf", EnumSet.noneOf(SearchFlags.class)).toString()
         );
     }
 
     @Test
     public void testIsContainsBasedSearch() {
         assertTrue(
-            new SearchQuery(
-                "asdf",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
+            new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE))
                 .isContainsBasedSearch()
         );
         assertTrue(
@@ -56,10 +52,7 @@ public class SearchQueryTest {
                 .isContainsBasedSearch()
         );
         assertFalse(
-            new SearchQuery(
-                "author=asdf",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
+            new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE))
                 .isContainsBasedSearch()
         );
     }
@@ -67,10 +60,7 @@ public class SearchQueryTest {
     @Test
     public void testIsGrammarBasedSearch() {
         assertFalse(
-            new SearchQuery(
-                "asdf",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
+            new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE))
                 .isGrammarBasedSearch()
         );
         assertFalse(
@@ -84,10 +74,7 @@ public class SearchQueryTest {
                 .isGrammarBasedSearch()
         );
         assertTrue(
-            new SearchQuery(
-                "author=asdf",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
+            new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE))
                 .isGrammarBasedSearch()
         );
     }
@@ -241,22 +228,14 @@ public class SearchQueryTest {
     @Test
     public void testIsValidQueryNotAsRegEx() {
         assertTrue(
-            new SearchQuery(
-                "asdf",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
-                .isValid()
+            new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid()
         );
     }
 
     @Test
     public void testIsValidQueryContainsBracketNotAsRegEx() {
         assertTrue(
-            new SearchQuery(
-                "asdf[",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
-                .isValid()
+            new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid()
         );
     }
 
@@ -347,10 +326,7 @@ public class SearchQueryTest {
     @Test
     public void testIsValidQueryWithEqualSignNotAsRegEx() {
         assertTrue(
-            new SearchQuery(
-                "author=asdf",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
+            new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE))
                 .isValid()
         );
     }
@@ -358,10 +334,7 @@ public class SearchQueryTest {
     @Test
     public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
         assertTrue(
-            new SearchQuery(
-                "author=123",
-                EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
-            )
+            new SearchQuery("author=123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE))
                 .isValid()
         );
     }
@@ -389,20 +362,14 @@ public class SearchQueryTest {
     public void testSimpleTerm() {
         String query = "progress";
 
-        SearchQuery result = new SearchQuery(
-            query,
-            EnumSet.noneOf(SearchFlags.class)
-        );
+        SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
         assertFalse(result.isGrammarBasedSearch());
     }
 
     @Test
     public void testGetPattern() {
         String query = "progress";
-        SearchQuery result = new SearchQuery(
-            query,
-            EnumSet.noneOf(SearchFlags.class)
-        );
+        SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
         Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
         // We can't directly compare the pattern objects
         assertEquals(
@@ -447,13 +414,10 @@ public class SearchQueryTest {
             queryText,
             EnumSet.noneOf(SearchFlags.class)
         );
-        String pattern =
-            "(\\Q<([{\\^-=$!|]})?*+.>\\E)|(\\Qword1\\E)|(\\Qword2.\\E)";
+        String pattern = "(\\Q<([{\\^-=$!|]})?*+.>\\E)|(\\Qword1\\E)|(\\Qword2.\\E)";
         assertEquals(
             Optional.of(pattern),
-            textQueryWithSpecialChars
-                .getPatternForWords()
-                .map(Pattern::toString)
+            textQueryWithSpecialChars.getPatternForWords().map(Pattern::toString)
         );
     }
 
@@ -465,13 +429,10 @@ public class SearchQueryTest {
             queryText,
             EnumSet.noneOf(SearchFlags.class)
         );
-        String pattern =
-            "(\\(\\[\\{\\\\\\^\\$\\|\\]\\}\\)\\?\\*\\+\\.\\/)|(word1)|(word2\\.)";
+        String pattern = "(\\(\\[\\{\\\\\\^\\$\\|\\]\\}\\)\\?\\*\\+\\.\\/)|(word1)|(word2\\.)";
         assertEquals(
             Optional.of(pattern),
-            textQueryWithSpecialChars
-                .getJavaScriptPatternForWords()
-                .map(Pattern::toString)
+            textQueryWithSpecialChars.getJavaScriptPatternForWords().map(Pattern::toString)
         );
     }
 }

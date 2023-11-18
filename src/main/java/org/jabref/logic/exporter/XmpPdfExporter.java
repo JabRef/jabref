@@ -21,27 +21,18 @@ import org.slf4j.LoggerFactory;
 
 public class XmpPdfExporter extends Exporter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        XmpPdfExporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmpPdfExporter.class);
 
     private final XmpPreferences xmpPreferences;
 
     public XmpPdfExporter(XmpPreferences xmpPreferences) {
-        super(
-            "pdf",
-            Localization.lang("XMP-annotated PDF"),
-            StandardFileType.PDF
-        );
+        super("pdf", Localization.lang("XMP-annotated PDF"), StandardFileType.PDF);
         this.xmpPreferences = xmpPreferences;
     }
 
     @Override
-    public void export(
-        BibDatabaseContext databaseContext,
-        Path pdfFile,
-        List<BibEntry> entries
-    ) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path pdfFile, List<BibEntry> entries)
+        throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(pdfFile);
         Objects.requireNonNull(entries);
@@ -53,18 +44,10 @@ public class XmpPdfExporter extends Exporter {
                 PDPage page = new PDPage();
                 document.addPage(page);
 
-                try (
-                    PDPageContentStream contentStream = new PDPageContentStream(
-                        document,
-                        page
-                    )
-                ) {
+                try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
                     contentStream.beginText();
                     contentStream.newLineAtOffset(25, 500);
-                    contentStream.setFont(
-                        new PDType1Font(Standard14Fonts.FontName.HELVETICA),
-                        12
-                    );
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
                     contentStream.showText(
                         "This PDF was created by JabRef. It demonstrates the embedding of XMP data in PDF files. Please open the file metadata view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF."
                     );

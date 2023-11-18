@@ -20,9 +20,7 @@ public class StyleLoader {
     public static final String DEFAULT_NUMERICAL_STYLE_PATH =
         "/resource/openoffice/default_numerical.jstyle";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        StyleLoader.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleLoader.class);
 
     // All internal styles
     private final List<String> internalStyleFiles = Arrays.asList(
@@ -44,12 +42,9 @@ public class StyleLoader {
         LayoutFormatterPreferences formatterPreferences,
         JournalAbbreviationRepository abbreviationRepository
     ) {
-        this.openOfficePreferences =
-            Objects.requireNonNull(openOfficePreferences);
-        this.layoutFormatterPreferences =
-            Objects.requireNonNull(formatterPreferences);
-        this.abbreviationRepository =
-            Objects.requireNonNull(abbreviationRepository);
+        this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
+        this.layoutFormatterPreferences = Objects.requireNonNull(formatterPreferences);
+        this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
         loadInternalStyles();
         loadExternalStyles();
     }
@@ -75,10 +70,7 @@ public class StyleLoader {
                 abbreviationRepository
             );
             if (externalStyles.contains(newStyle)) {
-                LOGGER.info(
-                    "External style file {} already existing.",
-                    filename
-                );
+                LOGGER.info("External style file {} already existing.", filename);
             } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
@@ -115,11 +107,7 @@ public class StyleLoader {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find external style file {}", filename);
             } catch (IOException e) {
-                LOGGER.info(
-                    "Problem reading external style file {}",
-                    filename,
-                    e
-                );
+                LOGGER.info("Problem reading external style file {}", filename, e);
             }
         }
     }
@@ -129,18 +117,10 @@ public class StyleLoader {
         for (String filename : internalStyleFiles) {
             try {
                 internalStyles.add(
-                    new OOBibStyle(
-                        filename,
-                        layoutFormatterPreferences,
-                        abbreviationRepository
-                    )
+                    new OOBibStyle(filename, layoutFormatterPreferences, abbreviationRepository)
                 );
             } catch (IOException e) {
-                LOGGER.info(
-                    "Problem reading internal style file {}",
-                    filename,
-                    e
-                );
+                LOGGER.info("Problem reading internal style file {}", filename, e);
             }
         }
     }

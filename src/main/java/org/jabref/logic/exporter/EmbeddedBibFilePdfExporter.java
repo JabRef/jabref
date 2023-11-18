@@ -43,9 +43,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
 
     public static String EMBEDDED_FILE_NAME = "main.bib";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        EmbeddedBibFilePdfExporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedBibFilePdfExporter.class);
 
     private final BibDatabaseMode bibDatabaseMode;
     private final BibEntryTypesManager bibEntryTypesManager;
@@ -68,11 +66,8 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
      * @param entries         a list containing all entries that should be exported
      */
     @Override
-    public void export(
-        BibDatabaseContext databaseContext,
-        Path file,
-        List<BibEntry> entries
-    ) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries)
+        throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
@@ -82,18 +77,10 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 PDPage page = new PDPage();
                 document.addPage(page);
 
-                try (
-                    PDPageContentStream contentStream = new PDPageContentStream(
-                        document,
-                        page
-                    )
-                ) {
+                try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
                     contentStream.beginText();
                     contentStream.newLineAtOffset(25, 500);
-                    contentStream.setFont(
-                        new PDType1Font(Standard14Fonts.FontName.HELVETICA),
-                        12
-                    );
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
                     contentStream.showText(
                         "This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file metadata view of your PDF viewer to see the attached files."
                     );
@@ -122,17 +109,14 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
         Path newFile = Files.createTempFile("JabRef", "pdf");
         try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            PDDocumentNameDictionary nameDictionary = document
-                .getDocumentCatalog()
-                .getNames();
+            PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
             Map<String, PDComplexFileSpecification> names;
 
             if (nameDictionary == null) {
                 efTree = new PDEmbeddedFilesNameTreeNode();
                 names = new HashMap<>();
-                nameDictionary =
-                    new PDDocumentNameDictionary(document.getDocumentCatalog());
+                nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             } else {
@@ -159,10 +143,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                     bibTeX.getBytes(StandardCharsets.UTF_8)
                 );
                 fileSpecification.setFile(EMBEDDED_FILE_NAME);
-                PDEmbeddedFile embeddedFile = new PDEmbeddedFile(
-                    document,
-                    inputStream
-                );
+                PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
                 embeddedFile.setSubtype("text/x-bibtex");
                 embeddedFile.setSize(bibTeX.length());
                 fileSpecification.setEmbeddedFile(embeddedFile);
@@ -172,10 +153,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                         names.put(EMBEDDED_FILE_NAME, fileSpecification);
                     } catch (UnsupportedOperationException e) {
                         throw new IOException(
-                            Localization.lang(
-                                "File '%0' is write protected.",
-                                path.toString()
-                            )
+                            Localization.lang("File '%0' is write protected.", path.toString())
                         );
                     }
                 }
@@ -193,13 +171,8 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     private String getBibString(List<BibEntry> entries) throws IOException {
         StringWriter stringWriter = new StringWriter();
         BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(
-            fieldPreferences
-        );
-        BibEntryWriter bibEntryWriter = new BibEntryWriter(
-            fieldWriter,
-            bibEntryTypesManager
-        );
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
             bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);
         }

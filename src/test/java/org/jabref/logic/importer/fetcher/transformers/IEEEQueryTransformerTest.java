@@ -10,8 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class IEEEQueryTransformerTest
-    extends InfixTransformerTest<IEEEQueryTransformer> {
+class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer> {
 
     @Override
     public IEEEQueryTransformer getTransformer() {
@@ -95,12 +94,10 @@ class IEEEQueryTransformerTest
 
     @ParameterizedTest
     @MethodSource("getTitleTestData")
-    public void testStopWordRemoval(String expected, String queryString)
-        throws Exception {
+    public void testStopWordRemoval(String expected, String queryString) throws Exception {
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> result = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> result = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.ofNullable(expected), result);
     }
 }

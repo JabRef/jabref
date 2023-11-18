@@ -43,11 +43,7 @@ class Codec52 {
          */
         public final List<String> citationKeys;
 
-        ParsedMarkName(
-            String index,
-            CitationType citationType,
-            List<String> citationKeys
-        ) {
+        ParsedMarkName(String index, CitationType citationType, List<String> citationKeys) {
             Objects.requireNonNull(index);
             Objects.requireNonNull(citationKeys);
             this.index = index;
@@ -64,9 +60,7 @@ class Codec52 {
             case 1 -> CitationType.AUTHORYEAR_PAR;
             case 2 -> CitationType.AUTHORYEAR_INTEXT;
             case 3 -> CitationType.INVISIBLE_CIT;
-            default -> throw new IllegalArgumentException(
-                "Invalid CitationType code"
-            );
+            default -> throw new IllegalArgumentException("Invalid CitationType code");
         };
     }
 
@@ -100,13 +94,7 @@ class Codec52 {
         int citTypeCode = citationTypeToInt(citationType);
         String name = BIB_CITATION + '_' + citTypeCode + '_' + citationKeysPart;
         while (usedNames.contains(name)) {
-            name =
-                BIB_CITATION +
-                index +
-                '_' +
-                citTypeCode +
-                '_' +
-                citationKeysPart;
+            name = BIB_CITATION + index + '_' + citTypeCode + '_' + citationKeysPart;
             index++;
         }
         return name;
@@ -127,9 +115,7 @@ class Codec52 {
         String index = citeMatcher.group(1);
         int citTypeCode = Integer.parseInt(citeMatcher.group(2));
         CitationType citationType = citationTypeFromInt(citTypeCode);
-        return Optional.of(
-            new Codec52.ParsedMarkName(index, citationType, keys)
-        );
+        return Optional.of(new Codec52.ParsedMarkName(index, citationType, keys));
     }
 
     /**
@@ -144,9 +130,7 @@ class Codec52 {
      *
      * @param names The list to be filtered.
      */
-    public static List<String> filterIsJabRefReferenceMarkName(
-        List<String> names
-    ) {
+    public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
         return names
             .stream()
             .filter(Codec52::isJabRefReferenceMarkName)

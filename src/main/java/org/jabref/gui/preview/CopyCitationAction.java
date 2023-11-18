@@ -34,9 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CopyCitationAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CopyCitationAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyCitationAction.class);
 
     private final List<BibEntry> selectedEntries;
     private final CitationStyleOutputFormat outputFormat;
@@ -73,12 +71,7 @@ public class CopyCitationAction extends SimpleCommand {
     public void execute() {
         BackgroundTask
             .wrap(this::generateCitations)
-            .onFailure(ex ->
-                LOGGER.error(
-                    "Error while copying citations to the clipboard",
-                    ex
-                )
-            )
+            .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
             .onSuccess(this::setClipBoardContent)
             .executeWith(taskExecutor);
     }
@@ -91,10 +84,7 @@ public class CopyCitationAction extends SimpleCommand {
             .getPreviewPreferences()
             .getSelectedPreviewLayout();
 
-        if (
-            previewLayout instanceof
-            CitationStylePreviewLayout citationStyleLayout
-        ) {
+        if (previewLayout instanceof CitationStylePreviewLayout citationStyleLayout) {
             styleSource = citationStyleLayout.getSource();
         }
 
@@ -111,8 +101,7 @@ public class CopyCitationAction extends SimpleCommand {
         }
     }
 
-    private List<String> generateTextBasedPreviewLayoutCitations()
-        throws IOException {
+    private List<String> generateTextBasedPreviewLayoutCitations() throws IOException {
         if (stateManager.getActiveDatabase().isEmpty()) {
             return Collections.emptyList();
         }
@@ -133,10 +122,7 @@ public class CopyCitationAction extends SimpleCommand {
         List<String> citations = new ArrayList<>(selectedEntries.size());
         for (BibEntry entry : selectedEntries) {
             citations.add(
-                layout.doLayout(
-                    entry,
-                    stateManager.getActiveDatabase().get().getDatabase()
-                )
+                layout.doLayout(entry, stateManager.getActiveDatabase().get().getDatabase())
             );
         }
         return citations;
@@ -147,17 +133,9 @@ public class CopyCitationAction extends SimpleCommand {
      */
     protected static ClipboardContent processPreview(List<String> citations) {
         ClipboardContent content = new ClipboardContent();
-        content.putHtml(
-            String.join(
-                CitationStyleOutputFormat.HTML.getLineSeparator(),
-                citations
-            )
-        );
+        content.putHtml(String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations));
         content.putString(
-            String.join(
-                CitationStyleOutputFormat.HTML.getLineSeparator(),
-                citations
-            )
+            String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations)
         );
         return content;
     }
@@ -168,10 +146,7 @@ public class CopyCitationAction extends SimpleCommand {
     protected static ClipboardContent processText(List<String> citations) {
         ClipboardContent content = new ClipboardContent();
         content.putString(
-            String.join(
-                CitationStyleOutputFormat.TEXT.getLineSeparator(),
-                citations
-            )
+            String.join(CitationStyleOutputFormat.TEXT.getLineSeparator(), citations)
         );
         return content;
     }
@@ -195,13 +170,8 @@ public class CopyCitationAction extends SimpleCommand {
             OS.NEWLINE +
             OS.NEWLINE;
 
-        result +=
-        String.join(
-            CitationStyleOutputFormat.HTML.getLineSeparator(),
-            citations
-        );
-        result +=
-        OS.NEWLINE + "   </body>" + OS.NEWLINE + "</html>" + OS.NEWLINE;
+        result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
+        result += OS.NEWLINE + "   </body>" + OS.NEWLINE + "</html>" + OS.NEWLINE;
 
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
@@ -236,10 +206,7 @@ public class CopyCitationAction extends SimpleCommand {
         }
 
         dialogService.notify(
-            Localization.lang(
-                "Copied %0 citations.",
-                String.valueOf(selectedEntries.size())
-            )
+            Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size()))
         );
     }
 }

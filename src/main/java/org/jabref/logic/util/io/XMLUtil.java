@@ -50,9 +50,7 @@ public class XMLUtil {
     }
 
     public static List<Node> asList(NodeList n) {
-        return n.getLength() == 0
-            ? Collections.emptyList()
-            : new NodeListWrapper(n);
+        return n.getLength() == 0 ? Collections.emptyList() : new NodeListWrapper(n);
     }
 
     /**
@@ -80,10 +78,7 @@ public class XMLUtil {
      * For example,
      * <item attributeName="content" />
      */
-    public static Optional<String> getAttributeContent(
-        Node item,
-        String attributeName
-    ) {
+    public static Optional<String> getAttributeContent(Node item, String attributeName) {
         NamedNodeMap attributes = item.getAttributes();
         return Optional
             .ofNullable(attributes.getNamedItem(attributeName))
@@ -120,9 +115,7 @@ public class XMLUtil {
 
     // Wrapper to make NodeList iterable,
     // taken from <a href="http://stackoverflow.com/questions/19589231/can-i-iterate-through-a-nodelist-using-for-each-in-java">StackOverflow Answer</a>.
-    private static final class NodeListWrapper
-        extends AbstractList<Node>
-        implements RandomAccess {
+    private static final class NodeListWrapper extends AbstractList<Node> implements RandomAccess {
 
         private final NodeList list;
 

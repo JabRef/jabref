@@ -9,26 +9,17 @@ public class FileNameCleanerTest {
 
     @Test
     public void testCleanFileName() {
-        assertEquals(
-            "legalFilename.txt",
-            FileNameCleaner.cleanFileName("legalFilename.txt")
-        );
+        assertEquals("legalFilename.txt", FileNameCleaner.cleanFileName("legalFilename.txt"));
         assertEquals(
             "illegalFilename______.txt",
             FileNameCleaner.cleanFileName("illegalFilename/?*<>|.txt")
         );
-        assertEquals(
-            "illegalFileName_.txt",
-            FileNameCleaner.cleanFileName("illegalFileName{.txt")
-        );
+        assertEquals("illegalFileName_.txt", FileNameCleaner.cleanFileName("illegalFileName{.txt"));
     }
 
     @Test
     public void testCleanDirectoryName() {
-        assertEquals(
-            "legalFilename.txt",
-            FileNameCleaner.cleanDirectoryName("legalFilename.txt")
-        );
+        assertEquals("legalFilename.txt", FileNameCleaner.cleanDirectoryName("legalFilename.txt"));
         assertEquals(
             "subdir/legalFilename.txt",
             FileNameCleaner.cleanDirectoryName("subdir/legalFilename.txt")
@@ -41,10 +32,7 @@ public class FileNameCleanerTest {
 
     @Test
     public void testCleanDirectoryNameForWindows() {
-        assertEquals(
-            "legalFilename.txt",
-            FileNameCleaner.cleanDirectoryName("legalFilename.txt")
-        );
+        assertEquals("legalFilename.txt", FileNameCleaner.cleanDirectoryName("legalFilename.txt"));
         assertEquals(
             "subdir\\legalFilename.txt",
             FileNameCleaner.cleanDirectoryName("subdir\\legalFilename.txt")

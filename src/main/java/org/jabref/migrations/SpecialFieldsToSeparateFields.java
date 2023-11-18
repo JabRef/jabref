@@ -17,13 +17,10 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
 
     private final KeywordList possibleKeywordsToMigrate;
     private final Character keywordDelimiter;
-    private final Map<String, SpecialField> migrationTable =
-        getMigrationTable();
+    private final Map<String, SpecialField> migrationTable = getMigrationTable();
 
     public SpecialFieldsToSeparateFields(Character keywordDelimiter) {
-        List<SpecialFieldValue> specialFieldValues = Arrays.asList(
-            SpecialFieldValue.values()
-        );
+        List<SpecialFieldValue> specialFieldValues = Arrays.asList(SpecialFieldValue.values());
         possibleKeywordsToMigrate =
             new KeywordList(
                 specialFieldValues
@@ -47,10 +44,7 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
                 entry.getKeywords(keywordDelimiter).contains(keyword) &&
                 migrationTable.containsKey(keyword.get())
             ) {
-                entry.setField(
-                    migrationTable.get(keyword.get()),
-                    keyword.get()
-                );
+                entry.setField(migrationTable.get(keyword.get()), keyword.get());
             }
         }
 

@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UndoableRemoveEntries.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntries.class);
     private final BibDatabase base;
     private final List<BibEntry> entries;
     private final boolean cut;
@@ -34,11 +32,7 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
         this(base, entries, false);
     }
 
-    public UndoableRemoveEntries(
-        BibDatabase base,
-        List<BibEntry> entries,
-        boolean cut
-    ) {
+    public UndoableRemoveEntries(BibDatabase base, List<BibEntry> entries, boolean cut) {
         this.base = base;
         this.entries = entries;
         this.cut = cut;
@@ -53,10 +47,7 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
                 return Localization.lang(
                     "cut entry %0",
                     StringUtil.boldHTML(
-                        entries
-                            .get(0)
-                            .getCitationKey()
-                            .orElse(Localization.lang("undefined"))
+                        entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))
                     )
                 );
             } else {
@@ -69,10 +60,7 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
                 return Localization.lang(
                     "remove entry %0",
                     StringUtil.boldHTML(
-                        entries
-                            .get(0)
-                            .getCitationKey()
-                            .orElse(Localization.lang("undefined"))
+                        entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))
                     )
                 );
             } else {

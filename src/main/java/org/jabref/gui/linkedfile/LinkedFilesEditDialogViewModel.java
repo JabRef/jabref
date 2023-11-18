@@ -28,18 +28,15 @@ import org.jabref.preferences.FilePreferences;
 
 public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
-    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile(
-        "[a-z]+://.*"
-    );
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     private final StringProperty link = new SimpleStringProperty("");
     private final StringProperty description = new SimpleStringProperty("");
-    private final ListProperty<ExternalFileType> allExternalFileTypes =
-        new SimpleListProperty<>(FXCollections.emptyObservableList());
+    private final ListProperty<ExternalFileType> allExternalFileTypes = new SimpleListProperty<>(
+        FXCollections.emptyObservableList()
+    );
     private final ObjectProperty<ExternalFileType> selectedExternalFileType =
         new SimpleObjectProperty<>();
-    private final ObservableOptionalValue<
-        ExternalFileType
-    > monadicSelectedExternalFileType;
+    private final ObservableOptionalValue<ExternalFileType> monadicSelectedExternalFileType;
     private final BibDatabaseContext database;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -54,13 +51,10 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         allExternalFileTypes.set(
-            FXCollections.observableArrayList(
-                filePreferences.getExternalFileTypes()
-            )
+            FXCollections.observableArrayList(filePreferences.getExternalFileTypes())
         );
 
-        monadicSelectedExternalFileType =
-            EasyBind.wrapNullable(selectedExternalFileType);
+        monadicSelectedExternalFileType = EasyBind.wrapNullable(selectedExternalFileType);
         setValues(linkedFile);
     }
 
@@ -84,20 +78,15 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = link.get();
 
-        Optional<Path> file = FileUtil.find(
-            database,
-            fileText,
-            filePreferences
-        );
+        Optional<Path> file = FileUtil.find(database, fileText, filePreferences);
 
         Path workingDir = file.orElse(filePreferences.getWorkingDirectory());
         String fileName = Path.of(fileText).getFileName().toString();
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDir)
-                .withInitialFileName(fileName)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(workingDir)
+            .withInitialFileName(fileName)
+            .build();
 
         dialogService
             .showFileOpenDialog(fileDialogConfiguration)
@@ -122,20 +111,14 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         selectedExternalFileType.setValue(null);
 
         // See what is a reasonable selection for the type combobox:
-        Optional<ExternalFileType> fileType =
-            ExternalFileTypes.getExternalFileTypeByLinkedFile(
-                linkedFile,
-                false,
-                filePreferences
-            );
-        if (
-            fileType.isPresent() &&
-            !(fileType.get() instanceof UnknownExternalFileType)
-        ) {
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByLinkedFile(
+            linkedFile,
+            false,
+            filePreferences
+        );
+        if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
             selectedExternalFileType.setValue(fileType.get());
-        } else if (
-            (linkedFile.getLink() != null) && (!linkedFile.getLink().isEmpty())
-        ) {
+        } else if ((linkedFile.getLink() != null) && (!linkedFile.getLink().isEmpty())) {
             setExternalFileTypeByExtension(linkedFile.getLink());
         }
     }
@@ -164,30 +147,16 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         if (LinkedFile.isOnlineLink(link.getValue())) {
             try {
-                return new LinkedFile(
-                    description.getValue(),
-                    new URL(link.getValue()),
-                    fileType
-                );
+                return new LinkedFile(description.getValue(), new URL(link.getValue()), fileType);
             } catch (MalformedURLException e) {
-                return new LinkedFile(
-                    description.getValue(),
-                    link.getValue(),
-                    fileType
-                );
+                return new LinkedFile(description.getValue(), link.getValue(), fileType);
             }
         }
-        return new LinkedFile(
-            description.getValue(),
-            Path.of(link.getValue()),
-            fileType
-        );
+        return new LinkedFile(description.getValue(), Path.of(link.getValue()), fileType);
     }
 
     private String relativize(Path filePath) {
-        List<Path> fileDirectories = database.getFileDirectories(
-            filePreferences
-        );
+        List<Path> fileDirectories = database.getFileDirectories(filePreferences);
         return FileUtil.relativize(filePath, fileDirectories).toString();
     }
 }

@@ -76,10 +76,7 @@ public class NormalizePagesFormatterTest {
             // This appears in https://doi.org/10.1145/1658373.1658375
             Arguments.of("2:1--2:33", "2:1--2:33"),
             // formatExample
-            Arguments.of(
-                "1--2",
-                new NormalizePagesFormatter().getExampleInput()
-            ),
+            Arguments.of("1--2", new NormalizePagesFormatter().getExampleInput()),
             // replaceDashWithMinus
             Arguments.of("R404--R405", "R404–R405")
         );

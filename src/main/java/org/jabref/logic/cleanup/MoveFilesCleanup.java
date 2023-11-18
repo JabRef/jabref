@@ -17,17 +17,12 @@ import org.slf4j.LoggerFactory;
 
 public class MoveFilesCleanup implements CleanupJob {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MoveFilesCleanup.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public MoveFilesCleanup(
-        BibDatabaseContext databaseContext,
-        FilePreferences filePreferences
-    ) {
+    public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
     }
@@ -50,11 +45,7 @@ public class MoveFilesCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (IOException exception) {
-                LOGGER.error(
-                    "Error while moving file {}",
-                    file.getLink(),
-                    exception
-                );
+                LOGGER.error("Error while moving file {}", file.getLink(), exception);
             }
         }
 

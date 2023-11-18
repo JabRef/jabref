@@ -24,10 +24,7 @@ class PushToEmacsTest {
 
     @BeforeEach
     public void setup() {
-        DialogService dialogService = mock(
-            DialogService.class,
-            Answers.RETURNS_DEEP_STUBS
-        );
+        DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
         PreferencesService preferencesService = mock(PreferencesService.class);
 
         PushToApplicationPreferences pushToApplicationPreferences = mock(
@@ -38,13 +35,13 @@ class PushToEmacsTest {
             ? "\"C:\\tools\\emacs\\bin\\emacsclientw.exe\""
             : "emacsclient";
         Map<String, String> emacsConfig = Map.of("Emacs", emacsClient);
-        ObservableMap<String, String> emacsConfigObservableMap =
-            FXCollections.observableMap(emacsConfig);
+        ObservableMap<String, String> emacsConfigObservableMap = FXCollections.observableMap(
+            emacsConfig
+        );
         when(pushToApplicationPreferences.getCommandPaths())
             .thenReturn(new SimpleMapProperty<>(emacsConfigObservableMap));
 
-        when(pushToApplicationPreferences.getEmacsArguments())
-            .thenReturn("-n -e");
+        when(pushToApplicationPreferences.getEmacsArguments()).thenReturn("-n -e");
 
         when(preferencesService.getPushToApplicationPreferences())
             .thenReturn(pushToApplicationPreferences);
@@ -52,8 +49,7 @@ class PushToEmacsTest {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(
             ExternalApplicationsPreferences.class
         );
-        when(externalApplicationsPreferences.getCiteCommand())
-            .thenReturn("\\cite{key1,key2}");
+        when(externalApplicationsPreferences.getCiteCommand()).thenReturn("\\cite{key1,key2}");
         when(preferencesService.getExternalApplicationsPreferences())
             .thenReturn(externalApplicationsPreferences);
 

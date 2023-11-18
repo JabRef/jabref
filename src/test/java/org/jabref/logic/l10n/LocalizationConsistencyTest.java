@@ -38,9 +38,7 @@ class LocalizationConsistencyTest {
     void allFilesMustBeInLanguages() throws IOException {
         String bundle = "JabRef";
         // e.g., "<bundle>_en.properties", where <bundle> is [JabRef, Menu]
-        Pattern propertiesFile = Pattern.compile(
-            String.format("%s_.{2,}.properties", bundle)
-        );
+        Pattern propertiesFile = Pattern.compile(String.format("%s_.{2,}.properties", bundle));
         Set<String> localizationFiles = new HashSet<>();
         try (
             DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
@@ -75,23 +73,15 @@ class LocalizationConsistencyTest {
     void ensureNoDuplicates() {
         String bundle = "JabRef";
         for (Language lang : Language.values()) {
-            String propertyFilePath = String.format(
-                "/l10n/%s_%s.properties",
-                bundle,
-                lang.getId()
-            );
+            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang.getId());
 
             // read in
-            DuplicationDetectionProperties properties =
-                new DuplicationDetectionProperties();
+            DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
             try (
                 InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(
                         propertyFilePath
                     );
-                InputStreamReader reader = new InputStreamReader(
-                    is,
-                    StandardCharsets.UTF_8
-                )
+                InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)
             ) {
                 properties.load(reader);
             } catch (IOException e) {
@@ -131,9 +121,7 @@ class LocalizationConsistencyTest {
     @Test
     void languageKeysShouldNotContainUnderscoresForSpaces() throws IOException {
         final List<LocalizationEntry> quotedEntries = LocalizationParser
-            .findLocalizationParametersStringsInJavaFiles(
-                LocalizationBundleForTest.LANG
-            )
+            .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
             .stream()
             .filter(key -> key.getKey().contains("\\_"))
             .collect(Collectors.toList());
@@ -144,9 +132,7 @@ class LocalizationConsistencyTest {
             "Please correct the following entries:\n" +
             quotedEntries
                 .stream()
-                .map(key ->
-                    String.format("\n%s (%s)\n", key.getKey(), key.getPath())
-                )
+                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
                 .toList()
         );
     }
@@ -154,13 +140,9 @@ class LocalizationConsistencyTest {
     @Test
     void languageKeysShouldNotContainHtmlBrAndHtmlP() throws IOException {
         final List<LocalizationEntry> entriesWithHtml = LocalizationParser
-            .findLocalizationParametersStringsInJavaFiles(
-                LocalizationBundleForTest.LANG
-            )
+            .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
             .stream()
-            .filter(key ->
-                key.getKey().contains("<br>") || key.getKey().contains("<p>")
-            )
+            .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
             .collect(Collectors.toList());
         assertEquals(
             Collections.emptyList(),
@@ -169,9 +151,7 @@ class LocalizationConsistencyTest {
             "Please correct the following entries:\n" +
             entriesWithHtml
                 .stream()
-                .map(key ->
-                    String.format("\n%s (%s)\n", key.getKey(), key.getPath())
-                )
+                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
                 .toList()
         );
     }
@@ -211,9 +191,7 @@ class LocalizationConsistencyTest {
 
     @Test
     void findObsoleteLocalizationKeys() throws IOException {
-        Set<String> obsoleteKeys = LocalizationParser.findObsolete(
-            LocalizationBundleForTest.LANG
-        );
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
         assertEquals(
             Collections.emptySet(),
             obsoleteKeys,
@@ -274,12 +252,7 @@ class LocalizationConsistencyTest {
     void resourceBundleExists(Language language) {
         Path messagesPropertyFile = Path
             .of("src/main/resources")
-            .resolve(
-                Localization.RESOURCE_PREFIX +
-                "_" +
-                language.getId() +
-                ".properties"
-            );
+            .resolve(Localization.RESOURCE_PREFIX + "_" + language.getId() + ".properties");
         assertTrue(Files.exists(messagesPropertyFile));
     }
 

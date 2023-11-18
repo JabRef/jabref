@@ -25,12 +25,7 @@ public class HeaderCell extends ThreeWayMergeCell {
     private void initializeLabel() {
         label.textProperty().bind(textProperty());
         label.setPadding(
-            new Insets(
-                getPadding().getTop(),
-                getPadding().getRight(),
-                getPadding().getBottom(),
-                16
-            )
+            new Insets(getPadding().getTop(), getPadding().getRight(), getPadding().getBottom(), 16)
         );
     }
 }

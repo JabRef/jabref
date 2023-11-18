@@ -32,9 +32,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
 
     public static final String FETCHER_NAME = "ScholarArchive";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ScholarArchiveFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScholarArchiveFetcher.class);
 
     private static final String API_URL = "https://scholar.archive.org/search";
 
@@ -51,14 +49,9 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter(
             "q",
-            new ScholarArchiveQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new ScholarArchiveQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
-        uriBuilder.addParameter(
-            "from",
-            String.valueOf(getPageSize() * pageNumber)
-        );
+        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber));
         uriBuilder.addParameter("size", String.valueOf(getPageSize()));
         uriBuilder.addParameter("format", "json");
 
@@ -101,8 +94,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
         return FETCHER_NAME;
     }
 
-    private BibEntry parseJSONtoBibtex(JSONObject jsonEntry)
-        throws ParseException {
+    private BibEntry parseJSONtoBibtex(JSONObject jsonEntry) throws ParseException {
         try {
             BibEntry entry = new BibEntry();
             EntryType entryType = StandardEntryType.InCollection;
@@ -132,29 +124,14 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
             entry.setType(entryType);
 
             entry.setField(StandardField.TITLE, biblio.optString("title"));
-            entry.setField(
-                StandardField.JOURNAL,
-                biblio.optString("container_name")
-            );
+            entry.setField(StandardField.JOURNAL, biblio.optString("container_name"));
             entry.setField(StandardField.DOI, biblio.optString("doi"));
             entry.setField(StandardField.ISSUE, biblio.optString("issue"));
-            entry.setField(
-                StandardField.LANGUAGE,
-                biblio.optString("lang_code")
-            );
-            entry.setField(
-                StandardField.PUBLISHER,
-                biblio.optString("publisher")
-            );
+            entry.setField(StandardField.LANGUAGE, biblio.optString("lang_code"));
+            entry.setField(StandardField.PUBLISHER, biblio.optString("publisher"));
 
-            entry.setField(
-                StandardField.YEAR,
-                String.valueOf(biblio.optInt("release_year"))
-            );
-            entry.setField(
-                StandardField.VOLUME,
-                String.valueOf(biblio.optInt("volume_int"))
-            );
+            entry.setField(StandardField.YEAR, String.valueOf(biblio.optInt("release_year")));
+            entry.setField(StandardField.VOLUME, String.valueOf(biblio.optInt("volume_int")));
             entry.setField(StandardField.ABSTRACT, foundAbstract);
             entry.setField(StandardField.URL, url);
 
@@ -168,9 +145,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
                 for (int i = 0; i < authors.length(); i++) {
                     authorList.add(authors.getString(i));
                 }
-                AuthorList parsedAuthors = AuthorList.parse(
-                    String.join(" and ", authorList)
-                );
+                AuthorList parsedAuthors = AuthorList.parse(String.join(" and ", authorList));
                 entry.setField(
                     StandardField.AUTHOR,
                     parsedAuthors.getAsLastFirstNamesWithAnd(false)
@@ -187,10 +162,7 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
             }
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException(
-                "ScholarArchive API JSON format has changed",
-                exception
-            );
+            throw new ParseException("ScholarArchive API JSON format has changed", exception);
         }
     }
 }

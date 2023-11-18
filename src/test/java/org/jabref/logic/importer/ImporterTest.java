@@ -38,9 +38,7 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void isRecognizedFormatWithNullForBufferedReaderThrowsException(
-        Importer format
-    ) {
+    public void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
         assertThrows(
             NullPointerException.class,
             () -> format.isRecognizedFormat((BufferedReader) null)
@@ -49,20 +47,13 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void isRecognizedFormatWithNullForStringThrowsException(
-        Importer format
-    ) {
-        assertThrows(
-            NullPointerException.class,
-            () -> format.isRecognizedFormat((String) null)
-        );
+    public void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void importDatabaseWithNullForBufferedReaderThrowsException(
-        Importer format
-    ) {
+    public void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
         assertThrows(
             NullPointerException.class,
             () -> format.importDatabase((BufferedReader) null)
@@ -71,13 +62,8 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void importDatabaseWithNullForStringThrowsException(
-        Importer format
-    ) {
-        assertThrows(
-            NullPointerException.class,
-            () -> format.importDatabase((String) null)
-        );
+    public void importDatabaseWithNullForStringThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
     @ParameterizedTest
@@ -107,9 +93,7 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getIdStripsSpecialCharactersAndConvertsToLowercase(
-        Importer format
-    ) {
+    public void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
         Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
         when(importer.getName()).thenReturn("*Test-Importer");
         assertEquals("testimporter", importer.getId());
@@ -129,10 +113,7 @@ public class ImporterTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
         return Stream.of(

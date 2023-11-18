@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class OpenOfficeFileSearch {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OpenOfficeFileSearch.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeFileSearch.class);
 
     /**
      * Detects existing installation of OpenOffice and LibreOffice.
@@ -34,45 +32,32 @@ public class OpenOfficeFileSearch {
             return programDirs
                 .stream()
                 .filter(dir ->
-                    FileUtil
-                        .find(OpenOfficePreferences.WINDOWS_EXECUTABLE, dir)
-                        .isPresent()
+                    FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, dir).isPresent()
                 )
                 .collect(Collectors.toList());
         } else if (OS.OS_X) {
             List<Path> programDirs = findOSXOpenOfficeDirs();
             return programDirs
                 .stream()
-                .filter(dir ->
-                    FileUtil
-                        .find(OpenOfficePreferences.OSX_EXECUTABLE, dir)
-                        .isPresent()
-                )
+                .filter(dir -> FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, dir).isPresent())
                 .collect(Collectors.toList());
         } else if (OS.LINUX) {
             List<Path> programDirs = findLinuxOpenOfficeDirs();
             return programDirs
                 .stream()
                 .filter(dir ->
-                    FileUtil
-                        .find(OpenOfficePreferences.LINUX_EXECUTABLE, dir)
-                        .isPresent()
+                    FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, dir).isPresent()
                 )
                 .collect(Collectors.toList());
         }
         return new ArrayList<>(0);
     }
 
-    private static List<Path> findOpenOfficeDirectories(
-        List<Path> programDirectories
-    ) {
+    private static List<Path> findOpenOfficeDirectories(List<Path> programDirectories) {
         BiPredicate<Path, BasicFileAttributes> filePredicate = (path, attr) ->
             attr.isDirectory() &&
             (path.toString().toLowerCase(Locale.ROOT).contains("openoffice") ||
-                path
-                    .toString()
-                    .toLowerCase(Locale.ROOT)
-                    .contains("libreoffice"));
+                path.toString().toLowerCase(Locale.ROOT).contains("libreoffice"));
 
         return programDirectories
             .stream()
@@ -109,9 +94,7 @@ public class OpenOfficeFileSearch {
     }
 
     private static List<Path> findOSXOpenOfficeDirs() {
-        List<Path> sourceList = Collections.singletonList(
-            Path.of("/Applications")
-        );
+        List<Path> sourceList = Collections.singletonList(Path.of("/Applications"));
 
         return findOpenOfficeDirectories(sourceList);
     }

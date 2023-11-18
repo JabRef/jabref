@@ -8,8 +8,7 @@ import org.jabref.logic.l10n.Localization;
 public class SearchTextField {
 
     public static CustomTextField create() {
-        CustomTextField textField =
-            (CustomTextField) TextFields.createClearableTextField();
+        CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
         textField.setPromptText(Localization.lang("Search") + "...");
         textField.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         textField.setId("searchField");

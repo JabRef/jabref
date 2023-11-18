@@ -27,16 +27,12 @@ class FulltextFetcherTest {
     @ParameterizedTest
     @MethodSource("fetcherProvider")
     void findFullTextRejectsNullParameter(FulltextFetcher fetcher) {
-        assertThrows(
-            NullPointerException.class,
-            () -> fetcher.findFullText(null)
-        );
+        assertThrows(NullPointerException.class, () -> fetcher.findFullText(null));
     }
 
     @ParameterizedTest
     @MethodSource("fetcherProvider")
-    void findFullTextWithEmptyEntryFindsNothing(FulltextFetcher fetcher)
-        throws Exception {
+    void findFullTextWithEmptyEntryFindsNothing(FulltextFetcher fetcher) throws Exception {
         assertEquals(Optional.empty(), fetcher.findFullText(new BibEntry()));
     }
 }

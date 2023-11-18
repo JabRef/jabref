@@ -55,17 +55,9 @@ public class SearchFieldRightClickMenu {
                 new SeparatorMenuItem(),
                 factory.createMenuItem(
                     StandardActions.SELECT_ALL,
-                    new EditAction(
-                        StandardActions.SELECT_ALL,
-                        null,
-                        stateManager
-                    )
+                    new EditAction(StandardActions.SELECT_ALL, null, stateManager)
                 ),
-                createSearchFromHistorySubMenu(
-                    factory,
-                    stateManager,
-                    searchField
-                )
+                createSearchFromHistorySubMenu(factory, stateManager, searchField)
             );
 
         return contextMenu;
@@ -82,9 +74,7 @@ public class SearchFieldRightClickMenu {
 
         int num = stateManager.getLastSearchHistory(10).size();
         if (num == 0) {
-            MenuItem item = new MenuItem(
-                Localization.lang("your search history is empty")
-            );
+            MenuItem item = new MenuItem(Localization.lang("your search history is empty"));
             searchFromHistorySubMenu.getItems().addAll(item);
         } else {
             for (int i = 0; i < num; i++) {
@@ -94,11 +84,7 @@ public class SearchFieldRightClickMenu {
                     new SimpleCommand() {
                         @Override
                         public void execute() {
-                            searchField.setText(
-                                stateManager
-                                    .getLastSearchHistory(10)
-                                    .get(finalI)
-                            );
+                            searchField.setText(stateManager.getLastSearchHistory(10).get(finalI));
                         }
                     }
                 );
@@ -113,9 +99,7 @@ public class SearchFieldRightClickMenu {
                     }
                 }
             );
-            searchFromHistorySubMenu
-                .getItems()
-                .addAll(new SeparatorMenuItem(), clear);
+            searchFromHistorySubMenu.getItems().addAll(new SeparatorMenuItem(), clear);
         }
         return searchFromHistorySubMenu;
     }

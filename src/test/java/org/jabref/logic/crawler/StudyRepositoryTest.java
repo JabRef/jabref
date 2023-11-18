@@ -42,8 +42,7 @@ import org.mockito.Answers;
 
 class StudyRepositoryTest {
 
-    private static final String NON_EXISTING_DIRECTORY =
-        "nonExistingTestRepositoryDirectory";
+    private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
     CitationKeyPatternPreferences citationKeyPatternPreferences;
     PreferencesService preferencesService;
     LibraryPreferences libraryPreferences;
@@ -55,31 +54,20 @@ class StudyRepositoryTest {
     Path tempRepositoryDirectory;
 
     StudyRepository studyRepository;
-    SlrGitHandler gitHandler = mock(
-        SlrGitHandler.class,
-        Answers.RETURNS_DEFAULTS
-    );
+    SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
-    String hashCodeCloudComputing = String.valueOf(
-        "Cloud Computing".hashCode()
-    );
-    String hashCodeSoftwareEngineering = String.valueOf(
-        "\"Software Engineering\"".hashCode()
-    );
+    String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
+    String hashCodeSoftwareEngineering = String.valueOf("\"Software Engineering\"".hashCode());
 
     /**
      * Set up mocks
      */
     @BeforeEach
     public void setUpMocks() throws Exception {
-        libraryPreferences =
-            mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        saveConfiguration =
-            mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        preferencesService =
-            mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         citationKeyPatternPreferences =
             new CitationKeyPatternPreferences(
                 false,
@@ -97,12 +85,8 @@ class StudyRepositoryTest {
             .thenReturn(citationKeyPatternPreferences);
         when(preferencesService.getImporterPreferences().getApiKeys())
             .thenReturn(FXCollections.emptyObservableSet());
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
-        when(preferencesService.getImportFormatPreferences())
-            .thenReturn(importFormatPreferences);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferencesService.getTimestampPreferences().getTimestampField())
             .then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
@@ -136,10 +120,7 @@ class StudyRepositoryTest {
         // When repository is instantiated the directory structure is created
         assertTrue(
             Files.exists(
-                Path.of(
-                    tempRepositoryDirectory.toString(),
-                    hashCodeQuantum + " - Quantum"
-                )
+                Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")
             )
         );
         assertTrue(
@@ -261,15 +242,11 @@ class StudyRepositoryTest {
 
         assertEquals(
             getArXivQuantumMockResults(),
-            getTestStudyRepository()
-                .getFetcherResultEntries("Quantum", "ArXiv")
-                .getEntries()
+            getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries()
         );
         assertEquals(
             getSpringerQuantumMockResults(),
-            getTestStudyRepository()
-                .getFetcherResultEntries("Quantum", "Springer")
-                .getEntries()
+            getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries()
         );
         assertEquals(
             getSpringerCloudComputingMockResults(),
@@ -292,15 +269,11 @@ class StudyRepositoryTest {
         // All Springer results are duplicates for "Quantum"
         assertEquals(
             expected,
-            getTestStudyRepository()
-                .getQueryResultEntries("Quantum")
-                .getEntries()
+            getTestStudyRepository().getQueryResultEntries("Quantum").getEntries()
         );
         assertEquals(
             getSpringerCloudComputingMockResults(),
-            getTestStudyRepository()
-                .getQueryResultEntries("Cloud Computing")
-                .getEntries()
+            getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries()
         );
     }
 
@@ -310,9 +283,7 @@ class StudyRepositoryTest {
         studyRepository.persist(mockResults);
         assertEquals(
             new HashSet<>(getNonDuplicateBibEntryResult().getEntries()),
-            new HashSet<>(
-                getTestStudyRepository().getStudyResultEntries().getEntries()
-            )
+            new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries())
         );
     }
 
@@ -337,8 +308,7 @@ class StudyRepositoryTest {
             StudyRepository.STUDY_DEFINITION_FILE_NAME
         );
         URL studyDefinition =
-            this.getClass()
-                .getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+            this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 
@@ -351,41 +321,21 @@ class StudyRepositoryTest {
             tempRepositoryDirectory.toString(),
             hashCodeQuantum + " - Quantum"
         );
-        Path resultFileLocation = Path.of(
-            queryDirectory.toString(),
-            "ArXiv" + ".bib"
-        );
+        Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXiv" + ".bib");
         URL resultFile = this.getClass().getResource("ArXivQuantumMock.bib");
-        FileUtil.copyFile(
-            Path.of(resultFile.toURI()),
-            resultFileLocation,
-            true
-        );
-        resultFileLocation =
-            Path.of(queryDirectory.toString(), "Springer" + ".bib");
+        FileUtil.copyFile(Path.of(resultFile.toURI()), resultFileLocation, true);
+        resultFileLocation = Path.of(queryDirectory.toString(), "Springer" + ".bib");
         resultFile = this.getClass().getResource("SpringerQuantumMock.bib");
-        FileUtil.copyFile(
-            Path.of(resultFile.toURI()),
-            resultFileLocation,
-            true
-        );
+        FileUtil.copyFile(Path.of(resultFile.toURI()), resultFileLocation, true);
     }
 
     private BibDatabase getNonDuplicateBibEntryResult() {
-        BibDatabase mockResults = new BibDatabase(
-            getSpringerCloudComputingMockResults()
-        );
+        BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
         DatabaseMerger merger = new DatabaseMerger(
             importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
         );
-        merger.merge(
-            mockResults,
-            new BibDatabase(getSpringerQuantumMockResults())
-        );
-        merger.merge(
-            mockResults,
-            new BibDatabase(getArXivQuantumMockResults())
-        );
+        merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
+        merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;
     }
 
@@ -395,25 +345,18 @@ class StudyRepositoryTest {
             List.of(
                 new FetchResult(
                     "ArXiv",
-                    new BibDatabase(
-                        stripCitationKeys(getArXivQuantumMockResults())
-                    )
+                    new BibDatabase(stripCitationKeys(getArXivQuantumMockResults()))
                 ),
                 new FetchResult(
                     "Springer",
-                    new BibDatabase(
-                        stripCitationKeys(getSpringerQuantumMockResults())
-                    )
+                    new BibDatabase(stripCitationKeys(getSpringerQuantumMockResults()))
                 )
             )
         );
         QueryResult resultCloudComputing = new QueryResult(
             "Cloud Computing",
             List.of(
-                new FetchResult(
-                    "Springer",
-                    new BibDatabase(getSpringerCloudComputingMockResults())
-                )
+                new FetchResult("Springer", new BibDatabase(getSpringerCloudComputingMockResults()))
             )
         );
         return List.of(resultQuantum, resultCloudComputing);
@@ -502,10 +445,7 @@ class StudyRepositoryTest {
         entry1.setType(StandardEntryType.Article);
         BibEntry entry2 = new BibEntry()
             .withCitationKey("Rangras")
-            .withField(
-                StandardField.AUTHOR,
-                "Rangras, Jimit and Bhavsar, Sejal"
-            )
+            .withField(StandardField.AUTHOR, "Rangras, Jimit and Bhavsar, Sejal")
             .withField(
                 StandardField.TITLE,
                 "Design of Framework for Disaster Recovery in Cloud Computing"

@@ -9,8 +9,7 @@ import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-public class PreamblePropertiesView
-    extends AbstractPropertiesTabView<PreamblePropertiesViewModel> {
+public class PreamblePropertiesView extends AbstractPropertiesTabView<PreamblePropertiesViewModel> {
 
     @FXML
     private TextArea preamble;
@@ -30,8 +29,7 @@ public class PreamblePropertiesView
     }
 
     public void initialize() {
-        this.viewModel =
-            new PreamblePropertiesViewModel(databaseContext, undoManager);
+        this.viewModel = new PreamblePropertiesViewModel(databaseContext, undoManager);
 
         preamble.textProperty().bindBidirectional(viewModel.preambleProperty());
     }

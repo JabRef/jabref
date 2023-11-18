@@ -33,9 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class MetaDataSerializerTest {
 
-    private static final EntryType CUSTOM_TYPE = new UnknownEntryType(
-        "customType"
-    );
+    private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
 
     private MetaData metaData;
     private GlobalCitationKeyPattern pattern;
@@ -48,9 +46,7 @@ public class MetaDataSerializerTest {
         newCustomType =
             new BibEntryType(
                 CUSTOM_TYPE,
-                List.of(
-                    new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)
-                ),
+                List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
                 Collections.emptySet()
             );
     }
@@ -68,10 +64,7 @@ public class MetaDataSerializerTest {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(
             true,
             Collections.singletonList(
-                new FieldFormatterCleanup(
-                    StandardField.TITLE,
-                    new LowerCaseFormatter()
-                )
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())
             )
         );
         metaData.setSaveActions(saveActions);
@@ -89,22 +82,12 @@ public class MetaDataSerializerTest {
 
     @Test
     public void serializeSingleContentSelectors() {
-        List<String> values = List.of(
-            "approved",
-            "captured",
-            "received",
-            "status"
-        );
+        List<String> values = List.of("approved", "captured", "received", "status");
 
-        metaData.addContentSelector(
-            new ContentSelector(StandardField.PUBSTATE, values)
-        );
+        metaData.addContentSelector(new ContentSelector(StandardField.PUBSTATE, values));
 
         Map<String, String> expectedSerialization = new TreeMap<>();
-        expectedSerialization.put(
-            "selector_pubstate",
-            "approved;captured;received;status;"
-        );
+        expectedSerialization.put("selector_pubstate", "approved;captured;received;status;");
         assertEquals(
             expectedSerialization,
             MetaDataSerializer.getSerializedStringMap(metaData, pattern)
@@ -113,12 +96,8 @@ public class MetaDataSerializerTest {
 
     @Test
     void testParsingEmptyOrFieldsReturnsEmptyCollections() {
-        String serialized = MetaDataSerializer.serializeCustomEntryTypes(
-            newCustomType
-        );
-        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(
-            serialized
-        );
+        String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
+        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getRequiredFields());
     }
 
@@ -131,12 +110,8 @@ public class MetaDataSerializerTest {
                 Collections.singleton(new OrFields(StandardField.AUTHOR))
             );
 
-        String serialized = MetaDataSerializer.serializeCustomEntryTypes(
-            newCustomType
-        );
-        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(
-            serialized
-        );
+        String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
+        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getOptionalFields());
     }
 
@@ -148,10 +123,7 @@ public class MetaDataSerializerTest {
             Arguments.of(
                 new BibEntryTypeBuilder()
                     .withType(new UnknownEntryType("test"))
-                    .withRequiredFields(
-                        StandardField.AUTHOR,
-                        StandardField.TITLE
-                    ),
+                    .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE),
                 "jabref-entrytype: test: req[author;title] opt[]"
             ),
             Arguments.of(
@@ -184,15 +156,10 @@ public class MetaDataSerializerTest {
 
     @ParameterizedTest
     @MethodSource
-    void serializeCustomizedEntryType(
-        BibEntryTypeBuilder bibEntryTypeBuilder,
-        String expected
-    ) {
+    void serializeCustomizedEntryType(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
         assertEquals(
             expected,
-            MetaDataSerializer.serializeCustomEntryTypes(
-                bibEntryTypeBuilder.build()
-            )
+            MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build())
         );
     }
 }

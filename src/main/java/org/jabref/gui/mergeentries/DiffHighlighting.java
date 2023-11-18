@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class DiffHighlighting {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DiffHighlighting.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiffHighlighting.class);
 
     private DiffHighlighting() {}
 
@@ -39,40 +37,28 @@ public class DiffHighlighting {
             switch (delta.getType()) {
                 case CHANGE:
                     for (String line : lines) {
-                        result.set(
-                            startPos + offset,
-                            forRemoved(line + separator)
-                        );
+                        result.set(startPos + offset, forRemoved(line + separator));
                         offset++;
                     }
                     result.set(
                         startPos + offset - 1,
-                        forRemoved(
-                            stringList.get((startPos + offset) - 1) + separator
-                        )
+                        forRemoved(stringList.get((startPos + offset) - 1) + separator)
                     );
                     result.add(
                         startPos + offset,
-                        forAdded(
-                            String.join(separator, delta.getTarget().getLines())
-                        )
+                        forAdded(String.join(separator, delta.getTarget().getLines()))
                     );
                     break;
                 case DELETE:
                     for (String line : lines) {
-                        result.set(
-                            startPos + offset,
-                            forRemoved(line + separator)
-                        );
+                        result.set(startPos + offset, forRemoved(line + separator));
                         offset++;
                     }
                     break;
                 case INSERT:
                     result.add(
                         delta.getSource().getPosition(),
-                        forAdded(
-                            String.join(separator, delta.getTarget().getLines())
-                        )
+                        forAdded(String.join(separator, delta.getTarget().getLines()))
                     );
                     break;
                 default:
@@ -127,19 +113,13 @@ public class DiffHighlighting {
             switch (delta.getType()) {
                 case CHANGE:
                     for (String line : lines) {
-                        result.set(
-                            startPos + offset,
-                            forChanged(line + separator)
-                        );
+                        result.set(startPos + offset, forChanged(line + separator));
                         offset++;
                     }
                     break;
                 case DELETE:
                     for (String line : lines) {
-                        result.set(
-                            startPos + offset,
-                            forAdded(line + separator)
-                        );
+                        result.set(startPos + offset, forAdded(line + separator));
                         offset++;
                     }
                     break;

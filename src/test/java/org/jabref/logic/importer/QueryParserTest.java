@@ -60,9 +60,7 @@ public class QueryParserTest {
     @Test
     public void convertAlphabeticallyFirstJournalField() {
         ComplexSearchQuery searchQuery = parser
-            .parseQueryStringIntoComplexQuery(
-                "journal:Nature journal:\"Complex Networks\""
-            )
+            .parseQueryStringIntoComplexQuery("journal:Nature journal:\"Complex Networks\"")
             .get();
         ComplexSearchQuery expectedQuery = ComplexSearchQuery
             .builder()
@@ -73,13 +71,8 @@ public class QueryParserTest {
 
     @Test
     public void convertYearField() {
-        ComplexSearchQuery searchQuery = parser
-            .parseQueryStringIntoComplexQuery("year:2015")
-            .get();
-        ComplexSearchQuery expectedQuery = ComplexSearchQuery
-            .builder()
-            .singleYear(2015)
-            .build();
+        ComplexSearchQuery searchQuery = parser.parseQueryStringIntoComplexQuery("year:2015").get();
+        ComplexSearchQuery expectedQuery = ComplexSearchQuery.builder().singleYear(2015).build();
         assertEquals(expectedQuery, searchQuery);
     }
 
@@ -88,10 +81,7 @@ public class QueryParserTest {
         ComplexSearchQuery searchQuery = parser
             .parseQueryStringIntoComplexQuery("year:2015 year:2014")
             .get();
-        ComplexSearchQuery expectedQuery = ComplexSearchQuery
-            .builder()
-            .singleYear(2014)
-            .build();
+        ComplexSearchQuery expectedQuery = ComplexSearchQuery.builder().singleYear(2014).build();
         assertEquals(expectedQuery, searchQuery);
     }
 

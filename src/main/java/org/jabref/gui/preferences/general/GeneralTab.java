@@ -103,22 +103,20 @@ public class GeneralTab
     @Inject
     private BibEntryTypesManager entryTypesManager;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
-    private final TextFormatter<Integer> fontSizeFormatter =
-        new TextFormatter<>(
-            new IntegerStringConverter(),
-            9,
-            c -> {
-                if (Pattern.matches("\\d*", c.getText())) {
-                    return c;
-                }
-                c.setText("0");
+    private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(
+        new IntegerStringConverter(),
+        9,
+        c -> {
+            if (Pattern.matches("\\d*", c.getText())) {
                 return c;
             }
-        );
+            c.setText("0");
+            return c;
+        }
+    );
 
     public GeneralTab() {
         ViewLoader.view(this).root(this).load();
@@ -142,37 +140,24 @@ public class GeneralTab
             .withText(Language::getDisplayName)
             .install(language);
         language.itemsProperty().bind(viewModel.languagesListProperty());
-        language
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedLanguageProperty());
+        language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
 
-        fontOverride
-            .selectedProperty()
-            .bindBidirectional(viewModel.fontOverrideProperty());
+        fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
 
         // Spinner does neither support alignment nor disableProperty in FXML
         fontSize.disableProperty().bind(fontOverride.selectedProperty().not());
         fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
         fontSize.setValueFactory(GeneralTabViewModel.fontSizeValueFactory);
-        fontSize
-            .getEditor()
-            .textProperty()
-            .bindBidirectional(viewModel.fontSizeProperty());
+        fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
         new ViewModelListCellFactory<ThemeTypes>()
             .withText(ThemeTypes::getDisplayName)
             .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
-        theme
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedThemeProperty());
-        themeSyncOs
-            .selectedProperty()
-            .bindBidirectional(viewModel.themeSyncOsProperty());
-        customThemePath
-            .textProperty()
-            .bindBidirectional(viewModel.customPathToThemeProperty());
+        theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
+        themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());
+        customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
         EasyBind.subscribe(
             viewModel.selectedThemeProperty(),
             theme -> {
@@ -184,30 +169,22 @@ public class GeneralTab
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
 
-        openLastStartup
-            .selectedProperty()
-            .bindBidirectional(viewModel.openLastStartupProperty());
+        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         showAdvancedHints
             .selectedProperty()
             .bindBidirectional(viewModel.showAdvancedHintsProperty());
         inspectionWarningDuplicate
             .selectedProperty()
             .bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
-        confirmDelete
-            .selectedProperty()
-            .bindBidirectional(viewModel.confirmDeleteProperty());
+        confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
 
-        collectTelemetry
-            .selectedProperty()
-            .bindBidirectional(viewModel.collectTelemetryProperty());
+        collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
 
         new ViewModelListCellFactory<BibDatabaseMode>()
             .withText(BibDatabaseMode::getFormattedName)
             .install(biblatexMode);
         biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
-        biblatexMode
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedBiblatexModeProperty());
+        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 
         alwaysReformatBib
             .selectedProperty()
@@ -229,48 +206,29 @@ public class GeneralTab
         );
         actionFactory.configureIconButton(
             StandardActions.HELP,
-            new HelpAction(
-                HelpFile.REMOTE,
-                dialogService,
-                preferencesService.getFilePreferences()
-            ),
+            new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()),
             remoteHelp
         );
 
-        createBackup
-            .selectedProperty()
-            .bindBidirectional(viewModel.createBackupProperty());
-        backupDirectory
-            .textProperty()
-            .bindBidirectional(viewModel.backupDirectoryProperty());
-        backupDirectory
-            .disableProperty()
-            .bind(viewModel.createBackupProperty().not());
+        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
+        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(
                 viewModel.remotePortValidationStatus(),
                 remotePort
             );
-            validationVisualizer.initVisualization(
-                viewModel.fontSizeValidationStatus(),
-                fontSize
-            );
+            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(
                 viewModel.customPathToThemeValidationStatus(),
                 customThemePath
             );
         });
 
-        remoteServer
-            .selectedProperty()
-            .bindBidirectional(viewModel.remoteServerProperty());
-        remotePort
-            .textProperty()
-            .bindBidirectional(viewModel.remotePortProperty());
-        remotePort
-            .disableProperty()
-            .bind(remoteServer.selectedProperty().not());
+        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
+        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
+        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
     }
 
     @FXML

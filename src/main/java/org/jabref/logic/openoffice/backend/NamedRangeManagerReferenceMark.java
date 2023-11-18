@@ -31,18 +31,13 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
     }
 
     @Override
-    public List<String> getUsedNames(XTextDocument doc)
-        throws NoDocumentException {
+    public List<String> getUsedNames(XTextDocument doc) throws NoDocumentException {
         return UnoReferenceMark.getListOfNames(doc);
     }
 
     @Override
-    public Optional<NamedRange> getNamedRangeFromDocument(
-        XTextDocument doc,
-        String refMarkName
-    ) throws NoDocumentException, WrappedTargetException {
-        return NamedRangeReferenceMark
-            .getFromDocument(doc, refMarkName)
-            .map(x -> x);
+    public Optional<NamedRange> getNamedRangeFromDocument(XTextDocument doc, String refMarkName)
+        throws NoDocumentException, WrappedTargetException {
+        return NamedRangeReferenceMark.getFromDocument(doc, refMarkName).map(x -> x);
     }
 }

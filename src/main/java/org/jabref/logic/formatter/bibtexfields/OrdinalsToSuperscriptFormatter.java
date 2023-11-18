@@ -17,8 +17,7 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
         Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
     );
 
-    private static final String SUPERSCRIPT_REPLACE_PATTERN =
-        "$1\\\\textsuperscript{$2}";
+    private static final String SUPERSCRIPT_REPLACE_PATTERN = "$1\\\\textsuperscript{$2}";
 
     @Override
     public String getName() {

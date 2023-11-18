@@ -32,9 +32,7 @@ public class MSBibDatabase {
         "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MSBibDatabase.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MSBibDatabase.class);
 
     private Set<MSBibEntry> entries;
 
@@ -55,10 +53,7 @@ public class MSBibDatabase {
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
-            var resolvedEntries = database.resolveForStrings(
-                database.getEntries(),
-                false
-            );
+            var resolvedEntries = database.resolveForStrings(database.getEntries(), false);
             addEntriesForExport(resolvedEntries);
         } else {
             var resolvedEntries = database.resolveForStrings(entries, false);
@@ -75,8 +70,7 @@ public class MSBibDatabase {
         entries = new HashSet<>();
         Document inputDocument;
         try {
-            DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
@@ -84,10 +78,7 @@ public class MSBibDatabase {
             LOGGER.warn("Could not parse document", e);
             return Collections.emptyList();
         }
-        NodeList rootList = inputDocument.getElementsByTagNameNS(
-            "*",
-            "Sources"
-        );
+        NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         if (rootList.getLength() == 0) {
             rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         }
@@ -96,8 +87,7 @@ public class MSBibDatabase {
             return bibitems;
         }
 
-        NodeList sourceList =
-            ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
+        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
             MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i));
             entries.add(entry);
@@ -123,21 +113,13 @@ public class MSBibDatabase {
     public Document getDomForExport() {
         Document document = null;
         try {
-            DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             document = documentBuilder.newDocument();
 
-            Element rootNode = document.createElementNS(
-                NAMESPACE,
-                PREFIX + "Sources"
-            );
-            rootNode.setAttributeNS(
-                "http://www.w3.org/2000/xmlns/",
-                "xmlns",
-                NAMESPACE
-            );
+            Element rootNode = document.createElementNS(NAMESPACE, PREFIX + "Sources");
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
             rootNode.setAttributeNS(
                 "http://www.w3.org/2000/xmlns/",
                 "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1),

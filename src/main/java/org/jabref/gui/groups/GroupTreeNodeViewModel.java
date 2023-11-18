@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class GroupTreeNodeViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        GroupTreeNodeViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
 
     private final GroupTreeNode node;
 
@@ -59,22 +57,14 @@ public class GroupTreeNodeViewModel {
         String shortDescription = "";
         boolean showDynamic = true;
         if (group instanceof ExplicitGroup explicitGroup) {
-            shortDescription =
-                GroupDescriptions.getShortDescriptionExplicitGroup(
-                    explicitGroup
-                );
+            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
         } else if (group instanceof KeywordGroup keywordGroup) {
             shortDescription =
-                GroupDescriptions.getShortDescriptionKeywordGroup(
-                    keywordGroup,
-                    showDynamic
-                );
+                GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);
         } else if (group instanceof SearchGroup searchGroup) {
-            shortDescription =
-                GroupDescriptions.getShortDescription(searchGroup, showDynamic);
+            shortDescription = GroupDescriptions.getShortDescription(searchGroup, showDynamic);
         } else {
-            shortDescription =
-                GroupDescriptions.getShortDescriptionAllEntriesGroup();
+            shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
         }
         return "<html>" + shortDescription + "</html>";
     }
@@ -97,10 +87,7 @@ public class GroupTreeNodeViewModel {
         getNode()
             .sortChildren(
                 (node1, node2) ->
-                    node1
-                        .getGroup()
-                        .getName()
-                        .compareToIgnoreCase(node2.getGroup().getName()),
+                    node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
                 recursive
             );
     }
@@ -160,10 +147,7 @@ public class GroupTreeNodeViewModel {
         );
     }
 
-    public void changeEntriesTo(
-        List<BibEntry> entries,
-        UndoManager undoManager
-    ) {
+    public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
         AbstractGroup group = node.getGroup();
         List<FieldChange> changesRemove = new ArrayList<>();
         List<FieldChange> changesAdd = new ArrayList<>();
@@ -194,25 +178,17 @@ public class GroupTreeNodeViewModel {
 
         // Remember undo information
         if (!changesRemove.isEmpty()) {
-            AbstractUndoableEdit undoRemove =
-                UndoableChangeEntriesOfGroup.getUndoableEdit(
-                    this,
-                    changesRemove
-                );
+            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(
+                this,
+                changesRemove
+            );
             if (!changesAdd.isEmpty() && (undoRemove != null)) {
                 // we removed and added entries
-                undoRemove.addEdit(
-                    UndoableChangeEntriesOfGroup.getUndoableEdit(
-                        this,
-                        changesAdd
-                    )
-                );
+                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
             }
             undoManager.addEdit(undoRemove);
         } else if (!changesAdd.isEmpty()) {
-            undoManager.addEdit(
-                UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd)
-            );
+            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
         }
     }
 
@@ -224,10 +200,7 @@ public class GroupTreeNodeViewModel {
         return getNode().getGroup() instanceof AllEntriesGroup;
     }
 
-    public void addNewGroup(
-        AbstractGroup newGroup,
-        CountingUndoManager undoManager
-    ) {
+    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
         GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
         this.getNode().addChild(newNode);
 
@@ -246,9 +219,7 @@ public class GroupTreeNodeViewModel {
         return node.addEntriesToGroup(entries);
     }
 
-    public void subscribeToDescendantChanged(
-        Consumer<GroupTreeNodeViewModel> subscriber
-    ) {
+    public void subscribeToDescendantChanged(Consumer<GroupTreeNodeViewModel> subscriber) {
         getNode()
             .subscribeToDescendantChanged(node ->
                 subscriber.accept(new GroupTreeNodeViewModel(node))

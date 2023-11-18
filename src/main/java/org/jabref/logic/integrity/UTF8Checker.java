@@ -39,9 +39,7 @@ public class UTF8Checker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
-            boolean utfOnly = UTF8EncodingChecker(
-                field.getValue().getBytes(charset)
-            );
+            boolean utfOnly = UTF8EncodingChecker(field.getValue().getBytes(charset));
             if (!utfOnly) {
                 results.add(
                     new IntegrityMessage(

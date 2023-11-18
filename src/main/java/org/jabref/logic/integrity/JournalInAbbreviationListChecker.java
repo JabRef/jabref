@@ -19,8 +19,7 @@ public class JournalInAbbreviationListChecker implements EntryChecker {
         JournalAbbreviationRepository abbreviationRepository
     ) {
         this.field = Objects.requireNonNull(field);
-        this.abbreviationRepository =
-            Objects.requireNonNull(abbreviationRepository);
+        this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
     }
 
     @Override

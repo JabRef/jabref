@@ -40,11 +40,7 @@ public class CompositeFormatTest {
             f.format("John Flynn and Sabine Gartska")
         );
         assertEquals(
-            second.format(
-                first.format(
-                    "Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"
-                )
-            ),
+            second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")),
             f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")
         );
     }

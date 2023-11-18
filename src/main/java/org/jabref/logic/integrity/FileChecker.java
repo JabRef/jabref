@@ -17,10 +17,7 @@ public class FileChecker implements ValueChecker {
     private final BibDatabaseContext context;
     private final FilePreferences filePreferences;
 
-    public FileChecker(
-        BibDatabaseContext context,
-        FilePreferences filePreferences
-    ) {
+    public FileChecker(BibDatabaseContext context, FilePreferences filePreferences) {
         this.context = context;
         this.filePreferences = filePreferences;
     }
@@ -40,11 +37,7 @@ public class FileChecker implements ValueChecker {
         for (LinkedFile file : linkedFiles) {
             Optional<Path> linkedFile = file.findIn(context, filePreferences);
             if ((!linkedFile.isPresent()) || !Files.exists(linkedFile.get())) {
-                return Optional.of(
-                    Localization.lang(
-                        "link should refer to a correct file path"
-                    )
-                );
+                return Optional.of(Localization.lang("link should refer to a correct file path"));
             }
         }
 

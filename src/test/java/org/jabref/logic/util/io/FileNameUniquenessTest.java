@@ -18,8 +18,7 @@ public class FileNameUniquenessTest {
     protected Path tempDir;
 
     @Test
-    public void testGetNonOverWritingFileNameReturnsSameName()
-        throws IOException {
+    public void testGetNonOverWritingFileNameReturnsSameName() throws IOException {
         assertFalse(Files.exists(tempDir.resolve("sameFile.txt")));
 
         String outputFileName = FileNameUniqueness.getNonOverWritingFileName(
@@ -30,8 +29,7 @@ public class FileNameUniquenessTest {
     }
 
     @Test
-    public void testGetNonOverWritingFileNameReturnsUniqueNameOver1Conflict()
-        throws IOException {
+    public void testGetNonOverWritingFileNameReturnsUniqueNameOver1Conflict() throws IOException {
         Path dummyFilePath1 = tempDir.resolve("differentFile.txt");
 
         Files.createFile(dummyFilePath1);
@@ -44,8 +42,7 @@ public class FileNameUniquenessTest {
     }
 
     @Test
-    public void testGetNonOverWritingFileNameReturnsUniqueNameOverNConflicts()
-        throws IOException {
+    public void testGetNonOverWritingFileNameReturnsUniqueNameOverNConflicts() throws IOException {
         Path dummyFilePath1 = tempDir.resolve("manyfiles.txt");
         Path dummyFilePath2 = tempDir.resolve("manyfiles (1).txt");
 
@@ -93,16 +90,14 @@ public class FileNameUniquenessTest {
     }
 
     @Test
-    public void testTaseDuplicateMarksReturnsOrignalFileName1()
-        throws IOException {
+    public void testTaseDuplicateMarksReturnsOrignalFileName1() throws IOException {
         String fileName1 = "abc def (1)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc def", fileName2);
     }
 
     @Test
-    public void testTaseDuplicateMarksReturnsOrignalFileName2()
-        throws IOException {
+    public void testTaseDuplicateMarksReturnsOrignalFileName2() throws IOException {
         String fileName1 = "abc (def) gh (1)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc (def) gh", fileName2);

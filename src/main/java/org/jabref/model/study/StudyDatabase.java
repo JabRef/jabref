@@ -51,9 +51,7 @@ public class StudyDatabase {
         if (isEnabled() != that.isEnabled()) {
             return false;
         }
-        return getName() != null
-            ? getName().equals(that.getName())
-            : that.getName() == null;
+        return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
     }
 
     @Override
@@ -65,14 +63,6 @@ public class StudyDatabase {
 
     @Override
     public String toString() {
-        return (
-            "LibraryEntry{" +
-            "name='" +
-            name +
-            '\'' +
-            ", enabled=" +
-            enabled +
-            '}'
-        );
+        return ("LibraryEntry{" + "name='" + name + '\'' + ", enabled=" + enabled + '}');
     }
 }

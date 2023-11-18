@@ -26,9 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Importer implements Comparable<Importer> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        Importer.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(Importer.class);
 
     /**
      * Check whether the source is in the correct format for this importer.
@@ -39,8 +37,7 @@ public abstract class Importer implements Comparable<Importer> {
      * Thus the correct behaviour is to return false if it is certain that the file is not of the suitable type, and
      * true otherwise. Returning true is the safe choice if not certain.
      */
-    public abstract boolean isRecognizedFormat(BufferedReader input)
-        throws IOException;
+    public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
     /**
      * Check whether the source is in the correct format for this importer.
@@ -84,8 +81,7 @@ public abstract class Importer implements Comparable<Importer> {
      *
      * @param input the input to read from
      */
-    public abstract ParserResult importDatabase(BufferedReader input)
-        throws IOException;
+    public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
 
     /**
      * Parse the database in the specified file.
@@ -93,15 +89,8 @@ public abstract class Importer implements Comparable<Importer> {
      * @param filePath the path to the file which should be imported
      */
     public ParserResult importDatabase(Path filePath) throws IOException {
-        try (
-            InputStream inputStream = Files.newInputStream(
-                filePath,
-                StandardOpenOption.READ
-            )
-        ) {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(
-                inputStream
-            );
+        try (InputStream inputStream = Files.newInputStream(filePath, StandardOpenOption.READ)) {
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
             Charset charset = StandardCharsets.UTF_8;
 
@@ -119,19 +108,13 @@ public abstract class Importer implements Comparable<Importer> {
             if (parserResult.getMetaData().getMode().isEmpty()) {
                 parserResult
                     .getMetaData()
-                    .setMode(
-                        BibDatabaseModeDetection.inferMode(
-                            parserResult.getDatabase()
-                        )
-                    );
+                    .setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
             }
             return parserResult;
         }
     }
 
-    protected static Charset getCharset(
-        BufferedInputStream bufferedInputStream
-    ) {
+    protected static Charset getCharset(BufferedInputStream bufferedInputStream) {
         Charset defaultCharSet = StandardCharsets.UTF_8;
 
         // This reads the first 8000 bytes only, thus the default size of 8192 of the bufferedInputStream is OK.
@@ -145,11 +128,7 @@ public abstract class Importer implements Comparable<Importer> {
                 return defaultCharSet;
             }
 
-            if (
-                Arrays
-                    .stream(matches)
-                    .anyMatch(charset -> "ASCII".equals(charset.getName()))
-            ) {
+            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()))) {
                 return defaultCharSet;
             }
 
@@ -182,29 +161,19 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     public static BufferedReader getReader(Path filePath) throws IOException {
-        InputStream stream = Files.newInputStream(
-            filePath,
-            StandardOpenOption.READ
-        );
+        InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
 
         if (FileUtil.isBibFile(filePath)) {
             return getReader(stream);
         }
 
-        return new BufferedReader(
-            new InputStreamReader(stream, StandardCharsets.UTF_8)
-        );
+        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     }
 
     public static BufferedReader getReader(InputStream stream) {
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(
-            stream
-        );
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(stream);
         Charset charset = getCharset(bufferedInputStream);
-        InputStreamReader reader = new InputStreamReader(
-            bufferedInputStream,
-            charset
-        );
+        InputStreamReader reader = new InputStreamReader(bufferedInputStream, charset);
         return new BufferedReader(reader);
     }
 

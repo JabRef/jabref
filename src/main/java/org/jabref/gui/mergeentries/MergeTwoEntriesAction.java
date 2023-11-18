@@ -17,10 +17,7 @@ public class MergeTwoEntriesAction extends SimpleCommand {
     private final EntriesMergeResult entriesMergeResult;
     private final StateManager stateManager;
 
-    public MergeTwoEntriesAction(
-        EntriesMergeResult entriesMergeResult,
-        StateManager stateManager
-    ) {
+    public MergeTwoEntriesAction(EntriesMergeResult entriesMergeResult, StateManager stateManager) {
         this.entriesMergeResult = entriesMergeResult;
         this.stateManager = stateManager;
     }
@@ -31,10 +28,7 @@ public class MergeTwoEntriesAction extends SimpleCommand {
             return;
         }
 
-        BibDatabase database = stateManager
-            .getActiveDatabase()
-            .get()
-            .getDatabase();
+        BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
         List<BibEntry> entriesToRemove = Arrays.asList(
             entriesMergeResult.originalLeftEntry(),
             entriesMergeResult.originalRightEntry()
@@ -43,9 +37,7 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         database.insertEntry(entriesMergeResult.mergedEntry());
         database.removeEntries(entriesToRemove);
 
-        NamedCompound ce = new NamedCompound(
-            Localization.lang("Merge entries")
-        );
+        NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
         ce.addEdit(
             new UndoableInsertEntries(
                 stateManager.getActiveDatabase().get().getDatabase(),

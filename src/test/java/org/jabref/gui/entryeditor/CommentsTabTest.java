@@ -87,8 +87,7 @@ class CommentsTabTest {
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
         BibEntryType entryTypeMock = mock(BibEntryType.class);
-        when(entryTypesManager.enrich(any(), any()))
-            .thenReturn(Optional.of(entryTypeMock));
+        when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
 
         commentsTab =
             new CommentsTab(
@@ -107,8 +106,7 @@ class CommentsTabTest {
 
     @Test
     void testDetermineFieldsToShowWorksForASingleUser() {
-        final UserSpecificCommentField ownerComment =
-            new UserSpecificCommentField(ownerName);
+        final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
             .withField(StandardField.COMMENT, "Standard comment text")
@@ -121,10 +119,10 @@ class CommentsTabTest {
 
     @Test
     void testDetermineFieldsToShowWorksForMultipleUsers() {
-        final UserSpecificCommentField ownerComment =
-            new UserSpecificCommentField(ownerName);
-        final UserSpecificCommentField otherUsersComment =
-            new UserSpecificCommentField("other-user-id");
+        final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
+        final UserSpecificCommentField otherUsersComment = new UserSpecificCommentField(
+            "other-user-id"
+        );
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
             .withField(StandardField.COMMENT, "Standard comment text")
@@ -133,10 +131,7 @@ class CommentsTabTest {
 
         Set<Field> fields = commentsTab.determineFieldsToShow(entry);
 
-        assertEquals(
-            Set.of(StandardField.COMMENT, ownerComment, otherUsersComment),
-            fields
-        );
+        assertEquals(Set.of(StandardField.COMMENT, ownerComment, otherUsersComment), fields);
     }
 
     @Test

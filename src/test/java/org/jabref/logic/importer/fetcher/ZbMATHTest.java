@@ -29,10 +29,7 @@ class ZbMATHTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         fetcher = new ZbMATH(importFormatPreferences);
 
@@ -40,17 +37,11 @@ class ZbMATHTest {
         donaldsonEntry.setType(StandardEntryType.Article);
         donaldsonEntry.setCitationKey("zbMATH03800580");
         donaldsonEntry.setField(StandardField.AUTHOR, "Donaldson, S. K.");
-        donaldsonEntry.setField(
-            StandardField.JOURNAL,
-            "Journal of Differential Geometry"
-        );
+        donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
         donaldsonEntry.setField(StandardField.DOI, "10.4310/jdg/1214437665");
         donaldsonEntry.setField(StandardField.ISSN, "0022-040X");
         donaldsonEntry.setField(StandardField.LANGUAGE, "English");
-        donaldsonEntry.setField(
-            StandardField.KEYWORDS,
-            "57N13,57R10,53C05,58J99,57R65"
-        );
+        donaldsonEntry.setField(StandardField.KEYWORDS, "57N13,57R10,53C05,58J99,57R65");
         donaldsonEntry.setField(StandardField.PAGES, "279--315");
         donaldsonEntry.setField(
             StandardField.TITLE,
@@ -70,9 +61,7 @@ class ZbMATHTest {
 
     @Test
     void searchByIdFindsEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "0507.57010"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
         assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
     }
 

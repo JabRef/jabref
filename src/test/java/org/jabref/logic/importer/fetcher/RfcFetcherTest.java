@@ -31,14 +31,8 @@ public class RfcFetcherTest {
         .withField(StandardField.PUBLISHER, "RFC Editor")
         .withField(StandardField.DOI, "10.17487/RFC1945")
         .withField(StandardField.URL, "https://www.rfc-editor.org/info/rfc1945")
-        .withField(
-            StandardField.AUTHOR,
-            "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee"
-        )
-        .withField(
-            StandardField.TITLE,
-            "{Hypertext Transfer Protocol -- HTTP/1.0}"
-        )
+        .withField(StandardField.AUTHOR, "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee")
+        .withField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}")
         .withField(StandardField.PAGETOTAL, "60")
         .withField(StandardField.YEAR, "1996")
         .withField(StandardField.MONTH, "#may#")
@@ -53,8 +47,7 @@ public class RfcFetcherTest {
     }
 
     @Test
-    public void performSearchByIdFindsEntryWithDraftIdentifier()
-        throws Exception {
+    public void performSearchByIdFindsEntryWithDraftIdentifier() throws Exception {
         BibEntry bibDraftEntry = new BibEntry(StandardEntryType.TechReport)
             .withField(InternalField.KEY_FIELD, "fielding-http-spec-01")
             .withField(
@@ -62,22 +55,13 @@ public class RfcFetcherTest {
                 "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee"
             )
             .withField(StandardField.DAY, "20")
-            .withField(
-                StandardField.INSTITUTION,
-                "Internet Engineering Task Force"
-            )
+            .withField(StandardField.INSTITUTION, "Internet Engineering Task Force")
             .withField(StandardField.MONTH, "#dec#")
             .withField(StandardField.NOTE, "Work in Progress")
             .withField(StandardField.NUMBER, "draft-fielding-http-spec-01")
             .withField(StandardField.PAGETOTAL, "41")
-            .withField(
-                StandardField.PUBLISHER,
-                "Internet Engineering Task Force"
-            )
-            .withField(
-                StandardField.TITLE,
-                "{Hypertext Transfer Protocol -- HTTP/1.0}"
-            )
+            .withField(StandardField.PUBLISHER, "Internet Engineering Task Force")
+            .withField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}")
             .withField(StandardField.TYPE, "Internet-Draft")
             .withField(
                 StandardField.URL,
@@ -100,17 +84,12 @@ public class RfcFetcherTest {
 
     @ParameterizedTest
     @CsvSource({ "rfc1945", "RFC1945", "1945" })
-    public void performSearchByIdFindsEntry(String identifier)
-        throws Exception {
-        assertEquals(
-            Optional.of(bibEntry),
-            fetcher.performSearchById(identifier)
-        );
+    public void performSearchByIdFindsEntry(String identifier) throws Exception {
+        assertEquals(Optional.of(bibEntry), fetcher.performSearchById(identifier));
     }
 
     @Test
-    public void performSearchByIdFindsNothingWithoutIdentifier()
-        throws Exception {
+    public void performSearchByIdFindsNothingWithoutIdentifier() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
@@ -124,12 +103,8 @@ public class RfcFetcherTest {
             "banana",
         }
     )
-    public void performSearchByIdFindsNothingWithValidDraftIdentifier(
-        String identifier
-    ) throws Exception {
-        assertThrows(
-            FetcherClientException.class,
-            () -> fetcher.performSearchById(identifier)
-        );
+    public void performSearchByIdFindsNothingWithValidDraftIdentifier(String identifier)
+        throws Exception {
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById(identifier));
     }
 }

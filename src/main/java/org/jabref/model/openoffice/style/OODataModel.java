@@ -23,19 +23,14 @@ public enum OODataModel {
      * @param pageInfo Nullable.
      * @return JabRef60 style pageInfo list with pageInfo in the last slot.
      */
-    public static List<Optional<OOText>> fakePageInfos(
-        String pageInfo,
-        int nCitations
-    ) {
+    public static List<Optional<OOText>> fakePageInfos(String pageInfo, int nCitations) {
         List<Optional<OOText>> pageInfos = new ArrayList<>(nCitations);
         for (int i = 0; i < nCitations; i++) {
             pageInfos.add(Optional.empty());
         }
         if (pageInfo != null) {
             final int last = nCitations - 1;
-            Optional<OOText> optionalPageInfo = Optional.ofNullable(
-                OOText.fromString(pageInfo)
-            );
+            Optional<OOText> optionalPageInfo = Optional.ofNullable(OOText.fromString(pageInfo));
             pageInfos.set(last, PageInfo.normalizePageInfo(optionalPageInfo));
         }
         return pageInfos;

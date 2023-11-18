@@ -59,8 +59,7 @@ public class ExternalTab
     @FXML
     private TextField kindleEmail;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public ExternalTab() {
         ViewLoader.view(this).root(this).load();
@@ -72,8 +71,7 @@ public class ExternalTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new ExternalTabViewModel(dialogService, preferencesService);
+        this.viewModel = new ExternalTabViewModel(dialogService, preferencesService);
 
         new ViewModelListCellFactory<PushToApplication>()
             .withText(PushToApplication::getDisplayName)
@@ -87,15 +85,11 @@ public class ExternalTab
             .selectedProperty()
             .bindBidirectional(viewModel.autoOpenAttachedFoldersProperty());
 
-        pushToApplicationCombo
-            .itemsProperty()
-            .bind(viewModel.pushToApplicationsListProperty());
+        pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());
         pushToApplicationCombo
             .valueProperty()
             .bindBidirectional(viewModel.selectedPushToApplication());
-        citeCommand
-            .textProperty()
-            .bindBidirectional(viewModel.citeCommandProperty());
+        citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
 
         useCustomTerminal
             .selectedProperty()
@@ -103,12 +97,8 @@ public class ExternalTab
         customTerminalCommand
             .textProperty()
             .bindBidirectional(viewModel.customTerminalCommandProperty());
-        customTerminalCommand
-            .disableProperty()
-            .bind(useCustomTerminal.selectedProperty().not());
-        customTerminalBrowse
-            .disableProperty()
-            .bind(useCustomTerminal.selectedProperty().not());
+        customTerminalCommand.disableProperty().bind(useCustomTerminal.selectedProperty().not());
+        customTerminalBrowse.disableProperty().bind(useCustomTerminal.selectedProperty().not());
 
         useCustomFileBrowser
             .selectedProperty()
@@ -123,9 +113,7 @@ public class ExternalTab
             .disableProperty()
             .bind(useCustomFileBrowser.selectedProperty().not());
 
-        kindleEmail
-            .textProperty()
-            .bindBidirectional(viewModel.kindleEmailProperty());
+        kindleEmail.textProperty().bindBidirectional(viewModel.kindleEmailProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {

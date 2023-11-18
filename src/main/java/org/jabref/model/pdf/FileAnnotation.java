@@ -12,14 +12,11 @@ import org.slf4j.LoggerFactory;
 
 public class FileAnnotation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileAnnotation.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
 
     private static final int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
     private static final String DATE_TIME_STRING = "^D:\\d{14}$";
-    private static final String DATE_TIME_STRING_WITH_TIME_ZONE =
-        "^D:\\d{14}.+";
+    private static final String DATE_TIME_STRING_WITH_TIME_ZONE = "^D:\\d{14}.+";
     private static final String ANNOTATION_DATE_FORMAT = "yyyyMMddHHmmss";
 
     private final String author;
@@ -149,10 +146,7 @@ public class FileAnnotation {
     private String abbreviateAnnotationName(final String annotationName) {
         if (annotationName.length() > ABBREVIATED_ANNOTATION_NAME_LENGTH) {
             return (
-                annotationName
-                    .subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH)
-                    .toString() +
-                "..."
+                annotationName.subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH).toString() + "..."
             );
         }
         return annotationName;
@@ -178,10 +172,7 @@ public class FileAnnotation {
             Objects.equals(this.author, that.author) &&
             Objects.equals(this.content, that.content) &&
             Objects.equals(this.page, that.page) &&
-            Objects.equals(
-                this.linkedFileAnnotation,
-                that.linkedFileAnnotation
-            ) &&
+            Objects.equals(this.linkedFileAnnotation, that.linkedFileAnnotation) &&
             Objects.equals(this.timeModified, that.timeModified)
         );
     }

@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultLatexParser implements LatexParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DefaultLatexParser.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLatexParser.class);
     private static final String TEX_EXT = ".tex";
     private static final String BIB_EXT = ".bib";
 
@@ -48,18 +46,12 @@ public class DefaultLatexParser implements LatexParser {
 
     private static final String BIBLIOGRAPHY_GROUP = "bib";
     private static final Pattern BIBLIOGRAPHY_PATTERN = Pattern.compile(
-        String.format(
-            "\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}",
-            BIBLIOGRAPHY_GROUP
-        )
+        String.format("\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}", BIBLIOGRAPHY_GROUP)
     );
 
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
-        String.format(
-            "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}",
-            INCLUDE_GROUP
-        )
+        String.format("\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}", INCLUDE_GROUP)
     );
 
     private final LatexParserResult latexParserResult;
@@ -96,10 +88,7 @@ public class DefaultLatexParser implements LatexParser {
 
             try (
                 InputStream inputStream = Files.newInputStream(file);
-                Reader reader = new InputStreamReader(
-                    inputStream,
-                    StandardCharsets.UTF_8
-                );
+                Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                 LineNumberReader lineNumberReader = new LineNumberReader(reader)
             ) {
                 for (
@@ -162,9 +151,7 @@ public class DefaultLatexParser implements LatexParser {
         Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
 
         while (bibliographyMatch.find()) {
-            for (String bibString : bibliographyMatch
-                .group(BIBLIOGRAPHY_GROUP)
-                .split(",")) {
+            for (String bibString : bibliographyMatch.group(BIBLIOGRAPHY_GROUP).split(",")) {
                 bibString = bibString.trim();
                 Path bibFile = file
                     .getParent()
@@ -198,9 +185,7 @@ public class DefaultLatexParser implements LatexParser {
                 ? filenamePassedToInclude
                 : String.format("%s%s", filenamePassedToInclude, TEX_EXT);
             Path nestedFile = texFile.getParent().resolve(texFileName);
-            if (
-                nestedFile.toFile().exists() && !texFiles.contains(nestedFile)
-            ) {
+            if (nestedFile.toFile().exists() && !texFiles.contains(nestedFile)) {
                 referencedFiles.add(nestedFile);
             }
         }

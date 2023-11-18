@@ -55,10 +55,7 @@ public class Medra implements IdBasedParserFetcher {
         try {
             return new BibEntry(convertType(item.getString("type")))
                 .withField(StandardField.TITLE, item.getString("title"))
-                .withField(
-                    StandardField.AUTHOR,
-                    toAuthors(item.optJSONArray("author"))
-                )
+                .withField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")))
                 .withField(
                     StandardField.YEAR,
                     Optional
@@ -72,25 +69,17 @@ public class Medra implements IdBasedParserFetcher {
                 .withField(StandardField.DOI, item.getString("DOI"))
                 .withField(StandardField.PAGES, item.optString("page"))
                 .withField(StandardField.ISSN, item.optString("ISSN"))
-                .withField(
-                    StandardField.JOURNAL,
-                    item.optString("container-title")
-                )
+                .withField(StandardField.JOURNAL, item.optString("container-title"))
                 .withField(StandardField.PUBLISHER, item.optString("publisher"))
                 .withField(StandardField.URL, item.optString("URL"))
                 .withField(StandardField.VOLUME, item.optString("volume"));
         } catch (JSONException exception) {
-            throw new ParseException(
-                "mEdRA API JSON format has changed",
-                exception
-            );
+            throw new ParseException("mEdRA API JSON format has changed", exception);
         }
     }
 
     private EntryType convertType(String type) {
-        return "article-journal".equals(type)
-            ? StandardEntryType.Article
-            : StandardEntryType.Misc;
+        return "article-journal".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     private String toAuthors(JSONArray authors) {

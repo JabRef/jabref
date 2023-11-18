@@ -21,8 +21,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
         CitationKeyPatternPreferences citationKeyPatternPreferences
     ) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.citationKeyPatternPreferences =
-            Objects.requireNonNull(citationKeyPatternPreferences);
+        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
     }
 
     @Override
@@ -44,9 +43,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(
                 new IntegrityMessage(
-                    Localization.lang(
-                        "Citation key deviates from generated key"
-                    ),
+                    Localization.lang("Citation key deviates from generated key"),
                     entry,
                     InternalField.KEY_FIELD
                 )

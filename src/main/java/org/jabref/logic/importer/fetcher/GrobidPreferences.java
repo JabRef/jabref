@@ -11,11 +11,7 @@ public class GrobidPreferences {
     private final BooleanProperty grobidOptOut;
     private final StringProperty grobidURL;
 
-    public GrobidPreferences(
-        boolean grobidEnabled,
-        boolean grobidOptOut,
-        String grobidURL
-    ) {
+    public GrobidPreferences(boolean grobidEnabled, boolean grobidOptOut, String grobidURL) {
         this.grobidEnabled = new SimpleBooleanProperty(grobidEnabled);
         this.grobidOptOut = new SimpleBooleanProperty(grobidOptOut);
         this.grobidURL = new SimpleStringProperty(grobidURL);

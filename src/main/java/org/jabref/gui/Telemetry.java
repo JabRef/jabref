@@ -12,10 +12,7 @@ public class Telemetry {
         return Optional.empty();
     }
 
-    private static void start(
-        TelemetryPreferences telemetryPreferences,
-        BuildInfo buildInfo
-    ) {}
+    private static void start(TelemetryPreferences telemetryPreferences, BuildInfo buildInfo) {}
 
     public static void shutdown() {
         getTelemetryClient().ifPresent(client -> {});

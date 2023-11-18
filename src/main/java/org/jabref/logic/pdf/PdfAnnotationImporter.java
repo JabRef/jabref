@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PdfAnnotationImporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfAnnotationImporter.class);
 
     /**
      * Imports the comments from a pdf specified by its path
@@ -44,25 +42,15 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         List<FileAnnotation> annotationsList = new LinkedList<>();
         try (PDDocument document = Loader.loadPDF(path.toFile())) {
             PDPageTree pdfPages = document.getDocumentCatalog().getPages();
-            for (
-                int pageIndex = 0;
-                pageIndex < pdfPages.getCount();
-                pageIndex++
-            ) {
+            for (int pageIndex = 0; pageIndex < pdfPages.getCount(); pageIndex++) {
                 PDPage page = pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
                     if (!isSupportedAnnotationType(annotation)) {
                         continue;
                     }
 
-                    if (
-                        FileAnnotationType.isMarkedFileAnnotationType(
-                            annotation.getSubtype()
-                        )
-                    ) {
-                        annotationsList.add(
-                            createMarkedAnnotations(pageIndex, page, annotation)
-                        );
+                    if (FileAnnotationType.isMarkedFileAnnotationType(annotation.getSubtype())) {
+                        annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(
                             annotation,
@@ -87,13 +75,9 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         if (annotation.getSubtype() == null) {
             return false;
         }
-        if (
-            "Link".equals(annotation.getSubtype()) ||
-            "Widget".equals(annotation.getSubtype())
-        ) {
+        if ("Link".equals(annotation.getSubtype()) || "Widget".equals(annotation.getSubtype())) {
             LOGGER.debug(
-                annotation.getSubtype() +
-                " is excluded from the supported file annotations"
+                annotation.getSubtype() + " is excluded from the supported file annotations"
             );
             return false;
         }
@@ -101,9 +85,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             if (
                 !Arrays
                     .asList(FileAnnotationType.values())
-                    .contains(
-                        FileAnnotationType.valueOf(annotation.getSubtype())
-                    )
+                    .contains(FileAnnotationType.valueOf(annotation.getSubtype()))
             ) {
                 return false;
             }
@@ -129,46 +111,30 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
             pageIndex + 1,
             annotation.getContents(),
-            FileAnnotationType.valueOf(
-                annotation.getSubtype().toUpperCase(Locale.ROOT)
-            ),
+            FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)),
             Optional.empty()
         );
 
-        if (
-            annotationBelongingToMarking
-                .getAnnotationType()
-                .isLinkedFileAnnotationType()
-        ) {
+        if (annotationBelongingToMarking.getAnnotationType().isLinkedFileAnnotationType()) {
             try {
                 COSArray boundingBoxes = (COSArray) annotation
                     .getCOSObject()
                     .getDictionaryObject(COSName.getPDFName("QuadPoints"));
-                annotation.setContents(
-                    new TextExtractor(page, boundingBoxes).extractMarkedText()
-                );
+                annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());
             } catch (IOException e) {
-                annotation.setContents(
-                    "JabRef: Could not extract any marked text!"
-                );
+                annotation.setContents("JabRef: Could not extract any marked text!");
             }
         }
 
         // Marked text that has a sticky note on it should be linked to the sticky note
-        return new FileAnnotation(
-            annotation,
-            pageIndex + 1,
-            annotationBelongingToMarking
-        );
+        return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 
     private boolean validatePath(Path path) {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn(
-                String.format("File '%s' does not end with .pdf!", path)
-            );
+            LOGGER.warn(String.format("File '%s' does not end with .pdf!", path));
             return false;
         }
 

@@ -29,14 +29,9 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
             entry
                 .getField(oldField)
                 .ifPresent(oldValue -> {
-                    if (
-                        !oldValue.isEmpty() &&
-                        (!entry.getField(newField).isPresent())
-                    ) {
+                    if (!oldValue.isEmpty() && (!entry.getField(newField).isPresent())) {
                         // There is content in the old field and no value in the new, so just copy
-                        entry
-                            .setField(newField, oldValue)
-                            .ifPresent(changes::add);
+                        entry.setField(newField, oldValue).ifPresent(changes::add);
                         entry.clearField(oldField).ifPresent(changes::add);
                     }
                 });
@@ -47,15 +42,9 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
             entry
                 .getFieldOrAlias(StandardField.DATE)
                 .ifPresent(newDate -> {
-                    entry
-                        .setField(StandardField.DATE, newDate)
-                        .ifPresent(changes::add);
-                    entry
-                        .clearField(StandardField.YEAR)
-                        .ifPresent(changes::add);
-                    entry
-                        .clearField(StandardField.MONTH)
-                        .ifPresent(changes::add);
+                    entry.setField(StandardField.DATE, newDate).ifPresent(changes::add);
+                    entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                    entry.clearField(StandardField.MONTH).ifPresent(changes::add);
                 });
         } else {
             // If the year from date field is filled and equal to year it should be removed the year field
@@ -70,12 +59,8 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                     );
 
                     if (checkDate.equals(newDate)) {
-                        entry
-                            .clearField(StandardField.YEAR)
-                            .ifPresent(changes::add);
-                        entry
-                            .clearField(StandardField.MONTH)
-                            .ifPresent(changes::add);
+                        entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                        entry.clearField(StandardField.MONTH).ifPresent(changes::add);
                     }
                 });
         }

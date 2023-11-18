@@ -19,10 +19,7 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
-        return (
-            o instanceof AllEntriesGroup aeg &&
-            Objects.equals(aeg.getName(), getName())
-        );
+        return (o instanceof AllEntriesGroup aeg && Objects.equals(aeg.getName(), getName()));
     }
 
     @Override

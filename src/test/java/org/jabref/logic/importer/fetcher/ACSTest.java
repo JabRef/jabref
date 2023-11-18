@@ -30,11 +30,7 @@ class ACSTest {
         entry.setField(StandardField.DOI, "10.1021/bk-2006-STYG.ch014");
 
         assertEquals(
-            Optional.of(
-                new URL(
-                    "https://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014"
-                )
-            ),
+            Optional.of(new URL("https://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014")),
             finder.findFullText(entry)
         );
     }

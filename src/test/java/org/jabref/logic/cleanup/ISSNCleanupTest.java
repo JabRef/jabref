@@ -36,10 +36,7 @@ public class ISSNCleanupTest {
         entry.setField(StandardField.ISSN, "0123-4567");
 
         worker.cleanup(preset, entry);
-        assertEquals(
-            Optional.of("0123-4567"),
-            entry.getField(StandardField.ISSN)
-        );
+        assertEquals(Optional.of("0123-4567"), entry.getField(StandardField.ISSN));
     }
 
     @Test
@@ -51,10 +48,7 @@ public class ISSNCleanupTest {
         entry.setField(StandardField.ISSN, "01234567");
 
         worker.cleanup(preset, entry);
-        assertEquals(
-            Optional.of("0123-4567"),
-            entry.getField(StandardField.ISSN)
-        );
+        assertEquals(Optional.of("0123-4567"), entry.getField(StandardField.ISSN));
     }
 
     @Test

@@ -20,8 +20,7 @@ import org.jabref.model.TreeNode;
  * Nodes with a common parent are added as direct children.
  * For example, the list { A > A1, A > A2, B } is transformed into the forest { A > A1, A2, B}.
  */
-public class TreeCollector<T>
-    implements Collector<T, ObservableList<T>, ObservableList<T>> {
+public class TreeCollector<T> implements Collector<T, ObservableList<T>, ObservableList<T>> {
 
     private Function<T, List<T>> getChildren;
     private BiConsumer<T, T> addChild;
@@ -108,9 +107,6 @@ public class TreeCollector<T>
 
     @Override
     public Set<Characteristics> characteristics() {
-        return EnumSet.of(
-            Characteristics.UNORDERED,
-            Characteristics.IDENTITY_FINISH
-        );
+        return EnumSet.of(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
     }
 }

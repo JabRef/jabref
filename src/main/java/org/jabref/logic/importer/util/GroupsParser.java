@@ -37,9 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GroupsParser {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(
-        GroupsParser.class
-    );
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GroupsParser.class);
 
     private GroupsParser() {}
 
@@ -61,9 +59,7 @@ public class GroupsParser {
 
                 int spaceIndex = string.indexOf(' ');
                 if (spaceIndex <= 0) {
-                    throw new ParseException(
-                        "Expected \"" + string + "\" to contain whitespace"
-                    );
+                    throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
                 AbstractGroup group = GroupsParser.fromString(
@@ -79,10 +75,7 @@ public class GroupsParser {
                     root = cursor;
                 } else {
                     // insert at desired location
-                    while (
-                        (level <= cursor.getLevel()) &&
-                        (cursor.getParent().isPresent())
-                    ) {
+                    while ((level <= cursor.getLevel()) && (cursor.getParent().isPresent())) {
                         cursor = cursor.getParent().get();
                     }
                     cursor.addChild(newNode);
@@ -116,40 +109,22 @@ public class GroupsParser {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return keywordGroupFromString(s, keywordSeparator);
         }
-        if (
-            s.startsWith(
-                MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID
-            )
-        ) {
+        if (s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             return allEntriesGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
             return searchGroupFromString(s);
         }
-        if (
-            s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)
-        ) {
+        if (s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
             return explicitGroupFromString(s, keywordSeparator);
         }
-        if (
-            s.startsWith(
-                MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID
-            )
-        ) {
+        if (s.startsWith(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID)) {
             return legacyExplicitGroupFromString(s, keywordSeparator);
         }
-        if (
-            s.startsWith(
-                MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID
-            )
-        ) {
+        if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID)) {
             return automaticPersonsGroupFromString(s);
         }
-        if (
-            s.startsWith(
-                MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID
-            )
-        ) {
+        if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
             return automaticKeywordGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
@@ -165,9 +140,7 @@ public class GroupsParser {
         MetaData metaData
     ) throws ParseException {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(
-            string.substring(
-                MetadataSerializationConfiguration.TEX_GROUP_ID.length()
-            ),
+            string.substring(MetadataSerializationConfiguration.TEX_GROUP_ID.length()),
             MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
             MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
         );
@@ -216,14 +189,8 @@ public class GroupsParser {
         }
     }
 
-    private static AbstractGroup automaticPersonsGroupFromString(
-        String string
-    ) {
-        if (
-            !string.startsWith(
-                MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID
-            )
-        ) {
+    private static AbstractGroup automaticPersonsGroupFromString(String string) {
+        if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID)) {
             throw new IllegalArgumentException(
                 "KeywordGroup cannot be created from \"" + string + "\"."
             );
@@ -244,28 +211,15 @@ public class GroupsParser {
             Integer.parseInt(tok.nextToken())
         );
         Field field = FieldFactory.parseField(
-            StringUtil.unquote(
-                tok.nextToken(),
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
-            )
+            StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
         );
-        AutomaticPersonsGroup newGroup = new AutomaticPersonsGroup(
-            name,
-            context,
-            field
-        );
+        AutomaticPersonsGroup newGroup = new AutomaticPersonsGroup(name, context, field);
         addGroupDetails(tok, newGroup);
         return newGroup;
     }
 
-    private static AbstractGroup automaticKeywordGroupFromString(
-        String string
-    ) {
-        if (
-            !string.startsWith(
-                MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID
-            )
-        ) {
+    private static AbstractGroup automaticKeywordGroupFromString(String string) {
+        if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
             throw new IllegalArgumentException(
                 "KeywordGroup cannot be created from \"" + string + "\"."
             );
@@ -286,22 +240,13 @@ public class GroupsParser {
             Integer.parseInt(tok.nextToken())
         );
         Field field = FieldFactory.parseField(
-            StringUtil.unquote(
-                tok.nextToken(),
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
-            )
+            StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
         );
         Character delimiter = StringUtil
-            .unquote(
-                tok.nextToken(),
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
-            )
+            .unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
             .charAt(0);
         Character hierarchicalDelimiter = StringUtil
-            .unquote(
-                tok.nextToken(),
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
-            )
+            .unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
             .charAt(0);
         AutomaticKeywordGroup newGroup = new AutomaticKeywordGroup(
             name,
@@ -319,21 +264,15 @@ public class GroupsParser {
      *
      * @param s The String representation obtained from KeywordGroup.toString()
      */
-    private static KeywordGroup keywordGroupFromString(
-        String s,
-        Character keywordSeparator
-    ) throws ParseException {
-        if (
-            !s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)
-        ) {
+    private static KeywordGroup keywordGroupFromString(String s, Character keywordSeparator)
+        throws ParseException {
+        if (!s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             throw new IllegalArgumentException(
                 "KeywordGroup cannot be created from \"" + s + "\"."
             );
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(
-            s.substring(
-                MetadataSerializationConfiguration.KEYWORD_GROUP_ID.length()
-            ),
+            s.substring(MetadataSerializationConfiguration.KEYWORD_GROUP_ID.length()),
             MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
             MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
         );
@@ -346,10 +285,7 @@ public class GroupsParser {
             Integer.parseInt(tok.nextToken())
         );
         Field field = FieldFactory.parseField(
-            StringUtil.unquote(
-                tok.nextToken(),
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
-            )
+            StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
         );
         String expression = StringUtil.unquote(
             tok.nextToken(),
@@ -359,14 +295,7 @@ public class GroupsParser {
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
         KeywordGroup newGroup;
         if (regExp) {
-            newGroup =
-                new RegexKeywordGroup(
-                    name,
-                    context,
-                    field,
-                    expression,
-                    caseSensitive
-                );
+            newGroup = new RegexKeywordGroup(name, context, field, expression, caseSensitive);
         } else {
             newGroup =
                 new WordKeywordGroup(
@@ -383,23 +312,15 @@ public class GroupsParser {
         return newGroup;
     }
 
-    private static ExplicitGroup explicitGroupFromString(
-        String input,
-        Character keywordSeparator
-    ) throws ParseException {
-        if (
-            !input.startsWith(
-                MetadataSerializationConfiguration.EXPLICIT_GROUP_ID
-            )
-        ) {
+    private static ExplicitGroup explicitGroupFromString(String input, Character keywordSeparator)
+        throws ParseException {
+        if (!input.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
             throw new IllegalArgumentException(
                 "ExplicitGroup cannot be created from \"" + input + "\"."
             );
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(
-            input.substring(
-                MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()
-            ),
+            input.substring(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()),
             MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
             MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
         );
@@ -426,19 +347,13 @@ public class GroupsParser {
         String input,
         Character keywordSeparator
     ) throws ParseException {
-        if (
-            !input.startsWith(
-                MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID
-            )
-        ) {
+        if (!input.startsWith(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID)) {
             throw new IllegalArgumentException(
                 "ExplicitGroup cannot be created from \"" + input + "\"."
             );
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(
-            input.substring(
-                MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID.length()
-            ),
+            input.substring(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID.length()),
             MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
             MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
         );
@@ -467,10 +382,7 @@ public class GroupsParser {
      *  ExplicitGroup:GroupName\;0\;Key1\;Key2\;;
      * This method exists for backwards compatibility.
      */
-    private static void addLegacyEntryKeys(
-        QuotedStringTokenizer tok,
-        ExplicitGroup group
-    ) {
+    private static void addLegacyEntryKeys(QuotedStringTokenizer tok, ExplicitGroup group) {
         while (tok.hasMoreTokens()) {
             String key = StringUtil.unquote(
                 tok.nextToken(),
@@ -481,11 +393,7 @@ public class GroupsParser {
     }
 
     private static AbstractGroup allEntriesGroupFromString(String s) {
-        if (
-            !s.startsWith(
-                MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID
-            )
-        ) {
+        if (!s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             throw new IllegalArgumentException(
                 "AllEntriesGroup cannot be created from \"" + s + "\"."
             );
@@ -500,14 +408,10 @@ public class GroupsParser {
      */
     private static AbstractGroup searchGroupFromString(String s) {
         if (!s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
-            throw new IllegalArgumentException(
-                "SearchGroup cannot be created from \"" + s + "\"."
-            );
+            throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(
-            s.substring(
-                MetadataSerializationConfiguration.SEARCH_GROUP_ID.length()
-            ),
+            s.substring(MetadataSerializationConfiguration.SEARCH_GROUP_ID.length()),
             MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
             MetadataSerializationConfiguration.GROUP_QUOTE_CHAR
         );
@@ -540,10 +444,7 @@ public class GroupsParser {
         return searchGroup;
     }
 
-    private static void addGroupDetails(
-        QuotedStringTokenizer tokenizer,
-        AbstractGroup group
-    ) {
+    private static void addGroupDetails(QuotedStringTokenizer tokenizer, AbstractGroup group) {
         if (tokenizer.hasMoreTokens()) {
             group.setExpanded(Integer.parseInt(tokenizer.nextToken()) == 1);
             group.setColor(tokenizer.nextToken());

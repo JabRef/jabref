@@ -18,11 +18,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         this(name, abbreviation, "");
     }
 
-    public Abbreviation(
-        String name,
-        String abbreviation,
-        String shortestUniqueAbbreviation
-    ) {
+    public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
         this(
             name,
             abbreviation,
@@ -41,8 +37,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         this.name = name.intern();
         this.abbreviation = abbreviation.intern();
         this.dotlessAbbreviation = dotlessAbbreviation.intern();
-        this.shortestUniqueAbbreviation =
-            shortestUniqueAbbreviation.trim().intern();
+        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim().intern();
     }
 
     public String getName() {
@@ -78,14 +73,12 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
             return nameComparison;
         }
 
-        int abbreviationComparison = getAbbreviation()
-            .compareTo(toCompare.getAbbreviation());
+        int abbreviationComparison = getAbbreviation().compareTo(toCompare.getAbbreviation());
         if (abbreviationComparison != 0) {
             return abbreviationComparison;
         }
 
-        return getShortestUniqueAbbreviation()
-            .compareTo(toCompare.getShortestUniqueAbbreviation());
+        return getShortestUniqueAbbreviation().compareTo(toCompare.getShortestUniqueAbbreviation());
     }
 
     public String getNext(String current) {
@@ -130,17 +123,12 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         return (
             getName().equals(that.getName()) &&
             getAbbreviation().equals(that.getAbbreviation()) &&
-            getShortestUniqueAbbreviation()
-                .equals(that.getShortestUniqueAbbreviation())
+            getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation())
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            getName(),
-            getAbbreviation(),
-            getShortestUniqueAbbreviation()
-        );
+        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation());
     }
 }

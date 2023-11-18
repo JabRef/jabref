@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UndoableRemoveString.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveString.class);
     private final BibDatabase base;
     private final BibtexString string;
 
@@ -23,10 +21,7 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang(
-            "remove string %0",
-            StringUtil.boldHTML(string.toString())
-        );
+        return Localization.lang("remove string %0", StringUtil.boldHTML(string.toString()));
     }
 
     @Override

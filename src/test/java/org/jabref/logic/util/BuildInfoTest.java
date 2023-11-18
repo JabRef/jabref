@@ -15,9 +15,7 @@ public class BuildInfoTest {
 
     @Test
     public void testFileImport() {
-        BuildInfo buildInfo = new BuildInfo(
-            "/org/jabref/util/build.properties"
-        );
+        BuildInfo buildInfo = new BuildInfo("/org/jabref/util/build.properties");
         assertEquals("42", buildInfo.version.getFullVersion());
     }
 

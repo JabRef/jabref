@@ -35,8 +35,7 @@ public class ContentSelectorViewModelTest {
     @BeforeEach
     void setUp() {
         databaseContext = new BibDatabaseContext();
-        viewModel =
-            new ContentSelectorViewModel(databaseContext, dialogService);
+        viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
         viewModel.setValues();
     }
 
@@ -160,10 +159,7 @@ public class ContentSelectorViewModelTest {
         when(
             dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove keyword"),
-                Localization.lang(
-                    "Are you sure you want to remove keyword: \"%0\"?",
-                    keyword
-                )
+                Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keyword)
             )
         )
             .thenReturn(true);

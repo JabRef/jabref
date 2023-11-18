@@ -31,20 +31,14 @@ public class TitleCheckerTest {
         @MethodSource("validTitle")
         void titleShouldNotRaiseWarning(String message, String title) {
             assertEquals(Optional.empty(), checker.checkValue(title));
-            assertEquals(
-                Optional.empty(),
-                checker.checkValue(translatedTitle(title))
-            );
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
         }
 
         @ParameterizedTest(name = "{index}. Title: \"{1}\" {0}")
         @MethodSource("invalidTitle")
         void titleShouldRaiseWarning(String message, String title) {
             assertNotEquals(Optional.empty(), checker.checkValue(title));
-            assertNotEquals(
-                Optional.empty(),
-                checker.checkValue(translatedTitle(title))
-            );
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
         }
 
         static Stream<Arguments> validTitle() {
@@ -77,22 +71,13 @@ public class TitleCheckerTest {
                     "firstLetterAsOnlyCapitalLetterInEverySubTitleWithRandomDelimiters ",
                     "This!is!!A!Title??"
                 ),
-                Arguments.of(
-                    "bibTexAcceptsTitleWithOnlyFirstCapitalLetter ",
-                    "This is a title"
-                ),
-                Arguments.of(
-                    "bibTexRemovesCapitalLetterInsideTitle ",
-                    "This is a {T}itle"
-                ),
+                Arguments.of("bibTexAcceptsTitleWithOnlyFirstCapitalLetter ", "This is a title"),
+                Arguments.of("bibTexRemovesCapitalLetterInsideTitle ", "This is a {T}itle"),
                 Arguments.of(
                     "bibTexRemovesEverythingInBracketsAndAcceptsNoTitleInput ",
                     "{This is a Title}"
                 ),
-                Arguments.of(
-                    "bibTexRemovesEverythingInBrackets ",
-                    "This is a {Title}"
-                ),
+                Arguments.of("bibTexRemovesEverythingInBrackets ", "This is a {Title}"),
                 Arguments.of(
                     "bibTexAcceptsTitleWithLowercaseFirstLetter ",
                     "{C}urrent {C}hronicle"
@@ -122,10 +107,7 @@ public class TitleCheckerTest {
                     "moreThanOneCapitalLetterInSubTitleWithoutCurlyBrackets ",
                     "This!is!!A!TitlE??"
                 ),
-                Arguments.of(
-                    "bibTexDoesNotAcceptCapitalLettersInsideTitle ",
-                    "This is a Title"
-                ),
+                Arguments.of("bibTexDoesNotAcceptCapitalLettersInsideTitle ", "This is a Title"),
                 Arguments.of(
                     "bibTexDoesNotAcceptsLeadingTranslatedTitleWithOriginal ",
                     "[This is translated title] This is a title"
@@ -150,34 +132,19 @@ public class TitleCheckerTest {
         @MethodSource("validTitle")
         void titleShouldNotRaiseWarning(String message, String title) {
             assertEquals(Optional.empty(), checkerBiblatex.checkValue(title));
-            assertEquals(
-                Optional.empty(),
-                checkerBiblatex.checkValue(translatedTitle(title))
-            );
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue(translatedTitle(title)));
         }
 
         static Stream<Arguments> validTitle() {
             return Stream.of(
-                Arguments.of(
-                    "bibLaTexAcceptsTitleWithOnlyFirstCapitalLetter",
-                    "This is a title"
-                ),
-                Arguments.of(
-                    "bibLaTexAcceptsCapitalLettersInsideTitle",
-                    "This is a Title"
-                ),
-                Arguments.of(
-                    "bibLaTexRemovesCapitalLetterInsideTitle",
-                    "This is a {T}itle"
-                ),
+                Arguments.of("bibLaTexAcceptsTitleWithOnlyFirstCapitalLetter", "This is a title"),
+                Arguments.of("bibLaTexAcceptsCapitalLettersInsideTitle", "This is a Title"),
+                Arguments.of("bibLaTexRemovesCapitalLetterInsideTitle", "This is a {T}itle"),
                 Arguments.of(
                     "bibLaTexRemovesEverythingInBracketsAndAcceptsNoTitleInput",
                     "{This is a Title}"
                 ),
-                Arguments.of(
-                    "bibLaTexRemovesEverythingInBrackets",
-                    "This is a {Title}"
-                ),
+                Arguments.of("bibLaTexRemovesEverythingInBrackets", "This is a {Title}"),
                 Arguments.of(
                     "bibLaTexAcceptsTitleWithLowercaseFirstLetter",
                     "{C}urrent {C}hronicle"

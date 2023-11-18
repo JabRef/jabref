@@ -10,9 +10,7 @@ public class PageInfo {
     /*
      * pageInfo normalization
      */
-    public static Optional<OOText> normalizePageInfo(
-        Optional<OOText> optionalText
-    ) {
+    public static Optional<OOText> normalizePageInfo(Optional<OOText> optionalText) {
         if (
             optionalText == null ||
             optionalText.isEmpty() ||

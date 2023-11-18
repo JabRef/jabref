@@ -20,9 +20,7 @@ class BstVMVisitorTest {
 
     @Test
     public void testVisitStringsCommand() {
-        BstVM vm = new BstVM(
-            "STRINGS { test.string1 test.string2 test.string3 }"
-        );
+        BstVM vm = new BstVM("STRINGS { test.string1 test.string2 test.string3 }");
 
         vm.render(Collections.emptyList());
 
@@ -61,8 +59,7 @@ class BstVMVisitorTest {
 
         vm.render(Collections.emptyList());
 
-        Map<String, BstFunctions.BstFunction> functions =
-            vm.latestContext.functions();
+        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("test.func"));
         assertNotNull(functions.get("test.func"));
     }
@@ -78,8 +75,7 @@ class BstVMVisitorTest {
 
         vm.render(Collections.emptyList());
 
-        Map<String, BstFunctions.BstFunction> functions =
-            vm.latestContext.functions();
+        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("jan"));
         assertNotNull(functions.get("jan"));
         assertEquals("January", vm.latestContext.stack().pop());
@@ -88,9 +84,7 @@ class BstVMVisitorTest {
 
     @Test
     void testVisitEntryCommand() {
-        BstVM vm = new BstVM(
-            "ENTRY { address author title type } { variable } { label }"
-        );
+        BstVM vm = new BstVM("ENTRY { address author title type } { variable } { label }");
         List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
         vm.render(testEntries);
@@ -133,10 +127,7 @@ class BstVMVisitorTest {
         assertEquals("2005", fields.get("year"));
         assertEquals("oezbek", fields.get("owner"));
         assertEquals("2006.05.29", fields.get("timestamp"));
-        assertEquals(
-            "http://james.howison.name/publications.html",
-            fields.get("url")
-        );
+        assertEquals("http://james.howison.name/publications.html", fields.get("url"));
     }
 
     @Test
@@ -218,22 +209,10 @@ class BstVMVisitorTest {
         vm.render(testEntries);
 
         List<BstEntry> sortedEntries = vm.latestContext.entries();
-        assertEquals(
-            Optional.of("a"),
-            sortedEntries.get(0).entry.getCitationKey()
-        );
-        assertEquals(
-            Optional.of("b"),
-            sortedEntries.get(1).entry.getCitationKey()
-        );
-        assertEquals(
-            Optional.of("c"),
-            sortedEntries.get(2).entry.getCitationKey()
-        );
-        assertEquals(
-            Optional.of("d"),
-            sortedEntries.get(3).entry.getCitationKey()
-        );
+        assertEquals(Optional.of("a"), sortedEntries.get(0).entry.getCitationKey());
+        assertEquals(Optional.of("b"), sortedEntries.get(1).entry.getCitationKey());
+        assertEquals(Optional.of("c"), sortedEntries.get(2).entry.getCitationKey());
+        assertEquals(Optional.of("d"), sortedEntries.get(3).entry.getCitationKey());
     }
 
     @Test

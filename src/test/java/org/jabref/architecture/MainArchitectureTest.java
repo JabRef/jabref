@@ -16,8 +16,7 @@ import java.nio.file.Paths;
 @AnalyzeClasses(packages = "org.jabref")
 class MainArchitectureTest {
 
-    public static final String CLASS_ORG_JABREF_GLOBALS =
-        "org.jabref.gui.Globals";
+    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
     private static final String PACKAGE_JAVA_AWT = "java.awt..";
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
@@ -60,11 +59,7 @@ class MainArchitectureTest {
 
     @ArchTest
     public static void doNotUseAssertJ(JavaClasses classes) {
-        noClasses()
-            .should()
-            .accessClassesThat()
-            .resideInAPackage("org.assertj..")
-            .check(classes);
+        noClasses().should().accessClassesThat().resideInAPackage("org.assertj..").check(classes);
     }
 
     @ArchTest
@@ -111,33 +106,15 @@ class MainArchitectureTest {
             .whereLayer("Gui")
             .mayOnlyBeAccessedByLayers("Preferences", "Cli") // TODO: Remove preferences here
             .whereLayer("Logic")
-            .mayOnlyBeAccessedByLayers(
-                "Gui",
-                "Cli",
-                "Model",
-                "Migrations",
-                "Preferences"
-            )
+            .mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
             .whereLayer("Model")
-            .mayOnlyBeAccessedByLayers(
-                "Gui",
-                "Logic",
-                "Migrations",
-                "Cli",
-                "Preferences"
-            )
+            .mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
             .whereLayer("Cli")
             .mayNotBeAccessedByAnyLayer()
             .whereLayer("Migrations")
             .mayOnlyBeAccessedByLayers("Logic")
             .whereLayer("Preferences")
-            .mayOnlyBeAccessedByLayers(
-                "Gui",
-                "Logic",
-                "Migrations",
-                "Styletester",
-                "Cli"
-            ) // TODO: Remove logic here
+            .mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
             .check(classes);
     }
 
@@ -160,17 +137,11 @@ class MainArchitectureTest {
         // because the PDFSearch needs to access the index of the corresponding database
         noClasses()
             .that()
-            .areNotAssignableFrom(
-                "org.jabref.model.search.rules.ContainBasedSearchRule"
-            )
+            .areNotAssignableFrom("org.jabref.model.search.rules.ContainBasedSearchRule")
             .and()
-            .areNotAssignableFrom(
-                "org.jabref.model.search.rules.RegexBasedSearchRule"
-            )
+            .areNotAssignableFrom("org.jabref.model.search.rules.RegexBasedSearchRule")
             .and()
-            .areNotAssignableFrom(
-                "org.jabref.model.search.rules.GrammarBasedSearchRule"
-            )
+            .areNotAssignableFrom("org.jabref.model.search.rules.GrammarBasedSearchRule")
             .and()
             .resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
             .should()

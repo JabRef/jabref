@@ -31,13 +31,8 @@ public class CopacImporterTest {
 
     @Test
     public void testImportEmptyEntries() throws Exception {
-        Path path = Path.of(
-            CopacImporterTest.class.getResource("Empty.txt").toURI()
-        );
-        List<BibEntry> entries = importer
-            .importDatabase(path)
-            .getDatabase()
-            .getEntries();
+        Path path = Path.of(CopacImporterTest.class.getResource("Empty.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(path).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 }

@@ -42,14 +42,9 @@ class CrawlerTest {
     ImporterPreferences importerPreferences;
     SaveConfiguration saveConfiguration;
     BibEntryTypesManager entryTypesManager;
-    SlrGitHandler gitHandler = mock(
-        SlrGitHandler.class,
-        Answers.RETURNS_DEFAULTS
-    );
+    SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
-    String hashCodeCloudComputing = String.valueOf(
-        "Cloud Computing".hashCode()
-    );
+    String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
 
     PreferencesService preferencesService = mock(
         PreferencesService.class,
@@ -77,19 +72,12 @@ class CrawlerTest {
                 ','
             );
 
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);
-        saveConfiguration =
-            mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
-        when(saveConfiguration.getSaveOrder())
-            .thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         when(preferencesService.getCitationKeyPatternPreferences())
             .thenReturn(citationKeyPatternPreferences);
@@ -98,10 +86,7 @@ class CrawlerTest {
     }
 
     private void setUpRepository() throws Exception {
-        Git git = Git
-            .init()
-            .setDirectory(tempRepositoryDirectory.toFile())
-            .call();
+        Git git = Git.init().setDirectory(tempRepositoryDirectory.toFile()).call();
         setUpTestStudyDefinitionFile();
         git.add().addFilepattern(".").call();
         git.commit().setMessage("Initialize").call();
@@ -113,8 +98,7 @@ class CrawlerTest {
             StudyRepository.STUDY_DEFINITION_FILE_NAME
         );
         URL studyDefinition =
-            this.getClass()
-                .getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+            this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 
@@ -132,10 +116,7 @@ class CrawlerTest {
 
         assertTrue(
             Files.exists(
-                Path.of(
-                    tempRepositoryDirectory.toString(),
-                    hashCodeQuantum + " - Quantum"
-                )
+                Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")
             )
         );
         assertTrue(
@@ -173,11 +154,7 @@ class CrawlerTest {
                 )
             );
         });
-        assertTrue(
-            Files.exists(
-                Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")
-            )
-        );
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")));
     }
 
     private Path getPathToStudyDefinitionFile() {

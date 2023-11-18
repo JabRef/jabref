@@ -32,8 +32,7 @@ public class SciteTabViewModelTest {
             Answers.RETURNS_DEEP_STUBS
         );
         when(entryEditorPreferences.shouldShowSciteTab()).thenReturn(true);
-        when(preferencesService.getEntryEditorPreferences())
-            .thenReturn(entryEditorPreferences);
+        when(preferencesService.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
     }
 
     @Test

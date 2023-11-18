@@ -24,10 +24,8 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
      * @param pageNumber  requested site number indexed from 0
      * @return Page with search results
      */
-    default Page<BibEntry> performSearchPaged(
-        String searchQuery,
-        int pageNumber
-    ) throws FetcherException {
+    default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber)
+        throws FetcherException {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, Collections.emptyList());
         }
@@ -39,9 +37,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
                     pageNumber
                 );
         } catch (QueryNodeParseException e) {
-            throw new FetcherException(
-                "An error occurred during parsing of the query."
-            );
+            throw new FetcherException("An error occurred during parsing of the query.");
         }
     }
 
@@ -59,8 +55,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     @Override
-    default List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         return new ArrayList<>(performSearchPaged(luceneQuery, 0).getContent());
     }
 }

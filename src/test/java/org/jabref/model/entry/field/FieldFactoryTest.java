@@ -16,10 +16,7 @@ class FieldFactoryTest {
     void testOrFieldsTwoTerms() {
         assertEquals(
             "Aaa/Bbb",
-            FieldFactory.serializeOrFields(
-                new UnknownField("aaa"),
-                new UnknownField("bbb")
-            )
+            FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"))
         );
     }
 
@@ -38,14 +35,8 @@ class FieldFactoryTest {
     private static Stream<Arguments> fieldsWithoutFieldProperties() {
         return Stream.of(
             // comment fields
-            Arguments.of(
-                new UserSpecificCommentField("user1"),
-                "comment-user1"
-            ),
-            Arguments.of(
-                new UserSpecificCommentField("other-user-id"),
-                "comment-other-user-id"
-            ),
+            Arguments.of(new UserSpecificCommentField("user1"), "comment-user1"),
+            Arguments.of(new UserSpecificCommentField("other-user-id"), "comment-other-user-id"),
             // unknown field
             Arguments.of(new UnknownField("cased", "cAsEd"), "cAsEd")
         );
@@ -59,20 +50,14 @@ class FieldFactoryTest {
 
     @Test
     void testDoesNotParseApaFieldWithoutEntryType() {
-        assertNotEquals(
-            BiblatexApaField.ARTICLE,
-            FieldFactory.parseField("article")
-        );
+        assertNotEquals(BiblatexApaField.ARTICLE, FieldFactory.parseField("article"));
     }
 
     @Test
     void testDoesParseApaFieldWithEntryType() {
         assertEquals(
             BiblatexApaField.ARTICLE,
-            FieldFactory.parseField(
-                BiblatexApaEntryType.Constitution,
-                "article"
-            )
+            FieldFactory.parseField(BiblatexApaEntryType.Constitution, "article")
         );
     }
 }

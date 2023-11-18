@@ -36,12 +36,8 @@ public class PageNumbers {
         if (freeform == null) {
             Element tmpStart = document.createElement("start");
             Element tmpEnd = document.createElement("end");
-            tmpStart.appendChild(
-                document.createTextNode(String.valueOf(this.start))
-            );
-            tmpEnd.appendChild(
-                document.createTextNode(String.valueOf(this.end))
-            );
+            tmpStart.appendChild(document.createTextNode(String.valueOf(this.start)));
+            tmpEnd.appendChild(document.createTextNode(String.valueOf(this.end)));
             result.appendChild(tmpStart);
             result.appendChild(tmpEnd);
         } else {

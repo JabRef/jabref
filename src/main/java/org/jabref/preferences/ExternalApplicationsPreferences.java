@@ -36,12 +36,9 @@ public class ExternalApplicationsPreferences {
         this.citeCommand = new SimpleStringProperty(citeCommand);
         this.defaultCiteCommand = new SimpleStringProperty(defaultCiteCommand);
         this.useCustomTerminal = new SimpleBooleanProperty(useCustomTerminal);
-        this.customTerminalCommand =
-            new SimpleStringProperty(customTerminalCommand);
-        this.useCustomFileBrowser =
-            new SimpleBooleanProperty(useCustomFileBrowser);
-        this.customFileBrowserCommand =
-            new SimpleStringProperty(customFileBrowserCommand);
+        this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);
+        this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
+        this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);
         this.kindleEmail = new SimpleStringProperty(kindleEmail);
     }
 
@@ -65,12 +62,8 @@ public class ExternalApplicationsPreferences {
         return shouldAutoOpenEmailAttachmentsFolder;
     }
 
-    public void setAutoOpenEmailAttachmentsFolder(
-        boolean shouldAutoOpenEmailAttachmentsFolder
-    ) {
-        this.shouldAutoOpenEmailAttachmentsFolder.set(
-                shouldAutoOpenEmailAttachmentsFolder
-            );
+    public void setAutoOpenEmailAttachmentsFolder(boolean shouldAutoOpenEmailAttachmentsFolder) {
+        this.shouldAutoOpenEmailAttachmentsFolder.set(shouldAutoOpenEmailAttachmentsFolder);
     }
 
     public String getCiteCommand() {

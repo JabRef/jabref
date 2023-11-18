@@ -19,11 +19,7 @@ class AbbreviationTest {
 
     @Test
     void testAbbreviationsWithTrailingSpacesWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation(
-            "Long Name",
-            "L. N.",
-            "LN"
-        );
+        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
 
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.", abbreviation.getAbbreviation());
@@ -38,19 +34,12 @@ class AbbreviationTest {
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.;LN;M", abbreviation.getAbbreviation());
         assertEquals("L N ;LN;M", abbreviation.getDotlessAbbreviation());
-        assertEquals(
-            "L. N.;LN;M",
-            abbreviation.getShortestUniqueAbbreviation()
-        );
+        assertEquals("L. N.;LN;M", abbreviation.getShortestUniqueAbbreviation());
     }
 
     @Test
     void testAbbreviationsWithSemicolonsWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation(
-            "Long Name",
-            "L. N.;LN;M",
-            "LNLNM"
-        );
+        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.;LN;M", "LNLNM");
 
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.;LN;M", abbreviation.getAbbreviation());
@@ -69,11 +58,7 @@ class AbbreviationTest {
 
     @Test
     void testGetNextElementWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation(
-            "Long Name",
-            "L. N.",
-            "LN"
-        );
+        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
 
         assertEquals("L. N.", abbreviation.getNext("Long Name"));
         assertEquals("L N", abbreviation.getNext("L. N."));
@@ -92,11 +77,7 @@ class AbbreviationTest {
 
     @Test
     void testGetNextElementWithTrailingSpacesWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation(
-            "Long Name",
-            "L. N.",
-            "LN"
-        );
+        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
 
         assertEquals("L. N.", abbreviation.getNext("Long Name"));
         assertEquals("L N", abbreviation.getNext("L. N."));
@@ -107,54 +88,33 @@ class AbbreviationTest {
     @Test
     void testDefaultAndMedlineAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
-        assertEquals(
-            abbreviation.getAbbreviation(),
-            abbreviation.getDotlessAbbreviation()
-        );
+        assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
     }
 
     @Test
     void testDefaultAndMedlineAbbreviationsAreSameWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
-        assertEquals(
-            abbreviation.getAbbreviation(),
-            abbreviation.getDotlessAbbreviation()
-        );
+        assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
     }
 
     @Test
     void testDefaultAndShortestUniqueAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
-        assertEquals(
-            abbreviation.getAbbreviation(),
-            abbreviation.getShortestUniqueAbbreviation()
-        );
+        assertEquals(abbreviation.getAbbreviation(), abbreviation.getShortestUniqueAbbreviation());
     }
 
     @Test
     void testEquals() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
-        Abbreviation otherAbbreviation = new Abbreviation(
-            "Long Name",
-            "L N",
-            "LN"
-        );
+        Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
         assertEquals(abbreviation, otherAbbreviation);
         assertNotEquals(abbreviation, "String");
     }
 
     @Test
     void equalAbbrevationsWithFourComponentsAreAlsoCompareZero() {
-        Abbreviation abbreviation1 = new Abbreviation(
-            "Long Name",
-            "L. N.",
-            "LN"
-        );
-        Abbreviation abbreviation2 = new Abbreviation(
-            "Long Name",
-            "L. N.",
-            "LN"
-        );
+        Abbreviation abbreviation1 = new Abbreviation("Long Name", "L. N.", "LN");
+        Abbreviation abbreviation2 = new Abbreviation("Long Name", "L. N.", "LN");
         assertEquals(0, abbreviation1.compareTo(abbreviation2));
     }
 }

@@ -33,13 +33,10 @@ public final class SearchResult {
     private List<String> contentResultStringsHtml;
     private List<String> annotationsResultStringsHtml;
 
-    public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc)
-        throws IOException {
+    public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
-        this.pageNumber =
-            Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
-        this.modified =
-            Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
+        this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
+        this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
         String content = getFieldContents(searcher, scoreDoc, CONTENT);
@@ -50,10 +47,7 @@ public final class SearchResult {
             new QueryScorer(query)
         );
 
-        try (
-            TokenStream contentStream = new EnglishStemAnalyzer()
-                .tokenStream(CONTENT, content)
-        ) {
+        try (TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content)) {
             TextFragment[] frags = highlighter.getBestTextFragments(
                 contentStream,
                 content,
@@ -61,10 +55,7 @@ public final class SearchResult {
                 10
             );
             this.contentResultStringsHtml =
-                Arrays
-                    .stream(frags)
-                    .map(TextFragment::toString)
-                    .collect(Collectors.toList());
+                Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {
             this.contentResultStringsHtml = List.of();
         }
@@ -80,23 +71,15 @@ public final class SearchResult {
                 10
             );
             this.annotationsResultStringsHtml =
-                Arrays
-                    .stream(frags)
-                    .map(TextFragment::toString)
-                    .collect(Collectors.toList());
+                Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {
             this.annotationsResultStringsHtml = List.of();
         }
     }
 
-    private String getFieldContents(
-        IndexSearcher searcher,
-        ScoreDoc scoreDoc,
-        String field
-    ) throws IOException {
-        IndexableField indexableField = searcher
-            .doc(scoreDoc.doc)
-            .getField(field);
+    private String getFieldContents(IndexSearcher searcher, ScoreDoc scoreDoc, String field)
+        throws IOException {
+        IndexableField indexableField = searcher.doc(scoreDoc.doc).getField(field);
         if (indexableField == null) {
             return "";
         }
@@ -104,10 +87,7 @@ public final class SearchResult {
     }
 
     public boolean isResultFor(BibEntry entry) {
-        return entry
-            .getFiles()
-            .stream()
-            .anyMatch(linkedFile -> path.equals(linkedFile.getLink()));
+        return entry.getFiles().stream().anyMatch(linkedFile -> path.equals(linkedFile.getLink()));
     }
 
     public String getPath() {

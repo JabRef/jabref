@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 class PasswordTest {
 
     @Test
-    void passwordAESTest()
-        throws GeneralSecurityException, UnsupportedEncodingException {
+    void passwordAESTest() throws GeneralSecurityException, UnsupportedEncodingException {
         String phrase = "Password";
         Password password = new Password(phrase, "someKey");
         String encryptedPassword = password.encrypt();
@@ -19,8 +18,7 @@ class PasswordTest {
     }
 
     @Test
-    void passwordAsCharTest()
-        throws GeneralSecurityException, UnsupportedEncodingException {
+    void passwordAsCharTest() throws GeneralSecurityException, UnsupportedEncodingException {
         char[] charPhrase = "Password".toCharArray();
         Password charPassword = new Password(charPhrase, "someKey");
         String charEncryptedPassword = charPassword.encrypt();

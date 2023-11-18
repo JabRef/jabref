@@ -11,16 +11,11 @@ import org.junit.jupiter.api.Test;
 public class MetaDataDiffTest {
 
     @Test
-    public void compareWithSameContentSelectorsDoesNotReportAnyDiffs()
-        throws Exception {
+    public void compareWithSameContentSelectorsDoesNotReportAnyDiffs() throws Exception {
         MetaData one = new MetaData();
-        one.addContentSelector(
-            new ContentSelector(StandardField.AUTHOR, "first", "second")
-        );
+        one.addContentSelector(new ContentSelector(StandardField.AUTHOR, "first", "second"));
         MetaData two = new MetaData();
-        two.addContentSelector(
-            new ContentSelector(StandardField.AUTHOR, "first", "second")
-        );
+        two.addContentSelector(new ContentSelector(StandardField.AUTHOR, "first", "second"));
 
         assertEquals(Optional.empty(), MetaDataDiff.compare(one, two));
     }

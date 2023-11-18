@@ -7,9 +7,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 
 @ApacheCommonsLang3Allowed("There is no equivalent in Google's Guava")
-public class HtmlToUnicodeFormatter
-    extends Formatter
-    implements LayoutFormatter {
+public class HtmlToUnicodeFormatter extends Formatter implements LayoutFormatter {
 
     @Override
     public String getName() {
@@ -34,8 +32,6 @@ public class HtmlToUnicodeFormatter
     @Override
     public String format(String fieldText) {
         // StringEscapeUtils converts characters and regex kills tags
-        return StringEscapeUtils
-            .unescapeHtml4(fieldText)
-            .replaceAll("<[^>]*>", "");
+        return StringEscapeUtils.unescapeHtml4(fieldText).replaceAll("<[^>]*>", "");
     }
 }

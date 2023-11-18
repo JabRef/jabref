@@ -16,19 +16,13 @@ public class OOListUtil {
      * Integers 0..(len-1)
      */
     public static List<Integer> makeIndices(int len) {
-        return Stream
-            .iterate(0, i -> i + 1)
-            .limit(len)
-            .collect(Collectors.toList());
+        return Stream.iterate(0, i -> i + 1).limit(len).collect(Collectors.toList());
     }
 
     /**
      * Return indices so that list.get(indices.get(i)) is sorted.
      */
-    public static <T extends U, U> List<Integer> order(
-        List<T> list,
-        Comparator<U> comparator
-    ) {
+    public static <T extends U, U> List<Integer> order(List<T> list, Comparator<U> comparator) {
         List<Integer> indices = makeIndices(list.size());
         indices.sort((a, b) -> comparator.compare(list.get(a), list.get(b)));
         return indices;

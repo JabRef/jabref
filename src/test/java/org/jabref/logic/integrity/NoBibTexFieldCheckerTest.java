@@ -45,11 +45,7 @@ class NoBibTexFieldCheckerTest {
     @CsvSource({ "AFTERWORD", "JOURNALTITLE", "LOCATION" })
     void biblatexOnlyField(StandardField field) {
         BibEntry entry = new BibEntry().withField(field, "test");
-        IntegrityMessage message = new IntegrityMessage(
-            "biblatex field only",
-            entry,
-            field
-        );
+        IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, field);
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(Collections.singletonList(message), messages);
     }

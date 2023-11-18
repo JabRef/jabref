@@ -32,11 +32,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     public InternalMaterialDesignIcon(List<Ikon> icons) {
         this.icons = icons;
         this.unicode =
-            icons
-                .stream()
-                .map(Ikon::getCode)
-                .map(String::valueOf)
-                .collect(Collectors.joining());
+            icons.stream().map(Ikon::getCode).map(String::valueOf).collect(Collectors.joining());
         this.color = Optional.empty();
     }
 
@@ -60,10 +56,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public JabRefIcon disabled() {
-        return new InternalMaterialDesignIcon(
-            IconTheme.DEFAULT_DISABLED_COLOR,
-            icons
-        );
+        return new InternalMaterialDesignIcon(IconTheme.DEFAULT_DISABLED_COLOR, icons);
     }
 
     @Override

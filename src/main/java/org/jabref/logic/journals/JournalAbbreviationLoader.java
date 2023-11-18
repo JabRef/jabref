@@ -21,13 +21,10 @@ import org.slf4j.LoggerFactory;
  */
 public class JournalAbbreviationLoader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        JournalAbbreviationLoader.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
-    public static Collection<Abbreviation> readAbbreviationsFromCsvFile(
-        Path file
-    ) throws IOException {
+    public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file)
+        throws IOException {
         LOGGER.debug("Reading journal list from file {}", file);
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(file);
@@ -46,9 +43,7 @@ public class JournalAbbreviationLoader {
                 )
         ) {
             if (resourceAsStream == null) {
-                LOGGER.warn(
-                    "There is no journal-list.mv. We use a default journal list"
-                );
+                LOGGER.warn("There is no journal-list.mv. We use a default journal list");
                 repository = new JournalAbbreviationRepository();
             } else {
                 Path tempDir = Files.createTempDirectory("jabref-journal");
@@ -64,8 +59,7 @@ public class JournalAbbreviationLoader {
         }
 
         // Read external lists
-        List<String> lists =
-            journalAbbreviationPreferences.getExternalJournalLists();
+        List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
         // might produce NPE in tests
         if (lists != null && !(lists.isEmpty())) {
             // reversing ensures that the latest lists overwrites the former one
@@ -76,11 +70,7 @@ public class JournalAbbreviationLoader {
                         readAbbreviationsFromCsvFile(Path.of(filename))
                     );
                 } catch (IOException e) {
-                    LOGGER.error(
-                        "Cannot read external journal list file {}",
-                        filename,
-                        e
-                    );
+                    LOGGER.error("Cannot read external journal list file {}", filename, e);
                 }
             }
         }
@@ -88,8 +78,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(
-            new JournalAbbreviationPreferences(Collections.emptyList(), true)
-        );
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
     }
 }

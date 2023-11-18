@@ -37,9 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DoiResolution implements FulltextFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DoiResolution.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
     private DOIPreferences doiPreferences;
 
     public DoiResolution(DOIPreferences doiPreferences) {
@@ -51,9 +49,7 @@ public class DoiResolution implements FulltextFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {
             return Optional.empty();
@@ -107,19 +103,14 @@ public class DoiResolution implements FulltextFetcher {
 
             List<URL> links = new ArrayList<>();
             for (Element element : hrefElements) {
-                String href = element
-                    .attr("abs:href")
-                    .toLowerCase(Locale.ENGLISH);
+                String href = element.attr("abs:href").toLowerCase(Locale.ENGLISH);
                 String hrefText = element.text().toLowerCase(Locale.ENGLISH);
                 // Only check if pdf is included in the link or inside the text
                 // ACM uses tokens without PDF inside the link
                 // See https://github.com/lehner/LocalCopy for more scrape ideas
                 // link with "PDF" in title tag
                 if (
-                    element
-                        .attr("title")
-                        .toLowerCase(Locale.ENGLISH)
-                        .contains("pdf") &&
+                    element.attr("title").toLowerCase(Locale.ENGLISH).contains("pdf") &&
                     new URLDownload(href).isPdf()
                 ) {
                     return Optional.of(new URL(href));
@@ -158,9 +149,7 @@ public class DoiResolution implements FulltextFetcher {
      * See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
      */
     private Optional<URL> citationMetaTag(Document html) {
-        Elements citationPdfUrlElement = html
-            .head()
-            .select("meta[name='citation_pdf_url']");
+        Elements citationPdfUrlElement = html.head().select("meta[name='citation_pdf_url']");
         Optional<String> citationPdfUrl = citationPdfUrlElement
             .stream()
             .map(e -> e.attr("content"))
@@ -178,10 +167,7 @@ public class DoiResolution implements FulltextFetcher {
 
     private Optional<URL> findEmbeddedLink(Document html, URL base) {
         Elements embedElement = html.body().select("embed[id='pdf']");
-        Optional<String> pdfUrl = embedElement
-            .stream()
-            .map(e -> e.attr("src"))
-            .findFirst();
+        Optional<String> pdfUrl = embedElement.stream().map(e -> e.attr("src")).findFirst();
 
         if (pdfUrl.isPresent()) {
             try {
@@ -195,10 +181,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     private Optional<URL> findDistinctLinks(List<URL> urls) {
-        List<URL> distinctLinks = urls
-            .stream()
-            .distinct()
-            .collect(Collectors.toList());
+        List<URL> distinctLinks = urls.stream().distinct().collect(Collectors.toList());
 
         if (distinctLinks.isEmpty()) {
             return Optional.empty();

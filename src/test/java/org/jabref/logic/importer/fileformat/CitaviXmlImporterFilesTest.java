@@ -13,14 +13,12 @@ public class CitaviXmlImporterFilesTest {
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name ->
-            name.startsWith("CitaviXmlImporterTest") &&
-            name.endsWith(FILE_ENDING);
+            name.startsWith("CitaviXmlImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name ->
-            !name.startsWith("CitaviXmlImporterTest");
+        Predicate<String> fileName = name -> !name.startsWith("CitaviXmlImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -33,19 +31,12 @@ public class CitaviXmlImporterFilesTest {
     @ParameterizedTest
     @MethodSource("invalidFileNames")
     void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(
-            citaviXmlImporter,
-            fileName
-        );
+        ImporterTestEngine.testIsNotRecognizedFormat(citaviXmlImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            citaviXmlImporter,
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(citaviXmlImporter, fileName, FILE_ENDING);
     }
 }

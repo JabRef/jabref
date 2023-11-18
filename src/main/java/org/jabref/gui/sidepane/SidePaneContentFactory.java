@@ -69,11 +69,7 @@ public class SidePaneContentFactory {
                 undoManager
             )
                 .getContent();
-            case WEB_SEARCH -> new WebSearchPaneView(
-                preferences,
-                dialogService,
-                stateManager
-            );
+            case WEB_SEARCH -> new WebSearchPaneView(preferences, dialogService, stateManager);
         };
     }
 }

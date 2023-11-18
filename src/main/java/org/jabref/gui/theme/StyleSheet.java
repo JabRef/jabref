@@ -15,9 +15,7 @@ abstract class StyleSheet {
     static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
     static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        StyleSheet.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
     abstract URL getSceneStylesheet();
 
@@ -30,9 +28,7 @@ abstract class StyleSheet {
     abstract void reload();
 
     static Optional<StyleSheet> create(String name) {
-        Optional<URL> styleSheetUrl = Optional.ofNullable(
-            JabRefFrame.class.getResource(name)
-        );
+        Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefFrame.class.getResource(name));
 
         if (styleSheetUrl.isEmpty()) {
             try {
@@ -54,9 +50,7 @@ abstract class StyleSheet {
 
         if (styleSheetUrl.isEmpty()) {
             try {
-                return Optional.of(
-                    new StyleSheetDataUrl(new URL(EMPTY_WEBENGINE_CSS))
-                );
+                return Optional.of(new StyleSheetDataUrl(new URL(EMPTY_WEBENGINE_CSS)));
             } catch (MalformedURLException e) {
                 return Optional.empty();
             }

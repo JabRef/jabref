@@ -81,10 +81,7 @@ public class GrammarBasedSearchRuleTest {
         String query = "anyfield:fruit";
         assertTrue(searchRule.validateSearchStrings(query));
         assertTrue(
-            searchRule.applyRule(
-                query,
-                new BibEntry().withField(StandardField.KEYWORDS, "fruit")
-            )
+            searchRule.applyRule(query, new BibEntry().withField(StandardField.KEYWORDS, "fruit"))
         );
     }
 
@@ -98,10 +95,7 @@ public class GrammarBasedSearchRuleTest {
         String query = "anykeyword:apple";
         assertTrue(searchRule.validateSearchStrings(query));
         assertTrue(
-            searchRule.applyRule(
-                query,
-                new BibEntry().withField(StandardField.KEYWORDS, "apple")
-            )
+            searchRule.applyRule(query, new BibEntry().withField(StandardField.KEYWORDS, "apple"))
         );
         assertFalse(
             searchRule.applyRule(
@@ -118,12 +112,7 @@ public class GrammarBasedSearchRuleTest {
         );
         String query = "citationkey==miller2005";
         assertTrue(searchRule.validateSearchStrings(query));
-        assertTrue(
-            searchRule.applyRule(
-                query,
-                new BibEntry().withCitationKey("miller2005")
-            )
-        );
+        assertTrue(searchRule.applyRule(query, new BibEntry().withCitationKey("miller2005")));
     }
 
     @Test
@@ -133,21 +122,13 @@ public class GrammarBasedSearchRuleTest {
         );
         String query = "entrytype=thesis";
         assertTrue(searchRule.validateSearchStrings(query));
-        assertTrue(
-            searchRule.applyRule(
-                query,
-                new BibEntry(StandardEntryType.PhdThesis)
-            )
-        );
+        assertTrue(searchRule.applyRule(query, new BibEntry(StandardEntryType.PhdThesis)));
     }
 
     public BibEntry makeBibtexEntry() {
         return new BibEntry(StandardEntryType.InCollection)
             .withCitationKey("shields01")
-            .withField(
-                StandardField.TITLE,
-                "Marine finfish larviculture in Europe"
-            )
+            .withField(StandardField.TITLE, "Marine finfish larviculture in Europe")
             .withField(StandardField.YEAR, "2001")
             .withField(StandardField.AUTHOR, "Kevin Shields");
     }

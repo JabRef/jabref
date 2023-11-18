@@ -68,26 +68,18 @@ public class FunctionalTextViewCursor {
      * On failure the constructor restores the selection. On success, the caller may want to call
      * instance.restore() after finished using the cursor.
      */
-    public static OOResult<FunctionalTextViewCursor, String> get(
-        XTextDocument doc
-    ) {
+    public static OOResult<FunctionalTextViewCursor, String> get(XTextDocument doc) {
         Objects.requireNonNull(doc);
 
         XTextRange initialPosition = null;
-        XServiceInfo initialSelection = UnoSelection
-            .getSelectionAsXServiceInfo(doc)
-            .orElse(null);
+        XServiceInfo initialSelection = UnoSelection.getSelectionAsXServiceInfo(doc).orElse(null);
         XTextViewCursor viewCursor = UnoCursor.getViewCursor(doc).orElse(null);
         if (viewCursor != null) {
             try {
                 initialPosition = UnoCursor.createTextCursorByRange(viewCursor);
                 viewCursor.getStart();
                 return OOResult.ok(
-                    new FunctionalTextViewCursor(
-                        initialPosition,
-                        initialSelection,
-                        viewCursor
-                    )
+                    new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor)
                 );
             } catch (com.sun.star.uno.RuntimeException ex) {
                 // bad cursor
@@ -122,17 +114,12 @@ public class FunctionalTextViewCursor {
             viewCursor.getStart();
         } catch (com.sun.star.uno.RuntimeException ex) {
             restore(doc, initialPosition, initialSelection);
-            String errorMessage =
-                "The view cursor failed the functionality test";
+            String errorMessage = "The view cursor failed the functionality test";
             return OOResult.error(errorMessage);
         }
 
         return OOResult.ok(
-            new FunctionalTextViewCursor(
-                initialPosition,
-                initialSelection,
-                viewCursor
-            )
+            new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor)
         );
     }
 
@@ -146,9 +133,7 @@ public class FunctionalTextViewCursor {
         XServiceInfo initialSelection
     ) {
         if (initialPosition != null) {
-            XTextViewCursor viewCursor = UnoCursor
-                .getViewCursor(doc)
-                .orElse(null);
+            XTextViewCursor viewCursor = UnoCursor.getViewCursor(doc).orElse(null);
             if (viewCursor != null) {
                 viewCursor.gotoRange(initialPosition, false);
                 return;
@@ -161,10 +146,6 @@ public class FunctionalTextViewCursor {
 
     /* Restore initial state of viewCursor (possibly by restoring selection) if possible. */
     public void restore(XTextDocument doc) {
-        FunctionalTextViewCursor.restore(
-            doc,
-            initialPosition,
-            initialSelection
-        );
+        FunctionalTextViewCursor.restore(doc, initialPosition, initialSelection);
     }
 }

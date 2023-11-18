@@ -35,9 +35,7 @@ public class SearchShortScienceAction extends SimpleCommand {
             StandardField.TITLE,
             stateManager
         );
-        this.executable.bind(
-                needsEntriesSelected(1, stateManager).and(fieldIsSet)
-            );
+        this.executable.bind(needsEntriesSelected(1, stateManager).and(fieldIsSet));
     }
 
     @Override
@@ -45,8 +43,7 @@ public class SearchShortScienceAction extends SimpleCommand {
         stateManager
             .getActiveDatabase()
             .ifPresent(databaseContext -> {
-                final List<BibEntry> bibEntries =
-                    stateManager.getSelectedEntries();
+                final List<BibEntry> bibEntries = stateManager.getSelectedEntries();
 
                 if (bibEntries.size() != 1) {
                     dialogService.notify(
@@ -70,9 +67,7 @@ public class SearchShortScienceAction extends SimpleCommand {
                             );
                         } catch (IOException ex) {
                             dialogService.showErrorDialogAndWait(
-                                Localization.lang(
-                                    "Unable to open ShortScience."
-                                ),
+                                Localization.lang("Unable to open ShortScience."),
                                 ex
                             );
                         }

@@ -64,10 +64,7 @@ class OOBibStyleTest {
     @Test
     void testAuthorYearAsFile() throws URISyntaxException, IOException {
         Path defFile = Path.of(
-            OOBibStyleTest.class.getResource(
-                    StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH
-                )
-                .toURI()
+            OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI()
         );
 
         OOBibStyle style = new OOBibStyle(
@@ -110,26 +107,14 @@ class OOBibStyleTest {
         int minGroupingCount,
         boolean inList
     ) {
-        return OOBibStyleTestHelper.runGetNumCitationMarker2a(
-            style,
-            num,
-            minGroupingCount,
-            inList
-        );
+        return OOBibStyleTestHelper.runGetNumCitationMarker2a(style, num, minGroupingCount, inList);
     }
 
-    static CitationMarkerNumericEntry numEntry(
-        String key,
-        int num,
-        String pageInfoOrNull
-    ) {
+    static CitationMarkerNumericEntry numEntry(String key, int num, String pageInfoOrNull) {
         return OOBibStyleTestHelper.numEntry(key, num, pageInfoOrNull);
     }
 
-    static CitationMarkerNumericBibEntry numBibEntry(
-        String key,
-        Optional<Integer> num
-    ) {
+    static CitationMarkerNumericBibEntry numBibEntry(String key, Optional<Integer> num) {
         return OOBibStyleTestHelper.numBibEntry(key, num);
     }
 
@@ -138,9 +123,7 @@ class OOBibStyleTest {
         int minGroupingCount,
         CitationMarkerNumericEntry... s
     ) {
-        List<CitationMarkerNumericEntry> input = Stream
-            .of(s)
-            .collect(Collectors.toList());
+        List<CitationMarkerNumericEntry> input = Stream.of(s).collect(Collectors.toList());
         OOText res = style.getNumCitationMarker2(input, minGroupingCount);
         return res.toString();
     }
@@ -216,24 +199,12 @@ class OOBibStyleTest {
             layoutFormatterPreferences,
             abbreviationRepository
         );
-        assertEquals(
-            "[1] ",
-            runGetNumCitationMarker2a(style, List.of(1), -1, true)
-        );
+        assertEquals("[1] ", runGetNumCitationMarker2a(style, List.of(1), -1, true));
 
-        assertEquals(
-            "[1]",
-            runGetNumCitationMarker2a(style, List.of(1), -1, false)
-        );
-        assertEquals(
-            "[1]",
-            runGetNumCitationMarker2b(style, -1, numEntry("key", 1, null))
-        );
+        assertEquals("[1]", runGetNumCitationMarker2a(style, List.of(1), -1, false));
+        assertEquals("[1]", runGetNumCitationMarker2b(style, -1, numEntry("key", 1, null)));
 
-        assertEquals(
-            "[1] ",
-            runGetNumCitationMarker2a(style, List.of(1), 0, true)
-        );
+        assertEquals("[1] ", runGetNumCitationMarker2a(style, List.of(1), 0, true));
 
         CitationMarkerNumericEntry e2 = numEntry("key", 1, "pp. 55-56");
         assertTrue(e2.getPageInfo().isPresent());
@@ -329,9 +300,7 @@ class OOBibStyleTest {
 
         // old
         assertEquals(3, style.getIntCitProperty("MaxAuthors"));
-        assertTrue(
-            style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)
-        );
+        assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
         // new
         assertEquals(3, style.getMaxAuthors());
         assertTrue(style.getMultiCiteChronological());
@@ -529,15 +498,7 @@ class OOBibStyleTest {
 
         assertEquals(
             "[JabRef Development Team, 2016]",
-            getCitationMarker2(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2(style, entries, entryDBMap, true, null, null, null)
         );
     }
 
@@ -564,15 +525,7 @@ class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals(
             "[von Beta, 2016]",
-            getCitationMarker2(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2(style, entries, entryDBMap, true, null, null, null)
         );
     }
 
@@ -597,15 +550,7 @@ class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals(
             "[, 2016]",
-            getCitationMarker2(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2(style, entries, entryDBMap, true, null, null, null)
         );
     }
 
@@ -630,15 +575,7 @@ class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals(
             "[von Beta, ]",
-            getCitationMarker2(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2(style, entries, entryDBMap, true, null, null, null)
         );
     }
 
@@ -662,15 +599,7 @@ class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals(
             "[, ]",
-            getCitationMarker2(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2(style, entries, entryDBMap, true, null, null, null)
         );
     }
 
@@ -712,15 +641,7 @@ class OOBibStyleTest {
 
         assertEquals(
             "[Beta, 2000; Beta, 2000; Epsilon, 2001]",
-            getCitationMarker2b(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2b(style, entries, entryDBMap, true, null, null, null)
         );
         assertEquals(
             "[Beta, 2000a,b; Epsilon, 2001]",
@@ -774,15 +695,7 @@ class OOBibStyleTest {
 
         assertEquals(
             "Beta [2000]; Beta [2000]; Epsilon [2001]",
-            getCitationMarker2b(
-                style,
-                entries,
-                entryDBMap,
-                false,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2b(style, entries, entryDBMap, false, null, null, null)
         );
         assertEquals(
             "Beta [2000a,b]; Epsilon [2001]",
@@ -799,8 +712,7 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetCitationMarkerInParenthesisUniquefiersThreeSameAuthor()
-        throws IOException {
+    void testGetCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(
             StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
             layoutFormatterPreferences,
@@ -851,8 +763,7 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetCitationMarkerInTextUniquefiersThreeSameAuthor()
-        throws IOException {
+    void testGetCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(
             StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
             layoutFormatterPreferences,
@@ -978,10 +889,7 @@ class OOBibStyleTest {
 
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
-        entry.setField(
-            StandardField.AUTHOR,
-            "Alpha von Beta and Gamma Epsilon and Ypsilon Tau"
-        );
+        entry.setField(StandardField.AUTHOR, "Alpha von Beta and Gamma Epsilon and Ypsilon Tau");
         entry.setField(StandardField.TITLE, "JabRef Manual");
         entry.setField(StandardField.YEAR, "2016");
         entry.setCitationKey("a1");
@@ -990,15 +898,7 @@ class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals(
             "von Beta, Epsilon, & Tau, 2016",
-            getCitationMarker2(
-                style,
-                entries,
-                entryDBMap,
-                true,
-                null,
-                null,
-                null
-            )
+            getCitationMarker2(style, entries, entryDBMap, true, null, null, null)
         );
     }
 
@@ -1083,29 +983,11 @@ class OOBibStyleTest {
         // The third is NotKruchten, should not be joined.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                null,
-                true
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", null, true);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry2,
-                database,
-                "b",
-                null,
-                true
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry2, database, "b", null, true);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry3,
-                database,
-                "c",
-                null,
-                true
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry3, database, "c", null, true);
             citationMarkerEntries.add(cm3);
 
             assertEquals(
@@ -1138,29 +1020,11 @@ class OOBibStyleTest {
         // The third is NotKruchten, should not be joined.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                null,
-                true
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", null, true);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry2,
-                database,
-                "b",
-                null,
-                false
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry2, database, "b", null, false);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry3,
-                database,
-                "c",
-                null,
-                false
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry3, database, "c", null, false);
             citationMarkerEntries.add(cm3);
 
             assertEquals(
@@ -1181,29 +1045,11 @@ class OOBibStyleTest {
         // The third is NotKruchten, should not be joined.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                null,
-                false
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", null, false);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry2,
-                database,
-                "b",
-                null,
-                true
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry2, database, "b", null, true);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry3,
-                database,
-                "c",
-                null,
-                false
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry3, database, "c", null, false);
             citationMarkerEntries.add(cm3);
 
             assertEquals(
@@ -1226,29 +1072,11 @@ class OOBibStyleTest {
         // Is this the correct behaviour?
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                null,
-                false
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", null, false);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry2,
-                database,
-                "b",
-                null,
-                false
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry2, database, "b", null, false);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry3,
-                database,
-                "c",
-                null,
-                false
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry3, database, "c", null, false);
             citationMarkerEntries.add(cm3);
 
             assertEquals(
@@ -1267,29 +1095,11 @@ class OOBibStyleTest {
         // XY [2000a,b,c; p1] whould be confusing.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", "p1", false);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry2,
-                database,
-                "b",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry2, database, "b", "p1", false);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry3,
-                database,
-                "c",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry3, database, "c", "p1", false);
             citationMarkerEntries.add(cm3);
 
             assertEquals(
@@ -1311,29 +1121,11 @@ class OOBibStyleTest {
         //       but ignores the rest. Normally the citation key should distinguish.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", "p1", false);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry1, database, "a", "p1", false);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry1, database, "a", "p1", false);
             citationMarkerEntries.add(cm3);
 
             assertEquals(
@@ -1351,37 +1143,13 @@ class OOBibStyleTest {
         // Empty ("") and missing pageInfos considered equal, thus collapsed.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
-            CitationMarkerEntry cm1 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "p1",
-                false
-            );
+            CitationMarkerEntry cm1 = makeCitationMarkerEntry(entry1, database, "a", "p1", false);
             citationMarkerEntries.add(cm1);
-            CitationMarkerEntry cm2 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "p2",
-                false
-            );
+            CitationMarkerEntry cm2 = makeCitationMarkerEntry(entry1, database, "a", "p2", false);
             citationMarkerEntries.add(cm2);
-            CitationMarkerEntry cm3 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                "",
-                false
-            );
+            CitationMarkerEntry cm3 = makeCitationMarkerEntry(entry1, database, "a", "", false);
             citationMarkerEntries.add(cm3);
-            CitationMarkerEntry cm4 = makeCitationMarkerEntry(
-                entry1,
-                database,
-                "a",
-                null,
-                false
-            );
+            CitationMarkerEntry cm4 = makeCitationMarkerEntry(entry1, database, "a", null, false);
             citationMarkerEntries.add(cm4);
 
             assertEquals(

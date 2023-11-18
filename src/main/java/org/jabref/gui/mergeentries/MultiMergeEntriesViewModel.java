@@ -24,28 +24,24 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         FXCollections.observableArrayList()
     );
 
-    private final ObjectProperty<BibEntry> mergedEntry =
-        new SimpleObjectProperty<>(new BibEntry());
+    private final ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>(new BibEntry());
 
-    private final ListProperty<String> failedSuppliers =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<String> failedSuppliers = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
 
     public void addSource(EntrySource entrySource) {
         if (!entrySource.isLoading.getValue()) {
             updateFields(entrySource.entry.get());
         } else {
-            entrySource.isLoading.addListener(
-                (observable, oldValue, newValue) -> {
-                    if (!newValue) {
-                        updateFields(entrySource.entry.get());
-                        if (entrySource.entryProperty().get() == null) {
-                            failedSuppliers.add(
-                                entrySource.titleProperty().get()
-                            );
-                        }
+            entrySource.isLoading.addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {
+                    updateFields(entrySource.entry.get());
+                    if (entrySource.entryProperty().get() == null) {
+                        failedSuppliers.add(entrySource.titleProperty().get());
                     }
                 }
-            );
+            });
         }
         entries.add(entrySource);
     }
@@ -54,19 +50,10 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
-        for (Map.Entry<Field, String> fieldEntry : entry
-            .getFieldMap()
-            .entrySet()) {
+        for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
             // make sure there is a row for the field
-            if (
-                !mergedEntry
-                    .get()
-                    .getFieldsObservable()
-                    .containsKey(fieldEntry.getKey())
-            ) {
-                mergedEntry
-                    .get()
-                    .setField(fieldEntry.getKey(), fieldEntry.getValue());
+            if (!mergedEntry.get().getFieldsObservable().containsKey(fieldEntry.getKey())) {
+                mergedEntry.get().setField(fieldEntry.getKey(), fieldEntry.getValue());
             }
         }
     }
@@ -93,11 +80,8 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
     public static class EntrySource {
 
         private final StringProperty title = new SimpleStringProperty("");
-        private final ObjectProperty<BibEntry> entry =
-            new SimpleObjectProperty<>();
-        private final BooleanProperty isLoading = new SimpleBooleanProperty(
-            false
-        );
+        private final ObjectProperty<BibEntry> entry = new SimpleObjectProperty<>();
+        private final BooleanProperty isLoading = new SimpleBooleanProperty(false);
 
         public EntrySource(
             String title,

@@ -66,10 +66,7 @@ public class MonthCheckerTest {
 
     @Test
     void bibLaTexDoesNotAcceptFullInput() {
-        assertNotEquals(
-            Optional.empty(),
-            checkerBiblatex.checkValue("January")
-        );
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("January"));
     }
 
     @Test

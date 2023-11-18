@@ -21,10 +21,7 @@ public class HTMLCharacterCheckerTest {
 
     @Test
     void testSettingNullThrowsNPE() {
-        assertThrows(
-            NullPointerException.class,
-            () -> entry.setField(StandardField.AUTHOR, null)
-        );
+        assertThrows(NullPointerException.class, () -> entry.setField(StandardField.AUTHOR, null));
     }
 
     @Test
@@ -59,11 +56,7 @@ public class HTMLCharacterCheckerTest {
         entry.setField(StandardField.AUTHOR, "Lenhard, J&#227;rg");
         assertEquals(
             List.of(
-                new IntegrityMessage(
-                    "HTML encoded character found",
-                    entry,
-                    StandardField.AUTHOR
-                )
+                new IntegrityMessage("HTML encoded character found", entry, StandardField.AUTHOR)
             ),
             checker.check(entry)
         );
@@ -71,17 +64,10 @@ public class HTMLCharacterCheckerTest {
 
     @Test
     void journalDoesNotAcceptHTMLEncodedCharacters() {
-        entry.setField(
-            StandardField.JOURNAL,
-            "&Auml;rling Str&ouml;m for &#8211; &#x2031;"
-        );
+        entry.setField(StandardField.JOURNAL, "&Auml;rling Str&ouml;m for &#8211; &#x2031;");
         assertEquals(
             List.of(
-                new IntegrityMessage(
-                    "HTML encoded character found",
-                    entry,
-                    StandardField.JOURNAL
-                )
+                new IntegrityMessage("HTML encoded character found", entry, StandardField.JOURNAL)
             ),
             checker.check(entry)
         );
@@ -90,10 +76,7 @@ public class HTMLCharacterCheckerTest {
     static Stream<Arguments> entryWithVerabitmFieldsNotCausingMessages() {
         return Stream.of(
             Arguments.of(StandardField.FILE, "one &amp; another.pdf"),
-            Arguments.of(
-                StandardField.URL,
-                "https://example.org?key=value&key2=value2"
-            )
+            Arguments.of(StandardField.URL, "https://example.org?key=value&key2=value2")
         );
     }
 

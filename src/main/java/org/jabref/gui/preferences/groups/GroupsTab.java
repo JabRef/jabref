@@ -34,8 +34,7 @@ public class GroupsTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new GroupsTabViewModel(preferencesService.getGroupsPreferences());
+        this.viewModel = new GroupsTabViewModel(preferencesService.getGroupsPreferences());
 
         groupViewModeIntersection
             .selectedProperty()
@@ -43,11 +42,7 @@ public class GroupsTab
         groupViewModeUnion
             .selectedProperty()
             .bindBidirectional(viewModel.groupViewModeUnionProperty());
-        autoAssignGroup
-            .selectedProperty()
-            .bindBidirectional(viewModel.autoAssignGroupProperty());
-        displayGroupCount
-            .selectedProperty()
-            .bindBidirectional(viewModel.displayGroupCount());
+        autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
+        displayGroupCount.selectedProperty().bindBidirectional(viewModel.displayGroupCount());
     }
 }

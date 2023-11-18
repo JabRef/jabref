@@ -17,9 +17,7 @@ public class ASCIICharacterChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
-            boolean asciiOnly = CharMatcher
-                .ascii()
-                .matchesAllOf(field.getValue());
+            boolean asciiOnly = CharMatcher.ascii().matchesAllOf(field.getValue());
             if (!asciiOnly) {
                 results.add(
                     new IntegrityMessage(

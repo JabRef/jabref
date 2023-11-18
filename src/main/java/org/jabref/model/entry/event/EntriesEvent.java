@@ -24,10 +24,7 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
      * @param bibEntries List of BibEntry objects which are involved in this event
      * @param location   Location affected by this event
      */
-    public EntriesEvent(
-        List<BibEntry> bibEntries,
-        EntriesEventSource location
-    ) {
+    public EntriesEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super();
         this.bibEntries = Objects.requireNonNull(bibEntries);
         this.location = Objects.requireNonNull(location);

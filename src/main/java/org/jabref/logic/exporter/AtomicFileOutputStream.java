@@ -44,13 +44,10 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicFileOutputStream extends FilterOutputStream {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AtomicFileOutputStream.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String SAVE_EXTENSION =
-        "." + BackupFileType.SAVE.getExtensions().get(0);
+    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().get(0);
 
     /**
      * The file we want to create/replace.
@@ -79,8 +76,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * @param path       the path of the file to write to or replace
      * @param keepBackup whether to keep the backup file (.sav) after a successful write process
      */
-    public AtomicFileOutputStream(Path path, boolean keepBackup)
-        throws IOException {
+    public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
         this(
             path,
@@ -180,11 +176,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             Files.deleteIfExists(temporaryFile);
             Files.deleteIfExists(backupFile);
         } catch (IOException exception) {
-            LOGGER.debug(
-                "Unable to abort writing to file {}",
-                temporaryFile,
-                exception
-            );
+            LOGGER.debug("Unable to abort writing to file {}", temporaryFile, exception);
         }
     }
 
@@ -196,11 +188,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         } catch (IOException exception) {
             // Currently, we always get the exception:
             // Unable to release lock on file C:\Users\koppor\AppData\Local\Temp\junit11976839611279549873\error-during-save.txt.tmp: java.nio.channels.ClosedChannelException
-            LOGGER.debug(
-                "Unable to release lock on file {}",
-                temporaryFile,
-                exception
-            );
+            LOGGER.debug("Unable to release lock on file {}", temporaryFile, exception);
         }
         try {
             Files.deleteIfExists(temporaryFile);
@@ -244,18 +232,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             );
             if (Files.exists(targetFile)) {
                 try {
-                    Files.copy(
-                        targetFile,
-                        backupFile,
-                        StandardCopyOption.REPLACE_EXISTING
-                    );
+                    Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
                 } catch (Exception e) {
                     LOGGER.warn("Could not create backup file {}", backupFile);
                 }
                 if (FileUtil.IS_POSIX_COMPLIANT) {
                     try {
-                        oldFilePermissions =
-                            Files.getPosixFilePermissions(targetFile);
+                        oldFilePermissions = Files.getPosixFilePermissions(targetFile);
                     } catch (IOException exception) {
                         LOGGER.warn(
                             "Error getting file permissions for file {}.",
@@ -282,10 +265,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
                 try {
-                    Files.setPosixFilePermissions(
-                        targetFile,
-                        oldFilePermissions
-                    );
+                    Files.setPosixFilePermissions(targetFile, oldFilePermissions);
                 } catch (IOException exception) {
                     LOGGER.warn(
                         "Error writing file permissions to file {}.",

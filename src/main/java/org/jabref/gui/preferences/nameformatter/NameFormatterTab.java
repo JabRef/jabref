@@ -56,63 +56,36 @@ public class NameFormatterTab
 
     public void initialize() {
         this.viewModel =
-            new NameFormatterTabViewModel(
-                preferencesService.getNameFormatterPreferences()
-            );
+            new NameFormatterTabViewModel(preferencesService.getNameFormatterPreferences());
 
         formatterNameColumn.setSortable(true);
         formatterNameColumn.setReorderable(false);
-        formatterNameColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
+        formatterNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         formatterNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterNameColumn.setEditable(true);
         formatterNameColumn.setOnEditCommit(
-                (
-                    TableColumn.CellEditEvent<
-                        NameFormatterItemModel,
-                        String
-                    > event
-                ) ->
+                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
             event.getRowValue().setName(event.getNewValue())
         );
 
         formatterStringColumn.setSortable(true);
         formatterStringColumn.setReorderable(false);
-        formatterStringColumn.setCellValueFactory(cellData ->
-            cellData.getValue().formatProperty()
-        );
-        formatterStringColumn.setCellFactory(
-            TextFieldTableCell.forTableColumn()
-        );
+        formatterStringColumn.setCellValueFactory(cellData -> cellData.getValue().formatProperty());
+        formatterStringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterStringColumn.setEditable(true);
         formatterStringColumn.setOnEditCommit(
-                (
-                    TableColumn.CellEditEvent<
-                        NameFormatterItemModel,
-                        String
-                    > event
-                ) ->
+                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
             event.getRowValue().setFormat(event.getNewValue())
         );
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<NameFormatterItemModel, String>()
-            .withGraphic(name ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
-            .withTooltip(name ->
-                Localization.lang("Remove formatter '%0'", name)
-            )
+            .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+            .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
             .withOnMouseClickedEvent(item ->
-                evt ->
-                    viewModel.removeFormatter(
-                        formatterList.getFocusModel().getFocusedItem()
-                    )
+                evt -> viewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem())
             )
             .install(actionsColumn);
 
@@ -120,22 +93,16 @@ public class NameFormatterTab
             KeyEvent.KEY_PRESSED,
             event -> {
                 if (event.getCode() == KeyCode.DELETE) {
-                    viewModel.removeFormatter(
-                        formatterList.getSelectionModel().getSelectedItem()
-                    );
+                    viewModel.removeFormatter(formatterList.getSelectionModel().getSelectedItem());
                     event.consume();
                 }
             }
         );
 
         formatterList.setEditable(true);
-        formatterList
-            .itemsProperty()
-            .bindBidirectional(viewModel.formatterListProperty());
+        formatterList.itemsProperty().bindBidirectional(viewModel.formatterListProperty());
 
-        addFormatterName
-            .textProperty()
-            .bindBidirectional(viewModel.addFormatterNameProperty());
+        addFormatterName.textProperty().bindBidirectional(viewModel.addFormatterNameProperty());
         addFormatterName.addEventFilter(
             KeyEvent.KEY_PRESSED,
             event -> {
@@ -147,9 +114,7 @@ public class NameFormatterTab
             }
         );
 
-        addFormatterString
-            .textProperty()
-            .bindBidirectional(viewModel.addFormatterStringProperty());
+        addFormatterString.textProperty().bindBidirectional(viewModel.addFormatterStringProperty());
         addFormatterString.addEventFilter(
             KeyEvent.KEY_PRESSED,
             event -> {

@@ -86,8 +86,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
             getDialogPane(),
             event -> viewModel.parseButtonClicked()
         );
-        Button parseButton = (Button) getDialogPane()
-            .lookupButton(parseButtonType);
+        Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);
         parseButton
             .disableProperty()
             .bind(
@@ -110,22 +109,14 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
                 fileMonitor
             );
 
-        fileTreeView
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
-        fileTreeView
-            .showRootProperty()
-            .bindBidirectional(viewModel.successfulSearchProperty());
+        fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());
         fileTreeView
             .rootProperty()
             .bind(
                 EasyBind.map(
                     viewModel.rootProperty(),
-                    fileNode ->
-                        new RecursiveTreeItem<>(
-                            fileNode,
-                            FileNodeViewModel::getChildren
-                        )
+                    fileNode -> new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)
                 )
             );
 
@@ -153,21 +144,13 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
             viewModel.latexDirectoryValidation(),
             latexDirectoryField
         );
-        browseButton
-            .disableProperty()
-            .bindBidirectional(viewModel.searchInProgressProperty());
+        browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
         searchButton
             .disableProperty()
             .bind(viewModel.latexDirectoryValidation().validProperty().not());
-        selectAllButton
-            .disableProperty()
-            .bindBidirectional(viewModel.noFilesFoundProperty());
-        unselectAllButton
-            .disableProperty()
-            .bindBidirectional(viewModel.noFilesFoundProperty());
-        progressIndicator
-            .visibleProperty()
-            .bindBidirectional(viewModel.searchInProgressProperty());
+        selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
+        unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
+        progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());
     }
 
     @FXML

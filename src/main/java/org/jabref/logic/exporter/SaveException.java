@@ -11,9 +11,7 @@ public class SaveException extends Exception {
 
     public static final SaveException FILE_LOCKED = new SaveException(
         "Could not save, file locked by another JabRef instance.",
-        Localization.lang(
-            "Could not save, file locked by another JabRef instance."
-        )
+        Localization.lang("Could not save, file locked by another JabRef instance.")
     );
     public static final SaveException BACKUP_CREATION = new SaveException(
         "Unable to create backup",
@@ -51,12 +49,7 @@ public class SaveException extends Exception {
         this.entry = entry;
     }
 
-    public SaveException(
-        String message,
-        String localizedMessage,
-        BibEntry entry,
-        Throwable base
-    ) {
+    public SaveException(String message, String localizedMessage, BibEntry entry, Throwable base) {
         super(message, base);
         this.localizedMessage = localizedMessage;
         this.entry = entry;

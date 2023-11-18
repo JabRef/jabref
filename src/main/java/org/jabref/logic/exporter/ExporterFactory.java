@@ -33,13 +33,10 @@ public class ExporterFactory {
         LayoutFormatterPreferences layoutPreferences =
             preferencesService.getLayoutFormatterPreferences();
         SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(
-            preferencesService
-                .getSelfContainedExportConfiguration()
-                .getSaveOrder()
+            preferencesService.getSelfContainedExportConfiguration().getSaveOrder()
         );
         XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
-        FieldPreferences fieldPreferences =
-            preferencesService.getFieldPreferences();
+        FieldPreferences fieldPreferences = preferencesService.getFieldPreferences();
         BibDatabaseMode bibDatabaseMode = preferencesService
             .getLibraryPreferences()
             .getDefaultBibDatabaseMode();
@@ -255,11 +252,7 @@ public class ExporterFactory {
         exporters.add(new XmpExporter(xmpPreferences));
         exporters.add(new XmpPdfExporter(xmpPreferences));
         exporters.add(
-            new EmbeddedBibFilePdfExporter(
-                bibDatabaseMode,
-                entryTypesManager,
-                fieldPreferences
-            )
+            new EmbeddedBibFilePdfExporter(bibDatabaseMode, entryTypesManager, fieldPreferences)
         );
 
         // Now add custom export formats

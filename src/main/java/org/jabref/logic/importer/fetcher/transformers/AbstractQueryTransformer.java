@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractQueryTransformer {
 
     public static final String NO_EXPLICIT_FIELD = "default";
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AbstractQueryTransformer.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
 
     // These can be used for filtering in post processing
     protected int startYear = Integer.MAX_VALUE;
@@ -120,8 +118,7 @@ public abstract class AbstractQueryTransformer {
     private Optional<String> transform(ModifierQueryNode query) {
         ModifierQueryNode.Modifier modifier = query.getModifier();
         if (modifier == ModifierQueryNode.Modifier.MOD_NOT) {
-            return transform(query.getChild())
-                .map(s -> getLogicalNotOperator() + s);
+            return transform(query.getChild()).map(s -> getLogicalNotOperator() + s);
         } else {
             return transform(query.getChild());
         }
@@ -198,11 +195,7 @@ public abstract class AbstractQueryTransformer {
         return createKeyValuePair(fieldAsString, term, ":");
     }
 
-    protected String createKeyValuePair(
-        String fieldAsString,
-        String term,
-        String separator
-    ) {
+    protected String createKeyValuePair(String fieldAsString, String term, String separator) {
         return String.format(
             "%s%s%s",
             fieldAsString,
@@ -215,10 +208,7 @@ public abstract class AbstractQueryTransformer {
      * Return a string representation of the provided field
      * If it is not supported return an empty optional.
      */
-    protected Optional<String> handleOtherField(
-        String fieldAsString,
-        String term
-    ) {
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
@@ -232,10 +222,7 @@ public abstract class AbstractQueryTransformer {
         } else if (query instanceof ModifierQueryNode) {
             return transform((ModifierQueryNode) query);
         } else {
-            LOGGER.error(
-                "Unsupported case when transforming the query:\n {}",
-                query
-            );
+            LOGGER.error("Unsupported case when transforming the query:\n {}", query);
             return Optional.empty();
         }
     }

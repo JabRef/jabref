@@ -41,50 +41,25 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void oneElement() {
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long Name", "L. N.")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.getCustomAbbreviations().size());
 
-        assertEquals(
-            "L. N.",
-            repository.getDefaultAbbreviation("Long Name").orElse("WRONG")
-        );
-        assertEquals(
-            "UNKNOWN",
-            repository.getDefaultAbbreviation("?").orElse("UNKNOWN")
-        );
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getDefaultAbbreviation("?").orElse("UNKNOWN"));
 
         assertEquals("L N", repository.getDotless("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getDotless("?").orElse("UNKNOWN"));
 
         assertEquals(
             "L. N.",
-            repository
-                .getShortestUniqueAbbreviation("Long Name")
-                .orElse("WRONG")
+            repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG")
         );
-        assertEquals(
-            "UNKNOWN",
-            repository.getShortestUniqueAbbreviation("?").orElse("UNKNOWN")
-        );
+        assertEquals("UNKNOWN", repository.getShortestUniqueAbbreviation("?").orElse("UNKNOWN"));
 
-        assertEquals(
-            "L. N.",
-            repository.getNextAbbreviation("Long Name").orElse("WRONG")
-        );
-        assertEquals(
-            "L N",
-            repository.getNextAbbreviation("L. N.").orElse("WRONG")
-        );
-        assertEquals(
-            "Long Name",
-            repository.getNextAbbreviation("L N").orElse("WRONG")
-        );
-        assertEquals(
-            "UNKNOWN",
-            repository.getNextAbbreviation("?").orElse("UNKNOWN")
-        );
+        assertEquals("L. N.", repository.getNextAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("L N", repository.getNextAbbreviation("L. N.").orElse("WRONG"));
+        assertEquals("Long Name", repository.getNextAbbreviation("L N").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getNextAbbreviation("?").orElse("UNKNOWN"));
 
         assertTrue(repository.isKnownName("Long Name"));
         assertTrue(repository.isKnownName("L. N."));
@@ -94,54 +69,23 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void oneElementWithShortestUniqueAbbreviation() {
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long Name", "L. N.", "LN")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         assertEquals(1, repository.getCustomAbbreviations().size());
 
-        assertEquals(
-            "L. N.",
-            repository.getDefaultAbbreviation("Long Name").orElse("WRONG")
-        );
-        assertEquals(
-            "UNKNOWN",
-            repository.getDefaultAbbreviation("?").orElse("UNKNOWN")
-        );
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getDefaultAbbreviation("?").orElse("UNKNOWN"));
 
         assertEquals("L N", repository.getDotless("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getDotless("?").orElse("UNKNOWN"));
 
-        assertEquals(
-            "LN",
-            repository
-                .getShortestUniqueAbbreviation("Long Name")
-                .orElse("WRONG")
-        );
-        assertEquals(
-            "UNKNOWN",
-            repository.getShortestUniqueAbbreviation("?").orElse("UNKNOWN")
-        );
+        assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getShortestUniqueAbbreviation("?").orElse("UNKNOWN"));
 
-        assertEquals(
-            "L. N.",
-            repository.getNextAbbreviation("Long Name").orElse("WRONG")
-        );
-        assertEquals(
-            "L N",
-            repository.getNextAbbreviation("L. N.").orElse("WRONG")
-        );
-        assertEquals(
-            "LN",
-            repository.getNextAbbreviation("L N").orElse("WRONG")
-        );
-        assertEquals(
-            "Long Name",
-            repository.getNextAbbreviation("LN").orElse("WRONG")
-        );
-        assertEquals(
-            "UNKNOWN",
-            repository.getNextAbbreviation("?").orElse("UNKNOWN")
-        );
+        assertEquals("L. N.", repository.getNextAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("L N", repository.getNextAbbreviation("L. N.").orElse("WRONG"));
+        assertEquals("LN", repository.getNextAbbreviation("L N").orElse("WRONG"));
+        assertEquals("Long Name", repository.getNextAbbreviation("LN").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getNextAbbreviation("?").orElse("UNKNOWN"));
 
         assertTrue(repository.isKnownName("Long Name"));
         assertTrue(repository.isKnownName("L. N."));
@@ -152,45 +96,29 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicates() {
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long Name", "L. N.")
-        );
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long Name", "L. N.")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.getCustomAbbreviations().size());
     }
 
     @Test
     void testDuplicatesWithShortestUniqueAbbreviation() {
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long Name", "L. N.", "LN")
-        );
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long Name", "L. N.", "LN")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         assertEquals(1, repository.getCustomAbbreviations().size());
     }
 
     @Test
     void testDuplicatesIsoOnly() {
-        repository.addCustomAbbreviation(
-            new Abbreviation("Old Long Name", "L. N.")
-        );
-        repository.addCustomAbbreviation(
-            new Abbreviation("New Long Name", "L. N.")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N."));
+        repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N."));
         assertEquals(2, repository.getCustomAbbreviations().size());
     }
 
     @Test
     void testDuplicatesIsoOnlyWithShortestUniqueAbbreviation() {
-        repository.addCustomAbbreviation(
-            new Abbreviation("Old Long Name", "L. N.", "LN")
-        );
-        repository.addCustomAbbreviation(
-            new Abbreviation("New Long Name", "L. N.", "LN")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N.", "LN"));
+        repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N.", "LN"));
         assertEquals(2, repository.getCustomAbbreviations().size());
     }
 
@@ -198,85 +126,40 @@ class JournalAbbreviationRepositoryTest {
     void testDuplicateKeys() {
         Abbreviation abbreviationOne = new Abbreviation("Long Name", "L. N.");
         repository.addCustomAbbreviation(abbreviationOne);
-        assertEquals(
-            Set.of(abbreviationOne),
-            repository.getCustomAbbreviations()
-        );
-        assertEquals(
-            "L. N.",
-            repository.getDefaultAbbreviation("Long Name").orElse("WRONG")
-        );
+        assertEquals(Set.of(abbreviationOne), repository.getCustomAbbreviations());
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
 
         Abbreviation abbreviationTwo = new Abbreviation("Long Name", "LA. N.");
         repository.addCustomAbbreviation(abbreviationTwo);
-        assertEquals(
-            Set.of(abbreviationOne, abbreviationTwo),
-            repository.getCustomAbbreviations()
-        );
+        assertEquals(Set.of(abbreviationOne, abbreviationTwo), repository.getCustomAbbreviations());
 
         // Both abbreviations are kept in the repository
         // "L. N." is smaller than "LA. N.", therefore "L. N." is returned
-        assertEquals(
-            "L. N.",
-            repository.getDefaultAbbreviation("Long Name").orElse("WRONG")
-        );
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
     }
 
     @Test
     void testDuplicateKeysWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviationOne = new Abbreviation(
-            "Long Name",
-            "L. N.",
-            "LN"
-        );
+        Abbreviation abbreviationOne = new Abbreviation("Long Name", "L. N.", "LN");
         repository.addCustomAbbreviation(abbreviationOne);
-        assertEquals(
-            Set.of(abbreviationOne),
-            repository.getCustomAbbreviations()
-        );
-        assertEquals(
-            "L. N.",
-            repository.getDefaultAbbreviation("Long Name").orElse("WRONG")
-        );
-        assertEquals(
-            "LN",
-            repository
-                .getShortestUniqueAbbreviation("Long Name")
-                .orElse("WRONG")
-        );
+        assertEquals(Set.of(abbreviationOne), repository.getCustomAbbreviations());
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
 
-        Abbreviation abbreviationTwo = new Abbreviation(
-            "Long Name",
-            "LA. N.",
-            "LAN"
-        );
+        Abbreviation abbreviationTwo = new Abbreviation("Long Name", "LA. N.", "LAN");
         repository.addCustomAbbreviation(abbreviationTwo);
-        assertEquals(
-            Set.of(abbreviationOne, abbreviationTwo),
-            repository.getCustomAbbreviations()
-        );
+        assertEquals(Set.of(abbreviationOne, abbreviationTwo), repository.getCustomAbbreviations());
 
         // Both abbreviations are kept in the repository
         // "L. N." is smaller than "LA. N.", therefore "L. N." is returned
-        assertEquals(
-            "L. N.",
-            repository.getDefaultAbbreviation("Long Name").orElse("WRONG")
-        );
-        assertEquals(
-            "LN",
-            repository
-                .getShortestUniqueAbbreviation("Long Name")
-                .orElse("WRONG")
-        );
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
     }
 
     @Test
     void getFromFullName() {
         assertEquals(
-            new Abbreviation(
-                "American Journal of Public Health",
-                "Am. J. Public Health"
-            ),
+            new Abbreviation("American Journal of Public Health", "Am. J. Public Health"),
             repository.get("American Journal of Public Health").get()
         );
     }
@@ -284,10 +167,7 @@ class JournalAbbreviationRepositoryTest {
     @Test
     void getFromAbbreviatedName() {
         assertEquals(
-            new Abbreviation(
-                "American Journal of Public Health",
-                "Am. J. Public Health"
-            ),
+            new Abbreviation("American Journal of Public Health", "Am. J. Public Health"),
             repository.get("Am. J. Public Health").get()
         );
     }
@@ -295,37 +175,23 @@ class JournalAbbreviationRepositoryTest {
     @Test
     void testAbbreviationsWithEscapedAmpersand() {
         assertEquals(
-            new Abbreviation(
-                "ACS Applied Materials & Interfaces",
-                "ACS Appl. Mater. Interfaces"
-            ),
+            new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"),
             repository.get("ACS Applied Materials & Interfaces").get()
         );
         assertEquals(
-            new Abbreviation(
-                "ACS Applied Materials & Interfaces",
-                "ACS Appl. Mater. Interfaces"
-            ),
+            new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"),
             repository.get("ACS Applied Materials \\& Interfaces").get()
         );
         assertEquals(
-            new Abbreviation(
-                "Antioxidants & Redox Signaling",
-                "Antioxid. Redox Sign."
-            ),
+            new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Sign."),
             repository.get("Antioxidants & Redox Signaling").get()
         );
         assertEquals(
-            new Abbreviation(
-                "Antioxidants & Redox Signaling",
-                "Antioxid. Redox Sign."
-            ),
+            new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Sign."),
             repository.get("Antioxidants \\& Redox Signaling").get()
         );
 
-        repository.addCustomAbbreviation(
-            new Abbreviation("Long & Name", "L. N.", "LN")
-        );
+        repository.addCustomAbbreviation(new Abbreviation("Long & Name", "L. N.", "LN"));
         assertEquals(
             new Abbreviation("Long & Name", "L. N.", "LN"),
             repository.get("Long & Name").get()
@@ -344,9 +210,7 @@ class JournalAbbreviationRepositoryTest {
             false
         );
 
-        BibEntry entryWithEscapedAmpersandInJournal = new BibEntry(
-            StandardEntryType.Article
-        );
+        BibEntry entryWithEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article);
         entryWithEscapedAmpersandInJournal.setField(
             StandardField.JOURNAL,
             "ACS Applied Materials \\& Interfaces"
@@ -358,25 +222,15 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
-        assertEquals(
-            expectedAbbreviatedJournalEntry,
-            entryWithEscapedAmpersandInJournal
-        );
+        assertEquals(expectedAbbreviatedJournalEntry, entryWithEscapedAmpersandInJournal);
     }
 
     @Test
     void testJournalUnabbreviate() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        );
-        abbreviatedJournalEntry.setField(
-            StandardField.JOURNAL,
-            "ACS Appl. Mater. Interfaces"
-        );
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article);
+        abbreviatedJournalEntry.setField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
         undoableUnabbreviator.unabbreviate(
             bibDatabase,
@@ -384,13 +238,8 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            );
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
@@ -402,13 +251,8 @@ class JournalAbbreviationRepositoryTest {
             false
         );
 
-        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            );
+        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
 
         undoableAbbreviator.abbreviate(
             bibDatabase,
@@ -416,14 +260,9 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
-        assertEquals(
-            expectedAbbreviatedJournalEntry,
-            entryWithoutEscapedAmpersandInJournal
-        );
+        assertEquals(expectedAbbreviatedJournalEntry, entryWithoutEscapedAmpersandInJournal);
     }
 
     @Test
@@ -434,13 +273,8 @@ class JournalAbbreviationRepositoryTest {
             true
         );
 
-        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            )
+        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces")
             .withField(AMSField.FJOURNAL, "&nbsp;");
 
         undoableAbbreviator.abbreviate(
@@ -449,22 +283,15 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
             .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
-        assertEquals(
-            expectedAbbreviatedJournalEntry,
-            entryWithoutEscapedAmpersandInJournal
-        );
+        assertEquals(expectedAbbreviatedJournalEntry, entryWithoutEscapedAmpersandInJournal);
     }
 
     @Test
     void testUnabbreviateWithJournalExistsAndFJournalNot() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
         undoableUnabbreviator.unabbreviate(
@@ -473,21 +300,14 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            );
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
     @Test
     void testUnabbreviateWithJournalExistsAndFJournalExists() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
             .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
 
@@ -497,21 +317,14 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            );
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
     @Test
     void testJournalDotlessAbbreviation() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl Mater Interfaces");
 
         undoableUnabbreviator.unabbreviate(
@@ -520,21 +333,14 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            );
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
     @Test
     void testJournalDotlessAbbreviationWithCurlyBraces() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "{ACS Appl Mater Interfaces}");
 
         undoableUnabbreviator.unabbreviate(
@@ -543,13 +349,8 @@ class JournalAbbreviationRepositoryTest {
             StandardField.JOURNAL,
             new CompoundEdit()
         );
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
-            .withField(
-                StandardField.JOURNAL,
-                "ACS Applied Materials & Interfaces"
-            );
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
@@ -558,9 +359,7 @@ class JournalAbbreviationRepositoryTest {
      */
     @Test
     void testTitleEmbeddedWithCurlyBracesHavingNoChangesKeepsBraces() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.InCollection
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InCollection)
             .withField(StandardField.JOURNAL, "{The Visualization Handbook}");
 
         undoableUnabbreviator.unabbreviate(
@@ -570,9 +369,7 @@ class JournalAbbreviationRepositoryTest {
             new CompoundEdit()
         );
 
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.InCollection
-        )
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.InCollection)
             .withField(StandardField.JOURNAL, "{The Visualization Handbook}");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
@@ -582,9 +379,7 @@ class JournalAbbreviationRepositoryTest {
      */
     @Test
     void testTitleWithNestedCurlyBracesHavingNoChangesKeepsBraces() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.InProceedings
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InProceedings)
             .withField(
                 StandardField.BOOKTITLE,
                 "2015 {IEEE} International Conference on Digital Signal Processing, {DSP} 2015, Singapore, July 21-24, 2015"
@@ -597,9 +392,7 @@ class JournalAbbreviationRepositoryTest {
             new CompoundEdit()
         );
 
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.InProceedings
-        )
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.InProceedings)
             .withField(
                 StandardField.BOOKTITLE,
                 "2015 {IEEE} International Conference on Digital Signal Processing, {DSP} 2015, Singapore, July 21-24, 2015"
@@ -609,9 +402,7 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDotlessForPhysRevB() {
-        BibEntry abbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "Phys Rev B");
 
         undoableUnabbreviator.unabbreviate(
@@ -621,9 +412,7 @@ class JournalAbbreviationRepositoryTest {
             new CompoundEdit()
         );
 
-        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(
-            StandardEntryType.Article
-        )
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "Physical Review B");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }

@@ -16,11 +16,7 @@ public class AbbreviationParserTest {
     private Path csvFile;
     private final AbbreviationParser parser = new AbbreviationParser();
 
-    private final Abbreviation abbreviation = new Abbreviation(
-        "Long Name",
-        "L.N.",
-        "L.N."
-    );
+    private final Abbreviation abbreviation = new Abbreviation("Long Name", "L.N.", "L.N.");
 
     @BeforeEach
     void setup(@TempDir Path tempDir) {
@@ -31,12 +27,7 @@ public class AbbreviationParserTest {
     void testReadingFileFromCSVWithSemicolon() throws Exception {
         // String name, String abbreviation, String shortestUniqueAbbreviation
         String testAbbrev = "Long Name;L.N.;L.N.";
-        try (
-            BufferedWriter writer = Files.newBufferedWriter(
-                csvFile,
-                StandardCharsets.UTF_8
-            )
-        ) {
+        try (BufferedWriter writer = Files.newBufferedWriter(csvFile, StandardCharsets.UTF_8)) {
             writer.write(testAbbrev);
         }
         parser.readJournalListFromFile(csvFile);
@@ -46,12 +37,7 @@ public class AbbreviationParserTest {
     @Test
     void testReadingFileFromCSVWithComma() throws Exception {
         String testAbbrev = "Long Name,L.N.,L.N.";
-        try (
-            BufferedWriter writer = Files.newBufferedWriter(
-                csvFile,
-                StandardCharsets.UTF_8
-            )
-        ) {
+        try (BufferedWriter writer = Files.newBufferedWriter(csvFile, StandardCharsets.UTF_8)) {
             writer.write(testAbbrev);
         }
         parser.readJournalListFromFile(csvFile);

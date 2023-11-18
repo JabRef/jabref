@@ -12,10 +12,7 @@ import com.tngtech.archunit.junit.ArchTest;
 /**
  * This class checks JabRef's test classes for architecture quality
  */
-@AnalyzeClasses(
-    packages = "org.jabref",
-    importOptions = ImportOption.OnlyIncludeTests.class
-)
+@AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.OnlyIncludeTests.class)
 public class TestArchitectureTest {
 
     private static final String CLASS_ORG_JABREF_PREFERENCES =
@@ -61,53 +58,31 @@ public class TestArchitectureTest {
             .and()
             .doNotHaveFullyQualifiedName("org.jabref.http.server.TestBibFile")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.gui.autocompleter.AutoCompleterUtil"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.gui.autocompleter.AutoCompleterUtil")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.gui.search.TextFlowEqualityHelper"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.gui.search.TextFlowEqualityHelper")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.logic.bibtex.BibEntryAssert"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.logic.bibtex.BibEntryAssert")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.logic.importer.fileformat.ImporterTestEngine"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.logic.importer.fileformat.ImporterTestEngine")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.logic.l10n.JavaLocalizationEntryParser"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.logic.l10n.JavaLocalizationEntryParser")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.logic.l10n.LocalizationEntry"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.logic.l10n.LocalizationEntry")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.logic.l10n.LocalizationParser"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.logic.l10n.LocalizationParser")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.logic.openoffice.style.OOBibStyleTestHelper"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.logic.openoffice.style.OOBibStyleTestHelper")
             .and()
             .doNotHaveFullyQualifiedName("org.jabref.logic.shared.TestManager")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.model.search.rules.MockSearchMatcher"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.model.search.rules.MockSearchMatcher")
             .and()
             .doNotHaveFullyQualifiedName("org.jabref.model.TreeNodeTestData")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.performance.BibtexEntryGenerator"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.performance.BibtexEntryGenerator")
             .and()
-            .doNotHaveFullyQualifiedName(
-                "org.jabref.support.DisabledOnCIServer"
-            )
+            .doNotHaveFullyQualifiedName("org.jabref.support.DisabledOnCIServer")
             .and()
             .doNotHaveFullyQualifiedName("org.jabref.support.CIServerCondition")
             .and()

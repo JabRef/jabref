@@ -20,46 +20,25 @@ public class ExternalFileTypesTab
     implements PreferencesTab {
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        JabRefIcon
-    > fileTypesTableIconColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, JabRefIcon> fileTypesTableIconColumn;
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        String
-    > fileTypesTableNameColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, String> fileTypesTableNameColumn;
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        String
-    > fileTypesTableExtensionColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, String> fileTypesTableExtensionColumn;
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        String
-    > fileTypesTableMimeTypeColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, String> fileTypesTableMimeTypeColumn;
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        String
-    > fileTypesTableApplicationColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, String> fileTypesTableApplicationColumn;
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        Boolean
-    > fileTypesTableEditColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, Boolean> fileTypesTableEditColumn;
 
     @FXML
-    private TableColumn<
-        ExternalFileTypeItemViewModel,
-        Boolean
-    > fileTypesTableDeleteColumn;
+    private TableColumn<ExternalFileTypeItemViewModel, Boolean> fileTypesTableDeleteColumn;
 
     @FXML
     private TableView<ExternalFileTypeItemViewModel> fileTypesTable;
@@ -83,15 +62,13 @@ public class ExternalFileTypesTab
 
         fileTypesTable.setItems(viewModel.getFileTypes());
 
-        fileTypesTableIconColumn.setCellValueFactory(cellData ->
-            cellData.getValue().iconProperty()
+        fileTypesTableIconColumn.setCellValueFactory(cellData -> cellData.getValue().iconProperty()
         );
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, JabRefIcon>()
             .withGraphic(JabRefIcon::getGraphicNode)
             .install(fileTypesTableIconColumn);
 
-        fileTypesTableNameColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
+        fileTypesTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty()
         );
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, String>()
             .withText(name -> name)
@@ -118,29 +95,19 @@ public class ExternalFileTypesTab
             .withText(extension -> extension)
             .install(fileTypesTableApplicationColumn);
 
-        fileTypesTableEditColumn.setCellValueFactory(data ->
-            BindingsHelper.constantOf(true)
-        );
-        fileTypesTableDeleteColumn.setCellValueFactory(data ->
-            BindingsHelper.constantOf(true)
-        );
+        fileTypesTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
+        fileTypesTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
 
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, JabRefIcon>()
             .withGraphic(JabRefIcon::getGraphicNode)
             .install(fileTypesTableIconColumn);
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, Boolean>()
             .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
-            .withOnMouseClickedEvent((type, none) ->
-                event -> viewModel.edit(type)
-            )
+            .withOnMouseClickedEvent((type, none) -> event -> viewModel.edit(type))
             .install(fileTypesTableEditColumn);
         new ValueTableCellFactory<ExternalFileTypeItemViewModel, Boolean>()
-            .withGraphic(none ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
-            .withOnMouseClickedEvent((type, none) ->
-                event -> viewModel.remove(type)
-            )
+            .withGraphic(none -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+            .withOnMouseClickedEvent((type, none) -> event -> viewModel.remove(type))
             .install(fileTypesTableDeleteColumn);
     }
 

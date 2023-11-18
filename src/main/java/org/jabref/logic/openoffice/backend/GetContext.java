@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GetContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        GetContext.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetContext.class);
 
     private GetContext() {}
 
@@ -59,11 +57,7 @@ public class GetContext {
                 cursor.goRight((short) 1, true);
                 if (i >= ((charAfter + lengthWithBefore) - flex)) {
                     String strNow = cursor.getString();
-                    if (
-                        Character.isWhitespace(
-                            strNow.charAt(strNow.length() - 1)
-                        )
-                    ) {
+                    if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
                         break;
                     }
                 }

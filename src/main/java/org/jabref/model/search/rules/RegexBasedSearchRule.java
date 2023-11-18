@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public class RegexBasedSearchRule extends FullTextSearchRule {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RegexBasedSearchRule.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegexBasedSearchRule.class);
 
     public RegexBasedSearchRule(EnumSet<SearchFlags> searchFlags) {
         super(searchFlags);

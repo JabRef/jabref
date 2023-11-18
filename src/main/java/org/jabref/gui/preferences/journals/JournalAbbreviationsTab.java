@@ -55,16 +55,10 @@ public class JournalAbbreviationsTab
     private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
 
     @FXML
-    private TableColumn<
-        AbbreviationViewModel,
-        String
-    > journalTableAbbreviationColumn;
+    private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
 
     @FXML
-    private TableColumn<
-        AbbreviationViewModel,
-        String
-    > journalTableShortestUniqueAbbreviationColumn;
+    private TableColumn<AbbreviationViewModel, String> journalTableShortestUniqueAbbreviationColumn;
 
     @FXML
     private TableColumn<AbbreviationViewModel, String> actionsColumn;
@@ -108,8 +102,7 @@ public class JournalAbbreviationsTab
                 abbreviationRepository
             );
 
-        filteredAbbreviations =
-            new FilteredList<>(viewModel.abbreviationsProperty());
+        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
         setUpTable();
         setBindings();
@@ -120,19 +113,13 @@ public class JournalAbbreviationsTab
     }
 
     private void setUpTable() {
-        journalTableNameColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
-        journalTableNameColumn.setCellFactory(
-            TextFieldTableCell.forTableColumn()
-        );
+        journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        journalTableNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
         journalTableAbbreviationColumn.setCellValueFactory(cellData ->
             cellData.getValue().abbreviationProperty()
         );
-        journalTableAbbreviationColumn.setCellFactory(
-            TextFieldTableCell.forTableColumn()
-        );
+        journalTableAbbreviationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
         journalTableShortestUniqueAbbreviationColumn.setCellValueFactory(cellData ->
             cellData.getValue().shortestUniqueAbbreviationProperty()
@@ -141,26 +128,16 @@ public class JournalAbbreviationsTab
             TextFieldTableCell.forTableColumn()
         );
 
-        actionsColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<AbbreviationViewModel, String>()
-            .withGraphic(name ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
+            .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
             .withTooltip(name -> Localization.lang("Remove journal '%0'", name))
-            .withDisableExpression(item ->
-                viewModel.isEditableAndRemovableProperty().not()
-            )
-            .withVisibleExpression(item ->
-                viewModel.isEditableAndRemovableProperty()
-            )
+            .withDisableExpression(item -> viewModel.isEditableAndRemovableProperty().not())
+            .withVisibleExpression(item -> viewModel.isEditableAndRemovableProperty())
             .withOnMouseClickedEvent(item ->
                 evt ->
                     viewModel.removeAbbreviation(
-                        journalAbbreviationsTable
-                            .getFocusModel()
-                            .getFocusedItem()
+                        journalAbbreviationsTable.getFocusModel().getFocusedItem()
                     )
             )
             .install(actionsColumn);
@@ -170,15 +147,12 @@ public class JournalAbbreviationsTab
         journalAbbreviationsTable.setItems(filteredAbbreviations);
 
         EasyBind.subscribe(
-            journalAbbreviationsTable
-                .getSelectionModel()
-                .selectedItemProperty(),
+            journalAbbreviationsTable.getSelectionModel().selectedItemProperty(),
             newValue -> viewModel.currentAbbreviationProperty().set(newValue)
         );
         EasyBind.subscribe(
             viewModel.currentAbbreviationProperty(),
-            newValue ->
-                journalAbbreviationsTable.getSelectionModel().select(newValue)
+            newValue -> journalAbbreviationsTable.getSelectionModel().select(newValue)
         );
 
         journalTableNameColumn
@@ -194,12 +168,8 @@ public class JournalAbbreviationsTab
         removeAbbreviationListButton
             .disableProperty()
             .bind(viewModel.isFileRemovableProperty().not());
-        journalFilesBox
-            .itemsProperty()
-            .bindBidirectional(viewModel.journalFilesProperty());
-        journalFilesBox
-            .valueProperty()
-            .bindBidirectional(viewModel.currentFileProperty());
+        journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
+        journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
 
         addAbbreviationButton
             .disableProperty()
@@ -212,22 +182,18 @@ public class JournalAbbreviationsTab
             .textProperty()
             .addListener((observable, previousText, searchTerm) ->
                 filteredAbbreviations.setPredicate(abbreviation ->
-                    searchTerm.isEmpty() ||
-                    abbreviation.containsCaseIndependent(searchTerm)
+                    searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm)
                 )
             );
 
-        useFJournal
-            .selectedProperty()
-            .bindBidirectional(viewModel.useFJournalProperty());
+        useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
     }
 
     private void setAnimations() {
-        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(
-            Color.TRANSPARENT
+        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
+        StringProperty flashingColorStringProperty = createFlashingColorStringProperty(
+            flashingColor
         );
-        StringProperty flashingColorStringProperty =
-            createFlashingColorStringProperty(flashingColor);
 
         searchBox
             .styleProperty()
@@ -240,11 +206,7 @@ public class JournalAbbreviationsTab
             new Timeline(
                 new KeyFrame(
                     Duration.seconds(0),
-                    new KeyValue(
-                        flashingColor,
-                        Color.TRANSPARENT,
-                        Interpolator.LINEAR
-                    )
+                    new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)
                 ),
                 new KeyFrame(
                     Duration.seconds(0.25),
@@ -252,11 +214,7 @@ public class JournalAbbreviationsTab
                 ),
                 new KeyFrame(
                     Duration.seconds(0.25),
-                    new KeyValue(
-                        searchBox.textProperty(),
-                        "",
-                        Interpolator.DISCRETE
-                    )
+                    new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)
                 ),
                 new KeyFrame(
                     Duration.seconds(0.25),
@@ -264,11 +222,7 @@ public class JournalAbbreviationsTab
                 ),
                 new KeyFrame(
                     Duration.seconds(0.5),
-                    new KeyValue(
-                        flashingColor,
-                        Color.TRANSPARENT,
-                        Interpolator.LINEAR
-                    )
+                    new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)
                 )
             );
     }
@@ -306,8 +260,7 @@ public class JournalAbbreviationsTab
     private static StringProperty createFlashingColorStringProperty(
         final ObjectProperty<Color> flashingColor
     ) {
-        final StringProperty flashingColorStringProperty =
-            new SimpleStringProperty();
+        final StringProperty flashingColorStringProperty = new SimpleStringProperty();
         setColorStringFromColor(flashingColorStringProperty, flashingColor);
         flashingColor.addListener((observable, oldValue, newValue) ->
             setColorStringFromColor(flashingColorStringProperty, flashingColor)
@@ -334,9 +287,7 @@ public class JournalAbbreviationsTab
         int lastRow = viewModel.abbreviationsCountProperty().get() - 1;
         journalAbbreviationsTable.scrollTo(lastRow);
         journalAbbreviationsTable.getSelectionModel().select(lastRow);
-        journalAbbreviationsTable
-            .getFocusModel()
-            .focus(lastRow, journalTableNameColumn);
+        journalAbbreviationsTable.getFocusModel().focus(lastRow, journalTableNameColumn);
     }
 
     @Override

@@ -31,10 +31,7 @@ public class ImportDataTest {
      */
     @Test
     void testTestingEnvironment() {
-        assertTrue(
-            Files.exists(ImportDataTest.EXISTING_FOLDER),
-            "EXISTING_FOLDER does not exist"
-        );
+        assertTrue(Files.exists(ImportDataTest.EXISTING_FOLDER), "EXISTING_FOLDER does not exist");
         assertTrue(
             Files.isDirectory(ImportDataTest.EXISTING_FOLDER),
             "EXISTING_FOLDER is not a directory"
@@ -58,13 +55,7 @@ public class ImportDataTest {
             "FILE_NOT_IN_DATABASE is not a regular file"
         );
 
-        assertFalse(
-            Files.exists(ImportDataTest.NOT_EXISTING_FOLDER),
-            "NOT_EXISTING_FOLDER exists"
-        );
-        assertFalse(
-            Files.exists(ImportDataTest.NOT_EXISTING_PDF),
-            "NOT_EXISTING_PDF exists"
-        );
+        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_FOLDER), "NOT_EXISTING_FOLDER exists");
+        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_PDF), "NOT_EXISTING_PDF exists");
     }
 }

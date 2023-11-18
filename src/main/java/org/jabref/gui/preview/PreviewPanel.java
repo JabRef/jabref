@@ -34,9 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public class PreviewPanel extends VBox {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PreviewPanel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
@@ -69,8 +67,7 @@ public class PreviewPanel extends VBox {
                 dialogService
             );
 
-        PreviewPreferences previewPreferences =
-            preferencesService.getPreviewPreferences();
+        PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
         previewView =
             new PreviewViewer(
                 database,
@@ -85,9 +82,7 @@ public class PreviewPanel extends VBox {
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
-            Dragboard dragboard = previewView.startDragAndDrop(
-                TransferMode.COPY
-            );
+            Dragboard dragboard = previewView.startDragAndDrop(TransferMode.COPY);
             ClipboardContent content = new ClipboardContent();
             content.putHtml(previewView.getSelectionHtmlContent());
             dragboard.setContent(content);
@@ -97,11 +92,7 @@ public class PreviewPanel extends VBox {
 
         previewView.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(
-                    TransferMode.COPY,
-                    TransferMode.MOVE,
-                    TransferMode.LINK
-                );
+                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
             event.consume();
         });
@@ -130,11 +121,7 @@ public class PreviewPanel extends VBox {
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
                     LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
-                    fileLinker.copyFilesToFileDirAndAddToEntry(
-                        entry,
-                        files,
-                        indexingTaskManager
-                    );
+                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, indexingTaskManager);
                 }
                 success = true;
             }
@@ -152,8 +139,7 @@ public class PreviewPanel extends VBox {
         previewView.addEventFilter(
             KeyEvent.KEY_PRESSED,
             event -> {
-                Optional<KeyBinding> keyBinding =
-                    keyBindingRepository.mapToKeyBinding(event);
+                Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
                 if (keyBinding.isPresent()) {
                     switch (keyBinding.get()) {
                         case COPY_PREVIEW:
@@ -176,27 +162,19 @@ public class PreviewPanel extends VBox {
             .getKeyCombination(KeyBinding.COPY_PREVIEW)
             .ifPresent(copyPreview::setAccelerator);
         copyPreview.setOnAction(event -> previewView.copyPreviewToClipBoard());
-        MenuItem copySelection = new MenuItem(
-            Localization.lang("Copy selection")
-        );
-        copySelection.setOnAction(event ->
-            previewView.copySelectionToClipBoard()
-        );
+        MenuItem copySelection = new MenuItem(Localization.lang("Copy selection"));
+        copySelection.setOnAction(event -> previewView.copySelectionToClipBoard());
         MenuItem printEntryPreview = new MenuItem(
             Localization.lang("Print entry preview"),
             IconTheme.JabRefIcons.PRINTED.getGraphicNode()
         );
         printEntryPreview.setOnAction(event -> previewView.print());
-        MenuItem previousPreviewLayout = new MenuItem(
-            Localization.lang("Previous preview layout")
-        );
+        MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         keyBindingRepository
             .getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT)
             .ifPresent(previousPreviewLayout::setAccelerator);
         previousPreviewLayout.setOnAction(event -> this.previousPreviewStyle());
-        MenuItem nextPreviewLayout = new MenuItem(
-            Localization.lang("Next preview layout")
-        );
+        MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         keyBindingRepository
             .getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT)
             .ifPresent(nextPreviewLayout::setAccelerator);
@@ -236,10 +214,7 @@ public class PreviewPanel extends VBox {
         PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();
         previewView.setLayout(layout);
         dialogService.notify(
-            Localization.lang(
-                "Preview style changed to: %0",
-                layout.getDisplayName()
-            )
+            Localization.lang("Preview style changed to: %0", layout.getDisplayName())
         );
     }
 }

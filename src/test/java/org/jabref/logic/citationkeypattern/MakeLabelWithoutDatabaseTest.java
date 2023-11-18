@@ -19,30 +19,23 @@ class MakeLabelWithoutDatabaseTest {
 
     @BeforeEach
     void setUp() {
-        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(
-            Collections.emptyList()
-        );
+        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[auth]");
-        CitationKeyPatternPreferences patternPreferences =
-            new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
-                "",
-                new SimpleObjectProperty<>(',')
-            );
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+            false,
+            false,
+            false,
+            CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+            "",
+            "",
+            CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
+            keyPattern,
+            "",
+            new SimpleObjectProperty<>(',')
+        );
 
         citationKeyGenerator =
-            new CitationKeyGenerator(
-                keyPattern,
-                new BibDatabase(),
-                patternPreferences
-            );
+            new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences);
     }
 
     @Test

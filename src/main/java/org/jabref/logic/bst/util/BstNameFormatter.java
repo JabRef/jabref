@@ -28,9 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BstNameFormatter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BstNameFormatter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);
 
     private BstNameFormatter() {}
 
@@ -41,11 +39,7 @@ public class BstNameFormatter {
      * @param whichName       index of the list, starting with 1
      * @param formatString    TODO
      */
-    public static String formatName(
-        String authorsNameList,
-        int whichName,
-        String formatString
-    ) {
+    public static String formatName(String authorsNameList, int whichName, String formatString) {
         AuthorList al = AuthorList.parse(authorsNameList);
 
         if ((whichName < 1) && (whichName > al.getNumberOfAuthors())) {
@@ -56,10 +50,7 @@ public class BstNameFormatter {
             );
             return "";
         }
-        return BstNameFormatter.formatName(
-            al.getAuthor(whichName - 1),
-            formatString
-        );
+        return BstNameFormatter.formatName(al.getAuthor(whichName - 1), formatString);
     }
 
     public static String formatName(Author author, String format) {
@@ -104,9 +95,7 @@ public class BstNameFormatter {
                     i++;
                 }
                 i--; // unskip last brace (for last i++ at the end)
-                String control = level1Chars
-                    .toString()
-                    .toLowerCase(Locale.ROOT);
+                String control = level1Chars.toString().toLowerCase(Locale.ROOT);
 
                 if (control.isEmpty()) {
                     continue;
@@ -153,10 +142,7 @@ public class BstNameFormatter {
 
                 // Now we know what to do
 
-                if (
-                    (braceLevel == 0) &&
-                    (wholeChar.charAt(wholeChar.length() - 1) == '}')
-                ) {
+                if ((braceLevel == 0) && (wholeChar.charAt(wholeChar.length() - 1) == '}')) {
                     wholeChar.deleteCharAt(wholeChar.length() - 1);
                 }
 
@@ -175,17 +161,8 @@ public class BstNameFormatter {
                         }
                         if (((j + 1) < d.length) && (d[j + 1] == '{')) {
                             StringBuilder interTokenSb = new StringBuilder();
-                            j =
-                                BstNameFormatter.consumeToMatchingBrace(
-                                    interTokenSb,
-                                    d,
-                                    j + 1
-                                );
-                            interToken =
-                                interTokenSb.substring(
-                                    1,
-                                    interTokenSb.length() - 1
-                                );
+                            j = BstNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
+                            interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
                         }
 
                         for (int k = 0; k < tokens.length; k++) {
@@ -196,9 +173,7 @@ public class BstNameFormatter {
                                 token =
                                     Arrays
                                         .stream(dashes)
-                                        .map(
-                                            BstNameFormatter::getFirstCharOfString
-                                        )
+                                        .map(BstNameFormatter::getFirstCharOfString)
                                         .collect(Collectors.joining(".-"));
                             }
 
@@ -217,10 +192,7 @@ public class BstNameFormatter {
                                     if (
                                         (k == (tokens.length - 2)) ||
                                         (BstNameFormatter.numberOfChars(
-                                                sb.substring(
-                                                    groupStart,
-                                                    sb.length()
-                                                ),
+                                                sb.substring(groupStart, sb.length()),
                                                 3
                                             ) <
                                             3)
@@ -255,8 +227,7 @@ public class BstNameFormatter {
                                     4
                                 ) >=
                                 4) ||
-                            ((sb.length() > 1) &&
-                                (noDisTie = sb.charAt(sb.length() - 2) == '~')))
+                            ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))
                     ) {
                         sb.deleteCharAt(sb.length() - 1);
                         if (!noDisTie) {
@@ -272,10 +243,7 @@ public class BstNameFormatter {
             i++;
         }
         if (braceLevel != 0) {
-            LOGGER.warn(
-                "Unbalanced brace in format string for nameFormat: {}",
-                format
-            );
+            LOGGER.warn("Unbalanced brace in format string for nameFormat: {}", format);
         }
 
         return sb.toString();
@@ -284,11 +252,7 @@ public class BstNameFormatter {
     /**
      * Including the matching brace.
      */
-    public static int consumeToMatchingBrace(
-        StringBuilder interTokenSb,
-        char[] c,
-        int pos
-    ) {
+    public static int consumeToMatchingBrace(StringBuilder interTokenSb, char[] c, int pos) {
         int braceLevel = 0;
 
         for (int i = pos; i < c.length; i++) {

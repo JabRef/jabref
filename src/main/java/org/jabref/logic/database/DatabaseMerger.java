@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseMerger {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DatabaseMerger.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMerger.class);
     private final char keywordDelimiter;
 
     public DatabaseMerger(char keywordDelimiter) {
@@ -54,29 +52,18 @@ public class DatabaseMerger {
     ) {
         mergeEntries(target.getDatabase(), other.getDatabase());
         mergeStrings(target.getDatabase(), other.getDatabase());
-        mergeMetaData(
-            target.getMetaData(),
-            other.getMetaData(),
-            otherFileName,
-            other.getEntries()
-        );
+        mergeMetaData(target.getMetaData(), other.getMetaData(), otherFileName, other.getEntries());
     }
 
     private void mergeEntries(BibDatabase target, BibDatabase other) {
-        DuplicateCheck duplicateCheck = new DuplicateCheck(
-            new BibEntryTypesManager()
-        );
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         List<BibEntry> newEntries = other
             .getEntries()
             .stream()
             // Remove all entries that are already part of the database (duplicate)
             .filter(entry ->
                 duplicateCheck
-                    .containsDuplicate(
-                        target,
-                        entry,
-                        BibDatabaseModeDetection.inferMode(target)
-                    )
+                    .containsDuplicate(target, entry, BibDatabaseModeDetection.inferMode(target))
                     .isEmpty()
             )
             .collect(Collectors.toList());
@@ -105,10 +92,7 @@ public class DatabaseMerger {
                         suffix++;
                         newName = bibtexStringName + "_" + suffix;
                     }
-                    BibtexString newBibtexString = new BibtexString(
-                        newName,
-                        importedContent
-                    );
+                    BibtexString newBibtexString = new BibtexString(newName, importedContent);
                     // TODO undo/redo
                     target.addString(newBibtexString);
                     LOGGER.info(

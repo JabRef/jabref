@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RTFChars implements LayoutFormatter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LayoutFormatter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
@@ -58,9 +56,7 @@ public class RTFChars implements LayoutFormatter {
                     currentCommand.append(c);
                     testCharCom:if (
                         (currentCommand.length() == 1) &&
-                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
-                            currentCommand.toString()
-                        )
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
                     ) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -94,8 +90,7 @@ public class RTFChars implements LayoutFormatter {
                 }
             } else {
                 testContent:if (
-                    !incommand ||
-                    (!Character.isWhitespace(c) && (c != '{') && (c != '}'))
+                    !incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))
                 ) {
                     sb.append(c);
                 } else {
@@ -124,10 +119,7 @@ public class RTFChars implements LayoutFormatter {
                         break testContent;
                     }
 
-                    if (
-                        ((c == '{') || (c == ' ')) &&
-                        (currentCommand.length() > 0)
-                    ) {
+                    if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.
@@ -140,9 +132,7 @@ public class RTFChars implements LayoutFormatter {
                             StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\i ").append(part.s).append('}');
-                        } else if (
-                            "textbf".equals(command) || "bf".equals(command)
-                        ) {
+                        } else if ("textbf".equals(command) || "bf".equals(command)) {
                             StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
@@ -169,10 +159,7 @@ public class RTFChars implements LayoutFormatter {
             if (c < 128) {
                 sb.append(c);
             } else {
-                sb
-                    .append("\\u")
-                    .append((long) c)
-                    .append(transformSpecialCharacter(c));
+                sb.append("\\u").append((long) c).append(transformSpecialCharacter(c));
             }
         }
 
@@ -190,11 +177,7 @@ public class RTFChars implements LayoutFormatter {
      * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
      * @return a tuple of number of added characters and the extracted part
      */
-    private StringInt getPart(
-        String text,
-        int i,
-        boolean commandNestedInBraces
-    ) {
+    private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
         char c;
         int count = 0;
         int icount = i;
@@ -232,24 +215,16 @@ public class RTFChars implements LayoutFormatter {
      * @return returns the basic character of the given unicode
      */
     private String transformSpecialCharacter(long c) {
-        if (
-            ((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)
-        ) {
+        if (((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)) {
             return "A";
         }
-        if (
-            ((224 <= c) && (c <= 229)) || (c == 257) || (c == 259) || (c == 261)
-        ) {
+        if (((224 <= c) && (c <= 229)) || (c == 257) || (c == 259) || (c == 261)) {
             return "a";
         }
-        if (
-            (199 == c) || (262 == c) || (264 == c) || (266 == c) || (268 == c)
-        ) {
+        if ((199 == c) || (262 == c) || (264 == c) || (266 == c) || (268 == c)) {
             return "C";
         }
-        if (
-            (231 == c) || (263 == c) || (265 == c) || (267 == c) || (269 == c)
-        ) {
+        if ((231 == c) || (263 == c) || (265 == c) || (267 == c) || (269 == c)) {
             return "c";
         }
         if ((208 == c) || (272 == c)) {
@@ -278,14 +253,10 @@ public class RTFChars implements LayoutFormatter {
         ) {
             return "e";
         }
-        if (
-            ((284 == c) || (286 == c)) || (288 == c) || (290 == c) || (330 == c)
-        ) {
+        if (((284 == c) || (286 == c)) || (288 == c) || (290 == c) || (330 == c)) {
             return "G";
         }
-        if (
-            (285 == c) || (287 == c) || (289 == c) || (291 == c) || (331 == c)
-        ) {
+        if ((285 == c) || (287 == c) || (289 == c) || (291 == c) || (331 == c)) {
             return "g";
         }
         if ((292 == c) || (294 == c)) {
@@ -304,13 +275,7 @@ public class RTFChars implements LayoutFormatter {
         ) {
             return "I";
         }
-        if (
-            ((236 <= c) && (c <= 239)) ||
-            (297 == c) ||
-            (299 == c) ||
-            (301 == c) ||
-            (303 == c)
-        ) {
+        if (((236 <= c) && (c <= 239)) || (297 == c) || (299 == c) || (301 == c) || (303 == c)) {
             return "i";
         }
         if (308 == c) {
@@ -337,14 +302,10 @@ public class RTFChars implements LayoutFormatter {
         if ((241 == c) || (324 == c) || (326 == c) || (328 == c)) {
             return "n";
         }
-        if (
-            ((210 <= c) && (c <= 214)) || (c == 216) || (332 == c) || (334 == c)
-        ) {
+        if (((210 <= c) && (c <= 214)) || (c == 216) || (332 == c) || (334 == c)) {
             return "O";
         }
-        if (
-            ((242 <= c) && (c <= 248) && (247 != c)) || (333 == c) || (335 == c)
-        ) {
+        if (((242 <= c) && (c <= 248) && (247 != c)) || (333 == c) || (335 == c)) {
             return "o";
         }
         if ((340 == c) || (342 == c) || (344 == c)) {

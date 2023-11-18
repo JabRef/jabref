@@ -23,15 +23,10 @@ public class LibraryOfCongressTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(
-            ImportFormatPreferences.class
-        );
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.bibEntryPreferences())
             .thenReturn(mock(BibEntryPreferences.class));
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         fetcher = new LibraryOfCongress(importFormatPreferences);
     }
@@ -53,16 +48,10 @@ public class LibraryOfCongressTest {
             .withField(StandardField.NOTE, "Matthew West., Includes index.")
             .withField(new UnknownField("oclc"), "ocn665135773")
             .withField(new UnknownField("source"), "aacr")
-            .withField(
-                StandardField.TITLE,
-                "Developing high quality data models"
-            )
+            .withField(StandardField.TITLE, "Developing high quality data models")
             .withField(StandardField.YEAR, "2011");
 
-        assertEquals(
-            Optional.of(expected),
-            fetcher.performSearchById("2010045158")
-        );
+        assertEquals(Optional.of(expected), fetcher.performSearchById("2010045158"));
     }
 
     @Test
@@ -72,9 +61,6 @@ public class LibraryOfCongressTest {
 
     @Test
     public void performSearchByInvalidId() {
-        assertThrows(
-            FetcherClientException.class,
-            () -> fetcher.performSearchById("xxx")
-        );
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("xxx"));
     }
 }

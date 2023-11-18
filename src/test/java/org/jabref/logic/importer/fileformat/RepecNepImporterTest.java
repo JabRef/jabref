@@ -27,10 +27,7 @@ public class RepecNepImporterTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         testImporter = new RepecNepImporter(importFormatPreferences);
     }
@@ -61,11 +58,7 @@ public class RepecNepImporterTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            testImporter,
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
     }
 
     @Test

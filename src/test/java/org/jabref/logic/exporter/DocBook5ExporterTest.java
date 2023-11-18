@@ -47,22 +47,14 @@ public class DocBook5ExporterTest {
                 "docbook5",
                 null,
                 StandardFileType.XML,
-                mock(
-                    LayoutFormatterPreferences.class,
-                    Answers.RETURNS_DEEP_STUBS
-                ),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder()
             );
 
         LocalDate myDate = LocalDate.of(2018, 1, 1);
 
         xmlFile =
-            Path.of(
-                DocBook5ExporterTest.class.getResource(
-                        "Docbook5ExportFormat.xml"
-                    )
-                    .toURI()
-            );
+            Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         BibEntry entry = new BibEntry(StandardEntryType.Book)
@@ -75,8 +67,7 @@ public class DocBook5ExporterTest {
     }
 
     @Test
-    void testPerformExportForSingleEntry(@TempDir Path testFolder)
-        throws Exception {
+    void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         exporter.export(databaseContext, path, entries);
@@ -89,9 +80,7 @@ public class DocBook5ExporterTest {
             CompareMatcher
                 .isSimilarTo(control)
                 .normalizeWhitespace()
-                .withNodeMatcher(
-                    new DefaultNodeMatcher(ElementSelectors.byNameAndText)
-                )
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
                 .throwComparisonFailure()
         );
     }

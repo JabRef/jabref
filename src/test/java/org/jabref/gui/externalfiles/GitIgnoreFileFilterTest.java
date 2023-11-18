@@ -23,8 +23,7 @@ class GitIgnoreFileFilterTest {
     }
 
     @Test
-    public void checkSimpleGitIgnoreWithAllowing(@TempDir Path dir)
-        throws Exception {
+    public void checkSimpleGitIgnoreWithAllowing(@TempDir Path dir) throws Exception {
         Files.writeString(
             dir.resolve(".gitignore"),
             """
@@ -36,8 +35,7 @@ class GitIgnoreFileFilterTest {
     }
 
     @Test
-    public void checkSimpleGitIgnoreWithOverwritingDefs(@TempDir Path dir)
-        throws Exception {
+    public void checkSimpleGitIgnoreWithOverwritingDefs(@TempDir Path dir) throws Exception {
         Files.writeString(
             dir.resolve(".gitignore"),
             """

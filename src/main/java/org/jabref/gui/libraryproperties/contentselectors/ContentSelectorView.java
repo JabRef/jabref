@@ -17,8 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 
-public class ContentSelectorView
-    extends AbstractPropertiesTabView<ContentSelectorViewModel> {
+public class ContentSelectorView extends AbstractPropertiesTabView<ContentSelectorViewModel> {
 
     @FXML
     private Button removeFieldNameButton;
@@ -53,8 +52,7 @@ public class ContentSelectorView
 
     @FXML
     public void initialize() {
-        this.viewModel =
-            new ContentSelectorViewModel(databaseContext, dialogService);
+        this.viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
 
         initFieldNameComponents();
         initKeywordsComponents();
@@ -68,13 +66,8 @@ public class ContentSelectorView
         new ViewModelListCellFactory<Field>()
             .withText(Field::getDisplayName)
             .install(fieldsListView);
-        removeFieldNameButton
-            .disableProperty()
-            .bind(viewModel.isNoFieldNameSelected());
-        EasyBind.subscribe(
-            viewModel.selectedFieldProperty(),
-            viewModel::populateKeywords
-        );
+        removeFieldNameButton.disableProperty().bind(viewModel.isNoFieldNameSelected());
+        EasyBind.subscribe(viewModel.selectedFieldProperty(), viewModel::populateKeywords);
     }
 
     private void initKeywordsComponents() {
@@ -82,12 +75,8 @@ public class ContentSelectorView
         viewModel
             .selectedKeywordProperty()
             .bind(keywordsListView.getSelectionModel().selectedItemProperty());
-        addKeywordButton
-            .disableProperty()
-            .bind(viewModel.isFieldNameListEmpty());
-        removeKeywordButton
-            .disableProperty()
-            .bind(viewModel.isNoKeywordSelected());
+        addKeywordButton.disableProperty().bind(viewModel.isFieldNameListEmpty());
+        removeKeywordButton.disableProperty().bind(viewModel.isNoKeywordSelected());
     }
 
     @FXML
@@ -97,8 +86,7 @@ public class ContentSelectorView
 
     @FXML
     private void removeFieldName() {
-        getSelectedField()
-            .ifPresent(viewModel::showRemoveFieldNameConfirmationDialog);
+        getSelectedField().ifPresent(viewModel::showRemoveFieldNameConfirmationDialog);
     }
 
     @FXML
@@ -111,10 +99,7 @@ public class ContentSelectorView
         Optional<Field> fieldName = getSelectedField();
         Optional<String> keywordToRemove = getSelectedKeyword();
         if (fieldName.isPresent() && keywordToRemove.isPresent()) {
-            viewModel.showRemoveKeywordConfirmationDialog(
-                fieldName.get(),
-                keywordToRemove.get()
-            );
+            viewModel.showRemoveKeywordConfirmationDialog(fieldName.get(), keywordToRemove.get());
         }
     }
 
@@ -127,9 +112,7 @@ public class ContentSelectorView
     }
 
     private Optional<Field> getSelectedField() {
-        return Optional
-            .of(fieldsListView.getSelectionModel())
-            .map(SelectionModel::getSelectedItem);
+        return Optional.of(fieldsListView.getSelectionModel()).map(SelectionModel::getSelectedItem);
     }
 
     private Optional<String> getSelectedKeyword() {

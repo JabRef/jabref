@@ -46,14 +46,7 @@ public class StudyCatalogItem {
 
     @Override
     public String toString() {
-        return (
-            "StudyCatalogItem{" +
-            "name=" +
-            name.get() +
-            ", enabled=" +
-            enabled.get() +
-            '}'
-        );
+        return ("StudyCatalogItem{" + "name=" + name.get() + ", enabled=" + enabled.get() + '}');
     }
 
     @Override

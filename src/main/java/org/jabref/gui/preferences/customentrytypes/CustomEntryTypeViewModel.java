@@ -6,10 +6,7 @@ import org.jabref.model.entry.field.Field;
 
 public class CustomEntryTypeViewModel extends EntryTypeViewModel {
 
-    public CustomEntryTypeViewModel(
-        BibEntryType entryType,
-        Predicate<Field> isMultiline
-    ) {
+    public CustomEntryTypeViewModel(BibEntryType entryType, Predicate<Field> isMultiline) {
         super(entryType, isMultiline);
     }
 }

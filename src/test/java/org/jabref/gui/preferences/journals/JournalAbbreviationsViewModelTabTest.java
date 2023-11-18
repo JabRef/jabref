@@ -36,50 +36,44 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class JournalAbbreviationsViewModelTabTest {
 
-    private static final TestAbbreviation ABBREVIATION_0 = new TestAbbreviation(
+    private static final TestAbbreviation ABBREVIATION_0 = new TestAbbreviation("Full0", "Abb0");
+    private static final TestAbbreviation ABBREVIATION_0_OTHER_SHORT_UNIQUE = new TestAbbreviation(
         "Full0",
-        "Abb0"
+        "Abb0",
+        "A0"
     );
-    private static final TestAbbreviation ABBREVIATION_0_OTHER_SHORT_UNIQUE =
-        new TestAbbreviation("Full0", "Abb0", "A0");
 
-    private static final TestAbbreviation ABBREVIATION_1 = new TestAbbreviation(
+    private static final TestAbbreviation ABBREVIATION_1 = new TestAbbreviation("Full1", "Abb1");
+    private static final TestAbbreviation ABBREVIATION_1_SHOW = new TestAbbreviation(
         "Full1",
-        "Abb1"
+        "Abb1",
+        true
     );
-    private static final TestAbbreviation ABBREVIATION_1_SHOW =
-        new TestAbbreviation("Full1", "Abb1", true);
-    private static final TestAbbreviation ABBREVIATION_1_OTHER_SHORT_UNIQUE =
-        new TestAbbreviation("Full1", "Abb1", "A1");
+    private static final TestAbbreviation ABBREVIATION_1_OTHER_SHORT_UNIQUE = new TestAbbreviation(
+        "Full1",
+        "Abb1",
+        "A1"
+    );
 
-    private static final TestAbbreviation ABBREVIATION_2 = new TestAbbreviation(
+    private static final TestAbbreviation ABBREVIATION_2 = new TestAbbreviation("Full2", "Abb2");
+    private static final TestAbbreviation ABBREVIATION_2_OTHER_SHORT_UNIQUE = new TestAbbreviation(
         "Full2",
-        "Abb2"
+        "Abb2",
+        "A2"
     );
-    private static final TestAbbreviation ABBREVIATION_2_OTHER_SHORT_UNIQUE =
-        new TestAbbreviation("Full2", "Abb2", "A2");
 
-    private static final TestAbbreviation ABBREVIATION_3 = new TestAbbreviation(
+    private static final TestAbbreviation ABBREVIATION_3 = new TestAbbreviation("Full3", "Abb3");
+    private static final TestAbbreviation ABBREVIATION_3_OTHER_SHORT_UNIQUE = new TestAbbreviation(
         "Full3",
-        "Abb3"
-    );
-    private static final TestAbbreviation ABBREVIATION_3_OTHER_SHORT_UNIQUE =
-        new TestAbbreviation("Full3", "Abb3", "A3");
-
-    private static final TestAbbreviation ABBREVIATION_4 = new TestAbbreviation(
-        "Full4",
-        "Abb4"
+        "Abb3",
+        "A3"
     );
 
-    private static final TestAbbreviation ABBREVIATION_5 = new TestAbbreviation(
-        "Full5",
-        "Abb5"
-    );
+    private static final TestAbbreviation ABBREVIATION_4 = new TestAbbreviation("Full4", "Abb4");
 
-    private static final TestAbbreviation ABBREVIATION_6 = new TestAbbreviation(
-        "Full6",
-        "Abb6"
-    );
+    private static final TestAbbreviation ABBREVIATION_5 = new TestAbbreviation("Full5", "Abb5");
+
+    private static final TestAbbreviation ABBREVIATION_6 = new TestAbbreviation("Full6", "Abb6");
 
     private JournalAbbreviationsTabViewModel viewModel;
     private Path emptyTestFile;
@@ -102,8 +96,7 @@ class JournalAbbreviationsViewModelTabTest {
             boolean showShortestUniqueAbbreviation
         ) {
             super(name, abbreviation);
-            this.showShortestUniqueAbbreviation =
-                showShortestUniqueAbbreviation;
+            this.showShortestUniqueAbbreviation = showShortestUniqueAbbreviation;
         }
 
         public TestAbbreviation(
@@ -130,28 +123,19 @@ class JournalAbbreviationsViewModelTabTest {
         }
     }
 
-    private static String csvListOfAbbreviations(
-        List<TestAbbreviation> testAbbreviations
-    ) {
+    private static String csvListOfAbbreviations(List<TestAbbreviation> testAbbreviations) {
         return testAbbreviations
             .stream()
             .map(TestAbbreviation::toString)
             .collect(Collectors.joining("\n"));
     }
 
-    private static String csvListOfAbbreviations(
-        TestAbbreviation... testAbbreviations
-    ) {
-        return csvListOfAbbreviations(
-            Arrays.stream(testAbbreviations).toList()
-        );
+    private static String csvListOfAbbreviations(TestAbbreviation... testAbbreviations) {
+        return csvListOfAbbreviations(Arrays.stream(testAbbreviations).toList());
     }
 
     private record CsvFileNameAndContent(String fileName, String content) {
-        CsvFileNameAndContent(
-            String fileName,
-            TestAbbreviation... testAbbreviations
-        ) {
+        CsvFileNameAndContent(String fileName, TestAbbreviation... testAbbreviations) {
             this(fileName, csvListOfAbbreviations(testAbbreviations));
         }
     }
@@ -174,14 +158,8 @@ class JournalAbbreviationsViewModelTabTest {
             this(
                 csvFiles,
                 abbreviationToCheck,
-                finalContentsOfFile2
-                    .stream()
-                    .map(TestAbbreviation::toString)
-                    .toList(),
-                finalContentsOfFile3
-                    .stream()
-                    .map(TestAbbreviation::toString)
-                    .toList()
+                finalContentsOfFile2.stream().map(TestAbbreviation::toString).toList(),
+                finalContentsOfFile3.stream().map(TestAbbreviation::toString).toList()
             );
         }
     }
@@ -218,12 +196,7 @@ class JournalAbbreviationsViewModelTabTest {
                         ABBREVIATION_4
                     )
                 ),
-                List.of(
-                    ABBREVIATION_0,
-                    ABBREVIATION_1,
-                    ABBREVIATION_2,
-                    ABBREVIATION_5
-                ),
+                List.of(ABBREVIATION_0, ABBREVIATION_1, ABBREVIATION_2, ABBREVIATION_5),
                 List.of(
                     ABBREVIATION_0,
                     ABBREVIATION_1,
@@ -236,10 +209,7 @@ class JournalAbbreviationsViewModelTabTest {
             // Shortest unique abbreviations
             new TestData(
                 List.of(
-                    new CsvFileNameAndContent(
-                        "testFile20.csv",
-                        ABBREVIATION_1_OTHER_SHORT_UNIQUE
-                    ),
+                    new CsvFileNameAndContent("testFile20.csv", ABBREVIATION_1_OTHER_SHORT_UNIQUE),
                     new CsvFileNameAndContent(
                         "testFile21.csv",
                         ABBREVIATION_0_OTHER_SHORT_UNIQUE,
@@ -345,8 +315,7 @@ class JournalAbbreviationsViewModelTabTest {
                 repository
             );
 
-        emptyTestFile =
-            createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
+        emptyTestFile = createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
     }
 
     @Test
@@ -357,16 +326,14 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testInitialWithSavedFilesIncrementsFilesCounter(TestData testData)
-        throws IOException {
+    void testInitialWithSavedFilesIncrementsFilesCounter(TestData testData) throws IOException {
         addFourTestFileToViewModelAndPreferences(testData);
         assertEquals(4, viewModel.journalFilesProperty().size());
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testRemoveDuplicatesWhenReadingFiles(TestData testData)
-        throws IOException {
+    void testRemoveDuplicatesWhenReadingFiles(TestData testData) throws IOException {
         addFourTestFileToViewModelAndPreferences(testData);
         viewModel.selectLastJournalFile();
 
@@ -376,8 +343,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @Test
     void addFileIncreasesCounterOfOpenFilesAndHasNoAbbreviations() {
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(emptyTestFile));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
 
         assertEquals(1, viewModel.journalFilesProperty().size());
@@ -386,8 +352,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void addDuplicatedFileResultsInErrorDialog(TestData testData)
-        throws IOException {
+    void addDuplicatedFileResultsInErrorDialog(TestData testData) throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
         viewModel.addNewFile();
@@ -397,8 +362,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testOpenDuplicatedFileResultsInAnException(TestData testData)
-        throws IOException {
+    void testOpenDuplicatedFileResultsInAnException(TestData testData) throws IOException {
         when(dialogService.showFileOpenDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
         viewModel.openFile();
@@ -408,11 +372,9 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testSelectLastJournalFileSwitchesFilesAndTheirAbbreviations(
-        TestData testData
-    ) throws IOException {
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(emptyTestFile));
+    void testSelectLastJournalFileSwitchesFilesAndTheirAbbreviations(TestData testData)
+        throws IOException {
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         assertEquals(0, viewModel.abbreviationsCountProperty().get());
@@ -426,9 +388,8 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testOpenValidFileContainsTheSpecificEntryAndEnoughAbbreviations(
-        TestData testData
-    ) throws IOException {
+    void testOpenValidFileContainsTheSpecificEntryAndEnoughAbbreviations(TestData testData)
+        throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(2))));
         viewModel.addNewFile();
@@ -440,17 +401,14 @@ class JournalAbbreviationsViewModelTabTest {
         assertTrue(
             viewModel
                 .abbreviationsProperty()
-                .contains(
-                    new AbbreviationViewModel(testData.abbreviationToCheck)
-                )
+                .contains(new AbbreviationViewModel(testData.abbreviationToCheck))
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testRemoveLastListSetsCurrentFileAndCurrentAbbreviationToNull(
-        TestData testData
-    ) throws IOException {
+    void testRemoveLastListSetsCurrentFileAndCurrentAbbreviationToNull(TestData testData)
+        throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
         viewModel.addNewFile();
@@ -472,9 +430,7 @@ class JournalAbbreviationsViewModelTabTest {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(2))));
         viewModel.addNewFile();
-        viewModel
-            .currentFileProperty()
-            .set(viewModel.journalFilesProperty().get(1));
+        viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(1));
 
         // size of the list of journal files should be incremented by two
         assertEquals(2, viewModel.journalFilesProperty().size());
@@ -486,18 +442,13 @@ class JournalAbbreviationsViewModelTabTest {
         assertTrue(
             viewModel
                 .abbreviationsProperty()
-                .contains(
-                    new AbbreviationViewModel(testData.abbreviationToCheck)
-                )
+                .contains(new AbbreviationViewModel(testData.abbreviationToCheck))
         );
 
         // simulate add new file button
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(emptyTestFile));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
-        viewModel
-            .currentFileProperty()
-            .set(viewModel.journalFilesProperty().get(2));
+        viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(2));
 
         // size of the list of journal files should be incremented by one
         assertEquals(3, viewModel.journalFilesProperty().size());
@@ -509,9 +460,7 @@ class JournalAbbreviationsViewModelTabTest {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(3))));
         viewModel.addNewFile();
-        viewModel
-            .currentFileProperty()
-            .set(viewModel.journalFilesProperty().get(3));
+        viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(3));
 
         // size of the list of journal files should have been incremented by one
         assertEquals(4, viewModel.journalFilesProperty().size());
@@ -523,9 +472,7 @@ class JournalAbbreviationsViewModelTabTest {
         assertTrue(
             viewModel
                 .abbreviationsProperty()
-                .contains(
-                    new AbbreviationViewModel(testData.abbreviationToCheck)
-                )
+                .contains(new AbbreviationViewModel(testData.abbreviationToCheck))
         );
     }
 
@@ -533,27 +480,24 @@ class JournalAbbreviationsViewModelTabTest {
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
         viewModel.addBuiltInList();
         assertEquals(1, viewModel.journalFilesProperty().getSize());
-        viewModel
-            .currentFileProperty()
-            .set(viewModel.journalFilesProperty().get(0));
-        ObservableList<Abbreviation> expected =
-            FXCollections.observableArrayList(repository.getAllLoaded());
-        ObservableList<Abbreviation> actualAbbreviations =
-            FXCollections.observableArrayList(
-                viewModel
-                    .abbreviationsProperty()
-                    .stream()
-                    .map(AbbreviationViewModel::getAbbreviationObject)
-                    .collect(Collectors.toList())
-            );
+        viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
+        ObservableList<Abbreviation> expected = FXCollections.observableArrayList(
+            repository.getAllLoaded()
+        );
+        ObservableList<Abbreviation> actualAbbreviations = FXCollections.observableArrayList(
+            viewModel
+                .abbreviationsProperty()
+                .stream()
+                .map(AbbreviationViewModel::getAbbreviationObject)
+                .collect(Collectors.toList())
+        );
 
         assertEquals(expected, actualAbbreviations);
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testCurrentFilePropertyChangeActiveFile(TestData testData)
-        throws IOException {
+    void testCurrentFilePropertyChangeActiveFile(TestData testData) throws IOException {
         for (CsvFileNameAndContent testFile : testData.csvFiles) {
             when(dialogService.showFileSaveDialog(any()))
                 .thenReturn(Optional.of(createTestFile(testFile)));
@@ -561,18 +505,10 @@ class JournalAbbreviationsViewModelTabTest {
         }
         viewModel.selectLastJournalFile();
 
-        AbbreviationsFileViewModel test1 = viewModel
-            .journalFilesProperty()
-            .get(0);
-        AbbreviationsFileViewModel test3 = viewModel
-            .journalFilesProperty()
-            .get(1);
-        AbbreviationsFileViewModel test4 = viewModel
-            .journalFilesProperty()
-            .get(2);
-        AbbreviationsFileViewModel test5 = viewModel
-            .journalFilesProperty()
-            .get(3);
+        AbbreviationsFileViewModel test1 = viewModel.journalFilesProperty().get(0);
+        AbbreviationsFileViewModel test3 = viewModel.journalFilesProperty().get(1);
+        AbbreviationsFileViewModel test4 = viewModel.journalFilesProperty().get(2);
+        AbbreviationsFileViewModel test5 = viewModel.journalFilesProperty().get(3);
 
         // test if the last opened file is active, but duplicated entry has been removed
         assertEquals(5, viewModel.abbreviationsProperty().size());
@@ -594,9 +530,8 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testAddAbbreviationIncludesAbbreviationsInAbbreviationList(
-        TestData testData
-    ) throws IOException {
+    void testAddAbbreviationIncludesAbbreviationsInAbbreviationList(TestData testData)
+        throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(2))));
         viewModel.addNewFile();
@@ -604,24 +539,18 @@ class JournalAbbreviationsViewModelTabTest {
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(3))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation(
-            "YetAnotherEntry",
-            "YAE"
-        );
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
         viewModel.addAbbreviation(testAbbreviation);
 
         assertEquals(6, viewModel.abbreviationsProperty().size());
         assertTrue(
-            viewModel
-                .abbreviationsProperty()
-                .contains(new AbbreviationViewModel(testAbbreviation))
+            viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation))
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testAddDuplicatedAbbreviationResultsInException(TestData testData)
-        throws IOException {
+    void testAddDuplicatedAbbreviationResultsInException(TestData testData) throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(1))));
         viewModel.addNewFile();
@@ -633,29 +562,22 @@ class JournalAbbreviationsViewModelTabTest {
 
     @Test
     void testEditSameAbbreviationWithNoChangeDoesNotResultInException() {
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(emptyTestFile));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation(
-            "YetAnotherEntry",
-            "YAE"
-        );
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
         viewModel.addAbbreviation(testAbbreviation);
         viewModel.editAbbreviation(testAbbreviation);
 
         assertTrue(
-            viewModel
-                .abbreviationsProperty()
-                .contains(new AbbreviationViewModel(testAbbreviation))
+            viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation))
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationIncludesNewAbbreviationInAbbreviationsList(
-        TestData testData
-    ) throws IOException {
+    void testEditAbbreviationIncludesNewAbbreviationInAbbreviationsList(TestData testData)
+        throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(2))));
         viewModel.addNewFile();
@@ -664,37 +586,28 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         selectLastAbbreviation();
-        Abbreviation testAbbreviation = new Abbreviation(
-            "YetAnotherEntry",
-            "YAE"
-        );
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
         viewModel.addAbbreviation(testAbbreviation);
 
         assertEquals(6, viewModel.abbreviationsProperty().size());
         assertTrue(
-            viewModel
-                .abbreviationsProperty()
-                .contains(new AbbreviationViewModel(testAbbreviation))
+            viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation))
         );
 
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(emptyTestFile));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         // addAbbreviation(testAbbreviation);
 
         assertEquals(0, viewModel.abbreviationsProperty().size());
         assertFalse(
-            viewModel
-                .abbreviationsProperty()
-                .contains(new AbbreviationViewModel(testAbbreviation))
+            viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation))
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationToExistingOneResultsInException(TestData testData)
-        throws IOException {
+    void testEditAbbreviationToExistingOneResultsInException(TestData testData) throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(1))));
         viewModel.addNewFile();
@@ -704,17 +617,14 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(3, viewModel.abbreviationsProperty().size());
 
         viewModel.editAbbreviation(new Abbreviation("YetAnotherEntry", "YAE"));
-        viewModel
-            .currentAbbreviationProperty()
-            .set(viewModel.abbreviationsProperty().get(1));
+        viewModel.currentAbbreviationProperty().set(viewModel.abbreviationsProperty().get(1));
         viewModel.editAbbreviation(new Abbreviation("YetAnotherEntry", "YAE"));
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationToEmptyNameResultsInException(TestData testData)
-        throws IOException {
+    void testEditAbbreviationToEmptyNameResultsInException(TestData testData) throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(1))));
         viewModel.addNewFile();
@@ -729,9 +639,8 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationToEmptyAbbreviationResultsInException(
-        TestData testData
-    ) throws IOException {
+    void testEditAbbreviationToEmptyAbbreviationResultsInException(TestData testData)
+        throws IOException {
         when(dialogService.showFileSaveDialog(any()))
             .thenReturn(Optional.of(createTestFile(testData.csvFiles.get(1))));
         viewModel.addNewFile();
@@ -746,26 +655,21 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(
-        TestData testData
-    ) throws Exception {
+    void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(TestData testData)
+        throws Exception {
         Path testFile2 = createTestFile(testData.csvFiles.get(2));
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(testFile2));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile2));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         selectLastAbbreviation();
         viewModel.editAbbreviation(ABBREVIATION_5);
         assertEquals(4, viewModel.abbreviationsProperty().size());
         assertTrue(
-            viewModel
-                .abbreviationsProperty()
-                .contains(new AbbreviationViewModel(ABBREVIATION_5))
+            viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(ABBREVIATION_5))
         );
 
         Path testFile3 = createTestFile(testData.csvFiles.get(3));
-        when(dialogService.showFileSaveDialog(any()))
-            .thenReturn(Optional.of(testFile3));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile3));
         viewModel.addNewFile();
         assertEquals(5, viewModel.abbreviationsProperty().size());
 
@@ -787,18 +691,13 @@ class JournalAbbreviationsViewModelTabTest {
         // deletion and addition of an entry leads to same size
         assertEquals(5, viewModel.abbreviationsProperty().size());
         assertTrue(
-            viewModel
-                .abbreviationsProperty()
-                .contains(new AbbreviationViewModel(ABBREVIATION_6))
+            viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(ABBREVIATION_6))
         );
 
         // overwrite all files
         viewModel.saveJournalAbbreviationFiles();
 
-        List<String> actual = Files.readAllLines(
-            testFile2,
-            StandardCharsets.UTF_8
-        );
+        List<String> actual = Files.readAllLines(testFile2, StandardCharsets.UTF_8);
         assertEquals(testData.finalContentsOfFile2, actual);
 
         actual = Files.readAllLines(testFile3, StandardCharsets.UTF_8);
@@ -818,8 +717,7 @@ class JournalAbbreviationsViewModelTabTest {
             );
     }
 
-    private void addFourTestFileToViewModelAndPreferences(TestData testData)
-        throws IOException {
+    private void addFourTestFileToViewModelAndPreferences(TestData testData) throws IOException {
         for (CsvFileNameAndContent csvFile : testData.csvFiles) {
             when(dialogService.showFileSaveDialog(any()))
                 .thenReturn(Optional.of(createTestFile(csvFile)));
@@ -828,8 +726,7 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.storeSettings();
     }
 
-    private Path createTestFile(CsvFileNameAndContent testFile)
-        throws IOException {
+    private Path createTestFile(CsvFileNameAndContent testFile) throws IOException {
         Path file = this.tempFolder.resolve(testFile.fileName);
         Files.writeString(file, testFile.content);
         return file;

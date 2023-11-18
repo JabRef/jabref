@@ -8,9 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
 
-public abstract class AbstractPreferenceTabView<
-    T extends PreferenceTabViewModel
->
+public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel>
     extends VBox
     implements PreferencesTab {
 

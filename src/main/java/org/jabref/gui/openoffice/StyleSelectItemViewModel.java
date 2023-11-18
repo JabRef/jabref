@@ -21,12 +21,7 @@ public class StyleSelectItemViewModel {
     private final OOBibStyle style;
     private final BooleanProperty internalStyle = new SimpleBooleanProperty();
 
-    public StyleSelectItemViewModel(
-        String name,
-        String journals,
-        String file,
-        OOBibStyle style
-    ) {
+    public StyleSelectItemViewModel(String name, String journals, String file, OOBibStyle style) {
         this.name.setValue(name);
         this.journals.setValue(journals);
         this.file.setValue(file);

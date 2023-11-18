@@ -32,9 +32,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        if (
-            (fieldText == null) || fieldText.isEmpty() || (pluralText == null)
-        ) {
+        if ((fieldText == null) || fieldText.isEmpty() || (pluralText == null)) {
             return ""; // TODO: argument missing or invalid. Print an error message here?
         }
         if (fieldText.matches(".*\\sand\\s.*")) {

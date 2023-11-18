@@ -35,8 +35,9 @@ public class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;
     private BibDatabase bibDatabase;
-    private final GlobalCitationKeyPattern pattern =
-        GlobalCitationKeyPattern.fromPattern("[auth][year]");
+    private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern(
+        "[auth][year]"
+    );
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private DBMSType dbmsType;
@@ -53,8 +54,7 @@ public class DBMSSynchronizerTest {
     public void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor =
-            DBMSProcessor.getProcessorInstance(this.dbmsConnection);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
 
@@ -62,12 +62,7 @@ public class DBMSSynchronizerTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
         dbmsSynchronizer =
-            new DBMSSynchronizer(
-                context,
-                ',',
-                pattern,
-                new DummyFileUpdateMonitor()
-            );
+            new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
@@ -93,8 +88,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void twoLocalFieldChangesAreSynchronizedCorrectly()
-        throws Exception {
+    public void twoLocalFieldChangesAreSynchronizedCorrectly() throws Exception {
         BibEntry expectedEntry = createExampleBibEntry(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
@@ -107,8 +101,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly()
-        throws Exception {
+    public void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly() throws Exception {
         BibEntry exampleBibEntry = createExampleBibEntry(1);
         exampleBibEntry.registerListener(dbmsSynchronizer);
 
@@ -126,10 +119,7 @@ public class DBMSSynchronizerTest {
         BibEntry expectedBibEntry = createExampleBibEntry(1)
             .withField(StandardField.AUTHOR, "Brad L and Gilson");
 
-        assertEquals(
-            Collections.singletonList(expectedBibEntry),
-            actualEntries
-        );
+        assertEquals(Collections.singletonList(expectedBibEntry), actualEntries);
     }
 
     @Test
@@ -161,8 +151,10 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
-        Map<String, String> expectedMap =
-            MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
+        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(
+            testMetaData,
+            pattern
+        );
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
         actualMap.remove("VersionDBStructure");
 
@@ -178,8 +170,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testSynchronizeLocalDatabaseWithEntryRemoval()
-        throws Exception {
+    public void testSynchronizeLocalDatabaseWithEntryRemoval() throws Exception {
         List<BibEntry> expectedBibEntries = Arrays.asList(
             createExampleBibEntry(1),
             createExampleBibEntry(2)
@@ -194,12 +185,9 @@ public class DBMSSynchronizerTest {
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbmsProcessor.removeEntries(
-            Collections.singletonList(expectedBibEntries.get(0))
-        );
+        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.get(0)));
 
-        expectedBibEntries =
-            Collections.singletonList(expectedBibEntries.get(1));
+        expectedBibEntries = Collections.singletonList(expectedBibEntries.get(1));
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 
@@ -222,10 +210,7 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(List.of(modifiedBibEntry), bibDatabase.getEntries());
-        assertEquals(
-            List.of(modifiedBibEntry),
-            dbmsProcessor.getSharedEntries()
-        );
+        assertEquals(List.of(modifiedBibEntry), dbmsProcessor.getSharedEntries());
     }
 
     @Test
@@ -242,10 +227,7 @@ public class DBMSSynchronizerTest {
         dbmsProcessor.updateEntry(modifiedBibEntry);
 
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
-        assertEquals(
-            List.of(modifiedBibEntry),
-            dbmsProcessor.getSharedEntries()
-        );
+        assertEquals(List.of(modifiedBibEntry), dbmsProcessor.getSharedEntries());
     }
 
     @Test
@@ -258,10 +240,7 @@ public class DBMSSynchronizerTest {
             new FieldFormatterCleanups(
                 true,
                 Collections.singletonList(
-                    new FieldFormatterCleanup(
-                        StandardField.AUTHOR,
-                        new LowerCaseFormatter()
-                    )
+                    new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter())
                 )
             )
         );
@@ -269,9 +248,6 @@ public class DBMSSynchronizerTest {
 
         dbmsSynchronizer.applyMetaData();
 
-        assertEquals(
-            "wirthlin, michael j1",
-            bibEntry.getField(StandardField.AUTHOR).get()
-        );
+        assertEquals("wirthlin, michael j1", bibEntry.getField(StandardField.AUTHOR).get());
     }
 }

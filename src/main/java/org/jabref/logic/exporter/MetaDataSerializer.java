@@ -44,28 +44,17 @@ public class MetaDataSerializer {
         metaData
             .getSaveOrder()
             .ifPresent(saveOrderConfig ->
-                stringyMetaData.put(
-                    MetaData.SAVE_ORDER_CONFIG,
-                    saveOrderConfig.getAsStringList()
-                )
+                stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList())
             );
         metaData
             .getSaveActions()
             .ifPresent(saveActions ->
-                stringyMetaData.put(
-                    MetaData.SAVE_ACTIONS,
-                    saveActions.getAsStringList(OS.NEWLINE)
-                )
+                stringyMetaData.put(MetaData.SAVE_ACTIONS, saveActions.getAsStringList(OS.NEWLINE))
             );
         if (metaData.isProtected()) {
-            stringyMetaData.put(
-                MetaData.PROTECTED_FLAG_META,
-                Collections.singletonList("true")
-            );
+            stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
         }
-        stringyMetaData.putAll(
-            serializeCiteKeyPattern(metaData, globalCiteKeyPattern)
-        );
+        stringyMetaData.putAll(serializeCiteKeyPattern(metaData, globalCiteKeyPattern));
         metaData
             .getMode()
             .ifPresent(mode ->
@@ -77,10 +66,7 @@ public class MetaDataSerializer {
         metaData
             .getDefaultFileDirectory()
             .ifPresent(path ->
-                stringyMetaData.put(
-                    MetaData.FILE_DIRECTORY,
-                    Collections.singletonList(path.trim())
-                )
+                stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim()))
             );
         metaData
             .getUserFileDirectories()
@@ -114,29 +100,18 @@ public class MetaDataSerializer {
             );
         }
 
-        Map<String, String> serializedMetaData = serializeMetaData(
-            stringyMetaData
-        );
+        Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
 
         // Write groups if present.
         // Skip this if only the root node exists (which is always the AllEntriesGroup).
         metaData
             .getGroups()
             .filter(root -> root.getNumberOfChildren() > 0)
-            .ifPresent(root ->
-                serializedMetaData.put(
-                    MetaData.GROUPSTREE,
-                    serializeGroups(root)
-                )
-            );
+            .ifPresent(root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
 
         // finally add all unknown meta data items to the serialization map
-        Map<String, List<String>> unknownMetaData =
-            metaData.getUnknownMetaData();
-        for (Map.Entry<
-            String,
-            List<String>
-        > entry : unknownMetaData.entrySet()) {
+        Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
+        for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
             StringJoiner value = new StringJoiner(
                 MetaData.SEPARATOR_STRING + OS.NEWLINE,
@@ -145,10 +120,7 @@ public class MetaDataSerializer {
             );
             for (String line : entry.getValue()) {
                 value.add(
-                    line.replace(
-                        MetaData.SEPARATOR_STRING,
-                        "\\" + MetaData.SEPARATOR_STRING
-                    )
+                    line.replace(MetaData.SEPARATOR_STRING, "\\" + MetaData.SEPARATOR_STRING)
                 );
             }
             serializedMetaData.put(entry.getKey(), value.toString());
@@ -161,19 +133,14 @@ public class MetaDataSerializer {
         Map<String, List<String>> stringyMetaData
     ) {
         Map<String, String> serializedMetaData = new TreeMap<>();
-        for (Map.Entry<
-            String,
-            List<String>
-        > metaItem : stringyMetaData.entrySet()) {
+        for (Map.Entry<String, List<String>> metaItem : stringyMetaData.entrySet()) {
             List<String> itemList = metaItem.getValue();
             if (itemList.isEmpty()) {
                 // Only add non-empty values
                 continue;
             }
 
-            boolean isSaveActions = metaItem
-                .getKey()
-                .equals(MetaData.SAVE_ACTIONS);
+            boolean isSaveActions = metaItem.getKey().equals(MetaData.SAVE_ACTIONS);
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
             StringJoiner joiner = new StringJoiner(
                 MetaData.SEPARATOR_STRING,
@@ -189,11 +156,7 @@ public class MetaDataSerializer {
                     string = "";
                 }
                 string +=
-                StringUtil.quote(
-                    dataItem,
-                    MetaData.SEPARATOR_STRING,
-                    MetaData.ESCAPE_CHARACTER
-                );
+                StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER);
                 // in case of save actions, add an additional newline after the enabled flag
                 lastWasSaveActionsEnablement =
                     isSaveActions &&
@@ -215,8 +178,9 @@ public class MetaDataSerializer {
         GlobalCitationKeyPattern globalCitationKeyPattern
     ) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
-        AbstractCitationKeyPattern citationKeyPattern =
-            metaData.getCiteKeyPattern(globalCitationKeyPattern);
+        AbstractCitationKeyPattern citationKeyPattern = metaData.getCiteKeyPattern(
+            globalCitationKeyPattern
+        );
         for (EntryType key : citationKeyPattern.getAllKeys()) {
             if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
@@ -242,11 +206,7 @@ public class MetaDataSerializer {
 
         for (String groupNode : new GroupSerializer().serializeTree(root)) {
             stringBuilder.append(
-                StringUtil.quote(
-                    groupNode,
-                    MetaData.SEPARATOR_STRING,
-                    MetaData.ESCAPE_CHARACTER
-                )
+                StringUtil.quote(groupNode, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)
             );
             stringBuilder.append(MetaData.SEPARATOR_STRING);
             stringBuilder.append(OS.NEWLINE);
@@ -259,9 +219,7 @@ public class MetaDataSerializer {
         builder.append(MetaData.ENTRYTYPE_FLAG);
         builder.append(entryType.getType().getName());
         builder.append(": req[");
-        builder.append(
-            FieldFactory.serializeOrFieldsList(entryType.getRequiredFields())
-        );
+        builder.append(FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()));
         builder.append("] opt[");
         builder.append(
             FieldFactory.serializeFieldsList(

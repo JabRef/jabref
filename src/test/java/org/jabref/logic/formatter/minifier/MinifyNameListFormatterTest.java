@@ -22,24 +22,15 @@ public class MinifyNameListFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideAuthorNames")
-    void minifyAuthorNames(
-        String expectedAuthorNames,
-        String originalAuthorNames
-    ) {
-        assertEquals(
-            expectedAuthorNames,
-            formatter.format(originalAuthorNames)
-        );
+    void minifyAuthorNames(String expectedAuthorNames, String originalAuthorNames) {
+        assertEquals(expectedAuthorNames, formatter.format(originalAuthorNames));
     }
 
     private static Stream<Arguments> provideAuthorNames() {
         return Stream.of(
             Arguments.of("Simon Harrer", "Simon Harrer"),
             Arguments.of("Simon Harrer and others", "Simon Harrer and others"),
-            Arguments.of(
-                "Simon Harrer and Jörg Lenhard",
-                "Simon Harrer and Jörg Lenhard"
-            ),
+            Arguments.of("Simon Harrer and Jörg Lenhard", "Simon Harrer and Jörg Lenhard"),
             Arguments.of(
                 "Simon Harrer and others",
                 "Simon Harrer and Jörg Lenhard and Guido Wirtz"
@@ -48,10 +39,7 @@ public class MinifyNameListFormatterTest {
                 "Simon Harrer and others",
                 "Simon Harrer and Jörg Lenhard and Guido Wirtz and others"
             ),
-            Arguments.of(
-                "Stefan Kolb and others",
-                new MinifyNameListFormatter().getExampleInput()
-            )
+            Arguments.of("Stefan Kolb and others", new MinifyNameListFormatter().getExampleInput())
         );
     }
 }

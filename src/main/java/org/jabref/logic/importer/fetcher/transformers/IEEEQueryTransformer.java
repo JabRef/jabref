@@ -14,13 +14,7 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
      * Returns words ignored by the engine. Need to be removed when querying for them.
      * See ADR-0022
      */
-    private static final List<String> STOP_WORDS = List.of(
-        "a",
-        "and",
-        "for",
-        "or",
-        "with"
-    );
+    private static final List<String> STOP_WORDS = List.of("a", "and", "for", "or", "with");
 
     // These have to be integrated into the IEEE query URL as these are just supported as query parameters
     // Journal is wrapped in quotes by the transformer
@@ -66,10 +60,7 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     @Override
-    protected Optional<String> handleOtherField(
-        String fieldAsString,
-        String term
-    ) {
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
             case "article_number" -> handleArticleNumber(term);
             default -> super.handleOtherField(fieldAsString, term);
@@ -90,14 +81,10 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     public Optional<String> getJournal() {
-        return Objects.isNull(journal)
-            ? Optional.empty()
-            : Optional.of(journal);
+        return Objects.isNull(journal) ? Optional.empty() : Optional.of(journal);
     }
 
     public Optional<String> getArticleNumber() {
-        return Objects.isNull(articleNumber)
-            ? Optional.empty()
-            : Optional.of(articleNumber);
+        return Objects.isNull(articleNumber) ? Optional.empty() : Optional.of(articleNumber);
     }
 }

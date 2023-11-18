@@ -44,12 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 public class IsiImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        IsiImporter.class
-    );
-    private static final Pattern SUB_SUP_PATTERN = Pattern.compile(
-        "/(sub|sup)\\s+(.*?)\\s*/"
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsiImporter.class);
+    private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
     // extra | at the end:
@@ -81,8 +77,7 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
@@ -112,9 +107,7 @@ public class IsiImporter extends Importer {
 
         for (Field aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
-                Matcher m = IsiImporter.SUB_SUP_PATTERN.matcher(
-                    map.get(aSubsup)
-                );
+                Matcher m = IsiImporter.SUB_SUP_PATTERN.matcher(map.get(aSubsup));
                 StringBuilder sb = new StringBuilder();
 
                 while (m.find()) {
@@ -138,11 +131,7 @@ public class IsiImporter extends Importer {
     }
 
     private static void processCapitalization(Map<Field, String> map) {
-        Field[] subsup = {
-            StandardField.TITLE,
-            StandardField.JOURNAL,
-            StandardField.PUBLISHER,
-        };
+        Field[] subsup = { StandardField.TITLE, StandardField.JOURNAL, StandardField.PUBLISHER };
 
         for (Field aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -156,8 +145,7 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
 
         List<BibEntry> bibEntries = new ArrayList<>();
@@ -245,8 +233,7 @@ public class IsiImporter extends Importer {
 
                         // if there is already someone there then append with "and"
                         if (hm.get(StandardField.AUTHOR) != null) {
-                            author =
-                                hm.get(StandardField.AUTHOR) + " and " + author;
+                            author = hm.get(StandardField.AUTHOR) + " and " + author;
                         }
                         hm.put(StandardField.AUTHOR, author);
                     }
@@ -260,13 +247,8 @@ public class IsiImporter extends Importer {
                     );
                     case "ID", "KW" -> {
                         value = EOL_PATTERN.matcher(value).replaceAll(" ");
-                        String existingKeywords = hm.get(
-                            StandardField.KEYWORDS
-                        );
-                        if (
-                            (existingKeywords == null) ||
-                            existingKeywords.contains(value)
-                        ) {
+                        String existingKeywords = hm.get(StandardField.KEYWORDS);
+                        if ((existingKeywords == null) || existingKeywords.contains(value)) {
                             existingKeywords = value;
                         } else {
                             existingKeywords += ", " + value;
@@ -282,10 +264,7 @@ public class IsiImporter extends Importer {
                         int detpos = value.indexOf(' ');
 
                         // tweak for IEEE Explore
-                        if (
-                            (detpos != -1) &&
-                            !value.substring(0, detpos).trim().isEmpty()
-                        ) {
+                        if ((detpos != -1) && !value.substring(0, detpos).trim().isEmpty()) {
                             value = value.substring(0, detpos);
                         }
                         pages = pages + "--" + value;
@@ -380,9 +359,7 @@ public class IsiImporter extends Importer {
     static String parseMonth(String value) {
         String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
-            Optional<Month> month = Month.getMonthByShortName(
-                part1.toLowerCase(Locale.ROOT)
-            );
+            Optional<Month> month = Month.getMonthByShortName(part1.toLowerCase(Locale.ROOT));
             if (month.isPresent()) {
                 return month.get().getJabRefFormat();
             }

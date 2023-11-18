@@ -48,11 +48,7 @@ public class UTF8CheckerTest {
         entry.setField(StandardField.MONTH, NonUTF8);
         assertEquals(
             List.of(
-                new IntegrityMessage(
-                    "Non-UTF-8 encoded field found",
-                    entry,
-                    StandardField.MONTH
-                )
+                new IntegrityMessage("Non-UTF-8 encoded field found", entry, StandardField.MONTH)
             ),
             checker.check(entry)
         );
@@ -84,10 +80,6 @@ public class UTF8CheckerTest {
             "你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8),
             StandardCharsets.UTF_8
         );
-        assertTrue(
-            UTF8Checker.UTF8EncodingChecker(
-                UTF8Demo.getBytes(StandardCharsets.UTF_8)
-            )
-        );
+        assertTrue(UTF8Checker.UTF8EncodingChecker(UTF8Demo.getBytes(StandardCharsets.UTF_8)));
     }
 }

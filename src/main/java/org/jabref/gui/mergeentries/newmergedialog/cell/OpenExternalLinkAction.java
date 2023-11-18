@@ -14,18 +14,13 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenExternalLinkAction extends SimpleCommand {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(
-        OpenExternalLinkAction.class
-    );
+    private final Logger LOGGER = LoggerFactory.getLogger(OpenExternalLinkAction.class);
 
     private final FilePreferences filePreferences;
 
     private final String urlOrDoi;
 
-    public OpenExternalLinkAction(
-        String urlOrDoi,
-        FilePreferences filePreferences
-    ) {
+    public OpenExternalLinkAction(String urlOrDoi, FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
         this.urlOrDoi = urlOrDoi;
     }
@@ -35,22 +30,14 @@ public class OpenExternalLinkAction extends SimpleCommand {
         try {
             if (DOI.isValid(urlOrDoi)) {
                 JabRefDesktop.openBrowser(
-                    DOI
-                        .parse(urlOrDoi)
-                        .flatMap(DOI::getExternalURI)
-                        .map(URI::toString)
-                        .orElse(""),
+                    DOI.parse(urlOrDoi).flatMap(DOI::getExternalURI).map(URI::toString).orElse(""),
                     filePreferences
                 );
             } else {
                 JabRefDesktop.openBrowser(urlOrDoi, filePreferences);
             }
         } catch (IOException e) {
-            LOGGER.warn(
-                "Cannot open the given external link '{}'",
-                urlOrDoi,
-                e
-            );
+            LOGGER.warn("Cannot open the given external link '{}'", urlOrDoi, e);
         }
     }
 }

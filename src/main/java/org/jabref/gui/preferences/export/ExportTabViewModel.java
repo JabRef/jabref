@@ -18,18 +18,14 @@ import org.jabref.preferences.ExportPreferences;
 public class ExportTabViewModel implements PreferenceTabViewModel {
 
     // SaveOrderConfigPanel
-    private final BooleanProperty exportInOriginalProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty exportInTableOrderProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty exportInSpecifiedOrderProperty =
-        new SimpleBooleanProperty();
-    private final ListProperty<Field> sortableFieldsProperty =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty =
-        new SimpleListProperty<>(
-            FXCollections.observableArrayList(new ArrayList<>())
-        );
+        new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
     private final ExportPreferences exportPreferences;
 
@@ -46,11 +42,7 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
             case TABLE -> exportInTableOrderProperty.setValue(true);
         }
         sortCriteriaProperty.addAll(
-            exportSaveOrder
-                .getSortCriteria()
-                .stream()
-                .map(SortCriterionViewModel::new)
-                .toList()
+            exportSaveOrder.getSortCriteria().stream().map(SortCriterionViewModel::new).toList()
         );
 
         Set<Field> fields = FieldFactory.getAllFieldsWithOutInternal();
@@ -58,9 +50,7 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
         fields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         fields.add(InternalField.KEY_FIELD);
         fields.add(InternalField.TYPE_HEADER);
-        sortableFieldsProperty.addAll(
-            FieldFactory.getStandardFieldsWithCitationKey()
-        );
+        sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());
     }
 
     @Override
@@ -70,10 +60,7 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
                 exportInSpecifiedOrderProperty.getValue(),
                 exportInOriginalProperty.getValue()
             ),
-            sortCriteriaProperty
-                .stream()
-                .map(SortCriterionViewModel::getCriterion)
-                .toList()
+            sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()
         );
         exportPreferences.setExportSaveOrder(newSaveOrder);
     }

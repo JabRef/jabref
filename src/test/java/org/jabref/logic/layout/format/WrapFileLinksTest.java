@@ -31,10 +31,7 @@ class WrapFileLinksTest {
 
     @Test
     void testNoFormatSetNonEmptyString() {
-        assertThrows(
-            NullPointerException.class,
-            () -> formatter.format("test.pdf")
-        );
+        assertThrows(NullPointerException.class, () -> formatter.format("test.pdf"));
     }
 
     @Test
@@ -88,10 +85,7 @@ class WrapFileLinksTest {
     @Test
     void testIteratorTwoItems() {
         formatter.setArgument("\\i\n");
-        assertEquals(
-            "1\n2\n",
-            formatter.format("Test file:test.pdf:PDF;test2.pdf")
-        );
+        assertEquals("1\n2\n", formatter.format("Test file:test.pdf:PDF;test2.pdf"));
     }
 
     @Test
@@ -103,29 +97,20 @@ class WrapFileLinksTest {
     @Test
     void testPath() throws IOException {
         formatter =
-            new WrapFileLinks(
-                Collections.singletonList(Path.of("src/test/resources/pdfs/")),
-                ""
-            );
+            new WrapFileLinks(Collections.singletonList(Path.of("src/test/resources/pdfs/")), "");
         formatter.setArgument("\\p");
         assertEquals(
-            new File("src/test/resources/pdfs/encrypted.pdf")
-                .getCanonicalPath(),
+            new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
             formatter.format("Preferences:encrypted.pdf:PDF")
         );
     }
 
     @Test
     void testPathFallBackToGeneratedDir() throws IOException {
-        formatter =
-            new WrapFileLinks(
-                Collections.emptyList(),
-                "src/test/resources/pdfs/"
-            );
+        formatter = new WrapFileLinks(Collections.emptyList(), "src/test/resources/pdfs/");
         formatter.setArgument("\\p");
         assertEquals(
-            new File("src/test/resources/pdfs/encrypted.pdf")
-                .getCanonicalPath(),
+            new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
             formatter.format("Preferences:encrypted.pdf:PDF")
         );
     }
@@ -133,10 +118,7 @@ class WrapFileLinksTest {
     @Test
     void testPathReturnsRelativePathIfNotFound() {
         formatter =
-            new WrapFileLinks(
-                Collections.singletonList(Path.of("src/test/resources/pdfs/")),
-                ""
-            );
+            new WrapFileLinks(Collections.singletonList(Path.of("src/test/resources/pdfs/")), "");
         formatter.setArgument("\\p");
         assertEquals("test.pdf", formatter.format("Preferences:test.pdf:PDF"));
     }

@@ -41,12 +41,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
         CitationKeyPatternPreferences citationKeyPatternPreferences,
         BibEntryTypesManager entryTypesManager
     ) {
-        super(
-            bibWriter,
-            saveConfiguration,
-            citationKeyPatternPreferences,
-            entryTypesManager
-        );
+        super(bibWriter, saveConfiguration, citationKeyPatternPreferences, entryTypesManager);
         this.fieldPreferences = fieldPreferences;
     }
 
@@ -76,8 +71,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeMetaDataItem(Map.Entry<String, String> metaItem)
-        throws IOException {
+    protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {
         bibWriter.write(COMMENT_PREFIX + "{");
         bibWriter.write(MetaData.META_FLAG);
         bibWriter.write(metaItem.getKey());
@@ -98,13 +92,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeString(BibtexString bibtexString, int maxKeyLength)
-        throws IOException {
+    protected void writeString(BibtexString bibtexString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
-        if (
-            !saveConfiguration.shouldReformatFile() &&
-            !bibtexString.hasChanged()
-        ) {
+        if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
             bibWriter.write(bibtexString.getParsedSerialization());
             return;
         }
@@ -119,9 +109,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
             STRING_PREFIX +
             "{" +
             bibtexString.getName() +
-            StringUtil.repeatSpaces(
-                maxKeyLength - bibtexString.getName().length()
-            ) +
+            StringUtil.repeatSpaces(maxKeyLength - bibtexString.getName().length()) +
             " = "
         );
         if (bibtexString.getContent().isEmpty()) {
@@ -129,10 +117,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
         } else {
             try {
                 String formatted = new FieldWriter(fieldPreferences)
-                    .write(
-                        InternalField.BIBTEX_STRING,
-                        bibtexString.getContent()
-                    );
+                    .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
                 bibWriter.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);
@@ -143,30 +128,23 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeEntryTypeDefinition(BibEntryType customType)
-        throws IOException {
+    protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
         bibWriter.write(COMMENT_PREFIX + "{");
-        bibWriter.write(
-            MetaDataSerializer.serializeCustomEntryTypes(customType)
-        );
+        bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
         bibWriter.writeLine("}");
         bibWriter.finishBlock();
     }
 
     @Override
-    protected void writeProlog(
-        BibDatabaseContext bibDatabaseContext,
-        Charset encoding
-    ) throws IOException {
+    protected void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding)
+        throws IOException {
         // We write the encoding if
         //   - it is provided (!= null)
         //   - explicitly set in the .bib file OR not equal to UTF_8
         // Otherwise, we do not write anything and return
         if (
             (encoding == null) ||
-            (!bibDatabaseContext
-                    .getMetaData()
-                    .getEncodingExplicitlySupplied() &&
+            (!bibDatabaseContext.getMetaData().getEncodingExplicitlySupplied() &&
                 (encoding.equals(StandardCharsets.UTF_8)))
         ) {
             return;
@@ -186,17 +164,11 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeEntry(BibEntry entry, BibDatabaseMode mode)
-        throws IOException {
+    protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
             new FieldWriter(fieldPreferences),
             entryTypesManager
         );
-        bibtexEntryWriter.write(
-            entry,
-            bibWriter,
-            mode,
-            saveConfiguration.shouldReformatFile()
-        );
+        bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
     }
 }

@@ -18,11 +18,7 @@ public class ConnectToSharedDatabaseCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
-        dialogService.showCustomDialogAndWait(
-            new SharedDatabaseLoginDialogView(jabRefFrame)
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(jabRefFrame));
     }
 }

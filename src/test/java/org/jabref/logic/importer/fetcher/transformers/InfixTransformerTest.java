@@ -39,11 +39,8 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
         String queryString = "author:\"Igor Steinmacher\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(
-            getAuthorPrefix() + "\"Igor Steinmacher\""
-        );
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of(getAuthorPrefix() + "\"Igor Steinmacher\"");
         assertEquals(expected, searchQuery);
     }
 
@@ -52,11 +49,8 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
         String queryString = "\"default value\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(
-            getUnFieldedPrefix() + queryString
-        );
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of(getUnFieldedPrefix() + queryString);
         assertEquals(expected, searchQuery);
     }
 
@@ -65,11 +59,8 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
         String queryString = "default:\"default value\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(
-            getUnFieldedPrefix() + "\"default value\""
-        );
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of(getUnFieldedPrefix() + "\"default value\"");
         assertEquals(expected, searchQuery);
     }
 
@@ -78,8 +69,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
         String queryString = "journal:Nature";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(getJournalPrefix() + "Nature");
         assertEquals(expected, searchQuery);
     }
@@ -92,12 +82,10 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
 
     @Test
     public void convertMultipleValuesWithTheSameFieldPrefix() throws Exception {
-        String queryString =
-            "author:\"Igor Steinmacher\" author:\"Christoph Treude\"";
+        String queryString = "author:\"Igor Steinmacher\" author:\"Christoph Treude\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(
             getAuthorPrefix() +
             "\"Igor Steinmacher\"" +
@@ -114,8 +102,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
             "(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND title:test";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(
             "(" +
             getAuthorPrefix() +
@@ -136,12 +123,10 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
 
     @Test
     public void notOperatorPrefix() throws Exception {
-        String queryString =
-            "!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")";
+        String queryString = "!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(
             getTransformer().getLogicalNotOperator() +
             "(" +

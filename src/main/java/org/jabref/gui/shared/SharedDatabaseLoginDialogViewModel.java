@@ -59,8 +59,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         SharedDatabaseLoginDialogViewModel.class
     );
 
-    private final ObjectProperty<DBMSType> selectedDBMSType =
-        new SimpleObjectProperty<>(DBMSType.values()[0]);
+    private final ObjectProperty<DBMSType> selectedDBMSType = new SimpleObjectProperty<>(
+        DBMSType.values()[0]
+    );
 
     private final StringProperty database = new SimpleStringProperty("");
     private final StringProperty host = new SimpleStringProperty("");
@@ -69,13 +70,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty password = new SimpleStringProperty("");
     private final StringProperty folder = new SimpleStringProperty("");
     private final BooleanProperty autosave = new SimpleBooleanProperty();
-    private final BooleanProperty rememberPassword =
-        new SimpleBooleanProperty();
+    private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
     private final BooleanProperty loading = new SimpleBooleanProperty();
     private final StringProperty keystore = new SimpleStringProperty("");
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
-    private final StringProperty keyStorePasswordProperty =
-        new SimpleStringProperty("");
+    private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
 
     private final JabRefFrame frame;
@@ -118,12 +117,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         EasyBind.subscribe(
             selectedDBMSType,
-            selected ->
-                port.setValue(Integer.toString(selected.getDefaultPort()))
+            selected -> port.setValue(Integer.toString(selected.getDefaultPort()))
         );
 
-        Predicate<String> notEmpty = input ->
-            (input != null) && !input.trim().isEmpty();
+        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
 
@@ -143,10 +140,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 host,
                 notEmpty,
                 ValidationMessage.error(
-                    Localization.lang(
-                        "Required field \"%0\" is empty.",
-                        Localization.lang("Port")
-                    )
+                    Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))
                 )
             );
         portValidator =
@@ -154,10 +148,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 port,
                 notEmpty,
                 ValidationMessage.error(
-                    Localization.lang(
-                        "Required field \"%0\" is empty.",
-                        Localization.lang("Host")
-                    )
+                    Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))
                 )
             );
         userValidator =
@@ -165,55 +156,42 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 user,
                 notEmpty,
                 ValidationMessage.error(
-                    Localization.lang(
-                        "Required field \"%0\" is empty.",
-                        Localization.lang("User")
-                    )
+                    Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))
                 )
             );
         folderValidator =
             new FunctionBasedValidator<>(
                 folder,
                 notEmptyAndfilesExist,
-                ValidationMessage.error(
-                    Localization.lang("Please enter a valid file path.")
-                )
+                ValidationMessage.error(Localization.lang("Please enter a valid file path."))
             );
         keystoreValidator =
             new FunctionBasedValidator<>(
                 keystore,
                 notEmptyAndfilesExist,
-                ValidationMessage.error(
-                    Localization.lang("Please enter a valid file path.")
-                )
+                ValidationMessage.error(Localization.lang("Please enter a valid file path."))
             );
 
         formValidator = new CompositeValidator();
-        formValidator.addValidators(
-            databaseValidator,
-            hostValidator,
-            portValidator,
-            userValidator
-        );
+        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
 
         applyPreferences();
     }
 
     public boolean openDatabase() {
-        DBMSConnectionProperties connectionProperties =
-            new DBMSConnectionPropertiesBuilder()
-                .setType(selectedDBMSType.getValue())
-                .setHost(host.getValue())
-                .setPort(Integer.parseInt(port.getValue()))
-                .setDatabase(database.getValue())
-                .setUser(user.getValue())
-                .setPassword(password.getValue())
-                .setUseSSL(useSSL.getValue())
-                // Authorize client to retrieve RSA server public key when serverRsaPublicKeyFile is not set (for sha256_password and caching_sha2_password authentication password)
-                .setAllowPublicKeyRetrieval(true)
-                .setKeyStore(keystore.getValue())
-                .setServerTimezone(serverTimezone.getValue())
-                .createDBMSConnectionProperties();
+        DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()
+            .setType(selectedDBMSType.getValue())
+            .setHost(host.getValue())
+            .setPort(Integer.parseInt(port.getValue()))
+            .setDatabase(database.getValue())
+            .setUser(user.getValue())
+            .setPassword(password.getValue())
+            .setUseSSL(useSSL.getValue())
+            // Authorize client to retrieve RSA server public key when serverRsaPublicKeyFile is not set (for sha256_password and caching_sha2_password authentication password)
+            .setAllowPublicKeyRetrieval(true)
+            .setKeyStore(keystore.getValue())
+            .setServerTimezone(serverTimezone.getValue())
+            .createDBMSConnectionProperties();
 
         setupKeyStore();
         return openSharedDatabase(connectionProperties);
@@ -221,16 +199,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private void setupKeyStore() {
         System.setProperty("javax.net.ssl.trustStore", keystore.getValue());
-        System.setProperty(
-            "javax.net.ssl.trustStorePassword",
-            keyStorePasswordProperty.getValue()
-        );
+        System.setProperty("javax.net.ssl.trustStorePassword", keyStorePasswordProperty.getValue());
         System.setProperty("javax.net.debug", "ssl");
     }
 
-    private boolean openSharedDatabase(
-        DBMSConnectionProperties connectionProperties
-    ) {
+    private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
             dialogService.showWarningDialogAndWait(
                 Localization.lang("Shared database connection"),
@@ -244,19 +217,16 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         if (autosave.get()) {
             Path localFilePath = Path.of(folder.getValue());
 
-            if (
-                Files.exists(localFilePath) && !Files.isDirectory(localFilePath)
-            ) {
-                boolean overwriteFilePressed =
-                    dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Existing file"),
-                        Localization.lang(
-                            "'%0' exists. Overwrite file?",
-                            localFilePath.getFileName().toString()
-                        ),
-                        Localization.lang("Overwrite file"),
-                        Localization.lang("Cancel")
-                    );
+            if (Files.exists(localFilePath) && !Files.isDirectory(localFilePath)) {
+                boolean overwriteFilePressed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Existing file"),
+                    Localization.lang(
+                        "'%0' exists. Overwrite file?",
+                        localFilePath.getFileName().toString()
+                    ),
+                    Localization.lang("Overwrite file"),
+                    Localization.lang("Cancel")
+                );
                 if (!overwriteFilePressed) {
                     return true;
                 }
@@ -276,9 +246,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 undoManager,
                 taskExecutor
             );
-            LibraryTab libraryTab = manager.openNewSharedDatabaseTab(
-                connectionProperties
-            );
+            LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
             if (!folder.getValue().isEmpty() && autosave.get()) {
@@ -296,34 +264,24 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             }
 
             return true;
-        } catch (
-            SQLException | InvalidDBMSConnectionPropertiesException exception
-        ) {
-            dialogService.showErrorDialogAndWait(
-                Localization.lang("Connection error"),
-                exception
-            );
+        } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"), exception);
         } catch (DatabaseNotSupportedException exception) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
 
-            Optional<ButtonType> result =
-                dialogService.showCustomButtonDialogAndWait(
-                    AlertType.INFORMATION,
-                    Localization.lang("Migration help information"),
-                    Localization.lang(
-                        "Entered database has obsolete structure and is no longer supported."
-                    ) +
-                    "\n" +
-                    Localization.lang(
-                        "Click help to learn about the migration of pre-3.6 databases."
-                    ) +
-                    "\n" +
-                    Localization.lang(
-                        "However, a new database was created alongside the pre-3.6 one."
-                    ),
-                    ButtonType.OK,
-                    openHelp
-                );
+            Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(
+                AlertType.INFORMATION,
+                Localization.lang("Migration help information"),
+                Localization.lang(
+                    "Entered database has obsolete structure and is no longer supported."
+                ) +
+                "\n" +
+                Localization.lang("Click help to learn about the migration of pre-3.6 databases.") +
+                "\n" +
+                Localization.lang("However, a new database was created alongside the pre-3.6 one."),
+                ButtonType.OK,
+                openHelp
+            );
 
             result
                 .filter(btn -> btn.equals(openHelp))
@@ -344,9 +302,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void setPreferences() {
-        sharedDatabasePreferences.setType(
-            selectedDBMSType.getValue().toString()
-        );
+        sharedDatabasePreferences.setType(selectedDBMSType.getValue().toString());
         sharedDatabasePreferences.setHost(host.getValue());
         sharedDatabasePreferences.setPort(port.getValue());
         sharedDatabasePreferences.setName(database.getValue());
@@ -360,13 +316,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 sharedDatabasePreferences.setPassword(
                     new Password(password.getValue(), user.getValue()).encrypt()
                 );
-            } catch (
-                GeneralSecurityException | UnsupportedEncodingException e
-            ) {
-                LOGGER.error(
-                    "Could not store the password due to encryption problems.",
-                    e
-                );
+            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+                LOGGER.error("Could not store the password due to encryption problems.", e);
             }
         } else {
             sharedDatabasePreferences.clearPassword(); // for the case that the password is already set
@@ -382,31 +333,19 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
      * Fetches possibly saved data and configures the control elements respectively.
      */
     private void applyPreferences() {
-        Optional<String> sharedDatabaseType =
-            sharedDatabasePreferences.getType();
-        Optional<String> sharedDatabaseHost =
-            sharedDatabasePreferences.getHost();
-        Optional<String> sharedDatabasePort =
-            sharedDatabasePreferences.getPort();
-        Optional<String> sharedDatabaseName =
-            sharedDatabasePreferences.getName();
-        Optional<String> sharedDatabaseUser =
-            sharedDatabasePreferences.getUser();
-        Optional<String> sharedDatabasePassword =
-            sharedDatabasePreferences.getPassword();
-        boolean sharedDatabaseRememberPassword =
-            sharedDatabasePreferences.getRememberPassword();
-        Optional<String> sharedDatabaseFolder =
-            sharedDatabasePreferences.getFolder();
-        boolean sharedDatabaseAutosave =
-            sharedDatabasePreferences.getAutosave();
-        Optional<String> sharedDatabaseKeystoreFile =
-            sharedDatabasePreferences.getKeyStoreFile();
+        Optional<String> sharedDatabaseType = sharedDatabasePreferences.getType();
+        Optional<String> sharedDatabaseHost = sharedDatabasePreferences.getHost();
+        Optional<String> sharedDatabasePort = sharedDatabasePreferences.getPort();
+        Optional<String> sharedDatabaseName = sharedDatabasePreferences.getName();
+        Optional<String> sharedDatabaseUser = sharedDatabasePreferences.getUser();
+        Optional<String> sharedDatabasePassword = sharedDatabasePreferences.getPassword();
+        boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();
+        Optional<String> sharedDatabaseFolder = sharedDatabasePreferences.getFolder();
+        boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();
+        Optional<String> sharedDatabaseKeystoreFile = sharedDatabasePreferences.getKeyStoreFile();
 
         if (sharedDatabaseType.isPresent()) {
-            Optional<DBMSType> dbmsType = DBMSType.fromString(
-                sharedDatabaseType.get()
-            );
+            Optional<DBMSType> dbmsType = DBMSType.fromString(sharedDatabaseType.get());
             dbmsType.ifPresent(selectedDBMSType::set);
         }
 
@@ -417,9 +356,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabaseKeystoreFile.ifPresent(keystore::set);
         useSSL.setValue(sharedDatabasePreferences.isUseSSL());
 
-        if (
-            sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()
-        ) {
+        if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
             try {
                 password.setValue(
                     new Password(
@@ -428,13 +365,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     )
                         .decrypt()
                 );
-            } catch (
-                GeneralSecurityException | UnsupportedEncodingException e
-            ) {
-                LOGGER.error(
-                    "Could not read the password due to decryption problems.",
-                    e
-                );
+            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+                LOGGER.error("Could not read the password due to decryption problems.", e);
             }
         }
 
@@ -444,9 +376,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         autosave.set(sharedDatabaseAutosave);
     }
 
-    private boolean isSharedDatabaseAlreadyPresent(
-        DBMSConnectionProperties connectionProperties
-    ) {
+    private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
         List<LibraryTab> libraryTabs = frame.getLibraryTabs();
         return libraryTabs
             .parallelStream()
@@ -463,37 +393,23 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     public void showSaveDbToFileDialog() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(
-                    preferencesService
-                        .getFilePreferences()
-                        .getWorkingDirectory()
-                )
-                .build();
-        Optional<Path> exportPath = dialogService.showFileSaveDialog(
-            fileDialogConfiguration
-        );
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(StandardFileType.BIBTEX_DB)
+            .withDefaultExtension(StandardFileType.BIBTEX_DB)
+            .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+            .build();
+        Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         exportPath.ifPresent(path -> folder.setValue(path.toString()));
     }
 
     public void showOpenKeystoreFileDialog() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileFilterConverter.ANY_FILE)
-                .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
-                .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
-                .withInitialDirectory(
-                    preferencesService
-                        .getFilePreferences()
-                        .getWorkingDirectory()
-                )
-                .build();
-        Optional<Path> keystorePath = dialogService.showFileOpenDialog(
-            fileDialogConfiguration
-        );
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(FileFilterConverter.ANY_FILE)
+            .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
+            .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
+            .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+            .build();
+        Optional<Path> keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);
         keystorePath.ifPresent(path -> keystore.setValue(path.toString()));
     }
 

@@ -24,9 +24,7 @@ public class OOFormat {
      */
     public static OOText setLocale(OOText ootext, String locale) {
         return OOText.fromString(
-            String.format("<span lang=\"%s\">", locale) +
-            ootext.toString() +
-            "</span>"
+            String.format("<span lang=\"%s\">", locale) + ootext.toString() + "</span>"
         );
     }
 
@@ -59,10 +57,7 @@ public class OOFormat {
         if (StringUtil.isNullOrEmpty(paraStyle)) {
             return paragraph(ootext);
         }
-        String startTag = String.format(
-            "<p oo:ParaStyleName=\"%s\">",
-            paraStyle
-        );
+        String startTag = String.format("<p oo:ParaStyleName=\"%s\">", paraStyle);
         return OOText.fromString(startTag + ootext.toString() + "</p>");
     }
 
@@ -76,9 +71,7 @@ public class OOFormat {
     /**
      * Format an OO cross-reference showing the target's page number as label to a reference mark.
      */
-    public static OOText formatReferenceToPageNumberOfReferenceMark(
-        String referenceMarkName
-    ) {
+    public static OOText formatReferenceToPageNumberOfReferenceMark(String referenceMarkName) {
         String string = String.format(
             "<oo:referenceToPageNumberOfReferenceMark target=\"%s\">",
             referenceMarkName

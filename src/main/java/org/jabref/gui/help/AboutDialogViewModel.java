@@ -34,21 +34,15 @@ public class AboutDialogViewModel extends AbstractViewModel {
         "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
     private final String changelogUrl;
     private final String versionInfo;
-    private final ReadOnlyStringWrapper environmentInfo =
-        new ReadOnlyStringWrapper();
-    private final Logger logger = LoggerFactory.getLogger(
-        AboutDialogViewModel.class
-    );
+    private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
+    private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper maintainers =
-        new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
-    private final ReadOnlyBooleanWrapper isDevelopmentVersion =
-        new ReadOnlyBooleanWrapper();
+    private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final ReadOnlyStringWrapper developmentVersion =
-        new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
     public AboutDialogViewModel(
@@ -177,15 +171,9 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            JabRefDesktop.openBrowser(
-                url,
-                preferencesService.getFilePreferences()
-            );
+            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(
-                Localization.lang("Could not open website."),
-                e
-            );
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);
         }
     }

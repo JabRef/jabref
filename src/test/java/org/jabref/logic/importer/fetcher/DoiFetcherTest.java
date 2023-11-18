@@ -21,22 +21,15 @@ public class DoiFetcherTest {
         mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
     );
 
-    private final BibEntry bibEntryBurd2011 = new BibEntry(
-        StandardEntryType.Book
-    )
+    private final BibEntry bibEntryBurd2011 = new BibEntry(StandardEntryType.Book)
         .withCitationKey("Burd_2011")
-        .withField(
-            StandardField.TITLE,
-            "Java{\\textregistered} For Dummies{\\textregistered}"
-        )
+        .withField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}")
         .withField(StandardField.PUBLISHER, "Wiley")
         .withField(StandardField.YEAR, "2011")
         .withField(StandardField.AUTHOR, "Barry Burd")
         .withField(StandardField.MONTH, "jul")
         .withField(StandardField.DOI, "10.1002/9781118257517");
-    private final BibEntry bibEntryDecker2007 = new BibEntry(
-        StandardEntryType.InProceedings
-    )
+    private final BibEntry bibEntryDecker2007 = new BibEntry(StandardEntryType.InProceedings)
         .withCitationKey("Decker_2007")
         .withField(
             StandardField.AUTHOR,
@@ -48,15 +41,10 @@ public class DoiFetcherTest {
         )
         .withField(StandardField.MONTH, "jul")
         .withField(StandardField.PUBLISHER, "{IEEE}")
-        .withField(
-            StandardField.TITLE,
-            "{BPEL}4Chor: Extending {BPEL} for Modeling Choreographies"
-        )
+        .withField(StandardField.TITLE, "{BPEL}4Chor: Extending {BPEL} for Modeling Choreographies")
         .withField(StandardField.YEAR, "2007")
         .withField(StandardField.DOI, "10.1109/icws.2007.59");
-    private final BibEntry bibEntryIannarelli2019 = new BibEntry(
-        StandardEntryType.Article
-    )
+    private final BibEntry bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
         .withField(
             StandardField.AUTHOR,
             "" +
@@ -68,10 +56,7 @@ public class DoiFetcherTest {
             "Telib Haysam  and " +
             "Meyer Thierry "
         )
-        .withField(
-            StandardField.PUBLISHER,
-            "AIDIC: Italian Association of Chemical Engineering"
-        )
+        .withField(StandardField.PUBLISHER, "AIDIC: Italian Association of Chemical Engineering")
         .withField(
             StandardField.TITLE,
             "Safety in research institutions: how to better communicate the risks using numerical simulations"
@@ -81,9 +66,7 @@ public class DoiFetcherTest {
         .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
         .withField(StandardField.PAGES, "871-876")
         .withField(StandardField.VOLUME, "77");
-    private final BibEntry bibEntryStenzel2020 = new BibEntry(
-        StandardEntryType.Article
-    )
+    private final BibEntry bibEntryStenzel2020 = new BibEntry(StandardEntryType.Article)
         .withCitationKey("Stenzel_2020")
         .withField(
             StandardField.AUTHOR,
@@ -109,34 +92,25 @@ public class DoiFetcherTest {
 
     @Test
     public void testPerformSearchBurd2011() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.1002/9781118257517"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/9781118257517");
         assertEquals(Optional.of(bibEntryBurd2011), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchDecker2007() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.1109/ICWS.2007.59"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/ICWS.2007.59");
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchIannarelli2019() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.3303/CET1977146"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.3303/CET1977146");
         assertEquals(Optional.of(bibEntryIannarelli2019), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchEmptyDOI() {
-        assertThrows(
-            FetcherException.class,
-            () -> fetcher.performSearchById("")
-        );
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
     }
 
     @Test
@@ -157,10 +131,7 @@ public class DoiFetcherTest {
 
     @Test
     public void testPerformSearchInvalidDOIClientResultsinFetcherClientException2() {
-        assertThrows(
-            FetcherException.class,
-            () -> fetcher.performSearchById("10.1002/9781517F")
-        );
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
     }
 
     @Test
@@ -172,11 +143,8 @@ public class DoiFetcherTest {
     }
 
     @Test
-    public void testAPSJournalCopiesArticleIdToPageField()
-        throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "10.1103/physreva.102.023315"
-        );
+    public void testAPSJournalCopiesArticleIdToPageField() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1103/physreva.102.023315");
         assertEquals(Optional.of(bibEntryStenzel2020), fetchedEntry);
     }
 }

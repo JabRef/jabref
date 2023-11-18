@@ -78,12 +78,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(
-            parsedEntries,
-            fileDirForDatabase,
-            preferences,
-            abbreviationRepository
-        );
+        return new Layout(parsedEntries, fileDirForDatabase, preferences, abbreviationRepository);
     }
 
     public static String getCurrentGroup() {
@@ -113,9 +108,7 @@ public class LayoutHelper {
             if ((currentCharacter == '{') || (currentCharacter == '}')) {
                 if (currentCharacter == '}') {
                     if (buffer != null) {
-                        parsedEntries.add(
-                            new StringInt(buffer.toString(), field)
-                        );
+                        parsedEntries.add(new StringInt(buffer.toString(), field));
                         return;
                     }
                 } else {
@@ -155,18 +148,14 @@ public class LayoutHelper {
                         tmp = buffer.toString() + '\n' + option;
                     }
 
-                    parsedEntries.add(
-                        new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD)
-                    );
+                    parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
                 }
 
                 return;
             }
             if (
                 !inQuotes &&
-                ((c == ']') ||
-                    (c == '[') ||
-                    (doneWithOptions && ((c == '{') || (c == '}'))))
+                ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))
             ) {
                 if ((c == ']') || (doneWithOptions && (c == '}'))) {
                     // changed section start - arudert
@@ -182,18 +171,14 @@ public class LayoutHelper {
                         // bracketed option must be followed by an (optionally empty) parameter
                         // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
                         // splits the string later on ignores the empty parameter)
-                        String parameter = buffer == null
-                            ? " "
-                            : buffer.toString();
+                        String parameter = buffer == null ? " " : buffer.toString();
                         if (option == null) {
                             tmp = parameter;
                         } else {
                             tmp = parameter + '\n' + option;
                         }
 
-                        parsedEntries.add(
-                            new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD)
-                        );
+                        parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
 
                         return;
                     }
@@ -245,10 +230,7 @@ public class LayoutHelper {
                 // Check for null, otherwise a Layout that finishes with a curly brace throws a NPE
                 if (buffer != null) {
                     parsedEntries.add(
-                        new StringInt(
-                            buffer.toString(),
-                            LayoutHelper.IS_LAYOUT_TEXT
-                        )
+                        new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT)
                     );
                 }
 
@@ -258,10 +240,7 @@ public class LayoutHelper {
             if ((c == '\\') && (peek() != '\\') && !escaped) {
                 if (buffer != null) {
                     parsedEntries.add(
-                        new StringInt(
-                            buffer.toString(),
-                            LayoutHelper.IS_LAYOUT_TEXT
-                        )
+                        new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT)
                     );
 
                     buffer = null;
@@ -347,17 +326,13 @@ public class LayoutHelper {
                     // Print the name of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
-                    parsedEntries.add(
-                        new StringInt(name, LayoutHelper.IS_FILENAME)
-                    );
+                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                     return;
                 } else if ("filepath".equalsIgnoreCase(name)) {
                     // Print the full path of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
-                    parsedEntries.add(
-                        new StringInt(name, LayoutHelper.IS_FILEPATH)
-                    );
+                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));
                     return;
                 } else if ("end".equalsIgnoreCase(name)) {
                     // get field name
@@ -371,16 +346,12 @@ public class LayoutHelper {
                     // Print the name of the current encoding used for export.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
-                    parsedEntries.add(
-                        new StringInt(name, LayoutHelper.IS_ENCODING_NAME)
-                    );
+                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));
                     return;
                 }
 
                 // for all other cases -> simple command
-                parsedEntries.add(
-                    new StringInt(name, LayoutHelper.IS_SIMPLE_COMMAND)
-                );
+                parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_COMMAND));
 
                 return;
             } else {

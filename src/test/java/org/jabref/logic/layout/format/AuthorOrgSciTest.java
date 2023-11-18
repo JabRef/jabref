@@ -24,22 +24,13 @@ public class AuthorOrgSciTest {
 
     @ParameterizedTest
     @MethodSource("formatTestsComposite")
-    void paramLayoutFormatTestComposite(
-        String expectedString,
-        String inputString
-    ) {
-        assertEquals(
-            expectedString,
-            authorOrgNatFormatterComposite.format(inputString)
-        );
+    void paramLayoutFormatTestComposite(String expectedString, String inputString) {
+        assertEquals(expectedString, authorOrgNatFormatterComposite.format(inputString));
     }
 
     private static Stream<Arguments> formatTests() {
         return Stream.of(
-            Arguments.of(
-                "Flynn, J., S. Gartska",
-                "John Flynn and Sabine Gartska"
-            ),
+            Arguments.of("Flynn, J., S. Gartska", "John Flynn and Sabine Gartska"),
             Arguments.of("Garvin, D. A.", "David A. Garvin"),
             Arguments.of(
                 "Makridakis, S., S. C. Wheelwright, V. E. McGee",
@@ -50,10 +41,7 @@ public class AuthorOrgSciTest {
 
     private static Stream<Arguments> formatTestsComposite() {
         return Stream.of(
-            Arguments.of(
-                "Flynn, J., S. Gartska",
-                "John Flynn and Sabine Gartska"
-            ),
+            Arguments.of("Flynn, J., S. Gartska", "John Flynn and Sabine Gartska"),
             Arguments.of("Garvin, D.A.", "David A. Garvin"),
             Arguments.of(
                 "Makridakis, S., S.C. Wheelwright, V.E. McGee",

@@ -47,31 +47,20 @@ class SidePaneViewModelTest {
         new HashMap<>(),
         0
     );
-    ObservableList<SidePaneType> sidePaneComponents =
-        FXCollections.observableArrayList();
+    ObservableList<SidePaneType> sidePaneComponents = FXCollections.observableArrayList();
     SidePaneViewModel sidePaneViewModel;
 
     @BeforeEach
     void setUp() {
-        when(stateManager.getVisibleSidePaneComponents())
-            .thenReturn(sidePaneComponents);
-        when(stateManager.getLocalDragboard())
-            .thenReturn(mock(CustomLocalDragboard.class));
-        when(stateManager.activeDatabaseProperty())
-            .thenReturn(OptionalObjectProperty.empty());
-        when(preferencesService.getSidePanePreferences())
-            .thenReturn(sidePanePreferences);
+        when(stateManager.getVisibleSidePaneComponents()).thenReturn(sidePaneComponents);
+        when(stateManager.getLocalDragboard()).thenReturn(mock(CustomLocalDragboard.class));
+        when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(preferencesService.getSidePanePreferences()).thenReturn(sidePanePreferences);
 
-        sidePanePreferences
-            .visiblePanes()
-            .addAll(EnumSet.allOf(SidePaneType.class));
+        sidePanePreferences.visiblePanes().addAll(EnumSet.allOf(SidePaneType.class));
         sidePanePreferences.getPreferredPositions().put(SidePaneType.GROUPS, 0);
-        sidePanePreferences
-            .getPreferredPositions()
-            .put(SidePaneType.WEB_SEARCH, 1);
-        sidePanePreferences
-            .getPreferredPositions()
-            .put(SidePaneType.OPEN_OFFICE, 2);
+        sidePanePreferences.getPreferredPositions().put(SidePaneType.WEB_SEARCH, 1);
+        sidePanePreferences.getPreferredPositions().put(SidePaneType.OPEN_OFFICE, 2);
 
         sidePaneViewModel =
             new SidePaneViewModel(
@@ -120,13 +109,9 @@ class SidePaneViewModelTest {
     @Test
     void sortByPreferredPositions() {
         sidePanePreferences.getPreferredPositions().put(SidePaneType.GROUPS, 2);
-        sidePanePreferences
-            .getPreferredPositions()
-            .put(SidePaneType.OPEN_OFFICE, 0);
+        sidePanePreferences.getPreferredPositions().put(SidePaneType.OPEN_OFFICE, 0);
 
-        sidePaneComponents.sort(
-            new SidePaneViewModel.PreferredIndexSort(sidePanePreferences)
-        );
+        sidePaneComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
 
         assertTrue(
             sidePaneComponents.get(0) == SidePaneType.OPEN_OFFICE &&

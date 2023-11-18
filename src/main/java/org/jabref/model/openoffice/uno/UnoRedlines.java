@@ -15,8 +15,7 @@ import java.util.Optional;
  */
 public class UnoRedlines {
 
-    public static boolean getRecordChanges(XTextDocument doc)
-        throws WrappedTargetException {
+    public static boolean getRecordChanges(XTextDocument doc) throws WrappedTargetException {
         // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Settings
         // "Properties of com.sun.star.text.TextDocument"
 
@@ -31,9 +30,7 @@ public class UnoRedlines {
         }
     }
 
-    private static Optional<XRedlinesSupplier> getRedlinesSupplier(
-        XTextDocument doc
-    ) {
+    private static Optional<XRedlinesSupplier> getRedlinesSupplier(XTextDocument doc) {
         return UnoCast.cast(XRedlinesSupplier.class, doc);
     }
 

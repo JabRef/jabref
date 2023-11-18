@@ -32,9 +32,7 @@ public class RemoveHyphenatedNewlinesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Removes all hyphenated line breaks in the field content."
-        );
+        return Localization.lang("Removes all hyphenated line breaks in the field content.");
     }
 
     @Override

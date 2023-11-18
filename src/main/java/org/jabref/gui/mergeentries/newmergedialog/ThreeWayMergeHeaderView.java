@@ -23,16 +23,9 @@ public class ThreeWayMergeHeaderView extends GridPane {
 
         this.leftHeaderCell = new HeaderCell(leftHeader);
         this.rightHeaderCell = new HeaderCell(rightHeader);
-        this.mergedHeaderCell =
-            new HeaderCell(Localization.lang("Merged Entry"));
+        this.mergedHeaderCell = new HeaderCell(Localization.lang("Merged Entry"));
 
-        addRow(
-            0,
-            new HeaderCell(""),
-            leftHeaderCell,
-            rightHeaderCell,
-            mergedHeaderCell
-        );
+        addRow(0, new HeaderCell(""), leftHeaderCell, rightHeaderCell, mergedHeaderCell);
 
         setPrefHeight(Control.USE_COMPUTED_SIZE);
         setMaxHeight(Control.USE_PREF_SIZE);

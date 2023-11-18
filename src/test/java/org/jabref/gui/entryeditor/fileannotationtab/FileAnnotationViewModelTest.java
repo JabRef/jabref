@@ -80,10 +80,7 @@ public class FileAnnotationViewModelTest {
             "This is paragraph 3."
         );
 
-        assertEquals(
-            expectedMarking,
-            annotationViewModelWithoutFileAnnotation.getContent()
-        );
+        assertEquals(expectedMarking, annotationViewModelWithoutFileAnnotation.getContent());
     }
 
     @Test

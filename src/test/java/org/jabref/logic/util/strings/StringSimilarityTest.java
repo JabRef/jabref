@@ -26,14 +26,7 @@ public class StringSimilarityTest {
             "abcdef, a, false", // no empty string sand similarity > threshold (4)
         }
     )
-    public void testStringSimilarity(
-        String a,
-        String b,
-        String expectedResult
-    ) {
-        assertEquals(
-            Boolean.valueOf(expectedResult),
-            similarityChecker.isSimilar(a, b)
-        );
+    public void testStringSimilarity(String a, String b, String expectedResult) {
+        assertEquals(Boolean.valueOf(expectedResult), similarityChecker.isSimilar(a, b));
     }
 }

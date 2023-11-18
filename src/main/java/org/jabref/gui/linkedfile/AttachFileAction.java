@@ -35,32 +35,24 @@ public class AttachFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
 
-        this.executable.bind(
-                ActionHelper.needsEntriesSelected(1, stateManager)
-            );
+        this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
 
     @Override
     public void execute() {
         if (stateManager.getActiveDatabase().isEmpty()) {
-            dialogService.notify(
-                Localization.lang("This operation requires an open library.")
-            );
+            dialogService.notify(Localization.lang("This operation requires an open library."));
             return;
         }
 
         if (stateManager.getSelectedEntries().size() != 1) {
             dialogService.notify(
-                Localization.lang(
-                    "This operation requires exactly one item to be selected."
-                )
+                Localization.lang("This operation requires exactly one item to be selected.")
             );
             return;
         }
 
-        BibDatabaseContext databaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
         BibEntry entry = stateManager.getSelectedEntries().get(0);
 
@@ -68,10 +60,9 @@ public class AttachFileAction extends SimpleCommand {
             .getFirstExistingFileDir(filePreferences)
             .orElse(filePreferences.getWorkingDirectory());
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDirectory)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(workingDirectory)
+            .build();
 
         dialogService
             .showFileOpenDialog(fileDialogConfiguration)
@@ -82,20 +73,14 @@ public class AttachFileAction extends SimpleCommand {
                     filePreferences
                 );
 
-                LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(
-                    linkedFile
-                );
+                LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
                 dialogService
                     .showCustomDialogAndWait(dialog)
                     .ifPresent(editedLinkedFile -> {
-                        Optional<FieldChange> fieldChange = entry.addFile(
-                            editedLinkedFile
-                        );
+                        Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
                         fieldChange.ifPresent(change -> {
-                            UndoableFieldChange ce = new UndoableFieldChange(
-                                change
-                            );
+                            UndoableFieldChange ce = new UndoableFieldChange(change);
                             libraryTab.getUndoManager().addEdit(ce);
                             libraryTab.markBaseChanged();
                         });

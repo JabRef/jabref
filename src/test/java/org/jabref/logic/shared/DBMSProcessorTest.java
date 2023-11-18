@@ -43,9 +43,7 @@ class DBMSProcessorTest {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor =
-            DBMSProcessor.getProcessorInstance(
-                ConnectorTest.getTestDBMSConnection(dbmsType)
-            );
+            DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
         TestManager.clearTables(this.dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }
@@ -78,26 +76,14 @@ class DBMSProcessorTest {
 
         Map<String, String> actualFieldMap = new HashMap<>();
 
-        try (
-            ResultSet entryResultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
             assertEquals("inproceedings", entryResultSet.getString("TYPE"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
-            try (
-                ResultSet fieldResultSet = selectFrom(
-                    "FIELD",
-                    dbmsConnection,
-                    dbmsProcessor
-                )
-            ) {
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
                 while (fieldResultSet.next()) {
                     actualFieldMap.put(
                         fieldResultSet.getString("NAME"),
@@ -111,12 +97,7 @@ class DBMSProcessorTest {
             .getFieldMap()
             .entrySet()
             .stream()
-            .collect(
-                Collectors.toMap(
-                    entry -> entry.getKey().getName(),
-                    Map.Entry::getValue
-                )
-            );
+            .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
@@ -127,13 +108,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        try (
-            ResultSet entryResultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
             assertEquals("article", entryResultSet.getString("TYPE"));
@@ -141,13 +116,7 @@ class DBMSProcessorTest {
             assertFalse(entryResultSet.next());
 
             // Adding an empty entry should not create an entry in field table, only in entry table
-            try (
-                ResultSet fieldResultSet = selectFrom(
-                    "FIELD",
-                    dbmsConnection,
-                    dbmsProcessor
-                )
-            ) {
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
                 assertFalse(fieldResultSet.next());
             }
         }
@@ -214,9 +183,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
 
-        List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntries(
-            Arrays.asList(1, 2)
-        );
+        List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntries(Arrays.asList(1, 2));
 
         assertEquals(List.of(firstEntry, secondEntry), sharedEntriesByIdList);
     }
@@ -231,10 +198,7 @@ class DBMSProcessorTest {
         bibEntry.getSharedBibEntryData().setVersion(0);
         bibEntry.setField(StandardField.YEAR, "1993");
 
-        assertThrows(
-            OfflineLockException.class,
-            () -> dbmsProcessor.updateEntry(bibEntry)
-        );
+        assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(bibEntry));
     }
 
     @Test
@@ -246,10 +210,9 @@ class DBMSProcessorTest {
         expectedBibEntry.getSharedBibEntryData().setVersion(0);
         dbmsProcessor.updateEntry(expectedBibEntry);
 
-        Optional<BibEntry> actualBibEntryOptional =
-            dbmsProcessor.getSharedEntry(
-                expectedBibEntry.getSharedBibEntryData().getSharedID()
-            );
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(
+            expectedBibEntry.getSharedBibEntryData().getSharedID()
+        );
 
         assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
@@ -263,13 +226,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(secondEntry);
         dbmsProcessor.removeEntries(entriesToRemove);
 
-        try (
-            ResultSet resultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(resultSet.next());
         }
     }
@@ -288,13 +245,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(thirdEntry);
         dbmsProcessor.removeEntries(entriesToRemove);
 
-        try (
-            ResultSet entryResultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertTrue(entryResultSet.next());
             assertEquals(2, entryResultSet.getInt("SHARED_ID"));
             assertFalse(entryResultSet.next());
@@ -307,36 +258,21 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(entryToRemove);
         dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
 
-        try (
-            ResultSet entryResultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(entryResultSet.next());
         }
     }
 
     @Test
     void testRemoveEntriesOnNullThrows() {
-        assertThrows(
-            NullPointerException.class,
-            () -> dbmsProcessor.removeEntries(null)
-        );
+        assertThrows(NullPointerException.class, () -> dbmsProcessor.removeEntries(null));
     }
 
     @Test
     void testRemoveEmptyEntryList() throws SQLException {
         dbmsProcessor.removeEntries(Collections.emptyList());
 
-        try (
-            ResultSet entryResultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(entryResultSet.next());
         }
     }
@@ -358,24 +294,21 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedBibEntry);
 
-        Optional<BibEntry> actualBibEntryOptional =
-            dbmsProcessor.getSharedEntry(
-                expectedBibEntry.getSharedBibEntryData().getSharedID()
-            );
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(
+            expectedBibEntry.getSharedBibEntryData().getSharedID()
+        );
 
         assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
 
     @Test
     void testGetNotExistingSharedEntry() {
-        Optional<BibEntry> actualBibEntryOptional =
-            dbmsProcessor.getSharedEntry(1);
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
     }
 
     @Test
-    void testGetSharedIDVersionMapping()
-        throws OfflineLockException, SQLException {
+    void testGetSharedIDVersionMapping() throws OfflineLockException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
 
@@ -384,29 +317,17 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(secondEntry);
 
         Map<Integer, Integer> expectedIDVersionMap = new HashMap<>();
-        expectedIDVersionMap.put(
-            firstEntry.getSharedBibEntryData().getSharedID(),
-            1
-        );
-        expectedIDVersionMap.put(
-            secondEntry.getSharedBibEntryData().getSharedID(),
-            2
-        );
+        expectedIDVersionMap.put(firstEntry.getSharedBibEntryData().getSharedID(), 1);
+        expectedIDVersionMap.put(secondEntry.getSharedBibEntryData().getSharedID(), 2);
 
-        Map<Integer, Integer> actualIDVersionMap =
-            dbmsProcessor.getSharedIDVersionMapping();
+        Map<Integer, Integer> actualIDVersionMap = dbmsProcessor.getSharedIDVersionMapping();
 
         assertEquals(expectedIDVersionMap, actualIDVersionMap);
     }
 
     @Test
     void testGetSharedMetaData() {
-        insertMetaData(
-            "databaseType",
-            "bibtex;",
-            dbmsConnection,
-            dbmsProcessor
-        );
+        insertMetaData("databaseType", "bibtex;", dbmsConnection, dbmsProcessor);
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
         insertMetaData(
             "saveActions",
@@ -420,12 +341,7 @@ class DBMSProcessorTest {
             dbmsConnection,
             dbmsProcessor
         );
-        insertMetaData(
-            "VersionDBStructure",
-            "1",
-            dbmsConnection,
-            dbmsProcessor
-        );
+        insertMetaData("VersionDBStructure", "1", dbmsConnection, dbmsProcessor);
 
         Map<String, String> expectedMetaData = getMetaDataExample();
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
@@ -452,10 +368,7 @@ class DBMSProcessorTest {
             "saveActions",
             "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;"
         );
-        expectedMetaData.put(
-            "saveOrderConfig",
-            "specified;author;false;title;false;year;true;"
-        );
+        expectedMetaData.put("saveOrderConfig", "specified;author;false;title;false;year;true;");
         expectedMetaData.put("VersionDBStructure", "1");
 
         return expectedMetaData;
@@ -472,14 +385,8 @@ class DBMSProcessorTest {
 
     private static BibEntry getBibEntryExample2() {
         return new BibEntry(StandardEntryType.InProceedings)
-            .withField(
-                StandardField.AUTHOR,
-                "Shelah, Saharon and Ziegler, Martin"
-            )
-            .withField(
-                StandardField.TITLE,
-                "Algebraically closed groups of large cardinality"
-            )
+            .withField(StandardField.AUTHOR, "Shelah, Saharon and Ziegler, Martin")
+            .withField(StandardField.TITLE, "Algebraically closed groups of large cardinality")
             .withField(StandardField.JOURNAL, "The Journal of Symbolic Logic")
             .withField(StandardField.YEAR, "1979")
             .withCitationKey("algegrou1979");
@@ -487,14 +394,8 @@ class DBMSProcessorTest {
 
     private static BibEntry getBibEntryExample3() {
         return new BibEntry(StandardEntryType.InProceedings)
-            .withField(
-                StandardField.AUTHOR,
-                "Hodges, Wilfrid and Shelah, Saharon"
-            )
-            .withField(
-                StandardField.TITLE,
-                "Infinite games and reduced products"
-            )
+            .withField(StandardField.AUTHOR, "Hodges, Wilfrid and Shelah, Saharon")
+            .withField(StandardField.TITLE, "Infinite games and reduced products")
             .withField(StandardField.JOURNAL, "Annals of Mathematical Logic")
             .withField(StandardField.YEAR, "1981")
             .withCitationKey("infigame1981");
@@ -515,13 +416,7 @@ class DBMSProcessorTest {
 
         Map<Integer, Map<String, String>> actualFieldMap = new HashMap<>();
 
-        try (
-            ResultSet entryResultSet = selectFrom(
-                "ENTRY",
-                dbmsConnection,
-                dbmsProcessor
-            )
-        ) {
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
             assertEquals("article", entryResultSet.getString("TYPE"));
@@ -544,19 +439,9 @@ class DBMSProcessorTest {
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
-            try (
-                ResultSet fieldResultSet = selectFrom(
-                    "FIELD",
-                    dbmsConnection,
-                    dbmsProcessor
-                )
-            ) {
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
                 while (fieldResultSet.next()) {
-                    if (
-                        actualFieldMap.containsKey(
-                            fieldResultSet.getInt("ENTRY_SHARED_ID")
-                        )
-                    ) {
+                    if (actualFieldMap.containsKey(fieldResultSet.getInt("ENTRY_SHARED_ID"))) {
                         actualFieldMap
                             .get(fieldResultSet.getInt("ENTRY_SHARED_ID"))
                             .put(
@@ -607,9 +492,7 @@ class DBMSProcessorTest {
             return dbmsConnection
                 .getConnection()
                 .createStatement()
-                .executeQuery(
-                    "SELECT * FROM " + escape_Table(table, dbmsProcessor)
-                );
+                .executeQuery("SELECT * FROM " + escape_Table(table, dbmsProcessor));
         } catch (SQLException e) {
             fail(e.getMessage());
             return null;
@@ -644,17 +527,11 @@ class DBMSProcessorTest {
         });
     }
 
-    private static String escape(
-        String expression,
-        DBMSProcessor dbmsProcessor
-    ) {
+    private static String escape(String expression, DBMSProcessor dbmsProcessor) {
         return dbmsProcessor.escape(expression);
     }
 
-    private static String escape_Table(
-        String expression,
-        DBMSProcessor dbmsProcessor
-    ) {
+    private static String escape_Table(String expression, DBMSProcessor dbmsProcessor) {
         return dbmsProcessor.escape_Table(expression);
     }
 

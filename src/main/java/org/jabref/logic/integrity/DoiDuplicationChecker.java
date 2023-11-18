@@ -17,16 +17,12 @@ public class DoiDuplicationChecker implements DatabaseChecker {
     @Override
     public List<IntegrityMessage> check(BibDatabase database) {
         ObservableList<BibEntry> bibEntries = database.getEntries();
-        BiMap<DOI, List<BibEntry>> duplicateMap = HashBiMap.create(
-            bibEntries.size()
-        );
+        BiMap<DOI, List<BibEntry>> duplicateMap = HashBiMap.create(bibEntries.size());
         for (BibEntry bibEntry : bibEntries) {
             bibEntry
                 .getDOI()
                 .ifPresent(doi ->
-                    duplicateMap
-                        .computeIfAbsent(doi, absentDoi -> new ArrayList<>())
-                        .add(bibEntry)
+                    duplicateMap.computeIfAbsent(doi, absentDoi -> new ArrayList<>()).add(bibEntry)
                 );
         }
 

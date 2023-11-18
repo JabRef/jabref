@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class UndoRedoAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UndoRedoAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoRedoAction.class);
 
     private final StandardActions action;
     private final JabRefFrame frame;
@@ -47,9 +45,7 @@ public class UndoRedoAction extends SimpleCommand {
                 libraryTab.markBaseChanged();
                 dialogService.notify(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
-                dialogService.notify(
-                    Localization.lang("Nothing to undo") + '.'
-                );
+                dialogService.notify(Localization.lang("Nothing to undo") + '.');
             }
             frame.getCurrentLibraryTab().markChangedOrUnChanged();
         } else if (action == StandardActions.REDO) {
@@ -58,9 +54,7 @@ public class UndoRedoAction extends SimpleCommand {
                 libraryTab.markBaseChanged();
                 dialogService.notify(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
-                dialogService.notify(
-                    Localization.lang("Nothing to redo") + '.'
-                );
+                dialogService.notify(Localization.lang("Nothing to redo") + '.');
             }
 
             libraryTab.markChangedOrUnChanged();

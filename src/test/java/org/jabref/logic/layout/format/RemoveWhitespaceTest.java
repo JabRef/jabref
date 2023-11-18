@@ -29,9 +29,6 @@ public class RemoveWhitespaceTest {
 
     @Test
     public void testNewLineCombo() {
-        assertEquals(
-            "abcd EFG",
-            new RemoveWhitespace().format("abcd\r E\nFG\r\n")
-        );
+        assertEquals("abcd EFG", new RemoveWhitespace().format("abcd\r E\nFG\r\n"));
     }
 }

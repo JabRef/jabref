@@ -58,19 +58,15 @@ public class ParseLatexResultView extends BaseDialog<Void> {
                 close();
             }
         );
-        Button importButton = (Button) getDialogPane()
-            .lookupButton(importButtonType);
-        importButton
-            .disableProperty()
-            .bind(viewModel.importButtonDisabledProperty());
+        Button importButton = (Button) getDialogPane().lookupButton(importButtonType);
+        importButton.disableProperty().bind(viewModel.importButtonDisabledProperty());
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML
     private void initialize() {
-        viewModel =
-            new ParseLatexResultViewModel(resolverResult, databaseContext);
+        viewModel = new ParseLatexResultViewModel(resolverResult, databaseContext);
 
         referenceListView.setItems(viewModel.getReferenceList());
         referenceListView.getSelectionModel().selectFirst();

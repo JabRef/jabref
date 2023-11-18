@@ -91,9 +91,7 @@ import org.slf4j.LoggerFactory;
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BibEntry.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
 
     /**
@@ -104,25 +102,19 @@ public class BibEntry implements Cloneable {
     /**
      * Cache that stores latex free versions of fields.
      */
-    private final Map<Field, String> latexFreeFields =
-        new ConcurrentHashMap<>();
+    private final Map<Field, String> latexFreeFields = new ConcurrentHashMap<>();
 
     /**
      * Cache that stores the field as keyword lists (format &lt;Field, Separator, Keyword list>)
      */
-    private final MultiKeyMap<
-        StandardField,
-        Character,
-        KeywordList
-    > fieldsAsKeywords = new MultiKeyMap<>(StandardField.class);
+    private final MultiKeyMap<StandardField, Character, KeywordList> fieldsAsKeywords =
+        new MultiKeyMap<>(StandardField.class);
 
     private final EventBus eventBus = new EventBus();
 
     private String id;
 
-    private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>(
-        DEFAULT_TYPE
-    );
+    private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>(DEFAULT_TYPE);
 
     private ObservableMap<Field, String> fields = FXCollections.observableMap(
         new ConcurrentHashMap<>()
@@ -165,10 +157,7 @@ public class BibEntry implements Cloneable {
         return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());
     }
 
-    public Optional<String> getResolvedFieldOrAlias(
-        OrFields fields,
-        BibDatabase database
-    ) {
+    public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
         for (Field field : fields.getFields()) {
             Optional<String> value = getResolvedFieldOrAlias(field, database);
             if (value.isPresent()) {
@@ -215,8 +204,7 @@ public class BibEntry implements Cloneable {
                 (targetEntry == StandardEntryType.InBook)) ||
             ((sourceEntry == StandardEntryType.Book) &&
                 (targetEntry == StandardEntryType.BookInBook)) ||
-            ((sourceEntry == StandardEntryType.Book) &&
-                (targetEntry == StandardEntryType.SuppBook))
+            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook))
         ) {
             if (targetField == StandardField.AUTHOR) {
                 return Optional.of(StandardField.AUTHOR);
@@ -330,10 +318,7 @@ public class BibEntry implements Cloneable {
             }
 
             // those fields are no more available for the same-name inheritance strategy
-            if (
-                (targetField == StandardField.TITLE) ||
-                (targetField == StandardField.SUBTITLE)
-            ) {
+            if ((targetField == StandardField.TITLE) || (targetField == StandardField.SUBTITLE)) {
                 return Optional.empty();
             }
 
@@ -361,26 +346,12 @@ public class BibEntry implements Cloneable {
      *                 The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public Optional<String> getResolvedFieldOrAlias(
-        Field field,
-        BibDatabase database
-    ) {
-        return genericGetResolvedFieldOrAlias(
-            field,
-            database,
-            BibEntry::getFieldOrAlias
-        );
+    public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
+        return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
     }
 
-    public Optional<String> getResolvedFieldOrAliasLatexFree(
-        Field field,
-        BibDatabase database
-    ) {
-        return genericGetResolvedFieldOrAlias(
-            field,
-            database,
-            BibEntry::getFieldOrAliasLatexFree
-        );
+    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, BibDatabase database) {
+        return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);
     }
 
     private Optional<String> genericGetResolvedFieldOrAlias(
@@ -388,10 +359,7 @@ public class BibEntry implements Cloneable {
         BibDatabase database,
         BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias
     ) {
-        if (
-            (InternalField.TYPE_HEADER == field) ||
-            (InternalField.OBSOLETE_TYPE_HEADER == field)
-        ) {
+        if ((InternalField.TYPE_HEADER == field) || (InternalField.OBSOLETE_TYPE_HEADER == field)) {
             return Optional.of(type.get().getDisplayName());
         }
 
@@ -407,18 +375,10 @@ public class BibEntry implements Cloneable {
             if (referred.isPresent()) {
                 EntryType sourceEntry = referred.get().type.get();
                 EntryType targetEntry = type.get();
-                Optional<Field> sourceField = getSourceField(
-                    field,
-                    targetEntry,
-                    sourceEntry
-                );
+                Optional<Field> sourceField = getSourceField(field, targetEntry, sourceEntry);
 
                 if (sourceField.isPresent()) {
-                    result =
-                        getFieldOrAlias.apply(
-                            referred.get(),
-                            sourceField.get()
-                        );
+                    result = getFieldOrAlias.apply(referred.get(), sourceField.get());
                 }
             }
         }
@@ -447,14 +407,7 @@ public class BibEntry implements Cloneable {
 
         String oldId = this.id;
 
-        eventBus.post(
-            new FieldChangedEvent(
-                this,
-                InternalField.INTERNAL_ID_FIELD,
-                id,
-                oldId
-            )
-        );
+        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
         this.id = id;
         changed = true;
     }
@@ -510,10 +463,7 @@ public class BibEntry implements Cloneable {
      * Sets this entry's type and sets the changed flag to true <br>
      * If the new entry type equals the old entry type no changed flag is set.
      */
-    public Optional<FieldChange> setType(
-        EntryType newType,
-        EntriesEventSource eventSource
-    ) {
+    public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
         Objects.requireNonNull(newType);
 
         EntryType oldType = type.get();
@@ -561,9 +511,7 @@ public class BibEntry implements Cloneable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
-                String latexFreeValue = LatexToUnicodeAdapter
-                    .format(fieldValue.get())
-                    .intern();
+                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
                 latexFreeFields.put(field, latexFreeValue);
                 return Optional.of(latexFreeValue);
             } else {
@@ -621,10 +569,7 @@ public class BibEntry implements Cloneable {
             (StandardField.MONTH == field) ||
             (StandardField.DAY == field)
         ) {
-            Optional<String> date = getFieldValue.apply(
-                this,
-                StandardField.DATE
-            );
+            Optional<String> date = getFieldValue.apply(this, StandardField.DATE);
             if (date.isEmpty()) {
                 return Optional.empty();
             }
@@ -635,10 +580,7 @@ public class BibEntry implements Cloneable {
                     return parsedDate.get().getYear().map(Object::toString);
                 }
                 if (StandardField.MONTH == field) {
-                    return parsedDate
-                        .get()
-                        .getMonth()
-                        .map(Month::getJabRefFormat);
+                    return parsedDate.get().getMonth().map(Month::getJabRefFormat);
                 }
                 if (StandardField.DAY == field) {
                     return parsedDate.get().getDay().map(Object::toString);
@@ -716,10 +658,7 @@ public class BibEntry implements Cloneable {
     ) {
         Objects.requireNonNull(field, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
-        Objects.requireNonNull(
-            eventSource,
-            "field eventSource must not be null"
-        );
+        Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
         if (value.isEmpty()) {
             return clearField(field);
@@ -771,10 +710,7 @@ public class BibEntry implements Cloneable {
      * @param field       the field to clear.
      * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
      */
-    public Optional<FieldChange> clearField(
-        Field field,
-        EntriesEventSource eventSource
-    ) {
+    public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
         if (oldValue.isEmpty()) {
             return Optional.empty();
@@ -800,15 +736,10 @@ public class BibEntry implements Cloneable {
      *                 that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    public boolean allFieldsPresent(
-        Collection<OrFields> fields,
-        BibDatabase database
-    ) {
+    public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
         return fields
             .stream()
-            .allMatch(field ->
-                this.getResolvedFieldOrAlias(field, database).isPresent()
-            );
+            .allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
     /**
@@ -818,8 +749,7 @@ public class BibEntry implements Cloneable {
     @Override
     public Object clone() {
         BibEntry clone = new BibEntry(type.getValue());
-        clone.fields =
-            FXCollections.observableMap(new ConcurrentHashMap<>(fields));
+        clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         clone.commentsBeforeEntry = commentsBeforeEntry;
         clone.parsedSerialization = parsedSerialization;
         clone.changed = changed;
@@ -916,18 +846,12 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-    public Optional<FieldChange> putKeywords(
-        List<String> keywords,
-        Character delimiter
-    ) {
+    public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
         Objects.requireNonNull(delimiter);
         return putKeywords(new KeywordList(keywords), delimiter);
     }
 
-    public Optional<FieldChange> putKeywords(
-        KeywordList keywords,
-        Character delimiter
-    ) {
+    public Optional<FieldChange> putKeywords(KeywordList keywords, Character delimiter) {
         Objects.requireNonNull(keywords);
         Optional<String> oldValue = this.getField(StandardField.KEYWORDS);
 
@@ -980,10 +904,7 @@ public class BibEntry implements Cloneable {
         return getFieldAsKeywords(StandardField.KEYWORDS, delimiter);
     }
 
-    public KeywordList getResolvedKeywords(
-        Character delimiter,
-        BibDatabase database
-    ) {
+    public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
         Optional<String> keywordsContent = getResolvedFieldOrAlias(
             StandardField.KEYWORDS,
             database
@@ -1043,9 +964,7 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-    public BibEntry withSharedBibEntryData(
-        SharedBibEntryData sharedBibEntryData
-    ) {
+    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
         sharedBibEntryData = sharedBibEntryData;
         return this;
     }
@@ -1133,19 +1052,13 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-    public List<ParsedEntryLink> getEntryLinkList(
-        Field field,
-        BibDatabase database
-    ) {
+    public List<ParsedEntryLink> getEntryLinkList(Field field, BibDatabase database) {
         return getField(field)
             .map(fieldValue -> EntryLinkList.parse(fieldValue, database))
             .orElse(Collections.emptyList());
     }
 
-    public Optional<FieldChange> setEntryLinkList(
-        Field field,
-        List<ParsedEntryLink> list
-    ) {
+    public Optional<FieldChange> setEntryLinkList(Field field, List<ParsedEntryLink> list) {
         return setField(field, EntryLinkList.serialize(list));
     }
 
@@ -1158,19 +1071,14 @@ public class BibEntry implements Cloneable {
             if (fieldValue == null) {
                 return Collections.emptySet();
             } else {
-                HashSet<String> words = new HashSet<>(
-                    StringUtil.getStringAsWords(fieldValue)
-                );
+                HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
                 fieldsAsWords.put(field, words);
                 return words;
             }
         }
     }
 
-    public KeywordList getFieldAsKeywords(
-        Field field,
-        Character keywordSeparator
-    ) {
+    public KeywordList getFieldAsKeywords(Field field, Character keywordSeparator) {
         if (field instanceof StandardField standardField) {
             Optional<KeywordList> storedList = fieldsAsKeywords.get(
                 standardField,
@@ -1232,13 +1140,9 @@ public class BibEntry implements Cloneable {
     }
 
     public void setDate(Date date) {
-        date
-            .getYear()
-            .ifPresent(year -> setField(StandardField.YEAR, year.toString()));
+        date.getYear().ifPresent(year -> setField(StandardField.YEAR, year.toString()));
         date.getMonth().ifPresent(this::setMonth);
-        date
-            .getDay()
-            .ifPresent(day -> setField(StandardField.DAY, day.toString()));
+        date.getDay().ifPresent(day -> setField(StandardField.DAY, day.toString()));
     }
 
     public Optional<Month> getMonth() {
@@ -1246,13 +1150,8 @@ public class BibEntry implements Cloneable {
     }
 
     public OptionalBinding<String> getFieldBinding(Field field) {
-        if (
-            (field == InternalField.TYPE_HEADER) ||
-            (field == InternalField.OBSOLETE_TYPE_HEADER)
-        ) {
-            return EasyBind
-                .wrapNullable(type)
-                .mapOpt(EntryType::getDisplayName);
+        if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
+            return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);
         }
         return EasyBind.valueAt(fields, field);
     }
@@ -1293,10 +1192,7 @@ public class BibEntry implements Cloneable {
      * @param linkToDownloadedFile the link to the file, which was downloaded
      * @param downloadedFile the path to be added to the entry
      */
-    public void replaceDownloadedFile(
-        String linkToDownloadedFile,
-        LinkedFile downloadedFile
-    ) {
+    public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
 
         int oldFileIndex = -1;
@@ -1336,12 +1232,8 @@ public class BibEntry implements Cloneable {
      * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
      */
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {
-        Set<Field> thisFields = new TreeSet<>(
-            Comparator.comparing(Field::getName)
-        );
-        Set<Field> otherFields = new TreeSet<>(
-            Comparator.comparing(Field::getName)
-        );
+        Set<Field> thisFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        Set<Field> otherFields = new TreeSet<>(Comparator.comparing(Field::getName));
 
         thisFields.addAll(this.getFields());
         otherFields.addAll(other.getFields());

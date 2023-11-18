@@ -25,20 +25,13 @@ public class SearchForUpdateAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(
-                preferencesService
-                    .getInternalPreferences()
-                    .versionCheckEnabledProperty()
+                preferencesService.getInternalPreferences().versionCheckEnabledProperty()
             );
     }
 
     @Override
     public void execute() {
-        new VersionWorker(
-            buildInfo.version,
-            dialogService,
-            taskExecutor,
-            preferencesService
-        )
+        new VersionWorker(buildInfo.version, dialogService, taskExecutor, preferencesService)
             .checkForNewVersionAsync();
     }
 }

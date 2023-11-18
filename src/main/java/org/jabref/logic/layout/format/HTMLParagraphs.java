@@ -10,9 +10,7 @@ import org.jabref.logic.layout.LayoutFormatter;
  */
 public class HTMLParagraphs implements LayoutFormatter {
 
-    private static final Pattern BEFORE_NEW_LINES_PATTERN = Pattern.compile(
-        "(.*?)\\n\\s*\\n"
-    );
+    private static final Pattern BEFORE_NEW_LINES_PATTERN = Pattern.compile("(.*?)\\n\\s*\\n");
 
     @Override
     public String format(String fieldText) {
@@ -26,9 +24,7 @@ public class HTMLParagraphs implements LayoutFormatter {
             return trimmedFieldText;
         }
 
-        Matcher m = HTMLParagraphs.BEFORE_NEW_LINES_PATTERN.matcher(
-            trimmedFieldText
-        );
+        Matcher m = HTMLParagraphs.BEFORE_NEW_LINES_PATTERN.matcher(trimmedFieldText);
         StringBuilder s = new StringBuilder();
         while (m.find()) {
             String middle = m.group(1).trim();

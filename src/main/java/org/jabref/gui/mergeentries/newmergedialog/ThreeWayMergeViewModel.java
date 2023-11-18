@@ -19,17 +19,13 @@ import org.jabref.model.entry.field.InternalField;
 
 public class ThreeWayMergeViewModel extends AbstractViewModel {
 
-    private final ObjectProperty<BibEntry> leftEntry =
-        new SimpleObjectProperty<>();
-    private final ObjectProperty<BibEntry> rightEntry =
-        new SimpleObjectProperty<>();
-    private final ObjectProperty<BibEntry> mergedEntry =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<BibEntry> leftEntry = new SimpleObjectProperty<>();
+    private final ObjectProperty<BibEntry> rightEntry = new SimpleObjectProperty<>();
+    private final ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>();
     private final StringProperty leftHeader = new SimpleStringProperty();
     private final StringProperty rightHeader = new SimpleStringProperty();
 
-    private final ObservableList<Field> visibleFields =
-        FXCollections.observableArrayList();
+    private final ObservableList<Field> visibleFields = FXCollections.observableArrayList();
 
     public ThreeWayMergeViewModel(
         BibEntry leftEntry,
@@ -51,10 +47,7 @@ public class ThreeWayMergeViewModel extends AbstractViewModel {
 
         setVisibleFields(
             Stream
-                .concat(
-                    leftEntry.getFields().stream(),
-                    rightEntry.getFields().stream()
-                )
+                .concat(leftEntry.getFields().stream(), rightEntry.getFields().stream())
                 .collect(Collectors.toSet())
         );
     }

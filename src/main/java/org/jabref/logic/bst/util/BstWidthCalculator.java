@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BstWidthCalculator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BstWidthCalculator.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstWidthCalculator.class);
 
     /*
      * Quoted from Bibtex:
@@ -204,16 +202,8 @@ public class BstWidthCalculator {
                         if ((i < n) && (i == afterBackslash)) {
                             i++; // Skip non-alpha control seq
                         } else {
-                            if (
-                                BstCaseChanger
-                                    .findSpecialChar(c, afterBackslash)
-                                    .isPresent()
-                            ) {
-                                result +=
-                                BstWidthCalculator.getSpecialCharWidth(
-                                    c,
-                                    afterBackslash
-                                );
+                            if (BstCaseChanger.findSpecialChar(c, afterBackslash).isPresent()) {
+                                result += BstWidthCalculator.getSpecialCharWidth(c, afterBackslash);
                             }
                         }
                         while ((i < n) && Character.isWhitespace(c[i])) {
@@ -236,9 +226,7 @@ public class BstWidthCalculator {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    LOGGER.warn(
-                        "Too many closing braces in string: " + toMeasure
-                    );
+                    LOGGER.warn("Too many closing braces in string: " + toMeasure);
                 }
             }
             result += BstWidthCalculator.getCharWidth(c[i]);

@@ -36,17 +36,13 @@ public class DocbookExporterTest {
                 "docbook4",
                 null,
                 StandardFileType.XML,
-                mock(
-                    LayoutFormatterPreferences.class,
-                    Answers.RETURNS_DEEP_STUBS
-                ),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder()
             );
     }
 
     @Test
-    public void testCorruptedTitleBraces(@TempDir Path testFolder)
-        throws Exception {
+    public void testCorruptedTitleBraces(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
@@ -68,8 +64,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void testCorruptedTitleUnicode(@TempDir Path testFolder)
-        throws Exception {
+    public void testCorruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();

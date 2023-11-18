@@ -38,9 +38,7 @@ class GroupTreeViewModelTest {
     void setUp() {
         databaseContext = new BibDatabaseContext();
         stateManager = new StateManager();
-        stateManager
-            .activeDatabaseProperty()
-            .setValue(Optional.of(databaseContext));
+        stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
@@ -90,11 +88,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void explicitGroupsAreRemovedFromEntriesOnDelete() {
-        ExplicitGroup group = new ExplicitGroup(
-            "group",
-            GroupHierarchyType.INDEPENDENT,
-            ','
-        );
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
@@ -143,11 +137,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldNotShowDialogWhenGroupNameChanges() {
-        AbstractGroup oldGroup = new ExplicitGroup(
-            "group",
-            GroupHierarchyType.INDEPENDENT,
-            ','
-        );
+        AbstractGroup oldGroup = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
         AbstractGroup newGroup = new ExplicitGroup(
             "newGroupName",
             GroupHierarchyType.INDEPENDENT,

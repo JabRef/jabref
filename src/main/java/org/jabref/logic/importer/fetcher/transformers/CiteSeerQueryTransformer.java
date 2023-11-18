@@ -81,10 +81,7 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
      * except "must_have_pdf" as FullTextFetcher is not yet implemented for CiteSeer
      */
     @Override
-    protected Optional<String> handleOtherField(
-        String fieldAsString,
-        String term
-    ) {
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
             case "page" -> handlePage(term);
             case "pageSize" -> handlePageSize(term);

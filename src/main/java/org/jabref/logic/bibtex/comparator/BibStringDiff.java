@@ -43,12 +43,7 @@ public class BibStringDiff {
                 .findAny();
             if (match.isPresent()) {
                 // We have found a string with a matching name.
-                if (
-                    !Objects.equals(
-                        original.getContent(),
-                        match.get().getContent()
-                    )
-                ) {
+                if (!Objects.equals(original.getContent(), match.get().getContent())) {
                     // But they have non-matching contents, so we've found a change.
                     differences.add(new BibStringDiff(original, match.get()));
                 }
@@ -60,10 +55,7 @@ public class BibStringDiff {
         }
 
         // See if we can detect a name change for those entries that we couldn't match, based on their content
-        for (
-            Iterator<BibtexString> iterator = notMatched.iterator();
-            iterator.hasNext();
-        ) {
+        for (Iterator<BibtexString> iterator = notMatched.iterator(); iterator.hasNext();) {
             BibtexString original = iterator.next();
 
             Optional<BibtexString> match = newDatabase
@@ -90,9 +82,7 @@ public class BibStringDiff {
             .getStringValues()
             .stream()
             .filter(test -> !used.contains(test))
-            .forEach(newString ->
-                differences.add(new BibStringDiff(null, newString))
-            );
+            .forEach(newString -> differences.add(new BibStringDiff(null, newString)));
 
         return differences;
     }

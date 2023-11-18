@@ -43,10 +43,7 @@ public class BvbFetcherTest {
             new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.TITLE, "Effective Java")
                 .withField(StandardField.YEAR, "2018")
-                .withField(
-                    StandardField.SUBTITLE,
-                    "best practices für die Java-Plattform"
-                )
+                .withField(StandardField.SUBTITLE, "best practices für die Java-Plattform")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.TITLEADDON, "Joshua Bloch")
                 .withField(
@@ -84,17 +81,13 @@ public class BvbFetcherTest {
 
     @Test
     public void testGetName() {
-        assertEquals(
-            "Bibliotheksverbund Bayern (Experimental)",
-            fetcher.getName()
-        );
+        assertEquals("Bibliotheksverbund Bayern (Experimental)", fetcher.getName());
     }
 
     @Test
     public void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser()
-            .parse(query, NO_EXPLICIT_FIELD);
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
         assertEquals(
             "http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=java+jdk&maximumRecords=30",
@@ -105,8 +98,7 @@ public class BvbFetcherTest {
     @Test
     public void complexSearchQueryURLCorrect() throws Exception {
         String query = "title:jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser()
-            .parse(query, NO_EXPLICIT_FIELD);
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
         assertEquals(
             "http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=jdk&maximumRecords=30",
@@ -115,11 +107,8 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void testPerformSearchMatchingMultipleEntries()
-        throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch(
-            "effective java bloch"
-        );
+    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
+        List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
         assertEquals(bibEntryISBN9783960886402, searchResult.get(0));
         assertEquals(bibEntryISBN0134685997, searchResult.get(1));
     }

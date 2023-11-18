@@ -61,9 +61,7 @@ public class EntryTab
     public void initialize() {
         this.viewModel = new EntryTabViewModel(preferencesService);
 
-        keywordSeparator
-            .textProperty()
-            .bindBidirectional(viewModel.keywordSeparatorProperty());
+        keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
 
         // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
         UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {
@@ -72,41 +70,25 @@ public class EntryTab
             }
             return null; // null means the change is rejected
         };
-        TextFormatter<String> formatter = new TextFormatter<>(
-            singleCharacterFilter
-        );
+        TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
 
         keywordSeparator.setTextFormatter(formatter);
 
-        resolveStrings
-            .selectedProperty()
-            .bindBidirectional(viewModel.resolveStringsProperty());
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
         resolveStringsForFields
             .textProperty()
             .bindBidirectional(viewModel.resolveStringsForFieldsProperty());
-        nonWrappableFields
-            .textProperty()
-            .bindBidirectional(viewModel.nonWrappableFieldsProperty());
+        nonWrappableFields.textProperty().bindBidirectional(viewModel.nonWrappableFieldsProperty());
 
-        markOwner
-            .selectedProperty()
-            .bindBidirectional(viewModel.markOwnerProperty());
-        markOwnerName
-            .textProperty()
-            .bindBidirectional(viewModel.markOwnerNameProperty());
-        markOwnerName
-            .disableProperty()
-            .bind(markOwner.selectedProperty().not());
+        markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
+        markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());
+        markOwnerName.disableProperty().bind(markOwner.selectedProperty().not());
         markOwnerOverwrite
             .selectedProperty()
             .bindBidirectional(viewModel.markOwnerOverwriteProperty());
-        markOwnerOverwrite
-            .disableProperty()
-            .bind(markOwner.selectedProperty().not());
+        markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
 
-        addCreationDate
-            .selectedProperty()
-            .bindBidirectional(viewModel.addCreationDateProperty());
+        addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
         addModificationDate
             .selectedProperty()
             .bindBidirectional(viewModel.addModificationDateProperty());
@@ -114,11 +96,7 @@ public class EntryTab
         ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
         actionFactory.configureIconButton(
             StandardActions.HELP,
-            new HelpAction(
-                HelpFile.OWNER,
-                dialogService,
-                preferencesService.getFilePreferences()
-            ),
+            new HelpAction(HelpFile.OWNER, dialogService, preferencesService.getFilePreferences()),
             markOwnerHelp
         );
     }

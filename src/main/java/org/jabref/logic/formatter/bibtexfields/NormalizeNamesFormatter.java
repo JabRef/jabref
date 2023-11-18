@@ -29,9 +29,7 @@ public class NormalizeNamesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Normalizes lists of persons to the BibTeX standard."
-        );
+        return Localization.lang("Normalizes lists of persons to the BibTeX standard.");
     }
 
     @Override

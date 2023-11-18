@@ -13,15 +13,11 @@ import org.slf4j.LoggerFactory;
 
 public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        HtmlToLatexFormatter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);
 
     private static final int MAX_TAG_LENGTH = 100;
 
-    private static final Pattern ESCAPED_PATTERN = Pattern.compile(
-        "&#([x]*)([0]*)(\\p{XDigit}+);"
-    );
+    private static final Pattern ESCAPED_PATTERN = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
     private static final Pattern ESCAPED_PATTERN2 = Pattern.compile(
         "(.)&#([x]*)([0]*)(\\p{XDigit}+);"
     );
@@ -40,16 +36,8 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
         StringBuilder sb = new StringBuilder();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
-        result =
-            result.replaceAll(
-                "<[ ]?sup>([^<]+)</sup>",
-                "\\\\textsuperscript\\{$1\\}"
-            );
-        result =
-            result.replaceAll(
-                "<[ ]?sub>([^<]+)</sub>",
-                "\\\\textsubscript\\{$1\\}"
-            );
+        result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+        result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
 
         // TODO: maybe rewrite this based on regular expressions instead
         // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to
@@ -71,15 +59,12 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         result = sb.toString();
 
         // Handle text based HTML entities
-        Set<String> patterns =
-            HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();
+        Set<String> patterns = HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();
         for (String pattern : patterns) {
             result =
                 result.replace(
                     pattern,
-                    HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(
-                        pattern
-                    )
+                    HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern)
                 );
         }
 
@@ -87,17 +72,11 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         Matcher m = ESCAPED_PATTERN.matcher(result);
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
-            if (
-                HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(
-                    num
-                )
-            ) {
+            if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {
                 result =
                     result.replace(
                         "&#" + m.group(1) + m.group(2) + m.group(3) + ";",
-                        HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(
-                            num
-                        )
+                        HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num)
                     );
             }
         }
@@ -110,38 +89,19 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
                 if ("i".equals(m.group(1))) {
                     result =
                         result.replace(
-                            m.group(1) +
-                            "&#" +
-                            m.group(2) +
-                            m.group(3) +
-                            m.group(4) +
-                            ";",
-                            "{\\" +
-                            HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) +
-                            "{\\i}}"
+                            m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                            "{\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "{\\i}}"
                         );
                 } else if ("j".equals(m.group(1))) {
                     result =
                         result.replace(
-                            m.group(1) +
-                            "&#" +
-                            m.group(2) +
-                            m.group(3) +
-                            m.group(4) +
-                            ";",
-                            "{\\" +
-                            HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) +
-                            "{\\j}}"
+                            m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                            "{\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "{\\j}}"
                         );
                 } else {
                     result =
                         result.replace(
-                            m.group(1) +
-                            "&#" +
-                            m.group(2) +
-                            m.group(3) +
-                            m.group(4) +
-                            ";",
+                            m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
                             "{\\" +
                             HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) +
                             "{" +

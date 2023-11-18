@@ -26,9 +26,7 @@ public class PdfVerbatimBibTextImporter extends Importer {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfVerbatimBibTextImporter(
-        ImportFormatPreferences importFormatPreferences
-    ) {
+    public PdfVerbatimBibTextImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -38,8 +36,7 @@ public class PdfVerbatimBibTextImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
             "PdfVerbatimBibTextImporter does not support importDatabase(BufferedReader reader)." +
@@ -59,30 +56,23 @@ public class PdfVerbatimBibTextImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath) {
         List<BibEntry> result;
-        try (
-            PDDocument document = new XmpUtilReader()
-                .loadWithAutomaticDecryption(filePath)
-        ) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             BibtexParser parser = new BibtexParser(importFormatPreferences);
             result = parser.parseEntries(firstPageContents);
         } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(
-                Localization.lang("Decryption not supported.")
-            );
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException | ParseException e) {
             return ParserResult.fromError(e);
         }
 
-        result.forEach(entry ->
-            entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF"))
+        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF"))
         );
         result.forEach(entry -> entry.setCommentsBeforeEntry(""));
         return new ParserResult(result);
     }
 
-    private String getFirstPageContents(PDDocument document)
-        throws IOException {
+    private String getFirstPageContents(PDDocument document) throws IOException {
         PDFTextStripper stripper = new PDFTextStripper();
 
         stripper.setStartPage(1);

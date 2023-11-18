@@ -25,14 +25,12 @@ class SilverPlatterImporterTest {
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name ->
-            name.startsWith("SilverPlatterImporterTest") &&
-            name.endsWith(FILE_ENDING);
+            name.startsWith("SilverPlatterImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name ->
-            !name.startsWith("SilverPlatterImporterTest");
+        Predicate<String> fileName = name -> !name.startsWith("SilverPlatterImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -51,26 +49,16 @@ class SilverPlatterImporterTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            testImporter,
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
     }
 
     @Test
     void testsGetExtensions() {
-        assertEquals(
-            StandardFileType.SILVER_PLATTER,
-            testImporter.getFileType()
-        );
+        assertEquals(StandardFileType.SILVER_PLATTER, testImporter.getFileType());
     }
 
     @Test
     void testGetDescription() {
-        assertEquals(
-            "Imports a SilverPlatter exported file.",
-            testImporter.getDescription()
-        );
+        assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
     }
 }

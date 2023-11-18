@@ -24,19 +24,11 @@ public class MarcXmlParserTest {
     }
 
     private void doTest(String xmlName, String bibName) throws Exception {
-        try (
-            InputStream is = MarcXmlParserTest.class.getResourceAsStream(
-                    xmlName
-                )
-        ) {
+        try (InputStream is = MarcXmlParserTest.class.getResourceAsStream(xmlName)) {
             MarcXmlParser parser = new MarcXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
-            BibEntryAssert.assertEquals(
-                MarcXmlParserTest.class,
-                bibName,
-                entries.get(0)
-            );
+            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.get(0));
         }
     }
 

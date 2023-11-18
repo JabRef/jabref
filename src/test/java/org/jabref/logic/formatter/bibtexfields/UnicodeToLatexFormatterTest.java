@@ -24,10 +24,7 @@ class UnicodeToLatexFormatterTest {
             Arguments.of("{{\\aa}}{\\\"{a}}{\\\"{o}}", "\u00E5\u00E4\u00F6"), // multiple unicodes input
             Arguments.of("", "\u0081"), // high code point unicode, boundary case: cp = 129
             Arguments.of("", "\u0080"), // high code point unicode, boundary case: cp = 128 < 129
-            Arguments.of(
-                "M{\\\"{o}}nch",
-                new UnicodeToLatexFormatter().getExampleInput()
-            )
+            Arguments.of("M{\\\"{o}}nch", new UnicodeToLatexFormatter().getExampleInput())
         );
     }
 

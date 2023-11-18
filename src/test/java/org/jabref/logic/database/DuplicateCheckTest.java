@@ -35,15 +35,9 @@ public class DuplicateCheckTest {
 
     private static BibEntry getSimpleIncollection() {
         return new BibEntry(StandardEntryType.InCollection)
-            .withField(
-                StandardField.TITLE,
-                "Innovation and Intellectual Property Rights"
-            )
+            .withField(StandardField.TITLE, "Innovation and Intellectual Property Rights")
             .withField(StandardField.AUTHOR, "Ove Grandstrand")
-            .withField(
-                StandardField.BOOKTITLE,
-                "The Oxford Handbook of Innovation"
-            )
+            .withField(StandardField.BOOKTITLE, "The Oxford Handbook of Innovation")
             .withField(StandardField.PUBLISHER, "Oxford University Press")
             .withField(StandardField.YEAR, "2004");
     }
@@ -52,10 +46,7 @@ public class DuplicateCheckTest {
         return new BibEntry(StandardEntryType.InBook)
             .withField(StandardField.TITLE, "Alice in Wonderland")
             .withField(StandardField.AUTHOR, "Charles Lutwidge Dodgson")
-            .withField(
-                StandardField.CHAPTER,
-                "Chapter One – Down the Rabbit Hole"
-            )
+            .withField(StandardField.CHAPTER, "Chapter One – Down the Rabbit Hole")
             .withField(StandardField.LANGUAGE, "English")
             .withField(StandardField.PUBLISHER, "Macmillan")
             .withField(StandardField.YEAR, "1865");
@@ -84,9 +75,7 @@ public class DuplicateCheckTest {
         BibEntry two = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Billy Bob");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -96,9 +85,7 @@ public class DuplicateCheckTest {
         BibEntry two = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "James Joyce");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -108,9 +95,7 @@ public class DuplicateCheckTest {
         BibEntry two = new BibEntry(StandardEntryType.Book)
             .withField(StandardField.AUTHOR, "Billy Bob");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -127,14 +112,8 @@ public class DuplicateCheckTest {
             .withField(StandardField.TITLE, "A title")
             .withField(StandardField.JOURNAL, "A");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
-        assertEquals(
-            1.01,
-            DuplicateCheck.compareEntriesStrictly(one, two),
-            0.01
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+        assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
     }
 
     @Test
@@ -151,14 +130,8 @@ public class DuplicateCheckTest {
             .withField(StandardField.TITLE, "A title")
             .withField(StandardField.JOURNAL, "B");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
-        assertEquals(
-            0.75,
-            DuplicateCheck.compareEntriesStrictly(one, two),
-            0.01
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+        assertEquals(0.75, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
     }
 
     @Test
@@ -179,9 +152,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.VOLUME, "22");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -202,9 +173,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.VOLUME, "21");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -227,9 +196,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.PAGES, "334--337");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -251,9 +218,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.PAGES, "334--337");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -274,9 +239,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.PAGES, "334--337");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -297,9 +260,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.PAGES, "334--337");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -322,9 +283,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.PAGES, "334--337");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -347,19 +306,14 @@ public class DuplicateCheckTest {
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.PAGES, "334--337");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX)
-        );
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
     public void testWordCorrelation() {
-        String d1 =
-            "Characterization of Calanus finmarchicus habitat in the North Sea";
-        String d2 =
-            "Characterization of Calunus finmarchicus habitat in the North Sea";
-        String d3 =
-            "Characterization of Calanus glacialissss habitat in the South Sea";
+        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
+        String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
+        String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
 
         assertEquals(1.0, (DuplicateCheck.correlateByWords(d1, d2)), 0.01);
         assertEquals(0.78, (DuplicateCheck.correlateByWords(d1, d3)), 0.01);
@@ -369,45 +323,27 @@ public class DuplicateCheckTest {
     @Test
     public void twoUnrelatedEntriesAreNoDuplicates() {
         assertFalse(
-            duplicateChecker.isDuplicate(
-                simpleArticle,
-                unrelatedArticle,
-                BibDatabaseMode.BIBTEX
-            )
+            duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX)
         );
     }
 
     @Test
     public void twoUnrelatedEntriesWithDifferentDoisAreNoDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
-        unrelatedArticle.setField(
-            StandardField.DOI,
-            "10.1016/j.is.2004.02.00X"
-        );
+        unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.00X");
 
         assertFalse(
-            duplicateChecker.isDuplicate(
-                simpleArticle,
-                unrelatedArticle,
-                BibDatabaseMode.BIBTEX
-            )
+            duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX)
         );
     }
 
     @Test
     public void twoUnrelatedEntriesWithEqualDoisAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
-        unrelatedArticle.setField(
-            StandardField.DOI,
-            "10.1016/j.is.2004.02.002"
-        );
+        unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
 
         assertTrue(
-            duplicateChecker.isDuplicate(
-                simpleArticle,
-                unrelatedArticle,
-                BibDatabaseMode.BIBTEX
-            )
+            duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX)
         );
     }
 
@@ -417,11 +353,7 @@ public class DuplicateCheckTest {
         unrelatedArticle.setField(StandardField.PMID, "12345678");
 
         assertTrue(
-            duplicateChecker.isDuplicate(
-                simpleArticle,
-                unrelatedArticle,
-                BibDatabaseMode.BIBTEX
-            )
+            duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX)
         );
     }
 
@@ -431,11 +363,7 @@ public class DuplicateCheckTest {
         unrelatedArticle.setField(StandardField.EPRINT, "12345678");
 
         assertTrue(
-            duplicateChecker.isDuplicate(
-                simpleArticle,
-                unrelatedArticle,
-                BibDatabaseMode.BIBTEX
-            )
+            duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX)
         );
     }
 
@@ -458,10 +386,7 @@ public class DuplicateCheckTest {
     public void twoEntriesWithDoiContainingUnderscoresAreNotEqual() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         // An underscore in a DOI can indicate a totally different DOI
-        unrelatedArticle.setField(
-            StandardField.DOI,
-            "10.1016/j.is.2004.02.0_02"
-        );
+        unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.0_02");
         BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
@@ -490,9 +415,7 @@ public class DuplicateCheckTest {
         );
     }
 
-    public static Stream<
-        Arguments
-    > twoEntriesWithDifferentSpecificFieldsAreNotDuplicates() {
+    public static Stream<Arguments> twoEntriesWithDifferentSpecificFieldsAreNotDuplicates() {
         return Stream.of(
             // twoInbooksWithDifferentChaptersAreNotDuplicates
             Arguments.of(
@@ -502,26 +425,11 @@ public class DuplicateCheckTest {
                 "Chapter Two – The Pool of Tears"
             ),
             // twoInbooksWithDifferentPagesAreNotDuplicates
-            Arguments.of(
-                getSimpleInbook(),
-                StandardField.PAGES,
-                "1-20",
-                "21-40"
-            ),
+            Arguments.of(getSimpleInbook(), StandardField.PAGES, "1-20", "21-40"),
             // twoIncollectionsWithDifferentChaptersAreNotDuplicates
-            Arguments.of(
-                getSimpleIncollection(),
-                StandardField.CHAPTER,
-                "10",
-                "9"
-            ),
+            Arguments.of(getSimpleIncollection(), StandardField.CHAPTER, "10", "9"),
             // twoEntriesWithDifferentSpecificFieldsAreNotDuplicates
-            Arguments.of(
-                getSimpleIncollection(),
-                StandardField.PAGES,
-                "1-20",
-                "21-40"
-            )
+            Arguments.of(getSimpleIncollection(), StandardField.PAGES, "1-20", "21-40")
         );
     }
 
@@ -533,30 +441,17 @@ public class DuplicateCheckTest {
         final String firstValue,
         final String secondValue
     ) {
-        final BibEntry entry1 =
-            ((BibEntry) cloneable.clone()).withField(field, firstValue);
-        final BibEntry entry2 =
-            ((BibEntry) cloneable.clone()).withField(field, secondValue);
-        assertFalse(
-            duplicateChecker.isDuplicate(entry1, entry2, BibDatabaseMode.BIBTEX)
-        );
+        final BibEntry entry1 = ((BibEntry) cloneable.clone()).withField(field, firstValue);
+        final BibEntry entry2 = ((BibEntry) cloneable.clone()).withField(field, secondValue);
+        assertFalse(duplicateChecker.isDuplicate(entry1, entry2, BibDatabaseMode.BIBTEX));
     }
 
     @Test
     public void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
         final BibEntry inbook2 =
-            ((BibEntry) simpleInbook.clone()).withField(
-                    StandardField.CHAPTER,
-                    ""
-                );
+            ((BibEntry) simpleInbook.clone()).withField(StandardField.CHAPTER, "");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(
-                simpleInbook,
-                inbook2,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertTrue(duplicateChecker.isDuplicate(simpleInbook, inbook2, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -575,13 +470,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.DATE, "2008")
             .withField(StandardField.EDITION, "2");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(
-                editionOne,
-                editionTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertFalse(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -598,13 +487,7 @@ public class DuplicateCheckTest {
             .withField(StandardField.PUBLISHER, "Prentice Hall")
             .withField(StandardField.DATE, "2008");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(
-                editionOne,
-                editionTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertTrue(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -622,29 +505,17 @@ public class DuplicateCheckTest {
             .withField(StandardField.DATE, "2008")
             .withField(StandardField.EDITION, "2");
 
-        assertTrue(
-            duplicateChecker.isDuplicate(
-                editionOne,
-                editionTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertTrue(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Test
     public void sameBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionTwo = new BibEntry(StandardEntryType.Book)
             .withCitationKey("Sutton17reinfLrnIntroBook")
-            .withField(
-                StandardField.TITLE,
-                "Reinforcement learning:An introduction"
-            )
+            .withField(StandardField.TITLE, "Reinforcement learning:An introduction")
             .withField(StandardField.PUBLISHER, "MIT Press")
             .withField(StandardField.YEAR, "2017")
-            .withField(
-                StandardField.AUTHOR,
-                "Sutton, Richard S and Barto, Andrew G"
-            )
+            .withField(StandardField.AUTHOR, "Sutton, Richard S and Barto, Andrew G")
             .withField(StandardField.ADDRESS, "Cambridge, MA.USA")
             .withField(StandardField.EDITION, "Second")
             .withField(StandardField.JOURNAL, "MIT Press")
@@ -655,65 +526,33 @@ public class DuplicateCheckTest {
 
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
             .withCitationKey("Sutton98reinfLrnIntroBook")
-            .withField(
-                StandardField.TITLE,
-                "Reinforcement learning: An introduction"
-            )
+            .withField(StandardField.TITLE, "Reinforcement learning: An introduction")
             .withField(StandardField.PUBLISHER, "MIT press Cambridge")
             .withField(StandardField.YEAR, "1998")
-            .withField(
-                StandardField.AUTHOR,
-                "Sutton, Richard S and Barto, Andrew G"
-            )
+            .withField(StandardField.AUTHOR, "Sutton, Richard S and Barto, Andrew G")
             .withField(StandardField.VOLUME, "1")
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.EDITION, "First");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(
-                editionOne,
-                editionTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertFalse(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences()
-        throws Exception {
+    void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences() throws Exception {
         BibEntry entryOne = new BibEntry()
             .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry()
             .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
-        assertTrue(
-            duplicateChecker.isDuplicate(
-                entryOne,
-                entryTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences()
-        throws Exception {
+    void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences() throws Exception {
         BibEntry entryOne = new BibEntry()
-            .withField(
-                StandardField.COMMENT,
-                "line1\r\n\r\nline3\r\n\r\nline5"
-            );
+            .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
         BibEntry entryTwo = new BibEntry()
-            .withField(
-                StandardField.COMMENT,
-                "line1\r\n\r\nline3\r\n\r\nline5"
-            );
-        assertTrue(
-            duplicateChecker.isDuplicate(
-                entryOne,
-                entryTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+            .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
+        assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -722,17 +561,8 @@ public class DuplicateCheckTest {
         BibEntry entryOne = new BibEntry()
             .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry()
-            .withField(
-                StandardField.COMMENT,
-                "line1\r\n\r\nline3\r\n\r\nline5"
-            );
-        assertTrue(
-            duplicateChecker.isDuplicate(
-                entryOne,
-                entryTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+            .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
+        assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
     @Disabled(
@@ -764,12 +594,6 @@ public class DuplicateCheckTest {
             .withField(StandardField.ISBN, "978-1-4684-8585-1")
             .withField(StandardField.YEAR, "1993");
 
-        assertFalse(
-            duplicateChecker.isDuplicate(
-                entryOne,
-                entryTwo,
-                BibDatabaseMode.BIBTEX
-            )
-        );
+        assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 }

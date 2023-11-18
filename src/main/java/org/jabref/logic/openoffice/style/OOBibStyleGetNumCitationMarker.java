@@ -59,8 +59,7 @@ class OOBibStyleGetNumCitationMarker {
         stringBuilder.append(
             current.isPresent()
                 ? String.valueOf(current.get())
-                : (OOBibStyle.UNDEFINED_CITATION_MARKER +
-                    entry.getCitationKey())
+                : (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
         );
         stringBuilder.append(bracketAfter);
         stringBuilder.append(style.getCitationGroupMarkupAfter());
@@ -107,8 +106,7 @@ class OOBibStyleGetNumCitationMarker {
             final Optional<Integer> num = entry.getNumber();
             stringBuilder.append(
                 num.isEmpty()
-                    ? (OOBibStyle.UNDEFINED_CITATION_MARKER +
-                        entry.getCitationKey())
+                    ? (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
                     : String.valueOf(num.get())
             );
             // Emit pageInfo
@@ -138,14 +136,8 @@ class OOBibStyleGetNumCitationMarker {
             }
 
             for (int j = 1; j < blockSize; j++) {
-                if (
-                    (block.get(j).getNumber().get() -
-                        block.get(j - 1).getNumber().get()) !=
-                    1
-                ) {
-                    throw new IllegalArgumentException(
-                        "Numbers are not consecutive"
-                    );
+                if ((block.get(j).getNumber().get() - block.get(j - 1).getNumber().get()) != 1) {
+                    throw new IllegalArgumentException("Numbers are not consecutive");
                 }
             }
 
@@ -157,9 +149,7 @@ class OOBibStyleGetNumCitationMarker {
                 int first = block.get(0).getNumber().get();
                 int last = block.get(blockSize - 1).getNumber().get();
                 if (last != (first + blockSize - 1)) {
-                    throw new IllegalArgumentException(
-                        "blockSize and length of num range differ"
-                    );
+                    throw new IllegalArgumentException("blockSize and length of num range differ");
                 }
 
                 // Emit: "first-last"
@@ -214,13 +204,8 @@ class OOBibStyleGetNumCitationMarker {
         final String bracketAfter = style.getBracketAfter();
 
         // Sort a copy of entries
-        List<CitationMarkerNumericEntry> sorted = OOListUtil.map(
-            entries,
-            e -> e
-        );
-        sorted.sort(
-            OOBibStyleGetNumCitationMarker::compareCitationMarkerNumericEntry
-        );
+        List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, e -> e);
+        sorted.sort(OOBibStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["
         StringBuilder stringBuilder = new StringBuilder(bracketBefore);
@@ -243,33 +228,22 @@ class OOBibStyleGetNumCitationMarker {
 
         for (int i = 0; i < nCitations; i++) {
             final CitationMarkerNumericEntry current = sorted.get(i);
-            if (
-                current.getNumber().isPresent() && current.getNumber().get() < 0
-            ) {
-                throw new IllegalArgumentException(
-                    "getNumCitationMarker2: found negative number"
-                );
+            if (current.getNumber().isPresent() && current.getNumber().get() < 0) {
+                throw new IllegalArgumentException("getNumCitationMarker2: found negative number");
             }
 
             if (currentBlock.isEmpty()) {
                 currentBlock.add(current);
             } else {
-                CitationMarkerNumericEntry prev = currentBlock.get(
-                    currentBlock.size() - 1
-                );
-                if (
-                    current.getNumber().isEmpty() || prev.getNumber().isEmpty()
-                ) {
+                CitationMarkerNumericEntry prev = currentBlock.get(currentBlock.size() - 1);
+                if (current.getNumber().isEmpty() || prev.getNumber().isEmpty()) {
                     nextBlock.add(current); // do not join if not found
                 } else if (joinIsDisabled) {
                     nextBlock.add(current); // join disabled
-                } else if (
-                    compareCitationMarkerNumericEntry(current, prev) == 0
-                ) {
+                } else if (compareCitationMarkerNumericEntry(current, prev) == 0) {
                     // Same as prev, just forget it.
                 } else if (
-                    (current.getNumber().get() ==
-                        (prev.getNumber().get() + 1)) &&
+                    (current.getNumber().get() == (prev.getNumber().get() + 1)) &&
                     (prev.getPageInfo().isEmpty()) &&
                     (current.getPageInfo().isEmpty())
                 ) {
@@ -294,9 +268,7 @@ class OOBibStyleGetNumCitationMarker {
         }
 
         if (!nextBlock.isEmpty()) {
-            throw new IllegalStateException(
-                "impossible: (nextBlock.size() != 0) after loop"
-            );
+            throw new IllegalStateException("impossible: (nextBlock.size() != 0) after loop");
         }
 
         if (!currentBlock.isEmpty()) {

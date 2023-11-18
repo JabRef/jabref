@@ -54,52 +54,31 @@ public class PdfXmpImporterTest {
         );
     }
 
-    @Disabled(
-        "XMP reader prints warnings to the logger when parsing does not work"
-    )
+    @Disabled("XMP reader prints warnings to the logger when parsing does not work")
     @Test
     public void importEncryptedFileReturnsError() throws URISyntaxException {
-        Path file = Path.of(
-            PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI()
-        );
+        Path file = Path.of(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
         ParserResult result = importer.importDatabase(file);
         assertTrue(result.hasWarnings());
     }
 
     @Test
     public void testImportEntries() throws URISyntaxException {
-        Path file = Path.of(
-            PdfXmpImporterTest.class.getResource("annotated.pdf").toURI()
-        );
-        List<BibEntry> bibEntries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
 
         BibEntry be0 = bibEntries.get(0);
-        assertEquals(
-            Optional.of("how to annotate a pdf"),
-            be0.getField(StandardField.ABSTRACT)
-        );
+        assertEquals(Optional.of("how to annotate a pdf"), be0.getField(StandardField.ABSTRACT));
         assertEquals(Optional.of("Chris"), be0.getField(StandardField.AUTHOR));
-        assertEquals(
-            Optional.of("pdf, annotation"),
-            be0.getField(StandardField.KEYWORDS)
-        );
-        assertEquals(
-            Optional.of("The best Pdf ever"),
-            be0.getField(StandardField.TITLE)
-        );
+        assertEquals(Optional.of("pdf, annotation"), be0.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("The best Pdf ever"), be0.getField(StandardField.TITLE));
     }
 
     @Test
-    public void testIsRecognizedFormat()
-        throws IOException, URISyntaxException {
-        Path file = Path.of(
-            PdfXmpImporterTest.class.getResource("annotated.pdf").toURI()
-        );
+    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+        Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 

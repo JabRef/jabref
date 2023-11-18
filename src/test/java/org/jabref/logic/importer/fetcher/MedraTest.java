@@ -28,21 +28,12 @@ public class MedraTest {
                 Optional.of(
                     new BibEntry(StandardEntryType.Article)
                         .withField(StandardField.AUTHOR, "SPILEERS, Steven ")
-                        .withField(
-                            StandardField.PUBLISHER,
-                            "Peeters online journals"
-                        )
+                        .withField(StandardField.PUBLISHER, "Peeters online journals")
                         .withField(StandardField.TITLE, "Algemene kroniek")
                         .withField(StandardField.YEAR, "2018")
-                        .withField(
-                            StandardField.DOI,
-                            "10.2143/TVF.80.3.3285690"
-                        )
+                        .withField(StandardField.DOI, "10.2143/TVF.80.3.3285690")
                         .withField(StandardField.ISSN, "2031-8952, 2031-8952")
-                        .withField(
-                            StandardField.JOURNAL,
-                            "Tijdschrift voor Filosofie"
-                        )
+                        .withField(StandardField.JOURNAL, "Tijdschrift voor Filosofie")
                         .withField(StandardField.PAGES, "625-629")
                 )
             ),
@@ -71,10 +62,7 @@ public class MedraTest {
                         )
                         .withField(StandardField.YEAR, "2019")
                         .withField(StandardField.DOI, "10.3303/CET1977146")
-                        .withField(
-                            StandardField.JOURNAL,
-                            "Chemical Engineering Transactions"
-                        )
+                        .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
                         .withField(StandardField.PAGES, "871-876")
                         .withField(StandardField.VOLUME, "77")
                 )
@@ -84,10 +72,7 @@ public class MedraTest {
                 Optional.of(
                     new BibEntry(StandardEntryType.Article)
                         .withField(StandardField.AUTHOR, "Paola Cisternino")
-                        .withField(
-                            StandardField.PUBLISHER,
-                            "Edizioni Otto Novecento"
-                        )
+                        .withField(StandardField.PUBLISHER, "Edizioni Otto Novecento")
                         .withField(
                             StandardField.TITLE,
                             "Diagramma semantico dei lemmi : casa, parola, silenzio e attesa in È fatto giorno e Margherite e rosolacci di Rocco Scotellaro"
@@ -124,10 +109,8 @@ public class MedraTest {
 
     @ParameterizedTest
     @MethodSource("getDoiBibEntryPairs")
-    public void testDoiBibEntryPairs(
-        String identifier,
-        Optional<BibEntry> expected
-    ) throws FetcherException {
+    public void testDoiBibEntryPairs(String identifier, Optional<BibEntry> expected)
+        throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier);
         assertEquals(expected, fetchedEntry);
     }

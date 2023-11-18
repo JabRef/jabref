@@ -15,10 +15,7 @@ public class AuthorLastFirstTest {
         assertEquals("", a.format(""));
 
         // Single Names
-        assertEquals(
-            "Someone, Van Something",
-            a.format("Van Something Someone")
-        );
+        assertEquals("Someone, Van Something", a.format("Van Something Someone"));
 
         // Two names
         assertEquals(

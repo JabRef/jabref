@@ -62,10 +62,7 @@ class DiffHighlightingTest {
     @Test
     void testGenerateDiffHighlightingSingleWordAddTextWordDiff() {
         assertEquals(
-            Arrays.asList(
-                DiffHighlighting.forRemoved("foo "),
-                DiffHighlighting.forAdded("foobar")
-            ),
+            Arrays.asList(DiffHighlighting.forRemoved("foo "), DiffHighlighting.forAdded("foobar")),
             DiffHighlighting.generateDiffHighlighting("foo", "foobar", " ")
         );
     }
@@ -86,10 +83,7 @@ class DiffHighlightingTest {
     @Test
     void testGenerateDiffHighlightingSingleWordDeleteTextWordDiff() {
         assertEquals(
-            Arrays.asList(
-                DiffHighlighting.forRemoved("foobar "),
-                DiffHighlighting.forAdded("foo")
-            ),
+            Arrays.asList(DiffHighlighting.forRemoved("foobar "), DiffHighlighting.forAdded("foo")),
             DiffHighlighting.generateDiffHighlighting("foobar", "foo", " ")
         );
     }

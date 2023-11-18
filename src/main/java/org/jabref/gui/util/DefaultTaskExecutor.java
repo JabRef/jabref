@@ -25,15 +25,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTaskExecutor implements TaskExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DefaultTaskExecutor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTaskExecutor.class);
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
-    private final ScheduledExecutorService scheduledExecutor =
-        Executors.newScheduledThreadPool(2);
-    private final WeakHashMap<DelayTaskThrottler, Void> throttlers =
-        new WeakHashMap<>();
+    private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
+    private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
     private final StateManager stateManager;
 
@@ -119,11 +115,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> Future<?> schedule(
-        BackgroundTask<V> task,
-        long delay,
-        TimeUnit unit
-    ) {
+    public <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
         return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);
     }
 
@@ -156,20 +148,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
                 this.updateTitle(task.titleProperty().get());
                 BindingsHelper.subscribeFuture(
                     task.progressProperty(),
-                    progress ->
-                        updateProgress(
-                            progress.getWorkDone(),
-                            progress.getMax()
-                        )
+                    progress -> updateProgress(progress.getWorkDone(), progress.getMax())
                 );
-                BindingsHelper.subscribeFuture(
-                    task.messageProperty(),
-                    this::updateMessage
-                );
-                BindingsHelper.subscribeFuture(
-                    task.titleProperty(),
-                    this::updateTitle
-                );
+                BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
+                BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
                 BindingsHelper.subscribeFuture(
                     task.isCanceledProperty(),
                     cancelled -> {
@@ -192,9 +174,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         }
         Consumer<V> onSuccess = task.getOnSuccess();
         if (onSuccess != null) {
-            javaTask.setOnSucceeded(event ->
-                onSuccess.accept(javaTask.getValue())
-            );
+            javaTask.setOnSucceeded(event -> onSuccess.accept(javaTask.getValue()));
         }
         Consumer<Exception> onException = task.getOnException();
         if (onException != null) {

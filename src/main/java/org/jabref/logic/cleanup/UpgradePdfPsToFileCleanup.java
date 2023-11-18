@@ -50,28 +50,14 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
                     fileList.add(flEntry);
 
                     entry.clearField(field.getKey());
-                    changes.add(
-                        new FieldChange(
-                            entry,
-                            field.getKey(),
-                            fieldContent,
-                            null
-                        )
-                    );
+                    changes.add(new FieldChange(entry, field.getKey(), fieldContent, null));
                 });
         }
 
         if (fileList.size() != oldItemCount) {
             String newValue = FileFieldWriter.getStringRepresentation(fileList);
             entry.setField(StandardField.FILE, newValue);
-            changes.add(
-                new FieldChange(
-                    entry,
-                    StandardField.FILE,
-                    oldFileContent,
-                    newValue
-                )
-            );
+            changes.add(new FieldChange(entry, StandardField.FILE, oldFileContent, newValue));
         }
 
         return changes;

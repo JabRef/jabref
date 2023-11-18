@@ -36,10 +36,7 @@ public class BindingsHelper {
     ) {
         Consumer<Boolean> changePseudoClass = value ->
             node.pseudoClassStateChanged(pseudoClass, value);
-        Subscription subscription = EasyBind.subscribe(
-            condition,
-            changePseudoClass
-        );
+        Subscription subscription = EasyBind.subscribe(condition, changePseudoClass);
 
         // Put the pseudo class there depending on the current value
         changePseudoClass.accept(condition.getValue());
@@ -58,9 +55,7 @@ public class BindingsHelper {
         };
 
         ObservableList<U> list = FXCollections.observableArrayList();
-        binding.addListener((observable, oldValue, newValue) ->
-            list.setAll(newValue)
-        );
+        binding.addListener((observable, oldValue, newValue) -> list.setAll(newValue));
         return list;
     }
 
@@ -73,10 +68,8 @@ public class BindingsHelper {
         Function<A, B> mapAtoB,
         Function<B, A> mapBtoA
     ) {
-        Consumer<B> updateA = newValueB ->
-            propertyA.setValue(mapBtoA.apply(newValueB));
-        Consumer<A> updateB = newValueA ->
-            propertyB.setValue(mapAtoB.apply(newValueA));
+        Consumer<B> updateA = newValueB -> propertyA.setValue(mapBtoA.apply(newValueB));
+        Consumer<A> updateB = newValueA -> propertyB.setValue(mapAtoB.apply(newValueA));
         bindBidirectional(propertyA, propertyB, updateA, updateB);
     }
 
@@ -134,13 +127,12 @@ public class BindingsHelper {
         Consumer<B> updateA,
         Consumer<List<A>> updateB
     ) {
-        final BidirectionalListBinding<A, B> binding =
-            new BidirectionalListBinding<>(
-                propertyA,
-                propertyB,
-                updateA,
-                updateB
-            );
+        final BidirectionalListBinding<A, B> binding = new BidirectionalListBinding<>(
+            propertyA,
+            propertyB,
+            updateA,
+            updateB
+        );
 
         // use property as initial source
         updateA.accept(propertyB.getValue());
@@ -155,10 +147,8 @@ public class BindingsHelper {
         Function<List<A>, B> mapToB,
         Function<B, List<A>> mapToList
     ) {
-        Consumer<B> updateList = newValueB ->
-            listProperty.setAll(mapToList.apply(newValueB));
-        Consumer<List<A>> updateB = newValueList ->
-            property.setValue(mapToB.apply(newValueList));
+        Consumer<B> updateList = newValueB -> listProperty.setAll(mapToList.apply(newValueB));
+        Consumer<List<A>> updateB = newValueList -> property.setValue(mapToB.apply(newValueList));
 
         bindContentBidirectional(listProperty, property, updateList, updateB);
     }
@@ -169,13 +159,12 @@ public class BindingsHelper {
         Consumer<B> updateA,
         Consumer<Map<A, V>> updateB
     ) {
-        final BidirectionalMapBinding<A, V, B> binding =
-            new BidirectionalMapBinding<>(
-                propertyA,
-                propertyB,
-                updateA,
-                updateB
-            );
+        final BidirectionalMapBinding<A, V, B> binding = new BidirectionalMapBinding<>(
+            propertyA,
+            propertyB,
+            updateA,
+            updateB
+        );
 
         // use list as initial source
         updateB.accept(propertyA);
@@ -290,27 +279,15 @@ public class BindingsHelper {
             return this::changedB;
         }
 
-        public void changedA(
-            ObservableValue<? extends A> observable,
-            A oldValue,
-            A newValue
-        ) {
+        public void changedA(ObservableValue<? extends A> observable, A oldValue, A newValue) {
             updateLocked(updateB, oldValue, newValue);
         }
 
-        public void changedB(
-            ObservableValue<? extends B> observable,
-            B oldValue,
-            B newValue
-        ) {
+        public void changedB(ObservableValue<? extends B> observable, B oldValue, B newValue) {
             updateLocked(updateA, oldValue, newValue);
         }
 
-        private <T> void updateLocked(
-            Consumer<T> update,
-            T oldValue,
-            T newValue
-        ) {
+        private <T> void updateLocked(Consumer<T> update, T oldValue, T newValue) {
             if (!updating) {
                 try {
                     updating = true;
@@ -344,11 +321,7 @@ public class BindingsHelper {
         }
 
         @Override
-        public void changed(
-            ObservableValue<? extends B> observable,
-            B oldValue,
-            B newValue
-        ) {
+        public void changed(ObservableValue<? extends B> observable, B oldValue, B newValue) {
             if (!updating) {
                 try {
                     updating = true;
@@ -394,11 +367,7 @@ public class BindingsHelper {
         }
 
         @Override
-        public void changed(
-            ObservableValue<? extends B> observable,
-            B oldValue,
-            B newValue
-        ) {
+        public void changed(ObservableValue<? extends B> observable, B oldValue, B newValue) {
             if (!updating) {
                 try {
                     updating = true;

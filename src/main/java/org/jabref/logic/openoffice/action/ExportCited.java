@@ -26,10 +26,7 @@ public class ExportCited {
         public final List<String> unresolvedKeys;
         public final BibDatabase newDatabase;
 
-        GenerateDatabaseResult(
-            List<String> unresolvedKeys,
-            BibDatabase newDatabase
-        ) {
+        GenerateDatabaseResult(List<String> unresolvedKeys, BibDatabase newDatabase) {
             this.unresolvedKeys = unresolvedKeys;
             this.newDatabase = newDatabase;
         }
@@ -47,8 +44,7 @@ public class ExportCited {
         List<BibDatabase> databases
     ) throws NoDocumentException, WrappedTargetException {
         OOFrontend frontend = new OOFrontend(doc);
-        CitedKeys citationKeys =
-            frontend.citationGroups.getCitedKeysUnordered();
+        CitedKeys citationKeys = frontend.citationGroups.getCitedKeysUnordered();
         citationKeys.lookupInDatabases(databases);
 
         List<String> unresolvedKeys = new ArrayList<>();
@@ -62,10 +58,7 @@ public class ExportCited {
                 unresolvedKeys.add(citation.citationKey);
             } else {
                 BibEntry entry = citation.getLookupResult().get().entry;
-                BibDatabase loopDatabase = citation
-                    .getLookupResult()
-                    .get()
-                    .database;
+                BibDatabase loopDatabase = citation.getLookupResult().get().database;
 
                 // If entry found
                 BibEntry clonedEntry = (BibEntry) entry.clone();

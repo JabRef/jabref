@@ -88,12 +88,9 @@ public class WebSearchTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new WebSearchTabViewModel(preferencesService, dialogService);
+        this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
 
-        enableWebSearch
-            .selectedProperty()
-            .bindBidirectional(viewModel.enableWebSearchProperty());
+        enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         generateNewKeyOnImport
             .selectedProperty()
             .bindBidirectional(viewModel.generateKeyOnImportProperty());
@@ -104,25 +101,13 @@ public class WebSearchTab
             .selectedProperty()
             .bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
 
-        grobidEnabled
-            .selectedProperty()
-            .bindBidirectional(viewModel.grobidEnabledProperty());
-        grobidURL
-            .textProperty()
-            .bindBidirectional(viewModel.grobidURLProperty());
-        grobidURL
-            .disableProperty()
-            .bind(grobidEnabled.selectedProperty().not());
+        grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
+        grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
+        grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
 
-        useCustomDOI
-            .selectedProperty()
-            .bindBidirectional(viewModel.useCustomDOIProperty());
-        useCustomDOIName
-            .textProperty()
-            .bindBidirectional(viewModel.useCustomDOINameProperty());
-        useCustomDOIName
-            .disableProperty()
-            .bind(useCustomDOI.selectedProperty().not());
+        useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
+        useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
+        useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
 
         new ViewModelTableRowFactory<StudyCatalogItem>()
             .withOnMouseClickedEvent((entry, event) -> {
@@ -137,17 +122,11 @@ public class WebSearchTab
 
         catalogEnabledColumn.setResizable(false);
         catalogEnabledColumn.setReorderable(false);
-        catalogEnabledColumn.setCellFactory(
-            CheckBoxTableCell.forTableColumn(catalogEnabledColumn)
-        );
-        catalogEnabledColumn.setCellValueFactory(param ->
-            param.getValue().enabledProperty()
-        );
+        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
+        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
 
         catalogColumn.setEditable(false);
-        catalogColumn.setCellValueFactory(param ->
-            param.getValue().nameProperty()
-        );
+        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
         catalogTable.setItems(viewModel.getCatalogs());
 
         new ViewModelListCellFactory<FetcherApiKey>()
@@ -167,31 +146,19 @@ public class WebSearchTab
             });
         customApiKey
             .textProperty()
-            .addListener(listener ->
-                updateFetcherApiKey(apiKeySelector.valueProperty().get())
-            );
+            .addListener(listener -> updateFetcherApiKey(apiKeySelector.valueProperty().get()));
 
-        customApiKey
-            .disableProperty()
-            .bind(useCustomApiKey.selectedProperty().not());
-        testCustomApiKey
-            .disableProperty()
-            .bind(useCustomApiKey.selectedProperty().not());
+        customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
+        testCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
 
-        persistApiKeys
-            .selectedProperty()
-            .bindBidirectional(viewModel.getApikeyPersistProperty());
-        persistApiKeys
-            .disableProperty()
-            .bind(viewModel.apiKeyPersistAvailable().not());
+        persistApiKeys.selectedProperty().bindBidirectional(viewModel.getApikeyPersistProperty());
+        persistApiKeys.disableProperty().bind(viewModel.apiKeyPersistAvailable().not());
         EasyBind.subscribe(
             viewModel.apiKeyPersistAvailable(),
             available -> {
                 if (!available) {
                     persistentTooltipWrapper.setTooltip(
-                        new Tooltip(
-                            Localization.lang("Credential store not available.")
-                        )
+                        new Tooltip(Localization.lang("Credential store not available."))
                     );
                 } else {
                     persistentTooltipWrapper.setTooltip(null);
@@ -206,8 +173,7 @@ public class WebSearchTab
         viewModel
             .fetcherApiKeys()
             .addListener(
-                (InvalidationListener) change ->
-                    apiKeySelector.getSelectionModel().selectFirst()
+                (InvalidationListener) change -> apiKeySelector.getSelectionModel().selectFirst()
             );
     }
 

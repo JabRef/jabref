@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BstPurifier {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BstPurifier.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstPurifier.class);
 
     private BstPurifier() {}
 
@@ -42,16 +40,12 @@ public class BstPurifier {
                     i++; // skip brace
                     while ((i < n) && (braceLevel > 0)) {
                         i++; // skip backslash
-                        BstCaseChanger
-                            .findSpecialChar(cs, i)
-                            .ifPresent(sb::append);
+                        BstCaseChanger.findSpecialChar(cs, i).ifPresent(sb::append);
 
                         while ((i < n) && Character.isLetter(cs[i])) {
                             i++;
                         }
-                        while (
-                            (i < n) && (braceLevel > 0) && ((c = cs[i]) != '\\')
-                        ) {
+                        while ((i < n) && (braceLevel > 0) && ((c = cs[i]) != '\\')) {
                             if (Character.isLetterOrDigit(c)) {
                                 sb.append(c);
                             } else if (c == '}') {
@@ -68,10 +62,7 @@ public class BstPurifier {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    LOGGER.warn(
-                        "Unbalanced brace in string for purify$: {}",
-                        toPurify
-                    );
+                    LOGGER.warn("Unbalanced brace in string for purify$: {}", toPurify);
                 }
             }
             i++;

@@ -11,8 +11,7 @@ public interface DatabaseSynchronizer {
 
     void registerListener(Object listener);
 
-    void openSharedDatabase(DatabaseConnection connection)
-        throws DatabaseNotSupportedException;
+    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException;
 
     void synchronizeSharedEntry(BibEntry bibEntry);
 

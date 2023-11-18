@@ -34,8 +34,9 @@ public class StyleSelectDialogViewModel {
     private final StyleLoader styleLoader;
     private final OpenOfficePreferences openOfficePreferences;
     private final FilePreferences filePreferences;
-    private final ListProperty<StyleSelectItemViewModel> styles =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem =
         new SimpleObjectProperty<>();
 
@@ -46,8 +47,7 @@ public class StyleSelectDialogViewModel {
     ) {
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
-        this.openOfficePreferences =
-            preferencesService.getOpenOfficePreferences();
+        this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
         this.styleLoader = styleLoader;
 
         styles.addAll(loadStyles());
@@ -60,9 +60,7 @@ public class StyleSelectDialogViewModel {
         return new StyleSelectItemViewModel(
             style.getName(),
             String.join(", ", style.getJournals()),
-            style.isInternalStyle()
-                ? Localization.lang("Internal style")
-                : style.getPath(),
+            style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(),
             style
         );
     }
@@ -72,21 +70,12 @@ public class StyleSelectDialogViewModel {
     }
 
     public void addStyleFile() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(
-                    Localization.lang("Style file"),
-                    StandardFileType.JSTYLE
-                )
-                .withDefaultExtension(
-                    Localization.lang("Style file"),
-                    StandardFileType.JSTYLE
-                )
-                .withInitialDirectory(filePreferences.getWorkingDirectory())
-                .build();
-        Optional<Path> path = dialogService.showFileOpenDialog(
-            fileDialogConfiguration
-        );
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
+            .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+            .withInitialDirectory(filePreferences.getWorkingDirectory())
+            .build();
+        Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path
             .map(Path::toAbsolutePath)
             .map(Path::toString)
@@ -127,11 +116,10 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-        Optional<ExternalFileType> type =
-            ExternalFileTypes.getExternalFileTypeByExt(
-                "jstyle",
-                filePreferences
-            );
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(
+            "jstyle",
+            filePreferences
+        );
         try {
             JabRefDesktop.openExternalFileAnyFormat(
                 new BibDatabaseContext(),
@@ -152,11 +140,7 @@ public class StyleSelectDialogViewModel {
         TextArea styleView = new TextArea(item.getStyle().getLocalCopy());
         scrollPane.setContent(styleView);
         pane.setContent(scrollPane);
-        dialogService.showCustomDialogAndWait(
-            item.getStyle().getName(),
-            pane,
-            ButtonType.OK
-        );
+        dialogService.showCustomDialogAndWait(item.getStyle().getName(), pane, ButtonType.OK);
     }
 
     public ObjectProperty<StyleSelectItemViewModel> selectedItemProperty() {
@@ -171,9 +155,7 @@ public class StyleSelectDialogViewModel {
             .map(OOBibStyle::getPath)
             .collect(Collectors.toList());
         openOfficePreferences.setExternalStyles(externalStyles);
-        openOfficePreferences.setCurrentStyle(
-            selectedItem.getValue().getStylePath()
-        );
+        openOfficePreferences.setCurrentStyle(selectedItem.getValue().getStylePath());
     }
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {

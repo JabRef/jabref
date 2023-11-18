@@ -15,10 +15,7 @@ public class FirstPageTest {
     @ParameterizedTest
     @MethodSource("providePages")
     void formatPages(String formattedFirstPage, String originalPages) {
-        assertEquals(
-            formattedFirstPage,
-            firstPageLayoutFormatter.format(originalPages)
-        );
+        assertEquals(formattedFirstPage, firstPageLayoutFormatter.format(originalPages));
     }
 
     private static Stream<Arguments> providePages() {

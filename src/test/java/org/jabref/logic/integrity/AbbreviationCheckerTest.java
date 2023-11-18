@@ -21,11 +21,8 @@ class AbbreviationCheckerTest {
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository =
-            JournalAbbreviationLoader.loadBuiltInRepository();
-        abbreviationRepository.addCustomAbbreviation(
-            new Abbreviation("Test Journal", "T. J.")
-        );
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Journal", "T. J."));
         entry = new BibEntry(StandardEntryType.InProceedings);
         checker = new AbbreviationChecker(abbreviationRepository);
     }
@@ -39,9 +36,7 @@ class AbbreviationCheckerTest {
     @Test
     void checkEntryDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
         entry.setField(StandardField.BOOKTITLE, "Journal");
-        abbreviationRepository.addCustomAbbreviation(
-            new Abbreviation("Journal", "Journal")
-        );
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Journal", "Journal"));
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 

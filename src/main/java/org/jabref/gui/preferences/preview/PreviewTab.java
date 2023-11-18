@@ -93,8 +93,7 @@ public class PreviewTab
     private long lastKeyPressTime;
     private String listSearchTerm;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public PreviewTab() {
         ViewLoader.view(this).root(this).load();
@@ -137,9 +136,7 @@ public class PreviewTab
             );
         lastKeyPressTime = System.currentTimeMillis();
 
-        showAsTabCheckBox
-            .selectedProperty()
-            .bindBidirectional(viewModel.showAsExtraTabProperty());
+        showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
 
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
@@ -148,14 +145,8 @@ public class PreviewTab
         contextMenu
             .getItems()
             .addAll(
-                factory.createMenuItem(
-                    StandardActions.CUT,
-                    new EditAction(StandardActions.CUT)
-                ),
-                factory.createMenuItem(
-                    StandardActions.COPY,
-                    new EditAction(StandardActions.COPY)
-                ),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),
                 factory.createMenuItem(
                     StandardActions.PASTE,
                     new EditAction(StandardActions.PASTE)
@@ -169,9 +160,7 @@ public class PreviewTab
         contextMenu.getStyleClass().add("context-menu");
 
         availableListView.setItems(viewModel.getFilteredAvailableLayouts());
-        viewModel
-            .availableSelectionModelProperty()
-            .setValue(availableListView.getSelectionModel());
+        viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
             .withText(PreviewLayout::getDisplayName)
             .install(availableListView);
@@ -180,50 +169,33 @@ public class PreviewTab
         availableListView.setOnDragDropped(event ->
             dragDropped(viewModel.availableListProperty(), event)
         );
-        availableListView.setOnKeyTyped(event ->
-            jumpToSearchKey(availableListView, event)
-        );
+        availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.setOnMouseClicked(this::mouseClickedAvailable);
-        availableListView
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
+        availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         availableListView
             .selectionModelProperty()
             .getValue()
             .selectedItemProperty()
-            .addListener((observable, oldValue, newValue) ->
-                viewModel.setPreviewLayout(newValue)
-            );
+            .addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
 
-        chosenListView
-            .itemsProperty()
-            .bindBidirectional(viewModel.chosenListProperty());
-        viewModel
-            .chosenSelectionModelProperty()
-            .setValue(chosenListView.getSelectionModel());
+        chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
+        viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
             .withText(PreviewLayout::getDisplayName)
             .setOnDragDropped(this::dragDroppedInChosenCell)
             .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
-        chosenListView.setOnDragDropped(event ->
-            dragDropped(viewModel.chosenListProperty(), event)
+        chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event)
         );
-        chosenListView.setOnKeyTyped(event ->
-            jumpToSearchKey(chosenListView, event)
-        );
+        chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.setOnMouseClicked(this::mouseClickedChosen);
-        chosenListView
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
+        chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView
             .selectionModelProperty()
             .getValue()
             .selectedItemProperty()
-            .addListener((observable, oldValue, newValue) ->
-                viewModel.setPreviewLayout(newValue)
-            );
+            .addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
 
         toRightButton
             .disableProperty()
@@ -237,29 +209,17 @@ public class PreviewTab
         toLeftButton
             .disableProperty()
             .bind(
-                viewModel
-                    .chosenSelectionModelProperty()
-                    .getValue()
-                    .selectedItemProperty()
-                    .isNull()
+                viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull()
             );
         sortUpButton
             .disableProperty()
             .bind(
-                viewModel
-                    .chosenSelectionModelProperty()
-                    .getValue()
-                    .selectedItemProperty()
-                    .isNull()
+                viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull()
             );
         sortDownButton
             .disableProperty()
             .bind(
-                viewModel
-                    .chosenSelectionModelProperty()
-                    .getValue()
-                    .selectedItemProperty()
-                    .isNull()
+                viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull()
             );
 
         PreviewViewer previewViewer = new PreviewViewer(
@@ -271,10 +231,7 @@ public class PreviewTab
             taskExecutor
         );
         previewViewer.setEntry(TestEntry.getTestEntry());
-        EasyBind.subscribe(
-            viewModel.selectedLayoutProperty(),
-            previewViewer::setLayout
-        );
+        EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer
             .visibleProperty()
             .bind(
@@ -326,10 +283,7 @@ public class PreviewTab
         editArea
             .textProperty()
             .addListener((obs, oldValue, newValue) ->
-                editArea.setStyleSpans(
-                    0,
-                    viewModel.computeHighlighting(newValue)
-                )
+                editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue))
             );
 
         editArea
@@ -346,12 +300,8 @@ public class PreviewTab
                 viewModel.setAvailableFilter(searchTerm)
             );
 
-        readOnlyLabel
-            .visibleProperty()
-            .bind(viewModel.selectedIsEditableProperty().not());
-        resetDefaultButton
-            .disableProperty()
-            .bind(viewModel.selectedIsEditableProperty().not());
+        readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
+        resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu
             .getItems()
             .get(0)
@@ -362,9 +312,7 @@ public class PreviewTab
             .get(2)
             .disableProperty()
             .bind(viewModel.selectedIsEditableProperty().not());
-        editArea
-            .editableProperty()
-            .bind(viewModel.selectedIsEditableProperty());
+        editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() ->
@@ -383,10 +331,7 @@ public class PreviewTab
      * @param keypressed The pressed character
      */
 
-    private void jumpToSearchKey(
-        ListView<PreviewLayout> list,
-        KeyEvent keypressed
-    ) {
+    private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {
             return;
         }
@@ -402,9 +347,7 @@ public class PreviewTab
         list
             .getItems()
             .stream()
-            .filter(item ->
-                item.getDisplayName().toLowerCase().startsWith(listSearchTerm)
-            )
+            .filter(item -> item.getDisplayName().toLowerCase().startsWith(listSearchTerm))
             .findFirst()
             .ifPresent(list::scrollTo);
     }
@@ -415,10 +358,7 @@ public class PreviewTab
 
     private void dragDetectedInAvailable(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(
-            viewModel
-                .availableSelectionModelProperty()
-                .getValue()
-                .getSelectedItems()
+            viewModel.availableSelectionModelProperty().getValue().getSelectedItems()
         );
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
@@ -434,10 +374,7 @@ public class PreviewTab
 
     private void dragDetectedInChosen(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(
-            viewModel
-                .chosenSelectionModelProperty()
-                .getValue()
-                .getSelectedItems()
+            viewModel.chosenSelectionModelProperty().getValue().getSelectedItems()
         );
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
@@ -451,26 +388,14 @@ public class PreviewTab
         event.consume();
     }
 
-    private void dragDropped(
-        ListProperty<PreviewLayout> targetList,
-        DragEvent event
-    ) {
-        boolean success = viewModel.dragDropped(
-            targetList,
-            event.getDragboard()
-        );
+    private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
+        boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }
 
-    private void dragDroppedInChosenCell(
-        PreviewLayout targetLayout,
-        DragEvent event
-    ) {
-        boolean success = viewModel.dragDroppedInChosenCell(
-            targetLayout,
-            event.getDragboard()
-        );
+    private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
+        boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }

@@ -24,8 +24,7 @@ public class UnoUndo {
      * Each call to enterUndoContext must be paired by a call to leaveUndoContext, otherwise, the document's undo stack is left in an inconsistent state.
      */
     public static void enterUndoContext(XTextDocument doc, String title) {
-        getXUndoManager(doc)
-            .ifPresent(undoManager -> undoManager.enterUndoContext(title));
+        getXUndoManager(doc).ifPresent(undoManager -> undoManager.enterUndoContext(title));
     }
 
     public static void leaveUndoContext(XTextDocument doc) {
@@ -34,9 +33,7 @@ public class UnoUndo {
             try {
                 undoManager.get().leaveUndoContext();
             } catch (InvalidStateException ex) {
-                throw new IllegalStateException(
-                    "leaveUndoContext reported InvalidStateException"
-                );
+                throw new IllegalStateException("leaveUndoContext reported InvalidStateException");
             }
         }
     }

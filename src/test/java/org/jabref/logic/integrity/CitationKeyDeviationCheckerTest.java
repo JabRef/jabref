@@ -21,9 +21,7 @@ import org.junit.jupiter.api.Test;
 
 public class CitationKeyDeviationCheckerTest {
 
-    private final BibDatabaseContext bibDatabaseContext = mock(
-        BibDatabaseContext.class
-    );
+    private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
     private final BibDatabase bibDatabase = mock(BibDatabase.class);
     private final MetaData metaData = mock(MetaData.class);
     private final AbstractCitationKeyPattern abstractCitationKeyPattern = mock(
@@ -32,24 +30,19 @@ public class CitationKeyDeviationCheckerTest {
     private final GlobalCitationKeyPattern globalCitationKeyPattern = mock(
         GlobalCitationKeyPattern.class
     );
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences =
-        mock(CitationKeyPatternPreferences.class);
-    private final CitationKeyDeviationChecker checker =
-        new CitationKeyDeviationChecker(
-            bibDatabaseContext,
-            citationKeyPatternPreferences
-        );
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences = mock(
+        CitationKeyPatternPreferences.class
+    );
+    private final CitationKeyDeviationChecker checker = new CitationKeyDeviationChecker(
+        bibDatabaseContext,
+        citationKeyPatternPreferences
+    );
 
     @BeforeEach
     void setUp() {
         when(bibDatabaseContext.getMetaData()).thenReturn(metaData);
-        when(citationKeyPatternPreferences.getKeyPattern())
-            .thenReturn(globalCitationKeyPattern);
-        when(
-            metaData.getCiteKeyPattern(
-                citationKeyPatternPreferences.getKeyPattern()
-            )
-        )
+        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(globalCitationKeyPattern);
+        when(metaData.getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()))
             .thenReturn(abstractCitationKeyPattern);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
     }

@@ -19,12 +19,11 @@ class KeyBindingViewModelTest {
     void resetToDefault() {
         // Set new key binding
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
-        KeyBindingsTabViewModel keyBindingsTabViewModel =
-            new KeyBindingsTabViewModel(
-                keyBindingRepository,
-                mock(DialogService.class),
-                mock(PreferencesService.class)
-            );
+        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(
+            keyBindingRepository,
+            mock(DialogService.class),
+            mock(PreferencesService.class)
+        );
         KeyBinding binding = KeyBinding.ABBREVIATE;
 
         KeyBindingViewModel viewModel = new KeyBindingViewModel(
@@ -32,9 +31,7 @@ class KeyBindingViewModelTest {
             binding,
             binding.getDefaultKeyBinding()
         );
-        keyBindingsTabViewModel
-            .selectedKeyBindingProperty()
-            .set(Optional.of(viewModel));
+        keyBindingsTabViewModel.selectedKeyBindingProperty().set(Optional.of(viewModel));
 
         KeyEvent shortcutKeyEvent = new KeyEvent(
             KeyEvent.KEY_PRESSED,

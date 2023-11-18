@@ -18,11 +18,7 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
         PushToApplicationPreferences preferences
     ) {
         super(application, dialogService, filePreferences, preferences);
-        settingsPane.add(
-            new Label(Localization.lang("Additional parameters") + ":"),
-            0,
-            1
-        );
+        settingsPane.add(new Label(Localization.lang("Additional parameters") + ":"), 0, 1);
         settingsPane.add(additionalParams, 1, 1);
         additionalParams.setText(preferences.getEmacsArguments());
     }

@@ -35,9 +35,7 @@ import org.jabref.model.strings.StringUtil;
  */
 public class PdfContentImporter extends Importer {
 
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile(
-        "\\d{4}"
-    );
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
     // input lines into several lines
     private String[] lines;
     // current index in lines
@@ -91,10 +89,7 @@ public class PdfContentImporter extends Importer {
                     if (posAnd >= 0) {
                         String nameBefore = curName.substring(0, posAnd);
                         // cannot be first name as "," is contained in the string
-                        res =
-                            res
-                                .concat(" and ")
-                                .concat(removeNonLettersAtEnd(nameBefore));
+                        res = res.concat(" and ").concat(removeNonLettersAtEnd(nameBefore));
                         curName = curName.substring(posAnd + 5);
                     }
                 }
@@ -185,8 +180,7 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
             "PdfContentImporter does not support importDatabase(BufferedReader reader)." +
@@ -206,35 +200,23 @@ public class PdfContentImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (
-            PDDocument document = new XmpUtilReader()
-                .loadWithAutomaticDecryption(filePath)
-        ) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            Optional<BibEntry> entry = getEntryFromPDFContent(
-                firstPageContents,
-                OS.NEWLINE
-            );
+            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(
-                Localization.lang("Decryption not supported.")
-            );
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
 
-        result.forEach(entry ->
-            entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF"))
+        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF"))
         );
         return new ParserResult(result);
     }
 
     // make this method package visible so we can test it
-    Optional<BibEntry> getEntryFromPDFContent(
-        String firstpageContents,
-        String lineSeparator
-    ) {
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
         // idea: split[] contains the different lines
         // blocks are separated by empty lines
         // treat each block
@@ -328,9 +310,7 @@ public class PdfContentImporter extends Importer {
             curString = lines[lineIndex];
             if (
                 (curString.length() >= "Abstract".length()) &&
-                "Abstract".equalsIgnoreCase(
-                        curString.substring(0, "Abstract".length())
-                    )
+                "Abstract".equalsIgnoreCase(curString.substring(0, "Abstract".length()))
             ) {
                 if (curString.length() == "Abstract".length()) {
                     // only word "abstract" found -- skip line
@@ -345,29 +325,21 @@ public class PdfContentImporter extends Importer {
                 lineIndex++;
                 // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
                 // whereas we need linebreak as separator
-                while (
-                    (lineIndex < lines.length) && !"".equals(lines[lineIndex])
-                ) {
-                    curString =
-                        curString
-                            .concat(lines[lineIndex])
-                            .concat(System.lineSeparator());
+                while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
+                    curString = curString.concat(lines[lineIndex]).concat(System.lineSeparator());
                     lineIndex++;
                 }
                 abstractT = curString.trim();
                 lineIndex++;
             } else if (
                 (curString.length() >= "Keywords".length()) &&
-                "Keywords".equalsIgnoreCase(
-                        curString.substring(0, "Keywords".length())
-                    )
+                "Keywords".equalsIgnoreCase(curString.substring(0, "Keywords".length()))
             ) {
                 if (curString.length() == "Keywords".length()) {
                     // only word "Keywords" found -- skip line
                     curString = "";
                 } else {
-                    curString =
-                        curString.substring("Keywords".length() + 1).trim();
+                    curString = curString.substring("Keywords".length() + 1).trim();
                 }
                 lineIndex++;
                 fillCurStringWithNonEmptyLines();
@@ -474,9 +446,7 @@ public class PdfContentImporter extends Importer {
                             // before the price, the ISSN is stated
                             // skip that
                             pos -= 2;
-                            while (
-                                (pos >= 0) && (curString.charAt(pos) != ' ')
-                            ) {
+                            while ((pos >= 0) && (curString.charAt(pos) != ' ')) {
                                 pos--;
                             }
                             if (pos > 0) {
@@ -535,8 +505,7 @@ public class PdfContentImporter extends Importer {
         return Optional.of(entry);
     }
 
-    private String getFirstPageContents(PDDocument document)
-        throws IOException {
+    private String getFirstPageContents(PDDocument document) throws IOException {
         PDFTextStripper stripper = new PDFTextStripper();
 
         stripper.setStartPage(1);
@@ -569,9 +538,7 @@ public class PdfContentImporter extends Importer {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while (
-            (lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()
-        ) {
+        while ((lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()) {
             lineIndex++;
         }
     }

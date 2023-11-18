@@ -10,9 +10,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test Interface for all transformers that use suffix notation for their logical binary operators
  */
-public abstract class SuffixTransformerTest<
-    T extends AbstractQueryTransformer
-> {
+public abstract class SuffixTransformerTest<T extends AbstractQueryTransformer> {
 
     protected abstract T getTransformer();
 
@@ -29,11 +27,8 @@ public abstract class SuffixTransformerTest<
         String queryString = "author:\"Igor Steinmacher\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(
-            "\"Igor Steinmacher\"" + getAuthorSuffix()
-        );
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of("\"Igor Steinmacher\"" + getAuthorSuffix());
         assertEquals(expected, searchQuery);
     }
 
@@ -42,11 +37,8 @@ public abstract class SuffixTransformerTest<
         String queryString = "\"default value\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(
-            queryString + getUnFieldedSuffix()
-        );
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of(queryString + getUnFieldedSuffix());
         assertEquals(expected, searchQuery);
     }
 
@@ -55,11 +47,8 @@ public abstract class SuffixTransformerTest<
         String queryString = "default:\"default value\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(
-            "\"default value\"" + getUnFieldedSuffix()
-        );
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
+        Optional<String> expected = Optional.of("\"default value\"" + getUnFieldedSuffix());
         assertEquals(expected, searchQuery);
     }
 
@@ -68,8 +57,7 @@ public abstract class SuffixTransformerTest<
         String queryString = "journal:Nature";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of("Nature" + getJournalSuffix());
         assertEquals(expected, searchQuery);
     }
@@ -82,12 +70,10 @@ public abstract class SuffixTransformerTest<
 
     @Test
     public void convertMultipleValuesWithTheSameSuffix() throws Exception {
-        String queryString =
-            "author:\"Igor Steinmacher\" author:\"Christoph Treude\"";
+        String queryString = "author:\"Igor Steinmacher\" author:\"Christoph Treude\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(
             "\"Igor Steinmacher\"" +
             getAuthorSuffix() +
@@ -104,8 +90,7 @@ public abstract class SuffixTransformerTest<
             "(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND title:test";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(
             "(" +
             "\"Igor Steinmacher\"" +
@@ -127,12 +112,10 @@ public abstract class SuffixTransformerTest<
 
     @Test
     public void notOperatorSufix() throws Exception {
-        String queryString =
-            "!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")";
+        String queryString = "!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of(
             getTransformer().getLogicalNotOperator() +
             "(" +

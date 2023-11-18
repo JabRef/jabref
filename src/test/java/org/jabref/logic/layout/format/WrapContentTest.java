@@ -10,24 +10,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class WrapContentTest {
 
-    private ParamLayoutFormatter wrapContentParamLayoutFormatter =
-        new WrapContent();
+    private ParamLayoutFormatter wrapContentParamLayoutFormatter = new WrapContent();
 
     @ParameterizedTest
     @MethodSource("provideContent")
-    void formatContent(
-        String formattedContent,
-        String originalContent,
-        String desiredFormat
-    ) {
+    void formatContent(String formattedContent, String originalContent, String desiredFormat) {
         if (!desiredFormat.isEmpty()) {
             wrapContentParamLayoutFormatter.setArgument(desiredFormat);
         }
 
-        assertEquals(
-            formattedContent,
-            wrapContentParamLayoutFormatter.format(originalContent)
-        );
+        assertEquals(formattedContent, wrapContentParamLayoutFormatter.format(originalContent));
     }
 
     private static Stream<Arguments> provideContent() {
@@ -35,23 +27,11 @@ public class WrapContentTest {
             Arguments.of("<Bob>", "Bob", "<,>"),
             Arguments.of("Bob:", "Bob", ",:"),
             Arguments.of("Content: Bob", "Bob", "Content: ,"),
-            Arguments.of(
-                "Name,Field,Bob,Author",
-                "Bob",
-                "Name\\,Field\\,,\\,Author"
-            ),
+            Arguments.of("Name,Field,Bob,Author", "Bob", "Name\\,Field\\,,\\,Author"),
             Arguments.of(null, null, "Eds.,Ed."),
             Arguments.of("", "", "Eds.,Ed."),
-            Arguments.of(
-                "Bob Bruce and Jolly Jumper",
-                "Bob Bruce and Jolly Jumper",
-                ""
-            ),
-            Arguments.of(
-                "Bob Bruce and Jolly Jumper",
-                "Bob Bruce and Jolly Jumper",
-                "Eds."
-            )
+            Arguments.of("Bob Bruce and Jolly Jumper", "Bob Bruce and Jolly Jumper", ""),
+            Arguments.of("Bob Bruce and Jolly Jumper", "Bob Bruce and Jolly Jumper", "Eds.")
         );
     }
 }

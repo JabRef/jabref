@@ -17,36 +17,25 @@ public class CopacImporterFilesTest {
     }
 
     private static Stream<String> nonCopacfileNames() throws IOException {
-        Predicate<String> fileName = name ->
-            !name.startsWith("CopacImporterTest");
+        Predicate<String> fileName = name -> !name.startsWith("CopacImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(
-            new CopacImporter(),
-            fileName
-        );
+        ImporterTestEngine.testIsRecognizedFormat(new CopacImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("nonCopacfileNames")
     public void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(
-            new CopacImporter(),
-            fileName
-        );
+        ImporterTestEngine.testIsNotRecognizedFormat(new CopacImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            new CopacImporter(),
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(new CopacImporter(), fileName, FILE_ENDING);
     }
 }

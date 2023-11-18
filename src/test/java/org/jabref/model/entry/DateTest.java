@@ -24,30 +24,12 @@ class DateTest {
 
     private static Stream<Arguments> validDates() {
         return Stream.of(
-            Arguments.of(
-                LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 24),
-                "2018-10-03T07:24"
-            ),
-            Arguments.of(
-                LocalDateTime.of(2018, Month.OCTOBER, 3, 17, 2),
-                "2018-10-03T17:2"
-            ),
-            Arguments.of(
-                LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 24),
-                "2018-10-03T7:24"
-            ),
-            Arguments.of(
-                LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 7),
-                "2018-10-03T7:7"
-            ),
-            Arguments.of(
-                LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 0),
-                "2018-10-03T07"
-            ),
-            Arguments.of(
-                LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 0),
-                "2018-10-03T7"
-            ),
+            Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 24), "2018-10-03T07:24"),
+            Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 17, 2), "2018-10-03T17:2"),
+            Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 24), "2018-10-03T7:24"),
+            Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 7), "2018-10-03T7:7"),
+            Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 0), "2018-10-03T07"),
+            Arguments.of(LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 0), "2018-10-03T7"),
             Arguments.of(LocalDate.of(2009, Month.JANUARY, 15), "2009-1-15"),
             Arguments.of(YearMonth.of(2009, Month.NOVEMBER), "2009-11"),
             Arguments.of(LocalDate.of(2012, Month.JANUARY, 15), "15-1-2012"),
@@ -55,28 +37,16 @@ class DateTest {
             Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "9/2015"),
             Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "09/2015"),
             Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "9/15"),
-            Arguments.of(
-                LocalDate.of(2015, Month.SEPTEMBER, 1),
-                "September 1, 2015"
-            ),
-            Arguments.of(
-                YearMonth.of(2015, Month.SEPTEMBER),
-                "September, 2015"
-            ),
+            Arguments.of(LocalDate.of(2015, Month.SEPTEMBER, 1), "September 1, 2015"),
+            Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "September, 2015"),
             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15.1.2015"),
             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "2015.1.15"),
             Arguments.of(Year.of(2015), "2015"),
             Arguments.of(YearMonth.of(2020, Month.JANUARY), "Jan, 2020"),
             Arguments.of(LocalDate.of(2015, Month.OCTOBER, 15), "2015.10.15"),
-            Arguments.of(
-                LocalDate.of(-10000, Month.OCTOBER, 15),
-                "-10000-10-15"
-            ),
+            Arguments.of(LocalDate.of(-10000, Month.OCTOBER, 15), "-10000-10-15"),
             Arguments.of(YearMonth.of(2015, Month.NOVEMBER), "2015/11"),
-            Arguments.of(
-                LocalDate.of(2015, Month.JANUARY, 15),
-                "15 January 2015"
-            ),
+            Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15 January 2015"),
             Arguments.of(Year.of(2015), "2015-"),
             Arguments.of(Year.of(2015), "2015?"),
             Arguments.of(Year.of(-29), "30 BC"),

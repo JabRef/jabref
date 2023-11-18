@@ -63,20 +63,14 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
      *                       the result)
      * @param fetchedEntries list of entries returned by the web service
      */
-    Optional<T> extractIdentifier(
-        BibEntry inputEntry,
-        List<BibEntry> fetchedEntries
-    ) throws FetcherException;
+    Optional<T> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries)
+        throws FetcherException;
 
     @Override
     default Optional<T> findIdentifier(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        try (
-            InputStream stream = new BufferedInputStream(
-                getURLForEntry(entry).openStream()
-            )
-        ) {
+        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {

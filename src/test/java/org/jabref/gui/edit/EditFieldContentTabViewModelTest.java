@@ -38,18 +38,12 @@ public class EditFieldContentTabViewModelTest {
 
         bibDatabase = new BibDatabase();
         editFieldContentViewModel =
-            new EditFieldContentViewModel(
-                bibDatabase,
-                List.of(entryA, entryB),
-                stateManager
-            );
+            new EditFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
     }
 
     @Test
     void clearSelectedFieldShouldClearFieldContentEvenWhenOverwriteFieldContentIsNotEnabled() {
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.YEAR);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
         editFieldContentViewModel.overwriteFieldContentProperty().set(false);
         editFieldContentViewModel.clearSelectedField();
 
@@ -58,9 +52,7 @@ public class EditFieldContentTabViewModelTest {
 
     @Test
     void clearSelectedFieldShouldDoNothingWhenFieldDoesntExistOrIsEmpty() {
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.FILE);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.FILE);
         editFieldContentViewModel.clearSelectedField();
 
         assertEquals(Optional.empty(), entryA.getField(StandardField.FILE));
@@ -69,9 +61,7 @@ public class EditFieldContentTabViewModelTest {
     @Test
     void setFieldValueShouldNotDoAnythingIfOverwriteFieldContentIsNotEnabled() {
         editFieldContentViewModel.overwriteFieldContentProperty().set(false);
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.YEAR);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
         editFieldContentViewModel.fieldValueProperty().set("2001");
         editFieldContentViewModel.setFieldValue();
 
@@ -81,9 +71,7 @@ public class EditFieldContentTabViewModelTest {
     @Test
     void setFieldValueShouldSetFieldValueIfOverwriteFieldContentIsEnabled() {
         editFieldContentViewModel.overwriteFieldContentProperty().set(true);
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.YEAR);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
         editFieldContentViewModel.fieldValueProperty().set("2001");
         editFieldContentViewModel.setFieldValue();
 
@@ -93,9 +81,7 @@ public class EditFieldContentTabViewModelTest {
     @Test
     void setFieldValueShouldSetFieldValueIfFieldContentIsEmpty() {
         editFieldContentViewModel.overwriteFieldContentProperty().set(false);
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.YEAR);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
         editFieldContentViewModel.fieldValueProperty().set("2001");
         editFieldContentViewModel.setFieldValue();
 
@@ -105,9 +91,7 @@ public class EditFieldContentTabViewModelTest {
     @Test
     void appendToFieldValueShouldDoNothingIfOverwriteFieldContentIsNotEnabled() {
         editFieldContentViewModel.overwriteFieldContentProperty().set(false);
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.YEAR);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
         editFieldContentViewModel.fieldValueProperty().set("0");
         editFieldContentViewModel.appendToFieldValue();
 
@@ -117,9 +101,7 @@ public class EditFieldContentTabViewModelTest {
     @Test
     void appendToFieldValueShouldAppendFieldValueIfOverwriteFieldContentIsEnabled() {
         editFieldContentViewModel.overwriteFieldContentProperty().set(true);
-        editFieldContentViewModel
-            .selectedFieldProperty()
-            .set(StandardField.YEAR);
+        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
         editFieldContentViewModel.fieldValueProperty().set("0");
         editFieldContentViewModel.appendToFieldValue();
 

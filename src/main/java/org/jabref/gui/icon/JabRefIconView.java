@@ -23,10 +23,7 @@ public class JabRefIconView extends FontIcon {
         this.glyphSize = new SimpleObjectProperty<>(size);
 
         EasyBind.subscribe(glyph, glyph -> setIconCode(glyph.getIkon()));
-        EasyBind.subscribe(
-            glyphSize,
-            glyphsize -> setIconSize(glyphsize.intValue())
-        );
+        EasyBind.subscribe(glyphSize, glyphsize -> setIconSize(glyphsize.intValue()));
     }
 
     public JabRefIconView(IconTheme.JabRefIcons icon) {
@@ -38,10 +35,7 @@ public class JabRefIconView extends FontIcon {
         int px = (int) size.pixels(getFont());
         glyphSize.set(px);
         EasyBind.subscribe(glyph, glyph -> setIconCode(glyph.getIkon()));
-        EasyBind.subscribe(
-            glyphSize,
-            glyphsize -> setIconSize(glyphsize.intValue())
-        );
+        EasyBind.subscribe(glyphSize, glyphsize -> setIconSize(glyphsize.intValue()));
     }
 
     public JabRefIconView() {

@@ -43,9 +43,7 @@ class INSPIREFetcherTest {
             .withField(StandardField.EPRINT, "1405.2249")
             .withField(StandardField.ARCHIVEPREFIX, "arXiv")
             .withField(StandardField.PRIMARYCLASS, "math-ph");
-        List<BibEntry> fetchedEntries = fetcher.performSearch(
-            "Fréchet group actions field"
-        );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Fréchet group actions field");
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 
@@ -53,10 +51,7 @@ class INSPIREFetcherTest {
     public void searchByIdentifierFindsEntry() throws Exception {
         BibEntry article = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Melnikov:1998pr")
-            .withField(
-                StandardField.AUTHOR,
-                "Melnikov, Kirill and Yelkhovsky, Alexander"
-            )
+            .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")
             .withField(
                 StandardField.TITLE,
                 "Top quark production at threshold with O(alpha-s**2) accuracy"
@@ -68,13 +63,8 @@ class INSPIREFetcherTest {
             .withField(StandardField.YEAR, "1998")
             .withField(StandardField.EPRINT, "hep-ph/9802379")
             .withField(StandardField.ARCHIVEPREFIX, "arXiv")
-            .withField(
-                new UnknownField("reportnumber"),
-                "BUDKER-INP-1998-7, TTP-98-10"
-            );
-        List<BibEntry> fetchedEntries = fetcher.performSearch(
-            "\"hep-ph/9802379\""
-        );
+            .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("\"hep-ph/9802379\"");
         assertEquals(Collections.singletonList(article), fetchedEntries);
     }
 
@@ -82,10 +72,7 @@ class INSPIREFetcherTest {
     public void searchByExistingEntry() throws Exception {
         BibEntry article = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Melnikov:1998pr")
-            .withField(
-                StandardField.AUTHOR,
-                "Melnikov, Kirill and Yelkhovsky, Alexander"
-            )
+            .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")
             .withField(
                 StandardField.TITLE,
                 "Top quark production at threshold with O(alpha-s**2) accuracy"
@@ -97,10 +84,7 @@ class INSPIREFetcherTest {
             .withField(StandardField.YEAR, "1998")
             .withField(StandardField.EPRINT, "hep-ph/9802379")
             .withField(StandardField.ARCHIVEPREFIX, "arXiv")
-            .withField(
-                new UnknownField("reportnumber"),
-                "BUDKER-INP-1998-7, TTP-98-10"
-            );
+            .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
         List<BibEntry> fetchedEntries = fetcher.performSearch(article);
         assertEquals(Collections.singletonList(article), fetchedEntries);
     }

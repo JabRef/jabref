@@ -11,10 +11,7 @@ public class DateFormatter implements ParamLayoutFormatter {
     @Override
     public String format(String fieldText) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
-        LocalDate date = LocalDate.parse(
-            fieldText,
-            DateTimeFormatter.ISO_LOCAL_DATE
-        );
+        LocalDate date = LocalDate.parse(fieldText, DateTimeFormatter.ISO_LOCAL_DATE);
         return date.format(formatter);
     }
 

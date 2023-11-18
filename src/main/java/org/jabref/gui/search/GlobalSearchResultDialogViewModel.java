@@ -9,22 +9,15 @@ import org.jabref.preferences.SearchPreferences;
 
 public class GlobalSearchResultDialogViewModel {
 
-    private final BibDatabaseContext searchDatabaseContext =
-        new BibDatabaseContext();
+    private final BibDatabaseContext searchDatabaseContext = new BibDatabaseContext();
     private final BooleanProperty keepOnTop = new SimpleBooleanProperty();
 
-    public GlobalSearchResultDialogViewModel(
-        PreferencesService preferencesService
-    ) {
-        SearchPreferences searchPreferences =
-            preferencesService.getSearchPreferences();
+    public GlobalSearchResultDialogViewModel(PreferencesService preferencesService) {
+        SearchPreferences searchPreferences = preferencesService.getSearchPreferences();
 
         keepOnTop.set(searchPreferences.shouldKeepWindowOnTop());
 
-        EasyBind.subscribe(
-            this.keepOnTop,
-            searchPreferences::setKeepWindowOnTop
-        );
+        EasyBind.subscribe(this.keepOnTop, searchPreferences::setKeepWindowOnTop);
     }
 
     public BibDatabaseContext getSearchDatabaseContext() {

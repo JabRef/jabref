@@ -18,10 +18,7 @@ public class CellFactory {
 
     private final Map<Field, JabRefIcon> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory(
-        PreferencesService preferencesService,
-        UndoManager undoManager
-    ) {
+    public CellFactory(PreferencesService preferencesService, UndoManager undoManager) {
         JabRefIcon icon;
         icon = IconTheme.JabRefIcons.PDF_FILE;
         // icon.setToo(Localization.lang("Open") + " PDF");

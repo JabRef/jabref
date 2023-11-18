@@ -25,12 +25,9 @@ import org.jabref.model.entry.identifier.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LookupIdentifierAction<T extends Identifier>
-    extends SimpleCommand {
+public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LookupIdentifierAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LookupIdentifierAction.class);
 
     private final JabRefFrame frame;
 
@@ -53,16 +50,13 @@ public class LookupIdentifierAction<T extends Identifier>
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(
-                needsDatabase(this.stateManager)
-                    .and(needsEntriesSelected(this.stateManager))
+                needsDatabase(this.stateManager).and(needsEntriesSelected(this.stateManager))
             );
         this.statusMessage.bind(
                 BindingsHelper.ifThenElse(
                     executable,
                     "",
-                    Localization.lang(
-                        "This operation requires one or more entries to be selected."
-                    )
+                    Localization.lang("This operation requires one or more entries to be selected.")
                 )
             );
     }
@@ -71,8 +65,7 @@ public class LookupIdentifierAction<T extends Identifier>
     public void execute() {
         try {
             BackgroundTask
-                .wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries())
-                )
+                .wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
                 .onSuccess(frame.getDialogService()::notify)
                 .executeWith(taskExecutor);
         } catch (Exception e) {
@@ -107,23 +100,15 @@ public class LookupIdentifierAction<T extends Identifier>
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
             } catch (FetcherException e) {
-                LOGGER.error(
-                    "Could not fetch " + fetcher.getIdentifierName(),
-                    e
-                );
+                LOGGER.error("Could not fetch " + fetcher.getIdentifierName(), e);
             }
-            if (
-                identifier.isPresent() &&
-                !bibEntry.hasField(identifier.get().getDefaultField())
-            ) {
+            if (identifier.isPresent() && !bibEntry.hasField(identifier.get().getDefaultField())) {
                 Optional<FieldChange> fieldChange = bibEntry.setField(
                     identifier.get().getDefaultField(),
                     identifier.get().getNormalized()
                 );
                 if (fieldChange.isPresent()) {
-                    namedCompound.addEdit(
-                        new UndoableFieldChange(fieldChange.get())
-                    );
+                    namedCompound.addEdit(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
                     final String nextStatusMessage = Localization.lang(
                         "Looking up %0... - entry %1 out of %2 - found %3",

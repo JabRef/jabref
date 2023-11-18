@@ -13,13 +13,10 @@ public class TestManager {
      * Determine the DBMSType to test from the environment variable "DMBS". In case that variable is not set, use "PostgreSQL" as default
      */
     public static DBMSType getDBMSTypeTestParameter() {
-        return DBMSType
-            .fromString(System.getenv("DBMS"))
-            .orElse(DBMSType.POSTGRESQL);
+        return DBMSType.fromString(System.getenv("DBMS")).orElse(DBMSType.POSTGRESQL);
     }
 
-    public static void clearTables(DBMSConnection dbmsConnection)
-        throws SQLException {
+    public static void clearTables(DBMSConnection dbmsConnection) throws SQLException {
         Objects.requireNonNull(dbmsConnection);
         DBMSType dbmsType = dbmsConnection.getProperties().getType();
 

@@ -63,23 +63,17 @@ public class GuiPreferences {
         this.sizeY = new SimpleDoubleProperty(sizeY);
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
         this.windowFullScreen = new SimpleBooleanProperty(windowFullScreen);
-        this.lastFilesOpened =
-            FXCollections.observableArrayList(lastFilesOpened);
+        this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
-        this.lastSelectedIdBasedFetcher =
-            new SimpleStringProperty(lastSelectedIdBasedFetcher);
+        this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
-        this.mergeShouldShowDiff =
-            new SimpleBooleanProperty(mergeShouldShowDiff);
-        this.mergeShouldShowUnifiedDiff =
-            new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);
-        this.mergeHighlightWords =
-            new SimpleBooleanProperty(mergeHighlightWords);
+        this.mergeShouldShowDiff = new SimpleBooleanProperty(mergeShouldShowDiff);
+        this.mergeShouldShowUnifiedDiff = new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);
+        this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightWords);
 
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
-        this.mergeShowChangedFieldsOnly =
-            new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
+        this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
     }
 
     public double getPositionX() {
@@ -186,9 +180,7 @@ public class GuiPreferences {
         return lastSelectedIdBasedFetcher;
     }
 
-    public void setLastSelectedIdBasedFetcher(
-        String lastSelectedIdBasedFetcher
-    ) {
+    public void setLastSelectedIdBasedFetcher(String lastSelectedIdBasedFetcher) {
         this.lastSelectedIdBasedFetcher.set(lastSelectedIdBasedFetcher);
     }
 
@@ -224,9 +216,7 @@ public class GuiPreferences {
         return mergeShouldShowUnifiedDiff;
     }
 
-    public void setMergeShouldShowUnifiedDiff(
-        boolean mergeShouldShowUnifiedDiff
-    ) {
+    public void setMergeShouldShowUnifiedDiff(boolean mergeShouldShowUnifiedDiff) {
         this.mergeShouldShowUnifiedDiff.set(mergeShouldShowUnifiedDiff);
     }
 

@@ -37,9 +37,7 @@ public class SentenceCaseFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Capitalize the first word, changes other words to lower case."
-        );
+        return Localization.lang("Capitalize the first word, changes other words to lower case.");
     }
 
     @Override

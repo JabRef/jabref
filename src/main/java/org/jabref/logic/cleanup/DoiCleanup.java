@@ -36,13 +36,10 @@ public class DoiCleanup implements CleanupJob {
 
         // First check if the Doi Field is empty
         if (entry.hasField(StandardField.DOI)) {
-            String doiFieldValue = entry
-                .getField(StandardField.DOI)
-                .orElse(null);
+            String doiFieldValue = entry.getField(StandardField.DOI).orElse(null);
 
             String decodeDoiFieldValue = "";
-            decodeDoiFieldValue =
-                URLDecoder.decode(doiFieldValue, StandardCharsets.UTF_8);
+            decodeDoiFieldValue = URLDecoder.decode(doiFieldValue, StandardCharsets.UTF_8);
             doiFieldValue = decodeDoiFieldValue;
 
             Optional<DOI> doi = DOI.parse(doiFieldValue);
@@ -66,9 +63,7 @@ public class DoiCleanup implements CleanupJob {
                     entry
                         .getField(field)
                         .flatMap(DOI::parse)
-                        .ifPresent(unused ->
-                            removeFieldValue(entry, field, changes)
-                        );
+                        .ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
@@ -105,15 +100,8 @@ public class DoiCleanup implements CleanupJob {
         return changes;
     }
 
-    private void removeFieldValue(
-        BibEntry entry,
-        Field field,
-        List<FieldChange> changes
-    ) {
-        CleanupJob eraser = new FieldFormatterCleanup(
-            field,
-            new ClearFormatter()
-        );
+    private void removeFieldValue(BibEntry entry, Field field, List<FieldChange> changes) {
+        CleanupJob eraser = new FieldFormatterCleanup(field, new ClearFormatter());
         changes.addAll(eraser.cleanup(entry));
     }
 }

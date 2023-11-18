@@ -27,10 +27,7 @@ public class BackupFileUtilTest {
     @Test
     void uniqueFilePrefix() {
         // We cannot test for a concrete hash code, because hashing implementation differs from environment to environment
-        assertNotEquals(
-            "",
-            BackupFileUtil.getUniqueFilePrefix(Path.of("test.bib"))
-        );
+        assertNotEquals("", BackupFileUtil.getUniqueFilePrefix(Path.of("test.bib")));
     }
 
     @Test
@@ -52,25 +49,17 @@ public class BackupFileUtilTest {
     void getPathOfBackupFileAndCreateDirectoryReturnsSameDirectoryInCaseOfException() {
         backupDir = OS.getNativeDesktop().getBackupDirectory();
         try (
-            MockedStatic<Files> files = Mockito.mockStatic(
-                Files.class,
-                Answers.RETURNS_DEEP_STUBS
-            )
+            MockedStatic<Files> files = Mockito.mockStatic(Files.class, Answers.RETURNS_DEEP_STUBS)
         ) {
             files
-                .when(() ->
-                    Files.createDirectories(
-                        OS.getNativeDesktop().getBackupDirectory()
-                    )
-                )
+                .when(() -> Files.createDirectories(OS.getNativeDesktop().getBackupDirectory()))
                 .thenThrow(new IOException());
             Path testPath = Path.of("tmp", "test.bib");
-            Path result =
-                BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
-                    testPath,
-                    BackupFileType.BACKUP,
-                    backupDir
-                );
+            Path result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
+                testPath,
+                BackupFileType.BACKUP,
+                backupDir
+            );
             // The intended fallback behavior is to put the .bak file in the same directory as the .bib file
             assertEquals(Path.of("tmp", "test.bib.bak"), result);
         }

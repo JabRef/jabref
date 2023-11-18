@@ -30,15 +30,11 @@ public class DocumentReaderTest {
     public void setup() {
         this.databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(Mockito.any()))
-            .thenReturn(
-                Collections.singletonList(Path.of("src/test/resources/pdfs"))
-            );
+            .thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         this.filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUserAndHost()).thenReturn("testuser-testhost");
-        when(filePreferences.getMainFileDirectory())
-            .thenReturn(Optional.empty());
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(true);
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
     }
 
     @Test
@@ -46,16 +42,11 @@ public class DocumentReaderTest {
         // given
         BibEntry entry = new BibEntry();
         entry.setFiles(
-            Collections.singletonList(
-                new LinkedFile("Wrong path", "NOT_PRESENT.pdf", "Type")
-            )
+            Collections.singletonList(new LinkedFile("Wrong path", "NOT_PRESENT.pdf", "Type"))
         );
 
         // when
-        final List<Document> emptyDocumentList = new DocumentReader(
-            entry,
-            filePreferences
-        )
+        final List<Document> emptyDocumentList = new DocumentReader(entry, filePreferences)
             .readLinkedPdfs(databaseContext);
 
         // then
@@ -64,18 +55,12 @@ public class DocumentReaderTest {
 
     private static Stream<Arguments> getLinesToMerge() {
         return Stream.of(
-            Arguments.of(
-                "Sentences end with periods.",
-                "Sentences end\nwith periods."
-            ),
+            Arguments.of("Sentences end with periods.", "Sentences end\nwith periods."),
             Arguments.of(
                 "Text is usually wrapped with hyphens.",
                 "Text is us-\nually wrapp-\ned with hyphens."
             ),
-            Arguments.of(
-                "Longer texts often have both.",
-                "Longer te-\nxts often\nhave both."
-            ),
+            Arguments.of("Longer texts often have both.", "Longer te-\nxts often\nhave both."),
             Arguments.of("No lines to break here", "No lines to break here")
         );
     }

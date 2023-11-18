@@ -55,9 +55,7 @@ public class DBMSConnectionPropertiesBuilder {
         return this;
     }
 
-    public DBMSConnectionPropertiesBuilder setServerTimezone(
-        String serverTimezone
-    ) {
+    public DBMSConnectionPropertiesBuilder setServerTimezone(String serverTimezone) {
         this.serverTimezone = serverTimezone;
         return this;
     }

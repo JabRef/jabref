@@ -25,26 +25,21 @@ public class AuxCommandLineTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
     public void test() throws URISyntaxException, IOException {
-        InputStream originalStream =
-            AuxCommandLineTest.class.getResourceAsStream("origin.bib");
+        InputStream originalStream = AuxCommandLineTest.class.getResourceAsStream("origin.bib");
 
-        File auxFile = Path
-            .of(AuxCommandLineTest.class.getResource("paper.aux").toURI())
-            .toFile();
+        File auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxCommandLine auxCommandLine = new AuxCommandLine(
                 auxFile.getAbsolutePath(),

@@ -33,10 +33,8 @@ class BiblioscapeImporterTypesTest {
 
     @ParameterizedTest
     @MethodSource("types")
-    void importConvertsToCorrectBibType(
-        String biblioscapeType,
-        EntryType bibtexType
-    ) throws IOException {
+    void importConvertsToCorrectBibType(String biblioscapeType, EntryType bibtexType)
+        throws IOException {
         String bsInput =
             "--AU-- Baklouti, F.\n" +
             "--YP-- 1999\n" +

@@ -51,33 +51,18 @@ public class CitationTest {
 
     @ParameterizedTest
     @MethodSource("colStartColEndNotInBounds")
-    public void constructorColStartColEndNotInBoundsTest(
-        int colStart,
-        int colEnd
-    ) {
+    public void constructorColStartColEndNotInBoundsTest(int colStart, int colEnd) {
         Exception e = assertThrows(
             IllegalArgumentException.class,
             () -> new Citation(path, 10, colStart, colEnd, "lineText")
         );
-        assertEquals(
-            "Citation has to be between 0 and line length.",
-            e.getMessage()
-        );
+        assertEquals("Citation has to be between 0 and line length.", e.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndInBounds")
-    public void constructorColStartColEndInBoundsTest(
-        int colStart,
-        int colEnd
-    ) {
-        Citation citation = new Citation(
-            path,
-            10,
-            colStart,
-            colEnd,
-            "lineText"
-        );
+    public void constructorColStartColEndInBoundsTest(int colStart, int colEnd) {
+        Citation citation = new Citation(path, 10, colStart, colEnd, "lineText");
     }
 
     @Test

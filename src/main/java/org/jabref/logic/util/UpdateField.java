@@ -16,11 +16,7 @@ public class UpdateField {
     /**
      * Updating a field will result in the entry being reformatted on save
      */
-    public static Optional<FieldChange> updateField(
-        BibEntry be,
-        Field field,
-        String newValue
-    ) {
+    public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue) {
         return updateField(be, field, newValue, false);
     }
 
@@ -33,12 +29,7 @@ public class UpdateField {
         String newValue
     ) {
         boolean changed = be.hasChanged();
-        Optional<FieldChange> fieldChange = updateField(
-            be,
-            field,
-            newValue,
-            false
-        );
+        Optional<FieldChange> fieldChange = updateField(be, field, newValue, false);
         be.setChanged(changed);
         return fieldChange;
     }
@@ -58,10 +49,7 @@ public class UpdateField {
         String oldValue = null;
         if (be.hasField(field)) {
             oldValue = be.getField(field).get();
-            if (
-                (newValue == null) ||
-                (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)
-            ) {
+            if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
                 // If the new field value is null or the old and the new value are the same and flag is set
                 // Clear the field
                 be.clearField(field);
@@ -128,15 +116,8 @@ public class UpdateField {
 
         for (BibEntry curEntry : entries) {
             boolean setOwner =
-                globalSetOwner &&
-                (overwriteOwner || (!curEntry.hasField(StandardField.OWNER)));
-            setAutomaticFields(
-                curEntry,
-                setOwner,
-                defaultOwner,
-                setTimeStamp,
-                timestamp
-            );
+                globalSetOwner && (overwriteOwner || (!curEntry.hasField(StandardField.OWNER)));
+            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timestamp);
         }
     }
 }

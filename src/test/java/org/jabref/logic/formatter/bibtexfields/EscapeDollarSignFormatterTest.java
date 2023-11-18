@@ -10,8 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class EscapeDollarSignFormatterTest {
 
-    private EscapeDollarSignFormatter formatter =
-        new EscapeDollarSignFormatter();
+    private EscapeDollarSignFormatter formatter = new EscapeDollarSignFormatter();
 
     private static Stream<Arguments> correctlyFormats() {
         return Stream.of(
@@ -41,9 +40,6 @@ class EscapeDollarSignFormatterTest {
 
     @Test
     void formatExample() {
-        assertEquals(
-            "Text\\$with\\$dollar\\$sign",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("Text\\$with\\$dollar\\$sign", formatter.format(formatter.getExampleInput()));
     }
 }

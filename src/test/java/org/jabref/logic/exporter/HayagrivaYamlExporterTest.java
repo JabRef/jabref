@@ -33,10 +33,7 @@ public class HayagrivaYamlExporterTest {
                 "hayagrivayaml",
                 null,
                 StandardFileType.YAML,
-                mock(
-                    LayoutFormatterPreferences.class,
-                    Answers.RETURNS_DEEP_STUBS
-                ),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder(),
                 BlankLineBehaviour.DELETE_BLANKS
             );
@@ -45,21 +42,15 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile)
-        throws Exception {
+    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            tempFile,
-            Collections.emptyList()
-        );
+        hayagrivaYamlExporter.export(databaseContext, tempFile, Collections.emptyList());
         assertEquals(Collections.emptyList(), Files.readAllLines(file));
     }
 
     @Test
-    public final void exportsCorrectContent(@TempDir Path tempFile)
-        throws Exception {
+    public final void exportsCorrectContent(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("test")
             .withField(StandardField.AUTHOR, "Test Author")
@@ -69,11 +60,7 @@ public class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
             "---",
@@ -91,8 +78,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportsCorrectMultipleAuthors(@TempDir Path tempFile)
-        throws Exception {
+    public final void exportsCorrectMultipleAuthors(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("test")
             .withField(StandardField.AUTHOR, "Test Author and Other One")
@@ -102,11 +88,7 @@ public class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
             "---",
@@ -125,8 +107,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void formatsContentCorrect(@TempDir Path tempFile)
-        throws Exception {
+    public final void formatsContentCorrect(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("test")
             .withField(StandardField.AUTHOR, "Test Author")
@@ -136,11 +117,7 @@ public class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
             "---",
@@ -168,11 +145,7 @@ public class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
             "---",
@@ -200,11 +173,7 @@ public class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
             "---",
@@ -221,8 +190,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportsCorrectParentField(@TempDir Path tempFile)
-        throws Exception {
+    public final void exportsCorrectParentField(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("test")
             .withField(StandardField.AUTHOR, "Test Author")
@@ -233,11 +201,7 @@ public class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(
-            databaseContext,
-            file,
-            Collections.singletonList(entry)
-        );
+        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
             "---",

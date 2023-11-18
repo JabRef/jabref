@@ -35,32 +35,24 @@ public class AttachFileFromURLAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(
-                ActionHelper.needsEntriesSelected(1, stateManager)
-            );
+        this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
 
     @Override
     public void execute() {
         if (stateManager.getActiveDatabase().isEmpty()) {
-            dialogService.notify(
-                Localization.lang("This operation requires an open library.")
-            );
+            dialogService.notify(Localization.lang("This operation requires an open library."));
             return;
         }
 
         if (stateManager.getSelectedEntries().size() != 1) {
             dialogService.notify(
-                Localization.lang(
-                    "This operation requires exactly one item to be selected."
-                )
+                Localization.lang("This operation requires exactly one item to be selected.")
             );
             return;
         }
 
-        BibDatabaseContext databaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
         BibEntry entry = stateManager.getSelectedEntries().get(0);
 
@@ -85,10 +77,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
             );
             onlineFile.download();
         } catch (MalformedURLException exception) {
-            dialogService.showErrorDialogAndWait(
-                Localization.lang("Invalid URL"),
-                exception
-            );
+            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }
     }
 

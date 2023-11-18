@@ -12,9 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class AutomaticPersonsGroupTest {
 
-    private static GroupTreeNode[] createPersonSubGroupFrom(
-        String... lastNames
-    ) {
+    private static GroupTreeNode[] createPersonSubGroupFrom(String... lastNames) {
         return Arrays
             .stream(lastNames)
             .map(lastName ->
@@ -60,8 +58,7 @@ class AutomaticPersonsGroupTest {
 
     @Test
     void createSubgroupFromLatex() {
-        BibEntry bibEntry = new BibEntry()
-            .withField(StandardField.AUTHOR, "Kurt G{\\\"{o}}del");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt G{\\\"{o}}del");
         var subgroup = new AutomaticPersonsGroup(
             "",
             GroupHierarchyType.INDEPENDENT,
@@ -74,8 +71,7 @@ class AutomaticPersonsGroupTest {
 
     @Test
     void createSubgroupFromUnicode() {
-        BibEntry bibEntry = new BibEntry()
-            .withField(StandardField.AUTHOR, "Kurt Gödel");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt Gödel");
         var subgroup = new AutomaticPersonsGroup(
             "",
             GroupHierarchyType.INDEPENDENT,

@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public class GVKQueryTransformer extends YearRangeByFilteringQueryTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        GVKQueryTransformer.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(GVKQueryTransformer.class);
 
     @Override
     protected String getLogicalAndOperator() {
@@ -57,12 +55,7 @@ public class GVKQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     @Override
-    protected Optional<String> handleOtherField(
-        String fieldAsString,
-        String term
-    ) {
-        return Optional.of(
-            createKeyValuePair("pica." + fieldAsString, term, "=")
-        );
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
+        return Optional.of(createKeyValuePair("pica." + fieldAsString, term, "="));
     }
 }

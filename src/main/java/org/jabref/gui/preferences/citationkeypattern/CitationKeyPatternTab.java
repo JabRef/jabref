@@ -68,33 +68,17 @@ public class CitationKeyPatternTab
                 preferencesService.getCitationKeyPatternPreferences()
             );
 
-        overwriteAllow
-            .selectedProperty()
-            .bindBidirectional(viewModel.overwriteAllowProperty());
-        overwriteWarning
-            .selectedProperty()
-            .bindBidirectional(viewModel.overwriteWarningProperty());
-        generateOnSave
-            .selectedProperty()
-            .bindBidirectional(viewModel.generateOnSaveProperty());
-        letterStartA
-            .selectedProperty()
-            .bindBidirectional(viewModel.letterStartAProperty());
-        letterStartB
-            .selectedProperty()
-            .bindBidirectional(viewModel.letterStartBProperty());
-        letterAlwaysAdd
-            .selectedProperty()
-            .bindBidirectional(viewModel.letterAlwaysAddProperty());
-        keyPatternRegex
-            .textProperty()
-            .bindBidirectional(viewModel.keyPatternRegexProperty());
+        overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
+        overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
+        generateOnSave.selectedProperty().bindBidirectional(viewModel.generateOnSaveProperty());
+        letterStartA.selectedProperty().bindBidirectional(viewModel.letterStartAProperty());
+        letterStartB.selectedProperty().bindBidirectional(viewModel.letterStartBProperty());
+        letterAlwaysAdd.selectedProperty().bindBidirectional(viewModel.letterAlwaysAddProperty());
+        keyPatternRegex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
         keyPatternReplacement
             .textProperty()
             .bindBidirectional(viewModel.keyPatternReplacementProperty());
-        unwantedCharacters
-            .textProperty()
-            .bindBidirectional(viewModel.unwantedCharactersProperty());
+        unwantedCharacters.textProperty().bindBidirectional(viewModel.unwantedCharactersProperty());
 
         bibtexKeyPatternTable
             .patternListProperty()
@@ -120,13 +104,9 @@ public class CitationKeyPatternTab
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
             Globals.entryTypesManager.getAllTypes(
-                preferencesService
-                    .getLibraryPreferences()
-                    .getDefaultBibDatabaseMode()
+                preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode()
             ),
-            preferencesService
-                .getCitationKeyPatternPreferences()
-                .getKeyPattern()
+            preferencesService.getCitationKeyPatternPreferences().getKeyPattern()
         );
     }
 

@@ -69,9 +69,7 @@ public enum StandardFileType implements FileType {
         return OptionalUtil.orElse(
             Arrays
                 .stream(StandardFileType.values())
-                .filter(field ->
-                    field.getExtensions().stream().anyMatch(exts::contains)
-                )
+                .filter(field -> field.getExtensions().stream().anyMatch(exts::contains))
                 .findAny(),
             new UnknownFileType(extensions)
         );

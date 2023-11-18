@@ -20,8 +20,7 @@ public class AbbreviationParser {
     private static final char NO_DELIMITER = '\0'; // empty char
 
     // Ensures ordering while preventing duplicates
-    private final LinkedHashSet<Abbreviation> abbreviations =
-        new LinkedHashSet<>();
+    private final LinkedHashSet<Abbreviation> abbreviations = new LinkedHashSet<>();
 
     /*
      * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
@@ -41,12 +40,8 @@ public class AbbreviationParser {
         ) {
             for (CSVRecord csvRecord : csvParser) {
                 String name = csvRecord.size() > 0 ? csvRecord.get(0) : "";
-                String abbreviation = csvRecord.size() > 1
-                    ? csvRecord.get(1)
-                    : "";
-                String shortestUniqueAbbreviation = csvRecord.size() > 2
-                    ? csvRecord.get(2)
-                    : "";
+                String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : "";
+                String shortestUniqueAbbreviation = csvRecord.size() > 2 ? csvRecord.get(2) : "";
 
                 // Check name and abbreviation
                 if (name.isEmpty() || abbreviation.isEmpty()) {
@@ -64,12 +59,7 @@ public class AbbreviationParser {
     }
 
     private char detectDelimiter(Path file) throws IOException {
-        try (
-            BufferedReader reader = Files.newBufferedReader(
-                file,
-                StandardCharsets.UTF_8
-            )
-        ) {
+        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             String line = reader.readLine();
 
             if (line == null) {

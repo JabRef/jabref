@@ -48,9 +48,7 @@ class MoveFilesCleanupTest {
         Files.createFile(fileBefore);
 
         MetaData metaData = new MetaData();
-        metaData.setDefaultFileDirectory(
-            defaultFileFolder.toAbsolutePath().toString()
-        );
+        metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
         databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
@@ -59,19 +57,11 @@ class MoveFilesCleanupTest {
         entry.setCitationKey("Toot");
         entry.setField(StandardField.TITLE, "test title");
         entry.setField(StandardField.YEAR, "1989");
-        LinkedFile fileField = new LinkedFile(
-            "",
-            fileBefore.toAbsolutePath(),
-            ""
-        );
-        entry.setField(
-            StandardField.FILE,
-            FileFieldWriter.getStringRepresentation(fileField)
-        );
+        LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath(), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
         cleanup = new MoveFilesCleanup(databaseContext, filePreferences);
     }
 
@@ -83,9 +73,7 @@ class MoveFilesCleanupTest {
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
         assertEquals(
             Optional.of(
-                FileFieldWriter.getStringRepresentation(
-                    new LinkedFile("", Path.of("test.pdf"), "")
-                )
+                FileFieldWriter.getStringRepresentation(new LinkedFile("", Path.of("test.pdf"), ""))
             ),
             entry.getField(StandardField.FILE)
         );
@@ -95,11 +83,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithMulitpleLinked() {
-        LinkedFile fileField = new LinkedFile(
-            "",
-            fileBefore.toAbsolutePath(),
-            ""
-        );
+        LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath(), "");
         entry.setField(
             StandardField.FILE,
             FileFieldWriter.getStringRepresentation(
@@ -133,8 +117,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithFileDirPattern() {
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("test.pdf");
@@ -158,9 +141,7 @@ class MoveFilesCleanupTest {
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
         assertEquals(
             Optional.of(
-                FileFieldWriter.getStringRepresentation(
-                    new LinkedFile("", Path.of("test.pdf"), "")
-                )
+                FileFieldWriter.getStringRepresentation(new LinkedFile("", Path.of("test.pdf"), ""))
             ),
             entry.getField(StandardField.FILE)
         );
@@ -170,14 +151,10 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithSubdirectoryPattern() {
-        when(filePreferences.getFileDirectoryPattern())
-            .thenReturn("[entrytype]/[year]/[auth]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]/[year]/[auth]");
         cleanup.cleanup(entry);
 
-        Path fileAfter = defaultFileFolder
-            .resolve("Misc")
-            .resolve("1989")
-            .resolve("test.pdf");
+        Path fileAfter = defaultFileFolder.resolve("Misc").resolve("1989").resolve("test.pdf");
         assertEquals(
             Optional.of(
                 FileFieldWriter.getStringRepresentation(

@@ -26,9 +26,7 @@ public class TexGroupTest {
 
     @Test
     public void containsReturnsTrueForEntryInAux() throws Exception {
-        Path auxFile = Path.of(
-            TexGroupTest.class.getResource("paper.aux").toURI()
-        );
+        Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         TexGroup group = new TexGroup(
             "paper",
             GroupHierarchyType.INDEPENDENT,
@@ -45,9 +43,7 @@ public class TexGroupTest {
 
     @Test
     public void containsReturnsTrueForEntryNotInAux() throws Exception {
-        Path auxFile = Path.of(
-            TexGroupTest.class.getResource("paper.aux").toURI()
-        );
+        Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         TexGroup group = new TexGroup(
             "paper",
             GroupHierarchyType.INDEPENDENT,
@@ -64,9 +60,7 @@ public class TexGroupTest {
 
     @Test
     public void getFilePathReturnsRelativePath() throws Exception {
-        Path auxFile = Path.of(
-            TexGroupTest.class.getResource("paper.aux").toURI()
-        );
+        Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         String user = "Darwin";
         metaData.setLatexFileDirectory(user, auxFile.getParent());
         TexGroup group = new TexGroup(

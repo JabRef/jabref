@@ -33,27 +33,19 @@ public class BstVMTest {
             .withField(StandardField.YEAR, "2005")
             .withField(StandardField.OWNER, "oezbek")
             .withField(StandardField.TIMESTAMP, "2006.05.29")
-            .withField(
-                StandardField.URL,
-                "http://james.howison.name/publications.html"
-            );
+            .withField(StandardField.URL, "http://james.howison.name/publications.html");
     }
 
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
-        BstVM vm = new BstVM(
-            Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst")
-        );
+        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
         String expected =
             "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
         String result = vm.render(testEntries);
 
-        assertEquals(
-            expected.replaceAll("\\s", ""),
-            result.replaceAll("\\s", "")
-        );
+        assertEquals(expected.replaceAll("\\s", ""), result.replaceAll("\\s", ""));
     }
 
     @Test
@@ -147,9 +139,7 @@ public class BstVMTest {
 
     @Test
     public void testHypthenatedName() throws RecognitionException, IOException {
-        BstVM vm = new BstVM(
-            Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst")
-        );
+        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(
             new BibEntry(StandardEntryType.Article)
                 .withCitationKey("canh05")

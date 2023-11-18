@@ -54,9 +54,7 @@ public enum SpecialField implements Field {
         for (SpecialFieldValue value : values) {
             this.values.add(value);
             value.getKeyword().ifPresent(keywords::add);
-            value
-                .getFieldValue()
-                .ifPresent(fieldValue -> map.put(fieldValue, value));
+            value.getFieldValue().ifPresent(fieldValue -> map.put(fieldValue, value));
         }
     }
 

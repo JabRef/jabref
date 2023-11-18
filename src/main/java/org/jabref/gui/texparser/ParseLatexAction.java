@@ -18,14 +18,10 @@ public class ParseLatexAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         BibDatabaseContext database = stateManager
             .getActiveDatabase()
             .orElseThrow(NullPointerException::new);
-        dialogService.showCustomDialogAndWait(
-            new ParseLatexDialogView(database)
-        );
+        dialogService.showCustomDialogAndWait(new ParseLatexDialogView(database));
     }
 }

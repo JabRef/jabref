@@ -33,14 +33,9 @@ class LayoutTest {
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
     }
 
-    private String layout(
-        String layout,
-        List<Path> fileDirForDatabase,
-        BibEntry entry
-    ) throws IOException {
-        StringReader layoutStringReader = new StringReader(
-            layout.replace("__NEWLINE__", "\n")
-        );
+    private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry)
+        throws IOException {
+        StringReader layoutStringReader = new StringReader(layout.replace("__NEWLINE__", "\n"));
 
         return new LayoutHelper(
             layoutStringReader,
@@ -85,10 +80,7 @@ class LayoutTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "This\nis\na\ntext");
 
-        String actual = layout(
-            "\\begin{author}\\format[HTMLChars]{\\author}\\end{author}",
-            entry
-        );
+        String actual = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author}", entry);
 
         assertEquals("This<br>is<br>a<br>text", actual);
     }
@@ -158,11 +150,7 @@ class LayoutTest {
         assertEquals("", layoutText);
 
         // ! (NOT)
-        layoutText =
-            layout(
-                "\\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year}",
-                entry
-            );
+        layoutText = layout("\\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year}", entry);
 
         assertEquals("(no year)", layoutText);
 
@@ -183,9 +171,7 @@ class LayoutTest {
     @Test
     void wrapFileLinksExpandFile() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.addFile(
-            new LinkedFile("Test file", Path.of("encrypted.pdf"), "PDF")
-        );
+        entry.addFile(new LinkedFile("Test file", Path.of("encrypted.pdf"), "PDF"));
 
         String layoutText = layout(
             "\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",
@@ -195,8 +181,7 @@ class LayoutTest {
 
         assertEquals(
             "1. Test file (" +
-            new File("src/test/resources/pdfs/encrypted.pdf")
-                .getCanonicalPath() +
+            new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath() +
             ")",
             layoutText
         );
@@ -226,10 +211,7 @@ class LayoutTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
 
-        String layoutText = layout(
-            "\\begin{author}\\format[DCA]{\\author}\\end{author}",
-            entry
-        );
+        String layoutText = layout("\\begin{author}\\format[DCA]{\\author}\\end{author}", entry);
 
         assertEquals("JoeDoe and MaryJ", layoutText);
     }

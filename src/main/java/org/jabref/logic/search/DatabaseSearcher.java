@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseSearcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DatabaseSearcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcher.class);
     private final SearchQuery query;
 
     private final BibDatabase database;

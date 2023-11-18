@@ -22,10 +22,7 @@ public class NameFormatterTest {
 
         assertEquals(
             "Doe",
-            l.format(
-                "Joe Doe",
-                "1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{last}@@*@*@more"
-            )
+            l.format("Joe Doe", "1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{last}@@*@*@more")
         );
 
         assertEquals(
@@ -64,10 +61,7 @@ public class NameFormatterTest {
             "1@1@{vv }{ll}{ ff}@@2@1@{vv }{ll}{ ff}@2@ and {vv }{ll}{, ff}@@*@1@{vv }{ll}{ ff}@2..-2@, {vv }{ll}{, ff}@-1@ and {vv }{ll}{, ff}";
 
         // Single Names
-        assertEquals(
-            "Vandekamp Mary~Ann",
-            a.format("Mary Ann Vandekamp", formatString)
-        );
+        assertEquals("Vandekamp Mary~Ann", a.format("Mary Ann Vandekamp", formatString));
 
         // Two names
         assertEquals(
@@ -78,18 +72,12 @@ public class NameFormatterTest {
         // Three names
         assertEquals(
             "von Neumann John, Smith, John and Black~Brown, Peter",
-            a.format(
-                "von Neumann, John and Smith, John and Black Brown, Peter",
-                formatString
-            )
+            a.format("von Neumann, John and Smith, John and Black Brown, Peter", formatString)
         );
 
         assertEquals(
             "von Neumann John, Smith, John and Black~Brown, Peter",
-            a.format(
-                "John von Neumann and John Smith and Black Brown, Peter",
-                formatString
-            )
+            a.format("John von Neumann and John Smith and Black Brown, Peter", formatString)
         );
 
         // Four names

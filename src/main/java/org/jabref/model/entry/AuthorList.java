@@ -116,8 +116,9 @@ import org.jabref.logic.importer.AuthorListParser;
 @AllowedToUseLogic("because it needs access to AuthorList parser")
 public class AuthorList {
 
-    private static final Map<String, AuthorList> AUTHOR_CACHE =
-        Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<String, AuthorList> AUTHOR_CACHE = Collections.synchronizedMap(
+        new WeakHashMap<>()
+    );
     private final List<Author> authors;
     private AuthorList latexFreeAuthors;
 
@@ -142,10 +143,7 @@ public class AuthorList {
     }
 
     public static Collector<Author, ?, AuthorList> collect() {
-        return Collectors.collectingAndThen(
-            Collectors.toUnmodifiableList(),
-            AuthorList::new
-        );
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
     }
 
     private static String andCoordinatedConjunction(
@@ -153,17 +151,11 @@ public class AuthorList {
         Function<Author, String> style,
         boolean oxfordComma
     ) {
-        var formattedAuthors = authors
-            .stream()
-            .map(style)
-            .collect(Collectors.toUnmodifiableList());
+        var formattedAuthors = authors.stream().map(style).collect(Collectors.toUnmodifiableList());
         return andCoordinatedConjunction(formattedAuthors, oxfordComma);
     }
 
-    private static String andCoordinatedConjunction(
-        List<String> authors,
-        boolean oxfordComma
-    ) {
+    private static String andCoordinatedConjunction(List<String> authors, boolean oxfordComma) {
         String lastDelimiter = oxfordComma ? ", and " : " and ";
         int lastIndex = authors.size() - 1;
         return switch (authors.size()) {
@@ -206,9 +198,7 @@ public class AuthorList {
         boolean abbreviate,
         boolean oxfordComma
     ) {
-        return AuthorList
-            .parse(authors)
-            .getAsFirstLastNames(abbreviate, oxfordComma);
+        return AuthorList.parse(authors).getAsFirstLastNames(abbreviate, oxfordComma);
     }
 
     /**
@@ -230,9 +220,7 @@ public class AuthorList {
         boolean abbreviate,
         boolean oxfordComma
     ) {
-        return AuthorList
-            .parse(authors)
-            .getAsLastFirstNames(abbreviate, oxfordComma);
+        return AuthorList.parse(authors).getAsLastFirstNames(abbreviate, oxfordComma);
     }
 
     /**
@@ -249,10 +237,7 @@ public class AuthorList {
      *
      * @see AuthorList#getAsLastFirstNamesWithAnd
      */
-    public static String fixAuthorLastNameFirst(
-        String authors,
-        boolean abbreviate
-    ) {
+    public static String fixAuthorLastNameFirst(String authors, boolean abbreviate) {
         return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(abbreviate);
     }
 
@@ -261,10 +246,7 @@ public class AuthorList {
      *
      * @see AuthorList#getAsLastNames
      */
-    public static String fixAuthorLastNameOnlyCommas(
-        String authors,
-        boolean oxfordComma
-    ) {
+    public static String fixAuthorLastNameOnlyCommas(String authors, boolean oxfordComma) {
         return AuthorList.parse(authors).getAsLastNames(oxfordComma);
     }
 
@@ -330,10 +312,7 @@ public class AuthorList {
         if (latexFreeAuthors == null) {
             latexFreeAuthors =
                 new AuthorList(
-                    authors
-                        .stream()
-                        .map(Author::latexFree)
-                        .collect(Collectors.toUnmodifiableList())
+                    authors.stream().map(Author::latexFree).collect(Collectors.toUnmodifiableList())
                 );
             latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
         }
@@ -357,9 +336,7 @@ public class AuthorList {
         return switch (authors.size()) {
             case 0 -> "";
             case 1 -> authors.get(0).getLastOnly();
-            case 2 -> authors.get(0).getLastOnly() +
-            " and " +
-            authors.get(1).getLastOnly();
+            case 2 -> authors.get(0).getLastOnly() + " and " + authors.get(1).getLastOnly();
             default -> authors.get(0).getLastOnly() + " et al.";
         };
     }
@@ -380,11 +357,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastNames(boolean oxfordComma) {
-        return andCoordinatedConjunction(
-            getAuthors(),
-            Author::getLastOnly,
-            oxfordComma
-        );
+        return andCoordinatedConjunction(getAuthors(), Author::getLastOnly, oxfordComma);
     }
 
     /**

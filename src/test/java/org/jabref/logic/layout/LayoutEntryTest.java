@@ -40,10 +40,7 @@ public class LayoutEntryTest {
             "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices"
         );
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
-        mBTE.setField(
-            StandardField.KEYWORDS,
-            "android, mobile devices, security"
-        );
+        mBTE.setField(StandardField.KEYWORDS, "android, mobile devices, security");
         mBTE.setField(new UnknownField("posted-at"), "2010-08-11 15:00:49");
         mBTE.setField(StandardField.LOCATION, "Dublin, Ireland");
         mBTE.setCitationKey("chaudhuri-plas09");
@@ -57,17 +54,11 @@ public class LayoutEntryTest {
             new UnknownField("citeulike-linkout-1"),
             "http://dx.doi.org/10.1145/1554339.1554341"
         );
-        mBTE.setField(
-            StandardField.URL,
-            "http://dx.doi.org/10.1145/1554339.1554341"
-        );
+        mBTE.setField(StandardField.URL, "http://dx.doi.org/10.1145/1554339.1554341");
         mBTE.setField(StandardField.PUBLISHER, "ACM");
         mBTE.setField(StandardField.TIMESTAMP, "2010.11.11");
         mBTE.setField(StandardField.AUTHOR, "Chaudhuri, Avik");
-        mBTE.setField(
-            StandardField.TITLE,
-            "Language-based security on Android"
-        );
+        mBTE.setField(StandardField.TITLE, "Language-based security on Android");
         mBTE.setField(StandardField.ADDRESS, "New York, NY, USA");
         mBTE.setField(SpecialField.PRIORITY, "2");
         mBTE.setField(StandardField.ISBN, "978-1-60558-645-8");
@@ -81,9 +72,7 @@ public class LayoutEntryTest {
     }
 
     public String layout(String layoutFile, BibEntry entry) throws IOException {
-        StringReader sr = new StringReader(
-            layoutFile.replace("__NEWLINE__", "\n")
-        );
+        StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(
             sr,
             mock(LayoutFormatterPreferences.class),
@@ -97,16 +86,10 @@ public class LayoutEntryTest {
     @Test
     public void testParseMethodCalls() {
         assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size());
-        assertEquals(
-            "bla",
-            (LayoutEntry.parseMethodsCalls("bla").get(0)).get(0)
-        );
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla").get(0)).get(0));
 
         assertEquals(1, LayoutEntry.parseMethodsCalls("bla,").size());
-        assertEquals(
-            "bla",
-            (LayoutEntry.parseMethodsCalls("bla,").get(0)).get(0)
-        );
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,").get(0)).get(0));
 
         assertEquals(1, LayoutEntry.parseMethodsCalls("_bla.bla.blub,").size());
         assertEquals(
@@ -115,63 +98,31 @@ public class LayoutEntryTest {
         );
 
         assertEquals(2, LayoutEntry.parseMethodsCalls("bla,foo").size());
-        assertEquals(
-            "bla",
-            (LayoutEntry.parseMethodsCalls("bla,foo").get(0)).get(0)
-        );
-        assertEquals(
-            "foo",
-            (LayoutEntry.parseMethodsCalls("bla,foo").get(1)).get(0)
-        );
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,foo").get(0)).get(0));
+        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla,foo").get(1)).get(0));
 
-        assertEquals(
-            2,
-            LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size()
-        );
+        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
         assertEquals(
             "bla",
-            (LayoutEntry
-                    .parseMethodsCalls("bla(\"test\"),foo(\"fark\")")
-                    .get(0)).get(0)
+            (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)).get(0)
         );
         assertEquals(
             "foo",
-            (LayoutEntry
-                    .parseMethodsCalls("bla(\"test\"),foo(\"fark\")")
-                    .get(1)).get(0)
+            (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)).get(0)
         );
         assertEquals(
             "test",
-            (LayoutEntry
-                    .parseMethodsCalls("bla(\"test\"),foo(\"fark\")")
-                    .get(0)).get(1)
+            (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)).get(1)
         );
         assertEquals(
             "fark",
-            (LayoutEntry
-                    .parseMethodsCalls("bla(\"test\"),foo(\"fark\")")
-                    .get(1)).get(1)
+            (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)).get(1)
         );
 
-        assertEquals(
-            2,
-            LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size()
-        );
-        assertEquals(
-            "bla",
-            (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(0)
-        );
-        assertEquals(
-            "foo",
-            (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(0)
-        );
-        assertEquals(
-            "test",
-            (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(1)
-        );
-        assertEquals(
-            "fark",
-            (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(1)
-        );
+        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size());
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(0));
+        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(0));
+        assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(1));
+        assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(1));
     }
 }

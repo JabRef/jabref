@@ -10,18 +10,15 @@ import javafx.collections.ObservableList;
 
 public class OpenOfficePreferences {
 
-    public static final String DEFAULT_WIN_EXEC_PATH =
-        "C:\\Program Files\\LibreOffice 5\\program";
+    public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\LibreOffice 5\\program";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
 
     public static final String DEFAULT_OSX_EXEC_PATH =
         "/Applications/LibreOffice.app/Contents/MacOS/soffice";
     public static final String OSX_EXECUTABLE = "soffice";
 
-    public static final String DEFAULT_LINUX_EXEC_PATH =
-        "/usr/lib/libreoffice/program/soffice";
-    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH =
-        "/app/bin/soffice";
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
+    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
     private final StringProperty executablePath;

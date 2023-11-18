@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PushToApplicationCommand extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PushToApplicationCommand.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToApplicationCommand.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -56,29 +54,20 @@ public class PushToApplicationCommand extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         setApplication(
-            preferencesService
-                .getPushToApplicationPreferences()
-                .getActiveApplicationName()
+            preferencesService.getPushToApplicationPreferences().getActiveApplicationName()
         );
 
         EasyBind.subscribe(
-            preferencesService
-                .getPushToApplicationPreferences()
-                .activeApplicationNameProperty(),
+            preferencesService.getPushToApplicationPreferences().activeApplicationNameProperty(),
             this::setApplication
         );
 
-        this.executable.bind(
-                needsDatabase(stateManager)
-                    .and(needsEntriesSelected(stateManager))
-            );
+        this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(
                 BindingsHelper.ifThenElse(
                     this.executable,
                     "",
-                    Localization.lang(
-                        "This operation requires one or more entries to be selected."
-                    )
+                    Localization.lang("This operation requires one or more entries to be selected.")
                 )
             );
     }
@@ -97,11 +86,7 @@ public class PushToApplicationCommand extends SimpleCommand {
             preferencesService.getKeyBindingRepository()
         );
         PushToApplication application = PushToApplications
-            .getApplicationByName(
-                applicationName,
-                dialogService,
-                preferencesService
-            )
+            .getApplicationByName(applicationName, dialogService, preferencesService)
             .orElse(new PushToEmacs(dialogService, preferencesService));
 
         preferencesService
@@ -111,17 +96,9 @@ public class PushToApplicationCommand extends SimpleCommand {
 
         reconfigurableControls.forEach(object -> {
             if (object instanceof MenuItem) {
-                factory.configureMenuItem(
-                    application.getAction(),
-                    this,
-                    (MenuItem) object
-                );
+                factory.configureMenuItem(application.getAction(), this, (MenuItem) object);
             } else if (object instanceof ButtonBase) {
-                factory.configureIconButton(
-                    application.getAction(),
-                    this,
-                    (ButtonBase) object
-                );
+                factory.configureIconButton(application.getAction(), this, (ButtonBase) object);
             }
         });
     }
@@ -130,10 +107,7 @@ public class PushToApplicationCommand extends SimpleCommand {
         return application.getAction();
     }
 
-    private static String getKeyString(
-        List<BibEntry> entries,
-        String delimiter
-    ) {
+    private static String getKeyString(List<BibEntry> entries, String delimiter) {
         StringBuilder result = new StringBuilder();
         Optional<String> citeKey;
         boolean first = true;
@@ -185,10 +159,7 @@ public class PushToApplicationCommand extends SimpleCommand {
         application.pushEntries(
             database,
             stateManager.getSelectedEntries(),
-            getKeyString(
-                stateManager.getSelectedEntries(),
-                application.getDelimiter()
-            )
+            getKeyString(stateManager.getSelectedEntries(), application.getDelimiter())
         );
     }
 }

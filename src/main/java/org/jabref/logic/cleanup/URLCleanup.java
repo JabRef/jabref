@@ -28,27 +28,16 @@ public class URLCleanup implements CleanupJob {
         "<>\\\\]+\\)))*\\))+(?:\\(([^\\s()<>\\\\]+|(\\([^\\s()<>\\\\]+\\" +
         ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
 
-    public static final String DATE_TERMS_REGEX =
-        "accessed on|visited on|retrieved on|viewed on";
+    public static final String DATE_TERMS_REGEX = "accessed on|visited on|retrieved on|viewed on";
 
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
     private static final Field URLDATE_FIELD = StandardField.URLDATE;
 
-    final Pattern urlPattern = Pattern.compile(
-        URL_REGEX,
-        Pattern.CASE_INSENSITIVE
-    );
-    final Pattern dateTermsPattern = Pattern.compile(
-        DATE_TERMS_REGEX,
-        Pattern.CASE_INSENSITIVE
-    );
-    final Pattern datePattern = Pattern.compile(
-        Date.DATE_REGEX,
-        Pattern.CASE_INSENSITIVE
-    );
-    private final NormalizeDateFormatter formatter =
-        new NormalizeDateFormatter();
+    final Pattern urlPattern = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
+    final Pattern dateTermsPattern = Pattern.compile(DATE_TERMS_REGEX, Pattern.CASE_INSENSITIVE);
+    final Pattern datePattern = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);
+    private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -57,9 +46,7 @@ public class URLCleanup implements CleanupJob {
         String noteFieldValue = entry.getField(NOTE_FIELD).orElse("");
 
         final Matcher urlMatcher = urlPattern.matcher(noteFieldValue);
-        final Matcher dateTermsMatcher = dateTermsPattern.matcher(
-            noteFieldValue
-        );
+        final Matcher dateTermsMatcher = dateTermsPattern.matcher(noteFieldValue);
         final Matcher dateMatcher = datePattern.matcher(noteFieldValue);
 
         if (urlMatcher.find()) {
@@ -87,14 +74,10 @@ public class URLCleanup implements CleanupJob {
             if (entry.hasField(URL_FIELD)) {
                 String urlFieldValue = entry.getField(URL_FIELD).orElse("");
                 if (urlFieldValue.equals(url)) {
-                    entry
-                        .setField(NOTE_FIELD, newNoteFieldValue)
-                        .ifPresent(changes::add);
+                    entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                 }
             } else {
-                entry
-                    .setField(NOTE_FIELD, newNoteFieldValue)
-                    .ifPresent(changes::add);
+                entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                 entry.setField(URL_FIELD, url).ifPresent(changes::add);
             }
 
@@ -105,29 +88,17 @@ public class URLCleanup implements CleanupJob {
                     String date = dateMatcher.group();
                     String formattedDate = formatter.format(date);
                     newNoteFieldValue =
-                        newNoteFieldValue
-                            .replace(date, "")
-                            .trim()
-                            .replaceAll("^,|,$", "")
-                            .trim(); // either starts or ends with a comma
+                        newNoteFieldValue.replace(date, "").trim().replaceAll("^,|,$", "").trim(); // either starts or ends with a comma
 
                     // Same approach with the URL cleanup.
                     if (entry.hasField(URLDATE_FIELD)) {
-                        String urlDateFieldValue = entry
-                            .getField(URLDATE_FIELD)
-                            .orElse("");
+                        String urlDateFieldValue = entry.getField(URLDATE_FIELD).orElse("");
                         if (urlDateFieldValue.equals(formattedDate)) {
-                            entry
-                                .setField(NOTE_FIELD, newNoteFieldValue)
-                                .ifPresent(changes::add);
+                            entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                         }
                     } else {
-                        entry
-                            .setField(NOTE_FIELD, newNoteFieldValue)
-                            .ifPresent(changes::add);
-                        entry
-                            .setField(URLDATE_FIELD, formattedDate)
-                            .ifPresent(changes::add);
+                        entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
+                        entry.setField(URLDATE_FIELD, formattedDate).ifPresent(changes::add);
                     }
                 }
             }

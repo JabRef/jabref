@@ -25,13 +25,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         GroupsPreferences groupsPreferences,
         DialogService dialogService
     ) {
-        super(
-            SidePaneType.GROUPS,
-            closeCommand,
-            moveUpCommand,
-            moveDownCommand,
-            contentFactory
-        );
+        super(SidePaneType.GROUPS, closeCommand, moveUpCommand, moveDownCommand, contentFactory);
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
         setupIntersectionUnionToggle();
@@ -40,21 +34,15 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
             groupsPreferences.groupViewModeProperty(),
             mode -> {
                 GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
-                intersectionUnionToggle.setGraphic(
-                    modeViewModel.getUnionIntersectionGraphic()
-                );
-                intersectionUnionToggle.setTooltip(
-                    modeViewModel.getUnionIntersectionTooltip()
-                );
+                intersectionUnionToggle.setGraphic(modeViewModel.getUnionIntersectionGraphic());
+                intersectionUnionToggle.setTooltip(modeViewModel.getUnionIntersectionTooltip());
             }
         );
     }
 
     private void setupIntersectionUnionToggle() {
         addExtraButtonToHeader(intersectionUnionToggle, 0);
-        intersectionUnionToggle.setOnAction(event ->
-            new ToggleUnionIntersectionAction().execute()
-        );
+        intersectionUnionToggle.setOnAction(event -> new ToggleUnionIntersectionAction().execute());
     }
 
     private class ToggleUnionIntersectionAction extends SimpleCommand {
@@ -65,14 +53,10 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
 
             if (mode == GroupViewMode.UNION) {
                 groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION);
-                dialogService.notify(
-                    Localization.lang("Group view mode set to intersection")
-                );
+                dialogService.notify(Localization.lang("Group view mode set to intersection"));
             } else if (mode == GroupViewMode.INTERSECTION) {
                 groupsPreferences.setGroupViewMode(GroupViewMode.UNION);
-                dialogService.notify(
-                    Localization.lang("Group view mode set to union")
-                );
+                dialogService.notify(Localization.lang("Group view mode set to union"));
             }
         }
     }

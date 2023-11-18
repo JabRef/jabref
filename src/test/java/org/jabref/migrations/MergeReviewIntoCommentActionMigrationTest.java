@@ -26,27 +26,17 @@ class MergeReviewIntoCommentActionMigrationTest {
 
     @Test
     public void noFields() {
-        ParserResult actualParserResult = new ParserResult(
-            Collections.singletonList(entry)
-        );
+        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         action.performMigration(actualParserResult);
 
-        assertEquals(
-            entry,
-            actualParserResult
-                .getDatabase()
-                .getEntryByCitationKey("Entry1")
-                .get()
-        );
+        assertEquals(entry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     @Test
     public void reviewField() {
         entry.setField(StandardField.REVIEW, "My Review");
-        ParserResult actualParserResult = new ParserResult(
-            Collections.singletonList(entry)
-        );
+        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         expectedEntry.setField(StandardField.COMMENT, "My Review");
 
@@ -54,40 +44,26 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         assertEquals(
             expectedEntry,
-            actualParserResult
-                .getDatabase()
-                .getEntryByCitationKey("Entry1")
-                .get()
+            actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get()
         );
     }
 
     @Test
     public void commentField() {
         entry.setField(StandardField.COMMENT, "My Comment");
-        ParserResult actualParserResult = new ParserResult(
-            Collections.singletonList(entry)
-        );
+        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         action.performMigration(actualParserResult);
 
-        assertEquals(
-            entry,
-            actualParserResult
-                .getDatabase()
-                .getEntryByCitationKey("Entry1")
-                .get()
-        );
+        assertEquals(entry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     @Test
     public void multiLineReviewField() {
-        String commentString =
-            "My Review\n\nSecond Paragraph\n\nThird Paragraph";
+        String commentString = "My Review\n\nSecond Paragraph\n\nThird Paragraph";
 
         entry.setField(StandardField.REVIEW, commentString);
-        ParserResult actualParserResult = new ParserResult(
-            Collections.singletonList(entry)
-        );
+        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         expectedEntry.setField(StandardField.COMMENT, commentString);
 
@@ -95,10 +71,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         assertEquals(
             expectedEntry,
-            actualParserResult
-                .getDatabase()
-                .getEntryByCitationKey("Entry1")
-                .get()
+            actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get()
         );
     }
 
@@ -110,9 +83,7 @@ class MergeReviewIntoCommentActionMigrationTest {
         entry.setField(StandardField.REVIEW, "My Review");
         entry.setField(StandardField.COMMENT, "My Comment");
 
-        ParserResult actualParserResult = new ParserResult(
-            Collections.singletonList(entry)
-        );
+        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         expectedEntry.setField(
             StandardField.COMMENT,
@@ -123,10 +94,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         assertEquals(
             expectedEntry,
-            actualParserResult
-                .getDatabase()
-                .getEntryByCitationKey("Entry1")
-                .get()
+            actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get()
         );
     }
 

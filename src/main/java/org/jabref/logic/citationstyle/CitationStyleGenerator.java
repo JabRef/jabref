@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationStyleGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CitationStyleGenerator.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleGenerator.class);
     private static final CSLAdapter CSL_ADAPTER = new CSLAdapter();
 
     private CitationStyleGenerator() {}
@@ -106,24 +104,18 @@ public class CitationStyleGenerator {
                 e
             );
             return Collections.singletonList(
-                Localization.lang(
-                    "Cannot generate preview based on selected citation style."
-                )
+                Localization.lang("Cannot generate preview based on selected citation style.")
             );
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);
             return Collections.singletonList(
-                Localization.lang(
-                    "Cannot generate preview based on selected citation style."
-                )
+                Localization.lang("Cannot generate preview based on selected citation style.")
             );
         } catch (TokenMgrException e) {
             LOGGER.error("Bad character inside BibEntry", e);
             // sadly one cannot easily retrieve the bad char from the TokenMgrError
             return Collections.singletonList(
-                Localization.lang(
-                    "Cannot generate preview based on selected citation style."
-                ) +
+                Localization.lang("Cannot generate preview based on selected citation style.") +
                 outputFormat.getLineSeparator() +
                 Localization.lang("Bad character inside entry") +
                 outputFormat.getLineSeparator() +

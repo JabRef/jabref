@@ -47,9 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BracketedPattern {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BracketedPattern.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
     /**
      * The maximum number of characters in the first author's last name.
@@ -70,17 +68,13 @@ public class BracketedPattern {
     /**
      * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
      */
-    private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile(
-        "[^A-Z]"
-    );
+    private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
 
     /**
      * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
      */
 
-    private static final Pattern INLINE_ABBREVIATION = Pattern.compile(
-        "(?<=\\(\\{)[A-Z]+(?=}\\))"
-    );
+    private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
 
     /**
      * Matches with "dep"/"dip", case-insensitive
@@ -90,9 +84,7 @@ public class BracketedPattern {
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern WHITESPACE = Pattern.compile(
-        "\\p{javaWhitespace}"
-    );
+    private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private enum Institution {
         SCHOOL,
@@ -136,13 +128,9 @@ public class BracketedPattern {
             for (String namePart : nameParts) {
                 if (UNIVERSITIES.matcher(namePart).matches()) {
                     parts.add(Institution.UNIVERSITY);
-                } else if (
-                    TECHNOLOGICAL_INSTITUTES.matcher(namePart).matches()
-                ) {
+                } else if (TECHNOLOGICAL_INSTITUTES.matcher(namePart).matches()) {
                     parts.add(Institution.TECHNOLOGY);
-                } else if (
-                    StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)
-                ) {
+                } else if (StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)) {
                     parts.add(Institution.SCHOOL);
                 } else if (DEPARTMENTS_OR_LABS.matcher(namePart).matches()) {
                     parts.add(Institution.DEPARTMENT);
@@ -197,18 +185,9 @@ public class BracketedPattern {
      * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(
-        BibEntry bibentry,
-        Character keywordDelimiter,
-        BibDatabase database
-    ) {
+    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         Objects.requireNonNull(bibentry);
-        return expandBrackets(
-            this.pattern,
-            keywordDelimiter,
-            bibentry,
-            database
-        );
+        return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
     /**
@@ -228,10 +207,7 @@ public class BracketedPattern {
     ) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
-        return expandBrackets(
-            pattern,
-            expandBracketContent(keywordDelimiter, entry, database)
-        );
+        return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
     }
 
     /**
@@ -253,13 +229,7 @@ public class BracketedPattern {
             List<String> fieldParts = parseFieldAndModifiers(bracket);
             // check whether there is a modifier on the end such as
             // ":lower":
-            expandedPattern =
-                getFieldValue(
-                    entry,
-                    fieldParts.get(0),
-                    keywordDelimiter,
-                    database
-                );
+            expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
             if (fieldParts.size() > 1) {
                 // apply modifiers:
                 expandedPattern =
@@ -288,32 +258,21 @@ public class BracketedPattern {
     ) {
         Objects.requireNonNull(pattern);
         StringBuilder expandedPattern = new StringBuilder();
-        StringTokenizer parsedPattern = new StringTokenizer(
-            pattern,
-            "\\[]\"",
-            true
-        );
+        StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
 
         while (parsedPattern.hasMoreTokens()) {
             String token = parsedPattern.nextToken();
             switch (token) {
                 case "\"" -> appendQuote(expandedPattern, parsedPattern);
                 case "[" -> {
-                    String fieldMarker = contentBetweenBrackets(
-                        parsedPattern,
-                        pattern
-                    );
-                    expandedPattern.append(
-                        bracketContentHandler.apply(fieldMarker)
-                    );
+                    String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
+                    expandedPattern.append(bracketContentHandler.apply(fieldMarker));
                 }
                 case "\\" -> {
                     if (parsedPattern.hasMoreTokens()) {
                         expandedPattern.append(parsedPattern.nextToken());
                     } else {
-                        LOGGER.warn(
-                            "Found a \"\\\" that is not part of an escape sequence"
-                        );
+                        LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
                 }
                 default -> expandedPattern.append(token);
@@ -333,10 +292,7 @@ public class BracketedPattern {
      * @param tokenizer the tokenizer producing the tokens
      * @return the content enclosed by brackets
      */
-    private static String contentBetweenBrackets(
-        StringTokenizer tokenizer,
-        final String pattern
-    ) {
+    private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
         StringBuilder bracketContent = new StringBuilder();
         boolean foundClosingBracket = false;
         int subBrackets = 0;
@@ -378,10 +334,7 @@ public class BracketedPattern {
      * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
      * @param tokenizer     the tokenizer producing the tokens
      */
-    private static void appendQuote(
-        StringBuilder stringBuilder,
-        StringTokenizer tokenizer
-    ) {
+    private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
         stringBuilder.append("\""); // We know that the previous token was \"
         String token = "";
         while (tokenizer.hasMoreTokens() && !"\"".equals(token)) {
@@ -421,12 +374,7 @@ public class BracketedPattern {
                 } else if (unparsedAuthors.isEmpty()) {
                     // special feature: A pattern starting with "auth" falls back to the editor
                     unparsedAuthors =
-                        entry
-                            .getResolvedFieldOrAlias(
-                                StandardField.EDITOR,
-                                database
-                            )
-                            .orElse("");
+                        entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
                 }
 
                 AuthorList authorList = createAuthorList(unparsedAuthors);
@@ -475,18 +423,12 @@ public class BracketedPattern {
                     int num = Integer.parseInt(pattern.substring(4));
                     return authN(authorList, num);
                 } else if (pattern.matches("authors\\d+")) {
-                    return nAuthors(
-                        authorList,
-                        Integer.parseInt(pattern.substring(7))
-                    );
+                    return nAuthors(authorList, Integer.parseInt(pattern.substring(7)));
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
                     return entry
-                        .getResolvedFieldOrAlias(
-                            FieldFactory.parseField(pattern),
-                            database
-                        )
+                        .getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database)
                         .orElse("");
                 }
             } else if (pattern.startsWith("ed")) {
@@ -537,50 +479,32 @@ public class BracketedPattern {
                     // This "ed" business was a dead end, so just
                     // use it literally:
                     return entry
-                        .getResolvedFieldOrAlias(
-                            FieldFactory.parseField(pattern),
-                            database
-                        )
+                        .getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database)
                         .orElse("");
                 }
             } else if ("firstpage".equals(pattern)) {
                 return firstPage(
-                    entry
-                        .getResolvedFieldOrAlias(StandardField.PAGES, database)
-                        .orElse("")
+                    entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse("")
                 );
             } else if ("pageprefix".equals(pattern)) {
                 return pagePrefix(
-                    entry
-                        .getResolvedFieldOrAlias(StandardField.PAGES, database)
-                        .orElse("")
+                    entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse("")
                 );
             } else if ("lastpage".equals(pattern)) {
                 return lastPage(
-                    entry
-                        .getResolvedFieldOrAlias(StandardField.PAGES, database)
-                        .orElse("")
+                    entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse("")
                 );
             } else if ("title".equals(pattern)) {
                 return camelizeSignificantWordsInTitle(
-                    entry
-                        .getResolvedFieldOrAlias(StandardField.TITLE, database)
-                        .orElse("")
+                    entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")
                 );
             } else if ("fulltitle".equals(pattern)) {
-                return entry
-                    .getResolvedFieldOrAlias(StandardField.TITLE, database)
-                    .orElse("");
+                return entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("");
             } else if ("shorttitle".equals(pattern)) {
                 return getTitleWords(
                     3,
                     removeSmallWords(
-                        entry
-                            .getResolvedFieldOrAlias(
-                                StandardField.TITLE,
-                                database
-                            )
-                            .orElse("")
+                        entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")
                     )
                 );
             } else if ("shorttitleINI".equals(pattern)) {
@@ -588,12 +512,7 @@ public class BracketedPattern {
                     applyModifiers(
                         getTitleWordsWithSpaces(
                             3,
-                            entry
-                                .getResolvedFieldOrAlias(
-                                    StandardField.TITLE,
-                                    database
-                                )
-                                .orElse("")
+                            entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")
                         ),
                         Collections.singletonList("abbr"),
                         0,
@@ -604,19 +523,12 @@ public class BracketedPattern {
                 return getTitleWords(
                     1,
                     removeSmallWords(
-                        entry
-                            .getResolvedFieldOrAlias(
-                                StandardField.TITLE,
-                                database
-                            )
-                            .orElse("")
+                        entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")
                     )
                 );
             } else if ("camel".equals(pattern)) {
                 return getCamelizedTitle(
-                    entry
-                        .getResolvedFieldOrAlias(StandardField.TITLE, database)
-                        .orElse("")
+                    entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")
                 );
             } else if ("shortyear".equals(pattern)) {
                 String yearString = entry
@@ -625,9 +537,7 @@ public class BracketedPattern {
                 if (yearString.isEmpty()) {
                     return yearString;
                     // In press/in preparation/submitted
-                } else if (
-                    yearString.startsWith("in") || yearString.startsWith("sub")
-                ) {
+                } else if (yearString.startsWith("in") || yearString.startsWith("sub")) {
                     return "IP";
                 } else if (yearString.length() > 2) {
                     return yearString.substring(yearString.length() - 2);
@@ -636,10 +546,7 @@ public class BracketedPattern {
                 }
             } else if ("entrytype".equals(pattern)) {
                 return entry
-                    .getResolvedFieldOrAlias(
-                        InternalField.TYPE_HEADER,
-                        database
-                    )
+                    .getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database)
                     .orElse("");
             } else if (pattern.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
@@ -682,10 +589,7 @@ public class BracketedPattern {
             } else {
                 // we haven't seen any special demands
                 return entry
-                    .getResolvedFieldOrAlias(
-                        FieldFactory.parseField(pattern),
-                        database
-                    )
+                    .getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database)
                     .orElse("");
             }
         } catch (NullPointerException ex) {
@@ -717,23 +621,11 @@ public class BracketedPattern {
                     )
                     .orElse(null);
                 return new Author(
-                    author
-                        .getFirst()
-                        .map(LatexToUnicodeAdapter::format)
-                        .orElse(null),
-                    author
-                        .getFirstAbbr()
-                        .map(LatexToUnicodeAdapter::format)
-                        .orElse(null),
-                    author
-                        .getVon()
-                        .map(LatexToUnicodeAdapter::format)
-                        .orElse(null),
+                    author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
                     lastName,
-                    author
-                        .getJr()
-                        .map(LatexToUnicodeAdapter::format)
-                        .orElse(null)
+                    author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
                 );
             })
             .collect(AuthorList.collect());
@@ -788,8 +680,7 @@ public class BracketedPattern {
                 }
                 resultingLabel = abbreviateSB.toString();
             } else {
-                Optional<Formatter> formatter =
-                    Formatters.getFormatterForModifier(modifier);
+                Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                 if (formatter.isPresent()) {
                     resultingLabel = formatter.get().format(resultingLabel);
                 } else if (
@@ -807,10 +698,7 @@ public class BracketedPattern {
                             );
                     }
                 } else {
-                    LOGGER.warn(
-                        "Key generator warning: unknown modifier '{}'.",
-                        modifier
-                    );
+                    LOGGER.warn("Key generator warning: unknown modifier '{}'.", modifier);
                 }
             }
         }
@@ -878,9 +766,7 @@ public class BracketedPattern {
                 String word = titleScanner.next();
 
                 // Camelize the word
-                word =
-                    word.substring(0, 1).toUpperCase(Locale.ROOT) +
-                    word.substring(1);
+                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
 
                 if (stringBuilder.length() > 0) {
                     stringBuilder.append(' ');
@@ -904,19 +790,13 @@ public class BracketedPattern {
                 String word = titleScanner.next();
 
                 // Camelize the word if it is significant
-                boolean camelize = !Word.SMALLER_WORDS.contains(
-                    word.toLowerCase(Locale.ROOT)
-                );
+                boolean camelize = !Word.SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
 
                 // We want to capitalize significant words and the first word of the title
                 if (camelize || (stringJoiner.length() == 0)) {
-                    word =
-                        word.substring(0, 1).toUpperCase(Locale.ROOT) +
-                        word.substring(1);
+                    word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
                 } else {
-                    word =
-                        word.substring(0, 1).toLowerCase(Locale.ROOT) +
-                        word.substring(1);
+                    word = word.substring(0, 1).toLowerCase(Locale.ROOT) + word.substring(1);
                 }
 
                 stringJoiner.add(word);
@@ -941,10 +821,7 @@ public class BracketedPattern {
         String formattedTitle = formatTitle(title);
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            return titleScanner
-                .tokens()
-                .limit(number)
-                .collect(Collectors.joining(" "));
+            return titleScanner.tokens().limit(number).collect(Collectors.joining(" "));
         }
     }
 
@@ -952,11 +829,7 @@ public class BracketedPattern {
         return in
             .codePoints()
             .filter(Character::isLetterOrDigit)
-            .collect(
-                StringBuilder::new,
-                StringBuilder::appendCodePoint,
-                StringBuilder::append
-            )
+            .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
             .toString();
     }
 
@@ -972,11 +845,7 @@ public class BracketedPattern {
             .getAuthors()
             .stream()
             .findFirst()
-            .flatMap(author ->
-                author.getLast().isPresent()
-                    ? author.getLast()
-                    : author.getVon()
-            )
+            .flatMap(author -> author.getLast().isPresent() ? author.getLast() : author.getVon())
             .orElse("");
     }
 
@@ -1005,9 +874,7 @@ public class BracketedPattern {
      * never return null.
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
-        return authorList.isEmpty()
-            ? ""
-            : authorList.getAuthor(0).getLastOnly().replace(" ", "");
+        return authorList.isEmpty() ? "" : authorList.getAuthor(0).getLastOnly().replace(" ", "");
     }
 
     /**
@@ -1056,12 +923,7 @@ public class BracketedPattern {
      * @return the surname of all authors/editors
      */
     static String allAuthors(AuthorList authorList) {
-        return joinAuthorsOnLastName(
-            authorList,
-            authorList.getNumberOfAuthors(),
-            "",
-            "EtAl"
-        );
+        return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "EtAl");
     }
 
     /**
@@ -1100,9 +962,7 @@ public class BracketedPattern {
                 Math.min(3, firstAuthor[firstAuthor.length - 1].length())
             );
         } else {
-            boolean andOthersPresent = authorList
-                .getAuthor(maxAuthors - 1)
-                .equals(Author.OTHERS);
+            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
             if (andOthersPresent) {
                 maxAuthors--;
             }
@@ -1115,10 +975,7 @@ public class BracketedPattern {
             for (String vonAndLast : vonAndLastNames) {
                 // replace all whitespaces by " "
                 // split the lastname at " "
-                String[] nameParts = vonAndLast
-                    .replaceAll("\\s+", " ")
-                    .trim()
-                    .split(" ");
+                String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
                 for (String part : nameParts) {
                     // use first character of each part of lastname
                     alphaStyle.append(part, 0, 1);
@@ -1148,18 +1005,14 @@ public class BracketedPattern {
         String delimiter,
         final String suffix
     ) {
-        final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors
-            ? suffix
-            : "";
+        final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
         return authorList
             .getAuthors()
             .stream()
             .map(author -> {
                 if (author.equals(Author.OTHERS)) {
                     if (suffix.startsWith(delimiter)) {
-                        return Optional.of(
-                            suffix.substring(delimiter.length())
-                        );
+                        return Optional.of(suffix.substring(delimiter.length()));
                     } else {
                         return Optional.of(suffix);
                     }
@@ -1236,11 +1089,7 @@ public class BracketedPattern {
         // have m counting from 0
         int mminusone = m - 1;
 
-        if (
-            (authorList.getNumberOfAuthors() <= mminusone) ||
-            (n < 0) ||
-            (mminusone < 0)
-        ) {
+        if ((authorList.getNumberOfAuthors() <= mminusone) || (n < 0) || (mminusone < 0)) {
             return "";
         }
 
@@ -1399,9 +1248,7 @@ public class BracketedPattern {
             } else if ((currentChar == '(') && !escaped) {
                 inParenthesis++;
                 current.append(currentChar);
-            } else if (
-                (currentChar == ')') && !escaped && (inParenthesis > 0)
-            ) {
+            } else if ((currentChar == ')') && !escaped && (inParenthesis > 0)) {
                 inParenthesis--;
                 current.append(currentChar);
             } else if (currentChar == '\\') {
@@ -1499,9 +1346,7 @@ public class BracketedPattern {
             return LatexToUnicodeAdapter.format(matcher.group());
         }
 
-        Optional<String> unicodeFormattedName = LatexToUnicodeAdapter.parse(
-            content
-        );
+        Optional<String> unicodeFormattedName = LatexToUnicodeAdapter.parse(content);
         if (unicodeFormattedName.isEmpty()) {
             LOGGER.warn(
                 "{} could not be converted to unicode. This can result in an incorrect or missing institute citation key",
@@ -1524,9 +1369,7 @@ public class BracketedPattern {
         String rest = null;
 
         for (int index = 0; index < institutionNameTokens.length; index++) {
-            List<String> tokenParts = getValidInstitutionNameParts(
-                institutionNameTokens[index]
-            );
+            List<String> tokenParts = getValidInstitutionNameParts(institutionNameTokens[index]);
             EnumSet<Institution> tokenTypes = Institution.findTypes(tokenParts);
 
             if (tokenTypes.contains(Institution.UNIVERSITY)) {
@@ -1556,15 +1399,11 @@ public class BracketedPattern {
                 for (String k : tokenParts) {
                     if (noOtherInstitutionKeyWord(k)) {
                         if (tokenTypes.contains(Institution.SCHOOL)) {
-                            schoolSB.append(
-                                NOT_CAPITAL_CHARACTER.matcher(k).replaceAll("")
-                            );
+                            schoolSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(""));
                         }
                         // Explicitly defined department part is build the same way as school
                         if (tokenTypes.contains(Institution.DEPARTMENT)) {
-                            departmentSB.append(
-                                NOT_CAPITAL_CHARACTER.matcher(k).replaceAll("")
-                            );
+                            departmentSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(""));
                         }
                     }
                 }
@@ -1594,8 +1433,7 @@ public class BracketedPattern {
         return (
             (university == null ? Objects.toString(rest, "") : university) +
             (school == null ? "" : school) +
-            ((department == null) ||
-                    ((school != null) && department.equals(school))
+            ((department == null) || ((school != null) && department.equals(school))
                     ? ""
                     : department)
         );
@@ -1628,8 +1466,7 @@ public class BracketedPattern {
                     // remove empty
                     (part.charAt(part.length() - 1) != '.') &&
                     Character.isUpperCase(part.charAt(0))) ||
-                ((part.length() >= 3) &&
-                    "uni".equalsIgnoreCase(part.substring(0, 3)))
+                ((part.length() >= 3) && "uni".equalsIgnoreCase(part.substring(0, 3)))
             ) {
                 nameParts.add(part);
             }

@@ -31,11 +31,7 @@ public class LinkedFile implements Serializable {
         "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
-    private static final LinkedFile NULL_OBJECT = new LinkedFile(
-        "",
-        Path.of(""),
-        ""
-    );
+    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -60,11 +56,7 @@ public class LinkedFile implements Serializable {
     }
 
     public LinkedFile(URL link, String fileType) {
-        this(
-            "",
-            Objects.requireNonNull(link).toString(),
-            Objects.requireNonNull(fileType)
-        );
+        this("", Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
     }
 
     public LinkedFile(String description, URL link, String fileType) {

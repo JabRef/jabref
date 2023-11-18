@@ -38,12 +38,9 @@ import org.slf4j.LoggerFactory;
  * This class controls the user interface of the study definition management dialog. The UI elements and their layout
  * are defined in the FXML file.
  */
-public class ManageStudyDefinitionView
-    extends BaseDialog<SlrStudyAndDirectory> {
+public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ManageStudyDefinitionView.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionView.class);
 
     @FXML
     private TextField studyTitle;
@@ -160,8 +157,7 @@ public class ManageStudyDefinitionView
     }
 
     private void setupSaveSurveyButton(boolean isEdit) {
-        Button saveSurveyButton = (Button) this.getDialogPane()
-            .lookupButton(saveSurveyButtonType);
+        Button saveSurveyButton = (Button) this.getDialogPane().lookupButton(saveSurveyButtonType);
 
         if (!isEdit) {
             saveSurveyButton.setText(Localization.lang("Start survey"));
@@ -220,9 +216,7 @@ public class ManageStudyDefinitionView
 
         // Listen whether any catalogs are removed from selection -> Add back to the catalog selector
         studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
-        studyDirectory
-            .textProperty()
-            .bindBidirectional(viewModel.getDirectory());
+        studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
 
         initAuthorTab();
         initQuestionsTab();
@@ -237,11 +231,7 @@ public class ManageStudyDefinitionView
             authorsColumn,
             authorsActionColumn
         );
-        setupCellFactories(
-            authorsColumn,
-            authorsActionColumn,
-            viewModel::deleteAuthor
-        );
+        setupCellFactories(authorsColumn, authorsActionColumn, viewModel::deleteAuthor);
         authorTableView.setItems(viewModel.getAuthors());
     }
 
@@ -252,11 +242,7 @@ public class ManageStudyDefinitionView
             questionsColumn,
             questionsActionColumn
         );
-        setupCellFactories(
-            questionsColumn,
-            questionsActionColumn,
-            viewModel::deleteQuestion
-        );
+        setupCellFactories(questionsColumn, questionsActionColumn, viewModel::deleteQuestion);
         questionTableView.setItems(viewModel.getResearchQuestions());
     }
 
@@ -267,22 +253,14 @@ public class ManageStudyDefinitionView
             queriesColumn,
             queriesActionColumn
         );
-        setupCellFactories(
-            queriesColumn,
-            queriesActionColumn,
-            viewModel::deleteQuery
-        );
+        setupCellFactories(queriesColumn, queriesActionColumn, viewModel::deleteQuery);
         queryTableView.setItems(viewModel.getQueries());
 
         // TODO: Keep until PR #7279 is merged
         helpIcon.setTooltip(
             new Tooltip(
                 new StringJoiner("\n")
-                    .add(
-                        Localization.lang(
-                            "Query terms are separated by spaces."
-                        )
-                    )
+                    .add(Localization.lang("Query terms are separated by spaces."))
                     .add(
                         Localization.lang(
                             "All query terms are joined using the logical AND, and OR operators"
@@ -318,17 +296,11 @@ public class ManageStudyDefinitionView
 
         catalogEnabledColumn.setResizable(false);
         catalogEnabledColumn.setReorderable(false);
-        catalogEnabledColumn.setCellFactory(
-            CheckBoxTableCell.forTableColumn(catalogEnabledColumn)
-        );
-        catalogEnabledColumn.setCellValueFactory(param ->
-            param.getValue().enabledProperty()
-        );
+        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
+        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
 
         catalogColumn.setEditable(false);
-        catalogColumn.setCellValueFactory(param ->
-            param.getValue().nameProperty()
-        );
+        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         catalogTable.setItems(viewModel.getCatalogs());
     }
@@ -356,16 +328,10 @@ public class ManageStudyDefinitionView
         TableColumn<String, String> actionColumn,
         Consumer<String> removeAction
     ) {
-        contentColumn.setCellValueFactory(param ->
-            new SimpleStringProperty(param.getValue())
-        );
-        actionColumn.setCellValueFactory(param ->
-            new SimpleStringProperty(param.getValue())
-        );
+        contentColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        actionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
         new ValueTableCellFactory<String, String>()
-            .withGraphic(item ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
+            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
             .withTooltip(name -> Localization.lang("Remove"))
             .withOnMouseClickedEvent(item -> evt -> removeAction.accept(item))
             .install(actionColumn);
@@ -397,9 +363,7 @@ public class ManageStudyDefinitionView
                 .build();
 
         viewModel.setStudyDirectory(
-            dialogService.showDirectorySelectionDialog(
-                directoryDialogConfiguration
-            )
+            dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
         );
     }
 }

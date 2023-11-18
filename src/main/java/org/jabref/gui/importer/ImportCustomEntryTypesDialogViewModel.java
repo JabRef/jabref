@@ -21,11 +21,9 @@ public class ImportCustomEntryTypesDialogViewModel {
     private final BibDatabaseMode mode;
     private final PreferencesService preferencesService;
 
-    private final ObservableList<BibEntryType> newTypes =
+    private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
+    private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes =
         FXCollections.observableArrayList();
-    private final ObservableList<
-        BibEntryTypePrefsAndFileViewModel
-    > differentCustomizationTypes = FXCollections.observableArrayList();
 
     public ImportCustomEntryTypesDialogViewModel(
         BibDatabaseMode mode,
@@ -36,27 +34,20 @@ public class ImportCustomEntryTypesDialogViewModel {
         this.preferencesService = preferencesService;
 
         for (BibEntryType customType : entryTypes) {
-            Optional<BibEntryType> currentlyStoredType =
-                Globals.entryTypesManager.enrich(customType.getType(), mode);
+            Optional<BibEntryType> currentlyStoredType = Globals.entryTypesManager.enrich(
+                customType.getType(),
+                mode
+            );
             if (currentlyStoredType.isEmpty()) {
                 newTypes.add(customType);
             } else {
                 if (
-                    !EntryTypeFactory.nameAndFieldsAreEqual(
-                        customType,
-                        currentlyStoredType.get()
-                    )
+                    !EntryTypeFactory.nameAndFieldsAreEqual(customType, currentlyStoredType.get())
                 ) {
-                    LOGGER.info(
-                        "currently stored type:    {}",
-                        currentlyStoredType.get()
-                    );
+                    LOGGER.info("currently stored type:    {}", currentlyStoredType.get());
                     LOGGER.info("type provided by library: {}", customType);
                     differentCustomizationTypes.add(
-                        new BibEntryTypePrefsAndFileViewModel(
-                            currentlyStoredType.get(),
-                            customType
-                        )
+                        new BibEntryTypePrefsAndFileViewModel(currentlyStoredType.get(), customType)
                     );
                 }
             }
@@ -67,9 +58,7 @@ public class ImportCustomEntryTypesDialogViewModel {
         return this.newTypes;
     }
 
-    public ObservableList<
-        BibEntryTypePrefsAndFileViewModel
-    > differentCustomizations() {
+    public ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizations() {
         return this.differentCustomizationTypes;
     }
 
@@ -81,17 +70,13 @@ public class ImportCustomEntryTypesDialogViewModel {
             checkedUnknownEntryTypes.forEach(type ->
                 Globals.entryTypesManager.addCustomOrModifiedType(type, mode)
             );
-            preferencesService.storeCustomEntryTypesRepository(
-                Globals.entryTypesManager
-            );
+            preferencesService.storeCustomEntryTypesRepository(Globals.entryTypesManager);
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type ->
                 Globals.entryTypesManager.addCustomOrModifiedType(type, mode)
             );
-            preferencesService.storeCustomEntryTypesRepository(
-                Globals.entryTypesManager
-            );
+            preferencesService.storeCustomEntryTypesRepository(Globals.entryTypesManager);
         }
     }
 }

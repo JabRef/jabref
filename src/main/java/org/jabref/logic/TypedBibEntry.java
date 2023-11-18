@@ -37,18 +37,10 @@ public class TypedBibEntry {
      *
      * @return true if all required fields are set, false otherwise
      */
-    public boolean hasAllRequiredFields(
-        BibEntryTypesManager entryTypesManager
-    ) {
-        Optional<BibEntryType> type = entryTypesManager.enrich(
-            entry.getType(),
-            this.mode
-        );
+    public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
-            return entry.allFieldsPresent(
-                type.get().getRequiredFields(),
-                database.orElse(null)
-            );
+            return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {
             return true;
         }

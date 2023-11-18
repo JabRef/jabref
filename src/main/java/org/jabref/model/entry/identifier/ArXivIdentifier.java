@@ -15,12 +15,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ArXivIdentifier extends EprintIdentifier {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ArXivIdentifier.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
-    private static final String ARXIV_PREFIX =
-        "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
+    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
     private final String identifier;
     private final String classification;
     private final String version;
@@ -64,9 +61,7 @@ public class ArXivIdentifier extends EprintIdentifier {
         return Optional.empty();
     }
 
-    private static Optional<ArXivIdentifier> getArXivIdentifier(
-        Matcher matcher
-    ) {
+    private static Optional<ArXivIdentifier> getArXivIdentifier(Matcher matcher) {
         String id = matcher.group("id");
         String classification = matcher.group("classification");
         if (classification == null) {
@@ -154,9 +149,7 @@ public class ArXivIdentifier extends EprintIdentifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(
-                new URI("https://arxiv.org/abs/" + getNormalized())
-            );
+            return Optional.of(new URI("https://arxiv.org/abs/" + getNormalized()));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

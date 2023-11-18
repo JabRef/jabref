@@ -38,9 +38,7 @@ public class PdfIndexerTest {
         when(context.getDatabasePath())
             .thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
         when(context.getFileDirectories(Mockito.any()))
-            .thenReturn(
-                Collections.singletonList(Path.of("src/test/resources/pdfs"))
-            );
+            .thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
@@ -170,11 +168,7 @@ public class PdfIndexerTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setFiles(
             Collections.singletonList(
-                new LinkedFile(
-                    "Example Thesis",
-                    "metaData.pdf",
-                    StandardFileType.PDF.getName()
-                )
+                new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())
             )
         );
 
@@ -265,11 +259,7 @@ public class PdfIndexerTest {
         metadata.setCitationKey("MetaData2017");
         metadata.setFiles(
             Collections.singletonList(
-                new LinkedFile(
-                    "Metadata file",
-                    "metaData.pdf",
-                    StandardFileType.PDF.getName()
-                )
+                new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())
             )
         );
 

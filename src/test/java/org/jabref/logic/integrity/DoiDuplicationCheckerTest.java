@@ -16,16 +16,11 @@ public class DoiDuplicationCheckerTest {
     private String doiA = "10.1023/A:1022883727209";
     private String doiB = "10.1177/1461444811422887";
     private String doiC = "10.1145/2568225.2568315";
-    private BibEntry doiA_entry1 = new BibEntry()
-        .withField(StandardField.DOI, doiA);
-    private BibEntry doiA_entry2 = new BibEntry()
-        .withField(StandardField.DOI, doiA);
-    private BibEntry doiB_entry1 = new BibEntry()
-        .withField(StandardField.DOI, doiB);
-    private BibEntry doiB_entry2 = new BibEntry()
-        .withField(StandardField.DOI, doiB);
-    private BibEntry doiC_entry1 = new BibEntry()
-        .withField(StandardField.DOI, doiC);
+    private BibEntry doiA_entry1 = new BibEntry().withField(StandardField.DOI, doiA);
+    private BibEntry doiA_entry2 = new BibEntry().withField(StandardField.DOI, doiA);
+    private BibEntry doiB_entry1 = new BibEntry().withField(StandardField.DOI, doiB);
+    private BibEntry doiB_entry2 = new BibEntry().withField(StandardField.DOI, doiB);
+    private BibEntry doiC_entry1 = new BibEntry().withField(StandardField.DOI, doiC);
 
     @Test
     public void testOnePairDuplicateDOI() {

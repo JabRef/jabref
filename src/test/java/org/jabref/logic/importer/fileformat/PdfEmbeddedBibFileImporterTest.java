@@ -48,28 +48,18 @@ class PdfEmbeddedBibFileImporterTest {
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(
-            PdfEmbeddedBibFileImporter.class.getResource("/pdfs/encrypted.pdf")
-                .toURI()
+            PdfEmbeddedBibFileImporter.class.getResource("/pdfs/encrypted.pdf").toURI()
         );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importWorksAsExpected() throws Exception {
         Path file = Path.of(
-            PdfEmbeddedBibFileImporterTest.class.getResource(
-                    "mixedMetadata.pdf"
-                )
-                .toURI()
+            PdfEmbeddedBibFileImporterTest.class.getResource("mixedMetadata.pdf").toURI()
         );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Misc);
         expected.setCitationKey("jabreftext2021");

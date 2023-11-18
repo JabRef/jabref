@@ -46,10 +46,7 @@ public class FieldFormatterCleanup implements CleanupJob {
      * @param entry    the entry to be cleaned up
      * @return a list of changes of the entry
      */
-    private List<FieldChange> cleanupSingleField(
-        Field fieldKey,
-        BibEntry entry
-    ) {
+    private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
             return Collections.emptyList();
@@ -66,18 +63,9 @@ public class FieldFormatterCleanup implements CleanupJob {
                 entry.clearField(fieldKey);
                 newValue = null;
             } else {
-                entry.setField(
-                    fieldKey,
-                    newValue,
-                    EntriesEventSource.SAVE_ACTION
-                );
+                entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
             }
-            FieldChange change = new FieldChange(
-                entry,
-                fieldKey,
-                oldValue,
-                newValue
-            );
+            FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
             return Collections.singletonList(change);
         }
     }
@@ -121,10 +109,7 @@ public class FieldFormatterCleanup implements CleanupJob {
             return true;
         }
         if (obj instanceof FieldFormatterCleanup that) {
-            return (
-                Objects.equals(field, that.field) &&
-                Objects.equals(formatter, that.formatter)
-            );
+            return (Objects.equals(field, that.field) && Objects.equals(formatter, that.formatter));
         }
         return false;
     }

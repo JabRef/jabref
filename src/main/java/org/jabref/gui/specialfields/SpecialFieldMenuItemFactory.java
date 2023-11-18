@@ -24,25 +24,17 @@ public class SpecialFieldMenuItemFactory {
         UndoManager undoManager,
         StateManager stateManager
     ) {
-        SpecialFieldValueViewModel specialField =
-            new SpecialFieldValueViewModel(field.getValues().get(0));
+        SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(
+            field.getValues().get(0)
+        );
         MenuItem menuItem = factory.createMenuItem(
             specialField.getAction(),
             new SpecialFieldViewModel(field, preferencesService, undoManager)
-                .getSpecialFieldAction(
-                    field.getValues().get(0),
-                    frame,
-                    dialogService,
-                    stateManager
-                )
+                .getSpecialFieldAction(field.getValues().get(0), frame, dialogService, stateManager)
         );
         menuItem
             .visibleProperty()
-            .bind(
-                preferencesService
-                    .getSpecialFieldsPreferences()
-                    .specialFieldsEnabledProperty()
-            );
+            .bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
         return menuItem;
     }
 
@@ -61,11 +53,7 @@ public class SpecialFieldMenuItemFactory {
             preferencesService,
             undoManager,
             specialField ->
-                new SpecialFieldViewModel(
-                    field,
-                    preferencesService,
-                    undoManager
-                )
+                new SpecialFieldViewModel(field, preferencesService, undoManager)
                     .getSpecialFieldAction(
                         specialField.getValue(),
                         frame,
@@ -90,8 +78,7 @@ public class SpecialFieldMenuItemFactory {
         Menu menu = factory.createMenu(viewModel.getAction());
 
         for (SpecialFieldValue Value : field.getValues()) {
-            SpecialFieldValueViewModel valueViewModel =
-                new SpecialFieldValueViewModel(Value);
+            SpecialFieldValueViewModel valueViewModel = new SpecialFieldValueViewModel(Value);
             menu
                 .getItems()
                 .add(
@@ -104,11 +91,7 @@ public class SpecialFieldMenuItemFactory {
 
         menu
             .visibleProperty()
-            .bind(
-                preferencesService
-                    .getSpecialFieldsPreferences()
-                    .specialFieldsEnabledProperty()
-            );
+            .bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
         return menu;
     }
 }

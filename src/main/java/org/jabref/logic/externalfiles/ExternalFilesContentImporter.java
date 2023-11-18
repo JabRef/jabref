@@ -12,29 +12,20 @@ public class ExternalFilesContentImporter {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public ExternalFilesContentImporter(
-        ImportFormatPreferences importFormatPreferences
-    ) {
+    public ExternalFilesContentImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
     public ParserResult importPDFContent(Path file) {
         try {
-            return new PdfMergeMetadataImporter(importFormatPreferences)
-                .importDatabase(file);
+            return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file);
         } catch (IOException e) {
             return ParserResult.fromError(e);
         }
     }
 
-    public ParserResult importFromBibFile(
-        Path bibFile,
-        FileUpdateMonitor fileUpdateMonitor
-    ) throws IOException {
-        return OpenDatabase.loadDatabase(
-            bibFile,
-            importFormatPreferences,
-            fileUpdateMonitor
-        );
+    public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor)
+        throws IOException {
+        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor);
     }
 }

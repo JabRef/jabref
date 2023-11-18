@@ -52,9 +52,7 @@ class XmpUtilWriterTest {
         .withField(StandardField.REVIEW, "review")
         .withField(StandardField.URL, "https://www.olly2018.edu");
 
-    private final BibEntry toral2006 = new BibEntry(
-        StandardEntryType.InProceedings
-    )
+    private final BibEntry toral2006 = new BibEntry(StandardEntryType.InProceedings)
         .withField(StandardField.AUTHOR, "Antonio Toral and Rafael Munoz")
         .withField(
             StandardField.TITLE,
@@ -67,10 +65,7 @@ class XmpUtilWriterTest {
         .withField(StandardField.URL, "www.url.de");
     private final BibEntry vapnik2000 = new BibEntry(StandardEntryType.Book)
         .withCitationKey("vapnik2000")
-        .withField(
-            StandardField.TITLE,
-            "The Nature of Statistical Learning Theory"
-        )
+        .withField(StandardField.TITLE, "The Nature of Statistical Learning Theory")
         .withField(StandardField.PUBLISHER, "Springer Science + Business Media")
         .withField(StandardField.AUTHOR, "Vladimir N. Vapnik")
         .withField(StandardField.DOI, "10.1007/978-1-4757-3264-1")
@@ -94,14 +89,11 @@ class XmpUtilWriterTest {
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
     void singleEntryWorks(BibEntry entry) throws Exception {
-        Path pdfFile =
-            this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
+        Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
-        new XmpUtilWriter(xmpPreferences)
-            .writeXmp(pdfFile.toAbsolutePath(), entry, null);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entry, null);
 
-        List<BibEntry> entriesWritten = new XmpUtilReader()
-            .readXmp(pdfFile, xmpPreferences);
+        List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
 
         BibEntry entryWritten = entriesWritten.get(0);
         entryWritten.clearField(StandardField.FILE);
@@ -129,8 +121,7 @@ class XmpUtilWriterTest {
     void testWriteTwoBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeTwo.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
-        new XmpUtilWriter(xmpPreferences)
-            .writeXmp(pdfFile.toAbsolutePath(), entries, null);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
         List<BibEntry> entryList = new XmpUtilReader()
             .readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
@@ -146,8 +137,7 @@ class XmpUtilWriterTest {
     void testWriteThreeBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeThree.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
-        new XmpUtilWriter(xmpPreferences)
-            .writeXmp(pdfFile.toAbsolutePath(), entries, null);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
         List<BibEntry> entryList = new XmpUtilReader()
             .readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
@@ -160,10 +150,8 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void proctingBracesAreRemovedAtTitle(@TempDir Path tempDir)
-        throws Exception {
-        Path pdfFile =
-            this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
+    void proctingBracesAreRemovedAtTitle(@TempDir Path tempDir) throws Exception {
+        Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
             .withField(StandardField.TITLE, "Some {P}rotected {T}erm");
         new XmpUtilWriter(xmpPreferences)
@@ -173,17 +161,14 @@ class XmpUtilWriterTest {
 
         entryList.forEach(entry -> entry.clearField(StandardField.FILE));
 
-        BibEntry expected = new BibEntry()
-            .withField(StandardField.TITLE, "Some Protected Term");
+        BibEntry expected = new BibEntry().withField(StandardField.TITLE, "Some Protected Term");
         assertEquals(List.of(expected), entryList);
     }
 
     @Test
     void proctingBracesAreKeptAtPages(@TempDir Path tempDir) throws Exception {
-        Path pdfFile =
-            this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
-        BibEntry original = new BibEntry()
-            .withField(StandardField.PAGES, "{55}-{99}");
+        Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
+        BibEntry original = new BibEntry().withField(StandardField.PAGES, "{55}-{99}");
         new XmpUtilWriter(xmpPreferences)
             .writeXmp(pdfFile.toAbsolutePath(), List.of(original), null);
         List<BibEntry> entryList = new XmpUtilReader()
@@ -196,10 +181,8 @@ class XmpUtilWriterTest {
 
     @Test
     void doubleDashAtPageNumberIsKept(@TempDir Path tempDir) throws Exception {
-        Path pdfFile =
-            this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
-        BibEntry original = new BibEntry()
-            .withField(StandardField.PAGES, "2--33");
+        Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
+        BibEntry original = new BibEntry().withField(StandardField.PAGES, "2--33");
         new XmpUtilWriter(xmpPreferences)
             .writeXmp(pdfFile.toAbsolutePath(), List.of(original), null);
         List<BibEntry> entryList = new XmpUtilReader()
@@ -226,8 +209,7 @@ class XmpUtilWriterTest {
     /**
      * Creates a temporary PDF-file with a single empty page.
      */
-    private Path createDefaultFile(String fileName, Path tempDir)
-        throws Exception {
+    private Path createDefaultFile(String fileName, Path tempDir) throws Exception {
         // create a default PDF
         Path pdfFile = tempDir.resolve(fileName);
         try (PDDocument pdf = new PDDocument()) {

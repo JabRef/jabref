@@ -11,10 +11,7 @@ public class KeywordTest {
     @Test
     public void getPathFromRootAsStringForSimpleChain() throws Exception {
         Keyword keywordChain = Keyword.of("A", "B", "C");
-        assertEquals(
-            "A > B",
-            keywordChain.getChild().get().getPathFromRootAsString('>')
-        );
+        assertEquals("A > B", keywordChain.getChild().get().getPathFromRootAsString('>'));
     }
 
     @Test

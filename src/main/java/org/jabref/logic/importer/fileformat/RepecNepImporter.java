@@ -138,9 +138,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RepecNepImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RepecNepImporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);
 
     private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList(
         "Keywords",
@@ -180,8 +178,7 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
@@ -200,8 +197,7 @@ public class RepecNepImporter extends Importer {
     private boolean startsWithKeyword(Collection<String> keywords) {
         boolean result = this.lastLine.indexOf(':') >= 1;
         if (result) {
-            String possibleKeyword =
-                this.lastLine.substring(0, this.lastLine.indexOf(':'));
+            String possibleKeyword = this.lastLine.substring(0, this.lastLine.indexOf(':'));
             result = keywords.contains(possibleKeyword);
         }
         return result;
@@ -237,9 +233,7 @@ public class RepecNepImporter extends Importer {
             !isStartOfWorkingPaper()
         ) {
             result.append(
-                this.lastLine.isEmpty()
-                    ? this.lastLine.trim()
-                    : " " + this.lastLine.trim()
+                this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim()
             );
             readLine(in);
         }
@@ -251,8 +245,7 @@ public class RepecNepImporter extends Importer {
      *
      * @throws IOException in case of error
      */
-    private void parseTitleString(BibEntry be, BufferedReader in)
-        throws IOException {
+    private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1);
         be.setField(StandardField.TITLE, readMultipleLines(in));
@@ -263,8 +256,7 @@ public class RepecNepImporter extends Importer {
      *
      * @throws IOException in case of error
      */
-    private void parseAuthors(BibEntry be, BufferedReader in)
-        throws IOException {
+    private void parseAuthors(BibEntry be, BufferedReader in) throws IOException {
         // read authors and institutions
         List<String> authors = new ArrayList<>();
         StringBuilder institutions = new StringBuilder();
@@ -278,16 +270,13 @@ public class RepecNepImporter extends Importer {
             StringBuilder institution = new StringBuilder();
             boolean institutionDone;
             if (this.lastLine.indexOf('(') >= 0) {
-                author =
-                    this.lastLine.substring(0, this.lastLine.indexOf('('))
-                        .trim();
+                author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') >= 1;
                 institution.append(
                     this.lastLine.substring(
                             this.lastLine.indexOf('(') + 1,
                             institutionDone &&
-                                (this.lastLine.indexOf(')') >
-                                    (this.lastLine.indexOf('(') + 1))
+                                (this.lastLine.indexOf(')') > (this.lastLine.indexOf('(') + 1))
                                 ? this.lastLine.indexOf(')')
                                 : this.lastLine.length()
                         )
@@ -304,9 +293,7 @@ public class RepecNepImporter extends Importer {
                 institution.append(
                     this.lastLine.substring(
                             0,
-                            institutionDone
-                                ? this.lastLine.indexOf(')')
-                                : this.lastLine.length()
+                            institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()
                         )
                         .trim()
                 );
@@ -337,8 +324,7 @@ public class RepecNepImporter extends Importer {
      *
      * @throws IOException in case of error
      */
-    private void parseAbstract(BibEntry be, BufferedReader in)
-        throws IOException {
+    private void parseAbstract(BibEntry be, BufferedReader in) throws IOException {
         String theabstract = readMultipleLines(in);
 
         if (!theabstract.isEmpty()) {
@@ -364,8 +350,7 @@ public class RepecNepImporter extends Importer {
         while (
             (this.lastLine != null) &&
             !isStartOfWorkingPaper() &&
-            (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) ||
-                "".equals(this.lastLine))
+            (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) || "".equals(this.lastLine))
         ) {
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = "".equals(this.lastLine)
@@ -375,8 +360,7 @@ public class RepecNepImporter extends Importer {
             this.lastLine =
                 "".equals(this.lastLine)
                     ? ""
-                    : this.lastLine.substring(this.lastLine.indexOf(':') + 1)
-                        .trim();
+                    : this.lastLine.substring(this.lastLine.indexOf(':') + 1).trim();
 
             if ("Keywords".equals(keyword)) {
                 // parse keywords field
@@ -384,9 +368,7 @@ public class RepecNepImporter extends Importer {
                 String[] keywords = content.split("[,;]");
                 be.addKeywords(
                     Arrays.asList(keywords),
-                    importFormatPreferences
-                        .bibEntryPreferences()
-                        .getKeywordSeparator()
+                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
                 );
             } else if ("JEL".equals(keyword)) {
                 // parse JEL field
@@ -427,8 +409,7 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
 
         List<BibEntry> bibitems = new ArrayList<>();
@@ -438,13 +419,11 @@ public class RepecNepImporter extends Importer {
             readLine(reader); // skip header and editor information
             while (this.lastLine != null) {
                 if (this.lastLine.startsWith("-----------------------------")) {
-                    this.inOverviewSection =
-                        this.preLine.startsWith("In this issue we have");
+                    this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }
                 if (isStartOfWorkingPaper()) {
                     BibEntry be = new BibEntry(StandardEntryType.TechReport);
-                    paperNoStr =
-                        this.lastLine.substring(0, this.lastLine.indexOf('.'));
+                    paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be, reader);
                     if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
                         parseAdditionalFields(be, false, reader);
@@ -453,9 +432,7 @@ public class RepecNepImporter extends Importer {
                         parseAuthors(be, reader);
                         readLine(reader); // skip empty line
                     }
-                    if (
-                        !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)
-                    ) {
+                    if (!startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
                         parseAbstract(be, reader);
                     }
                     parseAdditionalFields(be, true, reader);

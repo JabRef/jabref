@@ -11,8 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class ValidCitationKeyCheckerTest {
 
-    private final ValidCitationKeyChecker checker =
-        new ValidCitationKeyChecker();
+    private final ValidCitationKeyChecker checker = new ValidCitationKeyChecker();
 
     @ParameterizedTest
     @MethodSource("provideCitationKeys")
@@ -22,15 +21,9 @@ public class ValidCitationKeyCheckerTest {
 
     private static Stream<Arguments> provideCitationKeys() {
         return Stream.of(
-            Arguments.of(
-                Optional.of(Localization.lang("empty citation key")),
-                ""
-            ),
+            Arguments.of(Optional.of(Localization.lang("empty citation key")), ""),
             Arguments.of(Optional.empty(), "Seaver2019"),
-            Arguments.of(
-                Optional.of(Localization.lang("Invalid citation key")),
-                "Seaver_2019}"
-            )
+            Arguments.of(Optional.of(Localization.lang("Invalid citation key")), "Seaver_2019}")
         );
     }
 }

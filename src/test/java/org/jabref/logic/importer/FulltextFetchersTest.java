@@ -22,9 +22,7 @@ public class FulltextFetchersTest {
 
     @Test
     public void acceptPdfUrls() throws MalformedURLException {
-        URL pdfUrl = new URL(
-            "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf"
-        );
+        URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcher finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(entry));
@@ -32,9 +30,7 @@ public class FulltextFetchersTest {
 
     @Test
     public void rejectNonPdfUrls() throws MalformedURLException {
-        URL pdfUrl = new URL(
-            "https://github.com/JabRef/jabref/blob/master/README.md"
-        );
+        URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");
         FulltextFetcher finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
@@ -43,9 +39,7 @@ public class FulltextFetchersTest {
 
     @Test
     public void noTrustLevel() throws MalformedURLException {
-        URL pdfUrl = new URL(
-            "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf"
-        );
+        URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcher finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
@@ -56,9 +50,7 @@ public class FulltextFetchersTest {
     public void higherTrustLevelWins() throws IOException, FetcherException {
         FulltextFetcher finderHigh = mock(FulltextFetcher.class);
         when(finderHigh.getTrustLevel()).thenReturn(TrustLevel.SOURCE);
-        final URL highUrl = new URL(
-            "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf"
-        );
+        final URL highUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         when(finderHigh.findFullText(entry)).thenReturn(Optional.of(highUrl));
 
         FulltextFetcher finderLow = mock(FulltextFetcher.class);
@@ -68,9 +60,7 @@ public class FulltextFetchersTest {
         );
         when(finderLow.findFullText(entry)).thenReturn(Optional.of(lowUrl));
 
-        FulltextFetchers fetcher = new FulltextFetchers(
-            Set.of(finderLow, finderHigh)
-        );
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finderLow, finderHigh));
 
         // set an (arbitrary) DOI to the test entry to skip side effects inside the "findFullTextPDF" method
         entry.setField(StandardField.DOI, "10.5220/0007903201120130");

@@ -48,14 +48,10 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     private final ListProperty<String> keywords = new SimpleListProperty<>(
         FXCollections.observableArrayList()
     );
-    private final ObjectProperty<Field> selectedField =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
     private final StringProperty selectedKeyword = new SimpleStringProperty();
 
-    ContentSelectorViewModel(
-        BibDatabaseContext databaseContext,
-        DialogService dialogService
-    ) {
+    ContentSelectorViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
         this.metaData = databaseContext.getMetaData();
         this.dialogService = dialogService;
     }
@@ -84,9 +80,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        List<Field> metaDataFields = metaData
-            .getContentSelectors()
-            .getFieldsWithSelectors();
+        List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
 
         if (isDefaultMap(fieldKeywordsMap)) {
             Iterator<ContentSelector> iterator = metaData
@@ -163,10 +157,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         boolean exists = fieldKeywordsMap.containsKey(fieldToAdd);
         if (exists) {
             dialogService.showErrorDialogAndWait(
-                Localization.lang(
-                    "Field name \"%0\" already exists",
-                    fieldToAdd.getDisplayName()
-                )
+                Localization.lang("Field name \"%0\" already exists", fieldToAdd.getDisplayName())
             );
             return;
         }
@@ -177,9 +168,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
     void showRemoveFieldNameConfirmationDialog(Field fieldToRemove) {
         if (fieldToRemove == null) {
-            dialogService.showErrorDialogAndWait(
-                Localization.lang("No field name selected!")
-            );
+            dialogService.showErrorDialogAndWait(Localization.lang("No field name selected!"));
             return;
         }
 
@@ -214,9 +203,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
                 Localization.lang("Add new keyword"),
                 Localization.lang("Keyword:")
             )
-            .ifPresent(newKeyword ->
-                addKeywordIfUnique(selectedField, newKeyword)
-            );
+            .ifPresent(newKeyword -> addKeywordIfUnique(selectedField, newKeyword));
     }
 
     private void addKeywordIfUnique(Field field, String keywordToAdd) {
@@ -228,26 +215,17 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
             return;
         }
 
-        List<String> existingKeywords = fieldKeywordsMap.getOrDefault(
-            field,
-            new ArrayList<>()
-        );
+        List<String> existingKeywords = fieldKeywordsMap.getOrDefault(field, new ArrayList<>());
         existingKeywords.add(keywordToAdd);
         existingKeywords.sort(Comparator.naturalOrder());
         fieldKeywordsMap.put(field, existingKeywords);
         populateKeywords(field);
     }
 
-    void showRemoveKeywordConfirmationDialog(
-        Field field,
-        String keywordToRemove
-    ) {
+    void showRemoveKeywordConfirmationDialog(Field field, String keywordToRemove) {
         boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
             Localization.lang("Remove keyword"),
-            Localization.lang(
-                "Are you sure you want to remove keyword: \"%0\"?",
-                keywordToRemove
-            )
+            Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keywordToRemove)
         );
         if (deleteConfirmed) {
             removeKeyword(field, keywordToRemove);
@@ -287,8 +265,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
     private boolean keywordsHaveChanged(Field field, List<String> keywords) {
         HashSet<String> keywordsSet = asHashSet(keywords);
-        List<String> existingKeywords =
-            metaData.getContentSelectorValuesForField(field);
+        List<String> existingKeywords = metaData.getContentSelectorValuesForField(field);
         if (!keywordsSet.equals(asHashSet(existingKeywords))) {
             return true;
         }

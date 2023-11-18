@@ -43,10 +43,7 @@ public class UnprotectTermsFormatterTest {
                 "Testing BPEL Engine Performance: A Survey",
                 "{Testing {BPEL} Engine Performance: A Survey}"
             ),
-            Arguments.of(
-                "In CDMA",
-                new UnprotectTermsFormatter().getExampleInput()
-            )
+            Arguments.of("In CDMA", new UnprotectTermsFormatter().getExampleInput())
         );
     }
 

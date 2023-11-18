@@ -46,9 +46,7 @@ public class IntegrityCheck {
                         bibDatabaseContext,
                         citationKeyPatternPreferences
                     ),
-                    new CitationKeyDuplicationChecker(
-                        bibDatabaseContext.getDatabase()
-                    ),
+                    new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
                     new AmpersandChecker(),
                     new LatexIntegrityChecker(),
                     new JournalInAbbreviationListChecker(
@@ -60,10 +58,7 @@ public class IntegrityCheck {
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.add(
                 new UTF8Checker(
-                    bibDatabaseContext
-                        .getMetaData()
-                        .getEncoding()
-                        .orElse(StandardCharsets.UTF_8)
+                    bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8)
                 )
             );
         } else {

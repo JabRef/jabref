@@ -12,22 +12,14 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
-public class BaseDialog<T>
-    extends Dialog<T>
-    implements org.jabref.gui.Dialog<T> {
+public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T> {
 
     protected BaseDialog() {
         getDialogPane()
             .getScene()
             .setOnKeyPressed(event -> {
-                KeyBindingRepository keyBindingRepository =
-                    Globals.getKeyPrefs();
-                if (
-                    keyBindingRepository.checkKeyCombinationEquality(
-                        KeyBinding.CLOSE,
-                        event
-                    )
-                ) {
+                KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+                if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                     close();
                 } else if (
                     keyBindingRepository.checkKeyCombinationEquality(
@@ -52,9 +44,7 @@ public class BaseDialog<T>
     }
 
     private Optional<Button> getDefaultButton() {
-        return Optional.ofNullable(
-            (Button) getDialogPane().lookupButton(getDefaultButtonType())
-        );
+        return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));
     }
 
     private ButtonType getDefaultButtonType() {

@@ -8,8 +8,7 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.util.OOPair;
 
 public class Citation
-    implements
-        ComparableCitation, CitationMarkerEntry, CitationMarkerNumericEntry {
+    implements ComparableCitation, CitationMarkerEntry, CitationMarkerNumericEntry {
 
     /**
      * key in database
@@ -70,19 +69,13 @@ public class Citation
         return db.map(citationLookupResult -> citationLookupResult.entry);
     }
 
-    public static Optional<CitationLookupResult> lookup(
-        BibDatabase database,
-        String key
-    ) {
+    public static Optional<CitationLookupResult> lookup(BibDatabase database, String key) {
         return database
             .getEntryByCitationKey(key)
             .map(bibEntry -> new CitationLookupResult(bibEntry, database));
     }
 
-    public static Optional<CitationLookupResult> lookup(
-        List<BibDatabase> databases,
-        String key
-    ) {
+    public static Optional<CitationLookupResult> lookup(List<BibDatabase> databases, String key) {
         return databases
             .stream()
             .map(database -> Citation.lookup(database, key))
@@ -129,13 +122,9 @@ public class Citation
     }
 
     public void setPageInfo(Optional<OOText> pageInfo) {
-        Optional<OOText> normalizedPageInfo = PageInfo.normalizePageInfo(
-            pageInfo
-        );
+        Optional<OOText> normalizedPageInfo = PageInfo.normalizePageInfo(pageInfo);
         if (!normalizedPageInfo.equals(pageInfo)) {
-            throw new IllegalArgumentException(
-                "setPageInfo argument is not normalized"
-            );
+            throw new IllegalArgumentException("setPageInfo argument is not normalized");
         }
         this.pageInfo = normalizedPageInfo;
     }
@@ -147,9 +136,7 @@ public class Citation
     /*
      * Setters for CitationGroups.distribute()
      */
-    public static void setLookupResult(
-        OOPair<Citation, Optional<CitationLookupResult>> pair
-    ) {
+    public static void setLookupResult(OOPair<Citation, Optional<CitationLookupResult>> pair) {
         Citation citation = pair.a;
         citation.db = pair.b;
     }
@@ -159,9 +146,7 @@ public class Citation
         citation.number = pair.b;
     }
 
-    public static void setUniqueLetter(
-        OOPair<Citation, Optional<String>> pair
-    ) {
+    public static void setUniqueLetter(OOPair<Citation, Optional<String>> pair) {
         Citation citation = pair.a;
         citation.uniqueLetter = pair.b;
     }

@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileNodeViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileNodeViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileNodeViewModel.class);
     private final Path path;
     private final ObservableList<FileNodeViewModel> children;
     private int fileCount;
@@ -55,9 +53,7 @@ public class FileNodeViewModel {
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime();
 
-        return localDateTime.format(
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        );
+        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     /**
@@ -69,9 +65,7 @@ public class FileNodeViewModel {
                 "%s (%s %s)",
                 path.getFileName(),
                 fileCount,
-                fileCount == 1
-                    ? Localization.lang("file")
-                    : Localization.lang("files")
+                fileCount == 1 ? Localization.lang("file") : Localization.lang("files")
             );
         }
         return path.getFileName().toString();
@@ -87,9 +81,7 @@ public class FileNodeViewModel {
                 "%s (%s %s)",
                 path.getFileName(),
                 fileCount,
-                fileCount == 1
-                    ? Localization.lang("file")
-                    : Localization.lang("files")
+                fileCount == 1 ? Localization.lang("file") : Localization.lang("files")
             );
         }
         FileTime lastEditedTime = null;

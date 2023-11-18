@@ -42,17 +42,11 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(
-            "ods",
-            Localization.lang("OpenDocument spreadsheet"),
-            StandardFileType.ODS
-        );
+        super("ods", Localization.lang("OpenDocument spreadsheet"), StandardFileType.ODS);
     }
 
-    private static void storeOpenDocumentSpreadsheetFile(
-        Path file,
-        InputStream source
-    ) throws IOException {
+    private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source)
+        throws IOException {
         try (
             ZipOutputStream out = new ZipOutputStream(
                 new BufferedOutputStream(Files.newOutputStream(file))
@@ -104,22 +98,11 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
     ) throws IOException {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
-        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(
-            tmpFile,
-            database,
-            entries
-        );
+        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
-        try (
-            BufferedInputStream in = new BufferedInputStream(
-                new FileInputStream(tmpFile)
-            )
-        ) {
-            OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(
-                file,
-                in
-            );
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+            OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
         }
         // Delete the temporary file:
         if (!tmpFile.delete()) {
@@ -149,10 +132,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         BibDatabase database,
         List<BibEntry> entries
     ) {
-        OpenDocumentRepresentation od = new OpenDocumentRepresentation(
-            database,
-            entries
-        );
+        OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
 
         try (
             Writer ps = new OutputStreamWriter(
@@ -162,9 +142,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         ) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory
-                .newInstance()
-                .newTransformer();
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
         } catch (Exception e) {
@@ -172,11 +150,8 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         }
     }
 
-    private static void addResourceFile(
-        String name,
-        String resource,
-        ZipOutputStream out
-    ) throws IOException {
+    private static void addResourceFile(String name, String resource, ZipOutputStream out)
+        throws IOException {
         ZipEntry zipEntry = new ZipEntry(name);
         out.putNextEntry(zipEntry);
         OpenDocumentSpreadsheetCreator.addFromResource(resource, out);

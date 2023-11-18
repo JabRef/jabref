@@ -27,11 +27,9 @@ import org.jabref.model.strings.StringUtil;
  *
  * @param <T> cell value
  */
-public class ViewModelListCellFactory<T>
-    implements Callback<ListView<T>, ListCell<T>> {
+public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
-    private static final PseudoClass INVALID_PSEUDO_CLASS =
-        PseudoClass.getPseudoClass("invalid");
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
 
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
@@ -44,10 +42,8 @@ public class ViewModelListCellFactory<T>
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
-    private final Map<
-        PseudoClass,
-        Callback<T, ObservableValue<Boolean>>
-    > pseudoClasses = new HashMap<>();
+    private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses =
+        new HashMap<>();
     private Callback<T, ValidationStatus> validationStatusProperty;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
@@ -55,16 +51,12 @@ public class ViewModelListCellFactory<T>
         return this;
     }
 
-    public ViewModelListCellFactory<T> withGraphic(
-        Callback<T, Node> toGraphic
-    ) {
+    public ViewModelListCellFactory<T> withGraphic(Callback<T, Node> toGraphic) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ViewModelListCellFactory<T> withIcon(
-        Callback<T, JabRefIcon> toIcon
-    ) {
+    public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon) {
         this.toGraphic =
             viewModel -> {
                 JabRefIcon icon = toIcon.call(viewModel);
@@ -81,17 +73,11 @@ public class ViewModelListCellFactory<T>
         Callback<T, Color> toColor
     ) {
         this.toGraphic =
-            viewModel ->
-                toIcon
-                    .call(viewModel)
-                    .withColor(toColor.call(viewModel))
-                    .getGraphicNode();
+            viewModel -> toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
         return this;
     }
 
-    public ViewModelListCellFactory<T> withStringTooltip(
-        Callback<T, String> toStringTooltip
-    ) {
+    public ViewModelListCellFactory<T> withStringTooltip(Callback<T, String> toStringTooltip) {
         this.toTooltip =
             viewModel -> {
                 String tooltipText = toStringTooltip.call(viewModel);
@@ -103,23 +89,17 @@ public class ViewModelListCellFactory<T>
         return this;
     }
 
-    public ViewModelListCellFactory<T> withTooltip(
-        Callback<T, Tooltip> toTooltip
-    ) {
+    public ViewModelListCellFactory<T> withTooltip(Callback<T, Tooltip> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
 
-    public ViewModelListCellFactory<T> withContextMenu(
-        Callback<T, ContextMenu> toContextMenu
-    ) {
+    public ViewModelListCellFactory<T> withContextMenu(Callback<T, ContextMenu> toContextMenu) {
         this.toContextMenu = toContextMenu;
         return this;
     }
 
-    public ViewModelListCellFactory<T> withStyleClass(
-        Callback<T, String> toStyleClass
-    ) {
+    public ViewModelListCellFactory<T> withStyleClass(Callback<T, String> toStyleClass) {
         this.toStyleClass = toStyleClass;
         return this;
     }
@@ -218,9 +198,7 @@ public class ViewModelListCellFactory<T>
                         setGraphic(toGraphic.call(viewModel));
                     }
                     if (toOnMouseClickedEvent != null) {
-                        setOnMouseClicked(event ->
-                            toOnMouseClickedEvent.accept(viewModel, event)
-                        );
+                        setOnMouseClicked(event -> toOnMouseClickedEvent.accept(viewModel, event));
                     }
                     if (toStyleClass != null) {
                         getStyleClass().setAll(toStyleClass.call(viewModel));
@@ -232,36 +210,27 @@ public class ViewModelListCellFactory<T>
                         setContextMenu(toContextMenu.call(viewModel));
                     }
                     if (toOnDragDetected != null) {
-                        setOnDragDetected(event ->
-                            toOnDragDetected.accept(viewModel, event)
-                        );
+                        setOnDragDetected(event -> toOnDragDetected.accept(viewModel, event));
                     }
                     if (toOnDragDropped != null) {
-                        setOnDragDropped(event ->
-                            toOnDragDropped.accept(viewModel, event)
-                        );
+                        setOnDragDropped(event -> toOnDragDropped.accept(viewModel, event));
                     }
                     if (toOnDragEntered != null) {
-                        setOnDragEntered(event ->
-                            toOnDragEntered.accept(viewModel, event)
-                        );
+                        setOnDragEntered(event -> toOnDragEntered.accept(viewModel, event));
                     }
                     if (toOnDragExited != null) {
-                        setOnDragExited(event ->
-                            toOnDragExited.accept(viewModel, event)
-                        );
+                        setOnDragExited(event -> toOnDragExited.accept(viewModel, event));
                     }
                     if (toOnDragOver != null) {
-                        setOnDragOver(event ->
-                            toOnDragOver.accept(viewModel, event)
-                        );
+                        setOnDragOver(event -> toOnDragOver.accept(viewModel, event));
                     }
                     for (Map.Entry<
                         PseudoClass,
                         Callback<T, ObservableValue<Boolean>>
                     > pseudoClassWithCondition : pseudoClasses.entrySet()) {
-                        ObservableValue<Boolean> condition =
-                            pseudoClassWithCondition.getValue().call(viewModel);
+                        ObservableValue<Boolean> condition = pseudoClassWithCondition
+                            .getValue()
+                            .call(viewModel);
                         subscriptions.add(
                             BindingsHelper.includePseudoClassWhen(
                                 this,
@@ -274,18 +243,13 @@ public class ViewModelListCellFactory<T>
                         validationStatusProperty
                             .call(viewModel)
                             .getHighestMessage()
-                            .ifPresent(message ->
-                                setTooltip(new Tooltip(message.getMessage()))
-                            );
+                            .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
 
                         subscriptions.add(
                             BindingsHelper.includePseudoClassWhen(
                                 this,
                                 INVALID_PSEUDO_CLASS,
-                                validationStatusProperty
-                                    .call(viewModel)
-                                    .validProperty()
-                                    .not()
+                                validationStatusProperty.call(viewModel).validProperty().not()
                             )
                         );
                     }

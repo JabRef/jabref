@@ -29,10 +29,7 @@ class DOAJFetcherTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         fetcher = new DOAJFetcher(importFormatPreferences);
     }
 
@@ -43,10 +40,7 @@ class DOAJFetcherTest {
                 StandardField.AUTHOR,
                 "Nísea de A. Corrêa and Maria P. Foss and Paula R. B. Diniz"
             )
-            .withField(
-                StandardField.DOI,
-                "10.11606/issn.2176-7262.v49i6p533-548"
-            )
+            .withField(StandardField.DOI, "10.11606/issn.2176-7262.v49i6p533-548")
             .withField(StandardField.ISSN, "2176-7262")
             .withField(StandardField.JOURNAL, "Medicina")
             .withField(StandardField.PUBLISHER, "Universidade de São Paulo")
@@ -54,10 +48,7 @@ class DOAJFetcherTest {
                 StandardField.TITLE,
                 "Structural and functional changes related to memory deficit in non-demential elderly individuals"
             )
-            .withField(
-                StandardField.URL,
-                "http://www.revistas.usp.br/rmrp/article/view/127443"
-            )
+            .withField(StandardField.URL, "http://www.revistas.usp.br/rmrp/article/view/127443")
             .withField(StandardField.VOLUME, "49")
             .withField(StandardField.NUMBER, "6")
             .withField(StandardField.YEAR, "2016")
@@ -83,14 +74,8 @@ class DOAJFetcherTest {
         BibEntry bibEntry = DOAJFetcher.parseBibJSONtoBibtex(jsonObject, ',');
 
         assertEquals(StandardEntryType.Article, bibEntry.getType());
-        assertEquals(
-            Optional.of("VLSI Design"),
-            bibEntry.getField(StandardField.JOURNAL)
-        );
-        assertEquals(
-            Optional.of("10.1155/2014/217495"),
-            bibEntry.getField(StandardField.DOI)
-        );
+        assertEquals(Optional.of("VLSI Design"), bibEntry.getField(StandardField.JOURNAL));
+        assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField(StandardField.DOI));
         assertEquals(
             Optional.of("Syed Asad Alam and Oscar Gustafsson"),
             bibEntry.getField(StandardField.AUTHOR)
@@ -101,10 +86,7 @@ class DOAJFetcherTest {
             ),
             bibEntry.getField(StandardField.TITLE)
         );
-        assertEquals(
-            Optional.of("2014"),
-            bibEntry.getField(StandardField.YEAR)
-        );
+        assertEquals(Optional.of("2014"), bibEntry.getField(StandardField.YEAR));
     }
 
     @Test
@@ -116,39 +98,27 @@ class DOAJFetcherTest {
     void appendSingleWord() throws Exception {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "/example");
-        assertEquals(
-            "http://example.com/test/example",
-            builder.build().toASCIIString()
-        );
+        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
     }
 
     @Test
     void appendSingleWordWithSlash() throws Exception {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "/example");
-        assertEquals(
-            "http://example.com/test/example",
-            builder.build().toASCIIString()
-        );
+        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
     }
 
     @Test
     void appendSlash() throws Exception {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "/");
-        assertEquals(
-            "http://example.com/test",
-            builder.build().toASCIIString()
-        );
+        assertEquals("http://example.com/test", builder.build().toASCIIString());
     }
 
     @Test
     void appendTwoWords() throws Exception {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "example two");
-        assertEquals(
-            "http://example.com/test/example%20two",
-            builder.build().toASCIIString()
-        );
+        assertEquals("http://example.com/test/example%20two", builder.build().toASCIIString());
     }
 }

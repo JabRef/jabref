@@ -33,11 +33,7 @@ public class GroupMergerTest {
 
     @ParameterizedTest
     @MethodSource
-    public void mergeShouldMergeGroupsCorrectly(
-        String groupsA,
-        String groupsB,
-        String expected
-    ) {
+    public void mergeShouldMergeGroupsCorrectly(String groupsA, String groupsB, String expected) {
         assertEquals(expected, groupMerger.merge(groupsA, groupsB));
     }
 }

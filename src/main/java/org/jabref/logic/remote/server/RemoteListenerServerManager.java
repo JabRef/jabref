@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RemoteListenerServerManager implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RemoteListenerServerManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServerManager.class);
 
     private RemoteListenerServerThread remoteServerThread;
 
@@ -39,8 +37,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
         }
 
         try {
-            remoteServerThread =
-                new RemoteListenerServerThread(messageHandler, port);
+            remoteServerThread = new RemoteListenerServerThread(messageHandler, port);
         } catch (BindException e) {
             LOGGER.error(
                 "There was an error opening the configured network port {}. Please ensure there isn't another" +
@@ -61,17 +58,14 @@ public class RemoteListenerServerManager implements AutoCloseable {
     public void start() {
         if (isOpen() && isNotStartedBefore()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.startRemoteThread(
-                remoteServerThread
-            );
+            JabRefExecutorService.INSTANCE.startRemoteThread(remoteServerThread);
         }
     }
 
     public boolean isNotStartedBefore() {
         // threads can only be started when in state NEW
         return (
-            (remoteServerThread == null) ||
-            (remoteServerThread.getState() == Thread.State.NEW)
+            (remoteServerThread == null) || (remoteServerThread.getState() == Thread.State.NEW)
         );
     }
 

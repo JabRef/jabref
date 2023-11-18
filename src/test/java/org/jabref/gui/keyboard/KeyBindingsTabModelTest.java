@@ -52,27 +52,18 @@ class KeyBindingsTabModelTest {
             false
         );
         assertFalse(
-            keyBindingRepository.checkKeyCombinationEquality(
-                KeyBinding.COPY,
-                shortcutKeyEvent
-            )
+            keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent)
         );
         model.setNewBindingForCurrent(shortcutKeyEvent);
         KeyCombination combination = KeyCombination.keyCombination(
             keyBindingRepository.get(KeyBinding.COPY).get()
         );
         assertFalse(
-            KeyBindingRepository.checkKeyCombinationEquality(
-                combination,
-                shortcutKeyEvent
-            )
+            KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent)
         );
         model.storeSettings();
         assertFalse(
-            keyBindingRepository.checkKeyCombinationEquality(
-                KeyBinding.COPY,
-                shortcutKeyEvent
-            )
+            keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent)
         );
     }
 
@@ -101,12 +92,7 @@ class KeyBindingsTabModelTest {
             keyBindingRepository.get(KeyBinding.IMPORT_INTO_NEW_DATABASE).get()
         );
 
-        assertTrue(
-            KeyBindingRepository.checkKeyCombinationEquality(
-                combination,
-                shortcutKeyEvent
-            )
-        );
+        assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
         model.storeSettings();
 
@@ -136,15 +122,10 @@ class KeyBindingsTabModelTest {
             false
         );
         assertFalse(
-            keyBindingRepository.checkKeyCombinationEquality(
-                KeyBinding.CLEANUP,
-                shortcutKeyEvent
-            )
+            keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent)
         );
         model.setNewBindingForCurrent(shortcutKeyEvent);
-        assertNull(
-            model.selectedKeyBindingProperty().get().get().getKeyBinding()
-        );
+        assertNull(model.selectedKeyBindingProperty().get().get().getKeyBinding());
     }
 
     @Test
@@ -161,10 +142,7 @@ class KeyBindingsTabModelTest {
             false
         );
         assertFalse(
-            keyBindingRepository.checkKeyCombinationEquality(
-                KeyBinding.CLEANUP,
-                shortcutKeyEvent
-            )
+            keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent)
         );
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
@@ -172,18 +150,11 @@ class KeyBindingsTabModelTest {
             keyBindingRepository.get(KeyBinding.CLEANUP).get()
         );
 
-        assertTrue(
-            KeyBindingRepository.checkKeyCombinationEquality(
-                combination,
-                shortcutKeyEvent
-            )
-        );
+        assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
         assertFalse(
             KeyBindingRepository.checkKeyCombinationEquality(
-                KeyCombination.valueOf(
-                    KeyBinding.CLEANUP.getDefaultKeyBinding()
-                ),
+                KeyCombination.valueOf(KeyBinding.CLEANUP.getDefaultKeyBinding()),
                 shortcutKeyEvent
             )
         );
@@ -300,9 +271,7 @@ class KeyBindingsTabModelTest {
 
     @Test
     void testCloseEntryEditorCloseEntryKeybinding() {
-        KeyBindingViewModel viewModel = setKeyBindingViewModel(
-            KeyBinding.CLOSE
-        );
+        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.CLOSE);
         model.selectedKeyBindingProperty().set(Optional.of(viewModel));
         KeyEvent closeEditorEvent = new KeyEvent(
             KeyEvent.KEY_PRESSED,
@@ -315,21 +284,13 @@ class KeyBindingsTabModelTest {
             false
         );
 
-        assertEquals(
-            KeyBinding.CLOSE.getDefaultKeyBinding(),
-            KeyCode.ESCAPE.getName()
-        );
+        assertEquals(KeyBinding.CLOSE.getDefaultKeyBinding(), KeyCode.ESCAPE.getName());
 
-        KeyCombination combi = KeyCombination.valueOf(
-            KeyBinding.CLOSE.getDefaultKeyBinding()
-        );
+        KeyCombination combi = KeyCombination.valueOf(KeyBinding.CLOSE.getDefaultKeyBinding());
 
         assertTrue(combi.match(closeEditorEvent));
         assertTrue(
-            keyBindingRepository.checkKeyCombinationEquality(
-                KeyBinding.CLOSE,
-                closeEditorEvent
-            )
+            keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, closeEditorEvent)
         );
     }
 
@@ -337,9 +298,7 @@ class KeyBindingsTabModelTest {
     void testSetSingleKeyBindingToDefault() {
         assumeFalse(OS.OS_X);
 
-        KeyBindingViewModel viewModel = setKeyBindingViewModel(
-            KeyBinding.ABBREVIATE
-        );
+        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         model.selectedKeyBindingProperty().set(Optional.of(viewModel));
         KeyEvent shortcutKeyEvent = new KeyEvent(
             KeyEvent.KEY_PRESSED,

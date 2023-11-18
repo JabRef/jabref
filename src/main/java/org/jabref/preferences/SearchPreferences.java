@@ -18,8 +18,7 @@ public class SearchPreferences {
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    private final DoubleProperty searchWindowHeight =
-        new SimpleDoubleProperty();
+    private final DoubleProperty searchWindowHeight = new SimpleDoubleProperty();
     private final DoubleProperty searchWindowWidth = new SimpleDoubleProperty();
 
     public SearchPreferences(
@@ -35,8 +34,7 @@ public class SearchPreferences {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
-        searchFlags =
-            FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
+        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
         if (isCaseSensitive) {
             searchFlags.add(SearchFlags.CASE_SENSITIVE);
         }

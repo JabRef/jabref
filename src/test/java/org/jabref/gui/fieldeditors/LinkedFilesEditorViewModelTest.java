@@ -37,23 +37,17 @@ class LinkedFilesEditorViewModelTest {
         FilePreferences.class,
         Answers.RETURNS_DEEP_STUBS
     );
-    private final BibDatabaseContext bibDatabaseContext = mock(
-        BibDatabaseContext.class
-    );
+    private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
     private final UndoManager undoManager = mock(UndoManager.class);
 
     @Test
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
-        when(preferencesService.getFilePreferences())
-            .thenReturn(filePreferences);
+        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getExternalFileTypes())
-            .thenReturn(
-                FXCollections.observableSet(StandardExternalFileType.values())
-            );
+            .thenReturn(FXCollections.observableSet(StandardExternalFileType.values()));
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
-        when(bibDatabaseContext.getFirstExistingFileDir(any()))
-            .thenReturn(Optional.of(tempDir));
+        when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
 
         viewModel =
             new LinkedFilesEditorViewModel(
@@ -69,10 +63,7 @@ class LinkedFilesEditorViewModelTest {
 
         BibEntry entry = new BibEntry()
             .withCitationKey("test")
-            .withField(
-                StandardField.URL,
-                "https://ceur-ws.org/Vol-847/paper6.pdf"
-            );
+            .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
         viewModel.entry = entry;
         viewModel.fetchFulltext();
 

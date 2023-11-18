@@ -14,24 +14,17 @@ import javafx.scene.control.Labeled;
 
 class PreferencesSearchHandler {
 
-    private static PseudoClass labelHighlight = PseudoClass.getPseudoClass(
-        "search-highlight"
-    );
+    private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
     private final List<PreferencesTab> preferenceTabs;
     private final ListProperty<PreferencesTab> filteredPreferenceTabs;
-    private final ArrayListMultimap<
-        PreferencesTab,
-        Labeled
-    > preferenceTabsLabelNames;
+    private final ArrayListMultimap<PreferencesTab, Labeled> preferenceTabsLabelNames;
     private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
 
     PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
         this.filteredPreferenceTabs =
-            new SimpleListProperty<>(
-                FXCollections.observableArrayList(preferenceTabs)
-            );
+            new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
     }
 
     public void filterTabs(String text) {
@@ -70,8 +63,7 @@ class PreferencesSearchHandler {
     }
 
     private void clearHighlights() {
-        highlightedLabels.forEach(labeled ->
-            labeled.pseudoClassStateChanged(labelHighlight, false)
+        highlightedLabels.forEach(labeled -> labeled.pseudoClassStateChanged(labelHighlight, false)
         );
     }
 
@@ -84,17 +76,12 @@ class PreferencesSearchHandler {
      * mapping from PreferencesTab to all its Labeled type nodes.
      */
     private ArrayListMultimap<PreferencesTab, Labeled> getPrefsTabLabelMap() {
-        ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap =
-            ArrayListMultimap.create();
+        ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
         for (PreferencesTab preferencesTab : preferenceTabs) {
             Node builder = preferencesTab.getBuilder();
             if (builder instanceof Parent) {
                 Parent parentBuilder = (Parent) builder;
-                scanLabeledControls(
-                    parentBuilder,
-                    prefsTabLabelMap,
-                    preferencesTab
-                );
+                scanLabeledControls(parentBuilder, prefsTabLabelMap, preferencesTab);
             }
         }
         return prefsTabLabelMap;
@@ -111,11 +98,7 @@ class PreferencesSearchHandler {
     ) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (!(child instanceof Labeled)) {
-                scanLabeledControls(
-                    (Parent) child,
-                    prefsTabLabelMap,
-                    preferencesTab
-                );
+                scanLabeledControls((Parent) child, prefsTabLabelMap, preferencesTab);
             } else {
                 Labeled labeled = (Labeled) child;
                 if (!labeled.getText().isEmpty()) {

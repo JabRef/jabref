@@ -37,9 +37,7 @@ public class DiVA implements IdBasedParserFetcher {
     @Override
     public URL getUrlForIdentifier(String identifier)
         throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(
-            "http://www.diva-portal.org/smash/getreferences"
-        );
+        URIBuilder uriBuilder = new URIBuilder("http://www.diva-portal.org/smash/getreferences");
 
         uriBuilder.addParameter("referenceFormat", "BibTex");
         uriBuilder.addParameter("pids", identifier);

@@ -14,10 +14,7 @@ class DoiValidityCheckerTest {
 
     @Test
     void doiAcceptsValidInput() {
-        assertEquals(
-            Optional.empty(),
-            checker.checkValue("10.1023/A:1022883727209")
-        );
+        assertEquals(Optional.empty(), checker.checkValue("10.1023/A:1022883727209"));
     }
 
     @Test
@@ -34,9 +31,7 @@ class DoiValidityCheckerTest {
     void doiAcceptsValidInputNoMatterTheLengthOfTheDOIName() {
         assertEquals(
             Optional.empty(),
-            checker.checkValue(
-                "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"
-            )
+            checker.checkValue("10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0")
         );
     }
 

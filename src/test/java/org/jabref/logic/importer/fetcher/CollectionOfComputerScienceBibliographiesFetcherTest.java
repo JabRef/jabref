@@ -38,22 +38,13 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
-        fetcher =
-            new CollectionOfComputerScienceBibliographiesFetcher(
-                importFormatPreferences
-            );
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        fetcher = new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences);
     }
 
     @Test
     public void getNameReturnsCorrectName() {
-        assertEquals(
-            "Collection of Computer Science Bibliographies",
-            fetcher.getName()
-        );
+        assertEquals("Collection of Computer Science Bibliographies", fetcher.getName());
     }
 
     @Test
@@ -61,8 +52,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
         throws MalformedURLException, URISyntaxException, FetcherException, QueryNodeParseException {
         String query = "java jdk";
         URL url = fetcher.getURLForQuery(
-            new StandardSyntaxParser()
-                .parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD)
+            new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD)
         );
         assertEquals(
             "http://liinwww.ira.uka.de/bibliography/rss?query=java+jdk&sort=score",
@@ -71,8 +61,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     }
 
     @Test
-    public void performSearchReturnsMatchingMultipleEntries()
-        throws FetcherException {
+    public void performSearchReturnsMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("jabref");
 
         BibEntry secondBibEntry = new BibEntry(StandardEntryType.Article)
@@ -114,27 +103,12 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 " violations detectable by SACC methods are connected to" +
                 " higher than normal code churn."
             )
-            .withField(
-                StandardField.TYPE,
-                "info:eu-repo/semantics/conferenceObject"
-            )
-            .withField(
-                new UnknownField("description"),
-                "Information and Software Qualtiy"
-            )
+            .withField(StandardField.TYPE, "info:eu-repo/semantics/conferenceObject")
+            .withField(new UnknownField("description"), "Information and Software Qualtiy")
             .withField(StandardField.PAGES, "152--158")
-            .withField(
-                new UnknownField("bibsource"),
-                "OAI-PMH server at www.diva-portal.org"
-            )
-            .withField(
-                new UnknownField("rights"),
-                "info:eu-repo/semantics/openAccess"
-            )
-            .withField(
-                StandardField.URL,
-                "http://urn.kb.se/resolve?urn=urn:nbn:se:lnu:diva-68408"
-            )
+            .withField(new UnknownField("bibsource"), "OAI-PMH server at www.diva-portal.org")
+            .withField(new UnknownField("rights"), "info:eu-repo/semantics/openAccess")
+            .withField(StandardField.URL, "http://urn.kb.se/resolve?urn=urn:nbn:se:lnu:diva-68408")
             .withField(new UnknownField("oai"), "oai:DiVA.org:lnu-68408")
             .withField(
                 StandardField.TITLE,
@@ -145,10 +119,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 "Linn{\\'e}universitetet, Institutionen f{\\\"o}r datavetenskap (DV); Linn{\\'e}universitetet, Institutionen f{\\\"o}r datavetenskap (DV); Linn{\\'e}universitetet, Institutionen f{\\\"o}r datavetenskap (DV); New York, NY, USA"
             )
             .withField(StandardField.LANGUAGE, "eng")
-            .withField(
-                StandardField.AUTHOR,
-                "Tobias Olsson and Morgan Ericsson and Anna Wingkvist"
-            )
+            .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
             .withField(StandardField.YEAR, "2017");
 
         // Checking a subset, because the query "jabref" is generic and returns a changing result set
@@ -158,17 +129,14 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .stream()
                 .filter(bibEntry -> {
                     String citeKey = bibEntry.getCitationKey().get();
-                    return citeKey.equals(
-                        secondBibEntry.getCitationKey().get()
-                    );
+                    return citeKey.equals(secondBibEntry.getCitationKey().get());
                 })
                 .collect(Collectors.toSet())
         );
     }
 
     @Test
-    public void performSearchReturnsEmptyListForEmptySearch()
-        throws FetcherException {
+    public void performSearchReturnsEmptyListForEmptySearch() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }

@@ -26,12 +26,9 @@ import org.slf4j.LoggerFactory;
 
 public class SidePaneViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SidePaneViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SidePaneViewModel.class);
 
-    private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup =
-        new HashMap<>();
+    private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
 
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
@@ -65,10 +62,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                 undoManager
             );
 
-        preferencesService
-            .getSidePanePreferences()
-            .visiblePanes()
-            .forEach(this::show);
+        preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         getPanes()
             .addListener(
                 (ListChangeListener<? super SidePaneType>) change -> {
@@ -126,9 +120,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         IntStream
             .range(0, getPanes().size())
             .forEach(i -> preferredPositions.put(getPanes().get(i), i));
-        preferencesService
-            .getSidePanePreferences()
-            .setPreferredPositions(preferredPositions);
+        preferencesService.getSidePanePreferences().setPreferredPositions(preferredPositions);
     }
 
     public void moveUp(SidePaneType pane) {
@@ -154,10 +146,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                 swap(getPanes(), currentPosition, newPosition);
                 updatePreferredPositions();
             } else {
-                LOGGER.debug(
-                    "SidePaneComponent {} is already at the top",
-                    pane.getTitle()
-                );
+                LOGGER.debug("SidePaneComponent {} is already at the top", pane.getTitle());
             }
         } else {
             LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
@@ -167,12 +156,7 @@ public class SidePaneViewModel extends AbstractViewModel {
     private void show(SidePaneType pane) {
         if (!getPanes().contains(pane)) {
             getPanes().add(pane);
-            getPanes()
-                .sort(
-                    new PreferredIndexSort(
-                        preferencesService.getSidePanePreferences()
-                    )
-                );
+            getPanes().sort(new PreferredIndexSort(preferencesService.getSidePanePreferences()));
         } else {
             LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
         }
@@ -191,14 +175,12 @@ public class SidePaneViewModel extends AbstractViewModel {
     /**
      * Helper class for sorting visible side panes based on their preferred position.
      */
-    protected static class PreferredIndexSort
-        implements Comparator<SidePaneType> {
+    protected static class PreferredIndexSort implements Comparator<SidePaneType> {
 
         private final Map<SidePaneType, Integer> preferredPositions;
 
         public PreferredIndexSort(SidePanePreferences sidePanePreferences) {
-            this.preferredPositions =
-                sidePanePreferences.getPreferredPositions();
+            this.preferredPositions = sidePanePreferences.getPreferredPositions();
         }
 
         @Override

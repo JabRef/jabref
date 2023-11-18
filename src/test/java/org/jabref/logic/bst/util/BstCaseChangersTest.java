@@ -14,14 +14,8 @@ public class BstCaseChangersTest {
 
     @ParameterizedTest
     @MethodSource("provideStringsForTitleLowers")
-    public void testChangeCaseTitleLowers(
-        String expected,
-        String toBeFormatted
-    ) {
-        assertEquals(
-            expected,
-            BstCaseChanger.changeCase(toBeFormatted, FormatMode.TITLE_LOWERS)
-        );
+    public void testChangeCaseTitleLowers(String expected, String toBeFormatted) {
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.TITLE_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForTitleLowers() {
@@ -63,28 +57,16 @@ public class BstCaseChangersTest {
             Arguments.of("Hallo world; how", "HAllo WORLD; HOW"),
             Arguments.of("Hallo world- how", "HAllo WORLD- HOW"),
             // testSpecialBracketPlacement
-            Arguments.of(
-                "this i{S REALLY CraZy ST}uff",
-                "tHIS I{S REALLY CraZy ST}UfF"
-            ),
-            Arguments.of(
-                "this i{S R{\\'E}ALLY CraZy ST}uff",
-                "tHIS I{S R{\\'E}ALLY CraZy ST}UfF"
-            ),
-            Arguments.of(
-                "this is r{\\'e}ally crazy stuff",
-                "tHIS IS R{\\'E}ALLY CraZy STUfF"
-            )
+            Arguments.of("this i{S REALLY CraZy ST}uff", "tHIS I{S REALLY CraZy ST}UfF"),
+            Arguments.of("this i{S R{\\'E}ALLY CraZy ST}uff", "tHIS I{S R{\\'E}ALLY CraZy ST}UfF"),
+            Arguments.of("this is r{\\'e}ally crazy stuff", "tHIS IS R{\\'E}ALLY CraZy STUfF")
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideStringsForAllLowers")
     public void testChangeCaseAllLowers(String expected, String toBeFormatted) {
-        assertEquals(
-            expected,
-            BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS)
-        );
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForAllLowers() {
@@ -125,10 +107,7 @@ public class BstCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideStringsForAllUppers")
     public void testChangeCaseAllUppers(String expected, String toBeFormatted) {
-        assertEquals(
-            expected,
-            BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_UPPERS)
-        );
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_UPPERS));
     }
 
     private static Stream<Arguments> provideStringsForAllUppers() {
@@ -169,10 +148,7 @@ public class BstCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideTitleCaseAllLowers")
     public void testTitleCaseAllLowers(String expected, String toBeFormatted) {
-        assertEquals(
-            expected,
-            BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS)
-        );
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
     private static Stream<Arguments> provideTitleCaseAllLowers() {
@@ -180,10 +156,7 @@ public class BstCaseChangersTest {
             // CaseChangers.TITLE is good at keeping some words lower case
             // Here some modified test cases to show that escaping with BibtexCaseChanger also works
             // Examples taken from https://github.com/JabRef/jabref/pull/176#issuecomment-142723792
-            Arguments.of(
-                "this is a simple example {TITLE}",
-                "This is a simple example {TITLE}"
-            ),
+            Arguments.of("this is a simple example {TITLE}", "This is a simple example {TITLE}"),
             Arguments.of(
                 "this {IS} another simple example tit{LE}",
                 "This {IS} another simple example tit{LE}"

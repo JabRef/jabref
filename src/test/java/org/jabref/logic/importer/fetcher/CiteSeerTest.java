@@ -24,17 +24,10 @@ class CiteSeerTest {
 
     @Test
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
-        String title =
-            "RIGOROUS DERIVATION FROM LANDAU-DE GENNES THEORY TO ERICKSEN-LESLIE THEORY";
+        String title = "RIGOROUS DERIVATION FROM LANDAU-DE GENNES THEORY TO ERICKSEN-LESLIE THEORY";
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-            .withField(
-                StandardField.DOI,
-                "68b3fde1aa6354a34061f8811e2050e1b512af26"
-            )
-            .withField(
-                StandardField.AUTHOR,
-                "Wang, Wei and Zhang, Pingwen and Zhang, Zhifei"
-            )
+            .withField(StandardField.DOI, "68b3fde1aa6354a34061f8811e2050e1b512af26")
+            .withField(StandardField.AUTHOR, "Wang, Wei and Zhang, Pingwen and Zhang, Zhifei")
             .withField(StandardField.TITLE, title)
             .withField(StandardField.ABSTRACT, "ar")
             .withField(StandardField.YEAR, "0")
@@ -49,15 +42,9 @@ class CiteSeerTest {
     @Test
     void searchByQueryFindsEntryCopingTheoryAndResearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-            .withField(
-                StandardField.DOI,
-                "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"
-            )
+            .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e")
             .withField(StandardField.AUTHOR, "Lazarus, Richard S.")
-            .withField(
-                StandardField.TITLE,
-                "Coping theory and research: Past, present, and future"
-            )
+            .withField(StandardField.TITLE, "Coping theory and research: Past, present, and future")
             .withField(
                 StandardField.ABSTRACT,
                 "In this essay in honor of Donald Oken, I emphasize coping as a key concept for theory and research on adaptation and health. My focus will be the contrasts between two approaches to coping, one that emphasizes"
@@ -103,8 +90,7 @@ class CiteSeerTest {
         while (fetchedEntriesIter.hasNext()) {
             BibEntry laterEntry = fetchedEntriesIter.next();
             if (
-                recentEntry.hasField(StandardField.YEAR) &&
-                laterEntry.hasField(StandardField.YEAR)
+                recentEntry.hasField(StandardField.YEAR) && laterEntry.hasField(StandardField.YEAR)
             ) {
                 Integer recentYear = Integer.parseInt(
                     recentEntry.getField(StandardField.YEAR).orElse("0")
@@ -121,10 +107,7 @@ class CiteSeerTest {
     @Test
     void findByIdAsDOI() throws FetcherException, IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
-            .withField(
-                StandardField.DOI,
-                "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"
-            );
+            .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e");
         Optional<URL> expected = Optional.of(
             new URL(
                 "https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"
@@ -142,9 +125,7 @@ class CiteSeerTest {
                 "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf"
             );
         Optional<URL> expected = Optional.of(
-            new URL(
-                "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf"
-            )
+            new URL("http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf")
         );
         assertEquals(expected, fetcher.findFullText(entry));
     }

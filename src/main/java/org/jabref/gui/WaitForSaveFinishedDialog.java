@@ -20,9 +20,7 @@ public class WaitForSaveFinishedDialog {
             Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (
-                        LibraryTabs.stream().anyMatch(LibraryTab::isSaving)
-                    ) {
+                    while (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
                         if (isCancelled()) {
                             return null;
                         } else {
@@ -35,8 +33,7 @@ public class WaitForSaveFinishedDialog {
 
             dialogService.showProgressDialog(
                 Localization.lang("Please wait..."),
-                Localization.lang("Waiting for save operation to finish") +
-                "...",
+                Localization.lang("Waiting for save operation to finish") + "...",
                 waitForSaveFinished
             );
         }

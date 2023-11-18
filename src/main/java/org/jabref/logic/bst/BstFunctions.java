@@ -21,12 +21,8 @@ import org.slf4j.LoggerFactory;
 
 public class BstFunctions {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BstFunctions.class
-    );
-    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile(
-        "([^.?!}\\s])(}|\\s)*$"
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstFunctions.class);
+    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^.?!}\\s])(}|\\s)*$");
 
     private final Map<String, String> strings;
     private final Map<String, Integer> integers;
@@ -129,11 +125,7 @@ public class BstFunctions {
             throw new BstVMException("Can only compare two integers with >");
         }
 
-        stack.push(
-            ((Integer) o1).compareTo((Integer) o2) > 0
-                ? BstVM.TRUE
-                : BstVM.FALSE
-        );
+        stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -143,26 +135,18 @@ public class BstFunctions {
      */
     private void bstIsLowerThan(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
-            throw new BstVMException(
-                "Not enough operands on stack for operation <"
-            );
+            throw new BstVMException("Not enough operands on stack for operation <");
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
             throw new BstVMException(
-                "Can only compare two integers with < (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Can only compare two integers with < (line %d)".formatted(ctx.start.getLine())
             );
         }
 
-        stack.push(
-            ((Integer) o1).compareTo((Integer) o2) < 0
-                ? BstVM.TRUE
-                : BstVM.FALSE
-        );
+        stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -209,9 +193,7 @@ public class BstFunctions {
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
             throw new BstVMException(
-                "Can only compare two integers with + (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Can only compare two integers with + (line %d)".formatted(ctx.start.getLine())
             );
         }
 
@@ -235,9 +217,7 @@ public class BstFunctions {
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
             throw new BstVMException(
-                "Can only subtract two integers with - (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Can only subtract two integers with - (line %d)".formatted(ctx.start.getLine())
             );
         }
 
@@ -271,9 +251,7 @@ public class BstFunctions {
             LOGGER.error("o1: {} ({})", o1, o1.getClass());
             LOGGER.error("o2: {} ({})", o2, o2.getClass());
             throw new BstVMException(
-                "Can only concatenate two String with * (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Can only concatenate two String with * (line %d)".formatted(ctx.start.getLine())
             );
         }
 
@@ -292,11 +270,7 @@ public class BstFunctions {
         }
 
         @Override
-        public void execute(
-            BstVMVisitor visitor,
-            ParserRuleContext ctx,
-            BstEntry bstEntry
-        ) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
             if (stack.size() < 2) {
                 throw new BstVMException(
                     "Not enough operands on stack for operation := (line %d)".formatted(
@@ -309,18 +283,13 @@ public class BstFunctions {
 
             if (!(o1 instanceof BstVMVisitor.Identifier identifier)) {
                 throw new BstVMException(
-                    "Invalid parameters (line %d)".formatted(
-                            ctx.start.getLine()
-                        )
+                    "Invalid parameters (line %d)".formatted(ctx.start.getLine())
                 );
             }
             String name = identifier.name();
 
             if (o2 instanceof String value) {
-                if (
-                    (bstEntry != null) &&
-                    bstEntry.localStrings.containsKey(name)
-                ) {
+                if ((bstEntry != null) && bstEntry.localStrings.containsKey(name)) {
                     bstEntry.localStrings.put(name, value);
                     return;
                 }
@@ -329,10 +298,7 @@ public class BstFunctions {
                     strings.put(name, value);
                 }
             } else if (o2 instanceof Integer value) {
-                if (
-                    (bstEntry != null) &&
-                    bstEntry.localIntegers.containsKey(name)
-                ) {
+                if ((bstEntry != null) && bstEntry.localIntegers.containsKey(name)) {
                     bstEntry.localIntegers.put(name, value);
                     return;
                 }
@@ -342,9 +308,7 @@ public class BstFunctions {
                 }
             } else {
                 throw new BstVMException(
-                    "Invalid parameters (line %d)".formatted(
-                            ctx.start.getLine()
-                        )
+                    "Invalid parameters (line %d)".formatted(ctx.start.getLine())
                 );
             }
         }
@@ -411,17 +375,11 @@ public class BstFunctions {
         }
 
         @Override
-        public void execute(
-            BstVMVisitor visitor,
-            ParserRuleContext ctx,
-            BstEntry bstEntry
-        ) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
             if (bstEntry == null) {
                 this.execute(visitor, ctx); // Throw error
             } else {
-                functions
-                    .get(bstEntry.entry.getType().getName())
-                    .execute(visitor, ctx, bstEntry);
+                functions.get(bstEntry.entry.getType().getName()).execute(visitor, ctx, bstEntry);
             }
         }
     }
@@ -472,12 +430,7 @@ public class BstFunctions {
             );
         }
 
-        stack.push(
-            BstCaseChanger.changeCase(
-                toChange,
-                BstCaseChanger.FormatMode.of(format)
-            )
-        );
+        stack.push(BstCaseChanger.changeCase(toChange, BstCaseChanger.FormatMode.of(format)));
     }
 
     /**
@@ -515,18 +468,12 @@ public class BstFunctions {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException(
-                "Must have an entry to cite$ (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Must have an entry to cite$ (line %d)".formatted(ctx.start.getLine())
             );
         }
 
         @Override
-        public void execute(
-            BstVMVisitor visitor,
-            ParserRuleContext ctx,
-            BstEntry bstEntryContext
-        ) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
             if (bstEntryContext == null) {
                 execute(visitor, ctx);
                 return;
@@ -575,9 +522,7 @@ public class BstFunctions {
 
         if (!(o1 instanceof String s)) {
             throw new BstVMException(
-                "Operand does not match function empty$ (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Operand does not match function empty$ (line %d)".formatted(ctx.start.getLine())
             );
         }
 
@@ -607,11 +552,7 @@ public class BstFunctions {
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
-        if (
-            !(o1 instanceof String) &&
-            !(o2 instanceof Integer) &&
-            !(o3 instanceof String)
-        ) {
+        if (!(o1 instanceof String) && !(o2 instanceof Integer) && !(o3 instanceof String)) {
             // warning("A string is needed for change.case$");
             stack.push("");
             return;
@@ -649,9 +590,7 @@ public class BstFunctions {
     private void bstIf(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
             throw new BstVMException(
-                "Not enough operands on stack for if$ (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Not enough operands on stack for if$ (line %d)".formatted(ctx.start.getLine())
             );
         }
 
@@ -660,10 +599,8 @@ public class BstFunctions {
         Object i = stack.pop();
 
         if (
-            !((f1 instanceof BstVMVisitor.Identifier) ||
-                (f1 instanceof ParseTree)) &&
-            ((f2 instanceof BstVMVisitor.Identifier) ||
-                (f2 instanceof ParseTree)) &&
+            !((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof ParseTree)) &&
+            ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof ParseTree)) &&
             (i instanceof Integer)
         ) {
             throw new BstVMException(
@@ -680,11 +617,7 @@ public class BstFunctions {
         }
     }
 
-    private void callIdentifierOrTree(
-        Object f,
-        BstVMVisitor visitor,
-        ParserRuleContext ctx
-    ) {
+    private void callIdentifierOrTree(Object f, BstVMVisitor visitor, ParserRuleContext ctx) {
         if (f instanceof ParseTree tree) {
             visitor.visit(tree);
         } else if (f instanceof BstVMVisitor.Identifier identifier) {
@@ -935,9 +868,7 @@ public class BstFunctions {
             startI += s.length() + 1;
             startI = Math.max(1, (startI + 1) - lenI);
         }
-        stack.push(
-            s.substring(startI - 1, Math.min((startI - 1) + lenI, s.length()))
-        );
+        stack.push(s.substring(startI - 1, Math.min((startI - 1) + lenI, s.length())));
     }
 
     /**
@@ -1074,11 +1005,7 @@ public class BstFunctions {
      * Pops and prints the top of the stack to the log file. It's useful for debugging.
      */
     private void bstTop(BstVMVisitor visitor, ParserRuleContext ctx) {
-        LOGGER.debug(
-            "Stack entry {} (line {})",
-            stack.pop(),
-            ctx.start.getLine()
-        );
+        LOGGER.debug("Stack entry {} (line {})", stack.pop(), ctx.start.getLine());
     }
 
     /**
@@ -1095,11 +1022,7 @@ public class BstFunctions {
         }
 
         @Override
-        public void execute(
-            BstVMVisitor visitor,
-            ParserRuleContext ctx,
-            BstEntry bstEntryContext
-        ) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
             if (bstEntryContext == null) {
                 this.execute(visitor, ctx);
                 return;
@@ -1135,15 +1058,11 @@ public class BstFunctions {
         Object f1 = stack.pop();
 
         if (
-            !((f1 instanceof BstVMVisitor.Identifier) ||
-                (f1 instanceof ParseTree)) &&
-            ((f2 instanceof BstVMVisitor.Identifier) ||
-                (f2 instanceof ParseTree))
+            !((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof ParseTree)) &&
+            ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof ParseTree))
         ) {
             throw new BstVMException(
-                "Expecting two functions for while$ (line %d)".formatted(
-                        ctx.start.getLine()
-                    )
+                "Expecting two functions for while$ (line %d)".formatted(ctx.start.getLine())
             );
         }
 

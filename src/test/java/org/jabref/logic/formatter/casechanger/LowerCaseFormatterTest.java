@@ -38,9 +38,6 @@ public class LowerCaseFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(
-            "kde {Amarok}",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("kde {Amarok}", formatter.format(formatter.getExampleInput()));
     }
 }

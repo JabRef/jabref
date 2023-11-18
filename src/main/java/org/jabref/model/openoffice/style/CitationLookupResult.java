@@ -35,8 +35,7 @@ public class CitationLookupResult {
         }
         CitationLookupResult that = (CitationLookupResult) otherObject;
         return (
-            Objects.equals(this.entry, that.entry) &&
-            Objects.equals(this.database, that.database)
+            Objects.equals(this.entry, that.entry) && Objects.equals(this.database, that.database)
         );
     }
 

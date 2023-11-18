@@ -133,10 +133,7 @@ public class MainMenu extends MenuBar {
                     StandardActions.NEW_LIBRARY,
                     new NewDatabaseAction(frame, preferencesService)
                 ),
-                factory.createMenuItem(
-                    StandardActions.OPEN_LIBRARY,
-                    frame.getOpenDatabaseAction()
-                ),
+                factory.createMenuItem(StandardActions.OPEN_LIBRARY, frame.getOpenDatabaseAction()),
                 frame.getFileHistory(),
                 factory.createMenuItem(
                     StandardActions.SAVE_LIBRARY,
@@ -251,10 +248,7 @@ public class MainMenu extends MenuBar {
                     new ShowPreferencesAction(frame, taskExecutor)
                 ),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(
-                    StandardActions.QUIT,
-                    new JabRefFrame.CloseAction(frame)
-                )
+                factory.createMenuItem(StandardActions.QUIT, new JabRefFrame.CloseAction(frame))
             );
 
         edit
@@ -262,21 +256,11 @@ public class MainMenu extends MenuBar {
             .addAll(
                 factory.createMenuItem(
                     StandardActions.UNDO,
-                    new UndoRedoAction(
-                        StandardActions.UNDO,
-                        frame,
-                        dialogService,
-                        stateManager
-                    )
+                    new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)
                 ),
                 factory.createMenuItem(
                     StandardActions.REDO,
-                    new UndoRedoAction(
-                        StandardActions.REDO,
-                        frame,
-                        dialogService,
-                        stateManager
-                    )
+                    new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)
                 ),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(
@@ -399,11 +383,7 @@ public class MainMenu extends MenuBar {
         SeparatorMenuItem specialFieldsSeparator = new SeparatorMenuItem();
         specialFieldsSeparator
             .visibleProperty()
-            .bind(
-                preferencesService
-                    .getSpecialFieldsPreferences()
-                    .specialFieldsEnabledProperty()
-            );
+            .bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
 
         edit
             .getItems()
@@ -601,8 +581,7 @@ public class MainMenu extends MenuBar {
 
         // @formatter:on
         getStyleClass().add("mainMenu");
-        getMenus()
-            .addAll(file, edit, library, quality, lookup, tools, view, help);
+        getMenus().addAll(file, edit, library, quality, lookup, tools, view, help);
         setUseSystemMenuBar(true);
     }
 

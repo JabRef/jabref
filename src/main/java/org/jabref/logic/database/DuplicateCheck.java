@@ -37,9 +37,7 @@ public class DuplicateCheck {
 
     private static final double DUPLICATE_THRESHOLD = 0.75; // The overall threshold to signal a duplicate pair
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DuplicateCheck.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateCheck.class);
     /*
      * Integer values for indicating result of duplicate check (for entries):
      */
@@ -74,32 +72,20 @@ public class DuplicateCheck {
         this.entryTypesManager = entryTypesManager;
     }
 
-    private static boolean haveSameIdentifier(
-        final BibEntry one,
-        final BibEntry two
-    ) {
+    private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
         for (final Field name : FieldFactory.getIdentifierFieldNames()) {
-            if (
-                one.getField(name).isPresent() &&
-                one.getField(name).equals(two.getField(name))
-            ) {
+            if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean haveDifferentEntryType(
-        final BibEntry one,
-        final BibEntry two
-    ) {
+    private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
         return !one.getType().equals(two.getType());
     }
 
-    private static boolean haveDifferentEditions(
-        final BibEntry one,
-        final BibEntry two
-    ) {
+    private static boolean haveDifferentEditions(final BibEntry one, final BibEntry two) {
         final Optional<String> editionOne = one.getField(StandardField.EDITION);
         final Optional<String> editionTwo = two.getField(StandardField.EDITION);
         return (
@@ -116,10 +102,8 @@ public class DuplicateCheck {
         return (
             (compareSingleField(StandardField.AUTHOR, one, two) == EQUAL) &&
             (compareSingleField(StandardField.TITLE, one, two) == EQUAL) &&
-            ((compareSingleField(StandardField.CHAPTER, one, two) ==
-                    NOT_EQUAL) ||
-                (compareSingleField(StandardField.PAGES, one, two) ==
-                    NOT_EQUAL))
+            ((compareSingleField(StandardField.CHAPTER, one, two) == NOT_EQUAL) ||
+                (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL))
         );
     }
 
@@ -132,10 +116,7 @@ public class DuplicateCheck {
         return requiredFields.isEmpty()
             ? new double[] { 0., 0. }
             : DuplicateCheck.compareFieldSet(
-                requiredFields
-                    .stream()
-                    .map(OrFields::getPrimary)
-                    .collect(Collectors.toSet()),
+                requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()),
                 one,
                 two
             );
@@ -145,10 +126,7 @@ public class DuplicateCheck {
         if (value < 0.0) {
             LOGGER.debug("Value {} is below zero. Should not happen", value);
         }
-        return (
-            value - DuplicateCheck.DUPLICATE_THRESHOLD >
-            DuplicateCheck.DOUBT_RANGE
-        );
+        return (value - DuplicateCheck.DUPLICATE_THRESHOLD > DuplicateCheck.DOUBT_RANGE);
     }
 
     private static boolean compareOptionalFields(
@@ -162,18 +140,13 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
         final double[] opt = DuplicateCheck.compareFieldSet(
-            optionalFields
-                .stream()
-                .map(BibField::field)
-                .collect(Collectors.toSet()),
+            optionalFields.stream().map(BibField::field).collect(Collectors.toSet()),
             one,
             two
         );
         final double numerator =
-            (DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) +
-            (opt[0] * opt[1]);
-        final double denominator =
-            (req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1];
+            (DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1]);
+        final double denominator = (req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1];
         final double totValue = numerator / denominator;
         return totValue >= DuplicateCheck.DUPLICATE_THRESHOLD;
     }
@@ -189,8 +162,7 @@ public class DuplicateCheck {
         double equalWeights = 0;
         double totalWeights = 0.;
         for (final Field field : fields) {
-            final double currentWeight =
-                DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
+            final double currentWeight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
             totalWeights += currentWeight;
             int result = DuplicateCheck.compareSingleField(field, one, two);
             if (result == EQUAL) {
@@ -239,10 +211,7 @@ public class DuplicateCheck {
         return compareField(stringOne, stringTwo);
     }
 
-    private static int compareAuthorField(
-        final String stringOne,
-        final String stringTwo
-    ) {
+    private static int compareAuthorField(final String stringOne, final String stringTwo) {
         // Specific for name fields.
         // Harmonise case:
         final String authorOne = AuthorList
@@ -253,10 +222,7 @@ public class DuplicateCheck {
             .fixAuthorLastNameOnlyCommas(stringTwo, false)
             .replace(" and ", " ")
             .toLowerCase(Locale.ROOT);
-        final double similarity = DuplicateCheck.correlateByWords(
-            authorOne,
-            authorTwo
-        );
+        final double similarity = DuplicateCheck.correlateByWords(authorOne, authorTwo);
         if (similarity > 0.8) {
             return EQUAL;
         }
@@ -268,10 +234,7 @@ public class DuplicateCheck {
      * We do a replace to harmonize these to a simple "-"
      * After this, a simple test for equality should be enough
      */
-    private static int comparePagesField(
-        final String stringOne,
-        final String stringTwo
-    ) {
+    private static int comparePagesField(final String stringOne, final String stringTwo) {
         final String processedStringOne = stringOne.replaceAll("[- ]+", "-");
         final String processedStringTwo = stringTwo.replaceAll("[- ]+", "-");
         if (processedStringOne.equals(processedStringTwo)) {
@@ -284,16 +247,9 @@ public class DuplicateCheck {
      * We do not attempt to harmonize abbreviation state of the journal names,
      * but we remove periods from the names in case they are abbreviated with and without dots:
      */
-    private static int compareJournalField(
-        final String stringOne,
-        final String stringTwo
-    ) {
-        final String processedStringOne = stringOne
-            .replace(".", "")
-            .toLowerCase(Locale.ROOT);
-        final String processedStringTwo = stringTwo
-            .replace(".", "")
-            .toLowerCase(Locale.ROOT);
+    private static int compareJournalField(final String stringOne, final String stringTwo) {
+        final String processedStringOne = stringOne.replace(".", "").toLowerCase(Locale.ROOT);
+        final String processedStringTwo = stringTwo.replace(".", "").toLowerCase(Locale.ROOT);
         final double similarity = DuplicateCheck.correlateByWords(
             processedStringOne,
             processedStringTwo
@@ -304,23 +260,13 @@ public class DuplicateCheck {
         return NOT_EQUAL;
     }
 
-    private static int compareChapterField(
-        final String stringOne,
-        final String stringTwo
-    ) {
-        final String processedStringOne = stringOne
-            .replaceAll("(?i)chapter", "")
-            .trim();
-        final String processedStringTwo = stringTwo
-            .replaceAll("(?i)chapter", "")
-            .trim();
+    private static int compareChapterField(final String stringOne, final String stringTwo) {
+        final String processedStringOne = stringOne.replaceAll("(?i)chapter", "").trim();
+        final String processedStringTwo = stringTwo.replaceAll("(?i)chapter", "").trim();
         return compareField(processedStringOne, processedStringTwo);
     }
 
-    private static int compareField(
-        final String stringOne,
-        final String stringTwo
-    ) {
+    private static int compareField(final String stringOne, final String stringTwo) {
         final String processedStringOne = StringUtil.unifyLineBreaks(
             stringOne.toLowerCase(Locale.ROOT).trim(),
             OS.NEWLINE
@@ -356,11 +302,7 @@ public class DuplicateCheck {
         return (double) score / allFields.size();
     }
 
-    private static boolean isSingleFieldEqual(
-        BibEntry one,
-        BibEntry two,
-        Field field
-    ) {
+    private static boolean isSingleFieldEqual(BibEntry one, BibEntry two, Field field) {
         final Optional<String> stringOne = one.getField(field);
         final Optional<String> stringTwo = two.getField(field);
         if (stringOne.isEmpty() && stringTwo.isEmpty()) {
@@ -419,8 +361,7 @@ public class DuplicateCheck {
         }
         final double distanceIgnoredCase = new StringSimilarity()
             .editDistanceIgnoreCase(longer, shorter);
-        final double similarity =
-            (longerLength - distanceIgnoredCase) / longerLength;
+        final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
         LOGGER.debug(
             "Longer string: {} Shorter string: {} Similarity: {}",
             longer,
@@ -469,11 +410,7 @@ public class DuplicateCheck {
         );
         if (type.isPresent()) {
             BibEntryType entryType = type.get();
-            final double[] reqCmpResult = compareRequiredFields(
-                entryType,
-                one,
-                two
-            );
+            final double[] reqCmpResult = compareRequiredFields(entryType, one, two);
 
             if (isFarFromThreshold(reqCmpResult[0])) {
                 // Far from the threshold value, so we base our decision on the required fields only
@@ -488,11 +425,7 @@ public class DuplicateCheck {
         // if type is not present, so simply compare fields without any distinction between optional/required
         // In case both required and optional fields are equal, we also use this fallback
         return (
-            compareFieldSet(
-                Sets.union(one.getFields(), two.getFields()),
-                one,
-                two
-            )[0] >=
+            compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >=
             DuplicateCheck.DUPLICATE_THRESHOLD
         );
     }

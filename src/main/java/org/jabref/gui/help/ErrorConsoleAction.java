@@ -16,9 +16,7 @@ public class ErrorConsoleAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         dialogService.showCustomDialog(new ErrorConsoleView());
     }
 }

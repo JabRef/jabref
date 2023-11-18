@@ -19,8 +19,7 @@ import org.jabref.gui.icon.JabRefIcon;
  *
  * @param <T> cell value
  */
-public class ViewModelTreeCellFactory<T>
-    implements Callback<TreeView<T>, TreeCell<T>> {
+public class ViewModelTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
 
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
@@ -32,23 +31,17 @@ public class ViewModelTreeCellFactory<T>
         return this;
     }
 
-    public ViewModelTreeCellFactory<T> withGraphic(
-        Callback<T, Node> toGraphic
-    ) {
+    public ViewModelTreeCellFactory<T> withGraphic(Callback<T, Node> toGraphic) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ViewModelTreeCellFactory<T> withIcon(
-        Callback<T, JabRefIcon> toIcon
-    ) {
+    public ViewModelTreeCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon) {
         this.toGraphic = viewModel -> toIcon.call(viewModel).getGraphicNode();
         return this;
     }
 
-    public ViewModelTreeCellFactory<T> withTooltip(
-        Callback<T, String> toTooltip
-    ) {
+    public ViewModelTreeCellFactory<T> withTooltip(Callback<T, String> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
@@ -66,24 +59,17 @@ public class ViewModelTreeCellFactory<T>
 
     @Override
     public TreeCell<T> call(TreeView<T> tree) {
-        Callback<TreeItem<T>, ObservableValue<Boolean>> getSelectedProperty =
-            item -> {
-                if (item instanceof CheckBoxTreeItem<?>) {
-                    return ((CheckBoxTreeItem<?>) item).selectedProperty();
-                }
-                return null;
-            };
+        Callback<TreeItem<T>, ObservableValue<Boolean>> getSelectedProperty = item -> {
+            if (item instanceof CheckBoxTreeItem<?>) {
+                return ((CheckBoxTreeItem<?>) item).selectedProperty();
+            }
+            return null;
+        };
 
-        StringConverter<TreeItem<T>> converter = new StringConverter<
-            TreeItem<T>
-        >() {
+        StringConverter<TreeItem<T>> converter = new StringConverter<TreeItem<T>>() {
             @Override
             public String toString(TreeItem<T> treeItem) {
-                return (
-                        treeItem == null ||
-                        treeItem.getValue() == null ||
-                        toText == null
-                    )
+                return (treeItem == null || treeItem.getValue() == null || toText == null)
                     ? ""
                     : toText.call(treeItem.getValue());
             }

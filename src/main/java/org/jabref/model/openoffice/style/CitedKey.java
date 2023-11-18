@@ -13,10 +13,7 @@ import org.jabref.model.openoffice.ootext.OOText;
  * They contain backreferences to the corresponding citations in {@code where}. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
  */
 public class CitedKey
-    implements
-        ComparableCitedKey,
-        CitationMarkerNormEntry,
-        CitationMarkerNumericBibEntry {
+    implements ComparableCitedKey, CitationMarkerNormEntry, CitationMarkerNumericBibEntry {
 
     public final String citationKey;
     private final List<CitationPath> where;
@@ -101,19 +98,13 @@ public class CitedKey
 
         // Check consistency
         if (!cit.getLookupResult().equals(this.db)) {
-            throw new IllegalStateException(
-                "CitedKey.addPath: mismatch on cit.db"
-            );
+            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.db");
         }
         if (!cit.getNumber().equals(this.number)) {
-            throw new IllegalStateException(
-                "CitedKey.addPath: mismatch on cit.number"
-            );
+            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.number");
         }
         if (!cit.getUniqueLetter().equals(this.uniqueLetter)) {
-            throw new IllegalStateException(
-                "CitedKey.addPath: mismatch on cit.uniqueLetter"
-            );
+            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.uniqueLetter");
         }
     }
 
@@ -125,11 +116,7 @@ public class CitedKey
     }
 
     void distributeLookupResult(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(
-            where,
-            Citation::setLookupResult,
-            db
-        );
+        citationGroups.distributeToCitations(where, Citation::setLookupResult, db);
     }
 
     /*
@@ -137,18 +124,10 @@ public class CitedKey
      */
 
     void distributeNumber(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(
-            where,
-            Citation::setNumber,
-            number
-        );
+        citationGroups.distributeToCitations(where, Citation::setNumber, number);
     }
 
     void distributeUniqueLetter(CitationGroups citationGroups) {
-        citationGroups.distributeToCitations(
-            where,
-            Citation::setUniqueLetter,
-            uniqueLetter
-        );
+        citationGroups.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);
     }
 }

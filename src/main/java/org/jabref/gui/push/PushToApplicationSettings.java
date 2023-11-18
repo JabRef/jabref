@@ -54,23 +54,17 @@ public class PushToApplicationSettings {
         if (this.application.getCommandName() == null) {
             commandLine.append(':');
         } else {
-            commandLine
-                .append(" (")
-                .append(this.application.getCommandName())
-                .append("):");
+            commandLine.append(" (").append(this.application.getCommandName()).append("):");
         }
         commandLabel.setText(commandLine.toString());
         settingsPane.add(commandLabel, 0, 0);
 
-        path.setText(
-            preferences.getCommandPaths().get(this.application.getDisplayName())
-        );
+        path.setText(preferences.getCommandPaths().get(this.application.getDisplayName()));
         settingsPane.add(path, 1, 0);
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(filePreferences.getWorkingDirectory())
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(filePreferences.getWorkingDirectory())
+            .build();
         browse.setOnAction(e ->
             dialogService
                 .showFileOpenDialog(fileDialogConfiguration)
@@ -94,9 +88,7 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Map<String, String> commandPaths = new HashMap<>(
-            preferences.getCommandPaths()
-        );
+        Map<String, String> commandPaths = new HashMap<>(preferences.getCommandPaths());
         commandPaths.put(application.getDisplayName(), path.getText());
         preferences.setCommandPaths(commandPaths);
     }

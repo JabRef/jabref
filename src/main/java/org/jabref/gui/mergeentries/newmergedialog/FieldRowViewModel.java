@@ -35,21 +35,14 @@ public class FieldRowViewModel {
         NONE,
     }
 
-    private final Logger LOGGER = LoggerFactory.getLogger(
-        FieldRowViewModel.class
-    );
-    private final BooleanProperty isFieldsMerged = new SimpleBooleanProperty(
-        Boolean.FALSE
-    );
+    private final Logger LOGGER = LoggerFactory.getLogger(FieldRowViewModel.class);
+    private final BooleanProperty isFieldsMerged = new SimpleBooleanProperty(Boolean.FALSE);
 
-    private final ObjectProperty<Selection> selection =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Selection> selection = new SimpleObjectProperty<>();
 
     private final StringProperty leftFieldValue = new SimpleStringProperty("");
     private final StringProperty rightFieldValue = new SimpleStringProperty("");
-    private final StringProperty mergedFieldValue = new SimpleStringProperty(
-        ""
-    );
+    private final StringProperty mergedFieldValue = new SimpleStringProperty("");
 
     private final Field field;
 
@@ -98,8 +91,7 @@ public class FieldRowViewModel {
             mergedFieldValueProperty(),
             (obs, old, mergedFieldValue) -> {
                 if (field.equals(InternalField.TYPE_HEADER)) {
-                    getMergedEntry()
-                        .setType(EntryTypeFactory.parse(mergedFieldValue));
+                    getMergedEntry().setType(EntryTypeFactory.parse(mergedFieldValue));
                 } else {
                     getMergedEntry().setField(field, mergedFieldValue);
                 }
@@ -130,11 +122,7 @@ public class FieldRowViewModel {
         EasyBind.subscribe(
             selectionProperty(),
             selection -> {
-                LOGGER.debug(
-                    "Selecting {}' value for field {}",
-                    selection,
-                    field.getDisplayName()
-                );
+                LOGGER.debug("Selecting {}' value for field {}", selection, field.getDisplayName());
                 switch (selection) {
                     case LEFT -> EasyBind.subscribe(
                         leftFieldValueProperty(),
@@ -166,10 +154,7 @@ public class FieldRowViewModel {
             }
         );
 
-        EasyBind.subscribe(
-            hasEqualLeftAndRightBinding(),
-            this::setIsFieldsMerged
-        );
+        EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);
     }
 
     public void selectNonEmptyValue() {
@@ -223,10 +208,7 @@ public class FieldRowViewModel {
         String oldRightFieldValue = getRightFieldValue();
 
         FieldMerger fieldMerger = fieldMergerFactory.create(field);
-        String mergedFields = fieldMerger.merge(
-            getLeftFieldValue(),
-            getRightFieldValue()
-        );
+        String mergedFields = fieldMerger.merge(getLeftFieldValue(), getRightFieldValue());
         setLeftFieldValue(mergedFields);
         setRightFieldValue(mergedFields);
 
@@ -234,11 +216,7 @@ public class FieldRowViewModel {
             fieldsMergedEdit.redo();
         } else {
             fieldsMergedEdit.addEdit(
-                new MergeFieldsUndo(
-                    oldLeftFieldValue,
-                    oldRightFieldValue,
-                    mergedFields
-                )
+                new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields)
             );
             fieldsMergedEdit.end();
         }

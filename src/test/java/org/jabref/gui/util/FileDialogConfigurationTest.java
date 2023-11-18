@@ -18,10 +18,9 @@ class FileDialogConfigurationTest {
     void testWithValidDirectoryString(@TempDir Path folder) {
         String tempFolder = folder.toAbsolutePath().toString();
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(tempFolder)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(tempFolder)
+            .build();
 
         assertEquals(
             Optional.of(Path.of(tempFolder)),
@@ -31,63 +30,46 @@ class FileDialogConfigurationTest {
 
     @Test
     void testWithValidDirectoryPath(@TempDir Path tempFolder) {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(tempFolder)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(tempFolder)
+            .build();
 
-        assertEquals(
-            Optional.of(tempFolder),
-            fileDialogConfiguration.getInitialDirectory()
-        );
+        assertEquals(Optional.of(tempFolder), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
     void testWithNullStringDirectory() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory((String) null)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory((String) null)
+            .build();
 
-        assertEquals(
-            Optional.empty(),
-            fileDialogConfiguration.getInitialDirectory()
-        );
+        assertEquals(Optional.empty(), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
     void testWithNullPathDirectory() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory((Path) null)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory((Path) null)
+            .build();
 
-        assertEquals(
-            Optional.empty(),
-            fileDialogConfiguration.getInitialDirectory()
-        );
+        assertEquals(Optional.empty(), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
     void testWithNonExistingDirectoryAndParentNull() {
         String tempFolder = "workingDirectory";
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(tempFolder)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(tempFolder)
+            .build();
 
-        assertEquals(
-            Optional.empty(),
-            fileDialogConfiguration.getInitialDirectory()
-        );
+        assertEquals(Optional.empty(), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
     void testSingleExtension() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withDefaultExtension(StandardFileType.BIBTEX_DB)
+            .build();
 
         FileChooser.ExtensionFilter filter = toFilter(
             String.format("%1s %2s", "BibTex", Localization.lang("Library")),
@@ -100,10 +82,7 @@ class FileDialogConfigurationTest {
         );
     }
 
-    private FileChooser.ExtensionFilter toFilter(
-        String description,
-        FileType extension
-    ) {
+    private FileChooser.ExtensionFilter toFilter(String description, FileType extension) {
         return new FileChooser.ExtensionFilter(
             description,
             extension

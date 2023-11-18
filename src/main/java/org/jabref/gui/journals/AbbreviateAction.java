@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AbbreviateAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AbbreviateAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
 
     private final StandardActions action;
     private final JabRefFrame frame;
@@ -63,12 +61,9 @@ public class AbbreviateAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         switch (action) {
-            case ABBREVIATE_DEFAULT -> abbreviationType =
-                AbbreviationType.DEFAULT;
-            case ABBREVIATE_DOTLESS -> abbreviationType =
-                AbbreviationType.DOTLESS;
-            case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType =
-                AbbreviationType.SHORTEST_UNIQUE;
+            case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
+            case ABBREVIATE_DOTLESS -> abbreviationType = AbbreviationType.DOTLESS;
+            case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
             default -> LOGGER.debug("Unknown action: " + action.name());
         }
 
@@ -116,19 +111,14 @@ public class AbbreviateAction extends SimpleCommand {
         }
     }
 
-    private String abbreviate(
-        BibDatabaseContext databaseContext,
-        List<BibEntry> entries
-    ) {
+    private String abbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
             abbreviationRepository,
             abbreviationType,
             journalAbbreviationPreferences.shouldUseFJournalField()
         );
 
-        NamedCompound ce = new NamedCompound(
-            Localization.lang("Abbreviate journal names")
-        );
+        NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
 
         // Collect all callables to execute in one collection.
         Set<Callable<Boolean>> tasks = entries
@@ -150,8 +140,7 @@ public class AbbreviateAction extends SimpleCommand {
             .collect(Collectors.toSet());
 
         // Execute the callables and wait for the results.
-        List<Future<Boolean>> futures =
-            JabRefExecutorService.INSTANCE.executeAll(tasks);
+        List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
 
         // Evaluate the results of the callables.
         long count = futures
@@ -173,23 +162,15 @@ public class AbbreviateAction extends SimpleCommand {
         ce.end();
         frame.getUndoManager().addEdit(ce);
         frame.getCurrentLibraryTab().markBaseChanged();
-        return Localization.lang(
-            "Abbreviated %0 journal names.",
-            String.valueOf(count)
-        );
+        return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
     }
 
-    private String unabbreviate(
-        BibDatabaseContext databaseContext,
-        List<BibEntry> entries
-    ) {
+    private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(
             Globals.journalAbbreviationRepository
         );
 
-        NamedCompound ce = new NamedCompound(
-            Localization.lang("Unabbreviate journal names")
-        );
+        NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = entries
             .stream()
             .mapToInt(entry ->
@@ -208,17 +189,12 @@ public class AbbreviateAction extends SimpleCommand {
             )
             .sum();
         if (count == 0) {
-            return Localization.lang(
-                "No journal names could be unabbreviated."
-            );
+            return Localization.lang("No journal names could be unabbreviated.");
         }
 
         ce.end();
         frame.getUndoManager().addEdit(ce);
         frame.getCurrentLibraryTab().markBaseChanged();
-        return Localization.lang(
-            "Unabbreviated %0 journal names.",
-            String.valueOf(count)
-        );
+        return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
     }
 }

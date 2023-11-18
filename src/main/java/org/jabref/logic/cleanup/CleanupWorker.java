@@ -26,10 +26,7 @@ public class CleanupWorker {
         this.timestampPreferences = timestampPreferences;
     }
 
-    public List<FieldChange> cleanup(
-        CleanupPreferences preset,
-        BibEntry entry
-    ) {
+    public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
         Objects.requireNonNull(preset);
         Objects.requireNonNull(entry);
 
@@ -43,9 +40,7 @@ public class CleanupWorker {
         return changes;
     }
 
-    private List<CleanupJob> determineCleanupActions(
-        CleanupPreferences preset
-    ) {
+    private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
@@ -53,9 +48,7 @@ public class CleanupWorker {
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
-            jobs.addAll(
-                preset.getFieldFormatterCleanups().getConfiguredActions()
-            );
+            jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions());
         }
 
         return jobs;
@@ -66,15 +59,8 @@ public class CleanupWorker {
             case CLEAN_UP_DOI -> new DoiCleanup();
             case CLEANUP_EPRINT -> new EprintCleanup();
             case CLEAN_UP_URL -> new URLCleanup();
-            case MAKE_PATHS_RELATIVE -> new RelativePathsCleanup(
-                databaseContext,
-                filePreferences
-            );
-            case RENAME_PDF -> new RenamePdfCleanup(
-                false,
-                databaseContext,
-                filePreferences
-            );
+            case MAKE_PATHS_RELATIVE -> new RelativePathsCleanup(databaseContext, filePreferences);
+            case RENAME_PDF -> new RenamePdfCleanup(false, databaseContext, filePreferences);
             case RENAME_PDF_ONLY_RELATIVE_PATHS -> new RenamePdfCleanup(
                 true,
                 databaseContext,
@@ -89,10 +75,7 @@ public class CleanupWorker {
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE -> new TimeStampToModificationDate(
                 timestampPreferences
             );
-            case MOVE_PDF -> new MoveFilesCleanup(
-                databaseContext,
-                filePreferences
-            );
+            case MOVE_PDF -> new MoveFilesCleanup(databaseContext, filePreferences);
             case FIX_FILE_LINKS -> new FileLinksCleanup();
             case CLEAN_UP_ISSN -> new ISSNCleanup();
             default -> throw new UnsupportedOperationException(action.name());

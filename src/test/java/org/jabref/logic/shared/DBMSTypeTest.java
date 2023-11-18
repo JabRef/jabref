@@ -32,10 +32,7 @@ public class DBMSTypeTest {
 
     @Test
     public void fromStringWorksForPostgreSQL() {
-        assertEquals(
-            Optional.of(DBMSType.POSTGRESQL),
-            DBMSType.fromString("PostgreSQL")
-        );
+        assertEquals(Optional.of(DBMSType.POSTGRESQL), DBMSType.fromString("PostgreSQL"));
     }
 
     @Test
@@ -55,26 +52,17 @@ public class DBMSTypeTest {
 
     @Test
     public void driverClassForMysqlIsCorrect() {
-        assertEquals(
-            "org.mariadb.jdbc.Driver",
-            DBMSType.MYSQL.getDriverClassPath()
-        );
+        assertEquals("org.mariadb.jdbc.Driver", DBMSType.MYSQL.getDriverClassPath());
     }
 
     @Test
     public void driverClassForOracleIsCorrect() {
-        assertEquals(
-            "oracle.jdbc.driver.OracleDriver",
-            DBMSType.ORACLE.getDriverClassPath()
-        );
+        assertEquals("oracle.jdbc.driver.OracleDriver", DBMSType.ORACLE.getDriverClassPath());
     }
 
     @Test
     public void driverClassForPostgresIsCorrect() {
-        assertEquals(
-            "org.postgresql.Driver",
-            DBMSType.POSTGRESQL.getDriverClassPath()
-        );
+        assertEquals("org.postgresql.Driver", DBMSType.POSTGRESQL.getDriverClassPath());
     }
 
     @Test
@@ -89,10 +77,7 @@ public class DBMSTypeTest {
 
     @Test
     public void fromStringForPostgresReturnsCorrectValue() {
-        assertEquals(
-            DBMSType.POSTGRESQL,
-            DBMSType.fromString("PostgreSQL").get()
-        );
+        assertEquals(DBMSType.POSTGRESQL, DBMSType.fromString("PostgreSQL").get());
     }
 
     @Test

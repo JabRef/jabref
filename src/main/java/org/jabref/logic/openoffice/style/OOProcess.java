@@ -45,9 +45,7 @@ public class OOProcess {
      *
      *  Yes, they are always sorted one way or another.
      */
-    public static Comparator<BibEntry> comparatorForMulticite(
-        OOBibStyle style
-    ) {
+    public static Comparator<BibEntry> comparatorForMulticite(OOBibStyle style) {
         if (style.getMultiCiteChronological()) {
             return OOProcess.YEAR_AUTHOR_TITLE_COMPARATOR;
         } else {
@@ -75,20 +73,11 @@ public class OOProcess {
 
         // fill CitationGroup.citationMarker
         if (style.isCitationKeyCiteMarkers()) {
-            OOProcessCitationKeyMarkers.produceCitationMarkers(
-                citationGroups,
-                style
-            );
+            OOProcessCitationKeyMarkers.produceCitationMarkers(citationGroups, style);
         } else if (style.isNumberEntries()) {
-            OOProcessNumericMarkers.produceCitationMarkers(
-                citationGroups,
-                style
-            );
+            OOProcessNumericMarkers.produceCitationMarkers(citationGroups, style);
         } else {
-            OOProcessAuthorYearMarkers.produceCitationMarkers(
-                citationGroups,
-                style
-            );
+            OOProcessAuthorYearMarkers.produceCitationMarkers(citationGroups, style);
         }
     }
 }

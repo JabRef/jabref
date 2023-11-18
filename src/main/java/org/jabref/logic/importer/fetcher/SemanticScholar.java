@@ -39,17 +39,11 @@ import org.slf4j.LoggerFactory;
 
 public class SemanticScholar
     implements
-        FulltextFetcher,
-        PagedSearchBasedParserFetcher,
-        EntryBasedFetcher,
-        CustomizableKeyFetcher {
+        FulltextFetcher, PagedSearchBasedParserFetcher, EntryBasedFetcher, CustomizableKeyFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SemanticScholar.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholar.class);
 
-    private static final String SOURCE_ID_SEARCH =
-        "https://api.semanticscholar.org/v1/paper/";
+    private static final String SOURCE_ID_SEARCH = "https://api.semanticscholar.org/v1/paper/";
     private static final String SOURCE_WEB_SEARCH =
         "https://api.semanticscholar.org/graph/v1/paper/search?";
     private final ImporterPreferences importerPreferences;
@@ -69,13 +63,10 @@ public class SemanticScholar
      * @throws FetcherException if the received page differs from what was expected
      */
     @Override
-    public Optional<URL> findFullText(BibEntry entry)
-        throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
 
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
         Optional<ArXivIdentifier> arXiv = entry
             .getField(StandardField.EPRINT)
             .flatMap(ArXivIdentifier::parse);
@@ -98,10 +89,7 @@ public class SemanticScholar
                 LOGGER.info("Error for pdf lookup with DOI");
             }
         }
-        if (
-            arXiv.isPresent() &&
-            entry.getField(StandardField.EPRINT).isPresent()
-        ) {
+        if (arXiv.isPresent() && entry.getField(StandardField.EPRINT).isPresent()) {
             // Check if entry is a match
             String arXivString = entry.getField(StandardField.EPRINT).get();
             if (!arXivString.startsWith("arXiv:")) {
@@ -125,13 +113,10 @@ public class SemanticScholar
         // Retrieve PDF link from button on the webpage
         // First checked is a drop-down menu, as it has the correct URL if present
         // Else take the primary button
-        Elements metaLinks = html.getElementsByClass(
-            "flex-item alternate-sources__dropdown"
-        );
+        Elements metaLinks = html.getElementsByClass("flex-item alternate-sources__dropdown");
         String link = metaLinks.select("a").attr("href");
         if (link.length() < 10) {
-            metaLinks =
-                html.getElementsByClass("flex-paper-actions__button--primary");
+            metaLinks = html.getElementsByClass("flex-paper-actions__button--primary");
             link = metaLinks.select("a").attr("href");
         }
         if (link.isBlank()) {
@@ -162,19 +147,12 @@ public class SemanticScholar
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter(
             "query",
-            new DefaultQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
-        uriBuilder.addParameter(
-            "offset",
-            String.valueOf(pageNumber * getPageSize())
-        );
+        uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter(
             "limit",
-            String.valueOf(
-                Math.min(getPageSize(), 10000 - pageNumber * getPageSize())
-            )
+            String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize()))
         );
         // All fields need to be specified
         uriBuilder.addParameter(
@@ -201,11 +179,7 @@ public class SemanticScholar
             if (total == 0) {
                 return Collections.emptyList();
             } else if (response.has("next")) {
-                total =
-                    Math.min(
-                        total,
-                        response.getInt("next") - response.getInt("offset")
-                    );
+                total = Math.min(total, response.getInt("next") - response.getInt("offset"));
             }
 
             // Response contains a list
@@ -242,28 +216,20 @@ public class SemanticScholar
                 IntStream
                     .range(0, item.optJSONArray("authors").length())
                     .mapToObj(item.optJSONArray("authors")::getJSONObject)
-                    .map(author ->
-                        author.has("name") ? author.getString("name") : ""
-                    )
+                    .map(author -> author.has("name") ? author.getString("name") : "")
                     .collect(Collectors.joining(" and "))
             );
 
             JSONObject externalIds = item.optJSONObject("externalIds");
             entry.setField(StandardField.DOI, externalIds.optString("DOI"));
             if (externalIds.has("ArXiv")) {
-                entry.setField(
-                    StandardField.EPRINT,
-                    externalIds.getString("ArXiv")
-                );
+                entry.setField(StandardField.EPRINT, externalIds.getString("ArXiv"));
                 entry.setField(StandardField.EPRINTTYPE, "arXiv");
             }
             entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException(
-                "SemanticScholar API JSON format has changed",
-                exception
-            );
+            throw new ParseException("SemanticScholar API JSON format has changed", exception);
         }
     }
 
@@ -285,8 +251,7 @@ public class SemanticScholar
      * @throws FetcherException if an error linked to the Fetcher applies
      */
     @Override
-    public List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();
         if (title.isEmpty()) {
             return new ArrayList<>();

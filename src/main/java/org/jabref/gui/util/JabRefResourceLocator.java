@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefResourceLocator implements ResourceLocator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        JabRefResourceLocator.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefResourceLocator.class);
 
     @Override
     public ResourceBundle getResourceBundle(String s) {

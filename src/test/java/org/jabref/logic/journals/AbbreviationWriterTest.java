@@ -14,8 +14,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 class AbbreviationWriterTest {
 
     @Test
-    void shortestUniqueAbbreviationWrittenIfItDiffers(@TempDir Path tempDir)
-        throws Exception {
+    void shortestUniqueAbbreviationWrittenIfItDiffers(@TempDir Path tempDir) throws Exception {
         Abbreviation abbreviation = new Abbreviation("Full", "Abbr", "A");
         Path csvFile = tempDir.resolve("test.csv");
         AbbreviationWriter.writeOrCreate(csvFile, List.of(abbreviation));
@@ -23,9 +22,8 @@ class AbbreviationWriterTest {
     }
 
     @Test
-    void doNotWriteShortestUniqueAbbreviationWrittenIfItDiffers(
-        @TempDir Path tempDir
-    ) throws Exception {
+    void doNotWriteShortestUniqueAbbreviationWrittenIfItDiffers(@TempDir Path tempDir)
+        throws Exception {
         Abbreviation abbreviation = new Abbreviation("Full", "Abbr");
         Path csvFile = tempDir.resolve("test.csv");
         AbbreviationWriter.writeOrCreate(csvFile, List.of(abbreviation));

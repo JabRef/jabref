@@ -67,38 +67,27 @@ public class ConstantsPropertiesView
                 preferencesService.getFilePreferences()
             );
 
-        addStringButton.setTooltip(
-            new Tooltip(Localization.lang("New string"))
-        );
+        addStringButton.setTooltip(new Tooltip(Localization.lang("New string")));
 
         labelColumn.setSortable(true);
         labelColumn.setReorderable(false);
 
-        labelColumn.setCellValueFactory(cellData ->
-            cellData.getValue().labelProperty()
-        );
-        new ViewModelTextFieldTableCellVisualizationFactory<
-            ConstantsItemModel,
-            String
-        >()
+        labelColumn.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
+        new ViewModelTextFieldTableCellVisualizationFactory<ConstantsItemModel, String>()
             .withValidation(ConstantsItemModel::labelValidation)
             .install(labelColumn, new DefaultStringConverter());
         labelColumn.setOnEditCommit(
-            (
-                TableColumn.CellEditEvent<ConstantsItemModel, String> cellEvent
-            ) -> {
+            (TableColumn.CellEditEvent<ConstantsItemModel, String> cellEvent) -> {
                 var tableView = cellEvent.getTableView();
                 ConstantsItemModel cellItem = tableView
                     .getItems()
                     .get(cellEvent.getTablePosition().getRow());
 
-                Optional<ConstantsItemModel> existingItem =
-                    viewModel.labelAlreadyExists(cellEvent.getNewValue());
+                Optional<ConstantsItemModel> existingItem = viewModel.labelAlreadyExists(
+                    cellEvent.getNewValue()
+                );
 
-                if (
-                    existingItem.isPresent() &&
-                    !existingItem.get().equals(cellItem)
-                ) {
+                if (existingItem.isPresent() && !existingItem.get().equals(cellItem)) {
                     dialogService.showErrorDialogAndWait(
                         Localization.lang(
                             "A string with the label '%0' already exists.",
@@ -122,13 +111,8 @@ public class ConstantsPropertiesView
 
         contentColumn.setSortable(true);
         contentColumn.setReorderable(false);
-        contentColumn.setCellValueFactory(cellData ->
-            cellData.getValue().contentProperty()
-        );
-        new ViewModelTextFieldTableCellVisualizationFactory<
-            ConstantsItemModel,
-            String
-        >()
+        contentColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        new ViewModelTextFieldTableCellVisualizationFactory<ConstantsItemModel, String>()
             .withValidation(ConstantsItemModel::contentValidation)
             .install(contentColumn, new DefaultStringConverter());
         contentColumn.setOnEditCommit(
@@ -138,25 +122,16 @@ public class ConstantsPropertiesView
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData ->
-            cellData.getValue().labelProperty()
-        );
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
         new ValueTableCellFactory<ConstantsItemModel, String>()
-            .withGraphic(label ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
+            .withGraphic(label -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
             .withTooltip(label -> Localization.lang("Remove string %0", label))
             .withOnMouseClickedEvent(item ->
-                evt ->
-                    viewModel.removeString(
-                        stringsList.getFocusModel().getFocusedItem()
-                    )
+                evt -> viewModel.removeString(stringsList.getFocusModel().getFocusedItem())
             )
             .install(actionsColumn);
 
-        stringsList
-            .itemsProperty()
-            .bindBidirectional(viewModel.stringsListProperty());
+        stringsList.itemsProperty().bindBidirectional(viewModel.stringsListProperty());
         stringsList.setEditable(true);
     }
 

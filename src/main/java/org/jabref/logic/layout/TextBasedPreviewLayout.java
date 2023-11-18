@@ -17,9 +17,7 @@ public class TextBasedPreviewLayout implements PreviewLayout {
 
     public static final String NAME = "PREVIEW";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        TextBasedPreviewLayout.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
     private Layout layout;
     private String text;
     private LayoutFormatterPreferences layoutFormatterPreferences;
@@ -45,11 +43,7 @@ public class TextBasedPreviewLayout implements PreviewLayout {
         StringReader sr = new StringReader(text.replace("__NEWLINE__", "\n"));
         try {
             layout =
-                new LayoutHelper(
-                    sr,
-                    layoutFormatterPreferences,
-                    abbreviationRepository
-                )
+                new LayoutHelper(sr, layoutFormatterPreferences, abbreviationRepository)
                     .getLayoutFromText();
         } catch (IOException e) {
             LOGGER.error("Could not generate layout", e);
@@ -57,10 +51,7 @@ public class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(
-        BibEntry entry,
-        BibDatabaseContext databaseContext
-    ) {
+    public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
         if (layout != null) {
             return layout.doLayout(entry, databaseContext.getDatabase());
         } else {

@@ -15,9 +15,7 @@ import org.jabref.gui.icon.JabRefIcon;
 public class InfoButton extends Button {
 
     private final StringProperty infoMessage = new SimpleStringProperty();
-    private final ActionFactory actionFactory = new ActionFactory(
-        Globals.getKeyPrefs()
-    );
+    private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
 
     private final Action mergeAction = new Action() {
         @Override
@@ -34,10 +32,7 @@ public class InfoButton extends Button {
     public InfoButton(String infoMessage) {
         this.infoMessage.setValue(infoMessage);
         configureButton();
-        EasyBind.subscribe(
-            this.infoMessage,
-            newWarningMessage -> configureButton()
-        );
+        EasyBind.subscribe(this.infoMessage, newWarningMessage -> configureButton());
     }
 
     private void configureButton() {

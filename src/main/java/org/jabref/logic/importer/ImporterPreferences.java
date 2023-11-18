@@ -36,12 +36,9 @@ public class ImporterPreferences {
         List<String> catalogs
     ) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
-        this.generateNewKeyOnImport =
-            new SimpleBooleanProperty(generateNewKeyOnImport);
-        this.importWorkingDirectory =
-            new SimpleObjectProperty<>(importWorkingDirectory);
-        this.warnAboutDuplicatesOnImport =
-            new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
+        this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
+        this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
+        this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
@@ -92,9 +89,7 @@ public class ImporterPreferences {
         return warnAboutDuplicatesOnImport;
     }
 
-    public void setWarnAboutDuplicatesOnImport(
-        boolean warnAboutDuplicatesOnImport
-    ) {
+    public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
         this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
     }
 

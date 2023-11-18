@@ -18,27 +18,16 @@ import org.junit.jupiter.api.Test;
 @FetcherTest
 public class PicaXmlParserTest {
 
-    private void doTest(
-        String xmlName,
-        int expectedSize,
-        List<String> resourceNames
-    ) throws Exception {
-        try (
-            InputStream is = PicaXmlParserTest.class.getResourceAsStream(
-                    xmlName
-                )
-        ) {
+    private void doTest(String xmlName, int expectedSize, List<String> resourceNames)
+        throws Exception {
+        try (InputStream is = PicaXmlParserTest.class.getResourceAsStream(xmlName)) {
             PicaXmlParser parser = new PicaXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
             assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibEntryAssert.assertEquals(
-                    PicaXmlParserTest.class,
-                    resourceName,
-                    entries.get(i)
-                );
+                BibEntryAssert.assertEquals(PicaXmlParserTest.class, resourceName, entries.get(i));
                 i++;
             }
         }
@@ -46,11 +35,7 @@ public class PicaXmlParserTest {
 
     @Test
     public void emptyResult() throws Exception {
-        doTest(
-            "gvk_empty_result_because_of_bad_query.xml",
-            0,
-            Collections.emptyList()
-        );
+        doTest("gvk_empty_result_because_of_bad_query.xml", 0, Collections.emptyList());
     }
 
     @Test
@@ -64,11 +49,7 @@ public class PicaXmlParserTest {
 
     @Test
     public void testGMP() throws Exception {
-        doTest(
-            "gvk_gmp.xml",
-            2,
-            Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib")
-        );
+        doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }
 
     @Test
@@ -83,18 +64,9 @@ public class PicaXmlParserTest {
             assertNotNull(entries);
             assertEquals(5, entries.size());
 
-            assertEquals(
-                Optional.empty(),
-                entries.get(0).getField(StandardField.SUBTITLE)
-            );
-            assertEquals(
-                Optional.of("C"),
-                entries.get(1).getField(StandardField.SUBTITLE)
-            );
-            assertEquals(
-                Optional.of("Word"),
-                entries.get(2).getField(StandardField.SUBTITLE)
-            );
+            assertEquals(Optional.empty(), entries.get(0).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.of("C"), entries.get(1).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.of("Word"), entries.get(2).getField(StandardField.SUBTITLE));
             assertEquals(
                 Optional.of("Word1 word2"),
                 entries.get(3).getField(StandardField.SUBTITLE)

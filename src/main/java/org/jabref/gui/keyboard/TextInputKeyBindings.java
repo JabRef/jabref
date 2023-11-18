@@ -12,9 +12,7 @@ public class TextInputKeyBindings {
     public static void call(Scene scene, KeyEvent event) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl) {
             KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-            TextInputControl focusedTextField = (TextInputControl) scene
-                .focusOwnerProperty()
-                .get();
+            TextInputControl focusedTextField = (TextInputControl) scene.focusOwnerProperty().get();
             keyBindingRepository
                 .mapToKeyBinding(event)
                 .ifPresent(binding -> {
@@ -39,9 +37,7 @@ public class TextInputKeyBindings {
                             focusedTextField.nextWord();
                             event.consume();
                         }
-                        case EDITOR_BEGINNING,
-                            EDITOR_UP,
-                            EDITOR_BEGINNING_DOC -> {
+                        case EDITOR_BEGINNING, EDITOR_UP, EDITOR_BEGINNING_DOC -> {
                             focusedTextField.home();
                             event.consume();
                         }
@@ -55,8 +51,7 @@ public class TextInputKeyBindings {
                                 0,
                                 focusedTextField.getText().length()
                             );
-                            ResultingStringState res =
-                                StringManipulator.capitalize(pos, text);
+                            ResultingStringState res = StringManipulator.capitalize(pos, text);
                             focusedTextField.setText(res.text);
                             focusedTextField.positionCaret(res.caretPosition);
                             event.consume();
@@ -67,8 +62,7 @@ public class TextInputKeyBindings {
                                 0,
                                 focusedTextField.getText().length()
                             );
-                            ResultingStringState res =
-                                StringManipulator.lowercase(pos, text);
+                            ResultingStringState res = StringManipulator.lowercase(pos, text);
                             focusedTextField.setText(res.text);
                             focusedTextField.positionCaret(res.caretPosition);
                             event.consume();
@@ -79,17 +73,14 @@ public class TextInputKeyBindings {
                                 0,
                                 focusedTextField.getText().length()
                             );
-                            ResultingStringState res =
-                                StringManipulator.uppercase(pos, text);
+                            ResultingStringState res = StringManipulator.uppercase(pos, text);
                             focusedTextField.setText(res.text);
                             focusedTextField.positionCaret(res.caretPosition);
                             event.consume();
                         }
                         case EDITOR_KILL_LINE -> {
                             int pos = focusedTextField.getCaretPosition();
-                            focusedTextField.setText(
-                                focusedTextField.getText(0, pos)
-                            );
+                            focusedTextField.setText(focusedTextField.getText(0, pos));
                             focusedTextField.positionCaret(pos);
                             event.consume();
                         }
@@ -99,8 +90,7 @@ public class TextInputKeyBindings {
                                 0,
                                 focusedTextField.getText().length()
                             );
-                            ResultingStringState res =
-                                StringManipulator.killWord(pos, text);
+                            ResultingStringState res = StringManipulator.killWord(pos, text);
                             focusedTextField.setText(res.text);
                             focusedTextField.positionCaret(res.caretPosition);
                             event.consume();
@@ -111,8 +101,10 @@ public class TextInputKeyBindings {
                                 0,
                                 focusedTextField.getText().length()
                             );
-                            ResultingStringState res =
-                                StringManipulator.backwardKillWord(pos, text);
+                            ResultingStringState res = StringManipulator.backwardKillWord(
+                                pos,
+                                text
+                            );
                             focusedTextField.setText(res.text);
                             focusedTextField.positionCaret(res.caretPosition);
                             event.consume();

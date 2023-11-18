@@ -15,16 +15,11 @@ class URLUtilTest {
         assertEquals("", URLUtil.cleanGoogleSearchURL(""));
         assertEquals(" ", URLUtil.cleanGoogleSearchURL(" "));
         // no URL
-        assertEquals(
-            "this is no url!",
-            URLUtil.cleanGoogleSearchURL("this is no url!")
-        );
+        assertEquals("this is no url!", URLUtil.cleanGoogleSearchURL("this is no url!"));
         // no Google search URL
         assertEquals(
             "http://dl.acm.org/citation.cfm?id=321811",
-            URLUtil.cleanGoogleSearchURL(
-                "http://dl.acm.org/citation.cfm?id=321811"
-            )
+            URLUtil.cleanGoogleSearchURL("http://dl.acm.org/citation.cfm?id=321811")
         );
         // malformed Google URL
         assertEquals(
@@ -61,9 +56,7 @@ class URLUtilTest {
         // no url param
         assertEquals(
             "https://www.google.de/url?key=value&key2=value2",
-            URLUtil.cleanGoogleSearchURL(
-                "https://www.google.de/url?key=value&key2=value2"
-            )
+            URLUtil.cleanGoogleSearchURL("https://www.google.de/url?key=value&key2=value2")
         );
         // no url param value
         assertEquals(
@@ -73,9 +66,7 @@ class URLUtilTest {
         // url param value no URL
         assertEquals(
             "https://www.google.de/url?url=this+is+no+url",
-            URLUtil.cleanGoogleSearchURL(
-                "https://www.google.de/url?url=this+is+no+url"
-            )
+            URLUtil.cleanGoogleSearchURL("https://www.google.de/url?url=this+is+no+url")
         );
         // Http
         assertEquals(
@@ -135,8 +126,6 @@ class URLUtilTest {
 
     @Test
     void isURLshouldRejectEmbeddedURL() {
-        assertFalse(
-            URLUtil.isURL("dblp computer science bibliography, http://dblp.org")
-        );
+        assertFalse(URLUtil.isURL("dblp computer science bibliography, http://dblp.org"));
     }
 }

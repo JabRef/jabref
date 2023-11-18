@@ -30,13 +30,10 @@ public class KeyBindingRepository {
     }
 
     public KeyBindingRepository(List<String> bindNames, List<String> bindings) {
-        this.bindings =
-            new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization));
+        this.bindings = new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization));
 
         if (
-            (bindNames.isEmpty()) ||
-            (bindings.isEmpty()) ||
-            (bindNames.size() != bindings.size())
+            (bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())
         ) {
             // Use default key bindings
             for (KeyBinding keyBinding : KeyBinding.values()) {
@@ -74,9 +71,7 @@ public class KeyBindingRepository {
 
     public String get(String key) {
         Optional<KeyBinding> keyBinding = getKeyBinding(key);
-        Optional<String> result = keyBinding.flatMap(k ->
-            Optional.ofNullable(bindings.get(k))
-        );
+        Optional<String> result = keyBinding.flatMap(k -> Optional.ofNullable(bindings.get(k)));
 
         if (result.isPresent()) {
             return result.get();
@@ -110,8 +105,7 @@ public class KeyBindingRepository {
     }
 
     public void resetToDefault(String key) {
-        getKeyBinding(key)
-            .ifPresent(b -> bindings.put(b, b.getDefaultKeyBinding()));
+        getKeyBinding(key).ifPresent(b -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public void resetToDefault() {
@@ -149,23 +143,14 @@ public class KeyBindingRepository {
      * @param keyEvent as KeEvent
      * @return true if matching, else false
      */
-    public boolean checkKeyCombinationEquality(
-        KeyBinding binding,
-        KeyEvent keyEvent
-    ) {
+    public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
         return getKeyCombination(binding)
-            .filter(combination ->
-                checkKeyCombinationEquality(combination, keyEvent)
-            )
+            .filter(combination -> checkKeyCombinationEquality(combination, keyEvent))
             .isPresent();
     }
 
     public List<String> getBindNames() {
-        return bindings
-            .keySet()
-            .stream()
-            .map(KeyBinding::getConstant)
-            .collect(Collectors.toList());
+        return bindings.keySet().stream().map(KeyBinding::getConstant).collect(Collectors.toList());
     }
 
     public List<String> getBindings() {

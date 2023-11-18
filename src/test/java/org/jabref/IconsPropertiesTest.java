@@ -19,26 +19,19 @@ import org.junit.jupiter.api.Test;
 public class IconsPropertiesTest {
 
     @Test
-    public void testExistenceOfIconImagesReferencedFromIconsProperties()
-        throws IOException {
+    public void testExistenceOfIconImagesReferencedFromIconsProperties() throws IOException {
         String folder = "src/main/resources/images/external";
         String iconsProperties = "Icons.properties";
-        String iconsPropertiesPath =
-            "src/main/resources/images/" + iconsProperties;
+        String iconsPropertiesPath = "src/main/resources/images/" + iconsProperties;
 
         // load properties
         Properties properties = new Properties();
-        try (
-            Reader reader = Files.newBufferedReader(
-                Path.of(iconsPropertiesPath)
-            )
-        ) {
+        try (Reader reader = Files.newBufferedReader(Path.of(iconsPropertiesPath))) {
             properties.load(reader);
         }
         assertFalse(
             properties.entrySet().isEmpty(),
-            "There must be loaded properties after loading " +
-            iconsPropertiesPath
+            "There must be loaded properties after loading " + iconsPropertiesPath
         );
 
         // check that each key references an existing file

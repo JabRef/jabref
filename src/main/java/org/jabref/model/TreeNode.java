@@ -116,10 +116,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      */
     public int getPositionInParent() {
         return getParent()
-            .orElseThrow(() ->
-                new UnsupportedOperationException(
-                    "Roots have no position in parent"
-                )
+            .orElseThrow(() -> new UnsupportedOperationException("Roots have no position in parent")
             )
             .getIndexOfChild((T) this)
             .get();
@@ -281,9 +278,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * or an empty Optional if the index does not point to a child
      */
     public Optional<T> getChildAt(int index) {
-        return childIndexExists(index)
-            ? Optional.of(children.get(index))
-            : Optional.empty();
+        return childIndexExists(index) ? Optional.of(children.get(index)) : Optional.empty();
     }
 
     /**
@@ -517,10 +512,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      * @param recursive  if true the whole subtree is sorted
      * @throws NullPointerException if the comparator is null
      */
-    public void sortChildren(
-        Comparator<? super T> comparator,
-        boolean recursive
-    ) {
+    public void sortChildren(Comparator<? super T> comparator, boolean recursive) {
         Objects.requireNonNull(comparator);
 
         if (this.isLeaf()) {

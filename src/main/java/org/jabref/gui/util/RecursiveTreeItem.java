@@ -21,14 +21,10 @@ public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
 
     private final Callback<T, BooleanProperty> expandedProperty;
     private final Callback<T, ObservableList<T>> childrenFactory;
-    private final ObjectProperty<Predicate<T>> filter =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>();
     private FilteredList<RecursiveTreeItem<T>> children;
 
-    public RecursiveTreeItem(
-        final T value,
-        Callback<T, ObservableList<T>> func
-    ) {
+    public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func) {
         this(value, func, null, null);
     }
 
@@ -77,10 +73,7 @@ public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
             });
     }
 
-    private void bindExpandedProperty(
-        T value,
-        Callback<T, BooleanProperty> expandedProperty
-    ) {
+    private void bindExpandedProperty(T value, Callback<T, BooleanProperty> expandedProperty) {
         if (expandedProperty != null) {
             expandedProperty().bindBidirectional(expandedProperty.call(value));
         }
@@ -100,9 +93,7 @@ public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
                             filter
                         )
                 )
-                .filtered(
-                    Bindings.createObjectBinding(() -> this::showNode, filter)
-                );
+                .filtered(Bindings.createObjectBinding(() -> this::showNode, filter));
 
         Bindings.bindContent(getChildren(), children);
     }

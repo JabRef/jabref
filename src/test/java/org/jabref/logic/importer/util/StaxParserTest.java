@@ -24,11 +24,8 @@ class StaxParserTest {
 
     @ParameterizedTest
     @MethodSource("tests")
-    void getsCompleteXMLContent(String expected, String input)
-        throws XMLStreamException {
-        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(
-            new StringReader(input)
-        );
+    void getsCompleteXMLContent(String expected, String input) throws XMLStreamException {
+        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader(input));
         assertEquals(expected, StaxParser.getXMLContent(reader));
     }
 

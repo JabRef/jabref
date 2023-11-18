@@ -28,10 +28,7 @@ public class ThreeWayMergeViewModelTest {
     void setup() {
         leftEntry =
             new BibEntry(StandardEntryType.Article)
-                .withField(
-                    StandardField.AUTHOR,
-                    "Erik G. Larsson and Oscar Gustafsson"
-                )
+                .withField(StandardField.AUTHOR, "Erik G. Larsson and Oscar Gustafsson")
                 .withField(
                     StandardField.TITLE,
                     "The Impact of Dynamic Voltage and Frequency Scaling on Multicore {DSP} Algorithm Design [Exploratory {DSP]}"
@@ -54,27 +51,19 @@ public class ThreeWayMergeViewModelTest {
                     "Proceedings of the 2001 International Symposium on Circuits and Systems, {ISCAS} 2001, Sydney, Australia, May 6-9, 2001"
                 )
                 .withField(StandardField.NUMBER, "2");
-        viewModel =
-            new ThreeWayMergeViewModel(leftEntry, rightEntry, "left", "right");
+        viewModel = new ThreeWayMergeViewModel(leftEntry, rightEntry, "left", "right");
         visibleFields = viewModel.getVisibleFields();
     }
 
     @Test
     void getVisibleFieldsShouldReturnASortedListOfFieldsWithEntryTypeAtTheHeadOfTheList() {
-        List<String> names = visibleFields
-            .stream()
-            .map(Field::getName)
-            .skip(1)
-            .toList();
+        List<String> names = visibleFields.stream().map(Field::getName).skip(1).toList();
         Comparators.isInOrder(names, String::compareTo);
     }
 
     @Test
     void getVisibleFieldsShouldNotHaveDuplicates() {
-        assertEquals(
-            new HashSet<>(visibleFields).size(),
-            viewModel.numberOfVisibleFields()
-        );
+        assertEquals(new HashSet<>(visibleFields).size(), viewModel.numberOfVisibleFields());
     }
 
     @Test
@@ -86,20 +75,12 @@ public class ThreeWayMergeViewModelTest {
     void getVisibleFieldsShouldContainAllNonInternalFieldsInRightAndLeftEntry() {
         assertTrue(
             visibleFields.containsAll(
-                leftEntry
-                    .getFields()
-                    .stream()
-                    .filter(this::isNotInternalField)
-                    .toList()
+                leftEntry.getFields().stream().filter(this::isNotInternalField).toList()
             )
         );
         assertTrue(
             visibleFields.containsAll(
-                rightEntry
-                    .getFields()
-                    .stream()
-                    .filter(this::isNotInternalField)
-                    .toList()
+                rightEntry.getFields().stream().filter(this::isNotInternalField).toList()
             )
         );
     }

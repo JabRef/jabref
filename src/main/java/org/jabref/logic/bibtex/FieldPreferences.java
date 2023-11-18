@@ -23,10 +23,8 @@ public class FieldPreferences {
         List<Field> nonWrappableFields
     ) {
         this.resolveStrings.set(resolveStrings);
-        this.resolvableFields =
-            FXCollections.observableArrayList(resolvableFields);
-        this.nonWrappableFields =
-            FXCollections.observableArrayList(nonWrappableFields);
+        this.resolvableFields = FXCollections.observableArrayList(resolvableFields);
+        this.nonWrappableFields = FXCollections.observableArrayList(nonWrappableFields);
     }
 
     public boolean shouldResolveStrings() {

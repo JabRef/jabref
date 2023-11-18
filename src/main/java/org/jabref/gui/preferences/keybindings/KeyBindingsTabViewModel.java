@@ -29,13 +29,12 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     private final KeyBindingRepository keyBindingRepository;
     private final KeyBindingRepository initialKeyBindingRepository;
     private final PreferencesService preferences;
-    private final OptionalObjectProperty<
-        KeyBindingViewModel
-    > selectedKeyBinding = OptionalObjectProperty.empty();
-    private final ObjectProperty<KeyBindingViewModel> rootKeyBinding =
-        new SimpleObjectProperty<>();
-    private final ListProperty<KeyBindingPreset> keyBindingPresets =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding =
+        OptionalObjectProperty.empty();
+    private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
+    private final ListProperty<KeyBindingPreset> keyBindingPresets = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
 
     private final DialogService dialogService;
 
@@ -46,8 +45,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         DialogService dialogService,
         PreferencesService preferences
     ) {
-        this.keyBindingRepository =
-            Objects.requireNonNull(keyBindingRepository);
+        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
         this.initialKeyBindingRepository =
             new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = Objects.requireNonNull(dialogService);
@@ -75,12 +73,11 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
                 .getKeyBindings()
                 .forEach((keyBinding, bind) -> {
                     if (keyBinding.getCategory() == category) {
-                        KeyBindingViewModel keyBindViewModel =
-                            new KeyBindingViewModel(
-                                keyBindingRepository,
-                                keyBinding,
-                                bind
-                            );
+                        KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(
+                            keyBindingRepository,
+                            keyBinding,
+                            bind
+                        );
                         categoryItem.getChildren().add(keyBindViewModel);
                     }
                 });
@@ -90,8 +87,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setNewBindingForCurrent(KeyEvent event) {
-        Optional<KeyBindingViewModel> selectedKeyBindingValue =
-            selectedKeyBinding.getValue();
+        Optional<KeyBindingViewModel> selectedKeyBindingValue = selectedKeyBinding.getValue();
         if (selectedKeyBindingValue.isEmpty()) {
             return;
         }
@@ -102,10 +98,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
 
         if (selectedEntry.setNewBinding(event)) {
-            keyBindingRepository.put(
-                selectedEntry.getKeyBinding(),
-                selectedEntry.getBinding()
-            );
+            keyBindingRepository.put(selectedEntry.getKeyBinding(), selectedEntry.getBinding());
         }
     }
 
@@ -119,13 +112,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     public void resetToDefault() {
         String title = Localization.lang("Resetting all key bindings");
-        String content = Localization.lang(
-            "All key bindings will be reset to their defaults."
-        );
-        ButtonType resetButtonType = new ButtonType(
-            "Reset",
-            ButtonBar.ButtonData.OK_DONE
-        );
+        String content = Localization.lang("All key bindings will be reset to their defaults.");
+        ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService
             .showCustomButtonDialogAndWait(
                 Alert.AlertType.INFORMATION,
@@ -160,9 +148,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         return restartWarning;
     }
 
-    public OptionalObjectProperty<
-        KeyBindingViewModel
-    > selectedKeyBindingProperty() {
+    public OptionalObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
         return selectedKeyBinding;
     }
 

@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExistingStudySearchAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ExistingStudySearchAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistingStudySearchAction.class);
 
     protected final DialogService dialogService;
 
@@ -93,16 +91,13 @@ public class ExistingStudySearchAction extends SimpleCommand {
             LOGGER.error("Database is not present, even if it should");
             return;
         }
-        BibDatabaseContext bibDatabaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             LOGGER.error("Database path is not present, even if it should");
             return;
         }
-        this.studyDirectory =
-            bibDatabaseContext.getDatabasePath().get().getParent();
+        this.studyDirectory = bibDatabaseContext.getDatabasePath().get().getParent();
 
         crawl();
     }
@@ -131,9 +126,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         } catch (IOException | ParseException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(
-                Localization.lang(
-                    "Error during reading of study definition file."
-                ),
+                Localization.lang("Error during reading of study definition file."),
                 e
             );
             return;
@@ -148,19 +141,14 @@ public class ExistingStudySearchAction extends SimpleCommand {
             .onFailure(e -> {
                 LOGGER.error("Error during persistence of crawling results.");
                 dialogService.showErrorDialogAndWait(
-                    Localization.lang(
-                        "Error during persistence of crawling results."
-                    ),
+                    Localization.lang("Error during persistence of crawling results."),
                     e
                 );
             })
             .onSuccess(unused -> {
                 dialogService.notify(Localization.lang("Finished Searching"));
                 openDatabaseAction.openFile(
-                    Path.of(
-                        this.studyDirectory.toString(),
-                        Crawler.FILENAME_STUDY_RESULT_BIB
-                    )
+                    Path.of(this.studyDirectory.toString(), Crawler.FILENAME_STUDY_RESULT_BIB)
                 );
             })
             .executeWith(taskExecutor);
@@ -169,8 +157,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     /**
      * Hook for setting up the crawl phase (e.g., initialization the repository)
      */
-    protected void crawlPreparation(Path studyRepositoryRoot)
-        throws IOException, GitAPIException {
+    protected void crawlPreparation(Path studyRepositoryRoot) throws IOException, GitAPIException {
         // Do nothing with the repository as repository is already setup
 
         // The user focused an SLR

@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class UndoableInsertString extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UndoableInsertString.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableInsertString.class);
 
     private final BibDatabase base;
     private final BibtexString string;
@@ -24,10 +22,7 @@ public class UndoableInsertString extends AbstractUndoableJabRefEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang(
-            "insert string %0",
-            StringUtil.boldHTML(string.toString())
-        );
+        return Localization.lang("insert string %0", StringUtil.boldHTML(string.toString()));
     }
 
     @Override

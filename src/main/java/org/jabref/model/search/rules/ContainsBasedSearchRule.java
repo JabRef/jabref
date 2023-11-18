@@ -32,23 +32,19 @@ public class ContainsBasedSearchRule extends FullTextSearchRule {
             searchString = searchString.toLowerCase(Locale.ROOT);
         }
 
-        List<String> unmatchedWords = new SentenceAnalyzer(searchString)
-            .getWords();
+        List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
         for (Field fieldKey : bibEntry.getFields()) {
             String formattedFieldContent = StringUtil.stripAccents(
                 bibEntry.getFieldLatexFree(fieldKey).get()
             );
             if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-                formattedFieldContent =
-                    formattedFieldContent.toLowerCase(Locale.ROOT);
+                formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);
             }
 
             Iterator<String> unmatchedWordsIterator = unmatchedWords.iterator();
             while (unmatchedWordsIterator.hasNext()) {
-                String word = StringUtil.stripAccents(
-                    unmatchedWordsIterator.next()
-                );
+                String word = StringUtil.stripAccents(unmatchedWordsIterator.next());
                 if (formattedFieldContent.contains(word)) {
                     unmatchedWordsIterator.remove();
                 }

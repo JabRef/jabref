@@ -17,30 +17,24 @@ import org.slf4j.LoggerFactory;
  *  A DublinCoreSchema extension Class.
  *  In case anyone intends to alter standard behaviour.
  */
-@StructuredType(
-    preferedPrefix = "dc",
-    namespace = "http://purl.org/dc/elements/1.1/"
-)
+@StructuredType(preferedPrefix = "dc", namespace = "http://purl.org/dc/elements/1.1/")
 public class DublinCoreSchemaCustom extends DublinCoreSchema {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DublinCoreSchemaCustom.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DublinCoreSchemaCustom.class);
 
     public DublinCoreSchemaCustom(XMPMetadata metadata) {
         super(metadata);
     }
 
-    public static DublinCoreSchema copyDublinCoreSchema(
-        DublinCoreSchema dcSchema
-    ) {
+    public static DublinCoreSchema copyDublinCoreSchema(DublinCoreSchema dcSchema) {
         if (Objects.isNull(dcSchema)) {
             return null;
         }
 
         try {
-            DublinCoreSchemaCustom dublinCoreSchemaCustom =
-                new DublinCoreSchemaCustom(dcSchema.getMetadata());
+            DublinCoreSchemaCustom dublinCoreSchemaCustom = new DublinCoreSchemaCustom(
+                dcSchema.getMetadata()
+            );
             FieldUtils.writeField(
                 dublinCoreSchemaCustom,
                 "container",

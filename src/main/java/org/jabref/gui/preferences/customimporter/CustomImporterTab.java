@@ -44,37 +44,26 @@ public class CustomImporterTab
 
     @FXML
     private void initialize() {
-        viewModel =
-            new CustomImporterTabViewModel(preferencesService, dialogService);
+        viewModel = new CustomImporterTabViewModel(preferencesService, dialogService);
 
-        importerTable
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
+        importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());
         EasyBind.bindContent(
             viewModel.selectedImportersProperty(),
             importerTable.getSelectionModel().getSelectedItems()
         );
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
-        classColumn.setCellValueFactory(cellData ->
-            cellData.getValue().className()
-        );
-        basePathColumn.setCellValueFactory(cellData ->
-            cellData.getValue().basePath()
-        );
+        classColumn.setCellValueFactory(cellData -> cellData.getValue().className());
+        basePathColumn.setCellValueFactory(cellData -> cellData.getValue().basePath());
         new ViewModelTableRowFactory<ImporterViewModel>()
             .withTooltip(importer -> importer.getLogic().getDescription())
             .install(importerTable);
 
         addButton.setTooltip(
             new Tooltip(
-                Localization.lang(
-                    "Add a (compiled) custom Importer class from a class path."
-                ) +
+                Localization.lang("Add a (compiled) custom Importer class from a class path.") +
                 "\n" +
-                Localization.lang(
-                    "The path need not be on the classpath of JabRef."
-                )
+                Localization.lang("The path need not be on the classpath of JabRef.")
             )
         );
     }

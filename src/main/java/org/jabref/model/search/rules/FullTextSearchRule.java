@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public abstract class FullTextSearchRule implements SearchRule {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FullTextSearchRule.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FullTextSearchRule.class);
 
     protected final EnumSet<SearchRules.SearchFlags> searchFlags;
 
@@ -47,14 +45,8 @@ public abstract class FullTextSearchRule implements SearchRule {
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(
-        String query,
-        BibEntry bibEntry
-    ) {
-        if (
-            !searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) ||
-            databaseContext == null
-        ) {
+    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
             return new PdfSearchResults();
         }
 

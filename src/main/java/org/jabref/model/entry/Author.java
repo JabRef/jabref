@@ -17,13 +17,7 @@ public class Author {
      * Example: <code>authors = {Oliver Kopp and others}</code>. This is then appearing as "Oliver Kopp et al.".
      * In the context of BibTeX key generation, this is "Kopp+" (<code>+</code> for "et al.") and not "KO".
      */
-    public static final Author OTHERS = new Author(
-        "",
-        "",
-        null,
-        "others",
-        null
-    );
+    public static final Author OTHERS = new Author("", "", null, "others", null);
 
     private final String firstPart;
     private final String firstAbbr;
@@ -41,13 +35,7 @@ public class Author {
      * @param last      the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
      * @param jr        the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
      */
-    public Author(
-        String first,
-        String firstabbr,
-        String von,
-        String last,
-        String jr
-    ) {
+    public Author(String first, String firstabbr, String von, String last, String jr) {
         firstPart = addDotIfAbbreviation(removeStartAndEndBraces(first));
         firstAbbr = removeStartAndEndBraces(firstabbr);
         vonPart = removeStartAndEndBraces(von);
@@ -79,17 +67,13 @@ public class Author {
 
             if (currentChar == '.') {
                 // A.A. -> A. A.
-                if (
-                    ((i + 1) < name.length()) &&
-                    Character.isUpperCase(name.charAt(i + 1))
-                ) {
+                if (((i + 1) < name.length()) && Character.isUpperCase(name.charAt(i + 1))) {
                     sb.append(' ');
                 }
             }
 
             boolean currentIsUppercaseLetter =
-                Character.isLetter(currentChar) &&
-                Character.isUpperCase(currentChar);
+                Character.isLetter(currentChar) && Character.isUpperCase(currentChar);
             if (!currentIsUppercaseLetter) {
                 // No uppercase letter, hence nothing to do
                 continue;
@@ -136,8 +120,7 @@ public class Author {
                 }
 
                 boolean furtherIsUppercaseLetter =
-                    Character.isLetter(furtherChar) &&
-                    Character.isUpperCase(furtherChar);
+                    Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
                 if (!furtherIsUppercaseLetter) {
                     nextWordIsUppercase = false;
                     break;
@@ -398,18 +381,10 @@ public class Author {
      */
     public Author latexFree() {
         if (latexFreeAuthor == null) {
-            String first = getFirst()
-                .map(LatexToUnicodeAdapter::format)
-                .orElse(null);
-            String firstabbr = getFirstAbbr()
-                .map(LatexToUnicodeAdapter::format)
-                .orElse(null);
-            String von = getVon()
-                .map(LatexToUnicodeAdapter::format)
-                .orElse(null);
-            String last = getLast()
-                .map(LatexToUnicodeAdapter::format)
-                .orElse(null);
+            String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
+            String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
+            String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
+            String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
             latexFreeAuthor = new Author(first, firstabbr, von, last, jr);
             latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;

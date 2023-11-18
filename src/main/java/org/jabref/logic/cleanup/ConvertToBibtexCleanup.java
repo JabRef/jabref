@@ -27,9 +27,7 @@ public class ConvertToBibtexCleanup implements CleanupJob {
                 if (StringUtil.isBlank(entry.getField(StandardField.YEAR))) {
                     date
                         .getYear()
-                        .flatMap(year ->
-                            entry.setField(StandardField.YEAR, year.toString())
-                        )
+                        .flatMap(year -> entry.setField(StandardField.YEAR, year.toString()))
                         .ifPresent(changes::add);
                 }
 
@@ -37,18 +35,13 @@ public class ConvertToBibtexCleanup implements CleanupJob {
                     date
                         .getMonth()
                         .flatMap(month ->
-                            entry.setField(
-                                StandardField.MONTH,
-                                month.getJabRefFormat()
-                            )
+                            entry.setField(StandardField.MONTH, month.getJabRefFormat())
                         )
                         .ifPresent(changes::add);
                 }
 
                 if (!changes.isEmpty()) {
-                    entry
-                        .clearField(StandardField.DATE)
-                        .ifPresent(changes::add);
+                    entry.clearField(StandardField.DATE).ifPresent(changes::add);
                 }
             });
 
@@ -61,14 +54,9 @@ public class ConvertToBibtexCleanup implements CleanupJob {
             entry
                 .getField(oldField)
                 .ifPresent(oldValue -> {
-                    if (
-                        !oldValue.isEmpty() &&
-                        (!entry.getField(newField).isPresent())
-                    ) {
+                    if (!oldValue.isEmpty() && (!entry.getField(newField).isPresent())) {
                         // There is content in the old field and no value in the new, so just copy
-                        entry
-                            .setField(newField, oldValue)
-                            .ifPresent(changes::add);
+                        entry.setField(newField, oldValue).ifPresent(changes::add);
                         entry.clearField(oldField).ifPresent(changes::add);
                     }
                 });

@@ -6,9 +6,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabaseContext;
 
-public abstract class AbstractPropertiesTabView<
-    T extends PropertiesTabViewModel
->
+public abstract class AbstractPropertiesTabView<T extends PropertiesTabViewModel>
     extends VBox
     implements PropertiesTab {
 

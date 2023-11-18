@@ -18,11 +18,8 @@ import org.slf4j.LoggerFactory;
  */
 public class CurrentThreadTaskExecutor implements TaskExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CurrentThreadTaskExecutor.class
-    );
-    private final WeakHashMap<DelayTaskThrottler, Void> throttlers =
-        new WeakHashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrentThreadTaskExecutor.class);
+    private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
     /**
      * Executes the task on the current thread. The code is essentially taken from {@link
@@ -58,11 +55,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> Future<?> schedule(
-        BackgroundTask<V> task,
-        long delay,
-        TimeUnit unit
-    ) {
+    public <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
         return execute(task);
     }
 

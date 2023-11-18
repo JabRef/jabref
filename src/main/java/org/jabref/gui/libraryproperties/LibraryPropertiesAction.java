@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class LibraryPropertiesAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryPropertiesAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryPropertiesAction.class);
 
     private final StateManager stateManager;
     private final Supplier<BibDatabaseContext> alternateDatabase;
@@ -35,9 +33,7 @@ public class LibraryPropertiesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
 
         if (alternateDatabase != null) {
             dialogService.showCustomDialogAndWait(
@@ -46,9 +42,7 @@ public class LibraryPropertiesAction extends SimpleCommand {
         } else {
             if (stateManager.getActiveDatabase().isPresent()) {
                 dialogService.showCustomDialogAndWait(
-                    new LibraryPropertiesView(
-                        stateManager.getActiveDatabase().get()
-                    )
+                    new LibraryPropertiesView(stateManager.getActiveDatabase().get())
                 );
             } else {
                 LOGGER.warn("No library selected.");

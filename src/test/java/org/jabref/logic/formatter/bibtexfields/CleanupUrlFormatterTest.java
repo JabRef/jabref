@@ -19,10 +19,7 @@ class CleanupUrlFormatterTest {
 
     @Test
     void removeSpecialSymbolsFromURLLink() {
-        assertEquals(
-            "http://wikipedia.org",
-            formatter.format("http%3A%2F%2Fwikipedia.org")
-        );
+        assertEquals("http://wikipedia.org", formatter.format("http%3A%2F%2Fwikipedia.org"));
     }
 
     @Test
@@ -35,10 +32,7 @@ class CleanupUrlFormatterTest {
 
     @Test
     void validUrlUnmodified() {
-        assertEquals(
-            "http://wikipedia.org",
-            formatter.format("http://wikipedia.org")
-        );
+        assertEquals("http://wikipedia.org", formatter.format("http://wikipedia.org"));
     }
 
     @Test
@@ -54,10 +48,7 @@ class CleanupUrlFormatterTest {
     @Test
     void urlencodedSlashesAreAlsoConverted() {
         // the caller has to pay attention that this does not happen
-        assertEquals(
-            "jabref.org/test/test",
-            formatter.format("jabref.org/test%2Ftest")
-        );
+        assertEquals("jabref.org/test/test", formatter.format("jabref.org/test%2Ftest"));
     }
 
     @Test

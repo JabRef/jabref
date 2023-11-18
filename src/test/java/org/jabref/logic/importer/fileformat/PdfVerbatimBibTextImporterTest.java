@@ -49,28 +49,18 @@ class PdfVerbatimBibTextImporterTest {
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(
-            PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf")
-                .toURI()
+            PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf").toURI()
         );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
         Path file = Path.of(
-            PdfVerbatimBibTextImporterTest.class.getResource(
-                    "mixedMetadata.pdf"
-                )
-                .toURI()
+            PdfVerbatimBibTextImporterTest.class.getResource("mixedMetadata.pdf").toURI()
         );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Article);
         expected.setCitationKey("jabreftest2021");
@@ -81,9 +71,7 @@ class PdfVerbatimBibTextImporterTest {
         expected.setField(StandardField.YEAR, "2021");
         expected.setField(StandardField.ISBN, "0134685997");
         expected.setFiles(
-            Collections.singletonList(
-                new LinkedFile("", file.toAbsolutePath(), "PDF")
-            )
+            Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF"))
         );
 
         List<BibEntry> resultSecondImport = importer

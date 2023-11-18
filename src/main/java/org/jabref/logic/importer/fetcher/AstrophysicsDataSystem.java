@@ -52,13 +52,11 @@ public class AstrophysicsDataSystem
         EntryBasedParserFetcher,
         CustomizableKeyFetcher {
 
-    private static final String API_SEARCH_URL =
-        "https://api.adsabs.harvard.edu/v1/search/query";
+    private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL =
         "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private static final String API_KEY = new BuildInfo()
-        .astrophysicsDataSystemAPIKey;
+    private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
     private final ImportFormatPreferences preferences;
     private final ImporterPreferences importerPreferences;
 
@@ -82,8 +80,7 @@ public class AstrophysicsDataSystem
     /**
      * @return export URL endpoint
      */
-    private static URL getURLforExport()
-        throws URISyntaxException, MalformedURLException {
+    private static URL getURLforExport() throws URISyntaxException, MalformedURLException {
         return new URIBuilder(API_EXPORT_URL).build().toURL();
     }
 
@@ -102,16 +99,11 @@ public class AstrophysicsDataSystem
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter(
             "q",
-            new DefaultQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
-        builder.addParameter(
-            "start",
-            String.valueOf(getPageSize() * pageNumber)
-        );
+        builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
         return builder.build().toURL();
     }
 
@@ -120,8 +112,7 @@ public class AstrophysicsDataSystem
      * @return URL which points to a search request for given entry
      */
     @Override
-    public URL getURLForEntry(BibEntry entry)
-        throws URISyntaxException, MalformedURLException {
+    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional<String> title = entry
@@ -132,9 +123,7 @@ public class AstrophysicsDataSystem
             .map(a -> "author:\"" + a + "\"");
 
         if (title.isPresent()) {
-            stringBuilder
-                .append(title.get())
-                .append(author.map(s -> " AND " + s).orElse(""));
+            stringBuilder.append(title.get()).append(author.map(s -> " AND " + s).orElse(""));
         } else {
             stringBuilder.append(author.orElse(""));
         }
@@ -154,8 +143,7 @@ public class AstrophysicsDataSystem
     @Override
     public URL getUrlForIdentifier(String identifier)
         throws FetcherException, URISyntaxException, MalformedURLException {
-        String query =
-            "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
+        String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
         builder.addParameter("fl", "bibcode");
@@ -174,62 +162,37 @@ public class AstrophysicsDataSystem
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(
-            StandardField.ABSTRACT,
-            new RemoveBracesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.ABSTRACT,
-            new RemoveNewlinesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.TITLE,
-            new RemoveBracesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.AUTHOR,
-            new NormalizeNamesFormatter()
-        )
-            .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.MONTH,
-            new NormalizeMonthFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter())
             .cleanup(entry);
 
         // Remove ADS note
-        new FieldFormatterCleanup(
-            new UnknownField("adsnote"),
-            new ClearFormatter()
-        )
-            .cleanup(entry);
+        new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
-        new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL)
-            .cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         entry
             .getField(StandardField.ABSTRACT)
             .filter("Not Available <P />"::equals)
-            .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT)
-            );
+            .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
         entry
             .getField(StandardField.ABSTRACT)
             .map(abstractText -> abstractText.replace("<P />", ""))
             .map(abstractText -> abstractText.replace("\\textbackslash", ""))
             .map(String::trim)
-            .ifPresent(abstractText ->
-                entry.setField(StandardField.ABSTRACT, abstractText)
-            );
+            .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         if (
             entry.getFieldOrAlias(StandardField.TITLE).isEmpty() &&
             entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()
@@ -256,9 +219,7 @@ public class AstrophysicsDataSystem
             URLDownload download = getUrlDownload(url);
             String content = download.asString();
             JSONObject obj = new JSONObject(content);
-            JSONArray codes = obj
-                .getJSONObject("response")
-                .getJSONArray("docs");
+            JSONArray codes = obj.getJSONObject("response").getJSONArray("docs");
             List<String> bibcodes = new ArrayList<>();
             for (int i = 0; i < codes.length(); i++) {
                 bibcodes.add(codes.getJSONObject(i).getString("bibcode"));
@@ -272,16 +233,13 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier)
-        throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
 
         try {
-            List<String> bibcodes = fetchBibcodes(
-                getUrlForIdentifier(identifier)
-            );
+            List<String> bibcodes = fetchBibcodes(getUrlForIdentifier(identifier));
             List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
 
             if (fetchedEntries.isEmpty()) {
@@ -323,8 +281,7 @@ public class AstrophysicsDataSystem
             URLDownload download = new URLDownload(getURLforExport());
             download.addHeader(
                 "Authorization",
-                "Bearer " +
-                importerPreferences.getApiKey(getName()).orElse(API_KEY)
+                "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY)
             );
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
@@ -332,8 +289,7 @@ public class AstrophysicsDataSystem
             JSONObject obj = new JSONObject(content);
 
             try {
-                List<BibEntry> fetchedEntries = getParser()
-                    .parseEntries(obj.optString("export"));
+                List<BibEntry> fetchedEntries = getParser().parseEntries(obj.optString("export"));
                 if (fetchedEntries.isEmpty()) {
                     return Collections.emptyList();
                 }
@@ -354,8 +310,7 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery);
@@ -369,10 +324,8 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(
-        QueryNode luceneQuery,
-        int pageNumber
-    ) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber)
+        throws FetcherException {
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery, pageNumber);

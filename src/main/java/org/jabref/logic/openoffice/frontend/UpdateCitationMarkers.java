@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class UpdateCitationMarkers {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UpdateCitationMarkers.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateCitationMarkers.class);
 
     private UpdateCitationMarkers() {}
 
@@ -55,17 +53,8 @@ public class UpdateCitationMarkers {
             }
 
             if (withText && marker.isPresent()) {
-                XTextCursor cursor = frontend.getFillCursorForCitationGroup(
-                    doc,
-                    group
-                );
-                fillCitationMarkInCursor(
-                    doc,
-                    cursor,
-                    marker.get(),
-                    withText,
-                    style
-                );
+                XTextCursor cursor = frontend.getFillCursorForCitationGroup(doc, group);
+                fillCitationMarkInCursor(doc, cursor, marker.get(), withText, style);
                 frontend.cleanFillCursorForCitationGroup(doc, group);
             }
         }
@@ -77,8 +66,7 @@ public class UpdateCitationMarkers {
         OOText citationText,
         boolean withText,
         OOBibStyle style
-    )
-        throws WrappedTargetException, CreationException, IllegalArgumentException {
+    ) throws WrappedTargetException, CreationException, IllegalArgumentException {
         Objects.requireNonNull(cursor);
         Objects.requireNonNull(citationText);
         Objects.requireNonNull(style);
@@ -87,8 +75,7 @@ public class UpdateCitationMarkers {
             OOText citationText2 = style.decorateCitationMarker(citationText);
             // inject a ZERO_WIDTH_SPACE to hold the initial character format
             final String ZERO_WIDTH_SPACE = "\u200b";
-            citationText2 =
-                OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
+            citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
             OOTextIntoOO.write(doc, cursor, citationText2);
         } else {
             cursor.setString("");
@@ -117,9 +104,7 @@ public class UpdateCitationMarkers {
         throws NotRemoveableException, WrappedTargetException, PropertyVetoException, IllegalArgumentException, CreationException, NoDocumentException, IllegalTypeException {
         Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
-            throw new IllegalArgumentException(
-                "pageInfos.size != citationKeys.size"
-            );
+            throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
         CitationGroup group = frontend.createCitationGroup(
             doc,
@@ -133,10 +118,7 @@ public class UpdateCitationMarkers {
         final boolean withText = citationType.withText();
 
         if (withText) {
-            XTextCursor fillCursor = frontend.getFillCursorForCitationGroup(
-                doc,
-                group
-            );
+            XTextCursor fillCursor = frontend.getFillCursorForCitationGroup(doc, group);
 
             UpdateCitationMarkers.fillCitationMarkInCursor(
                 doc,

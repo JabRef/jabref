@@ -25,8 +25,7 @@ public class CustomImporter extends Importer {
 
     private final Importer importer;
 
-    public CustomImporter(String basePath, String className)
-        throws ImportException {
+    public CustomImporter(String basePath, String className) throws ImportException {
         this.basePath = Path.of(basePath);
         this.className = className;
         try {
@@ -38,9 +37,7 @@ public class CustomImporter extends Importer {
 
     private static Importer load(URL basePathURL, String className)
         throws IOException, ReflectiveOperationException {
-        try (
-            URLClassLoader cl = new URLClassLoader(new URL[] { basePathURL })
-        ) {
+        try (URLClassLoader cl = new URLClassLoader(new URL[] { basePathURL })) {
             Class<?> clazz = Class.forName(className, true, cl);
             return (Importer) clazz.getDeclaredConstructor().newInstance();
         }
@@ -80,8 +77,7 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader input) throws IOException {
         return importer.importDatabase(input);
     }
 

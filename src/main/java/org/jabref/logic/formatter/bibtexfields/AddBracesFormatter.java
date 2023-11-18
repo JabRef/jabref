@@ -34,9 +34,7 @@ public class AddBracesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Add braces encapsulating the complete field content."
-        );
+        return Localization.lang("Add braces encapsulating the complete field content.");
     }
 
     @Override

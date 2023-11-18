@@ -6,8 +6,7 @@ import java.util.Objects;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 
-public abstract sealed class DiffHighlighter
-    permits SplitDiffHighlighter, UnifiedDiffHighlighter {
+public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, UnifiedDiffHighlighter {
 
     protected final StyleClassedTextArea sourceTextview;
     protected final StyleClassedTextArea targetTextview;
@@ -19,14 +18,8 @@ public abstract sealed class DiffHighlighter
         StyleClassedTextArea targetTextview,
         DiffMethod diffMethod
     ) {
-        Objects.requireNonNull(
-            sourceTextview,
-            "source text view MUST NOT be null."
-        );
-        Objects.requireNonNull(
-            targetTextview,
-            "target text view MUST NOT be null."
-        );
+        Objects.requireNonNull(sourceTextview, "source text view MUST NOT be null.");
+        Objects.requireNonNull(targetTextview, "target text view MUST NOT be null.");
 
         this.sourceTextview = sourceTextview;
         this.targetTextview = targetTextview;

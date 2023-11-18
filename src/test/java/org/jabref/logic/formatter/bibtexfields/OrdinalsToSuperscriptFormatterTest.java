@@ -59,10 +59,7 @@ public class OrdinalsToSuperscriptFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(
-            "11\\textsuperscript{th}",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("11\\textsuperscript{th}", formatter.format(formatter.getExampleInput()));
     }
 
     private void expectCorrect(String input, String expected) {

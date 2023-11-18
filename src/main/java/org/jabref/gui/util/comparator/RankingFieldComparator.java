@@ -9,8 +9,7 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
  * <p>
  * Inverse comparison of ranking as rank5 is higher than rank1
  */
-public class RankingFieldComparator
-    implements Comparator<Optional<SpecialFieldValueViewModel>> {
+public class RankingFieldComparator implements Comparator<Optional<SpecialFieldValueViewModel>> {
 
     @Override
     public int compare(
@@ -19,10 +18,7 @@ public class RankingFieldComparator
     ) {
         if (val1.isPresent()) {
             if (val2.isPresent()) {
-                int compareToRes = val1
-                    .get()
-                    .getValue()
-                    .compareTo(val2.get().getValue());
+                int compareToRes = val1.get().getValue().compareTo(val2.get().getValue());
                 if (compareToRes == 0) {
                     return 0;
                 } else {

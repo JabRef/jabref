@@ -1,9 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
 class ScholarQueryTransformerTest
-    extends YearAndYearRangeByFilteringQueryTransformerTest<
-        ScholarQueryTransformer
-    > {
+    extends YearAndYearRangeByFilteringQueryTransformerTest<ScholarQueryTransformer> {
 
     @Override
     public ScholarQueryTransformer getTransformer() {

@@ -74,8 +74,7 @@ public class TableTab
     @FXML
     private RadioButton abbreviationLastNameOnly;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public TableTab() {
         ViewLoader.view(this).root(this).load();
@@ -87,8 +86,7 @@ public class TableTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new TableTabViewModel(dialogService, preferencesService);
+        this.viewModel = new TableTabViewModel(dialogService, preferencesService);
 
         setupTable();
         setupBindings();
@@ -110,42 +108,28 @@ public class TableTab
     private void setupTable() {
         nameColumn.setSortable(false);
         nameColumn.setReorderable(false);
-        nameColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<MainTableColumnModel, String>()
             .withText(name -> name)
             .install(nameColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData ->
-            cellData.getValue().nameProperty()
-        );
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<MainTableColumnModel, String>()
-            .withGraphic(item ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
-            .withTooltip(name -> Localization.lang("Remove column") + " " + name
-            )
+            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+            .withTooltip(name -> Localization.lang("Remove column") + " " + name)
             .withOnMouseClickedEvent(item ->
-                evt ->
-                    viewModel.removeColumn(
-                        columnsList.getFocusModel().getFocusedItem()
-                    )
+                evt -> viewModel.removeColumn(columnsList.getFocusModel().getFocusedItem())
             )
             .install(actionsColumn);
 
-        viewModel
-            .selectedColumnModelProperty()
-            .setValue(columnsList.getSelectionModel());
+        viewModel.selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
         columnsList.addEventFilter(
             KeyEvent.KEY_PRESSED,
             event -> {
                 if (event.getCode() == KeyCode.DELETE) {
-                    viewModel.removeColumn(
-                        columnsList.getSelectionModel().getSelectedItem()
-                    );
+                    viewModel.removeColumn(columnsList.getSelectionModel().getSelectedItem());
                     event.consume();
                 }
             }
@@ -156,12 +140,8 @@ public class TableTab
         new ViewModelListCellFactory<MainTableColumnModel>()
             .withText(MainTableColumnModel::getDisplayName)
             .install(addColumnName);
-        addColumnName
-            .itemsProperty()
-            .bind(viewModel.availableColumnsProperty());
-        addColumnName
-            .valueProperty()
-            .bindBidirectional(viewModel.addColumnProperty());
+        addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
+        addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
         addColumnName.setConverter(TableTabViewModel.columnNameStringConverter);
         addColumnName.addEventFilter(
             KeyEvent.KEY_PRESSED,
@@ -193,43 +173,29 @@ public class TableTab
             .selectedProperty()
             .bindBidirectional(viewModel.autoResizeColumnsProperty());
 
-        namesNatbib
-            .selectedProperty()
-            .bindBidirectional(viewModel.namesNatbibProperty());
-        nameAsIs
-            .selectedProperty()
-            .bindBidirectional(viewModel.nameAsIsProperty());
-        nameFirstLast
-            .selectedProperty()
-            .bindBidirectional(viewModel.nameFirstLastProperty());
-        nameLastFirst
-            .selectedProperty()
-            .bindBidirectional(viewModel.nameLastFirstProperty());
+        namesNatbib.selectedProperty().bindBidirectional(viewModel.namesNatbibProperty());
+        nameAsIs.selectedProperty().bindBidirectional(viewModel.nameAsIsProperty());
+        nameFirstLast.selectedProperty().bindBidirectional(viewModel.nameFirstLastProperty());
+        nameLastFirst.selectedProperty().bindBidirectional(viewModel.nameLastFirstProperty());
 
         abbreviationDisabled
             .selectedProperty()
             .bindBidirectional(viewModel.abbreviationDisabledProperty());
         abbreviationDisabled
             .disableProperty()
-            .bind(
-                namesNatbib.selectedProperty().or(nameAsIs.selectedProperty())
-            );
+            .bind(namesNatbib.selectedProperty().or(nameAsIs.selectedProperty()));
         abbreviationEnabled
             .selectedProperty()
             .bindBidirectional(viewModel.abbreviationEnabledProperty());
         abbreviationEnabled
             .disableProperty()
-            .bind(
-                namesNatbib.selectedProperty().or(nameAsIs.selectedProperty())
-            );
+            .bind(namesNatbib.selectedProperty().or(nameAsIs.selectedProperty()));
         abbreviationLastNameOnly
             .selectedProperty()
             .bindBidirectional(viewModel.abbreviationLastNameOnlyProperty());
         abbreviationLastNameOnly
             .disableProperty()
-            .bind(
-                namesNatbib.selectedProperty().or(nameAsIs.selectedProperty())
-            );
+            .bind(namesNatbib.selectedProperty().or(nameAsIs.selectedProperty()));
     }
 
     public void updateToCurrentColumnOrder() {

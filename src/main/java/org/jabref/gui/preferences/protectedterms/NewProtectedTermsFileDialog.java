@@ -30,46 +30,27 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
 
         this.setTitle(Localization.lang("New protected terms file"));
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(
-                    Localization.lang("Protected terms file"),
-                    StandardFileType.TERMS
-                )
-                .withDefaultExtension(
-                    Localization.lang("Protected terms file"),
-                    StandardFileType.TERMS
-                )
-                .withInitialDirectory(filePreferences.getWorkingDirectory())
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+            .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+            .withInitialDirectory(filePreferences.getWorkingDirectory())
+            .build();
 
         Button browse = new Button(Localization.lang("Browse"));
         browse.setOnAction(event ->
             this.dialogService.showFileSaveDialog(fileDialogConfiguration)
-                .ifPresent(file ->
-                    newFile.setText(file.toAbsolutePath().toString())
-                )
+                .ifPresent(file -> newFile.setText(file.toAbsolutePath().toString()))
         );
 
         TextField newDescription = new TextField();
         VBox container = new VBox(
             10,
-            new VBox(
-                5,
-                new Label(Localization.lang("Description")),
-                newDescription
-            ),
-            new VBox(
-                5,
-                new Label(Localization.lang("File")),
-                new HBox(10, newFile, browse)
-            )
+            new VBox(5, new Label(Localization.lang("Description")), newDescription),
+            new VBox(5, new Label(Localization.lang("File")), new HBox(10, newFile, browse))
         );
         getDialogPane().setContent(container);
 
-        getDialogPane()
-            .getButtonTypes()
-            .setAll(ButtonType.OK, ButtonType.CANCEL);
+        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {

@@ -25,10 +25,6 @@ class HelpFileTest {
         URL url = new URL(jabrefHelp + help.getPageName());
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestProperty("User-Agent", URLDownload.USER_AGENT);
-        assertEquals(
-            200,
-            http.getResponseCode(),
-            "Wrong URL: " + url.toString()
-        );
+        assertEquals(200, http.getResponseCode(), "Wrong URL: " + url.toString());
     }
 }

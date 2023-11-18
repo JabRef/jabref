@@ -18,10 +18,7 @@ public class AuthorAndsReplacerTest {
         assertEquals("", a.format(""));
 
         // Single Names don't change
-        assertEquals(
-            "Someone, Van Something",
-            a.format("Someone, Van Something")
-        );
+        assertEquals("Someone, Van Something", a.format("Someone, Van Something"));
 
         // Two names just an &
         assertEquals(

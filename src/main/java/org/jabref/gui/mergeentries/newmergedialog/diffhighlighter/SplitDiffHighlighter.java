@@ -46,9 +46,7 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
                 .map(String::length)
                 .reduce(Integer::sum)
                 .map(value ->
-                    value +
-                    (getSeparator().length() *
-                        (affectedTokensInSource.size() - 1))
+                    value + (getSeparator().length() * (affectedTokensInSource.size() - 1))
                 )
                 .orElse(0);
 
@@ -57,9 +55,7 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
                 .map(String::length)
                 .reduce(Integer::sum)
                 .map(value ->
-                    value +
-                    (getSeparator().length() *
-                        (affectedTokensInTarget.size() - 1))
+                    value + (getSeparator().length() * (affectedTokensInTarget.size() - 1))
                 )
                 .orElse(0);
             int affectedSourceTokensPositionInText = getPositionInText(
@@ -74,37 +70,30 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
                 case CHANGE -> {
                     sourceTextview.setStyleClass(
                         affectedSourceTokensPositionInText,
-                        affectedSourceTokensPositionInText +
-                        joinedSourceTokensLength,
+                        affectedSourceTokensPositionInText + joinedSourceTokensLength,
                         "deletion"
                     );
                     targetTextview.setStyleClass(
                         affectedTargetTokensPositionInText,
-                        affectedTargetTokensPositionInText +
-                        joinedTargetTokensLength,
+                        affectedTargetTokensPositionInText + joinedTargetTokensLength,
                         "updated"
                     );
                 }
                 case DELETE -> sourceTextview.setStyleClass(
                     affectedSourceTokensPositionInText,
-                    affectedSourceTokensPositionInText +
-                    joinedSourceTokensLength,
+                    affectedSourceTokensPositionInText + joinedSourceTokensLength,
                     "deletion"
                 );
                 case INSERT -> targetTextview.setStyleClass(
                     affectedTargetTokensPositionInText,
-                    affectedTargetTokensPositionInText +
-                    joinedTargetTokensLength,
+                    affectedTargetTokensPositionInText + joinedTargetTokensLength,
                     "addition"
                 );
             }
         }
     }
 
-    public int getPositionInText(
-        int positionInTokenList,
-        List<String> tokenList
-    ) {
+    public int getPositionInText(int positionInTokenList, List<String> tokenList) {
         if (positionInTokenList == 0) {
             return 0;
         } else {
@@ -113,9 +102,7 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
                 .limit(positionInTokenList)
                 .map(String::length)
                 .reduce(Integer::sum)
-                .map(value ->
-                    value + (getSeparator().length() * positionInTokenList)
-                )
+                .map(value -> value + (getSeparator().length() * positionInTokenList))
                 .orElse(0);
         }
     }

@@ -38,13 +38,10 @@ public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
      * <li>Optional fields:</li>
      * </ul>
      */
-    private static final BibEntryType SEARCH_QUERY_ENTRY =
-        new BibEntryTypeBuilder()
-            .withType(
-                SystematicLiteratureReviewStudyEntryType.SEARCH_QUERY_ENTRY
-            )
-            .withRequiredFields(new UnknownField("query"))
-            .build();
+    private static final BibEntryType SEARCH_QUERY_ENTRY = new BibEntryTypeBuilder()
+        .withType(SystematicLiteratureReviewStudyEntryType.SEARCH_QUERY_ENTRY)
+        .withRequiredFields(new UnknownField("query"))
+        .build();
 
     /**
      * Entry type for the targeted libraries within a study definition file
@@ -56,10 +53,7 @@ public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
      */
     private static final BibEntryType LIBRARY_ENTRY = new BibEntryTypeBuilder()
         .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)
-        .withRequiredFields(
-            new UnknownField("name"),
-            new UnknownField("enabled")
-        )
+        .withRequiredFields(new UnknownField("name"), new UnknownField("enabled"))
         .withImportantFields(StandardField.COMMENT)
         .build();
 

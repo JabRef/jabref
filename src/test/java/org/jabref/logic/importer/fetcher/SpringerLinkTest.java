@@ -20,26 +20,20 @@ import org.junit.jupiter.api.Test;
 @FetcherTest
 public class SpringerLinkTest {
 
-    private final ImporterPreferences importerPreferences = mock(
-        ImporterPreferences.class
-    );
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private SpringerLink finder;
     private BibEntry entry;
 
     @BeforeEach
     public void setUp() {
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         finder = new SpringerLink(importerPreferences);
         entry = new BibEntry();
     }
 
     @Test
     public void rejectNullParameter() {
-        assertThrows(
-            NullPointerException.class,
-            () -> finder.findFullText(null)
-        );
+        assertThrows(NullPointerException.class, () -> finder.findFullText(null));
     }
 
     @Test
@@ -53,9 +47,7 @@ public class SpringerLinkTest {
         entry.setField(StandardField.DOI, "10.1186/s13677-015-0042-8");
         assertEquals(
             Optional.of(
-                new URL(
-                    "http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf"
-                )
+                new URL("http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf")
             ),
             finder.findFullText(entry)
         );

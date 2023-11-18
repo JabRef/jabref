@@ -22,8 +22,7 @@ public class RangeSort {
      * <p>
      * Note: since we only look at the ranges, this comparison is generally not consistent with `equals` on the RangeHolders. Probably should not be used for key comparison in {@code TreeMap<RangeHolder>} or {@code Set<RangeHolder>}
      */
-    private static class HolderComparatorWithinPartition
-        implements Comparator<RangeHolder> {
+    private static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
 
         private final XTextRangeCompare cmp;
 
@@ -39,11 +38,7 @@ public class RangeSort {
          */
         @Override
         public int compare(RangeHolder a, RangeHolder b) {
-            return UnoTextRange.compareStartsThenEndsUnsafe(
-                cmp,
-                a.getRange(),
-                b.getRange()
-            );
+            return UnoTextRange.compareStartsThenEndsUnsafe(cmp, a.getRange(), b.getRange());
         }
     }
 
@@ -52,9 +47,7 @@ public class RangeSort {
      * <p>
      * Note: RangeHolder.getRange() is called many times.
      */
-    public static <V extends RangeHolder> void sortWithinPartition(
-        List<V> rangeHolders
-    ) {
+    public static <V extends RangeHolder> void sortWithinPartition(List<V> rangeHolders) {
         if (rangeHolders.isEmpty()) {
             return;
         }
@@ -90,9 +83,7 @@ public class RangeSort {
     /**
      * Partition RangeHolders by the corresponding XText.
      */
-    public static <V extends RangeHolder> RangePartitions<V> partitionRanges(
-        List<V> holders
-    ) {
+    public static <V extends RangeHolder> RangePartitions<V> partitionRanges(List<V> holders) {
         RangePartitions<V> result = new RangePartitions<>();
         for (V holder : holders) {
             result.add(holder);
@@ -103,9 +94,9 @@ public class RangeSort {
     /**
      * Note: RangeHolder.getRange() is called many times.
      */
-    public static <V extends RangeHolder> RangePartitions<
-        V
-    > partitionAndSortRanges(List<V> holders) {
+    public static <V extends RangeHolder> RangePartitions<V> partitionAndSortRanges(
+        List<V> holders
+    ) {
         RangePartitions<V> result = partitionRanges(holders);
         for (List<V> partition : result.getPartitions()) {
             sortWithinPartition(partition);

@@ -31,9 +31,7 @@ class UnlinkedFilesCrawlerTest {
         Files.createDirectories(subDir);
         Files.createFile(subDir.resolve("test.png"));
 
-        UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(
-            UnlinkedPDFFileFilter.class
-        );
+        UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(UnlinkedPDFFileFilter.class);
         when(unlinkedPDFFileFilter.accept(any(Path.class))).thenReturn(true);
 
         UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(
@@ -45,18 +43,16 @@ class UnlinkedFilesCrawlerTest {
             mock(FilePreferences.class)
         );
 
-        FileNodeViewModel fileNodeViewModel =
-            unlinkedFilesCrawler.searchDirectory(
-                testRoot,
-                unlinkedPDFFileFilter
-            );
+        FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(
+            testRoot,
+            unlinkedPDFFileFilter
+        );
 
         assertEquals(new FileNodeViewModel(testRoot), fileNodeViewModel);
     }
 
     @Test
-    public void excludingTheCurrentLibraryTest(@TempDir Path testRoot)
-        throws IOException {
+    public void excludingTheCurrentLibraryTest(@TempDir Path testRoot) throws IOException {
         // Adding 3 files one of which is the database file
         Files.createFile(testRoot.resolve("unlinkedPdf.pdf"));
         Files.createFile(testRoot.resolve("another-unlinkedPdf.pdf"));
@@ -86,11 +82,10 @@ class UnlinkedFilesCrawlerTest {
             databaseContext,
             filePreferences
         );
-        FileNodeViewModel fileNodeViewModel =
-            unlinkedFilesCrawler.searchDirectory(
-                testRoot,
-                unlinkedPdfFileFilter
-            );
+        FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(
+            testRoot,
+            unlinkedPdfFileFilter
+        );
 
         // checking to see if the database file has been filtered
         try (Stream<Path> filesInitially = Files.list(testRoot)) {

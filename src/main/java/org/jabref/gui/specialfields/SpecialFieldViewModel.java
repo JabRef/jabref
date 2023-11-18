@@ -90,10 +90,7 @@ public class SpecialFieldViewModel {
             .collect(Collectors.toList());
     }
 
-    public void setSpecialFieldValue(
-        BibEntry bibEntry,
-        SpecialFieldValue value
-    ) {
+    public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
         Optional<FieldChange> change = UpdateField.updateField(
             bibEntry,
             getField(),
@@ -101,9 +98,7 @@ public class SpecialFieldViewModel {
             getField().isSingleValueField()
         );
 
-        change.ifPresent(fieldChange ->
-            undoManager.addEdit(new UndoableFieldChange(fieldChange))
-        );
+        change.ifPresent(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
     }
 
     public void toggle(BibEntry entry) {

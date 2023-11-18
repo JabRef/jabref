@@ -23,8 +23,7 @@ public class PullChangesFromSharedAction extends SimpleCommand {
         stateManager
             .getActiveDatabase()
             .ifPresent(databaseContext -> {
-                DatabaseSynchronizer dbmsSynchronizer =
-                    databaseContext.getDBMSSynchronizer();
+                DatabaseSynchronizer dbmsSynchronizer = databaseContext.getDBMSSynchronizer();
                 dbmsSynchronizer.pullChanges();
             });
     }

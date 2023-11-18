@@ -20,10 +20,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Constructor for the right click menu
      *
      */
-    public MainTableHeaderContextMenu(
-        MainTable mainTable,
-        MainTableColumnFactory factory
-    ) {
+    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory) {
         super();
         this.mainTable = mainTable;
         this.factory = factory;
@@ -52,14 +49,10 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     private void constructItems(MainTable mainTable) {
         // Reset the right-click menu
         this.getItems().clear();
-        List<TableColumn<BibEntryTableViewModel, ?>> commonColumns =
-            commonColumns();
+        List<TableColumn<BibEntryTableViewModel, ?>> commonColumns = commonColumns();
 
         // Populate the menu with currently used fields
-        for (TableColumn<
-            BibEntryTableViewModel,
-            ?
-        > column : mainTable.getColumns()) {
+        for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
             // Append only if the column has not already been added (a common column)
             RightClickMenuItem itemToAdd = createMenuItem(column, true);
             this.getItems().add(itemToAdd);
@@ -68,8 +61,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             MainTableColumn searchCol = (MainTableColumn<?>) column;
             if (isACommonColumn(searchCol)) {
                 commonColumns.removeIf(tableCol ->
-                    ((MainTableColumn) tableCol).getModel()
-                        .equals(searchCol.getModel())
+                    ((MainTableColumn) tableCol).getModel().equals(searchCol.getModel())
                 );
             }
         }
@@ -79,10 +71,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Append to the menu the current remaining columns in the common columns.
 
-        for (TableColumn<
-            BibEntryTableViewModel,
-            ?
-        > tableColumn : commonColumns) {
+        for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
             RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
             this.getItems().add(itemToAdd);
         }
@@ -108,8 +97,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      *
      */
     private int obtainIndexOfColumn(MainTableColumn searchColumn) {
-        ObservableList<TableColumn<BibEntryTableViewModel, ?>> columns =
-            mainTable.getColumns();
+        ObservableList<TableColumn<BibEntryTableViewModel, ?>> columns = mainTable.getColumns();
         for (int i = 0; i < columns.size(); i++) {
             TableColumn<BibEntryTableViewModel, ?> column = columns.get(i);
             MainTableColumnModel model = ((MainTableColumn) column).getModel();
@@ -140,8 +128,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         mainTable
             .getColumns()
             .removeIf(tableCol ->
-                ((MainTableColumn) tableCol).getModel()
-                    .equals(tableColumn.getModel())
+                ((MainTableColumn) tableCol).getModel().equals(tableColumn.getModel())
             );
     }
 
@@ -184,72 +171,38 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Create the MainTableColumn Models from qualifiers + types.
         List<MainTableColumnModel> commonColumns = new ArrayList<>();
+        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
+        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
         commonColumns.add(
-            new MainTableColumnModel(MainTableColumnModel.Type.GROUPS)
+            new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, entryTypeQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(MainTableColumnModel.Type.FILES)
+            new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, authorEditQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.LINKED_IDENTIFIER
-            )
+            new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, titleQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.NORMALFIELD,
-                entryTypeQualifier
-            )
+            new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, yearQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.NORMALFIELD,
-                authorEditQualifier
-            )
+            new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, journalBookQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.NORMALFIELD,
-                titleQualifier
-            )
+            new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, rankQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.NORMALFIELD,
-                yearQualifier
-            )
+            new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, readStatusQualifier)
         );
         commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.NORMALFIELD,
-                journalBookQualifier
-            )
-        );
-        commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.SPECIALFIELD,
-                rankQualifier
-            )
-        );
-        commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.SPECIALFIELD,
-                readStatusQualifier
-            )
-        );
-        commonColumns.add(
-            new MainTableColumnModel(
-                MainTableColumnModel.Type.SPECIALFIELD,
-                priorityQualifier
-            )
+            new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, priorityQualifier)
         );
 
         // Create the Table Columns from the models using factory methods.
-        List<TableColumn<BibEntryTableViewModel, ?>> commonTableColumns =
-            new ArrayList<>();
+        List<TableColumn<BibEntryTableViewModel, ?>> commonTableColumns = new ArrayList<>();
         for (MainTableColumnModel columnModel : commonColumns) {
-            TableColumn<BibEntryTableViewModel, ?> tableColumn =
-                factory.createColumn(columnModel);
+            TableColumn<BibEntryTableViewModel, ?> tableColumn = factory.createColumn(columnModel);
             commonTableColumns.add(tableColumn);
         }
         return commonTableColumns;
@@ -264,11 +217,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         private int index;
         private boolean visibleInTable;
 
-        RightClickMenuItem(
-            String displayName,
-            MainTableColumn column,
-            boolean isVisible
-        ) {
+        RightClickMenuItem(String displayName, MainTableColumn column, boolean isVisible) {
             super(displayName);
             setVisibleInTable(isVisible);
             // Flag item as selected if the item is already in the main table.

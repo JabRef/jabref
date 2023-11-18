@@ -31,21 +31,11 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     public KeywordList(List<String> keywordChains) {
-        this(
-            keywordChains
-                .stream()
-                .map(Keyword::new)
-                .collect(Collectors.toList())
-        );
+        this(keywordChains.stream().map(Keyword::new).collect(Collectors.toList()));
     }
 
     public KeywordList(String... keywordChains) {
-        this(
-            Arrays
-                .stream(keywordChains)
-                .map(Keyword::new)
-                .collect(Collectors.toList())
-        );
+        this(Arrays.stream(keywordChains).map(Keyword::new).collect(Collectors.toList()));
     }
 
     public KeywordList(Keyword... keywordChains) {
@@ -66,15 +56,10 @@ public class KeywordList implements Iterable<Keyword> {
 
         KeywordList keywordList = new KeywordList();
 
-        StringTokenizer tok = new StringTokenizer(
-            keywordString,
-            delimiter.toString()
-        );
+        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
         while (tok.hasMoreTokens()) {
             String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(
-                chain.split(hierarchicalDelimiter.toString())
-            );
+            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
             keywordList.add(chainRoot);
         }
         return keywordList;
@@ -88,11 +73,7 @@ public class KeywordList implements Iterable<Keyword> {
      * @return an parsed list containing the keywordChains
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
-        return parse(
-            keywordString,
-            delimiter,
-            Keyword.DEFAULT_HIERARCHICAL_DELIMITER
-        );
+        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
     public static KeywordList merge(
@@ -214,10 +195,7 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     public Set<String> toStringList() {
-        return keywordChains
-            .stream()
-            .map(Keyword::toString)
-            .collect(Collectors.toSet());
+        return keywordChains.stream().map(Keyword::toString).collect(Collectors.toSet());
     }
 
     @Override
@@ -229,10 +207,7 @@ public class KeywordList implements Iterable<Keyword> {
             return false;
         }
         KeywordList keywords1 = (KeywordList) o;
-        return Objects.equals(
-            new HashSet<>(keywordChains),
-            new HashSet<>(keywords1.keywordChains)
-        );
+        return Objects.equals(new HashSet<>(keywordChains), new HashSet<>(keywords1.keywordChains));
     }
 
     @Override

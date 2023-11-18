@@ -11,14 +11,8 @@ import javafx.beans.property.StringProperty;
 public class ThreeWayMergeCellViewModel {
 
     private final StringProperty text = new SimpleStringProperty();
-    private final BooleanProperty odd = new SimpleBooleanProperty(
-        ThreeWayMergeCell.class,
-        "odd"
-    );
-    private final BooleanProperty even = new SimpleBooleanProperty(
-        ThreeWayMergeCell.class,
-        "even"
-    );
+    private final BooleanProperty odd = new SimpleBooleanProperty(ThreeWayMergeCell.class, "odd");
+    private final BooleanProperty even = new SimpleBooleanProperty(ThreeWayMergeCell.class, "even");
 
     public ThreeWayMergeCellViewModel(String text, int rowIndex) {
         setText(text);

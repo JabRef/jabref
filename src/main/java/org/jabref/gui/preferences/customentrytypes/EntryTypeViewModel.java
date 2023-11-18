@@ -15,14 +15,10 @@ import org.jabref.model.entry.field.Field;
 
 public class EntryTypeViewModel {
 
-    private final ObjectProperty<BibEntryType> entryType =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<BibEntryType> entryType = new SimpleObjectProperty<>();
     private final ObservableList<FieldViewModel> fields;
 
-    public EntryTypeViewModel(
-        BibEntryType entryType,
-        Predicate<Field> isMultiline
-    ) {
+    public EntryTypeViewModel(BibEntryType entryType, Predicate<Field> isMultiline) {
         this.entryType.set(entryType);
         List<FieldViewModel> allFieldsForType = entryType
             .getAllBibFields()
@@ -55,10 +51,7 @@ public class EntryTypeViewModel {
             return false;
         }
         EntryTypeViewModel other = (EntryTypeViewModel) obj;
-        return (
-            Objects.equals(entryType, other.entryType) &&
-            Objects.equals(fields, other.fields)
-        );
+        return (Objects.equals(entryType, other.entryType) && Objects.equals(fields, other.fields));
     }
 
     public void addField(FieldViewModel field) {
@@ -79,12 +72,6 @@ public class EntryTypeViewModel {
 
     @Override
     public String toString() {
-        return (
-            "CustomEntryTypeViewModel [entryType=" +
-            entryType +
-            ", fields=" +
-            fields +
-            "]"
-        );
+        return ("CustomEntryTypeViewModel [entryType=" + entryType + ", fields=" + fields + "]");
     }
 }

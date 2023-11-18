@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SendAsStandardEmailAction extends SendAsEMailAction {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SendAsStandardEmailAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendAsStandardEmailAction.class);
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -50,17 +48,13 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
 
     @Override
     protected String getSubject() {
-        return preferencesService
-            .getExternalApplicationsPreferences()
-            .getEmailSubject();
+        return preferencesService.getExternalApplicationsPreferences().getEmailSubject();
     }
 
     @Override
     protected String getBody() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
-        BibDatabaseContext databaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         StringWriter rawEntries = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
 
@@ -71,11 +65,7 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
 
         for (BibEntry entry : entries) {
             try {
-                bibtexEntryWriter.write(
-                    entry,
-                    bibWriter,
-                    databaseContext.getMode()
-                );
+                bibtexEntryWriter.write(entry, bibWriter, databaseContext.getMode());
             } catch (IOException e) {
                 LOGGER.warn("Problem creating BibTeX file for mailing.", e);
             }

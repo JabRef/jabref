@@ -31,20 +31,18 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         TaskExecutor taskExecutor
     ) {
         super();
-        MainTablePreferences mainTablePreferences =
-            preferencesService.getMainTablePreferences();
+        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
-        List<TableColumn<BibEntryTableViewModel, ?>> allCols =
-            new MainTableColumnFactory(
-                database,
-                preferencesService,
-                preferencesService.getSearchDialogColumnPreferences(),
-                undoManager,
-                dialogService,
-                stateManager,
-                taskExecutor
-            )
-                .createColumns();
+        List<TableColumn<BibEntryTableViewModel, ?>> allCols = new MainTableColumnFactory(
+            database,
+            preferencesService,
+            preferencesService.getSearchDialogColumnPreferences(),
+            undoManager,
+            dialogService,
+            stateManager,
+            taskExecutor
+        )
+            .createColumns();
 
         if (allCols.stream().noneMatch(LibraryColumn.class::isInstance)) {
             allCols.add(0, new LibraryColumn());
@@ -71,19 +69,12 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
-        model
-            .getEntriesFilteredAndSorted()
-            .comparatorProperty()
-            .bind(this.comparatorProperty());
+        model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
-        this.getStylesheets()
-            .add(MainTable.class.getResource("MainTable.css").toExternalForm());
+        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(
-            this,
-            preferencesService.getSearchDialogColumnPreferences()
-        )
+        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences())
             .addListeners();
 
         database.getDatabase().registerListener(this);

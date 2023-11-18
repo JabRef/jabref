@@ -12,10 +12,7 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     public static final String NAME = "Texmaker";
 
-    public PushToTexmaker(
-        DialogService dialogService,
-        PreferencesService preferencesService
-    ) {
+    public PushToTexmaker(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 

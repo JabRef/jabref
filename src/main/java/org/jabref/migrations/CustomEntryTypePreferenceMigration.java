@@ -32,10 +32,7 @@ class CustomEntryTypePreferenceMigration {
         int number = 0;
         Optional<BibEntryType> type;
         while ((type = getBibEntryType(number, preferences)).isPresent()) {
-            entryTypesManager.addCustomOrModifiedType(
-                type.get(),
-                defaultBibDatabaseMode
-            );
+            entryTypesManager.addCustomOrModifiedType(type.get(), defaultBibDatabaseMode);
             storedOldTypes.add(type.get());
             number++;
         }
@@ -59,25 +56,17 @@ class CustomEntryTypePreferenceMigration {
         }
         List<String> req = preferences.getStringList(CUSTOM_TYPE_REQ + nr);
         List<String> opt = preferences.getStringList(CUSTOM_TYPE_OPT + nr);
-        List<String> priOpt = preferences.getStringList(
-            CUSTOM_TYPE_PRIOPT + nr
-        );
+        List<String> priOpt = preferences.getStringList(CUSTOM_TYPE_PRIOPT + nr);
 
         BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
             .withType(EntryTypeFactory.parse(name))
             .withRequiredFields(
-                req
-                    .stream()
-                    .map(FieldFactory::parseOrFields)
-                    .collect(Collectors.toList())
+                req.stream().map(FieldFactory::parseOrFields).collect(Collectors.toList())
             );
         if (priOpt.isEmpty()) {
             entryTypeBuilder =
                 entryTypeBuilder.withImportantFields(
-                    opt
-                        .stream()
-                        .map(FieldFactory::parseField)
-                        .collect(Collectors.toSet())
+                    opt.stream().map(FieldFactory::parseField).collect(Collectors.toSet())
                 );
             return Optional.of(entryTypeBuilder.build());
         } else {
@@ -87,16 +76,10 @@ class CustomEntryTypePreferenceMigration {
             entryTypeBuilder =
                 entryTypeBuilder
                     .withImportantFields(
-                        priOpt
-                            .stream()
-                            .map(FieldFactory::parseField)
-                            .collect(Collectors.toSet())
+                        priOpt.stream().map(FieldFactory::parseField).collect(Collectors.toSet())
                     )
                     .withDetailFields(
-                        secondary
-                            .stream()
-                            .map(FieldFactory::parseField)
-                            .collect(Collectors.toSet())
+                        secondary.stream().map(FieldFactory::parseField).collect(Collectors.toSet())
                     );
             return Optional.of(entryTypeBuilder.build());
         }

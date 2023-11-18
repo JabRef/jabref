@@ -43,9 +43,7 @@ public class MergedFieldCell extends ThreeWayMergeCell {
             ScrollEvent.SCROLL,
             e -> {
                 e.consume();
-                MergedFieldCell.this.fireEvent(
-                        e.copyFor(e.getSource(), MergedFieldCell.this)
-                    );
+                MergedFieldCell.this.fireEvent(e.copyFor(e.getSource(), MergedFieldCell.this));
             }
         );
     }

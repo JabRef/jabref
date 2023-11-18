@@ -52,19 +52,13 @@ class ACMPortalFetcherTest {
                 StandardField.KEYWORDS,
                 "conformance checking, repository data mining, software architecture"
             )
-            .withField(
-                StandardField.PUBLISHER,
-                "Association for Computing Machinery"
-            )
+            .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
             .withField(StandardField.ADDRESS, "New York, NY, USA")
             .withField(
                 StandardField.TITLE,
                 "The relationship of code churn and architectural violations in the open source software JabRef"
             )
-            .withField(
-                StandardField.URL,
-                "https://doi.org/10.1145/3129790.3129810"
-            )
+            .withField(StandardField.URL, "https://doi.org/10.1145/3129790.3129810")
             .withField(StandardField.PAGETOTAL, "7")
             .withField(StandardField.PAGES, "152–158");
 
@@ -75,10 +69,7 @@ class ACMPortalFetcherTest {
         for (BibEntry bibEntry : fetchedEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertEquals(
-            Optional.of(searchEntry),
-            fetchedEntries.stream().findFirst()
-        );
+        assertEquals(Optional.of(searchEntry), fetchedEntries.stream().findFirst());
     }
 
     @Test
@@ -86,11 +77,8 @@ class ACMPortalFetcherTest {
         throws FetcherException, MalformedURLException, URISyntaxException, QueryNodeParseException {
         String testQuery = "test query url";
         SyntaxParser parser = new StandardSyntaxParser();
-        URL url = fetcher.getURLForQuery(
-            parser.parse(testQuery, NO_EXPLICIT_FIELD)
-        );
-        String expected =
-            "https://dl.acm.org/action/doSearch?AllField=test+query+url";
+        URL url = fetcher.getURLForQuery(parser.parse(testQuery, NO_EXPLICIT_FIELD));
+        String expected = "https://dl.acm.org/action/doSearch?AllField=test+query+url";
         assertEquals(expected, url.toString());
     }
 

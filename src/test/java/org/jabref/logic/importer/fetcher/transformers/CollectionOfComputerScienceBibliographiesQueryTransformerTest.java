@@ -7,9 +7,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
 class CollectionOfComputerScienceBibliographiesQueryTransformerTest
-    extends InfixTransformerTest<
-        CollectionOfComputerScienceBibliographiesQueryTransformer
-    > {
+    extends InfixTransformerTest<CollectionOfComputerScienceBibliographiesQueryTransformer> {
 
     @Override
     public CollectionOfComputerScienceBibliographiesQueryTransformer getTransformer() {
@@ -41,8 +39,7 @@ class CollectionOfComputerScienceBibliographiesQueryTransformerTest
         String queryString = "2018";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("year:2018"), query);
     }
 
@@ -51,11 +48,7 @@ class CollectionOfComputerScienceBibliographiesQueryTransformerTest
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = getTransformer()
-            .transformLuceneQuery(luceneQuery);
-        assertEquals(
-            Optional.of("year:2018 OR year:2019 OR year:2020 OR year:2021"),
-            query
-        );
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("year:2018 OR year:2019 OR year:2020 OR year:2021"), query);
     }
 }

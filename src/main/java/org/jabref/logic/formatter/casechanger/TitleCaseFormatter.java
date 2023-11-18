@@ -30,11 +30,7 @@ public class TitleCaseFormatter extends Formatter {
             .map(sentence -> {
                 Title title = new Title(sentence);
 
-                title
-                    .getWords()
-                    .stream()
-                    .filter(Word::isSmallerWord)
-                    .forEach(Word::toLowerCase);
+                title.getWords().stream().filter(Word::isSmallerWord).forEach(Word::toLowerCase);
                 title
                     .getWords()
                     .stream()

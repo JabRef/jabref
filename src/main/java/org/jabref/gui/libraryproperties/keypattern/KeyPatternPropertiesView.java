@@ -45,11 +45,7 @@ public class KeyPatternPropertiesView
     }
 
     public void initialize() {
-        this.viewModel =
-            new KeyPatternPropertiesViewModel(
-                databaseContext,
-                preferencesService
-            );
+        this.viewModel = new KeyPatternPropertiesViewModel(databaseContext, preferencesService);
 
         bibtexKeyPatternTable
             .patternListProperty()
@@ -78,18 +74,12 @@ public class KeyPatternPropertiesView
                 databaseContext
                     .getMetaData()
                     .getMode()
-                    .orElse(
-                        preferencesService
-                            .getLibraryPreferences()
-                            .getDefaultBibDatabaseMode()
-                    )
+                    .orElse(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode())
             ),
             databaseContext
                 .getMetaData()
                 .getCiteKeyPattern(
-                    preferencesService
-                        .getCitationKeyPatternPreferences()
-                        .getKeyPattern()
+                    preferencesService.getCitationKeyPatternPreferences().getKeyPattern()
                 )
         );
     }

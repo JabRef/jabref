@@ -17,8 +17,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @FetcherTest
-class LOBIDFetcherTest
-    implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     LOBIDFetcher fetcher;
@@ -47,10 +46,7 @@ class LOBIDFetcherTest
             .withField(StandardField.TITLE, "Das Kapital")
             .withField(StandardField.TITLEADDON, "Schuld, Territorium, Utopie")
             .withField(StandardField.TYPE, "BibliographicResource, Book")
-            .withField(
-                StandardField.URL,
-                "http://lobid.org/resources/991002500969706485"
-            )
+            .withField(StandardField.URL, "http://lobid.org/resources/991002500969706485")
             .withField(StandardField.YEAR, "2016");
 
         BibEntry secondArticle = new BibEntry(StandardEntryType.Article)
@@ -64,10 +60,7 @@ class LOBIDFetcherTest
             .withField(StandardField.KEYWORDS, "Beuys, Joseph, Physis")
             .withField(StandardField.LANGUAGE, "Deutsch")
             .withField(StandardField.TYPE, "BibliographicResource, Article")
-            .withField(
-                StandardField.URL,
-                "http://lobid.org/resources/990173112890206441"
-            )
+            .withField(StandardField.URL, "http://lobid.org/resources/990173112890206441")
             .withField(StandardField.YEAR, "2008");
 
         BibEntry thirdArticle = new BibEntry(StandardEntryType.Book)
@@ -90,24 +83,13 @@ class LOBIDFetcherTest
             .withField(StandardField.LANGUAGE, "Deutsch")
             .withField(StandardField.LOCATION, "Dortmund")
             .withField(StandardField.TITLE, "Das Kapital")
-            .withField(
-                StandardField.TITLEADDON,
-                "Schuld - Territorium - Utopie"
-            )
+            .withField(StandardField.TITLEADDON, "Schuld - Territorium - Utopie")
             .withField(StandardField.TYPE, "BibliographicResource, Book")
-            .withField(
-                StandardField.URL,
-                "http://lobid.org/resources/990212549810206441"
-            )
+            .withField(StandardField.URL, "http://lobid.org/resources/990212549810206441")
             .withField(StandardField.YEAR, "2016");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch(
-            "Cathrine Nichols"
-        );
-        assertEquals(
-            List.of(firstArticle, secondArticle, thirdArticle),
-            fetchedEntries
-        );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Cathrine Nichols");
+        assertEquals(List.of(firstArticle, secondArticle, thirdArticle), fetchedEntries);
     }
 
     @Test
@@ -117,9 +99,7 @@ class LOBIDFetcherTest
 
     @Test
     @Override
-    @Disabled(
-        "Results returned contain a few incorrect years. The majority are accurate"
-    )
+    @Disabled("Results returned contain a few incorrect years. The majority are accurate")
     public void supportsYearSearch() {}
 
     @Override

@@ -27,10 +27,7 @@ public class ISSNCheckerTest {
 
     @Test
     void issnDoesNotAcceptRandomInput() {
-        assertNotEquals(
-            Optional.empty(),
-            checker.checkValue("Some other stuff")
-        );
+        assertNotEquals(Optional.empty(), checker.checkValue("Some other stuff"));
     }
 
     @Test

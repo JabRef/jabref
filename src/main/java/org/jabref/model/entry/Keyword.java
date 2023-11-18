@@ -124,10 +124,7 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      */
     public Set<Keyword> flatten() {
         return Stream
-            .concat(
-                Stream.of(this),
-                getChild().stream().flatMap(child -> child.flatten().stream())
-            )
+            .concat(Stream.of(this), getChild().stream().flatMap(child -> child.flatten().stream()))
             .collect(Collectors.toSet());
     }
 
@@ -135,14 +132,10 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * Returns all subchains starting at this node.
      * E.g., for the chain "A > B > C" the subchains {"A", "A > B", "A > B > C"} are returned.
      */
-    public Set<String> getAllSubchainsAsString(
-        Character hierarchicalDelimiter
-    ) {
+    public Set<String> getAllSubchainsAsString(Character hierarchicalDelimiter) {
         return flatten()
             .stream()
-            .map(subchain ->
-                subchain.getPathFromRootAsString(hierarchicalDelimiter)
-            )
+            .map(subchain -> subchain.getPathFromRootAsString(hierarchicalDelimiter))
             .collect(Collectors.toSet());
     }
 }

@@ -30,10 +30,7 @@ public class DatabaseFileLookup {
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      */
-    public DatabaseFileLookup(
-        BibDatabaseContext databaseContext,
-        FilePreferences filePreferences
-    ) {
+    public DatabaseFileLookup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         Objects.requireNonNull(databaseContext);
         possibleFilePaths =
             Optional
@@ -43,8 +40,7 @@ public class DatabaseFileLookup {
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));
         }
-        this.pathOfDatabase =
-            databaseContext.getDatabasePath().orElse(Path.of(""));
+        this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(""));
     }
 
     /**

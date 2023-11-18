@@ -63,9 +63,7 @@ public class Layout {
                             blockEntries = null;
                         } else {
                             LOGGER.debug(blockStart + '\n' + parsedEntry.s);
-                            LOGGER.warn(
-                                "Nested field/group entries are not implemented!"
-                            );
+                            LOGGER.warn("Nested field/group entries are not implemented!");
                             Thread.dumpStack();
                         }
                     }
@@ -102,10 +100,7 @@ public class Layout {
     }
 
     public String getText() {
-        return layoutEntries
-            .stream()
-            .map(LayoutEntry::getText)
-            .collect(Collectors.joining("\n"));
+        return layoutEntries.stream().map(LayoutEntry::getText).collect(Collectors.joining("\n"));
     }
 
     /**
@@ -138,10 +133,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(
-        BibDatabaseContext databaseContext,
-        Charset encoding
-    ) {
+    public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
         StringBuilder sb = new StringBuilder(100);
         String fieldText;
 

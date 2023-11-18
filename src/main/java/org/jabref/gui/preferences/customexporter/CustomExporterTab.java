@@ -38,24 +38,17 @@ public class CustomExporterTab
 
     @FXML
     private void initialize() {
-        viewModel =
-            new CustomExporterTabViewModel(preferencesService, dialogService);
+        viewModel = new CustomExporterTabViewModel(preferencesService, dialogService);
 
-        exporterTable
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
+        exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
         EasyBind.bindContent(
             viewModel.selectedExportersProperty(),
             exporterTable.getSelectionModel().getSelectedItems()
         );
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
-        layoutColumn.setCellValueFactory(cellData ->
-            cellData.getValue().layoutFileName()
-        );
-        extensionColumn.setCellValueFactory(cellData ->
-            cellData.getValue().extension()
-        );
+        layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
+        extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());
     }
 
     @FXML

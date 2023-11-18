@@ -53,9 +53,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
     }
 
     public boolean isRequired(Field field) {
-        return getRequiredFields()
-            .stream()
-            .anyMatch(fields -> fields.contains(field));
+        return getRequiredFields().stream().anyMatch(fields -> fields.contains(field));
     }
 
     /**
@@ -118,15 +116,11 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    public Set<Field> getSecondaryOptionalNotDeprecatedFields(
-        BibDatabaseMode mode
-    ) {
+    public Set<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
         Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(
             getSecondaryOptionalFields()
         );
-        optionalFieldsNotPrimaryOrDeprecated.removeAll(
-            getDeprecatedFields(mode)
-        );
+        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }
 
@@ -134,16 +128,10 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * Get list of all optional fields of this entry and all fields being source for a BibTeX to BibLaTeX conversion.
      */
     private Set<Field> getOptionalFieldsAndAliases() {
-        Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(
-            getOptionalFields().size()
-        );
+        Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
             optionalFieldsAndAliases.add(field.field());
-            if (
-                EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(
-                    field.field()
-                )
-            ) {
+            if (EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(field.field())) {
                 optionalFieldsAndAliases.add(field.field());
             }
         }

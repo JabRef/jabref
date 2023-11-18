@@ -59,9 +59,7 @@ public class EntryLinkListTest {
 
     @Test
     public void givenBibEntryWhenParsingThenExpectLink() {
-        ParsedEntryLink expected = new ParsedEntryLink(
-            new BibEntry().withCitationKey("key")
-        );
+        ParsedEntryLink expected = new ParsedEntryLink(new BibEntry().withCitationKey("key"));
         assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
@@ -78,9 +76,7 @@ public class EntryLinkListTest {
     }
 
     private void assertSourceCrossrefsTarget(BibEntry target, BibEntry source) {
-        Optional<String> sourceCrossref = source.getField(
-            StandardField.CROSSREF
-        );
+        Optional<String> sourceCrossref = source.getField(StandardField.CROSSREF);
         Optional<String> targetCiteKey = target.getCitationKey();
         assertEquals(sourceCrossref, targetCiteKey);
     }

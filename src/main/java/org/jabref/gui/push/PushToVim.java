@@ -20,14 +20,9 @@ public class PushToVim extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.VIM;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PushToVim.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
-    public PushToVim(
-        DialogService dialogService,
-        PreferencesService preferencesService
-    ) {
+    public PushToVim(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 
@@ -55,11 +50,7 @@ public class PushToVim extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(
-        BibDatabaseContext database,
-        List<BibEntry> entries,
-        String keys
-    ) {
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -79,9 +70,7 @@ public class PushToVim extends AbstractPushToApplication {
             String[] com = new String[] {
                 commandPath,
                 "--servername",
-                preferencesService
-                    .getPushToApplicationPreferences()
-                    .getVimServer(),
+                preferencesService.getPushToApplicationPreferences().getVimServer(),
                 "--remote-send",
                 "<C-\\><C-N>a" + getCitePrefix() + keys + getCiteSuffix(),
             };

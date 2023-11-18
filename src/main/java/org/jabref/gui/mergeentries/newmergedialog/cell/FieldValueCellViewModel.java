@@ -15,8 +15,7 @@ public class FieldValueCellViewModel {
         FieldValueCell.class,
         "selected"
     );
-    private final ObjectProperty<ToggleGroup> toggleGroup =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>();
 
     public FieldValueCellViewModel(String text) {
         setFieldValue(text);

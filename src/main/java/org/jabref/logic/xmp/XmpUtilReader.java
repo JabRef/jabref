@@ -22,19 +22,14 @@ import org.slf4j.LoggerFactory;
 
 public class XmpUtilReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        XmpUtilReader.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);
 
     private static final String START_TAG = "<rdf:Description";
     private static final String END_TAG = "</rdf:Description>";
 
     public XmpUtilReader() {
         // See: https://pdfbox.apache.org/2.0/getting-started.html
-        System.setProperty(
-            "sun.java2d.cmm",
-            "sun.java2d.cmm.kcms.KcmsServiceProvider"
-        ); // To get higher rendering speed on java 8 oder 9 for images
+        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); // To get higher rendering speed on java 8 oder 9 for images
     }
 
     /**
@@ -60,8 +55,7 @@ public class XmpUtilReader {
      * @throws IOException Throws an IOException if the file cannot be read, so the user than remove a lock or cancel
      *                     the operation.
      */
-    public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences)
-        throws IOException {
+    public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
         List<BibEntry> result = new LinkedList<>();
 
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
@@ -70,37 +64,32 @@ public class XmpUtilReader {
             if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
                 for (XMPMetadata xmpMeta : xmpMetaList) {
-                    DublinCoreSchema dcSchema =
-                        DublinCoreSchemaCustom.copyDublinCoreSchema(
-                            xmpMeta.getDublinCoreSchema()
-                        );
+                    DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(
+                        xmpMeta.getDublinCoreSchema()
+                    );
                     if (dcSchema != null) {
-                        DublinCoreExtractor dcExtractor =
-                            new DublinCoreExtractor(
-                                dcSchema,
-                                xmpPreferences,
-                                new BibEntry()
-                            );
-                        Optional<BibEntry> entry =
-                            dcExtractor.extractBibtexEntry();
+                        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(
+                            dcSchema,
+                            xmpPreferences,
+                            new BibEntry()
+                        );
+                        Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
                         entry.ifPresent(result::add);
                     }
                 }
             }
             if (result.isEmpty()) {
                 // If we did not find any XMP metadata, search for non XMP metadata
-                PDDocumentInformation documentInformation =
-                    document.getDocumentInformation();
-                DocumentInformationExtractor diExtractor =
-                    new DocumentInformationExtractor(documentInformation);
+                PDDocumentInformation documentInformation = document.getDocumentInformation();
+                DocumentInformationExtractor diExtractor = new DocumentInformationExtractor(
+                    documentInformation
+                );
                 Optional<BibEntry> entry = diExtractor.extractBibtexEntry();
                 entry.ifPresent(result::add);
             }
         }
 
-        result.forEach(entry ->
-            entry.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF"))
-        );
+        result.forEach(entry -> entry.addFile(new LinkedFile("", path.toAbsolutePath(), "PDF")));
         return result;
     }
 
@@ -154,10 +143,7 @@ public class XmpUtilReader {
                     )
                 );
             } catch (IOException ex) {
-                LOGGER.warn(
-                    "Problem parsing XMP schema. Continuing with other schemas.",
-                    ex
-                );
+                LOGGER.warn("Problem parsing XMP schema. Continuing with other schemas.", ex);
             }
         }
         return metaList;
@@ -169,8 +155,7 @@ public class XmpUtilReader {
      * @param path The path to load.
      * @throws IOException from the underlying @link PDDocument#load(File)
      */
-    public PDDocument loadWithAutomaticDecryption(Path path)
-        throws IOException {
+    public PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document
         // also uses an empty string as default password
         return Loader.loadPDF(path.toFile());

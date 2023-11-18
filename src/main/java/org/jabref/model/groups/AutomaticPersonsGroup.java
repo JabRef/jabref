@@ -10,11 +10,7 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     private final Field field;
 
-    public AutomaticPersonsGroup(
-        String name,
-        GroupHierarchyType context,
-        Field field
-    ) {
+    public AutomaticPersonsGroup(String name, GroupHierarchyType context, Field field) {
         super(name, context);
         this.field = field;
     }
@@ -38,11 +34,7 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticPersonsGroup(
-            this.name.getValue(),
-            this.context,
-            this.field
-        );
+        return new AutomaticPersonsGroup(this.name.getValue(), this.context, this.field);
     }
 
     @Override
@@ -51,12 +43,7 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
             .getAsLastNamesLatexFree(field, entry)
             .stream()
             .map(lastName ->
-                new LastNameGroup(
-                    lastName,
-                    GroupHierarchyType.INDEPENDENT,
-                    field,
-                    lastName
-                )
+                new LastNameGroup(lastName, GroupHierarchyType.INDEPENDENT, field, lastName)
             )
             .map(GroupTreeNode::new)
             .collect(Collectors.toSet());

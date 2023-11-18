@@ -27,14 +27,12 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    String gitUsername = Optional
-        .ofNullable(System.getenv("GIT_EMAIL"))
-        .orElse("");
-    String gitPassword = Optional
-        .ofNullable(System.getenv("GIT_PW"))
-        .orElse("");
-    final CredentialsProvider credentialsProvider =
-        new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
+    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(
+        gitUsername,
+        gitPassword
+    );
 
     /**
      * Initialize the handler for the given repository
@@ -46,22 +44,14 @@ public class GitHandler {
         this.repositoryPathAsFile = this.repositoryPath.toFile();
         if (!isGitRepository()) {
             try {
-                Git
-                    .init()
-                    .setDirectory(repositoryPathAsFile)
-                    .setInitialBranch("main")
-                    .call();
+                Git.init().setDirectory(repositoryPathAsFile).setInitialBranch("main").call();
                 setupGitIgnore();
                 String initialCommit = "Initial commit";
                 if (!createCommitOnCurrentBranch(initialCommit, false)) {
                     // Maybe, setupGitIgnore failed and did not add something
                     // Then, we create an empty commit
                     try (Git git = Git.open(repositoryPathAsFile)) {
-                        git
-                            .commit()
-                            .setAllowEmpty(true)
-                            .setMessage(initialCommit)
-                            .call();
+                        git.commit().setAllowEmpty(true).setMessage(initialCommit).call();
                     }
                 }
             } catch (GitAPIException | IOException e) {
@@ -75,9 +65,7 @@ public class GitHandler {
             Path gitignore = Path.of(repositoryPath.toString(), ".gitignore");
             if (!Files.exists(gitignore)) {
                 FileUtil.copyFile(
-                    Path.of(
-                        this.getClass().getResource("git.gitignore").toURI()
-                    ),
+                    Path.of(this.getClass().getResource("git.gitignore").toURI()),
                     gitignore,
                     false
                 );
@@ -104,8 +92,7 @@ public class GitHandler {
      *
      * @param branchToCheckout Name of the branch to check out
      */
-    public void checkoutBranch(String branchToCheckout)
-        throws IOException, GitAPIException {
+    public void checkoutBranch(String branchToCheckout) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<Ref> branch = getRefForBranch(branchToCheckout);
             git
@@ -121,8 +108,7 @@ public class GitHandler {
      * Returns the reference of the specified branch
      * If it does not exist returns an empty optional
      */
-    Optional<Ref> getRefForBranch(String branchName)
-        throws GitAPIException, IOException {
+    Optional<Ref> getRefForBranch(String branchName) throws GitAPIException, IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git
                 .branchList()
@@ -139,10 +125,8 @@ public class GitHandler {
      * @param amend Whether to amend to the last commit (true), or not (false)
      * @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
      */
-    public boolean createCommitOnCurrentBranch(
-        String commitMessage,
-        boolean amend
-    ) throws IOException, GitAPIException {
+    public boolean createCommitOnCurrentBranch(String commitMessage, boolean amend)
+        throws IOException, GitAPIException {
         boolean commitCreated = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Status status = git.status().call();
@@ -156,12 +140,7 @@ public class GitHandler {
                     status.getMissing().forEach(removeCommand::addFilepattern);
                     removeCommand.call();
                 }
-                git
-                    .commit()
-                    .setAmend(amend)
-                    .setAllowEmpty(false)
-                    .setMessage(commitMessage)
-                    .call();
+                git.commit().setAmend(amend).setAllowEmpty(false).setMessage(commitMessage).call();
             }
         }
         return commitCreated;

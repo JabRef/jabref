@@ -14,50 +14,34 @@ import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty enableAutoCompleteProperty =
-        new SimpleBooleanProperty();
-    private final StringProperty autoCompleteFieldsProperty =
-        new SimpleStringProperty();
-    private final BooleanProperty autoCompleteFirstLastProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty autoCompleteLastFirstProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty autoCompleteBothProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty firstNameModeAbbreviatedProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty firstNameModeFullProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty firstNameModeBothProperty =
-        new SimpleBooleanProperty();
+    private final BooleanProperty enableAutoCompleteProperty = new SimpleBooleanProperty();
+    private final StringProperty autoCompleteFieldsProperty = new SimpleStringProperty();
+    private final BooleanProperty autoCompleteFirstLastProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoCompleteLastFirstProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoCompleteBothProperty = new SimpleBooleanProperty();
+    private final BooleanProperty firstNameModeAbbreviatedProperty = new SimpleBooleanProperty();
+    private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
+    private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
 
     private final AutoCompletePreferences autoCompletePreferences;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public AutoCompletionTabViewModel(
-        AutoCompletePreferences autoCompletePreferences
-    ) {
+    public AutoCompletionTabViewModel(AutoCompletePreferences autoCompletePreferences) {
         this.autoCompletePreferences = autoCompletePreferences;
     }
 
     @Override
     public void setValues() {
-        enableAutoCompleteProperty.setValue(
-            autoCompletePreferences.shouldAutoComplete()
-        );
-        autoCompleteFieldsProperty.setValue(
-            autoCompletePreferences.getCompleteNamesAsString()
-        );
+        enableAutoCompleteProperty.setValue(autoCompletePreferences.shouldAutoComplete());
+        autoCompleteFieldsProperty.setValue(autoCompletePreferences.getCompleteNamesAsString());
 
         if (
-            autoCompletePreferences.getNameFormat() ==
-            AutoCompletePreferences.NameFormat.FIRST_LAST
+            autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST
         ) {
             autoCompleteFirstLastProperty.setValue(true);
         } else if (
-            autoCompletePreferences.getNameFormat() ==
-            AutoCompletePreferences.NameFormat.LAST_FIRST
+            autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST
         ) {
             autoCompleteLastFirstProperty.setValue(true);
         } else {
@@ -65,9 +49,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
         }
 
         switch (autoCompletePreferences.getFirstNameMode()) {
-            case ONLY_ABBREVIATED -> firstNameModeAbbreviatedProperty.setValue(
-                true
-            );
+            case ONLY_ABBREVIATED -> firstNameModeAbbreviatedProperty.setValue(true);
             case ONLY_FULL -> firstNameModeFullProperty.setValue(true);
             default -> firstNameModeBothProperty.setValue(true);
         }
@@ -75,61 +57,36 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        autoCompletePreferences.setAutoComplete(
-            enableAutoCompleteProperty.getValue()
-        );
+        autoCompletePreferences.setAutoComplete(enableAutoCompleteProperty.getValue());
 
         if (autoCompleteBothProperty.getValue()) {
-            autoCompletePreferences.setNameFormat(
-                AutoCompletePreferences.NameFormat.BOTH
-            );
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.BOTH);
         } else if (autoCompleteFirstLastProperty.getValue()) {
-            autoCompletePreferences.setNameFormat(
-                AutoCompletePreferences.NameFormat.FIRST_LAST
-            );
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.FIRST_LAST);
         } else if (autoCompleteLastFirstProperty.getValue()) {
-            autoCompletePreferences.setNameFormat(
-                AutoCompletePreferences.NameFormat.LAST_FIRST
-            );
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.LAST_FIRST);
         }
 
         if (firstNameModeBothProperty.getValue()) {
-            autoCompletePreferences.setFirstNameMode(
-                AutoCompleteFirstNameMode.BOTH
-            );
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
         } else if (firstNameModeAbbreviatedProperty.getValue()) {
-            autoCompletePreferences.setFirstNameMode(
-                AutoCompleteFirstNameMode.ONLY_ABBREVIATED
-            );
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         } else if (firstNameModeFullProperty.getValue()) {
-            autoCompletePreferences.setFirstNameMode(
-                AutoCompleteFirstNameMode.ONLY_FULL
-            );
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.ONLY_FULL);
         }
 
-        if (
-            autoCompletePreferences.shouldAutoComplete() !=
-            enableAutoCompleteProperty.getValue()
-        ) {
+        if (autoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
             if (enableAutoCompleteProperty.getValue()) {
-                restartWarnings.add(
-                    Localization.lang("Auto complete enabled.")
-                );
+                restartWarnings.add(Localization.lang("Auto complete enabled."));
             } else {
-                restartWarnings.add(
-                    Localization.lang("Auto complete disabled.")
-                );
+                restartWarnings.add(Localization.lang("Auto complete disabled."));
             }
         }
 
         autoCompletePreferences.getCompleteFields().clear();
         autoCompletePreferences
             .getCompleteFields()
-            .addAll(
-                FieldFactory.parseFieldList(
-                    autoCompleteFieldsProperty.getValue()
-                )
-            );
+            .addAll(FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()));
     }
 
     @Override

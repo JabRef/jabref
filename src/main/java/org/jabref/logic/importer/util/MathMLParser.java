@@ -20,11 +20,8 @@ import org.slf4j.LoggerFactory;
 
 public class MathMLParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MathMLParser.class
-    );
-    private static final String XSLT_FILE_PATH =
-        "/xslt/mathml_latex/mmltex.xsl";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);
+    private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
 
     /**
      * Parses the MathML element into its corresponding
@@ -50,11 +47,8 @@ public class MathMLParser {
                 xsltResource.toURI().toASCIIString()
             );
 
-            TransformerFactory transformerFactory =
-                TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer(
-                xsltSource
-            );
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer(xsltSource);
 
             StringWriter writer = new StringWriter();
             Result result = new StreamResult(writer);

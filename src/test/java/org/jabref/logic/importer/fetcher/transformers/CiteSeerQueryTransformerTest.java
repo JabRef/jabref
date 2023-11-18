@@ -18,8 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class CiteSeerQueryTransformerTest
-    extends InfixTransformerTest<CiteSeerQueryTransformer> {
+class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTransformer> {
 
     @Override
     protected CiteSeerQueryTransformer getTransformer() {
@@ -34,12 +33,8 @@ class CiteSeerQueryTransformerTest
         CiteSeerQueryTransformer transformer = getTransformer();
         transformer.transformLuceneQuery(luceneQuery);
 
-        Optional<Integer> start = Optional.of(
-            transformer.getJSONPayload().getInt("yearStart")
-        );
-        Optional<Integer> end = Optional.of(
-            transformer.getJSONPayload().getInt("yearEnd")
-        );
+        Optional<Integer> start = Optional.of(transformer.getJSONPayload().getInt("yearStart"));
+        Optional<Integer> end = Optional.of(transformer.getJSONPayload().getInt("yearEnd"));
         assertEquals(Optional.of(2023), start);
         assertEquals(Optional.of(2023), end);
     }
@@ -52,12 +47,8 @@ class CiteSeerQueryTransformerTest
         CiteSeerQueryTransformer transformer = getTransformer();
         transformer.transformLuceneQuery(luceneQuery);
 
-        Optional<Integer> start = Optional.of(
-            transformer.getJSONPayload().getInt("yearStart")
-        );
-        Optional<Integer> end = Optional.of(
-            transformer.getJSONPayload().getInt("yearEnd")
-        );
+        Optional<Integer> start = Optional.of(transformer.getJSONPayload().getInt("yearStart"));
+        Optional<Integer> end = Optional.of(transformer.getJSONPayload().getInt("yearEnd"));
         assertEquals(Optional.of(2019), start);
         assertEquals(Optional.of(2023), end);
     }
@@ -70,9 +61,7 @@ class CiteSeerQueryTransformerTest
         CiteSeerQueryTransformer transformer = getTransformer();
         transformer.transformLuceneQuery(luceneQuery);
 
-        Optional<Integer> page = Optional.of(
-            transformer.getJSONPayload().getInt("page")
-        );
+        Optional<Integer> page = Optional.of(transformer.getJSONPayload().getInt("page"));
         assertEquals(Optional.of(2), page);
     }
 
@@ -84,9 +73,7 @@ class CiteSeerQueryTransformerTest
         CiteSeerQueryTransformer transformer = getTransformer();
         transformer.transformLuceneQuery(luceneQuery);
 
-        Optional<Integer> pageSize = Optional.of(
-            transformer.getJSONPayload().getInt("pageSize")
-        );
+        Optional<Integer> pageSize = Optional.of(transformer.getJSONPayload().getInt("pageSize"));
         assertEquals(Optional.of(20), pageSize);
     }
 
@@ -106,42 +93,23 @@ class CiteSeerQueryTransformerTest
 
     @Test
     public void convertMultipleAuthors() throws Exception {
-        String queryString =
-            "author:\"Wang Wei\" author:\"Zhang Pingwen\" author:\"Zhang Zhifei\"";
+        String queryString = "author:\"Wang Wei\" author:\"Zhang Pingwen\" author:\"Zhang Zhifei\"";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
         transformer.transformLuceneQuery(luceneQuery);
 
-        List<String> authorsActual = transformer
-            .getJSONPayload()
-            .getJSONArray("author")
-            .toList();
-        List<String> authorsExpected = List.of(
-            "Wang Wei",
-            "Zhang Pingwen",
-            "Zhang Zhifei"
-        );
+        List<String> authorsActual = transformer.getJSONPayload().getJSONArray("author").toList();
+        List<String> authorsExpected = List.of("Wang Wei", "Zhang Pingwen", "Zhang Zhifei");
         assertEquals(authorsExpected, authorsActual);
     }
 
-    private static Stream<Arguments> getJSONWithYearVariations()
-        throws FetcherException {
+    private static Stream<Arguments> getJSONWithYearVariations() throws FetcherException {
         String baseString =
             "title:Ericksen-Leslie page:1 pageSize:20 must_have_pdf:false sortBy:relevance";
         List<String> withYearAndYearRange = List.of(
-            StringUtil.join(
-                new String[] { baseString, "year:2020" },
-                " ",
-                0,
-                2
-            ),
-            StringUtil.join(
-                new String[] { baseString, "year-range:2019-2023" },
-                " ",
-                0,
-                2
-            )
+            StringUtil.join(new String[] { baseString, "year:2020" }, " ", 0, 2),
+            StringUtil.join(new String[] { baseString, "year-range:2019-2023" }, " ", 0, 2)
         );
 
         JSONObject expectedJson = new JSONObject();
@@ -157,15 +125,11 @@ class CiteSeerQueryTransformerTest
             try {
                 luceneQuery =
                     new StandardSyntaxParser()
-                        .parse(
-                            requestStr,
-                            AbstractQueryTransformer.NO_EXPLICIT_FIELD
-                        );
+                        .parse(requestStr, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
             } catch (QueryNodeParseException e) {
                 throw new RuntimeException(e);
             }
-            CiteSeerQueryTransformer transformer =
-                new CiteSeerQueryTransformer();
+            CiteSeerQueryTransformer transformer = new CiteSeerQueryTransformer();
             transformer.transformLuceneQuery(luceneQuery);
             actualJSONObjects.add(transformer.getJSONPayload());
         });

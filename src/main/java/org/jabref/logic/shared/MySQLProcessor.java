@@ -73,31 +73,22 @@ public class MySQLProcessor extends DBMSProcessor {
                 connection
                     .createStatement()
                     .executeUpdate(
-                        "INSERT INTO " +
-                        escape_Table("ENTRY") +
-                        " SELECT * FROM `ENTRY`"
+                        "INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM `ENTRY`"
                     );
                 connection
                     .createStatement()
                     .executeUpdate(
-                        "INSERT INTO " +
-                        escape_Table("FIELD") +
-                        " SELECT * FROM `FIELD`"
+                        "INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM `FIELD`"
                     );
                 connection
                     .createStatement()
                     .executeUpdate(
-                        "INSERT INTO " +
-                        escape_Table("METADATA") +
-                        " SELECT * FROM `METADATA`"
+                        "INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM `METADATA`"
                     );
                 metadata = getSharedMetaData();
             }
 
-            metadata.put(
-                MetaData.VERSION_DB_STRUCT,
-                CURRENT_VERSION_DB_STRUCT.toString()
-            );
+            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
             setSharedMetaData(metadata);
         }
     }

@@ -31,15 +31,10 @@ public class EprintCleanup implements CleanupJob {
 
             if (arXivIdentifier.isPresent()) {
                 entry
-                    .setField(
-                        StandardField.EPRINT,
-                        arXivIdentifier.get().getNormalized()
-                    )
+                    .setField(StandardField.EPRINT, arXivIdentifier.get().getNormalized())
                     .ifPresent(changes::add);
 
-                entry
-                    .setField(StandardField.EPRINTTYPE, "arxiv")
-                    .ifPresent(changes::add);
+                entry.setField(StandardField.EPRINTTYPE, "arxiv").ifPresent(changes::add);
 
                 arXivIdentifier
                     .get()
@@ -54,9 +49,7 @@ public class EprintCleanup implements CleanupJob {
 
                 if (field.equals(StandardField.URL)) {
                     // If we clear the URL field, we should also clear the URL-date field
-                    entry
-                        .clearField(StandardField.URLDATE)
-                        .ifPresent(changes::add);
+                    entry.clearField(StandardField.URLDATE).ifPresent(changes::add);
                 }
             }
         }

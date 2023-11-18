@@ -2,8 +2,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
-public class ArXivQueryTransformer
-    extends YearRangeByFilteringQueryTransformer {
+public class ArXivQueryTransformer extends YearRangeByFilteringQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {

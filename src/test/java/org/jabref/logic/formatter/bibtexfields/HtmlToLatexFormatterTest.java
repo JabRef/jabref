@@ -24,10 +24,7 @@ public class HtmlToLatexFormatterTest {
 
     @Test
     public void formatMultipleHtmlCharacters() {
-        assertEquals(
-            "{{\\aa}}{\\\"{a}}{\\\"{o}}",
-            formatter.format("&aring;&auml;&ouml;")
-        );
+        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("&aring;&auml;&ouml;"));
     }
 
     @Test

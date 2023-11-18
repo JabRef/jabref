@@ -42,9 +42,6 @@ public class MedlineImporterTest {
 
     @Test
     public void testGetDescription() {
-        assertEquals(
-            "Importer for the Medline format.",
-            importer.getDescription()
-        );
+        assertEquals("Importer for the Medline format.", importer.getDescription());
     }
 }

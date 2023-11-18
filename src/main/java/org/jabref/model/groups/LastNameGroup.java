@@ -21,19 +21,10 @@ public class LastNameGroup extends KeywordGroup {
         Field searchField,
         String lastName
     ) {
-        super(
-            groupName,
-            context,
-            searchField,
-            LatexToUnicodeAdapter.format(lastName),
-            true
-        );
+        super(groupName, context, searchField, LatexToUnicodeAdapter.format(lastName), true);
     }
 
-    static List<String> getAsLastNamesLatexFree(
-        Field field,
-        BibEntry bibEntry
-    ) {
+    static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
         return bibEntry
             .getField(field)
             .stream()

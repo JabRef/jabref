@@ -15,9 +15,7 @@ public class AuthorsTest {
     public void testStandardUsage() {
         assertEquals(
             "B. C. Bruce, C. Manson and J. Jumper",
-            authorsLayoutFormatter.format(
-                "Bob Croydon Bruce and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -44,9 +42,7 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma");
         assertEquals(
             "Bruce, Bob Croydon, Manson, Charles and Jumper, Jolly",
-            authorsLayoutFormatter.format(
-                "Bob Croydon Bruce and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -55,9 +51,7 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 2");
         assertEquals(
             "Bruce, Bob Croydon et al.",
-            authorsLayoutFormatter.format(
-                "Bob Croydon Bruce and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -85,9 +79,7 @@ public class AuthorsTest {
 
     @Test
     public void testSpecialEtAl() {
-        authorsLayoutFormatter.setArgument(
-            "fullname, LastFirst, Comma, 3, etal= and a few more"
-        );
+        authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 3, etal= and a few more");
         assertEquals(
             "Bruce, Bob Croydon and a few more",
             authorsLayoutFormatter.format(
@@ -106,9 +98,7 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("Oxford");
         assertEquals(
             "B. C. Bruce, C. Manson, and J. Jumper",
-            authorsLayoutFormatter.format(
-                "Bob Croydon Bruce and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -117,9 +107,7 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("FullName,Oxford");
         assertEquals(
             "Bob Croydon Bruce, Charles Manson, and Jolly Jumper",
-            authorsLayoutFormatter.format(
-                "Bruce, Bob Croydon and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -128,9 +116,7 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("FullName,Comma,Comma");
         assertEquals(
             "Bob Croydon Bruce, Charles Manson, Jolly Jumper",
-            authorsLayoutFormatter.format(
-                "Bruce, Bob Croydon and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -139,9 +125,7 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("FullName,Amp");
         assertEquals(
             "Bob Croydon Bruce, Charles Manson & Jolly Jumper",
-            authorsLayoutFormatter.format(
-                "Bruce, Bob Croydon and Charles Manson and Jolly Jumper"
-            )
+            authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper")
         );
     }
 
@@ -194,17 +178,13 @@ public class AuthorsTest {
         authorsLayoutFormatter.setArgument("2,1");
         assertEquals(
             "B. C. Bruce and C. K. von Manson",
-            authorsLayoutFormatter.format(
-                "Bruce, Bob Croydon and Charles Kermit von Manson"
-            )
+            authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Kermit von Manson")
         );
     }
 
     @Test
     public void testEmptyEtAl() {
-        authorsLayoutFormatter.setArgument(
-            "fullname, LastFirst, Comma, 3, etal="
-        );
+        authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 3, etal=");
         assertEquals(
             "Bruce, Bob Croydon",
             authorsLayoutFormatter.format(

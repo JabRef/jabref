@@ -17,9 +17,7 @@ class RecursiveTreeItemTest {
 
     private RecursiveTreeItem<TreeNodeTestData.TreeNodeMock> rootTreeItem;
     private TreeNodeTestData.TreeNodeMock root;
-    private ObjectProperty<
-        Predicate<TreeNodeTestData.TreeNodeMock>
-    > filterPredicate;
+    private ObjectProperty<Predicate<TreeNodeTestData.TreeNodeMock>> filterPredicate;
     private TreeNodeTestData.TreeNodeMock node;
 
     @BeforeEach
@@ -30,23 +28,14 @@ class RecursiveTreeItemTest {
 
         filterPredicate = new SimpleObjectProperty<>();
 
-        rootTreeItem =
-            new RecursiveTreeItem<>(
-                root,
-                TreeNode::getChildren,
-                filterPredicate
-            );
+        rootTreeItem = new RecursiveTreeItem<>(root, TreeNode::getChildren, filterPredicate);
     }
 
     @Test
     void addsAllChildrenNodes() throws Exception {
         assertEquals(
             root.getChildren(),
-            rootTreeItem
-                .getChildren()
-                .stream()
-                .map(TreeItem::getValue)
-                .collect(Collectors.toList())
+            rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList())
         );
     }
 
@@ -70,11 +59,7 @@ class RecursiveTreeItemTest {
 
         assertEquals(
             Collections.singletonList(node.getParent().get()),
-            rootTreeItem
-                .getChildren()
-                .stream()
-                .map(TreeItem::getValue)
-                .collect(Collectors.toList())
+            rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList())
         );
         assertEquals(
             Collections.singletonList(node),

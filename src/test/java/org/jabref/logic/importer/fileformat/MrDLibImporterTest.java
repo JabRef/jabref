@@ -51,10 +51,7 @@ public class MrDLibImporterTest {
 
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
 
-        assertEquals(
-            "2006",
-            resultList.get(0).getFieldLatexFree(StandardField.YEAR).get()
-        );
+        assertEquals("2006", resultList.get(0).getFieldLatexFree(StandardField.YEAR).get());
     }
 
     @Test

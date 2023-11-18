@@ -12,9 +12,7 @@ public class FieldWriter {
     // See also ADR-0024
     public static final char BIBTEX_STRING_START_END_SYMBOL = '#';
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FieldWriter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriter.class);
 
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
@@ -27,10 +25,7 @@ public class FieldWriter {
         this(true, preferences);
     }
 
-    private FieldWriter(
-        boolean neverFailOnHashes,
-        FieldPreferences preferences
-    ) {
+    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
 
@@ -41,8 +36,7 @@ public class FieldWriter {
         return new FieldWriter(true, prefs);
     }
 
-    private static void checkBraces(String text)
-        throws InvalidFieldValueException {
+    private static void checkBraces(String text) throws InvalidFieldValueException {
         int left = 0;
         int right = 0;
 
@@ -85,9 +79,7 @@ public class FieldWriter {
         }
         if (left != right) {
             LOGGER.error("Braces don't match. Field value: {}", text);
-            throw new InvalidFieldValueException(
-                "Braces don't match. Field value: " + text
-            );
+            throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
         }
     }
 
@@ -99,8 +91,7 @@ public class FieldWriter {
      * @return a formatted string suitable for output
      * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
-    public String write(Field field, String content)
-        throws InvalidFieldValueException {
+    public String write(Field field, String content) throws InvalidFieldValueException {
         if (content == null) {
             return FIELD_START + String.valueOf(FIELD_END);
         }
@@ -146,8 +137,7 @@ public class FieldWriter {
                 pos1 = content.length(); // No more occurrences found.
                 pos2 = -1;
             } else {
-                pos2 =
-                    content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
+                pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
                 if (pos2 == -1) {
                     if (neverFailOnHashes) {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
@@ -213,9 +203,7 @@ public class FieldWriter {
         throws InvalidFieldValueException {
         checkBraces(content);
 
-        StringBuilder stringBuilder = new StringBuilder(
-            String.valueOf(FIELD_START)
-        );
+        StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
         stringBuilder.append(formatter.format(content, field));
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
@@ -225,12 +213,7 @@ public class FieldWriter {
      * @param stringBuilder the StringBuilder to append the text to
      * @param text          the text to append
      */
-    private void writeText(
-        StringBuilder stringBuilder,
-        String text,
-        int startPos,
-        int endPos
-    ) {
+    private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
         stringBuilder.append(FIELD_START);
         stringBuilder.append(text, startPos, endPos);
         stringBuilder.append(FIELD_END);
@@ -253,9 +236,7 @@ public class FieldWriter {
         boolean isLast
     ) {
         String line =
-            (isFirst ? "" : " # ") +
-            text.substring(startPos, endPos) +
-            (isLast ? "" : " # ");
+            (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");
         stringBuilder.append(line);
     }
 }

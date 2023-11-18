@@ -6,8 +6,7 @@ import java.util.Optional;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
-class JstorQueryTransformerTest
-    extends InfixTransformerTest<JstorQueryTransformer> {
+class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransformer> {
 
     @Override
     public JstorQueryTransformer getTransformer() {
@@ -39,8 +38,7 @@ class JstorQueryTransformerTest
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("sd:2018 AND ed:2018"), query);
     }
 
@@ -49,8 +47,7 @@ class JstorQueryTransformerTest
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("sd:2018 AND ed:2021"), query);
     }
 }

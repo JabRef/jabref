@@ -47,18 +47,14 @@ public class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "0321356683"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
         assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
     @Test
     @Override
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "9780321356680"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780321356680");
         assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
@@ -69,15 +65,10 @@ public class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
             .withField(StandardField.TITLE, "Repository Eine Einführung")
             .withField(StandardField.SUBTITLE, "Eine Einführung")
             .withField(StandardField.PUBLISHER, "de Gruyter GmbH, Walter")
-            .withField(
-                StandardField.AUTHOR,
-                "Habermann, Hans-Joachim and Leymann, Frank"
-            )
+            .withField(StandardField.AUTHOR, "Habermann, Hans-Joachim and Leymann, Frank")
             .withField(StandardField.ISBN, "9783110702125")
             .withField(StandardField.YEAR, "2020");
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "9783110702125"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9783110702125");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -85,8 +76,7 @@ public class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    public void testIsbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary()
-        throws Exception {
+    public void testIsbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
         assertThrows(

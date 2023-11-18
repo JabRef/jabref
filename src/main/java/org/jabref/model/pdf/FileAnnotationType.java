@@ -25,9 +25,7 @@ public enum FileAnnotationType {
     UNKNOWN("Unknown", false),
     NONE("None", false);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileAnnotationType.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationType.class);
 
     private final String name;
     private final boolean linkedFileAnnotationType;
@@ -46,9 +44,7 @@ public enum FileAnnotationType {
      */
     public static FileAnnotationType parse(PDAnnotation annotation) {
         try {
-            return FileAnnotationType.valueOf(
-                annotation.getSubtype().toUpperCase(Locale.ROOT)
-            );
+            return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             LOGGER.info(
                 String.format(
@@ -68,9 +64,7 @@ public enum FileAnnotationType {
      */
     public static boolean isMarkedFileAnnotationType(String annotationType) {
         try {
-            return FileAnnotationType.valueOf(
-                annotationType.toUpperCase(Locale.ROOT)
-            )
+            return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT))
                 .linkedFileAnnotationType;
         } catch (IllegalArgumentException e) {
             return false;

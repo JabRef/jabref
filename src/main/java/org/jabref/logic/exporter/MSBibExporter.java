@@ -39,26 +39,14 @@ class MSBibExporter extends Exporter {
             return;
         }
 
-        MSBibDatabase msBibDatabase = new MSBibDatabase(
-            databaseContext.getDatabase(),
-            entries
-        );
+        MSBibDatabase msBibDatabase = new MSBibDatabase(databaseContext.getDatabase(), entries);
 
         // forcing to use UTF8 output format for some problems with xml export in other encodings
-        try (
-            AtomicFileWriter ps = new AtomicFileWriter(
-                file,
-                StandardCharsets.UTF_8
-            )
-        ) {
+        try (AtomicFileWriter ps = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             try {
-                DOMSource source = new DOMSource(
-                    msBibDatabase.getDomForExport()
-                );
+                DOMSource source = new DOMSource(msBibDatabase.getDomForExport());
                 StreamResult result = new StreamResult(ps);
-                Transformer trans = TransformerFactory
-                    .newInstance()
-                    .newTransformer();
+                Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
             } catch (

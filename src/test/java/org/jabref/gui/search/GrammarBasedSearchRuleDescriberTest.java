@@ -29,18 +29,13 @@ class GrammarBasedSearchRuleDescriberTest {
         stage.show();
     }
 
-    private TextFlow createDescription(
-        String query,
-        EnumSet<SearchFlags> searchFlags
-    ) {
-        GrammarBasedSearchRule grammarBasedSearchRule =
-            new GrammarBasedSearchRule(searchFlags);
+    private TextFlow createDescription(String query, EnumSet<SearchFlags> searchFlags) {
+        GrammarBasedSearchRule grammarBasedSearchRule = new GrammarBasedSearchRule(searchFlags);
         assertTrue(grammarBasedSearchRule.validateSearchStrings(query));
-        GrammarBasedSearchRuleDescriber describer =
-            new GrammarBasedSearchRuleDescriber(
-                searchFlags,
-                grammarBasedSearchRule.getTree()
-            );
+        GrammarBasedSearchRuleDescriber describer = new GrammarBasedSearchRuleDescriber(
+            searchFlags,
+            grammarBasedSearchRule.getTree()
+        );
         return describer.getDescription();
     }
 
@@ -48,9 +43,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testSimpleQueryCaseSensitiveRegex() {
         String query = "a=b";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
             TooltipTextUtil.createText(" contains the regular expression "),
@@ -73,9 +66,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testSimpleQueryCaseSensitive() {
         String query = "a=b";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
             TooltipTextUtil.createText(" contains the term "),
@@ -95,9 +86,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testSimpleQuery() {
         String query = "a=b";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
             TooltipTextUtil.createText(" contains the term "),
@@ -105,10 +94,7 @@ class GrammarBasedSearchRuleDescriberTest {
             TooltipTextUtil.createText(". "),
             TooltipTextUtil.createText("The search is case-insensitive.")
         );
-        TextFlow description = createDescription(
-            query,
-            EnumSet.noneOf(SearchFlags.class)
-        );
+        TextFlow description = createDescription(query, EnumSet.noneOf(SearchFlags.class));
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }
@@ -117,9 +103,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testSimpleQueryRegex() {
         String query = "a=b";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
             TooltipTextUtil.createText(" contains the regular expression "),
@@ -139,9 +123,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testComplexQueryCaseSensitiveRegex() {
         String query = "not a=b and c=e or e=\"x\"";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("not "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
@@ -175,9 +157,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testComplexQueryRegex() {
         String query = "not a=b and c=e or e=\"x\"";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("not "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
@@ -208,9 +188,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testComplexQueryCaseSensitive() {
         String query = "not a=b and c=e or e=\"x\"";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("not "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
@@ -241,9 +219,7 @@ class GrammarBasedSearchRuleDescriberTest {
     void testComplexQuery() {
         String query = "not a=b and c=e or e=\"x\"";
         List<Text> expectedTexts = Arrays.asList(
-            TooltipTextUtil.createText(
-                "This search contains entries in which "
-            ),
+            TooltipTextUtil.createText("This search contains entries in which "),
             TooltipTextUtil.createText("not "),
             TooltipTextUtil.createText("the field "),
             TooltipTextUtil.createText("a", TooltipTextUtil.TextType.BOLD),
@@ -262,10 +238,7 @@ class GrammarBasedSearchRuleDescriberTest {
             TooltipTextUtil.createText(". "),
             TooltipTextUtil.createText("The search is case-insensitive.")
         );
-        TextFlow description = createDescription(
-            query,
-            EnumSet.noneOf(SearchFlags.class)
-        );
+        TextFlow description = createDescription(query, EnumSet.noneOf(SearchFlags.class));
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }

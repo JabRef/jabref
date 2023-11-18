@@ -26,23 +26,15 @@ public class NewEntryActionTest {
     private LibraryTab libraryTab = mock(LibraryTab.class);
     private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private DialogService dialogService = spy(DialogService.class);
-    private PreferencesService preferencesService = mock(
-        PreferencesService.class
-    );
+    private PreferencesService preferencesService = mock(PreferencesService.class);
     private StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach
     public void setUp() {
         when(jabRefFrame.getCurrentLibraryTab()).thenReturn(libraryTab);
-        when(stateManager.activeDatabaseProperty())
-            .thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
         newEntryAction =
-            new NewEntryAction(
-                jabRefFrame,
-                dialogService,
-                preferencesService,
-                stateManager
-            );
+            new NewEntryAction(jabRefFrame, dialogService, preferencesService, stateManager);
     }
 
     @Test
@@ -51,21 +43,14 @@ public class NewEntryActionTest {
 
         newEntryAction.execute();
         verify(libraryTab, times(0)).insertEntry(any(BibEntry.class));
-        verify(dialogService, times(0))
-            .showCustomDialogAndWait(any(EntryTypeView.class));
+        verify(dialogService, times(0)).showCustomDialogAndWait(any(EntryTypeView.class));
     }
 
     @Test
     public void testExecuteOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
         newEntryAction =
-            new NewEntryAction(
-                jabRefFrame,
-                type,
-                dialogService,
-                preferencesService,
-                stateManager
-            );
+            new NewEntryAction(jabRefFrame, type, dialogService, preferencesService, stateManager);
         when(jabRefFrame.getBasePanelCount()).thenReturn(1);
 
         newEntryAction.execute();

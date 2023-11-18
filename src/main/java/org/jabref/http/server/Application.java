@@ -29,13 +29,7 @@ public class Application extends jakarta.ws.rs.core.Application {
      * Separate initialization method, because @Inject does not support injection at the constructor
      */
     private void initialize() {
-        ServiceLocatorUtilities.addFactoryConstants(
-            serviceLocator,
-            new GsonFactory()
-        );
-        ServiceLocatorUtilities.addFactoryConstants(
-            serviceLocator,
-            new PreferenceServiceFactory()
-        );
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferenceServiceFactory());
     }
 }

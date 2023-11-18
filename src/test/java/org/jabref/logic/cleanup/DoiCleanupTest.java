@@ -23,56 +23,33 @@ public class DoiCleanupTest {
 
     private static Stream<Arguments> provideDoiForAllLowers() {
         UnknownField unknownField = new UnknownField("ee");
-        BibEntry doiResult = new BibEntry()
-            .withField(StandardField.DOI, "10.1145/2594455");
+        BibEntry doiResult = new BibEntry().withField(StandardField.DOI, "10.1145/2594455");
 
         return Stream.of(
             // cleanup for Doi field only
             Arguments.of(
                 doiResult,
-                new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "https://doi.org/10.1145/2594455"
-                    )
+                new BibEntry().withField(StandardField.URL, "https://doi.org/10.1145/2594455")
             ),
             // cleanup with Doi and URL to all entries
             Arguments.of(
                 doiResult,
                 new BibEntry()
                     .withField(StandardField.DOI, "10.1145/2594455")
-                    .withField(
-                        StandardField.URL,
-                        "https://doi.org/10.1145/2594455"
-                    )
-                    .withField(
-                        StandardField.NOTE,
-                        "https://doi.org/10.1145/2594455"
-                    )
+                    .withField(StandardField.URL, "https://doi.org/10.1145/2594455")
+                    .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")
                     .withField(unknownField, "https://doi.org/10.1145/2594455")
             ),
             // cleanup with Doi and no URL to entries
             Arguments.of(
                 new BibEntry()
                     .withField(StandardField.DOI, "10.1145/2594455")
-                    .withField(
-                        StandardField.NOTE,
-                        "This is a random note to this Doi"
-                    )
-                    .withField(
-                        unknownField,
-                        "This is a random ee field for this Doi"
-                    ),
+                    .withField(StandardField.NOTE, "This is a random note to this Doi")
+                    .withField(unknownField, "This is a random ee field for this Doi"),
                 new BibEntry()
                     .withField(StandardField.DOI, "10.1145/2594455")
-                    .withField(
-                        StandardField.NOTE,
-                        "This is a random note to this Doi"
-                    )
-                    .withField(
-                        unknownField,
-                        "This is a random ee field for this Doi"
-                    )
+                    .withField(StandardField.NOTE, "This is a random note to this Doi")
+                    .withField(unknownField, "This is a random ee field for this Doi")
             ),
             // cleanup with spaced Doi
             Arguments.of(
@@ -82,17 +59,12 @@ public class DoiCleanupTest {
             // cleanup just Note field with URL
             Arguments.of(
                 doiResult,
-                new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "https://doi.org/10.1145/2594455"
-                    )
+                new BibEntry().withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")
             ),
             // cleanup just ee field with URL
             Arguments.of(
                 doiResult,
-                new BibEntry()
-                    .withField(unknownField, "https://doi.org/10.1145/2594455")
+                new BibEntry().withField(unknownField, "https://doi.org/10.1145/2594455")
             ),
             // cleanup of url encoded chars
             Arguments.of(

@@ -6,8 +6,7 @@ import java.util.Optional;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
-class ZbMathQueryTransformerTest
-    extends InfixTransformerTest<ZbMathQueryTransformer> {
+class ZbMathQueryTransformerTest extends InfixTransformerTest<ZbMathQueryTransformer> {
 
     @Override
     public ZbMathQueryTransformer getTransformer() {
@@ -39,8 +38,7 @@ class ZbMathQueryTransformerTest
         String queryString = "year:2015";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of("py:2015");
         assertEquals(expected, searchQuery);
     }
@@ -50,8 +48,7 @@ class ZbMathQueryTransformerTest
         String queryString = "year-range:2012-2015";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer()
-            .transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of("py:2012-2015");
         assertEquals(expected, searchQuery);
     }

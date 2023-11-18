@@ -20,12 +20,9 @@ public class GroupsPreferences {
         GroupHierarchyType defaultHierarchicalContext
     ) {
         this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
-        this.shouldAutoAssignGroup =
-            new SimpleBooleanProperty(shouldAutoAssignGroup);
-        this.shouldDisplayGroupCount =
-            new SimpleBooleanProperty(shouldDisplayGroupCount);
-        this.defaultHierarchicalContext =
-            new SimpleObjectProperty<>(defaultHierarchicalContext);
+        this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
     }
 
     public GroupViewMode getGroupViewMode() {
@@ -68,15 +65,11 @@ public class GroupsPreferences {
         return defaultHierarchicalContext.get();
     }
 
-    public ObjectProperty<
-        GroupHierarchyType
-    > defaultHierarchicalContextProperty() {
+    public ObjectProperty<GroupHierarchyType> defaultHierarchicalContextProperty() {
         return defaultHierarchicalContext;
     }
 
-    public void setDefaultHierarchicalContext(
-        GroupHierarchyType defaultHierarchicalContext
-    ) {
+    public void setDefaultHierarchicalContext(GroupHierarchyType defaultHierarchicalContext) {
         this.defaultHierarchicalContext.set(defaultHierarchicalContext);
     }
 }

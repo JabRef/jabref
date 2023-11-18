@@ -29,8 +29,7 @@ class BibDatabaseDiffTest {
 
     @Test
     void compareOfSameEntryReportsNoDifferences() throws Exception {
-        BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE)
-            .withField(StandardField.TITLE, "test");
+        BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
 
         BibDatabaseDiff diff = compareEntries(entry, entry);
 
@@ -38,8 +37,7 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfDifferentEntriesWithSameDataReportsNoDifferences()
-        throws Exception {
+    void compareOfDifferentEntriesWithSameDataReportsNoDifferences() throws Exception {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE)
             .withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE)
@@ -51,8 +49,7 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences()
-        throws Exception {
+    void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences() throws Exception {
         BibEntry entryOne = new BibEntry()
             .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry()
@@ -64,18 +61,11 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences()
-        throws Exception {
+    void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences() throws Exception {
         BibEntry entryOne = new BibEntry()
-            .withField(
-                StandardField.COMMENT,
-                "line1\r\n\r\nline3\r\n\r\nline5"
-            );
+            .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
         BibEntry entryTwo = new BibEntry()
-            .withField(
-                StandardField.COMMENT,
-                "line1\r\n\r\nline3\r\n\r\nline5"
-            );
+            .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
 
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
@@ -88,10 +78,7 @@ class BibDatabaseDiffTest {
         BibEntry entryOne = new BibEntry()
             .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry()
-            .withField(
-                StandardField.COMMENT,
-                "line1\r\n\r\nline3\r\n\r\nline5"
-            );
+            .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
 
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
@@ -99,8 +86,7 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfTwoDifferentEntriesWithDifferentDataReportsDifferences()
-        throws Exception {
+    void compareOfTwoDifferentEntriesWithDifferentDataReportsDifferences() throws Exception {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE)
             .withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE)
@@ -109,21 +95,14 @@ class BibDatabaseDiffTest {
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
         // two different entries between the databases
-        assertEquals(
-            2,
-            diff.getEntryDifferences().size(),
-            "incorrect amount of different entries"
-        );
+        assertEquals(2, diff.getEntryDifferences().size(), "incorrect amount of different entries");
 
         assertEquals(
             entryOne,
             diff.getEntryDifferences().get(0).getOriginalEntry(),
             "there is another value as originalEntry"
         );
-        assertNull(
-            diff.getEntryDifferences().get(0).getNewEntry(),
-            "newEntry is not null"
-        );
+        assertNull(diff.getEntryDifferences().get(0).getNewEntry(), "newEntry is not null");
         assertEquals(
             entryTwo,
             diff.getEntryDifferences().get(1).getNewEntry(),
@@ -136,8 +115,7 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfThreeDifferentEntriesWithDifferentDataReportsDifferences()
-        throws Exception {
+    void compareOfThreeDifferentEntriesWithDifferentDataReportsDifferences() throws Exception {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE)
             .withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE)
@@ -151,27 +129,17 @@ class BibDatabaseDiffTest {
             new BibDatabase(Arrays.asList(entryTwo, entryThree))
         );
 
-        BibDatabaseDiff diff = BibDatabaseDiff.compare(
-            databaseOne,
-            databaseTwo
-        );
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(databaseOne, databaseTwo);
 
         // three different entries between the databases
-        assertEquals(
-            3,
-            diff.getEntryDifferences().size(),
-            "incorrect amount of different entries"
-        );
+        assertEquals(3, diff.getEntryDifferences().size(), "incorrect amount of different entries");
 
         assertEquals(
             entryOne,
             diff.getEntryDifferences().get(0).getOriginalEntry(),
             "there is another value as originalEntry"
         );
-        assertNull(
-            diff.getEntryDifferences().get(0).getNewEntry(),
-            "newEntry is not null"
-        );
+        assertNull(diff.getEntryDifferences().get(0).getNewEntry(), "newEntry is not null");
         assertEquals(
             entryTwo,
             diff.getEntryDifferences().get(1).getNewEntry(),
@@ -208,11 +176,7 @@ class BibDatabaseDiffTest {
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
         // two different entries between the databases
-        assertEquals(
-            1,
-            diff.getEntryDifferences().size(),
-            "incorrect amount of different entries"
-        );
+        assertEquals(1, diff.getEntryDifferences().size(), "incorrect amount of different entries");
 
         assertEquals(
             entryOne,
@@ -226,10 +190,7 @@ class BibDatabaseDiffTest {
         );
     }
 
-    private BibDatabaseDiff compareEntries(
-        BibEntry entryOne,
-        BibEntry entryTwo
-    ) {
+    private BibDatabaseDiff compareEntries(BibEntry entryOne, BibEntry entryTwo) {
         BibDatabaseContext databaseOne = new BibDatabaseContext(
             new BibDatabase(Collections.singletonList(entryOne))
         );

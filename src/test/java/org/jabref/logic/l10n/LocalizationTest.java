@@ -44,10 +44,7 @@ class LocalizationTest {
     @Test
     void testKnownGermanTranslation() {
         Localization.setLanguage(Language.GERMAN);
-        assertEquals(
-            "Zeige Einstellungen",
-            Localization.lang("Show preferences")
-        );
+        assertEquals("Zeige Einstellungen", Localization.lang("Show preferences"));
     }
 
     @Test

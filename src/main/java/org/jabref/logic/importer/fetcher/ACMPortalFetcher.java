@@ -19,8 +19,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
 
     public static final String FETCHER_NAME = "ACM Portal";
 
-    private static final String SEARCH_URL =
-        "https://dl.acm.org/action/doSearch";
+    private static final String SEARCH_URL = "https://dl.acm.org/action/doSearch";
 
     public ACMPortalFetcher() {
         // website dl.acm.org requires cookies
@@ -38,9 +37,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     private static String createQueryString(QueryNode query) {
-        return new DefaultQueryTransformer()
-            .transformLuceneQuery(query)
-            .orElse("");
+        return new DefaultQueryTransformer().transformLuceneQuery(query).orElse("");
     }
 
     /**

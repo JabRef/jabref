@@ -8,9 +8,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.UnicodeLigaturesMap;
 
-public class ReplaceUnicodeLigaturesFormatter
-    extends Formatter
-    implements LayoutFormatter {
+public class ReplaceUnicodeLigaturesFormatter extends Formatter implements LayoutFormatter {
 
     private final Map<Pattern, String> ligaturesMap;
 
@@ -43,9 +41,7 @@ public class ReplaceUnicodeLigaturesFormatter
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Replaces Unicode ligatures with their expanded form"
-        );
+        return Localization.lang("Replaces Unicode ligatures with their expanded form");
     }
 
     @Override

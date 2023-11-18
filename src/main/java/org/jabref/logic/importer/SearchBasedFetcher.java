@@ -32,8 +32,7 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @param searchQuery query string that can be parsed into a lucene query
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    default List<BibEntry> performSearch(String searchQuery)
-        throws FetcherException {
+    default List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         if (searchQuery.isBlank()) {
             return Collections.emptyList();
         }
@@ -43,9 +42,7 @@ public interface SearchBasedFetcher extends WebFetcher {
         try {
             queryNode = parser.parse(searchQuery, NO_EXPLICIT_FIELD);
         } catch (QueryNodeParseException e) {
-            throw new FetcherException(
-                "An error occurred when parsing the query"
-            );
+            throw new FetcherException("An error occurred when parsing the query");
         }
 
         return this.performSearch(queryNode);

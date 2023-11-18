@@ -37,8 +37,7 @@ class GroupNodeViewModelTest {
     @BeforeEach
     void setUp() {
         stateManager = mock(StateManager.class);
-        when(stateManager.getSelectedEntries())
-            .thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
@@ -94,15 +93,10 @@ class GroupNodeViewModelTest {
 
     @Test
     void treeOfAutomaticKeywordGroupIsCombined() {
-        BibEntry entryOne = new BibEntry()
-            .withField(StandardField.KEYWORDS, "A > B > B1, A > C");
-        BibEntry entryTwo = new BibEntry()
-            .withField(StandardField.KEYWORDS, "A > D, E");
-        BibEntry entryThree = new BibEntry()
-            .withField(StandardField.KEYWORDS, "A > B > B2");
-        databaseContext
-            .getDatabase()
-            .insertEntries(entryOne, entryTwo, entryThree);
+        BibEntry entryOne = new BibEntry().withField(StandardField.KEYWORDS, "A > B > B1, A > C");
+        BibEntry entryTwo = new BibEntry().withField(StandardField.KEYWORDS, "A > D, E");
+        BibEntry entryThree = new BibEntry().withField(StandardField.KEYWORDS, "A > B > B2");
+        databaseContext.getDatabase().insertEntries(entryOne, entryTwo, entryThree);
 
         AutomaticKeywordGroup group = new AutomaticKeywordGroup(
             "Keywords",
@@ -183,8 +177,10 @@ class GroupNodeViewModelTest {
         expectedA.addSubgroup(expectedGroupC);
         expectedA.addSubgroup(expectedGroupD);
         GroupNodeViewModel expectedE = getViewModelForGroup(expectedGroupE);
-        ObservableList<GroupNodeViewModel> expected =
-            FXCollections.observableArrayList(expectedA, expectedE);
+        ObservableList<GroupNodeViewModel> expected = FXCollections.observableArrayList(
+            expectedA,
+            expectedE
+        );
 
         assertEquals(expected, groupViewModel.getChildren());
     }
@@ -297,10 +293,7 @@ class GroupNodeViewModelTest {
             rootViewModel.addSubgroup(groupC)
         );
 
-        groupCViewModel.draggedOn(
-            groupAViewModel,
-            DroppingMouseLocation.BOTTOM
-        );
+        groupCViewModel.draggedOn(groupAViewModel, DroppingMouseLocation.BOTTOM);
 
         assertEquals(
             Arrays.asList(groupAViewModel, groupCViewModel, groupBViewModel),
@@ -358,10 +351,7 @@ class GroupNodeViewModelTest {
             rootViewModel.addSubgroup(groupC)
         );
 
-        groupAViewModel.draggedOn(
-            groupBViewModel,
-            DroppingMouseLocation.BOTTOM
-        );
+        groupAViewModel.draggedOn(groupBViewModel, DroppingMouseLocation.BOTTOM);
 
         assertEquals(
             Arrays.asList(groupBViewModel, groupAViewModel, groupCViewModel),
@@ -430,11 +420,7 @@ class GroupNodeViewModelTest {
     @Test
     void entriesAreAddedCorrectly() {
         String groupName = "group";
-        ExplicitGroup group = new ExplicitGroup(
-            groupName,
-            GroupHierarchyType.INDEPENDENT,
-            ','
-        );
+        ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 

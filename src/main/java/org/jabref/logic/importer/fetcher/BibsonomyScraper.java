@@ -16,13 +16,10 @@ import org.slf4j.LoggerFactory;
  */
 public class BibsonomyScraper {
 
-    private static final String BIBSONOMY_SCRAPER =
-        "https://scraper.bibsonomy.org/service?url=";
+    private static final String BIBSONOMY_SCRAPER = "https://scraper.bibsonomy.org/service?url=";
     private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BibsonomyScraper.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibsonomyScraper.class);
 
     private BibsonomyScraper() {}
 
@@ -49,10 +46,7 @@ public class BibsonomyScraper {
                 BibsonomyScraper.BIBSONOMY_SCRAPER_POST
             );
             String bibtex = new URLDownload(url).asString();
-            return BibtexParser.singleFromString(
-                bibtex,
-                importFormatPreferences
-            );
+            return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
             return Optional.empty();

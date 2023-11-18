@@ -45,11 +45,7 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
             : createWarningNode();
         graphic
             .getStyleClass()
-            .add(
-                Severity.ERROR == message.getSeverity()
-                    ? "error-icon"
-                    : "warning-icon"
-            );
+            .add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
         Label label = new Label();
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));
@@ -62,18 +58,12 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         Tooltip tooltip = new Tooltip(message.getText());
         tooltip
             .getStyleClass()
-            .add(
-                Severity.ERROR == message.getSeverity()
-                    ? "tooltip-error"
-                    : "tooltip-warning"
-            );
+            .add(Severity.ERROR == message.getSeverity() ? "tooltip-error" : "tooltip-warning");
         return tooltip;
     }
 
     @Override
-    protected Collection<Decoration> createValidationDecorations(
-        ValidationMessage message
-    ) {
+    protected Collection<Decoration> createValidationDecorations(ValidationMessage message) {
         return Collections.singletonList(
             new GraphicDecoration(createDecorationNode(message), position)
         );

@@ -43,9 +43,7 @@ public class FileUtil {
         .contains("posix");
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileUtil.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -74,12 +72,7 @@ public class FileUtil {
     public static Optional<String> getFileExtension(String fileName) {
         int dotPosition = fileName.lastIndexOf('.');
         if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(
-                fileName
-                    .substring(dotPosition + 1)
-                    .trim()
-                    .toLowerCase(Locale.ROOT)
-            );
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();
         }
@@ -98,9 +91,7 @@ public class FileUtil {
      * Returns the name part of a file name (i.e., everything in front of last ".").
      */
     public static String getBaseName(String fileNameWithExtension) {
-        return com.google.common.io.Files.getNameWithoutExtension(
-            fileNameWithExtension
-        );
+        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
     }
 
     /**
@@ -124,8 +115,7 @@ public class FileUtil {
             Optional<String> extension = getFileExtension(fileName);
             String shortName = nameWithoutExtension.substring(
                 0,
-                MAXIMUM_FILE_NAME_LENGTH -
-                extension.map(s -> s.length() + 1).orElse(0)
+                MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0)
             );
             LOGGER.info(
                 String.format(
@@ -161,10 +151,7 @@ public class FileUtil {
      * @param paths List of paths as Strings
      * @param comparePath The to be tested path
      */
-    public static Optional<String> getUniquePathDirectory(
-        List<String> paths,
-        Path comparePath
-    ) {
+    public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
         String fileName = comparePath.getFileName().toString();
 
         List<String> uniquePathParts = uniquePathSubstrings(paths);
@@ -185,10 +172,7 @@ public class FileUtil {
      * @param paths List of paths as Strings
      * @param comparePath The to be shortened path
      */
-    public static Optional<String> getUniquePathFragment(
-        List<String> paths,
-        Path comparePath
-    ) {
+    public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths)
             .stream()
             .filter(part -> comparePath.toString().contains(part))
@@ -205,16 +189,12 @@ public class FileUtil {
         List<Deque<String>> stackList = new ArrayList<>(paths.size());
         // prepare data structures
         for (String path : paths) {
-            List<String> directories = Arrays.asList(
-                path.split(Pattern.quote(File.separator))
-            );
+            List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
             Deque<String> stack = new ArrayDeque<>(directories.reversed());
             stackList.add(stack);
         }
 
-        List<String> pathSubstrings = new ArrayList<>(
-            Collections.nCopies(paths.size(), "")
-        );
+        List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
         // compute the shortest folder substrings
         while (!stackList.stream().allMatch(Deque::isEmpty)) {
@@ -228,10 +208,7 @@ public class FileUtil {
                     pathSubstrings.set(i, stringFromDeque);
                 } else if (!stack.isEmpty()) {
                     String stringFromStack = stack.pop();
-                    pathSubstrings.set(
-                        i,
-                        stringFromStack + File.separator + tempPathString
-                    );
+                    pathSubstrings.set(i, stringFromStack + File.separator + tempPathString);
                 }
             }
 
@@ -264,9 +241,7 @@ public class FileUtil {
             return false;
         }
         if (Files.exists(pathToDestinationFile) && !replaceExisting) {
-            LOGGER.error(
-                "Path to the destination file exists but the file shouldn't be replaced."
-            );
+            LOGGER.error("Path to the destination file exists but the file shouldn't be replaced.");
             return false;
         }
         try {
@@ -315,10 +290,7 @@ public class FileUtil {
      * @param fileDirs list of directories to try for expansion
      * @return list of files. May be empty
      */
-    public static List<Path> getListOfLinkedFiles(
-        List<BibEntry> bes,
-        List<Path> fileDirs
-    ) {
+    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<Path> fileDirs) {
         Objects.requireNonNull(bes);
         Objects.requireNonNull(fileDirs);
 
@@ -342,12 +314,7 @@ public class FileUtil {
         BibEntry entry,
         String fileNamePattern
     ) {
-        String targetName = BracketedPattern.expandBrackets(
-            fileNamePattern,
-            ';',
-            entry,
-            database
-        );
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
             targetName = entry.getCitationKey().orElse("default");
@@ -395,10 +362,7 @@ public class FileUtil {
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
-    public static Optional<Path> findSingleFileRecursively(
-        String filename,
-        Path rootDirectory
-    ) {
+    public static Optional<Path> findSingleFileRecursively(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
                 .filter(Files::isRegularFile)
@@ -421,10 +385,7 @@ public class FileUtil {
         FilePreferences filePreferences
     ) {
         Objects.requireNonNull(fileName, "fileName");
-        return find(
-            fileName,
-            databaseContext.getFileDirectories(filePreferences)
-        );
+        return find(fileName, databaseContext.getFileDirectories(filePreferences));
     }
 
     /**
@@ -500,10 +461,7 @@ public class FileUtil {
      * @param directories the directories that will be searched
      * @return a list including all found paths to files that match the defined conditions
      */
-    public static List<Path> findListOfFiles(
-        String filename,
-        List<Path> directories
-    ) {
+    public static List<Path> findListOfFiles(String filename, List<Path> directories) {
         List<Path> files = new ArrayList<>();
         for (Path dir : directories) {
             FileUtil.find(filename, dir).ifPresent(files::add);
@@ -538,8 +496,7 @@ public class FileUtil {
     public static boolean isPDFFile(Path file) {
         Optional<String> extension = FileUtil.getFileExtension(file);
         return (
-            extension.isPresent() &&
-            StandardFileType.PDF.getExtensions().contains(extension.get())
+            extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get())
         );
     }
 
@@ -550,10 +507,7 @@ public class FileUtil {
         BibDatabaseContext databaseContext,
         Path workingDirectory
     ) {
-        return databaseContext
-            .getDatabasePath()
-            .map(Path::getParent)
-            .orElse(workingDirectory);
+        return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);
     }
 
     /**

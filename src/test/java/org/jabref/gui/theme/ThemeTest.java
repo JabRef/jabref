@@ -40,12 +40,7 @@ public class ThemeTest {
         assertTrue(theme.getAdditionalStylesheet().isPresent());
         assertEquals(
             "Dark.css",
-            theme
-                .getAdditionalStylesheet()
-                .get()
-                .getWatchPath()
-                .getFileName()
-                .toString(),
+            theme.getAdditionalStylesheet().get().getWatchPath().getFileName().toString(),
             "expected dark theme stylesheet to be available"
         );
     }
@@ -82,12 +77,7 @@ public class ThemeTest {
         assertTrue(theme.getAdditionalStylesheet().isPresent());
         assertEquals(
             "Idonotexist.css",
-            theme
-                .getAdditionalStylesheet()
-                .get()
-                .getWatchPath()
-                .getFileName()
-                .toString()
+            theme.getAdditionalStylesheet().get().getWatchPath().getFileName().toString()
         );
     }
 }

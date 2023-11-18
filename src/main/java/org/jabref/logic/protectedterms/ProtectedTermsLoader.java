@@ -16,12 +16,9 @@ import org.slf4j.LoggerFactory;
 
 public class ProtectedTermsLoader {
 
-    private static final Map<String, Supplier<String>> INTERNAL_LISTS =
-        new HashMap<>();
+    private static final Map<String, Supplier<String>> INTERNAL_LISTS = new HashMap<>();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ProtectedTermsLoader.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsLoader.class);
 
     private final List<ProtectedTermsList> mainList = new ArrayList<>();
 
@@ -66,19 +63,12 @@ public class ProtectedTermsLoader {
                     )
                 );
             } else {
-                LOGGER.warn(
-                    "Protected terms resource '{}' is no longer available.",
-                    filename
-                );
+                LOGGER.warn("Protected terms resource '{}' is no longer available.", filename);
             }
         }
         for (String filename : preferences.getDisabledInternalTermLists()) {
             if (INTERNAL_LISTS.containsKey(filename)) {
-                if (
-                    !preferences
-                        .getEnabledInternalTermLists()
-                        .contains(filename)
-                ) {
+                if (!preferences.getEnabledInternalTermLists().contains(filename)) {
                     mainList.add(
                         readProtectedTermsListFromResource(
                             filename,
@@ -88,10 +78,7 @@ public class ProtectedTermsLoader {
                     );
                 }
             } else {
-                LOGGER.warn(
-                    "Protected terms resource '{}' is no longer available.",
-                    filename
-                );
+                LOGGER.warn("Protected terms resource '{}' is no longer available.", filename);
             }
         }
 
@@ -128,9 +115,7 @@ public class ProtectedTermsLoader {
 
         for (String filename : preferences.getDisabledExternalTermLists()) {
             if (!preferences.getEnabledExternalTermLists().contains(filename)) {
-                mainList.add(
-                    readProtectedTermsListFromFile(Path.of(filename), false)
-                );
+                mainList.add(readProtectedTermsListFromFile(Path.of(filename), false));
             }
         }
     }
@@ -163,13 +148,8 @@ public class ProtectedTermsLoader {
         return new ArrayList<>(result);
     }
 
-    public void addProtectedTermsListFromFile(
-        String fileName,
-        boolean enabled
-    ) {
-        mainList.add(
-            readProtectedTermsListFromFile(Path.of(fileName), enabled)
-        );
+    public void addProtectedTermsListFromFile(String fileName, boolean enabled) {
+        mainList.add(readProtectedTermsListFromFile(Path.of(fileName), enabled));
     }
 
     public static ProtectedTermsList readProtectedTermsListFromResource(
@@ -185,10 +165,7 @@ public class ProtectedTermsLoader {
         return parser.getProtectTermsList(enabled, true);
     }
 
-    public static ProtectedTermsList readProtectedTermsListFromFile(
-        Path path,
-        boolean enabled
-    ) {
+    public static ProtectedTermsList readProtectedTermsListFromFile(Path path, boolean enabled) {
         LOGGER.debug("Reading term list from file {}", path);
         ProtectedTermsParser parser = new ProtectedTermsParser();
         parser.readTermsFromFile(Objects.requireNonNull(path));
@@ -218,10 +195,7 @@ public class ProtectedTermsLoader {
         return resultingList;
     }
 
-    public ProtectedTermsList addNewProtectedTermsList(
-        String newDescription,
-        String newLocation
-    ) {
+    public ProtectedTermsList addNewProtectedTermsList(String newDescription, String newLocation) {
         return addNewProtectedTermsList(newDescription, newLocation, true);
     }
 }

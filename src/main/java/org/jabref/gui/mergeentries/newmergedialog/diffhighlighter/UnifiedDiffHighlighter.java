@@ -48,43 +48,26 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
                     int changePosition = delta.getTarget().getPosition();
                     int deletionPoint = changePosition + deletionCount;
                     int insertionPoint = deletionPoint + 1;
-                    List<String> deltaSourceWords = delta
-                        .getSource()
-                        .getLines();
-                    List<String> deltaTargetWords = delta
-                        .getTarget()
-                        .getLines();
+                    List<String> deltaSourceWords = delta.getSource().getLines();
+                    List<String> deltaTargetWords = delta.getTarget().getLines();
 
                     unifiedWords.add(deletionPoint, join(deltaSourceWords));
 
+                    changeList.add(new Change(deletionPoint, 1, ChangeType.CHANGE_DELETION));
                     changeList.add(
-                        new Change(deletionPoint, 1, ChangeType.CHANGE_DELETION)
-                    );
-                    changeList.add(
-                        new Change(
-                            insertionPoint,
-                            deltaTargetWords.size(),
-                            ChangeType.ADDITION
-                        )
+                        new Change(insertionPoint, deltaTargetWords.size(), ChangeType.ADDITION)
                     );
                     deletionCount++;
                 }
                 case DELETE -> {
-                    int deletionPoint =
-                        delta.getTarget().getPosition() + deletionCount;
-                    unifiedWords.add(
-                        deletionPoint,
-                        join(delta.getSource().getLines())
-                    );
+                    int deletionPoint = delta.getTarget().getPosition() + deletionCount;
+                    unifiedWords.add(deletionPoint, join(delta.getSource().getLines()));
 
-                    changeList.add(
-                        new Change(deletionPoint, 1, ChangeType.DELETION)
-                    );
+                    changeList.add(new Change(deletionPoint, 1, ChangeType.DELETION));
                     deletionCount++;
                 }
                 case INSERT -> {
-                    int insertionPoint =
-                        delta.getTarget().getPosition() + deletionCount;
+                    int insertionPoint = delta.getTarget().getPosition() + deletionCount;
                     changeList.add(
                         new Change(
                             insertionPoint,
@@ -100,16 +83,9 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
         boolean changeInProgress = false;
         for (int position = 0; position < unifiedWords.size(); position++) {
             String word = unifiedWords.get(position);
-            Optional<Change> changeAtPosition = findChange(
-                position,
-                changeList
-            );
+            Optional<Change> changeAtPosition = findChange(position, changeList);
             if (changeAtPosition.isEmpty()) {
-                appendToTextArea(
-                    targetTextview,
-                    getSeparator() + word,
-                    "unchanged"
-                );
+                appendToTextArea(targetTextview, getSeparator() + word, "unchanged");
             } else {
                 Change change = changeAtPosition.get();
                 List<String> changeWords = unifiedWords.subList(
@@ -125,11 +101,7 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
                     );
                 } else if (change.type() == ChangeType.ADDITION) {
                     if (changeInProgress) {
-                        appendToTextArea(
-                            targetTextview,
-                            join(changeWords),
-                            "addition"
-                        );
+                        appendToTextArea(targetTextview, join(changeWords), "addition");
                         changeInProgress = false;
                     } else {
                         appendToTextArea(
@@ -155,30 +127,20 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
         }
     }
 
-    private void appendToTextArea(
-        StyleClassedTextArea textArea,
-        String text,
-        String styleClass
-    ) {
+    private void appendToTextArea(StyleClassedTextArea textArea, String text, String styleClass) {
         if (text.isEmpty()) {
             return;
         }
         // Append separator without styling it
         if (text.startsWith(getSeparator())) {
             textArea.append(getSeparator(), "unchanged");
-            textArea.append(
-                text.substring(getSeparator().length()),
-                styleClass
-            );
+            textArea.append(text.substring(getSeparator().length()), styleClass);
         } else {
             textArea.append(text, styleClass);
         }
     }
 
     private Optional<Change> findChange(int position, List<Change> changeList) {
-        return changeList
-            .stream()
-            .filter(change -> change.position() == position)
-            .findAny();
+        return changeList.stream().filter(change -> change.position() == position).findAny();
     }
 }

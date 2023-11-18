@@ -9,10 +9,7 @@ public class RemoteUtilTest {
 
     @Test
     public void rejectPortNumberBelowZero() {
-        assertFalse(
-            RemoteUtil.isUserPort(-55),
-            "Port number must be non negative."
-        );
+        assertFalse(RemoteUtil.isUserPort(-55), "Port number must be non negative.");
     }
 
     @Test
@@ -30,10 +27,7 @@ public class RemoteUtilTest {
     @Test
     public void rejectPortsAbove16Bits() {
         // 2 ^ 16 - 1 => 65535
-        assertFalse(
-            RemoteUtil.isUserPort(65536),
-            "Port number should be below 65535."
-        );
+        assertFalse(RemoteUtil.isUserPort(65536), "Port number should be below 65535.");
     }
 
     @Test

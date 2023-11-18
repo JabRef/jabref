@@ -11,8 +11,7 @@ import org.jabref.gui.icon.JabRefIcon;
 
 public class ExternalFileTypeItemViewModel {
 
-    private final ObjectProperty<JabRefIcon> icon =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<JabRefIcon> icon = new SimpleObjectProperty<>();
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty extension = new SimpleStringProperty();
     private final StringProperty mimetype = new SimpleStringProperty();
@@ -27,16 +26,7 @@ public class ExternalFileTypeItemViewModel {
     }
 
     public ExternalFileTypeItemViewModel() {
-        this(
-            new CustomExternalFileType(
-                "",
-                "",
-                "",
-                "",
-                "new",
-                IconTheme.JabRefIcons.FILE
-            )
-        );
+        this(new CustomExternalFileType("", "", "", "", "new", IconTheme.JabRefIcons.FILE));
     }
 
     public ObjectProperty<JabRefIcon> iconProperty() {

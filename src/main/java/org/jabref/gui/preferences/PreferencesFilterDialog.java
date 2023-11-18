@@ -23,12 +23,8 @@ import org.jabref.preferences.PreferencesFilter;
 public class PreferencesFilterDialog extends BaseDialog<Void> {
 
     private final PreferencesFilter preferencesFilter;
-    private final ObservableList<
-        PreferencesFilter.PreferenceOption
-    > preferenceOptions;
-    private final FilteredList<
-        PreferencesFilter.PreferenceOption
-    > filteredOptions;
+    private final ObservableList<PreferencesFilter.PreferenceOption> preferenceOptions;
+    private final FilteredList<PreferencesFilter.PreferenceOption> filteredOptions;
 
     @FXML
     private TableView<PreferencesFilter.PreferenceOption> table;
@@ -46,10 +42,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
     private TableColumn<PreferencesFilter.PreferenceOption, Object> columnValue;
 
     @FXML
-    private TableColumn<
-        PreferencesFilter.PreferenceOption,
-        Object
-    > columnDefaultValue;
+    private TableColumn<PreferencesFilter.PreferenceOption, Object> columnDefaultValue;
 
     @FXML
     private CheckBox showOnlyDeviatingPreferenceOptions;
@@ -82,43 +75,30 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
                         if ((searchText == null) || searchText.isEmpty()) {
                             return null;
                         }
-                        String lowerCaseSearchText = searchText.toLowerCase(
-                            Locale.ROOT
-                        );
+                        String lowerCaseSearchText = searchText.toLowerCase(Locale.ROOT);
                         return option ->
-                            option
-                                .getKey()
-                                .toLowerCase(Locale.ROOT)
-                                .contains(lowerCaseSearchText);
+                            option.getKey().toLowerCase(Locale.ROOT).contains(lowerCaseSearchText);
                     }
                 )
             );
         columnType.setCellValueFactory(data ->
             new ReadOnlyObjectWrapper<>(data.getValue().getType())
         );
-        columnKey.setCellValueFactory(data ->
-            new ReadOnlyStringWrapper(data.getValue().getKey())
-        );
+        columnKey.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getKey()));
         columnValue.setCellValueFactory(data ->
             new ReadOnlyObjectWrapper<>(data.getValue().getValue())
         );
         columnDefaultValue.setCellValueFactory(data ->
-            new ReadOnlyObjectWrapper<>(
-                data.getValue().getDefaultValue().orElse("")
-            )
+            new ReadOnlyObjectWrapper<>(data.getValue().getDefaultValue().orElse(""))
         );
         table.setItems(filteredOptions);
-        count
-            .textProperty()
-            .bind(Bindings.size(table.getItems()).asString("(%d)"));
+        count.textProperty().bind(Bindings.size(table.getItems()).asString("(%d)"));
         updateModel();
     }
 
     private void updateModel() {
         if (showOnlyDeviatingPreferenceOptions.isSelected()) {
-            preferenceOptions.setAll(
-                preferencesFilter.getDeviatingPreferences()
-            );
+            preferenceOptions.setAll(preferencesFilter.getDeviatingPreferences());
         } else {
             preferenceOptions.setAll(preferencesFilter.getPreferenceOptions());
         }

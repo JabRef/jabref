@@ -33,11 +33,7 @@ class DoiResolutionTest {
     void linkWithPdfInTitleTag() throws IOException {
         entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330");
         assertEquals(
-            Optional.of(
-                new URL(
-                    "https://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf"
-                )
-            ),
+            Optional.of(new URL("https://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
             finder.findFullText(entry)
         );
     }
@@ -47,11 +43,7 @@ class DoiResolutionTest {
     void linkWithPdfStringLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1002/acr2.11101");
         assertEquals(
-            Optional.of(
-                new URL(
-                    "https://onlinelibrary.wiley.com/doi/pdf/10.1002/acr2.11101"
-                )
-            ),
+            Optional.of(new URL("https://onlinelibrary.wiley.com/doi/pdf/10.1002/acr2.11101")),
             finder.findFullText(entry)
         );
     }
@@ -61,9 +53,7 @@ class DoiResolutionTest {
         entry.setField(StandardField.DOI, "10.1007/978-3-319-89963-3_28");
         assertEquals(
             Optional.of(
-                new URL(
-                    "https://link.springer.com/content/pdf/10.1007/978-3-319-89963-3_28.pdf"
-                )
+                new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-89963-3_28.pdf")
             ),
             finder.findFullText(entry)
         );
@@ -83,9 +73,7 @@ class DoiResolutionTest {
         entry.setField(StandardField.DOI, "10.1007/978-3-319-62594-2_12");
         assertEquals(
             Optional.of(
-                new URL(
-                    "https://link.springer.com/content/pdf/10.1007/978-3-319-62594-2_12.pdf"
-                )
+                new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-62594-2_12.pdf")
             ),
             finder.findFullText(entry)
         );

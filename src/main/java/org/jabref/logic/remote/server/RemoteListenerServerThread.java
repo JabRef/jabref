@@ -9,16 +9,12 @@ import org.slf4j.LoggerFactory;
  */
 public class RemoteListenerServerThread extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RemoteListenerServerThread.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServerThread.class);
 
     private final RemoteListenerServer server;
 
-    public RemoteListenerServerThread(
-        RemoteMessageHandler messageHandler,
-        int port
-    ) throws IOException {
+    public RemoteListenerServerThread(RemoteMessageHandler messageHandler, int port)
+        throws IOException {
         this.server = new RemoteListenerServer(messageHandler, port);
         this.setName("JabRef - Remote Listener Server on port " + port);
     }

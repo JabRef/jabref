@@ -14,13 +14,9 @@ public class StaxParser {
      * @param reader the stream reader
      * @return Returns the inner XML content
      */
-    public static String getXMLContent(XMLStreamReader reader)
-        throws XMLStreamException {
+    public static String getXMLContent(XMLStreamReader reader) throws XMLStreamException {
         // skip over START DOCUMENT event
-        while (
-            reader.getEventType() == XMLStreamConstants.START_DOCUMENT &&
-            reader.hasNext()
-        ) {
+        while (reader.getEventType() == XMLStreamConstants.START_DOCUMENT && reader.hasNext()) {
             reader.next();
         }
 
@@ -65,8 +61,7 @@ public class StaxParser {
             } else if (event == XMLStreamConstants.PROCESSING_INSTRUCTION) {
                 content.append(getXMLProcessingInstruction(reader));
             } else if (
-                event == XMLStreamConstants.SPACE ||
-                event == XMLStreamConstants.ENTITY_REFERENCE
+                event == XMLStreamConstants.SPACE || event == XMLStreamConstants.ENTITY_REFERENCE
             ) {
                 content.append(getXMLText(reader));
             }
@@ -75,10 +70,7 @@ public class StaxParser {
         return content.toString().trim();
     }
 
-    private static String getXMLStartTag(
-        XMLStreamReader reader,
-        boolean addNamespaceURI
-    ) {
+    private static String getXMLStartTag(XMLStreamReader reader, boolean addNamespaceURI) {
         StringBuilder startTag = new StringBuilder();
 
         String prefix = reader.getPrefix();

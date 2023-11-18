@@ -57,10 +57,7 @@ class FileUtilTest {
 
     @Test
     void extensionBakAddedCorrectly() {
-        assertEquals(
-            Path.of("demo.bib.bak"),
-            FileUtil.addExtension(Path.of("demo.bib"), ".bak")
-        );
+        assertEquals(Path.of("demo.bib.bak"), FileUtil.addExtension(Path.of("demo.bib"), ".bak"));
     }
 
     @Test
@@ -104,10 +101,7 @@ class FileUtilTest {
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals(
-            "1234",
-            FileUtil.createFileNameFromPattern(null, entry, fileNamePattern)
-        );
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -117,10 +111,7 @@ class FileUtilTest {
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals(
-            "1234",
-            FileUtil.createFileNameFromPattern(null, entry, fileNamePattern)
-        );
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -129,10 +120,7 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals(
-            "default",
-            FileUtil.createFileNameFromPattern(null, entry, fileNamePattern)
-        );
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -141,10 +129,7 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
 
-        assertEquals(
-            "1234",
-            FileUtil.createFileNameFromPattern(null, entry, fileNamePattern)
-        );
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -152,10 +137,7 @@ class FileUtilTest {
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
 
-        assertEquals(
-            "default",
-            FileUtil.createFileNameFromPattern(null, entry, fileNamePattern)
-        );
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -174,35 +156,23 @@ class FileUtilTest {
 
     @Test
     void testGetFileExtensionSimpleFile() {
-        assertEquals(
-            "pdf",
-            FileUtil.getFileExtension(Path.of("test.pdf")).get()
-        );
+        assertEquals("pdf", FileUtil.getFileExtension(Path.of("test.pdf")).get());
     }
 
     @Test
     void testGetFileExtensionMultipleDotsFile() {
-        assertEquals(
-            "pdf",
-            FileUtil.getFileExtension(Path.of("te.st.PdF")).get()
-        );
+        assertEquals("pdf", FileUtil.getFileExtension(Path.of("te.st.PdF")).get());
     }
 
     @Test
     void testGetFileExtensionNoExtensionFile() {
-        assertFalse(
-            FileUtil
-                .getFileExtension(Path.of("JustTextNotASingleDot"))
-                .isPresent()
-        );
+        assertFalse(FileUtil.getFileExtension(Path.of("JustTextNotASingleDot")).isPresent());
     }
 
     @Test
     void testGetFileExtensionNoExtension2File() {
         assertFalse(
-            FileUtil
-                .getFileExtension(Path.of(".StartsWithADotIsNotAnExtension"))
-                .isPresent()
+            FileUtil.getFileExtension(Path.of(".StartsWithADotIsNotAnExtension")).isPresent()
         );
     }
 
@@ -223,10 +193,7 @@ class FileUtilTest {
 
     @Test
     void getFileExtensionWithNoDotReturnsEmptyExtension() {
-        assertEquals(
-            Optional.empty(),
-            FileUtil.getFileExtension("JustTextNotASingleDot")
-        );
+        assertEquals(Optional.empty(), FileUtil.getFileExtension("JustTextNotASingleDot"));
     }
 
     @Test
@@ -276,10 +243,7 @@ class FileUtilTest {
         );
         assertEquals(
             Optional.of("bibliography.bib"),
-            FileUtil.getUniquePathFragment(
-                dirs,
-                Path.of("/users/jabref/bibliography.bib")
-            )
+            FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/bibliography.bib"))
         );
     }
 
@@ -291,39 +255,28 @@ class FileUtilTest {
         );
         assertEquals(
             Optional.of("koppor-bibliography.bib"),
-            FileUtil.getUniquePathFragment(
-                dirs,
-                Path.of("/users/jabref/koppor-bibliography.bib")
-            )
+            FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/koppor-bibliography.bib"))
         );
     }
 
     @Test
     void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile() {
-        assertFalse(
-            FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, true)
-        );
+        assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, true));
     }
 
     @Test
     void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithoutOverrideExistFile() {
-        assertFalse(
-            FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, false)
-        );
+        assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, false));
     }
 
     @Test
     void testCopyFileFromEmptySourcePathToExistDestinationPathWithOverrideExistFile() {
-        assertFalse(
-            FileUtil.copyFile(nonExistingTestPath, existingTestFile, true)
-        );
+        assertFalse(FileUtil.copyFile(nonExistingTestPath, existingTestFile, true));
     }
 
     @Test
     void testCopyFileFromEmptySourcePathToExistDestinationPathWithoutOverrideExistFile() {
-        assertFalse(
-            FileUtil.copyFile(nonExistingTestPath, existingTestFile, false)
-        );
+        assertFalse(FileUtil.copyFile(nonExistingTestPath, existingTestFile, false));
     }
 
     @Test
@@ -333,23 +286,17 @@ class FileUtilTest {
 
     @Test
     void testCopyFileFromExistSourcePathToExistDestinationPathWithoutOverrideExistFile() {
-        assertFalse(
-            FileUtil.copyFile(existingTestFile, existingTestFile, false)
-        );
+        assertFalse(FileUtil.copyFile(existingTestFile, existingTestFile, false));
     }
 
     @Test
     void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithOverrideExistFile() {
-        assertTrue(
-            FileUtil.copyFile(existingTestFile, otherExistingTestFile, true)
-        );
+        assertTrue(FileUtil.copyFile(existingTestFile, otherExistingTestFile, true));
     }
 
     @Test
     void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithoutOverrideExistFile() {
-        assertFalse(
-            FileUtil.copyFile(existingTestFile, otherExistingTestFile, false)
-        );
+        assertFalse(FileUtil.copyFile(existingTestFile, otherExistingTestFile, false));
     }
 
     @Test
@@ -397,15 +344,9 @@ class FileUtilTest {
                 .collect(Collectors.joining()) +
             ".pdf";
         String longerFilename =
-            Stream
-                .generate(() -> String.valueOf('1'))
-                .limit(260)
-                .collect(Collectors.joining()) +
+            Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining()) +
             ".pdf";
-        assertEquals(
-            longestValidFilename,
-            FileUtil.getValidFileName(longerFilename)
-        );
+        assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
 
     @Test
@@ -418,10 +359,7 @@ class FileUtilTest {
             .generate(() -> String.valueOf('1'))
             .limit(260)
             .collect(Collectors.joining());
-        assertEquals(
-            longestValidFilename,
-            FileUtil.getValidFileName(longerFilename)
-        );
+        assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
 
     @Test
@@ -475,23 +413,15 @@ class FileUtilTest {
     @Test
     void testFindInListOfPath() {
         // due to the added workaround for old JabRef behavior as both path starts with the same name they are considered equal
-        List<Path> paths = List.of(
-            existingTestFile,
-            otherExistingTestFile,
-            rootDir
-        );
+        List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
         List<Path> resultPaths = List.of(existingTestFile);
-        List<Path> result = FileUtil.findListOfFiles(
-            "existingTestFile.txt",
-            paths
-        );
+        List<Path> result = FileUtil.findListOfFiles("existingTestFile.txt", paths);
         assertEquals(resultPaths, result);
     }
 
     @Test
     public void extractFileExtension() {
-        final String filePath =
-            FileUtilTest.class.getResource("pdffile.pdf").getPath();
+        final String filePath = FileUtilTest.class.getResource("pdffile.pdf").getPath();
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
@@ -521,15 +451,11 @@ class FileUtilTest {
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
 
-        assertEquals(
-            Optional.of(firstFile),
-            FileUtil.find("test.pdf", temp.resolve("files"))
-        );
+        assertEquals(Optional.of(firstFile), FileUtil.find("test.pdf", temp.resolve("files")));
     }
 
     @Test
-    public void testFindsFileStartingWithTheSameDirectory(@TempDir Path temp)
-        throws Exception {
+    public void testFindsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));

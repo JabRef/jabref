@@ -51,9 +51,7 @@ public class GenerateEntryFromIdDialog {
         this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
-        this.generateButton.setGraphic(
-                IconTheme.JabRefIcons.IMPORT.getGraphicNode()
-            );
+        this.generateButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
         this.generateButton.setDefaultButton(true);
     }
 
@@ -66,17 +64,16 @@ public class GenerateEntryFromIdDialog {
 
         this.idTextField.requestFocus();
 
-        GenerateEntryFromIdAction generateEntryFromIdAction =
-            new GenerateEntryFromIdAction(
-                libraryTab,
-                dialogService,
-                preferencesService,
-                taskExecutor,
-                entryFromIdPopOver,
-                idTextField.getText(),
-                stateManager,
-                fileUpdateMonitor
-            );
+        GenerateEntryFromIdAction generateEntryFromIdAction = new GenerateEntryFromIdAction(
+            libraryTab,
+            dialogService,
+            preferencesService,
+            taskExecutor,
+            entryFromIdPopOver,
+            idTextField.getText(),
+            stateManager,
+            fileUpdateMonitor
+        );
         generateEntryFromIdAction.execute();
     }
 

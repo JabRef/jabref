@@ -34,8 +34,7 @@ class PdfMergeMetadataImporterTest {
             Answers.RETURNS_DEEP_STUBS
         );
         when(grobidPreferences.isGrobidEnabled()).thenReturn(true);
-        when(grobidPreferences.getGrobidURL())
-            .thenReturn("http://grobid.jabref.org:8070");
+        when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
 
         ImportFormatPreferences importFormatPreferences = mock(
             ImportFormatPreferences.class,
@@ -43,8 +42,7 @@ class PdfMergeMetadataImporterTest {
         );
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields())
             .thenReturn(FXCollections.emptyObservableList());
-        when(importFormatPreferences.grobidPreferences())
-            .thenReturn(grobidPreferences);
+        when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
         importer = new PdfMergeMetadataImporter(importFormatPreferences);
     }
@@ -65,13 +63,9 @@ class PdfMergeMetadataImporterTest {
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(
-            PdfMergeMetadataImporter.class.getResource("/pdfs/encrypted.pdf")
-                .toURI()
+            PdfMergeMetadataImporter.class.getResource("/pdfs/encrypted.pdf").toURI()
         );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
@@ -79,13 +73,9 @@ class PdfMergeMetadataImporterTest {
     @Disabled("Switch from ottobib to OpenLibraryFetcher changed the results")
     void importWorksAsExpected() throws Exception {
         Path file = Path.of(
-            PdfMergeMetadataImporterTest.class.getResource("mixedMetadata.pdf")
-                .toURI()
+            PdfMergeMetadataImporterTest.class.getResource("mixedMetadata.pdf").toURI()
         );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         // From DOI (contained in embedded bib file)
         BibEntry expected = new BibEntry(StandardEntryType.Book);
@@ -115,13 +105,7 @@ class PdfMergeMetadataImporterTest {
 
         // From merge
         expected.setFiles(
-            List.of(
-                new LinkedFile(
-                    "",
-                    file.toAbsolutePath(),
-                    StandardFileType.PDF.getName()
-                )
-            )
+            List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName()))
         );
 
         assertEquals(Collections.singletonList(expected), result);

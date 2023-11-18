@@ -74,22 +74,15 @@ class ExternalFileTypesTest {
 
     @Test
     void isExternalFileTypeByExt() {
-        assertTrue(
-            ExternalFileTypes.isExternalFileTypeByExt("html", filePreferences)
-        );
-        assertFalse(
-            ExternalFileTypes.isExternalFileTypeByExt("tst", filePreferences)
-        );
+        assertTrue(ExternalFileTypes.isExternalFileTypeByExt("html", filePreferences));
+        assertFalse(ExternalFileTypes.isExternalFileTypeByExt("tst", filePreferences));
     }
 
     @Test
     void getExternalFileTypeForName() {
         assertEquals(
             Optional.of(StandardExternalFileType.JPG),
-            ExternalFileTypes.getExternalFileTypeForName(
-                "testfile.jpg",
-                filePreferences
-            )
+            ExternalFileTypes.getExternalFileTypeForName("testfile.jpg", filePreferences)
         );
     }
 
@@ -97,10 +90,7 @@ class ExternalFileTypesTest {
     void getExternalFileTypeByMimeType() {
         assertEquals(
             Optional.of(StandardExternalFileType.TXT),
-            ExternalFileTypes.getExternalFileTypeByMimeType(
-                "text/plain",
-                filePreferences
-            )
+            ExternalFileTypes.getExternalFileTypeByMimeType("text/plain", filePreferences)
         );
     }
 
@@ -109,10 +99,7 @@ class ExternalFileTypesTest {
         Path testfile = Path.of("testfile.txt");
         assertEquals(
             Optional.of(StandardExternalFileType.TXT),
-            ExternalFileTypes.getExternalFileTypeByFile(
-                testfile,
-                filePreferences
-            )
+            ExternalFileTypes.getExternalFileTypeByFile(testfile, filePreferences)
         );
     }
 
@@ -125,11 +112,7 @@ class ExternalFileTypesTest {
         );
         assertEquals(
             Optional.of(StandardExternalFileType.PDF),
-            ExternalFileTypes.getExternalFileTypeByLinkedFile(
-                testfile,
-                false,
-                filePreferences
-            )
+            ExternalFileTypes.getExternalFileTypeByLinkedFile(testfile, false, filePreferences)
         );
     }
 
@@ -142,9 +125,7 @@ class ExternalFileTypesTest {
 
     @Test
     void fromString() {
-        Set<ExternalFileType> testList = ExternalFileTypes.fromString(
-            TEST_STRINGLIST
-        );
+        Set<ExternalFileType> testList = ExternalFileTypes.fromString(TEST_STRINGLIST);
 
         assertEquals(TEST_LIST, testList);
     }

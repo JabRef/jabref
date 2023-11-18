@@ -36,15 +36,11 @@ class RemoteSetupTest {
         final int port = 34567;
         final String[] message = new String[] { "MYMESSAGE" };
 
-        try (
-            RemoteListenerServerManager server = new RemoteListenerServerManager()
-        ) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
             server.openAndStart(messageHandler, port);
             assertTrue(server.isOpen());
-            assertTrue(
-                new RemoteClient(port).sendCommandLineArguments(message)
-            );
+            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
             verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
@@ -56,9 +52,7 @@ class RemoteSetupTest {
         final int port = 34567;
         final String[] message = new String[] { "MYMESSAGE" };
 
-        try (
-            RemoteListenerServerManager server = new RemoteListenerServerManager()
-        ) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.stop();
@@ -71,9 +65,7 @@ class RemoteSetupTest {
             assertTrue(server.isOpen());
             assertFalse(server.isNotStartedBefore());
 
-            assertTrue(
-                new RemoteClient(port).sendCommandLineArguments(message)
-            );
+            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
             verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
@@ -90,14 +82,11 @@ class RemoteSetupTest {
         try (ServerSocket socket = new ServerSocket(port)) {
             assertTrue(socket.isBound());
 
-            try (
-                RemoteListenerServerManager server = new RemoteListenerServerManager()
-            ) {
+            try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
                 assertFalse(server.isOpen());
                 server.openAndStart(messageHandler, port);
                 assertFalse(server.isOpen());
-                verify(messageHandler, never())
-                    .handleCommandLineArguments(any());
+                verify(messageHandler, never()).handleCommandLineArguments(any());
             }
         }
     }
@@ -107,15 +96,11 @@ class RemoteSetupTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        assertFalse(
-            new RemoteClient(port)
-                .sendCommandLineArguments(new String[] { message })
-        );
+        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[] { message }));
     }
 
     @Test
-    void pingReturnsFalseForWrongServerListening()
-        throws IOException, InterruptedException {
+    void pingReturnsFalseForWrongServerListening() throws IOException, InterruptedException {
         final int port = 34567;
 
         try (ServerSocket socket = new ServerSocket(port)) {
@@ -138,8 +123,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void pingReturnsFalseForNoServerListening()
-        throws IOException, InterruptedException {
+    void pingReturnsFalseForNoServerListening() throws IOException, InterruptedException {
         final int port = 34567;
 
         assertFalse(new RemoteClient(port).ping());
@@ -149,9 +133,7 @@ class RemoteSetupTest {
     void pingReturnsTrueWhenServerIsRunning() {
         final int port = 34567;
 
-        try (
-            RemoteListenerServerManager server = new RemoteListenerServerManager()
-        ) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             server.openAndStart(messageHandler, port);
 
             assertTrue(new RemoteClient(port).ping());

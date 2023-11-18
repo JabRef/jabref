@@ -82,25 +82,15 @@ public class OvidImporterTest {
 
     @Test
     public void testImportEmpty() throws IOException, URISyntaxException {
-        Path file = Path.of(
-            OvidImporter.class.getResource("Empty.txt").toURI()
-        );
-        List<BibEntry> entries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(OvidImporter.class.getResource("Empty.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
-        Path file = Path.of(
-            OvidImporter.class.getResource("OvidImporterTest1.txt").toURI()
-        );
-        List<BibEntry> entries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(5, entries.size());
 
         BibEntry entry = entries.get(0);
@@ -109,125 +99,69 @@ public class OvidImporterTest {
             Optional.of("Mustermann and Musterfrau"),
             entry.getField(StandardField.AUTHOR)
         );
-        assertEquals(
-            Optional.of("Short abstract"),
-            entry.getField(StandardField.ABSTRACT)
-        );
-        assertEquals(
-            Optional.of("Musterbuch"),
-            entry.getField(StandardField.TITLE)
-        );
-        assertEquals(
-            Optional.of("Einleitung"),
-            entry.getField(new UnknownField("chaptertitle"))
-        );
+        assertEquals(Optional.of("Short abstract"), entry.getField(StandardField.ABSTRACT));
+        assertEquals(Optional.of("Musterbuch"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Einleitung"), entry.getField(new UnknownField("chaptertitle")));
 
         entry = entries.get(1);
         assertEquals(StandardEntryType.InProceedings, entry.getType());
         assertEquals(Optional.of("Max"), entry.getField(StandardField.EDITOR));
-        assertEquals(
-            Optional.of("Max the Editor"),
-            entry.getField(StandardField.TITLE)
-        );
-        assertEquals(
-            Optional.of("Very Long Title"),
-            entry.getField(StandardField.JOURNAL)
-        );
+        assertEquals(Optional.of("Max the Editor"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Very Long Title"), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("28"), entry.getField(StandardField.VOLUME));
         assertEquals(Optional.of("2"), entry.getField(StandardField.ISSUE));
         assertEquals(Optional.of("2015"), entry.getField(StandardField.YEAR));
-        assertEquals(
-            Optional.of("103--106"),
-            entry.getField(StandardField.PAGES)
-        );
+        assertEquals(Optional.of("103--106"), entry.getField(StandardField.PAGES));
 
         entry = entries.get(2);
         assertEquals(StandardEntryType.InCollection, entry.getType());
         assertEquals(Optional.of("Max"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Test"), entry.getField(StandardField.TITLE));
-        assertEquals(
-            Optional.of("Very Long Title"),
-            entry.getField(StandardField.JOURNAL)
-        );
+        assertEquals(Optional.of("Very Long Title"), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("28"), entry.getField(StandardField.VOLUME));
         assertEquals(Optional.of("2"), entry.getField(StandardField.ISSUE));
         assertEquals(Optional.of("April"), entry.getField(StandardField.MONTH));
         assertEquals(Optional.of("2015"), entry.getField(StandardField.YEAR));
-        assertEquals(
-            Optional.of("103--106"),
-            entry.getField(StandardField.PAGES)
-        );
+        assertEquals(Optional.of("103--106"), entry.getField(StandardField.PAGES));
 
         entry = entries.get(3);
         assertEquals(StandardEntryType.Book, entry.getType());
         assertEquals(Optional.of("Max"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("2015"), entry.getField(StandardField.YEAR));
-        assertEquals(
-            Optional.of("Editor"),
-            entry.getField(StandardField.EDITOR)
-        );
-        assertEquals(
-            Optional.of("Very Long Title"),
-            entry.getField(StandardField.BOOKTITLE)
-        );
-        assertEquals(
-            Optional.of("103--106"),
-            entry.getField(StandardField.PAGES)
-        );
-        assertEquals(
-            Optional.of("Address"),
-            entry.getField(StandardField.ADDRESS)
-        );
-        assertEquals(
-            Optional.of("Publisher"),
-            entry.getField(StandardField.PUBLISHER)
-        );
+        assertEquals(Optional.of("Editor"), entry.getField(StandardField.EDITOR));
+        assertEquals(Optional.of("Very Long Title"), entry.getField(StandardField.BOOKTITLE));
+        assertEquals(Optional.of("103--106"), entry.getField(StandardField.PAGES));
+        assertEquals(Optional.of("Address"), entry.getField(StandardField.ADDRESS));
+        assertEquals(Optional.of("Publisher"), entry.getField(StandardField.PUBLISHER));
 
         entry = entries.get(4);
         assertEquals(StandardEntryType.Article, entry.getType());
         assertEquals(Optional.of("2014"), entry.getField(StandardField.YEAR));
         assertEquals(Optional.of("58"), entry.getField(StandardField.PAGES));
-        assertEquals(
-            Optional.of("Test"),
-            entry.getField(StandardField.ADDRESS)
-        );
+        assertEquals(Optional.of("Test"), entry.getField(StandardField.ADDRESS));
         assertEquals(Optional.empty(), entry.getField(StandardField.TITLE));
-        assertEquals(
-            Optional.of("TestPublisher"),
-            entry.getField(StandardField.PUBLISHER)
-        );
+        assertEquals(Optional.of("TestPublisher"), entry.getField(StandardField.PUBLISHER));
     }
 
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
-        Path file = Path.of(
-            OvidImporter.class.getResource("OvidImporterTest2Invalid.txt")
-                .toURI()
-        );
-        List<BibEntry> entries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public void testImportSingleEntries()
-        throws IOException, URISyntaxException {
+    public void testImportSingleEntries() throws IOException, URISyntaxException {
         for (int n = 3; n <= 7; n++) {
             Path file = Path.of(
-                OvidImporter.class.getResource("OvidImporterTest" + n + ".txt")
-                    .toURI()
+                OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI()
             );
             try (
                 InputStream nis = OvidImporter.class.getResourceAsStream(
                         "OvidImporterTestBib" + n + ".bib"
                     )
             ) {
-                List<BibEntry> entries = importer
-                    .importDatabase(file)
-                    .getDatabase()
-                    .getEntries();
+                List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
                 assertNotNull(entries);
                 assertEquals(1, entries.size());
                 BibEntryAssert.assertEquals(nis, entries.get(0));

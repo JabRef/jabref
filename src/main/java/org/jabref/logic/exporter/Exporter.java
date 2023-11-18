@@ -95,10 +95,7 @@ public abstract class Exporter {
 
         for (LinkedFile file : entryToWriteOn.getFiles()) {
             if (file.getFileType().equals(fileType.getName())) {
-                Optional<Path> filePath = file.findIn(
-                    databaseContext,
-                    filePreferences
-                );
+                Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
                     export(
                         databaseContext,

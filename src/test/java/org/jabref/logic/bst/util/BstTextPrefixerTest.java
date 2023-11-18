@@ -19,16 +19,10 @@ public class BstTextPrefixerTest {
         );
         assertPrefix("{\\'e}", "{\\'e}");
         assertPrefix("{\\'{E}}doua", "{\\'{E}}douard Masterly");
-        assertPrefix(
-            "Ulric",
-            "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot"
-        );
+        assertPrefix("Ulric", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
     }
 
-    private static void assertPrefix(
-        final String string,
-        final String string2
-    ) {
+    private static void assertPrefix(final String string, final String string2) {
         assertEquals(string, BstTextPrefixer.textPrefix(5, string2));
     }
 }

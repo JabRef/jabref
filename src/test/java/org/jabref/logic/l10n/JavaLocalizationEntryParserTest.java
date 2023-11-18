@@ -23,22 +23,13 @@ public class JavaLocalizationEntryParserTest {
             // " is kept unescaped
             Arguments.of("Localization.lang(\"\\\"Hey\\\"\")", "\"Hey\""),
             // \n is a "real" newline character in the simulated read read Java source code
-            Arguments.of(
-                "Localization.lang(\"multi \" + \n\"line\")",
-                "multi line"
-            ),
-            Arguments.of(
-                "Localization.lang(\n            \"A string\")",
-                "A string"
-            ),
+            Arguments.of("Localization.lang(\"multi \" + \n\"line\")", "multi line"),
+            Arguments.of("Localization.lang(\n            \"A string\")", "A string"),
             Arguments.of(
                 "Localization.lang(\"one per line with var\", var)",
                 "one per line with var"
             ),
-            Arguments.of(
-                "Localization.lang(\"Search %0\", \"Springer\")",
-                "Search %0"
-            ),
+            Arguments.of("Localization.lang(\"Search %0\", \"Springer\")", "Search %0"),
             Arguments.of(
                 "Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")",
                 "Reset preferences (key1,key2,... or 'all')"
@@ -73,18 +64,9 @@ public class JavaLocalizationEntryParserTest {
 
     public static Stream<Arguments> singleLineParameterChecks() {
         return Stream.of(
-            Arguments.of(
-                "Localization.lang(\"one per line\")",
-                "\"one per line\""
-            ),
-            Arguments.of(
-                "Localization.lang(\"one per line\" + var)",
-                "\"one per line\" + var"
-            ),
-            Arguments.of(
-                "Localization.lang(var + \"one per line\")",
-                "var + \"one per line\""
-            ),
+            Arguments.of("Localization.lang(\"one per line\")", "\"one per line\""),
+            Arguments.of("Localization.lang(\"one per line\" + var)", "\"one per line\" + var"),
+            Arguments.of("Localization.lang(var + \"one per line\")", "var + \"one per line\""),
             Arguments.of(
                 "Localization.lang(\"Search %0\", \"Springer\")",
                 "\"Search %0\", \"Springer\""
@@ -102,38 +84,27 @@ public class JavaLocalizationEntryParserTest {
 
     @ParameterizedTest
     @MethodSource("singleLineChecks")
-    public void testLocalizationKeyParsing(
-        String code,
-        String expectedLanguageKeys
-    ) {
+    public void testLocalizationKeyParsing(String code, String expectedLanguageKeys) {
         testLocalizationKeyParsing(code, List.of(expectedLanguageKeys));
     }
 
     @ParameterizedTest
     @MethodSource("multiLineChecks")
-    public void testLocalizationKeyParsing(
-        String code,
-        List<String> expectedLanguageKeys
-    ) {
-        List<String> languageKeysInString =
-            JavaLocalizationEntryParser.getLanguageKeysInString(
-                code,
-                LocalizationBundleForTest.LANG
-            );
+    public void testLocalizationKeyParsing(String code, List<String> expectedLanguageKeys) {
+        List<String> languageKeysInString = JavaLocalizationEntryParser.getLanguageKeysInString(
+            code,
+            LocalizationBundleForTest.LANG
+        );
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("singleLineParameterChecks")
-    public void testLocalizationParameterParsing(
-        String code,
-        String expectedParameter
-    ) {
-        List<String> languageKeysInString =
-            JavaLocalizationEntryParser.getLocalizationParameter(
-                code,
-                LocalizationBundleForTest.LANG
-            );
+    public void testLocalizationParameterParsing(String code, String expectedParameter) {
+        List<String> languageKeysInString = JavaLocalizationEntryParser.getLocalizationParameter(
+            code,
+            LocalizationBundleForTest.LANG
+        );
         assertEquals(List.of(expectedParameter), languageKeysInString);
     }
 

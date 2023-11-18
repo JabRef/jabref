@@ -23,8 +23,7 @@ import org.mockito.Answers;
 
 @FetcherTest
 @DisabledOnCIServer("CI server is blocked by Google")
-class GoogleScholarTest
-    implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
@@ -74,10 +73,7 @@ class GoogleScholarTest
             StandardField.TITLE,
             "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models."
         );
-        entry.setField(
-            StandardField.AUTHOR,
-            "Geiger, Matthias and Wirtz, Guido"
-        );
+        entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
         entry.setField(StandardField.BOOKTITLE, "ZEUS");
         entry.setField(StandardField.YEAR, "2013");
         entry.setField(StandardField.PAGES, "41--44");
@@ -91,9 +87,7 @@ class GoogleScholarTest
 
     @Test
     void findManyEntries() throws FetcherException {
-        List<BibEntry> foundEntries = finder.performSearch(
-            "random test string"
-        );
+        List<BibEntry> foundEntries = finder.performSearch("random test string");
 
         assertEquals(20, foundEntries.size());
     }

@@ -16,9 +16,7 @@ public record BibEntryTypePrefsAndFileViewModel(
         return Localization.lang(
             "%0 (from file)\n%1 (current setting)",
             MetaDataSerializer.serializeCustomEntryTypes(customTypeFromFile),
-            MetaDataSerializer.serializeCustomEntryTypes(
-                customTypeFromPreferences
-            )
+            MetaDataSerializer.serializeCustomEntryTypes(customTypeFromPreferences)
         );
     }
 }

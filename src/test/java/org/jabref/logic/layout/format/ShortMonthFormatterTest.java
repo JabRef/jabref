@@ -26,10 +26,7 @@ public class ShortMonthFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideArguments")
-    public void formatDifferentInputs(
-        String formattedString,
-        String originalString
-    ) {
+    public void formatDifferentInputs(String formattedString, String originalString) {
         assertEquals(formattedString, formatter.format(originalString));
     }
 

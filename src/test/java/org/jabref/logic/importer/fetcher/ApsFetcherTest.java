@@ -25,11 +25,7 @@ class ApsFetcherTest {
         BibEntry entry = new BibEntry()
             .withField(StandardField.DOI, "10.1103/PhysRevLett.116.061102");
         assertEquals(
-            Optional.of(
-                new URL(
-                    "https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102"
-                )
-            ),
+            Optional.of(new URL("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102")),
             finder.findFullText(entry)
         );
     }
@@ -39,11 +35,7 @@ class ApsFetcherTest {
         BibEntry entry = new BibEntry()
             .withField(StandardField.DOI, "10.1103/physrevlett.124.029002");
         assertEquals(
-            Optional.of(
-                new URL(
-                    "https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.124.029002"
-                )
-            ),
+            Optional.of(new URL("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.124.029002")),
             finder.findFullText(entry)
         );
     }

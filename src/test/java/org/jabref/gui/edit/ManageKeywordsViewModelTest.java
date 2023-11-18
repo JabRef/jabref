@@ -18,18 +18,13 @@ import org.junit.jupiter.api.Test;
 
 public class ManageKeywordsViewModelTest {
 
-    private final BibEntryPreferences bibEntryPreferences = mock(
-        BibEntryPreferences.class
-    );
+    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
     private ManageKeywordsViewModel keywordsViewModel;
 
     @BeforeEach
     void setUp() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.AUTHOR,
-                "Prakhar Srivastava and Nishant Singh"
-            )
+            .withField(StandardField.AUTHOR, "Prakhar Srivastava and Nishant Singh")
             .withField(StandardField.YEAR, "2020")
             .withField(StandardField.DOI, "10.1109/PARC49193.2020.236624")
             .withField(StandardField.ISBN, "978-1-7281-6575-2")
@@ -39,20 +34,14 @@ public class ManageKeywordsViewModelTest {
             )
             .withField(StandardField.PAGES, "351--354")
             .withField(StandardField.PUBLISHER, "IEEE")
-            .withField(
-                StandardField.TITLE,
-                "Automatized Medical Chatbot (Medibot)"
-            )
+            .withField(StandardField.TITLE, "Automatized Medical Chatbot (Medibot)")
             .withField(
                 StandardField.KEYWORDS,
                 "Human-machine interaction, Chatbot, Medical Chatbot, Natural Language Processing, Machine Learning, Bot"
             );
 
         BibEntry entryTwo = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.AUTHOR,
-                "Mladjan Jovanovic and Marcos Baez and Fabio Casati"
-            )
+            .withField(StandardField.AUTHOR, "Mladjan Jovanovic and Marcos Baez and Fabio Casati")
             .withField(StandardField.DATE, "November 2020")
             .withField(StandardField.YEAR, "2020")
             .withField(StandardField.DOI, "10.1109/MIC.2020.3037151")
@@ -60,10 +49,7 @@ public class ManageKeywordsViewModelTest {
             .withField(StandardField.JOURNALTITLE, "IEEE Internet Computing")
             .withField(StandardField.PAGES, "1--1")
             .withField(StandardField.PUBLISHER, "IEEE")
-            .withField(
-                StandardField.TITLE,
-                "Chatbots as conversational healthcare services"
-            )
+            .withField(StandardField.TITLE, "Chatbots as conversational healthcare services")
             .withField(
                 StandardField.KEYWORDS,
                 "Chatbot, Medical services, Internet, Data collection, Medical diagnostic imaging, Automation, Vocabulary"
@@ -73,8 +59,7 @@ public class ManageKeywordsViewModelTest {
 
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
-        keywordsViewModel =
-            new ManageKeywordsViewModel(bibEntryPreferences, entries);
+        keywordsViewModel = new ManageKeywordsViewModel(bibEntryPreferences, entries);
     }
 
     @Test
@@ -96,16 +81,12 @@ public class ManageKeywordsViewModelTest {
             "Vocabulary"
         );
 
-        assertEquals(
-            FXCollections.observableList(expectedKeywordsList),
-            addedKeywords
-        );
+        assertEquals(FXCollections.observableList(expectedKeywordsList), addedKeywords);
     }
 
     @Test
     void removedKeywordNotIncludedInKeywordsList() {
-        ObservableList<String> modifiedKeywords =
-            keywordsViewModel.getKeywords();
+        ObservableList<String> modifiedKeywords = keywordsViewModel.getKeywords();
         List<String> originalKeywordsList = Arrays.asList(
             "Human-machine interaction",
             "Chatbot",

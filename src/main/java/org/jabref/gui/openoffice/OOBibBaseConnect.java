@@ -35,9 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OOBibBaseConnect {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OOBibBaseConnect.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBaseConnect.class);
 
     private final DialogService dialogService;
     private final XDesktop xDesktop;
@@ -55,8 +53,7 @@ public class OOBibBaseConnect {
         this.xDesktop = simpleBootstrap(loPath);
     }
 
-    private XDesktop simpleBootstrap(Path loPath)
-        throws CreationException, BootstrapException {
+    private XDesktop simpleBootstrap(Path loPath) throws CreationException, BootstrapException {
         // Get the office component context:
         XComponentContext context = Bootstrap.bootstrap(loPath);
         XMultiComponentFactory sem = context.getServiceManager();
@@ -65,11 +62,7 @@ public class OOBibBaseConnect {
         // hierarchy of frames that contain viewable components:
         Object desktop;
         try {
-            desktop =
-                sem.createInstanceWithContext(
-                    "com.sun.star.frame.Desktop",
-                    context
-                );
+            desktop = sem.createInstanceWithContext("com.sun.star.frame.Desktop", context);
         } catch (com.sun.star.uno.Exception e) {
             throw new CreationException(e.getMessage());
         }
@@ -96,10 +89,7 @@ public class OOBibBaseConnect {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error(
-                "Exception disposing office process connection bridge",
-                ex
-            );
+            LOGGER.error("Exception disposing office process connection bridge", ex);
         }
     }
 
@@ -113,10 +103,7 @@ public class OOBibBaseConnect {
         while (compEnum.hasMoreElements()) {
             Object next = compEnum.nextElement();
             XComponent comp = UnoCast.cast(XComponent.class, next).get();
-            Optional<XTextDocument> doc = UnoCast.cast(
-                XTextDocument.class,
-                comp
-            );
+            Optional<XTextDocument> doc = UnoCast.cast(XTextDocument.class, comp);
             doc.ifPresent(result::add);
         }
         return result;
@@ -138,8 +125,7 @@ public class OOBibBaseConnect {
 
             public DocumentTitleViewModel(XTextDocument xTextDocument) {
                 this.xTextDocument = xTextDocument;
-                this.description =
-                    UnoTextDocument.getFrameTitle(xTextDocument).orElse("");
+                this.description = UnoTextDocument.getFrameTitle(xTextDocument).orElse("");
             }
 
             public XTextDocument getXtextDocument() {
@@ -160,17 +146,14 @@ public class OOBibBaseConnect {
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX
         // thread
-        Optional<DocumentTitleViewModel> selectedDocument =
-            dialogService.showChoiceDialogAndWait(
-                Localization.lang("Select document"),
-                Localization.lang("Found documents:"),
-                Localization.lang("Use selected document"),
-                viewModel
-            );
+        Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(
+            Localization.lang("Select document"),
+            Localization.lang("Found documents:"),
+            Localization.lang("Use selected document"),
+            viewModel
+        );
 
-        return selectedDocument
-            .map(DocumentTitleViewModel::getXtextDocument)
-            .orElse(null);
+        return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
     }
 
     /**
@@ -193,11 +176,7 @@ public class OOBibBaseConnect {
         } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
             selected = textDocumentList.get(0); // Get the only one
         } else { // Bring up a dialog
-            selected =
-                OOBibBaseConnect.selectDocumentDialog(
-                    textDocumentList,
-                    this.dialogService
-                );
+            selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList, this.dialogService);
         }
 
         if (selected == null) {

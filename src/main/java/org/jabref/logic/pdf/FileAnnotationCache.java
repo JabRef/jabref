@@ -15,17 +15,12 @@ import org.slf4j.LoggerFactory;
 
 public class FileAnnotationCache {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileAnnotation.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
     // cache size in entries
     private static final int CACHE_SIZE = 10;
 
     // the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
-    private LoadingCache<
-        BibEntry,
-        Map<Path, List<FileAnnotation>>
-    > annotationCache;
+    private LoadingCache<BibEntry, Map<Path, List<FileAnnotation>>> annotationCache;
 
     /**
      * Creates an empty fil annotation cache. Required to allow the annotation cache to be injected into views without
@@ -33,28 +28,18 @@ public class FileAnnotationCache {
      */
     public FileAnnotationCache() {}
 
-    public FileAnnotationCache(
-        BibDatabaseContext context,
-        FilePreferences filePreferences
-    ) {
+    public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {
         annotationCache =
             CacheBuilder
                 .newBuilder()
                 .maximumSize(CACHE_SIZE)
                 .build(
-                    new CacheLoader<
-                        BibEntry,
-                        Map<Path, List<FileAnnotation>>
-                    >() {
+                    new CacheLoader<BibEntry, Map<Path, List<FileAnnotation>>>() {
                         @Override
-                        public Map<Path, List<FileAnnotation>> load(
-                            BibEntry entry
-                        ) throws Exception {
+                        public Map<Path, List<FileAnnotation>> load(BibEntry entry)
+                            throws Exception {
                             return new EntryAnnotationImporter(entry)
-                                .importAnnotationsFromFiles(
-                                    context,
-                                    filePreferences
-                                );
+                                .importAnnotationsFromFiles(context, filePreferences);
                         }
                     }
                 );

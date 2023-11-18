@@ -5,8 +5,7 @@ import org.jabref.model.strings.StringUtil;
 /**
  * Default query transformer without any boolean operators
  */
-public class DefaultQueryTransformer
-    extends YearAndYearRangeByFilteringQueryTransformer {
+public class DefaultQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {

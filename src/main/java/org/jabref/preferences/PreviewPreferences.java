@@ -30,14 +30,10 @@ public class PreviewPreferences {
         boolean showPreviewAsExtraTab
     ) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
-        this.layoutCyclePosition =
-            new SimpleIntegerProperty(layoutCyclePosition);
-        this.customPreviewLayout =
-            new SimpleObjectProperty<>(customPreviewLayout);
-        this.defaultCustomPreviewLayout =
-            new SimpleStringProperty(defaultCustomPreviewLayout);
-        this.showPreviewAsExtraTab =
-            new SimpleBooleanProperty(showPreviewAsExtraTab);
+        this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
+        this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
+        this.defaultCustomPreviewLayout = new SimpleStringProperty(defaultCustomPreviewLayout);
+        this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -60,9 +56,7 @@ public class PreviewPreferences {
             while (previewCyclePosition < 0) {
                 previewCyclePosition += layoutCycle.size();
             }
-            this.layoutCyclePosition.setValue(
-                    previewCyclePosition % layoutCycle.size()
-                );
+            this.layoutCyclePosition.setValue(previewCyclePosition % layoutCycle.size());
         }
     }
 
@@ -82,9 +76,7 @@ public class PreviewPreferences {
         return customPreviewLayout.getValue();
     }
 
-    public ObjectProperty<
-        TextBasedPreviewLayout
-    > customPreviewLayoutProperty() {
+    public ObjectProperty<TextBasedPreviewLayout> customPreviewLayoutProperty() {
         return customPreviewLayout;
     }
 

@@ -42,9 +42,7 @@ import org.w3c.dom.html.HTMLAnchorElement;
  */
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PreviewViewer.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
     // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT =
@@ -116,9 +114,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         """
         var markInstance = new Mark(document.getElementById("content"));
         markInstance.unmark(%s);""";
-    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile(
-        "(?<!\\\\)/"
-    );
+    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile("(?<!\\\\)/");
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -142,8 +138,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         queryOldValue,
         queryNewValue
     ) -> {
-        searchHighlightPattern =
-            queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
+        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
         highlightSearchPattern();
     };
 
@@ -179,9 +174,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     return;
                 }
                 if (!registered) {
-                    stateManager
-                        .activeSearchQueryProperty()
-                        .addListener(listener);
+                    stateManager.activeSearchQueryProperty().addListener(listener);
                     registered = true;
                 }
                 highlightSearchPattern();
@@ -198,8 +191,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                         "click",
                         evt -> {
                             EventTarget target = evt.getCurrentTarget();
-                            HTMLAnchorElement anchorElement =
-                                (HTMLAnchorElement) target;
+                            HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
                             String href = anchorElement.getHref();
                             if (href != null) {
                                 try {
@@ -210,10 +202,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                 } catch (MalformedURLException exception) {
                                     LOGGER.error("Invalid URL", exception);
                                 } catch (IOException exception) {
-                                    LOGGER.error(
-                                        "Invalid URL Input",
-                                        exception
-                                    );
+                                    LOGGER.error("Invalid URL Input", exception);
                                 }
                             }
                             evt.preventDefault();
@@ -229,16 +218,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void highlightSearchPattern() {
         String callbackForUnmark = "";
         if (searchHighlightPattern.isPresent()) {
-            String javaScriptRegex = createJavaScriptRegex(
-                searchHighlightPattern.get()
-            );
-            callbackForUnmark =
-                String.format(JS_MARK_REG_EXP_CALLBACK, javaScriptRegex);
+            String javaScriptRegex = createJavaScriptRegex(searchHighlightPattern.get());
+            callbackForUnmark = String.format(JS_MARK_REG_EXP_CALLBACK, javaScriptRegex);
         }
-        String unmarkInstance = String.format(
-            JS_UNMARK_WITH_CALLBACK,
-            callbackForUnmark
-        );
+        String unmarkInstance = String.format(JS_UNMARK_WITH_CALLBACK, callbackForUnmark);
         previewView.getEngine().executeScript(unmarkInstance);
     }
 
@@ -296,10 +279,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             .onRunning(() ->
                 setPreviewText(
                     "<i>" +
-                    Localization.lang(
-                        "Processing %0",
-                        Localization.lang("Citation Style")
-                    ) +
+                    Localization.lang("Processing %0", Localization.lang("Citation Style")) +
                     ": " +
                     layout.getDisplayName() +
                     " ..." +
@@ -308,13 +288,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             )
             .onSuccess(this::setPreviewText)
             .onFailure(exception -> {
-                LOGGER.error(
-                    "Error while generating citation style",
-                    exception
-                );
-                setPreviewText(
-                    Localization.lang("Error while generating citation style")
-                );
+                LOGGER.error("Error while generating citation style", exception);
+                setPreviewText(Localization.lang("Error while generating citation style"));
             })
             .executeWith(taskExecutor);
     }
@@ -349,11 +324,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             .wrap(() -> {
                 job
                     .getJobSettings()
-                    .setJobName(
-                        entry
-                            .flatMap(BibEntry::getCitationKey)
-                            .orElse("NO ENTRY")
-                    );
+                    .setJobName(entry.flatMap(BibEntry::getCitationKey).orElse("NO ENTRY"));
                 previewView.getEngine().print(job);
                 job.endJob();
             })
@@ -372,9 +343,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ClipboardContent content = new ClipboardContent();
         content.putString(document.getElementById("content").getTextContent());
         content.putHtml(
-            (String) previewView
-                .getEngine()
-                .executeScript("document.documentElement.outerHTML")
+            (String) previewView.getEngine().executeScript("document.documentElement.outerHTML")
         );
 
         clipBoardManager.setContent(content);
@@ -394,14 +363,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public String getSelectionTextContent() {
-        return (String) previewView
-            .getEngine()
-            .executeScript("window.getSelection().toString()");
+        return (String) previewView.getEngine().executeScript("window.getSelection().toString()");
     }
 
     public String getSelectionHtmlContent() {
-        return (String) previewView
-            .getEngine()
-            .executeScript(JS_GET_SELECTION_HTML_SCRIPT);
+        return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
     }
 }

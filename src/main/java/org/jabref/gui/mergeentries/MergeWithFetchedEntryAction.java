@@ -55,16 +55,10 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
             dialogService.showInformationDialogAndWait(
                 Localization.lang(
                     "Merge entry with %0 information",
-                    new OrFields(
-                        StandardField.DOI,
-                        StandardField.ISBN,
-                        StandardField.EPRINT
-                    )
+                    new OrFields(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT)
                         .getDisplayName()
                 ),
-                Localization.lang(
-                    "This operation requires exactly one item to be selected."
-                )
+                Localization.lang("This operation requires exactly one item to be selected.")
             );
         }
 

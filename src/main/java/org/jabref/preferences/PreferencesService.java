@@ -77,9 +77,7 @@ public interface PreferencesService {
 
     BibEntryTypesManager getCustomEntryTypesRepository();
 
-    void storeCustomEntryTypesRepository(
-        BibEntryTypesManager entryTypesManager
-    );
+    void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
 
     CleanupPreferences getCleanupPreferences();
 

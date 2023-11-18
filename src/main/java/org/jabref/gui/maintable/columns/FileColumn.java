@@ -54,10 +54,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         setCommonSettings();
 
         Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
-        Tooltip.install(
-            headerGraphic,
-            new Tooltip(Localization.lang("Linked files"))
-        );
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
         this.setGraphic(headerGraphic);
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
@@ -66,20 +63,16 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             .withMenu(this::createFileMenu)
             .withOnMouseClickedEvent((entry, linkedFiles) ->
                 event -> {
-                    if (
-                        (event.getButton() == MouseButton.PRIMARY) &&
-                        (linkedFiles.size() == 1)
-                    ) {
+                    if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
                         // Only one linked file -> open directly
-                        LinkedFileViewModel linkedFileViewModel =
-                            new LinkedFileViewModel(
-                                linkedFiles.get(0),
-                                entry.getEntry(),
-                                database,
-                                taskExecutor,
-                                dialogService,
-                                preferencesService
-                            );
+                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
+                            linkedFiles.get(0),
+                            entry.getEntry(),
+                            database,
+                            taskExecutor,
+                            dialogService,
+                            preferencesService
+                        );
                         linkedFileViewModel.open();
                     }
                 }
@@ -108,10 +101,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
         this.setGraphic(
                 ExternalFileTypes
-                    .getExternalFileTypeByName(
-                        fileType,
-                        preferencesService.getFilePreferences()
-                    )
+                    .getExternalFileTypeByName(fileType, preferencesService.getFilePreferences())
                     .map(ExternalFileType::getIcon)
                     .orElse(IconTheme.JabRefIcons.FILE)
                     .getGraphicNode()
@@ -122,9 +112,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                 createFileIcon(
                     linkedFiles
                         .stream()
-                        .filter(linkedFile ->
-                            linkedFile.getFileType().equalsIgnoreCase(fileType)
-                        )
+                        .filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(fileType))
                         .collect(Collectors.toList())
                 )
             )
@@ -133,30 +121,19 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     private void setCommonSettings() {
         this.setResizable(false);
-        MainTableColumnFactory.setExactWidth(
-            this,
-            ColumnPreferences.ICON_COLUMN_WIDTH
-        );
+        MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
-        this.setCellValueFactory(cellData ->
-                cellData.getValue().getLinkedFiles()
-            );
+        this.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
     }
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
         if (!linkedFiles.isEmpty()) {
-            return Localization.lang(
-                "Open file %0",
-                linkedFiles.get(0).getLink()
-            );
+            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
         }
         return null;
     }
 
-    private ContextMenu createFileMenu(
-        BibEntryTableViewModel entry,
-        List<LinkedFile> linkedFiles
-    ) {
+    private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
         if (linkedFiles.size() <= 1) {
             return null;
         }

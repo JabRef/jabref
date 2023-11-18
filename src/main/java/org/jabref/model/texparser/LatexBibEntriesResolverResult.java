@@ -62,8 +62,7 @@ public class LatexBibEntriesResolverResult {
             return false;
         }
 
-        LatexBibEntriesResolverResult that =
-            (LatexBibEntriesResolverResult) obj;
+        LatexBibEntriesResolverResult that = (LatexBibEntriesResolverResult) obj;
 
         return (
             Objects.equals(latexParserResult, that.latexParserResult) &&

@@ -49,11 +49,9 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormat()
-        throws IOException, URISyntaxException {
+    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(
-            BibtexImporterTest.class.getResource("BibtexImporter.examples.bib")
-                .toURI()
+            BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI()
         );
         assertTrue(importer.isRecognizedFormat(file));
     }
@@ -61,13 +59,9 @@ public class BibtexImporterTest {
     @Test
     public void testImportEntries() throws IOException, URISyntaxException {
         Path file = Path.of(
-            BibtexImporterTest.class.getResource("BibtexImporter.examples.bib")
-                .toURI()
+            BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI()
         );
-        List<BibEntry> bibEntries = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(4, bibEntries.size());
 
@@ -81,28 +75,14 @@ public class BibtexImporterTest {
                     entry.getField(StandardField.AUTHOR)
                 );
                 assertEquals(Optional.of("aksin"), entry.getCitationKey());
+                assertEquals(Optional.of("2006"), entry.getField(StandardField.DATE));
                 assertEquals(
-                    Optional.of("2006"),
-                    entry.getField(StandardField.DATE)
-                );
-                assertEquals(
-                    Optional.of(
-                        "Effect of immobilization on catalytic characteristics"
-                    ),
+                    Optional.of("Effect of immobilization on catalytic characteristics"),
                     entry.getField(new UnknownField("indextitle"))
                 );
-                assertEquals(
-                    Optional.of("#jomch#"),
-                    entry.getField(StandardField.JOURNAL)
-                );
-                assertEquals(
-                    Optional.of("13"),
-                    entry.getField(StandardField.NUMBER)
-                );
-                assertEquals(
-                    Optional.of("3027-3036"),
-                    entry.getField(StandardField.PAGES)
-                );
+                assertEquals(Optional.of("#jomch#"), entry.getField(StandardField.JOURNAL));
+                assertEquals(Optional.of("13"), entry.getField(StandardField.NUMBER));
+                assertEquals(Optional.of("3027-3036"), entry.getField(StandardField.PAGES));
                 assertEquals(
                     Optional.of(
                         "Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic " +
@@ -110,10 +90,7 @@ public class BibtexImporterTest {
                     ),
                     entry.getField(StandardField.TITLE)
                 );
-                assertEquals(
-                    Optional.of("691"),
-                    entry.getField(StandardField.VOLUME)
-                );
+                assertEquals(Optional.of("691"), entry.getField(StandardField.VOLUME));
             } else if ("stdmodel".equals(entry.getCitationKey().get())) {
                 assertEquals(
                     Optional.of(
@@ -143,38 +120,20 @@ public class BibtexImporterTest {
                     entry.getField(StandardField.ENTRYSET)
                 );
             } else if ("Preissel2016".equals(entry.getCitationKey().get())) {
-                assertEquals(
-                    Optional.of("Heidelberg"),
-                    entry.getField(StandardField.ADDRESS)
-                );
-                assertEquals(
-                    Optional.of("Preißel, René"),
-                    entry.getField(StandardField.AUTHOR)
-                );
-                assertEquals(
-                    Optional.of("Preissel2016"),
-                    entry.getCitationKey()
-                );
+                assertEquals(Optional.of("Heidelberg"), entry.getField(StandardField.ADDRESS));
+                assertEquals(Optional.of("Preißel, René"), entry.getField(StandardField.AUTHOR));
+                assertEquals(Optional.of("Preissel2016"), entry.getCitationKey());
                 assertEquals(
                     Optional.of("3., aktualisierte und erweiterte Auflage"),
                     entry.getField(StandardField.EDITION)
                 );
-                assertEquals(
-                    Optional.of("978-3-86490-311-3"),
-                    entry.getField(StandardField.ISBN)
-                );
+                assertEquals(Optional.of("978-3-86490-311-3"), entry.getField(StandardField.ISBN));
                 assertEquals(
                     Optional.of("Versionsverwaltung"),
                     entry.getField(StandardField.KEYWORDS)
                 );
-                assertEquals(
-                    Optional.of("XX, 327 Seiten"),
-                    entry.getField(StandardField.PAGES)
-                );
-                assertEquals(
-                    Optional.of("dpunkt.verlag"),
-                    entry.getField(StandardField.PUBLISHER)
-                );
+                assertEquals(Optional.of("XX, 327 Seiten"), entry.getField(StandardField.PAGES));
+                assertEquals(Optional.of("dpunkt.verlag"), entry.getField(StandardField.PUBLISHER));
                 assertEquals(
                     Optional.of(
                         "Git: dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"
@@ -185,10 +144,7 @@ public class BibtexImporterTest {
                     Optional.of("http://d-nb.info/107601965X"),
                     entry.getField(StandardField.URL)
                 );
-                assertEquals(
-                    Optional.of("2016"),
-                    entry.getField(StandardField.YEAR)
-                );
+                assertEquals(Optional.of("2016"), entry.getField(StandardField.YEAR));
             }
         }
     }
@@ -214,8 +170,7 @@ public class BibtexImporterTest {
     @Test
     public void testRecognizesDatabaseID() throws Exception {
         Path file = Path.of(
-            BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib")
-                .toURI()
+            BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI()
         );
         String sharedDatabaseID = importer
             .importDatabase(file)
@@ -227,61 +182,36 @@ public class BibtexImporterTest {
 
     static Stream<Arguments> testParsingOfEncodedFileWithHeader() {
         return Stream.of(
-            Arguments.of(
-                StandardCharsets.US_ASCII,
-                "encoding-us-ascii-with-header.bib"
-            ),
-            Arguments.of(
-                StandardCharsets.UTF_8,
-                "encoding-utf-8-with-header.bib"
-            ),
-            Arguments.of(
-                Charset.forName("Windows-1252"),
-                "encoding-windows-1252-with-header.bib"
-            ),
-            Arguments.of(
-                StandardCharsets.UTF_16BE,
-                "encoding-utf-16BE-with-header.bib"
-            ),
-            Arguments.of(
-                StandardCharsets.UTF_16BE,
-                "encoding-utf-16BE-without-header.bib"
-            )
+            Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
+            Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),
+            Arguments.of(Charset.forName("Windows-1252"), "encoding-windows-1252-with-header.bib"),
+            Arguments.of(StandardCharsets.UTF_16BE, "encoding-utf-16BE-with-header.bib"),
+            Arguments.of(StandardCharsets.UTF_16BE, "encoding-utf-16BE-without-header.bib")
         );
     }
 
     @ParameterizedTest
     @MethodSource
-    public void testParsingOfEncodedFileWithHeader(
-        Charset charset,
-        String fileName
-    ) throws Exception {
+    public void testParsingOfEncodedFileWithHeader(Charset charset, String fileName)
+        throws Exception {
         ParserResult parserResult = importer.importDatabase(
             Path.of(BibtexImporterTest.class.getResource(fileName).toURI())
         );
-        assertEquals(
-            Optional.of(charset),
-            parserResult.getMetaData().getEncoding()
-        );
+        assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
     }
 
     @ParameterizedTest
     @CsvSource(
-        {
-            "encoding-windows-1252-with-header.bib",
-            "encoding-windows-1252-without-header.bib",
-        }
+        { "encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib" }
     )
-    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(
-        String filename
-    ) throws Exception {
+    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename)
+        throws Exception {
         ParserResult parserResult = importer.importDatabase(
             Path.of(BibtexImporterTest.class.getResource(filename).toURI())
         );
         assertEquals(
             List.of(
-                new BibEntry(StandardEntryType.Article)
-                    .withField(StandardField.ABSTRACT, "25° C")
+                new BibEntry(StandardEntryType.Article).withField(StandardField.ABSTRACT, "25° C")
             ),
             parserResult.getDatabase().getEntries()
         );
@@ -296,8 +226,7 @@ public class BibtexImporterTest {
             "encoding-utf-16BE-without-header.bib",
         }
     )
-    public void testParsingFilesReadsUmlautCharacterCorrectly(String filename)
-        throws Exception {
+    public void testParsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
             Path.of(BibtexImporterTest.class.getResource(filename).toURI())
         );
@@ -310,9 +239,7 @@ public class BibtexImporterTest {
         );
     }
 
-    private static Stream<
-        Arguments
-    > encodingExplicitlySuppliedCorrectlyDetermined() {
+    private static Stream<Arguments> encodingExplicitlySuppliedCorrectlyDetermined() {
         return Stream.of(
             Arguments.of("encoding-utf-8-with-header.bib", true),
             Arguments.of("encoding-utf-8-without-header.bib", false),
@@ -361,10 +288,7 @@ public class BibtexImporterTest {
     public void encodingNotSupplied() throws Exception {
         ParserResult parserResult = importer.importDatabase(
             Path.of(
-                BibtexImporterTest.class.getResource(
-                        "encoding-utf-8-without-header.bib"
-                    )
-                    .toURI()
+                BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()
             )
         );
         assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());

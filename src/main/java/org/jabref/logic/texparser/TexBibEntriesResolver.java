@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class TexBibEntriesResolver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        TexBibEntriesResolver.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(TexBibEntriesResolver.class);
 
     private final BibDatabase masterDatabase;
     private final LibraryPreferences libraryPreferences;
@@ -46,11 +44,10 @@ public class TexBibEntriesResolver {
     /**
      * Resolve all BibTeX entries and check if they are in the given database.
      */
-    public LatexBibEntriesResolverResult resolve(
-        LatexParserResult latexParserResult
-    ) {
-        LatexBibEntriesResolverResult resolverResult =
-            new LatexBibEntriesResolverResult(latexParserResult);
+    public LatexBibEntriesResolverResult resolve(LatexParserResult latexParserResult) {
+        LatexBibEntriesResolverResult resolverResult = new LatexBibEntriesResolverResult(
+            latexParserResult
+        );
 
         // Preload databases from BIB files.
         Map<Path, BibDatabase> bibDatabases = resolverResult
@@ -64,11 +61,7 @@ public class TexBibEntriesResolver {
                     path -> {
                         try {
                             return OpenDatabase
-                                .loadDatabase(
-                                    path,
-                                    importFormatPreferences,
-                                    fileMonitor
-                                )
+                                .loadDatabase(path, importFormatPreferences, fileMonitor)
                                 .getDatabase();
                         } catch (IOException e) {
                             LOGGER.error("Error opening file '{}'", path, e);
@@ -86,9 +79,7 @@ public class TexBibEntriesResolver {
             .distinct();
 
         Set<BibEntry> newEntries = citationsStream
-            .flatMap(mapEntry ->
-                apply(mapEntry, latexParserResult, bibDatabases)
-            )
+            .flatMap(mapEntry -> apply(mapEntry, latexParserResult, bibDatabases))
             .collect(Collectors.toSet());
 
         // Add all new entries to the newEntries set.
@@ -118,16 +109,12 @@ public class TexBibEntriesResolver {
                     .filter(entry ->
                         !entry.equals(
                             masterDatabase
-                                .getEntryByCitationKey(
-                                    entry.getCitationKey().orElse("")
-                                )
+                                .getEntryByCitationKey(entry.getCitationKey().orElse(""))
                                 .orElse(new BibEntry())
                         )
                     )
                     // Add cross-referencing data to the entry (fill empty fields).
-                    .map(entry ->
-                        addCrossReferencingData(entry, bibFile, bibDatabases)
-                    )
+                    .map(entry -> addCrossReferencingData(entry, bibFile, bibDatabases))
             );
     }
 
@@ -145,10 +132,7 @@ public class TexBibEntriesResolver {
                     .forEach(field ->
                         entry
                             .getFieldMap()
-                            .putIfAbsent(
-                                field,
-                                refEntry.getFieldOrAlias(field).orElse("")
-                            )
+                            .putIfAbsent(field, refEntry.getFieldOrAlias(field).orElse(""))
                     )
             );
 

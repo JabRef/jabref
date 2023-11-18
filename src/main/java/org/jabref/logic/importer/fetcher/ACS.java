@@ -38,9 +38,7 @@ public class ACS implements FulltextFetcher {
         Objects.requireNonNull(entry);
 
         // DOI search
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (!doi.isPresent()) {
             return Optional.empty();

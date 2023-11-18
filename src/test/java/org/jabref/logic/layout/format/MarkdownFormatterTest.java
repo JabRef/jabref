@@ -18,10 +18,7 @@ class MarkdownFormatterTest {
 
     @Test
     void formatWhenFormattingPlainTextThenReturnsTextWrappedInParagraph() {
-        assertEquals(
-            "<p>Hello World</p>",
-            markdownFormatter.format("Hello World")
-        );
+        assertEquals("<p>Hello World</p>", markdownFormatter.format("Hello World"));
     }
 
     @Test

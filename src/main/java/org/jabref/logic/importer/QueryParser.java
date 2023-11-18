@@ -27,9 +27,7 @@ public class QueryParser {
      * @param query The given query string
      * @return A complex query containing all fields of the query string
      */
-    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(
-        String query
-    ) {
+    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String query) {
         try {
             StandardQueryParser parser = new StandardQueryParser();
             Query luceneQuery = parser.parse(query, "default");
@@ -42,11 +40,7 @@ public class QueryParser {
             List<Term> sortedTerms = new ArrayList<>(terms);
             sortedTerms.sort(Comparator.comparing(Term::text).reversed());
             return Optional.of(ComplexSearchQuery.fromTerms(sortedTerms));
-        } catch (
-            QueryNodeException
-            | IllegalStateException
-            | IllegalArgumentException ex
-        ) {
+        } catch (QueryNodeException | IllegalStateException | IllegalArgumentException ex) {
             return Optional.empty();
         }
     }

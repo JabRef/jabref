@@ -21,9 +21,7 @@ import org.jabref.model.entry.field.FieldProperty;
 public class AmpersandChecker implements EntryChecker {
 
     // matches for an & preceded by any number of \
-    private static final Pattern BACKSLASH_PRECEDED_AMPERSAND = Pattern.compile(
-        "\\\\*&"
-    );
+    private static final Pattern BACKSLASH_PRECEDED_AMPERSAND = Pattern.compile("\\\\*&");
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
@@ -31,17 +29,12 @@ public class AmpersandChecker implements EntryChecker {
             .getFieldMap()
             .entrySet()
             .stream()
-            .filter(field ->
-                !field.getKey().getProperties().contains(FieldProperty.VERBATIM)
-            )
+            .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
             // We use "flatMap" instead of filtering later, because we assume there won't be that much error messages - and construction of Stream.empty() is faster than construction of a new Tuple2 (including lifting long to Long)
             .flatMap(AmpersandChecker::getUnescapedAmpersandsWithCount)
             .map(pair ->
                 new IntegrityMessage(
-                    Localization.lang(
-                        "Found %0 unescaped '&'",
-                        pair.getValue()
-                    ),
+                    Localization.lang("Found %0 unescaped '&'", pair.getValue()),
                     entry,
                     pair.getKey()
                 )

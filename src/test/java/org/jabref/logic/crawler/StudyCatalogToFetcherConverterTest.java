@@ -36,14 +36,10 @@ class StudyCatalogToFetcherConverterTest {
 
     @BeforeEach
     void setUpMocks() {
-        preferencesService =
-            mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        saveConfiguration =
-            mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
-        when(saveConfiguration.getSaveOrder())
-            .thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getBibEntryPreferences().getKeywordSeparator())
-            .thenReturn(',');
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getImporterPreferences().getApiKeys())
             .thenReturn(FXCollections.emptyObservableSet());
 
@@ -65,28 +61,22 @@ class StudyCatalogToFetcherConverterTest {
             new DummyFileUpdateMonitor(),
             entryTypesManager
         );
-        StudyCatalogToFetcherConverter converter =
-            new StudyCatalogToFetcherConverter(
-                studyRepository.getActiveLibraryEntries(),
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS)
-            );
+        StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
+            studyRepository.getActiveLibraryEntries(),
+            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+            mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS)
+        );
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(
             List.of("Springer", "ArXiv", "Medline/PubMed"),
-            result
-                .stream()
-                .map(SearchBasedFetcher::getName)
-                .collect(Collectors.toList())
+            result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
         );
     }
 
-    private void copyTestStudyDefinitionFileIntoDirectory(Path destination)
-        throws Exception {
+    private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {
         URL studyDefinition =
-            this.getClass()
-                .getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+            this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 }

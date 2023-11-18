@@ -32,15 +32,11 @@ import org.jabref.model.entry.field.UnknownField;
 /**
  * Fetches data from the INSPIRE database.
  */
-public class INSPIREFetcher
-    implements SearchBasedParserFetcher, EntryBasedFetcher {
+public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
 
-    private static final String INSPIRE_HOST =
-        "https://inspirehep.net/api/literature/";
-    private static final String INSPIRE_DOI_HOST =
-        "https://inspirehep.net/api/doi/";
-    private static final String INSPIRE_ARXIV_HOST =
-        "https://inspirehep.net/api/arxiv/";
+    private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
+    private static final String INSPIRE_DOI_HOST = "https://inspirehep.net/api/doi/";
+    private static final String INSPIRE_ARXIV_HOST = "https://inspirehep.net/api/arxiv/";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -64,9 +60,7 @@ public class INSPIREFetcher
         URIBuilder uriBuilder = new URIBuilder(INSPIRE_HOST);
         uriBuilder.addParameter(
             "q",
-            new DefaultLuceneQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
         return uriBuilder.build().toURL();
     }
@@ -81,23 +75,13 @@ public class INSPIREFetcher
     @Override
     public void doPostCleanup(BibEntry entry) {
         // Remove strange "SLACcitation" field
-        new FieldFormatterCleanup(
-            new UnknownField("SLACcitation"),
-            new ClearFormatter()
-        )
+        new FieldFormatterCleanup(new UnknownField("SLACcitation"), new ClearFormatter())
             .cleanup(entry);
 
         // Remove braces around content of "title" field
-        new FieldFormatterCleanup(
-            StandardField.TITLE,
-            new RemoveBracesFormatter()
-        )
-            .cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
 
-        new FieldFormatterCleanup(
-            StandardField.TITLE,
-            new LatexToUnicodeFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.TITLE, new LatexToUnicodeFormatter())
             .cleanup(entry);
     }
 
@@ -107,20 +91,14 @@ public class INSPIREFetcher
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         List<BibEntry> results = new ArrayList<>();
         Optional<String> doi = entry.getField(StandardField.DOI);
-        Optional<String> archiveprefix = entry.getFieldOrAlias(
-            StandardField.ARCHIVEPREFIX
-        );
+        Optional<String> archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
         String url;
 
-        if (
-            archiveprefix.filter("arxiv"::equals).isPresent() &&
-            eprint.isPresent()
-        ) {
+        if (archiveprefix.filter("arxiv"::equals).isPresent() && eprint.isPresent()) {
             url = INSPIRE_ARXIV_HOST + eprint.get();
         } else if (doi.isPresent()) {
             url = INSPIRE_DOI_HOST + doi.get();

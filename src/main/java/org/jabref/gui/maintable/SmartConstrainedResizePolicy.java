@@ -16,8 +16,7 @@ import org.slf4j.LoggerFactory;
  * We make sure that the width of all columns sums up to the total width of the table.
  * However, in contrast to {@link TableView#CONSTRAINED_RESIZE_POLICY} we size the columns initially by their preferred width.
  */
-public class SmartConstrainedResizePolicy
-    implements Callback<TableView.ResizeFeatures, Boolean> {
+public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFeatures, Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(
         SmartConstrainedResizePolicy.class
@@ -34,8 +33,7 @@ public class SmartConstrainedResizePolicy
 
     private Boolean initColumnSize(TableView<?> table) {
         double tableWidth = getContentWidth(table);
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns =
-            table.getVisibleLeafColumns();
+        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
         double totalWidth = visibleLeafColumns
             .stream()
             .mapToDouble(TableColumnBase::getWidth)
@@ -91,14 +89,8 @@ public class SmartConstrainedResizePolicy
 
     private Boolean constrainedResize(TableView.ResizeFeatures<?> prop) {
         TableView<?> table = prop.getTable();
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns =
-            table.getVisibleLeafColumns();
-        return constrainedResize(
-            prop,
-            false,
-            getContentWidth(table) - 2,
-            visibleLeafColumns
-        );
+        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
+        return constrainedResize(prop, false, getContentWidth(table) - 2, visibleLeafColumns);
     }
 
     private Boolean constrainedResize(
@@ -141,8 +133,7 @@ public class SmartConstrainedResizePolicy
     private Double getContentWidth(TableView<?> table) {
         try {
             // TODO: reflective access, should be removed
-            Field privateStringField =
-                TableView.class.getDeclaredField("contentWidth");
+            Field privateStringField = TableView.class.getDeclaredField("contentWidth");
             privateStringField.setAccessible(true);
             return (Double) privateStringField.get(table);
         } catch (IllegalAccessException | NoSuchFieldException e) {

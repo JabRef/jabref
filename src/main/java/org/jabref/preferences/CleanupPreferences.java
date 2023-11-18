@@ -31,8 +31,7 @@ public class CleanupPreferences {
         FieldFormatterCleanups formatterCleanups
     ) {
         this.activeJobs = FXCollections.observableSet(activeJobs);
-        this.fieldFormatterCleanups =
-            new SimpleObjectProperty<>(formatterCleanups);
+        this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
     }
 
     public EnumSet<CleanupStep> getActiveJobs() {
@@ -68,15 +67,11 @@ public class CleanupPreferences {
         return fieldFormatterCleanups.get();
     }
 
-    protected ObjectProperty<
-        FieldFormatterCleanups
-    > fieldFormatterCleanupsProperty() {
+    protected ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
         return fieldFormatterCleanups;
     }
 
-    public void setFieldFormatterCleanups(
-        FieldFormatterCleanups fieldFormatters
-    ) {
+    public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 

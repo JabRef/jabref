@@ -45,9 +45,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public class GrammarBasedSearchRule implements SearchRule {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        GrammarBasedSearchRule.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
     private final EnumSet<SearchFlags> searchFlags;
 
@@ -59,8 +57,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
-        public static final ThrowingErrorListener INSTANCE =
-            new ThrowingErrorListener();
+        public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
 
         @Override
         public void syntaxError(
@@ -77,18 +74,13 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
     }
 
-    public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags)
-        throws RecognitionException {
+    public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags) throws RecognitionException {
         this.searchFlags = searchFlags;
         databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
-    public static boolean isValid(
-        EnumSet<SearchFlags> searchFlags,
-        String query
-    ) {
-        return new GrammarBasedSearchRule(searchFlags)
-            .validateSearchStrings(query);
+    public static boolean isValid(EnumSet<SearchFlags> searchFlags, String query) {
+        return new GrammarBasedSearchRule(searchFlags).validateSearchStrings(query);
     }
 
     public ParseTree getTree() {
@@ -114,10 +106,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         tree = parser.start();
         this.query = query;
 
-        if (
-            !searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) ||
-            (databaseContext == null)
-        ) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || (databaseContext == null)) {
             return;
         }
         try {
@@ -140,10 +129,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(
-        String query,
-        BibEntry bibEntry
-    ) {
+    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
         return new PdfSearchResults(
             searchResults
                 .stream()
@@ -175,9 +161,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         public static ComparisonOperator build(String value) {
             if ("CONTAINS".equalsIgnoreCase(value) || "=".equals(value)) {
                 return CONTAINS;
-            } else if (
-                "MATCHES".equalsIgnoreCase(value) || "==".equals(value)
-            ) {
+            } else if ("MATCHES".equalsIgnoreCase(value) || "==".equals(value)) {
                 return EXACT;
             } else {
                 return DOES_NOT_CONTAIN;
@@ -199,25 +183,19 @@ public class GrammarBasedSearchRule implements SearchRule {
         ) {
             this.operator = operator;
 
-            int option = searchFlags.contains(
-                    SearchRules.SearchFlags.CASE_SENSITIVE
-                )
+            int option = searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)
                 ? 0
                 : Pattern.CASE_INSENSITIVE;
             this.fieldPattern =
                 Pattern.compile(
-                    searchFlags.contains(
-                            SearchRules.SearchFlags.REGULAR_EXPRESSION
-                        )
+                    searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)
                         ? StringUtil.stripAccents(field)
                         : "\\Q" + StringUtil.stripAccents(field) + "\\E",
                     option
                 );
             this.valuePattern =
                 Pattern.compile(
-                    searchFlags.contains(
-                            SearchRules.SearchFlags.REGULAR_EXPRESSION
-                        )
+                    searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)
                         ? StringUtil.stripAccents(value)
                         : "\\Q" + StringUtil.stripAccents(value) + "\\E",
                     option
@@ -226,11 +204,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         public boolean compare(BibEntry entry) {
             // special case for searching for entrytype=phdthesis
-            if (
-                fieldPattern
-                    .matcher(InternalField.TYPE_HEADER.getName())
-                    .matches()
-            ) {
+            if (fieldPattern.matcher(InternalField.TYPE_HEADER.getName()).matches()) {
                 return matchFieldValue(entry.getType().getName());
             }
 
@@ -250,30 +224,20 @@ public class GrammarBasedSearchRule implements SearchRule {
             if (!fieldPattern.matcher("anyfield").matches()) {
                 // Filter out the requested fields
                 fieldsKeys =
-                    fieldsKeys
-                        .stream()
-                        .filter(matchFieldKey())
-                        .collect(Collectors.toSet());
+                    fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toSet());
             }
 
             for (Field field : fieldsKeys) {
                 Optional<String> fieldValue = entry.getFieldLatexFree(field);
                 if (fieldValue.isPresent()) {
-                    if (
-                        matchFieldValue(
-                            StringUtil.stripAccents(fieldValue.get())
-                        )
-                    ) {
+                    if (matchFieldValue(StringUtil.stripAccents(fieldValue.get()))) {
                         return true;
                     }
                 }
             }
 
             // special case of asdf!=whatever and entry does not contain asdf
-            return (
-                fieldsKeys.isEmpty() &&
-                (operator == ComparisonOperator.DOES_NOT_CONTAIN)
-            );
+            return (fieldsKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN));
         }
 
         private Predicate<Field> matchFieldKey() {
@@ -303,21 +267,13 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         private final BibEntry entry;
 
-        public BibtexSearchVisitor(
-            EnumSet<SearchFlags> searchFlags,
-            BibEntry bibEntry
-        ) {
+        public BibtexSearchVisitor(EnumSet<SearchFlags> searchFlags, BibEntry bibEntry) {
             this.searchFlags = searchFlags;
             this.entry = bibEntry;
         }
 
-        public boolean comparison(
-            String field,
-            ComparisonOperator operator,
-            String value
-        ) {
-            return new Comparator(field, value, operator, searchFlags)
-                .compare(entry);
+        public boolean comparison(String field, ComparisonOperator operator, String value) {
+            return new Comparator(field, value, operator, searchFlags).compare(entry);
         }
 
         @Override
@@ -333,8 +289,7 @@ public class GrammarBasedSearchRule implements SearchRule {
                 right = right.substring(1, right.length() - 1);
             }
 
-            Optional<SearchParser.NameContext> fieldDescriptor =
-                Optional.ofNullable(context.left);
+            Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
             if (fieldDescriptor.isPresent()) {
                 return comparison(
                     fieldDescriptor.get().getText(),
@@ -342,30 +297,22 @@ public class GrammarBasedSearchRule implements SearchRule {
                     right
                 );
             } else {
-                return SearchRules
-                    .getSearchRule(searchFlags)
-                    .applyRule(right, entry);
+                return SearchRules.getSearchRule(searchFlags).applyRule(right, entry);
             }
         }
 
         @Override
-        public Boolean visitUnaryExpression(
-            SearchParser.UnaryExpressionContext ctx
-        ) {
+        public Boolean visitUnaryExpression(SearchParser.UnaryExpressionContext ctx) {
             return !visit(ctx.expression()); // negate
         }
 
         @Override
-        public Boolean visitParenExpression(
-            SearchParser.ParenExpressionContext ctx
-        ) {
+        public Boolean visitParenExpression(SearchParser.ParenExpressionContext ctx) {
             return visit(ctx.expression()); // ignore parenthesis
         }
 
         @Override
-        public Boolean visitBinaryExpression(
-            SearchParser.BinaryExpressionContext ctx
-        ) {
+        public Boolean visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
             if ("AND".equalsIgnoreCase(ctx.operator.getText())) {
                 return visit(ctx.left) && visit(ctx.right); // and
             } else {

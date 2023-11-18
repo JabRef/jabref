@@ -65,14 +65,12 @@ public class CompositeSearchBasedFetcherTest {
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
-    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers)
-        throws Exception {
-        CompositeSearchBasedFetcher compositeFetcher =
-            new CompositeSearchBasedFetcher(
-                fetchers,
-                importerPreferences,
-                Integer.MAX_VALUE
-            );
+    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(
+            fetchers,
+            importerPreferences,
+            Integer.MAX_VALUE
+        );
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
@@ -84,26 +82,20 @@ public class CompositeSearchBasedFetcherTest {
         "Fetchers: {arguments}"
     )
     @MethodSource("performSearchParameters")
-    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers)
-        throws Exception {
-        CompositeSearchBasedFetcher compositeFetcher =
-            new CompositeSearchBasedFetcher(
-                fetchers,
-                importerPreferences,
-                Integer.MAX_VALUE
-            );
+    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(
+            fetchers,
+            importerPreferences,
+            Integer.MAX_VALUE
+        );
         ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseMode.BIBTEX);
 
-        List<BibEntry> compositeResult = compositeFetcher.performSearch(
-            "quantum"
-        );
+        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
                 List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
                 fetcherResult.forEach(cleanup::doPostCleanup);
-                Assertions.assertTrue(
-                    compositeResult.containsAll(fetcherResult)
-                );
+                Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore, the test should not fail
@@ -124,21 +116,15 @@ public class CompositeSearchBasedFetcherTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        ImporterPreferences importerPreferences = mock(
-            ImporterPreferences.class
-        );
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(
             new ArXivFetcher(importFormatPreferences),
             new INSPIREFetcher(importFormatPreferences),
             new GvkFetcher(importFormatPreferences),
-            new AstrophysicsDataSystem(
-                importFormatPreferences,
-                importerPreferences
-            ),
+            new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
             new MathSciNet(importFormatPreferences),
             new ZbMATH(importFormatPreferences),
             new GoogleScholar(importFormatPreferences),

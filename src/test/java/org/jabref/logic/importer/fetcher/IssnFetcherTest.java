@@ -23,9 +23,7 @@ class IssnFetcherTest {
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importPrefs = mock(
-            ImportFormatPreferences.class
-        );
+        ImportFormatPreferences importPrefs = mock(ImportFormatPreferences.class);
         BibEntryPreferences bibEntryPrefs = mock(BibEntryPreferences.class);
         when(importPrefs.bibEntryPreferences()).thenReturn(bibEntryPrefs);
 
@@ -34,10 +32,7 @@ class IssnFetcherTest {
         bibEntry =
             new BibEntry()
                 .withField(StandardField.ISSN, "15454509")
-                .withField(
-                    StandardField.JOURNALTITLE,
-                    "Annual Review of Biochemistry"
-                )
+                .withField(StandardField.JOURNALTITLE, "Annual Review of Biochemistry")
                 .withField(StandardField.PUBLISHER, "Annual Reviews Inc.");
     }
 

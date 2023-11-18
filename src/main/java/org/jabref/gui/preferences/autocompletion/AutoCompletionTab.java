@@ -47,26 +47,19 @@ public class AutoCompletionTab
     }
 
     public void initialize() {
-        viewModel =
-            new AutoCompletionTabViewModel(
-                preferencesService.getAutoCompletePreferences()
-            );
+        viewModel = new AutoCompletionTabViewModel(preferencesService.getAutoCompletePreferences());
 
         enableAutoComplete
             .selectedProperty()
             .bindBidirectional(viewModel.enableAutoCompleteProperty());
-        autoCompleteFields
-            .textProperty()
-            .bindBidirectional(viewModel.autoCompleteFieldsProperty());
+        autoCompleteFields.textProperty().bindBidirectional(viewModel.autoCompleteFieldsProperty());
         autoCompleteFirstLast
             .selectedProperty()
             .bindBidirectional(viewModel.autoCompleteFirstLastProperty());
         autoCompleteLastFirst
             .selectedProperty()
             .bindBidirectional(viewModel.autoCompleteLastFirstProperty());
-        autoCompleteBoth
-            .selectedProperty()
-            .bindBidirectional(viewModel.autoCompleteBothProperty());
+        autoCompleteBoth.selectedProperty().bindBidirectional(viewModel.autoCompleteBothProperty());
         firstNameModeAbbreviated
             .selectedProperty()
             .bindBidirectional(viewModel.firstNameModeAbbreviatedProperty());

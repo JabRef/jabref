@@ -16,19 +16,10 @@ class AuthorListParserTest {
     private static Stream<Arguments> parseSingleAuthorCorrectly() {
         return Stream.of(
             Arguments.of("王, 军", new Author("军", "军.", null, "王", null)),
-            Arguments.of(
-                "Doe, John",
-                new Author("John", "J.", null, "Doe", null)
-            ),
+            Arguments.of("Doe, John", new Author("John", "J.", null, "Doe", null)),
             Arguments.of(
                 "von Berlichingen zu Hornberg, Johann Gottfried",
-                new Author(
-                    "Johann Gottfried",
-                    "J. G.",
-                    "von",
-                    "Berlichingen zu Hornberg",
-                    null
-                )
+                new Author("Johann Gottfried", "J. G.", "von", "Berlichingen zu Hornberg", null)
             ),
             Arguments.of(
                 "{Robert and Sons, Inc.}",
@@ -40,23 +31,11 @@ class AuthorListParserTest {
             ),
             Arguments.of(
                 "de la Vallée Poussin, Jean Charles Gabriel",
-                new Author(
-                    "Jean Charles Gabriel",
-                    "J. C. G.",
-                    "de la",
-                    "Vallée Poussin",
-                    null
-                )
+                new Author("Jean Charles Gabriel", "J. C. G.", "de la", "Vallée Poussin", null)
             ),
             Arguments.of(
                 "de la Vallée Poussin, J. C. G.",
-                new Author(
-                    "J. C. G.",
-                    "J. C. G.",
-                    "de la",
-                    "Vallée Poussin",
-                    null
-                )
+                new Author("J. C. G.", "J. C. G.", "de la", "Vallée Poussin", null)
             ),
             Arguments.of(
                 "{K}ent-{B}oswell, E. S.",
@@ -80,10 +59,7 @@ class AuthorListParserTest {
 
     @ParameterizedTest
     @MethodSource
-    void parseSingleAuthorCorrectly(
-        String authorsString,
-        Author authorsParsed
-    ) {
+    void parseSingleAuthorCorrectly(String authorsString, Author authorsParsed) {
         assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
     }
 

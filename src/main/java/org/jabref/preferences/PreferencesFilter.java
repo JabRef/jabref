@@ -23,11 +23,7 @@ public class PreferencesFilter {
             .entrySet()
             .stream()
             .map(entry ->
-                new PreferenceOption(
-                    entry.getKey(),
-                    entry.getValue(),
-                    defaults.get(entry.getKey())
-                )
+                new PreferenceOption(entry.getKey(), entry.getValue(), defaults.get(entry.getKey()))
             )
             .collect(Collectors.toList());
     }
@@ -46,8 +42,7 @@ public class PreferencesFilter {
         STRING,
     }
 
-    public static class PreferenceOption
-        implements Comparable<PreferenceOption> {
+    public static class PreferenceOption implements Comparable<PreferenceOption> {
 
         private final String key;
         private final Object value;
@@ -60,13 +55,8 @@ public class PreferencesFilter {
             this.defaultValue = Optional.ofNullable(defaultValue);
             this.type = Objects.requireNonNull(getType(value));
 
-            if (
-                (defaultValue != null) &&
-                !Objects.equals(this.type, getType(defaultValue))
-            ) {
-                throw new IllegalStateException(
-                    "types must match between default value and value"
-                );
+            if ((defaultValue != null) && !Objects.equals(this.type, getType(defaultValue))) {
+                throw new IllegalStateException("types must match between default value and value");
             }
         }
 
@@ -90,13 +80,7 @@ public class PreferencesFilter {
 
         @Override
         public String toString() {
-            return String.format(
-                "%s: %s=%s (%s)",
-                type,
-                key,
-                value,
-                defaultValue.orElse("NULL")
-            );
+            return String.format("%s: %s=%s (%s)", type, key, value, defaultValue.orElse("NULL"));
         }
 
         public String getKey() {

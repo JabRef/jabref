@@ -19,11 +19,7 @@ public class StringLengthComparatorTest {
 
     @ParameterizedTest
     @MethodSource("tests")
-    void compareStringLength(
-        int comparisonResult,
-        String firstString,
-        String secondString
-    ) {
+    void compareStringLength(int comparisonResult, String firstString, String secondString) {
         assertEquals(comparisonResult, slc.compare(firstString, secondString));
     }
 

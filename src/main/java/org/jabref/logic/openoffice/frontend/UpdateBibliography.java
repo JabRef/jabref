@@ -39,13 +39,7 @@ public class UpdateBibliography {
     ) throws WrappedTargetException, CreationException, NoDocumentException {
         clearBibTextSectionContent2(doc);
 
-        populateBibTextSection(
-            doc,
-            frontend,
-            bibliography,
-            style,
-            alwaysAddCitedOnPages
-        );
+        populateBibTextSection(doc, frontend, bibliography, style, alwaysAddCitedOnPages);
     }
 
     /**
@@ -53,8 +47,7 @@ public class UpdateBibliography {
      * <p>
      * Only called from `clearBibTextSectionContent2`
      */
-    private static void createBibTextSection2(XTextDocument doc)
-        throws CreationException {
+    private static void createBibTextSection2(XTextDocument doc) throws CreationException {
         // Always creating at the end of the document.
         // Alternatively, we could receive a cursor.
         XTextCursor textCursor = doc.getText().createTextCursor();
@@ -75,9 +68,7 @@ public class UpdateBibliography {
             createBibTextSection2(doc);
         } else {
             // Clear it
-            XTextCursor cursor = doc
-                .getText()
-                .createTextCursorByRange(sectionRange.get());
+            XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());
             cursor.setString("");
         }
     }
@@ -95,12 +86,9 @@ public class UpdateBibliography {
         boolean alwaysAddCitedOnPages
     )
         throws CreationException, IllegalArgumentException, NoDocumentException, WrappedTargetException {
-        XTextRange sectionRange = getBibliographyRange(doc)
-            .orElseThrow(IllegalStateException::new);
+        XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
-        XTextCursor cursor = doc
-            .getText()
-            .createTextCursorByRange(sectionRange);
+        XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange);
 
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);
@@ -114,11 +102,8 @@ public class UpdateBibliography {
         cursor.collapseToEnd();
 
         // remove the initial empty paragraph from the section.
-        sectionRange =
-            getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
-        XTextCursor initialParagraph = doc
-            .getText()
-            .createTextCursorByRange(sectionRange);
+        sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
+        XTextCursor initialParagraph = doc.getText().createTextCursorByRange(sectionRange);
         initialParagraph.collapseToStart();
         initialParagraph.goRight((short) 1, true);
         initialParagraph.setString("");

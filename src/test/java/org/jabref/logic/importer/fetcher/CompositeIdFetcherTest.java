@@ -31,9 +31,7 @@ class CompositeIdFetcherTest {
 
     private CompositeIdFetcher compositeIdFetcher;
 
-    public static Stream<
-        Arguments
-    > performSearchByIdReturnsCorrectEntryForIdentifier() {
+    public static Stream<Arguments> performSearchByIdReturnsCorrectEntryForIdentifier() {
         return Stream.of(
             Arguments.arguments(
                 "performSearchByIdReturnsCorrectEntryForArXivId",
@@ -51,14 +49,8 @@ class CompositeIdFetcherTest {
                     .withField(StandardField.MONTH, "aug")
                     .withField(StandardField.NUMBER, "2")
                     .withField(StandardField.VOLUME, "934")
-                    .withField(
-                        StandardField.PUBLISHER,
-                        "American Astronomical Society"
-                    )
-                    .withField(
-                        StandardField.JOURNAL,
-                        "The Astrophysical Journal"
-                    )
+                    .withField(StandardField.PUBLISHER, "American Astronomical Society")
+                    .withField(StandardField.JOURNAL, "The Astrophysical Journal")
                     .withField(StandardField.PAGES, "172")
                     .withField(
                         StandardField.ABSTRACT,
@@ -67,10 +59,7 @@ class CompositeIdFetcherTest {
                     .withField(StandardField.DOI, "10.3847/1538-4357/ac78ea")
                     .withField(StandardField.EPRINT, "2110.02957")
                     .withField(StandardField.DOI, "10.3847/1538-4357/ac78ea")
-                    .withField(
-                        StandardField.FILE,
-                        ":http\\://arxiv.org/pdf/2110.02957v1:PDF"
-                    )
+                    .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2110.02957v1:PDF")
                     .withField(StandardField.EPRINTTYPE, "arXiv")
                     .withField(StandardField.EPRINTCLASS, "astro-ph.GA")
                     .withField(
@@ -143,10 +132,7 @@ class CompositeIdFetcherTest {
             Answers.RETURNS_DEEP_STUBS
         );
         // Needed for ArXiv Fetcher keyword processing
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         compositeIdFetcher = new CompositeIdFetcher(importFormatPreferences);
     }
 
@@ -154,10 +140,7 @@ class CompositeIdFetcherTest {
     @ValueSource(strings = "arZiv:2110.02957")
     void performSearchByIdReturnsEmptyForInvalidId(String groundInvalidArXivId)
         throws FetcherException {
-        assertEquals(
-            Optional.empty(),
-            compositeIdFetcher.performSearchById(groundInvalidArXivId)
-        );
+        assertEquals(Optional.empty(), compositeIdFetcher.performSearchById(groundInvalidArXivId));
     }
 
     @ParameterizedTest(name = "{index} {0}")
@@ -167,9 +150,6 @@ class CompositeIdFetcherTest {
         BibEntry bibEntry,
         String identifier
     ) throws FetcherException {
-        assertEquals(
-            Optional.of(bibEntry),
-            compositeIdFetcher.performSearchById(identifier)
-        );
+        assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
     }
 }

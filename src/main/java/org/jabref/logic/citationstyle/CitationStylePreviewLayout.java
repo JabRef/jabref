@@ -19,10 +19,7 @@ public class CitationStylePreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(
-        BibEntry entry,
-        BibDatabaseContext databaseContext
-    ) {
+    public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
         return CitationStyleGenerator.generateCitation(
             entry,
             citationStyle.getSource(),

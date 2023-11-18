@@ -27,12 +27,9 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
 
     public static final String FETCHER_NAME = "Springer";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SpringerLink.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
-    private static final String API_URL =
-        "https://api.springer.com/meta/v1/json";
+    private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
 
@@ -47,9 +44,7 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
         Objects.requireNonNull(entry);
 
         // Try unique DOI first
-        Optional<DOI> doi = entry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {
             return Optional.empty();
@@ -58,18 +53,12 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest
                 .get(API_URL)
-                .queryString(
-                    "api_key",
-                    importerPreferences.getApiKey(getName()).orElse(API_KEY)
-                )
+                .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY))
                 .queryString("q", String.format("doi:%s", doi.get().getDOI()))
                 .asJson();
             if (jsonResponse.getBody() != null) {
                 JSONObject json = jsonResponse.getBody().getObject();
-                int results = json
-                    .getJSONArray("result")
-                    .getJSONObject(0)
-                    .getInt("total");
+                int results = json.getJSONArray("result").getJSONObject(0).getInt("total");
 
                 if (results > 0) {
                     LOGGER.info("Fulltext PDF found @ Springer.");
@@ -77,10 +66,7 @@ public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
                         new URL(
                             "http",
                             CONTENT_HOST,
-                            String.format(
-                                "/content/pdf/%s.pdf",
-                                doi.get().getDOI()
-                            )
+                            String.format("/content/pdf/%s.pdf", doi.get().getDOI())
                         )
                     );
                 }

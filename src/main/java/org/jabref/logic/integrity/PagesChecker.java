@@ -35,8 +35,7 @@ public class PagesChecker implements ValueChecker {
 
     public PagesChecker(BibDatabaseContext databaseContext) {
         if (databaseContext.isBiblatexMode()) {
-            isValidPageNumber =
-                Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
+            isValidPageNumber = Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
         } else {
             isValidPageNumber = Pattern.compile(PAGES_EXP_BIBTEX).asPredicate();
         }
@@ -63,9 +62,7 @@ public class PagesChecker implements ValueChecker {
                 .map(String::trim)
                 .anyMatch(pageRange -> !isValidPageNumber.test(pageRange))
         ) {
-            return Optional.of(
-                Localization.lang("should contain a valid page number range")
-            );
+            return Optional.of(Localization.lang("should contain a valid page number range"));
         }
         return Optional.empty();
     }

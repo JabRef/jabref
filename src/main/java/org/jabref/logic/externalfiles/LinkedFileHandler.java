@@ -18,9 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class LinkedFileHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LinkedFileHandler.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileHandler.class);
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
@@ -41,16 +39,12 @@ public class LinkedFileHandler {
     }
 
     public boolean moveToDefaultDirectory() throws IOException {
-        Optional<Path> targetDirectory =
-            databaseContext.getFirstExistingFileDir(filePreferences);
+        Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
             return false;
         }
 
-        Optional<Path> oldFile = fileEntry.findIn(
-            databaseContext,
-            filePreferences
-        );
+        Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
         if (oldFile.isEmpty()) {
             // Could not find file
             return false;
@@ -95,14 +89,9 @@ public class LinkedFileHandler {
         return renameToName(getSuggestedFileName(), false);
     }
 
-    public boolean renameToName(
-        String targetFileName,
-        boolean overwriteExistingFile
-    ) throws IOException {
-        Optional<Path> oldFile = fileEntry.findIn(
-            databaseContext,
-            filePreferences
-        );
+    public boolean renameToName(String targetFileName, boolean overwriteExistingFile)
+        throws IOException {
+        Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
         if (oldFile.isEmpty()) {
             return false;
         }
@@ -117,11 +106,7 @@ public class LinkedFileHandler {
 
         // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
         // nonetheless rename files to a new name which just differs by case.
-        if (
-            Files.exists(newPath) &&
-            !pathsDifferOnlyByCase &&
-            !overwriteExistingFile
-        ) {
+        if (Files.exists(newPath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
             LOGGER.debug(
                 "The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.",
                 oldPath,
@@ -130,11 +115,7 @@ public class LinkedFileHandler {
             return false;
         }
 
-        if (
-            Files.exists(newPath) &&
-            !pathsDifferOnlyByCase &&
-            overwriteExistingFile
-        ) {
+        if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
             Files.createDirectories(newPath.getParent());
             LOGGER.debug("Overwriting existing file {}", newPath);
             Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
@@ -150,18 +131,14 @@ public class LinkedFileHandler {
     }
 
     private String relativize(Path path) {
-        List<Path> fileDirectories = databaseContext.getFileDirectories(
-            filePreferences
-        );
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
         return FileUtil.relativize(path, fileDirectories).toString();
     }
 
     public String getSuggestedFileName() {
         String oldFileName = fileEntry.getLink();
 
-        String extension = FileUtil
-            .getFileExtension(oldFileName)
-            .orElse(fileEntry.getFileType());
+        String extension = FileUtil.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
         return getSuggestedFileName(extension);
     }
 
@@ -198,26 +175,17 @@ public class LinkedFileHandler {
             .get()
             .getParent()
             .resolve(targetFileName);
-        Path oldFilePath = flEntry
-            .findIn(databaseContext, filePreferences)
-            .get();
+        Path oldFilePath = flEntry.findIn(databaseContext, filePreferences).get();
         // Check if file already exists in directory with different case.
         // This is necessary because other entries may have such a file.
         Optional<Path> matchedByDiffCase = Optional.empty();
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase =
                 stream
-                    .filter(name ->
-                        name
-                            .toString()
-                            .equalsIgnoreCase(targetFilePath.toString())
-                    )
+                    .filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
                     .findFirst();
         } catch (IOException e) {
-            LOGGER.error(
-                "Could not get the list of files in target directory",
-                e
-            );
+            LOGGER.error("Could not get the list of files in target directory", e);
         }
         return matchedByDiffCase;
     }

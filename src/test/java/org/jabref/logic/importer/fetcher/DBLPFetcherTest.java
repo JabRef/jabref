@@ -25,9 +25,7 @@ public class DBLPFetcherTest {
     @BeforeEach
     public void setUp() {
         dblpFetcher =
-            new DBLPFetcher(
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
-            );
+            new DBLPFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         entry = new BibEntry();
 
         entry.setType(StandardEntryType.Article);

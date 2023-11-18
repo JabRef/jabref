@@ -27,8 +27,7 @@ import org.jabref.preferences.PreferencesService;
 /**
  * A clickable icons column for DOIs, URLs, URIs and EPrints.
  */
-public class LinkedIdentifierColumn
-    extends MainTableColumn<Map<Field, String>> {
+public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> {
 
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
@@ -50,20 +49,12 @@ public class LinkedIdentifierColumn
         this.preferences = preferences;
 
         Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
-        Tooltip.install(
-            headerGraphic,
-            new Tooltip(Localization.lang("Linked identifiers"))
-        );
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
         this.setGraphic(headerGraphic);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
-        MainTableColumnFactory.setExactWidth(
-            this,
-            ColumnPreferences.ICON_COLUMN_WIDTH
-        );
+        MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
         this.setResizable(false);
-        this.setCellValueFactory(cellData ->
-                cellData.getValue().getLinkedIdentifiers()
-            );
+        this.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
         new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()
             .withGraphic(this::createIdentifierGraphic)
             .withTooltip(this::createIdentifierTooltip)
@@ -71,16 +62,8 @@ public class LinkedIdentifierColumn
             .withOnMouseClickedEvent((entry, linkedFiles) ->
                 event -> {
                     // If we only have one identifer, open directly
-                    if (
-                        (linkedFiles.size() == 1) &&
-                        (event.getButton() == MouseButton.PRIMARY)
-                    ) {
-                        new OpenUrlAction(
-                            dialogService,
-                            stateManager,
-                            preferences
-                        )
-                            .execute();
+                    if ((linkedFiles.size() == 1) && (event.getButton() == MouseButton.PRIMARY)) {
+                        new OpenUrlAction(dialogService, stateManager, preferences).execute();
                     }
                 }
             )

@@ -30,21 +30,11 @@ public class OpenUrlAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferences = preferences;
 
-        BooleanExpression fieldIsSet =
-            ActionHelper.isAnyFieldSetForSelectedEntry(
-                List.of(
-                    StandardField.URL,
-                    StandardField.DOI,
-                    StandardField.URI,
-                    StandardField.EPRINT
-                ),
-                stateManager
-            );
-        this.executable.bind(
-                ActionHelper
-                    .needsEntriesSelected(1, stateManager)
-                    .and(fieldIsSet)
-            );
+        BooleanExpression fieldIsSet = ActionHelper.isAnyFieldSetForSelectedEntry(
+            List.of(StandardField.URL, StandardField.DOI, StandardField.URI, StandardField.EPRINT),
+            stateManager
+        );
+        this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager).and(fieldIsSet));
     }
 
     @Override
@@ -52,8 +42,7 @@ public class OpenUrlAction extends SimpleCommand {
         stateManager
             .getActiveDatabase()
             .ifPresent(databaseContext -> {
-                final List<BibEntry> entries =
-                    stateManager.getSelectedEntries();
+                final List<BibEntry> entries = stateManager.getSelectedEntries();
 
                 if (entries.size() != 1) {
                     dialogService.notify(
@@ -93,11 +82,7 @@ public class OpenUrlAction extends SimpleCommand {
                             field.equals(StandardField.DOI) &&
                             preferences.getDOIPreferences().isUseCustom()
                         ) {
-                            JabRefDesktop.openCustomDoi(
-                                link.get(),
-                                preferences,
-                                dialogService
-                            );
+                            JabRefDesktop.openCustomDoi(link.get(), preferences, dialogService);
                         } else {
                             JabRefDesktop.openExternalViewer(
                                 databaseContext,

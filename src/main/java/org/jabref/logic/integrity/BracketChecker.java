@@ -19,9 +19,7 @@ public class BracketChecker implements ValueChecker {
                 counter++;
             } else if (a == '}') {
                 if (counter == 0) {
-                    return Optional.of(
-                        Localization.lang("unexpected closing curly bracket")
-                    );
+                    return Optional.of(Localization.lang("unexpected closing curly bracket"));
                 } else {
                     counter--;
                 }
@@ -29,9 +27,7 @@ public class BracketChecker implements ValueChecker {
         }
 
         if (counter > 0) {
-            return Optional.of(
-                Localization.lang("unexpected opening curly bracket")
-            );
+            return Optional.of(Localization.lang("unexpected opening curly bracket"));
         }
 
         return Optional.empty();

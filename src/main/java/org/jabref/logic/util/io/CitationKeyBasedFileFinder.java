@@ -46,10 +46,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         List<Path> result = new ArrayList<>();
 
         // First scan directories
-        Set<Path> filesWithExtension = findFilesByExtension(
-            directories,
-            extensions
-        );
+        Set<Path> filesWithExtension = findFilesByExtension(directories, extensions);
 
         // Now look for keys
         for (Path file : filesWithExtension) {
@@ -71,9 +68,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
     }
 
     private boolean matches(String filename, String citeKey) {
-        boolean startsWithKey = filename.startsWith(
-            FileNameCleaner.cleanFileName(citeKey)
-        );
+        boolean startsWithKey = filename.startsWith(FileNameCleaner.cleanFileName(citeKey));
         if (startsWithKey) {
             // The file name starts with the key, that's already a good start
             // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
@@ -88,16 +83,11 @@ class CitationKeyBasedFileFinder implements FileFinder {
     /**
      * Returns a list of all files in the given directories which have one of the given extension.
      */
-    private Set<Path> findFilesByExtension(
-        List<Path> directories,
-        List<String> extensions
-    ) throws IOException {
+    private Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions)
+        throws IOException {
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
-        BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (
-                path,
-                attributes
-            ) ->
+        BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) ->
             !Files.isDirectory(path) &&
             extensions.contains(FileUtil.getFileExtension(path).orElse(""));
 

@@ -118,11 +118,8 @@ public class ComplexSearchQuery {
 
         // Just check for set equality, order does not matter
         if (
-            !(getDefaultFieldPhrases()
-                    .containsAll(that.getDefaultFieldPhrases()) &&
-                that
-                    .getDefaultFieldPhrases()
-                    .containsAll(getDefaultFieldPhrases()))
+            !(getDefaultFieldPhrases().containsAll(that.getDefaultFieldPhrases()) &&
+                that.getDefaultFieldPhrases().containsAll(getDefaultFieldPhrases()))
         ) {
             return false;
         }
@@ -165,11 +162,7 @@ public class ComplexSearchQuery {
         ) {
             return false;
         }
-        if (
-            getDOI().isPresent()
-                ? !getDOI().equals(that.getDOI())
-                : that.getDOI().isPresent()
-        ) {
+        if (getDOI().isPresent() ? !getDOI().equals(that.getDOI()) : that.getDOI().isPresent()) {
             return false;
         }
         return getJournal().isPresent()
@@ -196,10 +189,8 @@ public class ComplexSearchQuery {
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
-        getSingleYear()
-            .ifPresent(singleYear -> stringJoiner.add(singleYear.toString()));
-        getFromYear()
-            .ifPresent(fromYear -> stringJoiner.add(fromYear.toString()));
+        getSingleYear().ifPresent(singleYear -> stringJoiner.add(singleYear.toString()));
+        getFromYear().ifPresent(fromYear -> stringJoiner.add(fromYear.toString()));
         getToYear().ifPresent(toYear -> stringJoiner.add(toYear.toString()));
         getJournal().ifPresent(stringJoiner::add);
         getDOI().ifPresent(newElement -> stringJoiner.add("doi:" + newElement));
@@ -226,20 +217,13 @@ public class ComplexSearchQuery {
 
         private ComplexSearchQueryBuilder() {}
 
-        public ComplexSearchQueryBuilder defaultFieldPhrase(
-            String defaultFieldPhrase
-        ) {
+        public ComplexSearchQueryBuilder defaultFieldPhrase(String defaultFieldPhrase) {
             if (Objects.requireNonNull(defaultFieldPhrase).isBlank()) {
-                throw new IllegalArgumentException(
-                    "Parameter must not be blank"
-                );
+                throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
             this.defaultFieldPhrases.add(
-                    String.format(
-                        "\"%s\"",
-                        defaultFieldPhrase.replace("\"", "")
-                    )
+                    String.format("\"%s\"", defaultFieldPhrase.replace("\"", ""))
                 );
             return this;
         }
@@ -249,9 +233,7 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQueryBuilder author(String author) {
             if (Objects.requireNonNull(author).isBlank()) {
-                throw new IllegalArgumentException(
-                    "Parameter must not be blank"
-                );
+                throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
             this.authors.add(String.format("\"%s\"", author.replace("\"", "")));
@@ -263,14 +245,10 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQueryBuilder titlePhrase(String titlePhrase) {
             if (Objects.requireNonNull(titlePhrase).isBlank()) {
-                throw new IllegalArgumentException(
-                    "Parameter must not be blank"
-                );
+                throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
-            this.titlePhrases.add(
-                    String.format("\"%s\"", titlePhrase.replace("\"", ""))
-                );
+            this.titlePhrases.add(String.format("\"%s\"", titlePhrase.replace("\"", "")));
             return this;
         }
 
@@ -279,21 +257,14 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQueryBuilder abstractPhrase(String abstractPhrase) {
             if (Objects.requireNonNull(abstractPhrase).isBlank()) {
-                throw new IllegalArgumentException(
-                    "Parameter must not be blank"
-                );
+                throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
-            this.titlePhrases.add(
-                    String.format("\"%s\"", abstractPhrase.replace("\"", ""))
-                );
+            this.titlePhrases.add(String.format("\"%s\"", abstractPhrase.replace("\"", "")));
             return this;
         }
 
-        public ComplexSearchQueryBuilder fromYearAndToYear(
-            Integer fromYear,
-            Integer toYear
-        ) {
+        public ComplexSearchQueryBuilder fromYearAndToYear(Integer fromYear, Integer toYear) {
             if (Objects.nonNull(singleYear)) {
                 throw new IllegalArgumentException(
                     "You can not use single year and year range search."
@@ -316,9 +287,7 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder journal(String journal) {
             if (Objects.requireNonNull(journal).isBlank()) {
-                throw new IllegalArgumentException(
-                    "Parameter must not be blank"
-                );
+                throw new IllegalArgumentException("Parameter must not be blank");
             }
             this.journal = String.format("\"%s\"", journal.replace("\"", ""));
             return this;
@@ -326,9 +295,7 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder DOI(String doi) {
             if (Objects.requireNonNull(doi).isBlank()) {
-                throw new IllegalArgumentException(
-                    "Parameter must not be blank"
-                );
+                throw new IllegalArgumentException("Parameter must not be blank");
             }
             this.doi = doi.replace("\"", "");
             return this;
@@ -361,9 +328,7 @@ public class ComplexSearchQuery {
          */
         public ComplexSearchQuery build() throws IllegalStateException {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {
-                throw new IllegalStateException(
-                    "At least one text field has to be set"
-                );
+                throw new IllegalStateException("At least one text field has to be set");
             }
             return new ComplexSearchQuery(
                 defaultFieldPhrases,
@@ -411,17 +376,12 @@ public class ComplexSearchQuery {
 
         private boolean yearFieldsAreEmpty() {
             return (
-                Objects.isNull(singleYear) &&
-                Objects.isNull(fromYear) &&
-                Objects.isNull(toYear)
+                Objects.isNull(singleYear) && Objects.isNull(fromYear) && Objects.isNull(toYear)
             );
         }
 
         private boolean stringListIsBlank(List<String> stringList) {
-            return (
-                Objects.isNull(stringList) ||
-                stringList.stream().allMatch(String::isBlank)
-            );
+            return (Objects.isNull(stringList) || stringList.stream().allMatch(String::isBlank));
         }
     }
 }

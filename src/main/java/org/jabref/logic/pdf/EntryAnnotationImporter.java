@@ -34,9 +34,7 @@ public class EntryAnnotationImporter {
         return entry
             .getFiles()
             .stream()
-            .filter(parsedFileField ->
-                "pdf".equalsIgnoreCase(parsedFileField.getFileType())
-            )
+            .filter(parsedFileField -> "pdf".equalsIgnoreCase(parsedFileField.getFileType()))
             .filter(parsedFileField -> !parsedFileField.isOnlineLink())
             .collect(Collectors.toList());
     }
@@ -58,9 +56,7 @@ public class EntryAnnotationImporter {
         for (LinkedFile linkedFile : this.getFilteredFileList()) {
             linkedFile
                 .findIn(databaseContext, filePreferences)
-                .ifPresent(file ->
-                    annotations.put(file, importer.importAnnotations(file))
-                );
+                .ifPresent(file -> annotations.put(file, importer.importAnnotations(file)));
         }
         return annotations;
     }

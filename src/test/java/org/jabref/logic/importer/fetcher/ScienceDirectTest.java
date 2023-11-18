@@ -19,16 +19,13 @@ import org.junit.jupiter.api.Test;
 @FetcherTest
 class ScienceDirectTest {
 
-    private final ImporterPreferences importerPreferences = mock(
-        ImporterPreferences.class
-    );
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private ScienceDirect finder;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }
@@ -67,10 +64,7 @@ class ScienceDirectTest {
     @DisabledOnCIServer("CI server is blocked")
     void findByDoiWorksForBoneArticle() throws IOException {
         // The DOI is an example by a user taken from https://github.com/JabRef/jabref/issues/5860
-        entry.setField(
-            StandardField.DOI,
-            "https://doi.org/10.1016/j.bone.2020.115226"
-        );
+        entry.setField(StandardField.DOI, "https://doi.org/10.1016/j.bone.2020.115226");
 
         assertEquals(
             Optional.of(

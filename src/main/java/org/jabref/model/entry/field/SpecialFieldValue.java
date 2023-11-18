@@ -43,9 +43,7 @@ public enum SpecialFieldValue {
             case 3 -> RANK_3;
             case 4 -> RANK_4;
             case 5 -> RANK_5;
-            default -> throw new UnsupportedOperationException(
-                ranking + "is not a valid ranking"
-            );
+            default -> throw new UnsupportedOperationException(ranking + "is not a valid ranking");
         };
     }
 
@@ -65,9 +63,7 @@ public enum SpecialFieldValue {
             case RANK_3 -> 3;
             case RANK_4 -> 4;
             case RANK_5 -> 5;
-            default -> throw new UnsupportedOperationException(
-                this + "is not a valid ranking"
-            );
+            default -> throw new UnsupportedOperationException(this + "is not a valid ranking");
         };
     }
 }

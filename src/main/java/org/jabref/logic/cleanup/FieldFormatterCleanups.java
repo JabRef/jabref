@@ -40,9 +40,7 @@ public class FieldFormatterCleanups {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FieldFormatterCleanups.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanups.class);
 
     /**
      * This parses the key/list map of fields and clean up actions for the field.
@@ -55,32 +53,25 @@ public class FieldFormatterCleanups {
      * <p>
      * Example: <code>pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]</code>
      */
-    private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN =
-        Pattern.compile("([^\\[]+)\\[([^]]+)]");
+    private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile(
+        "([^\\[]+)\\[([^]]+)]"
+    );
 
     static {
         DEFAULT_SAVE_ACTIONS =
             List.of(
-                new FieldFormatterCleanup(
-                    StandardField.PAGES,
-                    new NormalizePagesFormatter()
-                ),
-                new FieldFormatterCleanup(
-                    StandardField.DATE,
-                    new NormalizeDateFormatter()
-                ),
-                new FieldFormatterCleanup(
-                    StandardField.MONTH,
-                    new NormalizeMonthFormatter()
-                ),
+                new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
+                new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
                 new FieldFormatterCleanup(
                     InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD,
                     new ReplaceUnicodeLigaturesFormatter()
                 )
             );
 
-        List<FieldFormatterCleanup> recommendedBibtexFormatters =
-            new ArrayList<>(DEFAULT_SAVE_ACTIONS);
+        List<FieldFormatterCleanup> recommendedBibtexFormatters = new ArrayList<>(
+            DEFAULT_SAVE_ACTIONS
+        );
         recommendedBibtexFormatters.addAll(
             List.of(
                 new FieldFormatterCleanup(
@@ -97,17 +88,14 @@ public class FieldFormatterCleanups {
                 )
             )
         );
-        RECOMMEND_BIBTEX_ACTIONS =
-            Collections.unmodifiableList(recommendedBibtexFormatters);
+        RECOMMEND_BIBTEX_ACTIONS = Collections.unmodifiableList(recommendedBibtexFormatters);
 
-        List<FieldFormatterCleanup> recommendedBiblatexFormatters =
-            new ArrayList<>(DEFAULT_SAVE_ACTIONS);
+        List<FieldFormatterCleanup> recommendedBiblatexFormatters = new ArrayList<>(
+            DEFAULT_SAVE_ACTIONS
+        );
         recommendedBiblatexFormatters.addAll(
             List.of(
-                new FieldFormatterCleanup(
-                    StandardField.TITLE,
-                    new HtmlToUnicodeFormatter()
-                ),
+                new FieldFormatterCleanup(StandardField.TITLE, new HtmlToUnicodeFormatter()),
                 new FieldFormatterCleanup(
                     InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD,
                     new LatexToUnicodeFormatter()
@@ -115,17 +103,13 @@ public class FieldFormatterCleanups {
             )
         );
         // DO NOT ADD OrdinalsToSuperscriptFormatter here, because this causes issues. See https://github.com/JabRef/jabref/issues/2596.
-        RECOMMEND_BIBLATEX_ACTIONS =
-            Collections.unmodifiableList(recommendedBiblatexFormatters);
+        RECOMMEND_BIBLATEX_ACTIONS = Collections.unmodifiableList(recommendedBiblatexFormatters);
     }
 
     private final boolean enabled;
     private final List<FieldFormatterCleanup> actions;
 
-    public FieldFormatterCleanups(
-        boolean enabled,
-        List<FieldFormatterCleanup> actions
-    ) {
+    public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions) {
         this.enabled = enabled;
         this.actions = Objects.requireNonNull(actions);
     }
@@ -160,11 +144,7 @@ public class FieldFormatterCleanups {
         for (Map.Entry<Field, List<String>> entry : groupedByField.entrySet()) {
             result.append(entry.getKey().getName());
 
-            StringJoiner joiner = new StringJoiner(
-                ",",
-                "[",
-                "]" + newLineSeparator
-            );
+            StringJoiner joiner = new StringJoiner(",", "[", "]" + newLineSeparator);
             entry.getValue().forEach(joiner::add);
             result.append(joiner);
         }
@@ -222,14 +202,9 @@ public class FieldFormatterCleanups {
         List<FieldFormatterCleanup> result = new ArrayList<>();
 
         // first remove all newlines for easier parsing
-        String formatterStringWithoutLineBreaks = StringUtil.unifyLineBreaks(
-            formatterString,
-            ""
-        );
+        String formatterStringWithoutLineBreaks = StringUtil.unifyLineBreaks(formatterString, "");
 
-        Matcher matcher = FIELD_FORMATTER_CLEANUP_PATTERN.matcher(
-            formatterStringWithoutLineBreaks
-        );
+        Matcher matcher = FIELD_FORMATTER_CLEANUP_PATTERN.matcher(formatterStringWithoutLineBreaks);
         while (matcher.find()) {
             String fieldKey = matcher.group(1);
             Field field = FieldFactory.parseField(fieldKey);
@@ -254,10 +229,7 @@ public class FieldFormatterCleanups {
             );
             String formatterString = formatterMetaList.get(1);
 
-            return new FieldFormatterCleanups(
-                enablementStatus,
-                parse(formatterString)
-            );
+            return new FieldFormatterCleanups(enablementStatus, parse(formatterString));
         } else {
             // return default actions
             return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
@@ -285,10 +257,7 @@ public class FieldFormatterCleanups {
             return true;
         }
         if (obj instanceof FieldFormatterCleanups other) {
-            return (
-                Objects.equals(actions, other.actions) &&
-                (enabled == other.enabled)
-            );
+            return (Objects.equals(actions, other.actions) && (enabled == other.enabled));
         }
         return false;
     }
@@ -296,13 +265,7 @@ public class FieldFormatterCleanups {
     @Override
     public String toString() {
         return (
-            "FieldFormatterCleanups{" +
-            "enabled=" +
-            enabled +
-            "," +
-            "actions=" +
-            actions +
-            "}"
+            "FieldFormatterCleanups{" + "enabled=" + enabled + "," + "actions=" + actions + "}"
         );
     }
 }

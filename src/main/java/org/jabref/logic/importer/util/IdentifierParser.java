@@ -43,12 +43,8 @@ public class IdentifierParser {
     }
 
     private Optional<? extends Identifier> parseEprint(String eprint) {
-        Optional<String> eprintTypeOpt = entry.getField(
-            StandardField.EPRINTTYPE
-        );
-        Optional<String> archivePrefixOpt = entry.getField(
-            StandardField.ARCHIVEPREFIX
-        );
+        Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
+        Optional<String> archivePrefixOpt = entry.getField(StandardField.ARCHIVEPREFIX);
 
         String eprintType = eprintTypeOpt.or(() -> archivePrefixOpt).orElse("");
         if ("arxiv".equalsIgnoreCase(eprintType)) {

@@ -31,9 +31,7 @@ public class AutoSetFileLinksUtilTest {
         false,
         ';'
     );
-    private final BibDatabaseContext databaseContext = mock(
-        BibDatabaseContext.class
-    );
+    private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
     private Path path = null;
 
@@ -45,9 +43,7 @@ public class AutoSetFileLinksUtilTest {
         when(filePreferences.getExternalFileTypes())
             .thenReturn(
                 FXCollections.observableSet(
-                    new TreeSet<>(
-                        ExternalFileTypes.getDefaultExternalFileTypes()
-                    )
+                    new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())
                 )
             );
     }
@@ -69,10 +65,8 @@ public class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    public void testFindAssociatedNotLinkedFilesForEmptySearchDir()
-        throws Exception {
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(false);
+    public void testFindAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
             databaseContext,
             filePreferences,

@@ -41,8 +41,7 @@ class GroupsParserTest {
 
     @Test
     // For https://github.com/JabRef/jabref/issues/1681
-    void fromStringParsesExplicitGroupWithEscapedCharacterInName()
-        throws Exception {
+    void fromStringParsesExplicitGroupWithEscapedCharacterInName() throws Exception {
         ExplicitGroup expected = new ExplicitGroup(
             "B{\\\"{o}}hmer",
             GroupHierarchyType.INDEPENDENT,
@@ -95,8 +94,7 @@ class GroupsParserTest {
     }
 
     @Test
-    void fromStringThrowsParseExceptionForNotEscapedGroupName()
-        throws Exception {
+    void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
         assertThrows(
             ParseException.class,
             () ->
@@ -124,32 +122,16 @@ class GroupsParserTest {
         //  Level 1 Name: 3
 
         GroupTreeNode rootNode = new GroupTreeNode(
-            new ExplicitGroup(
-                "All entries",
-                GroupHierarchyType.INDEPENDENT,
-                ','
-            )
+            new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ',')
         );
 
-        AbstractGroup firstSubGrpLvl1 = new ExplicitGroup(
-            "1",
-            GroupHierarchyType.INDEPENDENT,
-            ','
-        );
+        AbstractGroup firstSubGrpLvl1 = new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.addSubgroup(firstSubGrpLvl1);
 
-        AbstractGroup subLvl2 = new ExplicitGroup(
-            "2",
-            GroupHierarchyType.INDEPENDENT,
-            ','
-        );
+        AbstractGroup subLvl2 = new ExplicitGroup("2", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.getFirstChild().ifPresent(c -> c.addSubgroup(subLvl2));
 
-        AbstractGroup thirdSubGrpLvl1 = new ExplicitGroup(
-            "3",
-            GroupHierarchyType.INDEPENDENT,
-            ','
-        );
+        AbstractGroup thirdSubGrpLvl1 = new ExplicitGroup("3", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.addSubgroup(thirdSubGrpLvl1);
 
         GroupTreeNode parsedNode = GroupsParser.importGroups(
@@ -162,8 +144,7 @@ class GroupsParserTest {
     }
 
     @Test
-    void fromStringParsesExplicitGroupWithIconAndDescription()
-        throws Exception {
+    void fromStringParsesExplicitGroupWithIconAndDescription() throws Exception {
         ExplicitGroup expected = new ExplicitGroup(
             "myExplicitGroup",
             GroupHierarchyType.INDEPENDENT,

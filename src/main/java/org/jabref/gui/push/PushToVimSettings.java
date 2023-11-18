@@ -18,11 +18,7 @@ public class PushToVimSettings extends PushToApplicationSettings {
         PushToApplicationPreferences preferences
     ) {
         super(application, dialogService, filePreferences, preferences);
-        settingsPane.add(
-            new Label(Localization.lang("Vim server name") + ":"),
-            0,
-            1
-        );
+        settingsPane.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);
         settingsPane.add(vimServer, 1, 1);
         vimServer.setText(preferences.getVimServer());
     }

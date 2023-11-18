@@ -27,9 +27,7 @@ public class NormalizeMonthFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Normalize month to BibTeX standard abbreviation."
-        );
+        return Localization.lang("Normalize month to BibTeX standard abbreviation.");
     }
 
     @Override

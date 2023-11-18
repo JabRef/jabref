@@ -14,21 +14,14 @@ public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
     }
 
     @Override
-    public void performAction(
-        LibraryTab libraryTab,
-        ParserResult parserResult
-    ) {
-        MergeReviewIntoCommentMigration migration =
-            new MergeReviewIntoCommentMigration();
+    public void performAction(LibraryTab libraryTab, ParserResult parserResult) {
+        MergeReviewIntoCommentMigration migration = new MergeReviewIntoCommentMigration();
 
         migration.performMigration(parserResult);
-        List<BibEntry> conflicts =
-            MergeReviewIntoCommentMigration.collectConflicts(parserResult);
+        List<BibEntry> conflicts = MergeReviewIntoCommentMigration.collectConflicts(parserResult);
         if (
             !conflicts.isEmpty() &&
-            new MergeReviewIntoCommentConfirmationDialog(
-                libraryTab.frame().getDialogService()
-            )
+            new MergeReviewIntoCommentConfirmationDialog(libraryTab.frame().getDialogService())
                 .askUserForMerge(conflicts)
         ) {
             migration.performConflictingMigration(parserResult);

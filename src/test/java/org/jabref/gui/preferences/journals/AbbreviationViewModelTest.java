@@ -13,10 +13,7 @@ class AbbreviationViewModelTest {
 
     @ParameterizedTest
     @MethodSource("provideContainsCaseIndependentContains")
-    void containsCaseIndependentContains(
-        String searchTerm,
-        AbbreviationViewModel abbreviation
-    ) {
+    void containsCaseIndependentContains(String searchTerm, AbbreviationViewModel abbreviation) {
         assertTrue(abbreviation.containsCaseIndependent(searchTerm));
     }
 
@@ -24,32 +21,21 @@ class AbbreviationViewModelTest {
         return Stream.of(
             Arguments.of(
                 "name",
-                new AbbreviationViewModel(
-                    new Abbreviation("Long Name", "abbr", "unique")
-                )
+                new AbbreviationViewModel(new Abbreviation("Long Name", "abbr", "unique"))
             ),
             Arguments.of(
                 "bBr",
-                new AbbreviationViewModel(
-                    new Abbreviation("Long Name", "abbr", "unique")
-                )
+                new AbbreviationViewModel(new Abbreviation("Long Name", "abbr", "unique"))
             ),
             Arguments.of(
                 "Uniq",
-                new AbbreviationViewModel(
-                    new Abbreviation("Long Name", "abbr", "unique")
-                )
+                new AbbreviationViewModel(new Abbreviation("Long Name", "abbr", "unique"))
             ),
             Arguments.of(
                 "",
-                new AbbreviationViewModel(
-                    new Abbreviation("Long Name", "abbr", "unique")
-                )
+                new AbbreviationViewModel(new Abbreviation("Long Name", "abbr", "unique"))
             ),
-            Arguments.of(
-                "",
-                new AbbreviationViewModel(new Abbreviation("", "", ""))
-            )
+            Arguments.of("", new AbbreviationViewModel(new Abbreviation("", "", "")))
         );
     }
 
@@ -62,20 +48,13 @@ class AbbreviationViewModelTest {
         assertFalse(abbreviation.containsCaseIndependent(searchTerm));
     }
 
-    private static Stream<
-        Arguments
-    > provideContainsCaseIndependentDoesNotContain() {
+    private static Stream<Arguments> provideContainsCaseIndependentDoesNotContain() {
         return Stream.of(
             Arguments.of(
                 "Something else",
-                new AbbreviationViewModel(
-                    new Abbreviation("Long Name", "abbr", "unique")
-                )
+                new AbbreviationViewModel(new Abbreviation("Long Name", "abbr", "unique"))
             ),
-            Arguments.of(
-                "Something",
-                new AbbreviationViewModel(new Abbreviation("", "", ""))
-            )
+            Arguments.of("Something", new AbbreviationViewModel(new Abbreviation("", "", "")))
         );
     }
 }

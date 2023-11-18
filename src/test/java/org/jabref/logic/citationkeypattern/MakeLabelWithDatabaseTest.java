@@ -49,8 +49,7 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKey() {
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCitationKey());
     }
 
@@ -85,8 +84,7 @@ class MakeLabelWithDatabaseTest {
                 ','
             );
 
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016a"), entry.getCitationKey());
     }
 
@@ -135,8 +133,7 @@ class MakeLabelWithDatabaseTest {
                 ','
             );
 
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCitationKey());
     }
 
@@ -218,80 +215,70 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateKeyAuthLowerModified() {
         bibtexKeyPattern.setDefaultValue("[auth:lower][year]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("doe2016"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthUpperModified() {
         bibtexKeyPattern.setDefaultValue("[auth:upper][year]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("DOE2016"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthTitleCaseModified() {
         bibtexKeyPattern.setDefaultValue("[auth:title_case][year]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthSentenceCaseModified() {
         bibtexKeyPattern.setDefaultValue("[auth:sentence_case][year]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthCapitalizeModified() {
         bibtexKeyPattern.setDefaultValue("[auth:capitalize][year]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCitationKey());
     }
 
     @Test
     void generateDefaultKeyFixedValue() {
         bibtexKeyPattern.setDefaultValue("[auth]Test[year]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("DoeTest2016"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyShortYear() {
         bibtexKeyPattern.setDefaultValue("[shortyear]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("16"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthN() {
         bibtexKeyPattern.setDefaultValue("[auth2]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Do"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthNShortName() {
         bibtexKeyPattern.setDefaultValue("[auth10]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyEmptyField() {
         entry = new BibEntry();
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.empty(), entry.getCitationKey());
     }
 
@@ -299,49 +286,36 @@ class MakeLabelWithDatabaseTest {
     void generateKeyEmptyFieldDefaultText() {
         bibtexKeyPattern.setDefaultValue("[author:(No Author Provided)]");
         entry.clearField(StandardField.AUTHOR);
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("NoAuthorProvided"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyEmptyFieldNoColonInDefaultText() {
-        bibtexKeyPattern.setDefaultValue(
-            "[author:(Problem:No Author Provided)]"
-        );
+        bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
         entry.clearField(StandardField.AUTHOR);
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("ProblemNoAuthorProvided"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitle() {
         bibtexKeyPattern.setDefaultValue("[title]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("AnAwesomePaperonJabRef"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("AnAwesomePaperonJabRef"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleAbbr() {
         bibtexKeyPattern.setDefaultValue("[title:abbr]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AAPoJ"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyShorttitle() {
         bibtexKeyPattern.setDefaultValue("[shorttitle]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("awesomepaperJabRef"), entry.getCitationKey());
     }
 
@@ -349,8 +323,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyShorttitleLowerModified() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:lower]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("awesomepaperjabref"), entry.getCitationKey());
     }
 
@@ -358,8 +331,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyShorttitleUpperModified() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:upper]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AWESOMEPAPERJABREF"), entry.getCitationKey());
     }
 
@@ -367,8 +339,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyShorttitleTitleCaseModified() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:title_case]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AwesomePaperJabref"), entry.getCitationKey());
     }
 
@@ -376,8 +347,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyShorttitleSentenceCaseModified() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:sentence_case]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Awesomepaperjabref"), entry.getCitationKey());
     }
 
@@ -385,16 +355,14 @@ class MakeLabelWithDatabaseTest {
     void generateKeyShorttitleCapitalizeModified() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:capitalize]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AwesomePaperJabref"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyVeryshorttitle() {
         bibtexKeyPattern.setDefaultValue("[veryshorttitle]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("awesome"), entry.getCitationKey());
     }
 
@@ -402,8 +370,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyVeryshorttitleLowerModified() {
         bibtexKeyPattern.setDefaultValue("[veryshorttitle:lower]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("awesome"), entry.getCitationKey());
     }
 
@@ -411,8 +378,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyVeryshorttitleUpperModified() {
         bibtexKeyPattern.setDefaultValue("[veryshorttitle:upper]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AWESOME"), entry.getCitationKey());
     }
 
@@ -420,8 +386,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyVeryshorttitleTitleCaseModified() {
         bibtexKeyPattern.setDefaultValue("[veryshorttitle:title_case]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Awesome"), entry.getCitationKey());
     }
 
@@ -429,8 +394,7 @@ class MakeLabelWithDatabaseTest {
     void generateKeyVeryshorttitleSentenceCaseModified() {
         bibtexKeyPattern.setDefaultValue("[veryshorttitle:sentence_case]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Awesome"), entry.getCitationKey());
     }
 
@@ -438,75 +402,53 @@ class MakeLabelWithDatabaseTest {
     void generateKeyVeryshorttitleCapitalizeModified() {
         bibtexKeyPattern.setDefaultValue("[veryshorttitle:capitalize]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Awesome"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyShorttitleINI() {
         bibtexKeyPattern.setDefaultValue("[shorttitleINI]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Aap"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyCamel() {
         bibtexKeyPattern.setDefaultValue("[camel]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("AnAwesomePaperOnJabRef"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("AnAwesomePaperOnJabRef"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthNM() {
         bibtexKeyPattern.setDefaultValue("[auth4_3]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Wond"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthNMLargeN() {
         bibtexKeyPattern.setDefaultValue("[auth20_3]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Wonder"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthNMLargeM() {
         bibtexKeyPattern.setDefaultValue("[auth2_4]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.empty(), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthNMLargeMReallyReturnsEmptyString() {
         bibtexKeyPattern.setDefaultValue("[auth2_4][year]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("2016"), entry.getCitationKey());
     }
 
@@ -527,36 +469,24 @@ class MakeLabelWithDatabaseTest {
             );
 
         bibtexKeyPattern.setDefaultValue("[auth][year]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe3016"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthIni() {
         bibtexKeyPattern.setDefaultValue("[authIni2]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("D+"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyAuthIniMany() {
         bibtexKeyPattern.setDefaultValue("[authIni10]");
-        entry.setField(
-            StandardField.AUTHOR,
-            "John Doe and Donald Smith and Will Wonder"
-        );
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("DoeSmiWon"), entry.getCitationKey());
     }
 
@@ -564,68 +494,49 @@ class MakeLabelWithDatabaseTest {
     void generateKeyTitleRegexe() {
         bibtexKeyPattern.setDefaultValue("[title:regex(\" \",\"-\")]");
         entry.setField(StandardField.TITLE, "Please replace the spaces");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("PleaseReplacetheSpaces"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("PleaseReplacetheSpaces"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleTitleCase() {
         bibtexKeyPattern.setDefaultValue("[title:title_case]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("AnAwesomePaperonJabref"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("AnAwesomePaperonJabref"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleCapitalize() {
         bibtexKeyPattern.setDefaultValue("[title:capitalize]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("AnAwesomePaperOnJabref"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("AnAwesomePaperOnJabref"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleSentenceCase() {
         bibtexKeyPattern.setDefaultValue("[title:sentence_case]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
-        assertEquals(
-            Optional.of("Anawesomepaperonjabref"),
-            entry.getCitationKey()
-        );
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("Anawesomepaperonjabref"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleTitleCaseAbbr() {
         bibtexKeyPattern.setDefaultValue("[title:title_case:abbr]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AAPoJ"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleCapitalizeAbbr() {
         bibtexKeyPattern.setDefaultValue("[title:capitalize:abbr]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("AAPOJ"), entry.getCitationKey());
     }
 
     @Test
     void generateKeyTitleSentenceCaseAbbr() {
         bibtexKeyPattern.setDefaultValue("[title:sentence_case:abbr]");
-        new CitationKeyGenerator(bibtexKeyPattern, database, preferences)
-            .generateAndSetKey(entry);
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Aapoj"), entry.getCitationKey());
     }
 }

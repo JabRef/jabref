@@ -24,31 +24,19 @@ import org.jabref.preferences.PreferencesService;
 
 public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
-    private final StringProperty mainFileDirectoryProperty =
-        new SimpleStringProperty("");
-    private final BooleanProperty useMainFileDirectoryProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty useBibLocationAsPrimaryProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty autolinkFileStartsBibtexProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty autolinkFileExactBibtexProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty autolinkUseRegexProperty =
-        new SimpleBooleanProperty();
-    private final StringProperty autolinkRegexKeyProperty =
-        new SimpleStringProperty("");
-    private final ListProperty<String> defaultFileNamePatternsProperty =
-        new SimpleListProperty<>(
-            FXCollections.observableArrayList(
-                FilePreferences.DEFAULT_FILENAME_PATTERNS
-            )
-        );
+    private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
+    private final BooleanProperty useMainFileDirectoryProperty = new SimpleBooleanProperty();
+    private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
+    private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
+    private final ListProperty<String> defaultFileNamePatternsProperty = new SimpleListProperty<>(
+        FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS)
+    );
     private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
-    private final StringProperty fileNamePatternProperty =
-        new SimpleStringProperty();
-    private final StringProperty fileDirectoryPatternProperty =
-        new SimpleStringProperty();
+    private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
+    private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -56,10 +44,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final AutoLinkPreferences autoLinkPreferences;
 
-    public LinkedFilesTabViewModel(
-        DialogService dialogService,
-        PreferencesService preferences
-    ) {
+    public LinkedFilesTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.filePreferences = preferences.getFilePreferences();
         this.autoLinkPreferences = preferences.getAutoLinkPreferences();
@@ -92,24 +77,15 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         // External files preferences / Attached files preferences / File preferences
         mainFileDirectoryProperty.setValue(
-            filePreferences
-                .getMainFileDirectory()
-                .orElse(Path.of(""))
-                .toString()
+            filePreferences.getMainFileDirectory().orElse(Path.of("")).toString()
         );
-        useMainFileDirectoryProperty.setValue(
-            !filePreferences.shouldStoreFilesRelativeToBibFile()
-        );
+        useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(
             filePreferences.shouldStoreFilesRelativeToBibFile()
         );
-        fulltextIndex.setValue(
-            filePreferences.shouldFulltextIndexLinkedFiles()
-        );
+        fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
-        fileDirectoryPatternProperty.setValue(
-            filePreferences.getFileDirectoryPattern()
-        );
+        fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -118,24 +94,16 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
             case REGEX -> autolinkUseRegexProperty.setValue(true);
         }
 
-        autolinkRegexKeyProperty.setValue(
-            autoLinkPreferences.getRegularExpression()
-        );
+        autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
     }
 
     @Override
     public void storeSettings() {
         // External files preferences / Attached files preferences / File preferences
-        filePreferences.setMainFileDirectory(
-            mainFileDirectoryProperty.getValue()
-        );
-        filePreferences.setStoreFilesRelativeToBibFile(
-            useBibLocationAsPrimaryProperty.getValue()
-        );
+        filePreferences.setMainFileDirectory(mainFileDirectoryProperty.getValue());
+        filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
-        filePreferences.setFileDirectoryPattern(
-            fileDirectoryPatternProperty.getValue()
-        );
+        filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
 
         // Autolink preferences
@@ -153,9 +121,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
             );
         }
 
-        autoLinkPreferences.setRegularExpression(
-            autolinkRegexKeyProperty.getValue()
-        );
+        autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -165,14 +131,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         ValidationStatus validationStatus = mainFileDirValidationStatus();
-        if (
-            !validationStatus.isValid() && useMainFileDirectoryProperty().get()
-        ) {
+        if (!validationStatus.isValid() && useMainFileDirectoryProperty().get()) {
             validationStatus
                 .getHighestMessage()
-                .ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage())
-                );
+                .ifPresent(message -> dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;
@@ -181,9 +143,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     public void mainFileDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =
             new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(
-                    Path.of(mainFileDirectoryProperty.getValue())
-                )
+                .withInitialDirectory(Path.of(mainFileDirectoryProperty.getValue()))
                 .build();
         dialogService
             .showDirectorySelectionDialog(dirDialogConfiguration)

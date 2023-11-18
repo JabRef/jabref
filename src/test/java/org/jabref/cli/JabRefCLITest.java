@@ -15,11 +15,7 @@ class JabRefCLITest {
     @Test
     void emptyCLILeftOversLongOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(
-            new String[] {
-                "--nogui",
-                "--import=some/file",
-                "--output=some/export/file",
-            }
+            new String[] { "--nogui", "--import=some/file", "--output=some/export/file" }
         );
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
@@ -28,11 +24,7 @@ class JabRefCLITest {
     @Test
     void guiIsDisabledLongOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(
-            new String[] {
-                "--nogui",
-                "--import=some/file",
-                "--output=some/export/file",
-            }
+            new String[] { "--nogui", "--import=some/file", "--output=some/export/file" }
         );
 
         assertTrue(cli.isDisableGui());
@@ -41,11 +33,7 @@ class JabRefCLITest {
     @Test
     void successfulParsingOfFileImportCLILongOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(
-            new String[] {
-                "--nogui",
-                "--import=some/file",
-                "--output=some/export/file",
-            }
+            new String[] { "--nogui", "--import=some/file", "--output=some/export/file" }
         );
 
         assertEquals("some/file", cli.getFileImport());
@@ -54,11 +42,7 @@ class JabRefCLITest {
     @Test
     void successfulParsingOfFileExportCLILongOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(
-            new String[] {
-                "--nogui",
-                "--import=some/file",
-                "--output=some/export/file",
-            }
+            new String[] { "--nogui", "--import=some/file", "--output=some/export/file" }
         );
 
         assertEquals("some/export/file", cli.getFileExport());
@@ -66,36 +50,28 @@ class JabRefCLITest {
 
     @Test
     void emptyCLILeftOversShortOptions() throws Exception {
-        JabRefCLI cli = new JabRefCLI(
-            new String[] { "-n", "-i=some/file", "-o=some/export/file" }
-        );
+        JabRefCLI cli = new JabRefCLI(new String[] { "-n", "-i=some/file", "-o=some/export/file" });
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
     }
 
     @Test
     void guiIsDisabledShortOptions() throws Exception {
-        JabRefCLI cli = new JabRefCLI(
-            new String[] { "-n", "-i=some/file", "-o=some/export/file" }
-        );
+        JabRefCLI cli = new JabRefCLI(new String[] { "-n", "-i=some/file", "-o=some/export/file" });
 
         assertTrue(cli.isDisableGui());
     }
 
     @Test
     void successfulParsingOfFileImportShortOptions() throws Exception {
-        JabRefCLI cli = new JabRefCLI(
-            new String[] { "-n", "-i=some/file", "-o=some/export/file" }
-        );
+        JabRefCLI cli = new JabRefCLI(new String[] { "-n", "-i=some/file", "-o=some/export/file" });
 
         assertEquals("some/file", cli.getFileImport());
     }
 
     @Test
     void successfulParsingOfFileExportShortOptions() throws Exception {
-        JabRefCLI cli = new JabRefCLI(
-            new String[] { "-n", "-i=some/file", "-o=some/export/file" }
-        );
+        JabRefCLI cli = new JabRefCLI(new String[] { "-n", "-i=some/file", "-o=some/export/file" });
 
         assertEquals("some/export/file", cli.getFileExport());
     }
@@ -198,10 +174,7 @@ class JabRefCLITest {
             listrefs, tablerefsabsbib, harvard, iso690rtf, iso690txt, endnote, oocsv, ris, misq, yaml, bibtexml,
             oocalc, ods, MSBib, mods, xmp, pdf, bib""";
 
-        assertEquals(
-            expected,
-            "Available export formats: " + JabRefCLI.wrapStringList(given, 26)
-        );
+        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
     }
 
     @Test

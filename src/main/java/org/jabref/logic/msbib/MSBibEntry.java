@@ -135,10 +135,7 @@ class MSBibEntry {
         if (city != null) {
             addressBuffer.append(city);
         }
-        if (
-            ((state != null) && !state.isEmpty()) &&
-            ((city != null) && !city.isEmpty())
-        ) {
+        if (((state != null) && !state.isEmpty()) && ((city != null) && !city.isEmpty())) {
             addressBuffer.append(",").append(' ');
             addressBuffer.append(state);
         }
@@ -156,8 +153,7 @@ class MSBibEntry {
         }
         journalName = getXmlElementTextContent("JournalName", entry);
         month = getXmlElementTextContent("Month", entry);
-        internetSiteTitle =
-            getXmlElementTextContent("InternetSiteTitle", entry);
+        internetSiteTitle = getXmlElementTextContent("InternetSiteTitle", entry);
 
         String monthAccessed = getXmlElementTextContent("MonthAccessed", entry);
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
@@ -169,9 +165,7 @@ class MSBibEntry {
             Optional.ofNullable(dayAccessed)
         );
 
-        parsedDateAcessed
-            .map(Date::getNormalized)
-            .ifPresent(date -> dateAccessed = date);
+        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -203,28 +197,20 @@ class MSBibEntry {
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        nodeLst =
-            ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "NameList");
+        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "NameList");
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        NodeList person =
-            ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "Person");
+        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "Person");
         if (person.getLength() <= 0) {
             return result;
         }
 
         result = new LinkedList<>();
         for (int i = 0; i < person.getLength(); i++) {
-            NodeList firstName =
-                ((Element) person.item(i)).getElementsByTagNameNS("*", "First");
-            NodeList lastName =
-                ((Element) person.item(i)).getElementsByTagNameNS("*", "Last");
-            NodeList middleName =
-                ((Element) person.item(i)).getElementsByTagNameNS(
-                        "*",
-                        "Middle"
-                    );
+            NodeList firstName = ((Element) person.item(i)).getElementsByTagNameNS("*", "First");
+            NodeList lastName = ((Element) person.item(i)).getElementsByTagNameNS("*", "Last");
+            NodeList middleName = ((Element) person.item(i)).getElementsByTagNameNS("*", "Middle");
 
             StringBuilder sb = new StringBuilder();
 
@@ -319,12 +305,7 @@ class MSBibEntry {
         return rootNode;
     }
 
-    private void addField(
-        Document document,
-        Element parent,
-        String name,
-        String value
-    ) {
+    private void addField(Document document, Element parent, String name, String value) {
         if (value == null) {
             return;
         }
@@ -332,11 +313,7 @@ class MSBibEntry {
             MSBibDatabase.NAMESPACE,
             MSBibDatabase.PREFIX + name
         );
-        elem.appendChild(
-            document.createTextNode(
-                StringUtil.stripNonValidXMLCharacters(value)
-            )
-        );
+        elem.appendChild(document.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
         parent.appendChild(elem);
     }
 
@@ -401,12 +378,7 @@ class MSBibEntry {
             .flatMap(Date::getMonth)
             .map(Month::getFullName)
             .ifPresent(monthAcessed -> {
-                addField(
-                    document,
-                    rootNode,
-                    "Month" + "Accessed",
-                    monthAcessed
-                );
+                addField(document, rootNode, "Month" + "Accessed", monthAcessed);
             });
         parsedDateAcesseField
             .flatMap(Date::getDay)
@@ -416,22 +388,14 @@ class MSBibEntry {
             });
     }
 
-    private void addAddress(
-        Document document,
-        Element parent,
-        String addressToSplit
-    ) {
+    private void addAddress(Document document, Element parent, String addressToSplit) {
         if (addressToSplit == null) {
             return;
         }
 
         Matcher matcher = ADDRESS_PATTERN.matcher(addressToSplit);
 
-        if (
-            addressToSplit.contains(",") &&
-            matcher.matches() &&
-            (matcher.groupCount() >= 3)
-        ) {
+        if (addressToSplit.contains(",") && matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));

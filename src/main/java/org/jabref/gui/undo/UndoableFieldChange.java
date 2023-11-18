@@ -15,21 +15,14 @@ import org.slf4j.LoggerFactory;
  */
 public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UndoableFieldChange.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableFieldChange.class);
 
     private final BibEntry entry;
     private final Field field;
     private final String oldValue;
     private final String newValue;
 
-    public UndoableFieldChange(
-        BibEntry entry,
-        Field field,
-        String oldValue,
-        String newValue
-    ) {
+    public UndoableFieldChange(BibEntry entry, Field field, String oldValue, String newValue) {
         this.entry = entry;
         this.field = field;
         this.oldValue = oldValue;
@@ -37,12 +30,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
     }
 
     public UndoableFieldChange(FieldChange change) {
-        this(
-            change.getEntry(),
-            change.getField(),
-            change.getOldValue(),
-            change.getNewValue()
-        );
+        this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
     }
 
     @Override
@@ -50,9 +38,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
         return Localization.lang(
             "change field %0 of entry %1 from %2 to %3",
             StringUtil.boldHTML(field.getDisplayName()),
-            StringUtil.boldHTML(
-                entry.getCitationKey().orElse(Localization.lang("undefined"))
-            ),
+            StringUtil.boldHTML(entry.getCitationKey().orElse(Localization.lang("undefined"))),
             StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
             StringUtil.boldHTML(newValue, Localization.lang("undefined"))
         );

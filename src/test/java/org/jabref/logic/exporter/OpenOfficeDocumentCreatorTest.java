@@ -58,10 +58,7 @@ public class OpenOfficeDocumentCreatorTest {
         );
         entry.setField(StandardField.AUTHOR, "Tony Clear");
         entry.setField(StandardField.ISSN, "0097-8418");
-        entry.setField(
-            StandardField.DOI,
-            "http://doi.acm.org/10.1145/820127.820136"
-        );
+        entry.setField(StandardField.DOI, "http://doi.acm.org/10.1145/820127.820136");
         entry.setField(StandardField.JOURNAL, "SIGCSE Bull.");
         entry.setField(StandardField.NUMBER, "4");
         entry.setField(StandardField.PAGES, "13--14");
@@ -73,8 +70,7 @@ public class OpenOfficeDocumentCreatorTest {
     }
 
     @Test
-    void testPerformExportForSingleEntry(@TempDir Path testFolder)
-        throws Exception {
+    void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path zipPath = testFolder.resolve("OpenOfficeRandomNamedFile");
 
         exporter.export(databaseContext, zipPath, entries);
@@ -95,20 +91,13 @@ public class OpenOfficeDocumentCreatorTest {
             CompareMatcher
                 .isSimilarTo(control)
                 .normalizeWhitespace()
-                .withNodeMatcher(
-                    new DefaultNodeMatcher(ElementSelectors.byNameAndText)
-                )
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
                 .throwComparisonFailure()
         );
     }
 
-    private static void unzipContentXml(Path zipFile, Path unzipFolder)
-        throws IOException {
-        try (
-            ZipInputStream zis = new ZipInputStream(
-                new FileInputStream(zipFile.toFile())
-            )
-        ) {
+    private static void unzipContentXml(Path zipFile, Path unzipFolder) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
             ZipEntry zipEntry = zis.getNextEntry();
 
             while (zipEntry != null) {
@@ -122,11 +111,7 @@ public class OpenOfficeDocumentCreatorTest {
                             Files.createDirectories(newPath.getParent());
                         }
                     }
-                    Files.copy(
-                        zis,
-                        newPath,
-                        StandardCopyOption.REPLACE_EXISTING
-                    );
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
                 }
 
                 zipEntry = zis.getNextEntry();
@@ -136,8 +121,7 @@ public class OpenOfficeDocumentCreatorTest {
     }
 
     // protect zip slip attack: https://snyk.io/research/zip-slip-vulnerability
-    private static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir)
-        throws IOException {
+    private static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {
         Path targetDirResolved = targetDir.resolve(zipEntry.getName());
         Path normalizePath = targetDirResolved.normalize();
         if (!normalizePath.startsWith(targetDir)) {

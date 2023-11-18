@@ -24,8 +24,7 @@ public class EditionCheckerTest {
     @Test
     void isFirstCharacterANumberFalseForEmptyString() {
         assertFalse(
-            createSimpleEditionChecker(new BibDatabaseContext(), false)
-                .isFirstCharDigit("")
+            createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit("")
         );
     }
 
@@ -41,65 +40,44 @@ public class EditionCheckerTest {
     void editionCheckerDoesNotComplainIfAllowIntegerEditionIsEnabled() {
         assertEquals(
             Optional.empty(),
-            createSimpleEditionChecker(new BibDatabaseContext(), true)
-                .checkValue("2")
+            createSimpleEditionChecker(new BibDatabaseContext(), true).checkValue("2")
         );
     }
 
     @Test
     void bibTexAcceptsOrdinalNumberInWordsWithCapitalFirstLetter() {
-        assertEquals(
-            Optional.empty(),
-            createBibtexEditionChecker(true).checkValue("Second")
-        );
+        assertEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("Second"));
     }
 
     @Test
     void bibTexDoesNotAcceptOrdinalNumberInWordsWithNonCapitalFirstLetter() {
-        assertNotEquals(
-            Optional.empty(),
-            createBibtexEditionChecker(true).checkValue("second")
-        );
+        assertNotEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("second"));
     }
 
     @Test
     void bibTexAcceptsIntegerInputInEdition() {
-        assertEquals(
-            Optional.empty(),
-            createBibtexEditionChecker(true).checkValue("2")
-        );
+        assertEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("2"));
     }
 
     @Test
     void bibTexAcceptsOrdinalNumberInNumbers() {
-        assertEquals(
-            Optional.empty(),
-            createBibtexEditionChecker(true).checkValue("2nd")
-        );
+        assertEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("2nd"));
     }
 
     @Test
     void bibTexEmptyValueAsInput() {
-        assertEquals(
-            Optional.empty(),
-            createBibtexEditionChecker(false).checkValue("")
-        );
+        assertEquals(Optional.empty(), createBibtexEditionChecker(false).checkValue(""));
     }
 
     @Test
     void bibTexNullValueAsInput() {
-        assertEquals(
-            Optional.empty(),
-            createBibtexEditionChecker(false).checkValue(null)
-        );
+        assertEquals(Optional.empty(), createBibtexEditionChecker(false).checkValue(null));
     }
 
     @Test
     void bibTexDoesNotAcceptIntegerOnly() {
         assertEquals(
-            Optional.of(
-                Localization.lang("no integer as values for edition allowed")
-            ),
+            Optional.of(Localization.lang("no integer as values for edition allowed")),
             createBibtexEditionChecker(false).checkValue("3")
         );
     }
@@ -107,9 +85,7 @@ public class EditionCheckerTest {
     @Test
     void bibTexAcceptsFirstEditionAlsoIfIntegerEditionDisallowed() {
         assertEquals(
-            Optional.of(
-                Localization.lang("edition of book reported as just 1")
-            ),
+            Optional.of(Localization.lang("edition of book reported as just 1")),
             createBibtexEditionChecker(false).checkValue("1")
         );
     }
@@ -124,40 +100,29 @@ public class EditionCheckerTest {
 
     @Test
     void bibLaTexAcceptsIntegerInputInEdition() {
-        assertEquals(
-            Optional.empty(),
-            createBiblatexEditionChecker(true).checkValue("2")
-        );
+        assertEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("2"));
     }
 
     @Test
     void bibLaTexAcceptsEditionAsLiteralString() {
         assertEquals(
             Optional.empty(),
-            createBiblatexEditionChecker(true)
-                .checkValue("Third, revised and expanded edition")
+            createBiblatexEditionChecker(true).checkValue("Third, revised and expanded edition")
         );
     }
 
     @Test
     void bibLaTexDoesNotAcceptOrdinalNumberInNumbers() {
-        assertNotEquals(
-            Optional.empty(),
-            createBiblatexEditionChecker(true).checkValue("2nd")
-        );
+        assertNotEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("2nd"));
     }
 
-    private EditionChecker createBibtexEditionChecker(
-        Boolean allowIntegerEdition
-    ) {
+    private EditionChecker createBibtexEditionChecker(Boolean allowIntegerEdition) {
         BibDatabaseContext bibtex = new BibDatabaseContext();
         bibtex.setMode(BibDatabaseMode.BIBTEX);
         return new EditionChecker(bibtex, allowIntegerEdition);
     }
 
-    private EditionChecker createBiblatexEditionChecker(
-        Boolean allowIntegerEdition
-    ) {
+    private EditionChecker createBiblatexEditionChecker(Boolean allowIntegerEdition) {
         BibDatabaseContext biblatex = new BibDatabaseContext();
         biblatex.setMode(BibDatabaseMode.BIBLATEX);
         return new EditionChecker(biblatex, allowIntegerEdition);
@@ -167,9 +132,6 @@ public class EditionCheckerTest {
         BibDatabaseContext bibDatabaseContextEdition,
         boolean allowIntegerEdition
     ) {
-        return new EditionChecker(
-            bibDatabaseContextEdition,
-            allowIntegerEdition
-        );
+        return new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
     }
 }

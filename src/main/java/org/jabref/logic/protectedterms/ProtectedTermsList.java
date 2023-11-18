@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ProtectedTermsList.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsList.class);
 
     private String description;
     private final List<String> termsList;
@@ -36,11 +34,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
         this.internalList = internalList;
     }
 
-    public ProtectedTermsList(
-        String description,
-        List<String> termList,
-        String location
-    ) {
+    public ProtectedTermsList(String description, List<String> termList, String location) {
         this(description, termList, location, false);
     }
 

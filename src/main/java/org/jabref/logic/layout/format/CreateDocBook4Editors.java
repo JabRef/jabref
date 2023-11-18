@@ -15,12 +15,7 @@ public class CreateDocBook4Editors implements LayoutFormatter {
         StringBuilder sb = new StringBuilder(100);
         AuthorList al = AuthorList.parse(fieldText);
         DocBookAuthorFormatter formatter = new DocBookAuthorFormatter();
-        formatter.addBody(
-            sb,
-            al,
-            StandardField.EDITOR.getName(),
-            DocBookVersion.DOCBOOK_4
-        );
+        formatter.addBody(sb, al, StandardField.EDITOR.getName(), DocBookVersion.DOCBOOK_4);
         return sb.toString();
     }
 }

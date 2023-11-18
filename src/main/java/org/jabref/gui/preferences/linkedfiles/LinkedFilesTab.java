@@ -59,8 +59,7 @@ public class LinkedFilesTab
     @FXML
     private TextField fileDirectoryPattern;
 
-    private final ControlsFxVisualizer validationVisualizer =
-        new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public LinkedFilesTab() {
         ViewLoader.view(this).root(this).load();
@@ -72,18 +71,11 @@ public class LinkedFilesTab
     }
 
     public void initialize() {
-        this.viewModel =
-            new LinkedFilesTabViewModel(dialogService, preferencesService);
+        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferencesService);
 
-        mainFileDirectory
-            .textProperty()
-            .bindBidirectional(viewModel.mainFileDirectoryProperty());
-        mainFileDirectory
-            .disableProperty()
-            .bind(viewModel.useBibLocationAsPrimaryProperty());
-        browseDirectory
-            .disableProperty()
-            .bind(viewModel.useBibLocationAsPrimaryProperty());
+        mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
+        mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
+        browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary
             .selectedProperty()
             .bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
@@ -97,24 +89,12 @@ public class LinkedFilesTab
         autolinkFileExactBibtex
             .selectedProperty()
             .bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
-        autolinkUseRegex
-            .selectedProperty()
-            .bindBidirectional(viewModel.autolinkUseRegexProperty());
-        autolinkRegexKey
-            .textProperty()
-            .bindBidirectional(viewModel.autolinkRegexKeyProperty());
-        autolinkRegexKey
-            .disableProperty()
-            .bind(autolinkUseRegex.selectedProperty().not());
-        fulltextIndex
-            .selectedProperty()
-            .bindBidirectional(viewModel.fulltextIndexProperty());
-        fileNamePattern
-            .valueProperty()
-            .bindBidirectional(viewModel.fileNamePatternProperty());
-        fileNamePattern
-            .itemsProperty()
-            .bind(viewModel.defaultFileNamePatternsProperty());
+        autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
+        autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
+        autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
+        fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
+        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
+        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern
             .textProperty()
             .bindBidirectional(viewModel.fileDirectoryPatternProperty());

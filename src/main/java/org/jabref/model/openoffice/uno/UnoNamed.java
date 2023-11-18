@@ -28,9 +28,7 @@ public class UnoNamed {
         XTextRange range,
         boolean absorb
     ) throws CreationException {
-        XMultiServiceFactory msf = UnoCast
-            .cast(XMultiServiceFactory.class, doc)
-            .get();
+        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, doc).get();
 
         Object xObject;
         try {
@@ -41,17 +39,13 @@ public class UnoNamed {
 
         XNamed xNamed = UnoCast
             .cast(XNamed.class, xObject)
-            .orElseThrow(() ->
-                new IllegalArgumentException("Service is not an XNamed")
-            );
+            .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed"));
         xNamed.setName(name);
 
         // get XTextContent interface
         XTextContent xTextContent = UnoCast
             .cast(XTextContent.class, xObject)
-            .orElseThrow(() ->
-                new IllegalArgumentException("Service is not an XTextContent")
-            );
+            .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent"));
         range.getText().insertTextContent(range, xTextContent, absorb);
         return xNamed;
     }

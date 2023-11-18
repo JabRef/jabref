@@ -37,18 +37,12 @@ public class RangeOverlapBetween {
          * Cache all we need to know about fewHolders. We are trying to minimize the number of calls
          * to LO.
          */
-        List<OOTuple3<XText, XTextRangeCompare, V>> fewTuples = new ArrayList<>(
-            fewHolders.size()
-        );
+        List<OOTuple3<XText, XTextRangeCompare, V>> fewTuples = new ArrayList<>(fewHolders.size());
 
         for (V aHolder : fewHolders) {
             XText aText = aHolder.getRange().getText();
             fewTuples.add(
-                new OOTuple3<>(
-                    aText,
-                    UnoCast.cast(XTextRangeCompare.class, aText).get(),
-                    aHolder
-                )
+                new OOTuple3<>(aText, UnoCast.cast(XTextRangeCompare.class, aText).get(), aHolder)
             );
         }
 
@@ -74,10 +68,7 @@ public class RangeOverlapBetween {
                     aRange.getEnd(),
                     bRangeStart
                 );
-                if (
-                    abEndToStart < 0 ||
-                    (!includeTouching && (abEndToStart == 0))
-                ) {
+                if (abEndToStart < 0 || (!includeTouching && (abEndToStart == 0))) {
                     continue;
                 }
                 int baEndToStart = UnoTextRange.compareStartsUnsafe(
@@ -85,20 +76,11 @@ public class RangeOverlapBetween {
                     bRangeEnd,
                     aRange.getStart()
                 );
-                if (
-                    baEndToStart < 0 ||
-                    (!includeTouching && (baEndToStart == 0))
-                ) {
+                if (baEndToStart < 0 || (!includeTouching && (baEndToStart == 0))) {
                     continue;
                 }
 
-                boolean equal =
-                    UnoTextRange.compareStartsThenEndsUnsafe(
-                        cmp,
-                        aRange,
-                        bRange
-                    ) ==
-                    0;
+                boolean equal = UnoTextRange.compareStartsThenEndsUnsafe(cmp, aRange, bRange) == 0;
                 boolean touching = abEndToStart == 0 || baEndToStart == 0;
 
                 // In case of two equal collapsed ranges there is an ambiguity : TOUCH or EQUAL_RANGE ?
@@ -106,17 +88,13 @@ public class RangeOverlapBetween {
                 // We return EQUAL_RANGE
                 RangeOverlapKind kind = equal
                     ? RangeOverlapKind.EQUAL_RANGE
-                    : (touching
-                            ? RangeOverlapKind.TOUCH
-                            : RangeOverlapKind.OVERLAP);
+                    : (touching ? RangeOverlapKind.TOUCH : RangeOverlapKind.OVERLAP);
 
                 List<V> valuesForOverlappingRanges = new ArrayList<>();
                 valuesForOverlappingRanges.add(aHolder);
                 valuesForOverlappingRanges.add(bHolder);
 
-                result.add(
-                    new RangeOverlap<>(kind, valuesForOverlappingRanges)
-                );
+                result.add(new RangeOverlap<>(kind, valuesForOverlappingRanges));
                 return result;
             }
         }

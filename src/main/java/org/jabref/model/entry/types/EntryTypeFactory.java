@@ -17,10 +17,7 @@ public class EntryTypeFactory {
      *
      * @return returns true if the two compared entry types have the same name and equal required and optional fields
      */
-    public static boolean nameAndFieldsAreEqual(
-        BibEntryType type1,
-        BibEntryType type2
-    ) {
+    public static boolean nameAndFieldsAreEqual(BibEntryType type1, BibEntryType type2) {
         if ((type1 == null) && (type2 == null)) {
             return true;
         } else if ((type1 == null) || (type2 == null)) {
@@ -28,14 +25,8 @@ public class EntryTypeFactory {
         } else {
             return (
                 Objects.equals(type1.getType(), type2.getType()) &&
-                Objects.equals(
-                    type1.getRequiredFields(),
-                    type2.getRequiredFields()
-                ) &&
-                Objects.equals(
-                    type1.getOptionalFields(),
-                    type2.getOptionalFields()
-                ) &&
+                Objects.equals(type1.getRequiredFields(), type2.getRequiredFields()) &&
+                Objects.equals(type1.getOptionalFields(), type2.getOptionalFields()) &&
                 Objects.equals(
                     type1.getSecondaryOptionalFields(),
                     type2.getSecondaryOptionalFields()
@@ -65,21 +56,13 @@ public class EntryTypeFactory {
             Arrays.<EntryType>asList(StandardEntryType.values())
         );
         types.addAll(Arrays.<EntryType>asList(IEEETranEntryType.values()));
-        types.addAll(
-            Arrays.<EntryType>asList(BiblatexSoftwareEntryType.values())
-        );
+        types.addAll(Arrays.<EntryType>asList(BiblatexSoftwareEntryType.values()));
         types.addAll(Arrays.<EntryType>asList(BiblatexApaEntryType.values()));
-        types.addAll(
-            Arrays.<EntryType>asList(
-                SystematicLiteratureReviewStudyEntryType.values()
-            )
-        );
+        types.addAll(Arrays.<EntryType>asList(SystematicLiteratureReviewStudyEntryType.values()));
 
         return types
             .stream()
-            .filter(type ->
-                type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))
-            )
+            .filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH)))
             .findFirst()
             .orElse(new UnknownEntryType(typeName));
     }

@@ -23,12 +23,7 @@ public class RangeForOverlapCheck<T> implements RangeHolder {
     public final T idWithinKind;
     private final String description;
 
-    public RangeForOverlapCheck(
-        XTextRange range,
-        T idWithinKind,
-        int kind,
-        String description
-    ) {
+    public RangeForOverlapCheck(XTextRange range, T idWithinKind, int kind, String description) {
         this.range = range;
         this.kind = kind;
         this.idWithinKind = idWithinKind;

@@ -36,10 +36,7 @@ public class HtmlExportFormatTest {
                 "html",
                 null,
                 StandardFileType.HTML,
-                mock(
-                    LayoutFormatterPreferences.class,
-                    Answers.RETURNS_DEEP_STUBS
-                ),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder()
             );
 

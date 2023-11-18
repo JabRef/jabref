@@ -11,8 +11,7 @@ import javafx.scene.control.TableCell;
  * @param <S> view model of table row
  * @param <T> cell value
  */
-public class OptionalValueTableCellFactory<S, T>
-    extends ValueTableCellFactory<S, Optional<T>> {
+public class OptionalValueTableCellFactory<S, T> extends ValueTableCellFactory<S, Optional<T>> {
 
     private BiFunction<S, T, Node> toGraphicIfPresent;
     private Node defaultGraphic;
@@ -25,9 +24,7 @@ public class OptionalValueTableCellFactory<S, T>
         return this;
     }
 
-    public OptionalValueTableCellFactory<S, T> withDefaultGraphic(
-        Node defaultGraphic
-    ) {
+    public OptionalValueTableCellFactory<S, T> withDefaultGraphic(Node defaultGraphic) {
         this.defaultGraphic = defaultGraphic;
         setToGraphic();
         return this;

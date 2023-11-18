@@ -26,10 +26,7 @@ public class AuthorNatBibTest {
                 "von Neumann,,John and John Smith and Black Brown, Jr, Peter"
             ),
             // Test method for {@link org.jabref.logic.layout.format.AuthorLF_FF#format(java.lang.String)}.
-            Arguments.of(
-                "von Neumann and Smith",
-                "von Neumann,,John and John Smith"
-            ),
+            Arguments.of("von Neumann and Smith", "von Neumann,,John and John Smith"),
             Arguments.of("von Neumann", "von Neumann, John")
         );
     }

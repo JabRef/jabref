@@ -24,9 +24,7 @@ public class CitationKeyDuplicationChecker implements EntryChecker {
             return Collections.emptyList();
         }
 
-        boolean isDuplicate = database.isDuplicateCitationKeyExisting(
-            citeKey.get()
-        );
+        boolean isDuplicate = database.isDuplicateCitationKeyExisting(citeKey.get());
         if (isDuplicate) {
             return Collections.singletonList(
                 new IntegrityMessage(

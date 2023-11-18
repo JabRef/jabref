@@ -126,17 +126,14 @@ public class AuthorListParser {
         final boolean andOthersPresent;
         if (StringUtil.endsWithIgnoreCase(listOfNames, andOthersSuffix)) {
             andOthersPresent = true;
-            listOfNames =
-                StringUtil.removeStringAtTheEnd(listOfNames, " and others");
+            listOfNames = StringUtil.removeStringAtTheEnd(listOfNames, " and others");
         } else {
             andOthersPresent = false;
         }
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        final boolean authorsContainAND = listOfNames
-            .toUpperCase(Locale.ENGLISH)
-            .contains(" AND ");
+        final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
         final boolean authorsContainOpeningBrace = listOfNames.contains("{");
         final boolean authorsContainSemicolon = listOfNames.contains(";");
         final boolean authorsContainTwoOrMoreCommas =
@@ -154,10 +151,7 @@ public class AuthorListParser {
 
             // Looking for space between pre- and lastname
             boolean spaceInAllParts =
-                arrayNameList
-                    .stream()
-                    .filter(name -> name.contains(" "))
-                    .count() ==
+                arrayNameList.stream().filter(name -> name.contains(" ")).count() ==
                 arrayNameList.size();
 
             // We hit the comma name separator case
@@ -187,8 +181,7 @@ public class AuthorListParser {
 
                 if ((valuePartsCount % 2) == 0) {
                     // We hit the described special case with name affix like Jr
-                    listOfNames =
-                        buildWithAffix(avoidIndex, arrayNameList).toString();
+                    listOfNames = buildWithAffix(avoidIndex, arrayNameList).toString();
                 }
             }
         }
@@ -253,9 +246,7 @@ public class AuthorListParser {
                     if (vonStart < 0) {
                         if (!tokenCase) {
                             int previousTermToken =
-                                (tokens.size() -
-                                    TOKEN_GROUP_LENGTH -
-                                    TOKEN_GROUP_LENGTH) +
+                                (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) +
                                 OFFSET_TOKEN_TERM;
                             if (
                                 (previousTermToken >= 0) &&
@@ -265,12 +256,8 @@ public class AuthorListParser {
                                 break;
                             }
 
-                            int thisTermToken =
-                                previousTermToken + TOKEN_GROUP_LENGTH;
-                            if (
-                                (thisTermToken >= 0) &&
-                                tokens.get(thisTermToken).equals('-')
-                            ) {
+                            int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;
+                            if ((thisTermToken >= 0) && tokens.get(thisTermToken).equals('-')) {
                                 // We are in a name which contained a hyphen
                                 break;
                             }
@@ -307,9 +294,7 @@ public class AuthorListParser {
             if (vonStart < 0) { // no 'von part'
                 lastPartEnd = tokens.size();
                 lastPartStart = tokens.size() - TOKEN_GROUP_LENGTH;
-                int index =
-                    (tokens.size() - (2 * TOKEN_GROUP_LENGTH)) +
-                    OFFSET_TOKEN_TERM;
+                int index = (tokens.size() - (2 * TOKEN_GROUP_LENGTH)) + OFFSET_TOKEN_TERM;
                 if (index > 0) {
                     Character ch = (Character) tokens.get(index);
                     if (ch == '-') {
@@ -369,11 +354,7 @@ public class AuthorListParser {
             }
         }
 
-        if (
-            (firstPartStart == -1) &&
-            (lastPartStart == -1) &&
-            (vonPartStart != -1)
-        ) {
+        if ((firstPartStart == -1) && (lastPartStart == -1) && (vonPartStart != -1)) {
             // There is no first or last name, but we have a von part. This is likely
             // to indicate a single-entry name without an initial capital letter, such
             // as "unknown".
@@ -387,40 +368,16 @@ public class AuthorListParser {
         // Third step: do actual splitting, construct Author object
         String firstPart = firstPartStart < 0
             ? null
-            : concatTokens(
-                tokens,
-                firstPartStart,
-                firstPartEnd,
-                OFFSET_TOKEN,
-                false
-            );
+            : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN, false);
         String firstAbbr = firstPartStart < 0
             ? null
-            : concatTokens(
-                tokens,
-                firstPartStart,
-                firstPartEnd,
-                OFFSET_TOKEN_ABBR,
-                true
-            );
+            : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN_ABBR, true);
         String vonPart = vonPartStart < 0
             ? null
-            : concatTokens(
-                tokens,
-                vonPartStart,
-                vonPartEnd,
-                OFFSET_TOKEN,
-                false
-            );
+            : concatTokens(tokens, vonPartStart, vonPartEnd, OFFSET_TOKEN, false);
         String lastPart = lastPartStart < 0
             ? null
-            : concatTokens(
-                tokens,
-                lastPartStart,
-                lastPartEnd,
-                OFFSET_TOKEN,
-                false
-            );
+            : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN, false);
         String jrPart = jrPartStart < 0
             ? null
             : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
@@ -430,19 +387,14 @@ public class AuthorListParser {
             (lastPart != null) &&
             lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) &&
             (lastPart.length() < 5) &&
-            (Character.UnicodeScript.of(lastPart.charAt(0)) !=
-                Character.UnicodeScript.HAN)
+            (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)
         ) {
             // The last part is a small string in complete upper case, so interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
-            return Optional.of(
-                new Author(lastPart, lastPart, vonPart, firstPart, jrPart)
-            );
+            return Optional.of(new Author(lastPart, lastPart, vonPart, firstPart, jrPart));
         } else {
-            return Optional.of(
-                new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart)
-            );
+            return Optional.of(new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart));
         }
     }
 
@@ -474,11 +426,7 @@ public class AuthorListParser {
         }
         int updatedStart = start + TOKEN_GROUP_LENGTH;
         while (updatedStart < end) {
-            result.append(
-                tokens.get(
-                    (updatedStart - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM
-                )
-            );
+            result.append(tokens.get((updatedStart - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM));
             result.append((String) tokens.get(updatedStart + offset));
             if (dotAfter) {
                 result.append('.');
@@ -546,26 +494,17 @@ public class AuthorListParser {
                 bracesLevel++;
             }
 
-            if (
-                firstLetterIsFound &&
-                (tokenAbbrEnd < 0) &&
-                ((bracesLevel == 0) || (c == '{'))
-            ) {
+            if (firstLetterIsFound && (tokenAbbrEnd < 0) && ((bracesLevel == 0) || (c == '{'))) {
                 tokenAbbrEnd = tokenEnd;
             }
             if ((c == '}') && (bracesLevel > 0)) {
                 bracesLevel--;
             }
-            if (
-                !firstLetterIsFound &&
-                (currentBackslash < 0) &&
-                Character.isLetter(c)
-            ) {
+            if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
                 if (bracesLevel == 0) {
                     tokenCase =
                         Character.isUpperCase(c) ||
-                        (Character.UnicodeScript.of(c) ==
-                            Character.UnicodeScript.HAN);
+                        (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN);
                 } else {
                     // If this is a particle in braces, always treat it as if it starts with
                     // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"
@@ -576,10 +515,7 @@ public class AuthorListParser {
             }
             if ((currentBackslash >= 0) && !Character.isLetter(c)) {
                 if (!firstLetterIsFound) {
-                    String texCmdName = original.substring(
-                        currentBackslash + 1,
-                        tokenEnd
-                    );
+                    String texCmdName = original.substring(currentBackslash + 1, tokenEnd);
                     if (TEX_NAMES.contains(texCmdName)) {
                         tokenCase = Character.isUpperCase(texCmdName.charAt(0));
                         firstLetterIsFound = true;
@@ -590,10 +526,7 @@ public class AuthorListParser {
             if (c == '\\') {
                 currentBackslash = tokenEnd;
             }
-            if (
-                (bracesLevel == 0) &&
-                ((",;-".indexOf(c) != -1) || Character.isWhitespace(c))
-            ) {
+            if ((bracesLevel == 0) && ((",;-".indexOf(c) != -1) || Character.isWhitespace(c))) {
                 break;
             }
             tokenEnd++;
@@ -601,9 +534,7 @@ public class AuthorListParser {
         if (tokenAbbrEnd < 0) {
             tokenAbbrEnd = tokenEnd;
         }
-        if (
-            (tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')
-        ) {
+        if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
             tokenTerm = '-';
         }
         if ("and".equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {

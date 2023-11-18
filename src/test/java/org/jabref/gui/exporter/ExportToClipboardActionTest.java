@@ -42,12 +42,8 @@ public class ExportToClipboardActionTest {
 
     private ExportToClipboardAction exportToClipboardAction;
     private final DialogService dialogService = spy(DialogService.class);
-    private final ClipBoardManager clipBoardManager = mock(
-        ClipBoardManager.class
-    );
-    private final BibDatabaseContext databaseContext = mock(
-        BibDatabaseContext.class
-    );
+    private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
+    private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final PreferencesService preferences = mock(
         PreferencesService.class,
         Answers.RETURNS_DEEP_STUBS
@@ -67,10 +63,7 @@ public class ExportToClipboardActionTest {
             .withField(StandardField.TITLE, "A tale from the trenches")
             .withField(StandardField.YEAR, "2020")
             .withField(StandardField.DOI, "10.1145/3377811.3380330")
-            .withField(
-                StandardField.SUBTITLE,
-                "cognitive biases and software development"
-            );
+            .withField(StandardField.SUBTITLE, "cognitive biases and software development");
 
         selectedEntries = FXCollections.observableArrayList(entry);
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
@@ -80,8 +73,7 @@ public class ExportToClipboardActionTest {
             .thenReturn(FXCollections.observableList(List.of()));
         when(preferences.getSelfContainedExportConfiguration())
             .thenReturn(mock(SelfContainedSaveConfiguration.class));
-        when(preferences.getXmpPreferences())
-            .thenReturn(mock(XmpPreferences.class));
+        when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction =
             new ExportToClipboardAction(
                 dialogService,
@@ -94,25 +86,18 @@ public class ExportToClipboardActionTest {
 
     @Test
     public void testExecuteIfNoSelectedEntries() {
-        when(stateManager.getSelectedEntries())
-            .thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
 
         exportToClipboardAction.execute();
         verify(dialogService, times(1))
             .notify(
-                Localization.lang(
-                    "This operation requires one or more entries to be selected."
-                )
+                Localization.lang("This operation requires one or more entries to be selected.")
             );
     }
 
     @Test
     public void testExecuteOnSuccess() {
-        Exporter selectedExporter = new Exporter(
-            "html",
-            "HTML",
-            StandardFileType.HTML
-        ) {
+        Exporter selectedExporter = new Exporter("html", "HTML", StandardFileType.HTML) {
             @Override
             public void export(
                 BibDatabaseContext databaseContext,
@@ -125,24 +110,16 @@ public class ExportToClipboardActionTest {
             LibraryPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        FilePreferences filePreferences = mock(
-            FilePreferences.class,
-            Answers.RETURNS_DEEP_STUBS
-        );
+        FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(preferences.getLibraryPreferences())
-            .thenReturn(libraryPreferences);
-        when(preferences.getExportPreferences().getLastExportExtension())
-            .thenReturn("HTML");
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+        when(preferences.getExportPreferences().getLastExportExtension()).thenReturn("HTML");
         when(preferences.getSelfContainedExportConfiguration().getSaveOrder())
             .thenReturn(SaveOrder.getDefaultSaveOrder());
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
-        when(stateManager.getActiveDatabase())
-            .thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked
-        when(
-            databaseContext.getFileDirectories(preferences.getFilePreferences())
-        )
+        when(databaseContext.getFileDirectories(preferences.getFilePreferences()))
             .thenReturn(new ArrayList<>(List.of(Path.of("path"))));
         when(databaseContext.getMetaData()).thenReturn(new MetaData());
         when(
@@ -167,9 +144,7 @@ public class ExportToClipboardActionTest {
             );
         verify(dialogService, times(1))
             .notify(
-                Localization.lang("Entries exported to clipboard") +
-                ": " +
-                selectedEntries.size()
+                Localization.lang("Entries exported to clipboard") + ": " + selectedEntries.size()
             );
     }
 }

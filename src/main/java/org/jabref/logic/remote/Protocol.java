@@ -19,9 +19,7 @@ public class Protocol implements AutoCloseable {
 
     public static final String IDENTIFIER = "jabref";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        Protocol.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
     private final Socket socket;
     private final ObjectOutputStream out;
@@ -40,8 +38,7 @@ public class Protocol implements AutoCloseable {
         out.flush();
     }
 
-    public void sendMessage(RemoteMessage type, Object argument)
-        throws IOException {
+    public void sendMessage(RemoteMessage type, Object argument) throws IOException {
         out.writeObject(type);
 
         // encode the commandline arguments to handle special characters (eg. spaces and Chinese characters)
@@ -49,8 +46,7 @@ public class Protocol implements AutoCloseable {
         if (type == RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS) {
             String[] encodedArgs = ((String[]) argument).clone();
             for (int i = 0; i < encodedArgs.length; i++) {
-                encodedArgs[i] =
-                    URLEncoder.encode(encodedArgs[i], StandardCharsets.UTF_8);
+                encodedArgs[i] = URLEncoder.encode(encodedArgs[i], StandardCharsets.UTF_8);
             }
             out.writeObject(encodedArgs);
         } else {
@@ -71,17 +67,13 @@ public class Protocol implements AutoCloseable {
             if (type == RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS) {
                 for (int i = 0; i < ((String[]) argument).length; i++) {
                     ((String[]) argument)[i] =
-                        URLDecoder.decode(
-                            ((String[]) argument)[i],
-                            StandardCharsets.UTF_8
-                        );
+                        URLDecoder.decode(((String[]) argument)[i], StandardCharsets.UTF_8);
                 }
             }
 
             if (endOfMessage != '\0') {
                 throw new IOException(
-                    "Message didn't end on correct end of message identifier. Got " +
-                    endOfMessage
+                    "Message didn't end on correct end of message identifier. Got " + endOfMessage
                 );
             }
 

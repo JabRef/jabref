@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class CLIMessageHandler implements RemoteMessageHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CLIMessageHandler.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(CLIMessageHandler.class);
 
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;

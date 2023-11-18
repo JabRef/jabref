@@ -33,11 +33,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter {
         return sb.toString();
     }
 
-    private static void singleAuthor(
-        StringBuilder sb,
-        String author,
-        int position
-    ) {
+    private static void singleAuthor(StringBuilder sb, String author, int position) {
         sb.append("<bibo:contribution>\n");
         sb.append("  <bibo:Contribution>\n");
         sb.append(
@@ -47,10 +43,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter {
             .append("    <bibo:contributor><foaf:Person foaf:name=\"")
             .append(author)
             .append("\"/></bibo:contributor>\n");
-        sb
-            .append("    <bibo:position>")
-            .append(position)
-            .append("</bibo:position>\n");
+        sb.append("    <bibo:position>").append(position).append("</bibo:position>\n");
         sb.append("  </bibo:Contribution>\n");
         sb.append("</bibo:contribution>\n");
     }

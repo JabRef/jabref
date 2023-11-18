@@ -30,18 +30,12 @@ public class YearChecker implements ValueChecker {
         }
 
         if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
-            return Optional.of(
-                Localization.lang("should contain a four digit number")
-            );
+            return Optional.of(Localization.lang("should contain a four digit number"));
         }
 
-        if (
-            !ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, ""))
-        ) {
+        if (!ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, ""))) {
             return Optional.of(
-                Localization.lang(
-                    "last four nonpunctuation characters should be numerals"
-                )
+                Localization.lang("last four nonpunctuation characters should be numerals")
             );
         }
 

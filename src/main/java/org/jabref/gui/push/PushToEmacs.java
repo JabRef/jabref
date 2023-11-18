@@ -21,17 +21,12 @@ public class PushToEmacs extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.EMACS;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PushToEmacs.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
     /**
      * @param preferencesService getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
      */
-    public PushToEmacs(
-        DialogService dialogService,
-        PreferencesService preferencesService
-    ) {
+    public PushToEmacs(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 
@@ -46,11 +41,7 @@ public class PushToEmacs extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(
-        BibDatabaseContext database,
-        List<BibEntry> entries,
-        String keys
-    ) {
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -58,32 +49,23 @@ public class PushToEmacs extends AbstractPushToApplication {
         PushToApplicationPreferences pushToApplicationPreferences =
             preferencesService.getPushToApplicationPreferences();
 
-        commandPath =
-            pushToApplicationPreferences
-                .getCommandPaths()
-                .get(this.getDisplayName());
+        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
-        commandPath =
-            pushToApplicationPreferences
-                .getCommandPaths()
-                .get(this.getDisplayName());
+        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
 
-        String[] addParams = pushToApplicationPreferences
-            .getEmacsArguments()
-            .split(" ");
+        String[] addParams = pushToApplicationPreferences.getEmacsArguments().split(" ");
         try {
             String[] com = new String[addParams.length + 2];
             com[0] = commandPath;
             System.arraycopy(addParams, 0, com, 1, addParams.length);
 
             // Surrounding with is handled below
-            String prefix =
-                "(with-current-buffer (window-buffer (selected-window)) (insert ";
+            String prefix = "(with-current-buffer (window-buffer (selected-window)) (insert ";
             String suffix = "))";
 
             if (OS.WINDOWS) {

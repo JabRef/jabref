@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class RemoteListenerServer implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RemoteListenerServer.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServer.class);
 
     private static final int BACKLOG = 1;
 
@@ -24,10 +22,8 @@ public class RemoteListenerServer implements Runnable {
     private final RemoteMessageHandler messageHandler;
     private final ServerSocket serverSocket;
 
-    public RemoteListenerServer(RemoteMessageHandler messageHandler, int port)
-        throws IOException {
-        this.serverSocket =
-            new ServerSocket(port, BACKLOG, RemotePreferences.getIpAddress());
+    public RemoteListenerServer(RemoteMessageHandler messageHandler, int port) throws IOException {
+        this.serverSocket = new ServerSocket(port, BACKLOG, RemotePreferences.getIpAddress());
         this.messageHandler = messageHandler;
     }
 
@@ -39,13 +35,8 @@ public class RemoteListenerServer implements Runnable {
                     socket.setSoTimeout(TIMEOUT);
 
                     try (Protocol protocol = new Protocol(socket)) {
-                        Pair<RemoteMessage, Object> input =
-                            protocol.receiveMessage();
-                        handleMessage(
-                            protocol,
-                            input.getKey(),
-                            input.getValue()
-                        );
+                        Pair<RemoteMessage, Object> input = protocol.receiveMessage();
+                        handleMessage(protocol, input.getKey(), input.getValue());
                     }
                 } catch (SocketException ex) {
                     return;
@@ -58,11 +49,8 @@ public class RemoteListenerServer implements Runnable {
         }
     }
 
-    private void handleMessage(
-        Protocol protocol,
-        RemoteMessage type,
-        Object argument
-    ) throws IOException {
+    private void handleMessage(Protocol protocol, RemoteMessage type, Object argument)
+        throws IOException {
         switch (type) {
             case PING:
                 protocol.sendMessage(RemoteMessage.PONG, Protocol.IDENTIFIER);

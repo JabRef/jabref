@@ -38,11 +38,7 @@ public class DateFormatterTest {
             "yyyy/MM, 2016-07-15, 2016/07", // yyyy/MM
         }
     )
-    public void testOtherFormats(
-        String formatArg,
-        String input,
-        String expectedResult
-    ) {
+    public void testOtherFormats(String formatArg, String input, String expectedResult) {
         formatter.setArgument(formatArg);
         String formattedStr = formatter.format(input);
         assertEquals(expectedResult, formattedStr);

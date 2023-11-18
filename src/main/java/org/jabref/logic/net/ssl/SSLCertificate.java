@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class SSLCertificate {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SSLCertificate.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SSLCertificate.class);
 
     private final String sha256Thumbprint;
     private final String serialNumber;
@@ -78,9 +76,7 @@ public class SSLCertificate {
         return sha256Thumbprint;
     }
 
-    public static Optional<SSLCertificate> fromX509(
-        X509Certificate x509Certificate
-    ) {
+    public static Optional<SSLCertificate> fromX509(X509Certificate x509Certificate) {
         Objects.requireNonNull(x509Certificate);
         try {
             return Optional.of(
@@ -109,8 +105,7 @@ public class SSLCertificate {
     public static Optional<SSLCertificate> fromPath(Path certPath) {
         Objects.requireNonNull(certPath);
         try {
-            CertificateFactory certificateFactory =
-                CertificateFactory.getInstance("X509");
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
             return fromX509(
                 (X509Certificate) certificateFactory.generateCertificate(
                     new FileInputStream(certPath.toFile())

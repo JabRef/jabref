@@ -21,11 +21,7 @@ public interface PushToApplication {
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
      * operations without utilizing invokeLater().
      */
-    void pushEntries(
-        BibDatabaseContext database,
-        List<BibEntry> entries,
-        String keyString
-    );
+    void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.

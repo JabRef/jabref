@@ -22,11 +22,9 @@ class SpecialFieldsToSeparateFieldsTest {
         String fieldInKeyword,
         BibEntry expected
     ) {
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.KEYWORDS, fieldInKeyword);
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeyword);
 
-        new SpecialFieldsToSeparateFields(',')
-            .performMigration(new ParserResult(List.of(entry)));
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
         assertEquals(expected, entry);
     }
@@ -40,8 +38,7 @@ class SpecialFieldsToSeparateFieldsTest {
             .withField(StandardField.AUTHOR, "JabRef")
             .withField(StandardField.KEYWORDS, "tdd");
 
-        new SpecialFieldsToSeparateFields(',')
-            .performMigration(new ParserResult(List.of(entry)));
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
         assertEquals(expected, entry);
     }
@@ -55,8 +52,7 @@ class SpecialFieldsToSeparateFieldsTest {
             .withField(StandardField.AUTHOR, "JabRef")
             .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
 
-        new SpecialFieldsToSeparateFields(',')
-            .performMigration(new ParserResult(List.of(entry)));
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
         assertEquals(expected, entry);
     }
@@ -71,8 +67,7 @@ class SpecialFieldsToSeparateFieldsTest {
             .withField(SpecialField.PRINTED, "printed")
             .withField(SpecialField.PRIORITY, "prio1");
 
-        new SpecialFieldsToSeparateFields(',')
-            .performMigration(new ParserResult(List.of(entry)));
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
         assertEquals(expected, entry);
     }
@@ -88,8 +83,7 @@ class SpecialFieldsToSeparateFieldsTest {
             .withField(StandardField.KEYWORDS, "tdd, SE")
             .withField(SpecialField.PRIORITY, "prio1");
 
-        new SpecialFieldsToSeparateFields(',')
-            .performMigration(new ParserResult(List.of(entry)));
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
         assertEquals(expected, entry);
     }

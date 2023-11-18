@@ -39,15 +39,12 @@ import org.slf4j.LoggerFactory;
  */
 public final class DocumentReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
-    private static final Pattern HYPHEN_LINEBREAK_PATTERN = Pattern.compile(
-        "\\-\n"
+    private static final Pattern HYPHEN_LINEBREAK_PATTERN = Pattern.compile("\\-\n");
+    private static final Pattern LINEBREAK_WITHOUT_PERIOD_PATTERN = Pattern.compile(
+        "([^\\\\.])\\n"
     );
-    private static final Pattern LINEBREAK_WITHOUT_PERIOD_PATTERN =
-        Pattern.compile("([^\\\\.])\\n");
 
     private final BibEntry entry;
     private final FilePreferences filePreferences;
@@ -60,9 +57,7 @@ public final class DocumentReader {
     public DocumentReader(BibEntry bibEntry, FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
         if (bibEntry.getFiles().isEmpty()) {
-            throw new IllegalStateException(
-                "There are no linked PDF files to this BibEntry!"
-            );
+            throw new IllegalStateException("There are no linked PDF files to this BibEntry!");
         }
 
         this.entry = bibEntry;
@@ -100,19 +95,10 @@ public final class DocumentReader {
             .collect(Collectors.toList());
     }
 
-    private List<Document> readPdfContents(
-        LinkedFile pdf,
-        Path resolvedPdfPath
-    ) {
+    private List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
-        try (
-            PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())
-        ) {
-            for (
-                int pageNumber = 0;
-                pageNumber < pdfDocument.getNumberOfPages();
-                pageNumber++
-            ) {
+        try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
+            for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, pdf.getLink());
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
@@ -129,11 +115,7 @@ public final class DocumentReader {
                 pages.add(newDocument);
             }
         } catch (IOException e) {
-            LOGGER.warn(
-                "Could not read {}",
-                resolvedPdfPath.toAbsolutePath(),
-                e
-            );
+            LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();
@@ -144,11 +126,7 @@ public final class DocumentReader {
         return pages;
     }
 
-    private void addMetaData(
-        Document newDocument,
-        Path resolvedPdfPath,
-        int pageNumber
-    ) {
+    private void addMetaData(Document newDocument, Path resolvedPdfPath, int pageNumber) {
         try {
             BasicFileAttributes attributes = Files.readAttributes(
                 resolvedPdfPath,
@@ -157,9 +135,7 @@ public final class DocumentReader {
             addStringField(
                 newDocument,
                 MODIFIED,
-                String.valueOf(
-                    attributes.lastModifiedTime().to(TimeUnit.SECONDS)
-                )
+                String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS))
             );
         } catch (IOException e) {
             LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
@@ -167,11 +143,7 @@ public final class DocumentReader {
         addStringField(newDocument, PAGE_NUMBER, String.valueOf(pageNumber));
     }
 
-    private void addStringField(
-        Document newDocument,
-        String field,
-        String value
-    ) {
+    private void addStringField(Document newDocument, String field, String value) {
         if (!isValidField(value)) {
             return;
         }
@@ -183,19 +155,12 @@ public final class DocumentReader {
     }
 
     public static String mergeLines(String text) {
-        String mergedHyphenNewlines = HYPHEN_LINEBREAK_PATTERN
-            .matcher(text)
-            .replaceAll("");
-        return LINEBREAK_WITHOUT_PERIOD_PATTERN
-            .matcher(mergedHyphenNewlines)
-            .replaceAll("$1 ");
+        String mergedHyphenNewlines = HYPHEN_LINEBREAK_PATTERN.matcher(text).replaceAll("");
+        return LINEBREAK_WITHOUT_PERIOD_PATTERN.matcher(mergedHyphenNewlines).replaceAll("$1 ");
     }
 
-    private void addContentIfNotEmpty(
-        PDDocument pdfDocument,
-        Document newDocument,
-        int pageNumber
-    ) throws IOException {
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber)
+        throws IOException {
         PDFTextStripper pdfTextStripper = new PDFTextStripper();
         pdfTextStripper.setLineSeparator("\n");
         pdfTextStripper.setStartPage(pageNumber);
@@ -203,9 +168,7 @@ public final class DocumentReader {
 
         String pdfContent = pdfTextStripper.getText(pdfDocument);
         if (StringUtil.isNotBlank(pdfContent)) {
-            newDocument.add(
-                new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES)
-            );
+            newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
         }
         PDPage page = pdfDocument.getPage(pageNumber);
         List<String> annotations = page

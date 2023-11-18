@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchGroup extends AbstractGroup {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SearchGroup.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
     private final GroupSearchQuery query;
 
     public SearchGroup(
@@ -44,14 +42,8 @@ public class SearchGroup extends AbstractGroup {
         SearchGroup other = (SearchGroup) o;
         return (
             Objects.equals(getName(), other.getName()) &&
-            Objects.equals(
-                getHierarchicalContext(),
-                other.getHierarchicalContext()
-            ) &&
-            Objects.equals(
-                getSearchExpression(),
-                other.getSearchExpression()
-            ) &&
+            Objects.equals(getHierarchicalContext(), other.getHierarchicalContext()) &&
+            Objects.equals(getSearchExpression(), other.getSearchExpression()) &&
             Objects.equals(getSearchFlags(), other.getSearchFlags())
         );
     }

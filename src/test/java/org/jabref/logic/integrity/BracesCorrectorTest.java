@@ -44,9 +44,6 @@ public class BracesCorrectorTest {
 
     @Test
     public void inputWithMixedBraces() {
-        assertEquals(
-            "{b{anana\\\\\\}}}",
-            BracesCorrector.apply("{b{anana\\\\\\}")
-        );
+        assertEquals("{b{anana\\\\\\}}}", BracesCorrector.apply("{b{anana\\\\\\}"));
     }
 }

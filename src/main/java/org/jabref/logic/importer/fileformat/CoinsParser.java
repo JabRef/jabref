@@ -33,8 +33,7 @@ public class CoinsParser implements Parser {
     private final Pattern AUTHOR = Pattern.compile("&amp;rft.au=([^&]+)");
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream)
-        throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         String data = new BufferedReader(new InputStreamReader(inputStream))
             .lines()
             .collect(Collectors.joining(OS.NEWLINE));
@@ -72,12 +71,7 @@ public class CoinsParser implements Parser {
         return Collections.singletonList(entry);
     }
 
-    private void appendData(
-        String data,
-        BibEntry entry,
-        Pattern pattern,
-        Field field
-    ) {
+    private void appendData(String data, BibEntry entry, Pattern pattern, Field field) {
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
             entry.setField(field, matcher.group(1));

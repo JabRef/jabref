@@ -17,9 +17,7 @@ public class AppendPersonNamesStrategyTest {
     @ParameterizedTest(name = "separationBySpace={0}, expectedResult={1}")
     @CsvSource({ "TRUE, ' '", "FALSE, ' and '" })
     void testWithParam(boolean separationBySpace, String expectedResult) {
-        AppendPersonNamesStrategy strategy = new AppendPersonNamesStrategy(
-            separationBySpace
-        );
+        AppendPersonNamesStrategy strategy = new AppendPersonNamesStrategy(separationBySpace);
         assertEquals(expectedResult, strategy.getDelimiter());
     }
 }

@@ -81,24 +81,18 @@ public class OOFormatBibliography {
 
         // insert marker "[1]"
         if (style.isNumberEntries()) {
-            stringBuilder.append(
-                style.getNumCitationMarkerForBibliography(citedKey).toString()
-            );
+            stringBuilder.append(style.getNumCitationMarkerForBibliography(citedKey).toString());
         } else {
             // !style.isNumberEntries() : emit no prefix
             // Note: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
         }
 
         // Add entry body
-        stringBuilder.append(
-            formatBibliographyEntryBody(citedKey, style).toString()
-        );
+        stringBuilder.append(formatBibliographyEntryBody(citedKey, style).toString());
 
         // Add "Cited on pages"
         if (citedKey.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
-            stringBuilder.append(
-                formatCitedOnPages(citationGroups, citedKey).toString()
-            );
+            stringBuilder.append(formatCitedOnPages(citationGroups, citedKey).toString());
         }
 
         // Add paragraph
@@ -110,15 +104,10 @@ public class OOFormatBibliography {
     /**
      * @return just the body of a bibliography entry. No label, "Cited on pages" or paragraph.
      */
-    public static OOText formatBibliographyEntryBody(
-        CitedKey citedKey,
-        OOBibStyle style
-    ) {
+    public static OOText formatBibliographyEntryBody(CitedKey citedKey, OOBibStyle style) {
         if (citedKey.getLookupResult().isEmpty()) {
             // Unresolved entry
-            return OOText.fromString(
-                String.format("Unresolved(%s)", citedKey.citationKey)
-            );
+            return OOText.fromString(String.format("Unresolved(%s)", citedKey.citationKey));
         } else {
             // Resolved entry, use the layout engine
             BibEntry bibentry = citedKey.getLookupResult().get().entry;
@@ -161,9 +150,7 @@ public class OOFormatBibliography {
         }
 
         // Do the layout for this entry:
-        OOText formattedText = OOText.fromString(
-            layout.doLayout(entry, database)
-        );
+        OOText formattedText = OOText.fromString(layout.doLayout(entry, database));
 
         // Afterwards, reset the old value:
         if (oldUniqVal.isPresent()) {
@@ -183,31 +170,21 @@ public class OOFormatBibliography {
      * - The links are created as references that show page numbers of the reference marks.
      *   - We do not control the text shown, that is provided by OpenOffice.
      */
-    private static OOText formatCitedOnPages(
-        CitationGroups citationGroups,
-        CitedKey citedKey
-    ) {
-        if (
-            !citationGroups.citationGroupsProvideReferenceMarkNameForLinking()
-        ) {
+    private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
+        if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
             return OOText.fromString("");
         }
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        final String prefix = String.format(
-            " (%s: ",
-            Localization.lang("Cited on pages")
-        );
+        final String prefix = String.format(" (%s: ", Localization.lang("Cited on pages"));
         final String suffix = ")";
         stringBuilder.append(prefix);
 
         List<CitationGroup> filteredList = new ArrayList<>();
         for (CitationPath path : citedKey.getCitationPaths()) {
             CitationGroupId groupId = path.group;
-            Optional<CitationGroup> group = citationGroups.getCitationGroup(
-                groupId
-            );
+            Optional<CitationGroup> group = citationGroups.getCitationGroup(groupId);
             if (group.isEmpty()) {
                 throw new IllegalStateException();
             }
@@ -216,12 +193,8 @@ public class OOFormatBibliography {
 
         // sort the citationGroups according to their indexInGlobalOrder
         filteredList.sort((a, b) -> {
-            Integer aa = a
-                .getIndexInGlobalOrder()
-                .orElseThrow(IllegalStateException::new);
-            Integer bb = b
-                .getIndexInGlobalOrder()
-                .orElseThrow(IllegalStateException::new);
+            Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
+            Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
             return aa.compareTo(bb);
         });
 
@@ -233,9 +206,7 @@ public class OOFormatBibliography {
             String markName = group
                 .getReferenceMarkNameForLinking()
                 .orElseThrow(IllegalStateException::new);
-            OOText xref = OOFormat.formatReferenceToPageNumberOfReferenceMark(
-                markName
-            );
+            OOText xref = OOFormat.formatReferenceToPageNumberOfReferenceMark(markName);
             stringBuilder.append(xref.toString());
             index++;
         }

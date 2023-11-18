@@ -41,12 +41,7 @@ public class NoBibtexFieldChecker implements EntryChecker {
             .getFields()
             .stream()
             .filter(allBiblatexOnlyFields::contains)
-            .map(name ->
-                new IntegrityMessage(
-                    Localization.lang("biblatex field only"),
-                    entry,
-                    name
-                )
+            .map(name -> new IntegrityMessage(Localization.lang("biblatex field only"), entry, name)
             )
             .collect(Collectors.toList());
     }

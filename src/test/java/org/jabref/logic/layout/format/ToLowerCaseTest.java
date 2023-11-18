@@ -18,10 +18,7 @@ public class ToLowerCaseTest {
 
     @ParameterizedTest
     @MethodSource("provideArguments")
-    public void toLowerCaseWithDifferentInputs(
-        String expectedString,
-        String originalString
-    ) {
+    public void toLowerCaseWithDifferentInputs(String expectedString, String originalString) {
         assertEquals(expectedString, new ToLowerCase().format(originalString));
     }
 

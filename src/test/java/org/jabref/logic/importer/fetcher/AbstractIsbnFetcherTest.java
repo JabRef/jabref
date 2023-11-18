@@ -19,14 +19,11 @@ public abstract class AbstractIsbnFetcherTest {
 
     public abstract void authorsAreCorrectlyFormatted() throws Exception;
 
-    public abstract void searchByIdSuccessfulWithShortISBN()
-        throws FetcherException;
+    public abstract void searchByIdSuccessfulWithShortISBN() throws FetcherException;
 
     @Test
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "978-0321356680"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-0321356680");
         assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
@@ -38,25 +35,16 @@ public abstract class AbstractIsbnFetcherTest {
 
     @Test
     public void searchByIdThrowsExceptionForShortInvalidISBN() {
-        assertThrows(
-            FetcherException.class,
-            () -> fetcher.performSearchById("123456789")
-        );
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789"));
     }
 
     @Test
     public void searchByIdThrowsExceptionForLongInvalidISB() {
-        assertThrows(
-            FetcherException.class,
-            () -> fetcher.performSearchById("012345678910")
-        );
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910"));
     }
 
     @Test
     public void searchByIdThrowsExceptionForInvalidISBN() {
-        assertThrows(
-            FetcherException.class,
-            () -> fetcher.performSearchById("jabref-4-ever")
-        );
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
     }
 }

@@ -15,13 +15,9 @@ import org.mockito.Mockito;
 
 class TimeStampToModificationDateTest {
 
-    private static Field customTimeStampField = new UnknownField(
-        "dateOfCreation"
-    );
+    private static Field customTimeStampField = new UnknownField("dateOfCreation");
 
-    private TimestampPreferences timestampPreferences = Mockito.mock(
-        TimestampPreferences.class
-    );
+    private TimestampPreferences timestampPreferences = Mockito.mock(TimestampPreferences.class);
 
     public void makeMockReturnCustomField() {
         Mockito
@@ -38,27 +34,15 @@ class TimeStampToModificationDateTest {
     public static Stream<Arguments> standardFieldToModificationDate() {
         return Stream.of(
             Arguments.of(
-                new BibEntry()
-                    .withField(
-                        StandardField.MODIFICATIONDATE,
-                        "2018-09-10T00:00:00"
-                    ),
+                new BibEntry().withField(StandardField.MODIFICATIONDATE, "2018-09-10T00:00:00"),
                 new BibEntry().withField(StandardField.TIMESTAMP, "2018-09-10")
             ),
             Arguments.of(
-                new BibEntry()
-                    .withField(
-                        StandardField.MODIFICATIONDATE,
-                        "2020-12-24T00:00:00"
-                    ),
+                new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-24T00:00:00"),
                 new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-24")
             ),
             Arguments.of(
-                new BibEntry()
-                    .withField(
-                        StandardField.MODIFICATIONDATE,
-                        "2020-12-31T00:00:00"
-                    ),
+                new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-31T00:00:00"),
                 new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-31")
             )
         );
@@ -69,10 +53,7 @@ class TimeStampToModificationDateTest {
      */
     @ParameterizedTest
     @MethodSource("standardFieldToModificationDate")
-    public void withStandardFieldToModificationDate(
-        BibEntry expected,
-        BibEntry input
-    ) {
+    public void withStandardFieldToModificationDate(BibEntry expected, BibEntry input) {
         makeMockReturnStandardField();
         TimeStampToModificationDate migrator = new TimeStampToModificationDate(
             timestampPreferences
@@ -84,27 +65,15 @@ class TimeStampToModificationDateTest {
     public static Stream<Arguments> customFieldToModificationDate() {
         return Stream.of(
             Arguments.of(
-                new BibEntry()
-                    .withField(
-                        StandardField.MODIFICATIONDATE,
-                        "2018-09-10T00:00:00"
-                    ),
+                new BibEntry().withField(StandardField.MODIFICATIONDATE, "2018-09-10T00:00:00"),
                 new BibEntry().withField(customTimeStampField, "2018-09-10")
             ),
             Arguments.of(
-                new BibEntry()
-                    .withField(
-                        StandardField.MODIFICATIONDATE,
-                        "2020-12-24T00:00:00"
-                    ),
+                new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-24T00:00:00"),
                 new BibEntry().withField(customTimeStampField, "2020-12-24")
             ),
             Arguments.of(
-                new BibEntry()
-                    .withField(
-                        StandardField.MODIFICATIONDATE,
-                        "2020-12-31T00:00:00"
-                    ),
+                new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-31T00:00:00"),
                 new BibEntry().withField(customTimeStampField, "2020-12-31")
             )
         );
@@ -115,10 +84,7 @@ class TimeStampToModificationDateTest {
      */
     @ParameterizedTest
     @MethodSource("customFieldToModificationDate")
-    public void withCustomFieldToModificationDate(
-        BibEntry expected,
-        BibEntry input
-    ) {
+    public void withCustomFieldToModificationDate(BibEntry expected, BibEntry input) {
         makeMockReturnCustomField();
         TimeStampToModificationDate migrator = new TimeStampToModificationDate(
             timestampPreferences

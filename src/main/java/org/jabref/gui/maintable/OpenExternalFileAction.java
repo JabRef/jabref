@@ -31,14 +31,7 @@ public class OpenExternalFileAction extends SimpleCommand {
         PreferencesService preferencesService,
         TaskExecutor taskExecutor
     ) {
-        this(
-            dialogService,
-            stateManager,
-            preferencesService,
-            null,
-            null,
-            taskExecutor
-        );
+        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
     }
 
     public OpenExternalFileAction(
@@ -78,11 +71,9 @@ public class OpenExternalFileAction extends SimpleCommand {
             .getActiveDatabase()
             .ifPresent(databaseContext -> {
                 if (entry == null) {
-                    final List<BibEntry> selectedEntries =
-                        stateManager.getSelectedEntries();
+                    final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
 
-                    List<LinkedFileViewModel> linkedFileViewModelList =
-                        new LinkedList<>();
+                    List<LinkedFileViewModel> linkedFileViewModelList = new LinkedList<>();
                     LinkedFileViewModel linkedFileViewModel;
 
                     for (BibEntry entry : selectedEntries) {
@@ -103,18 +94,15 @@ public class OpenExternalFileAction extends SimpleCommand {
 
                     // ask the user when detecting # of files > FILES_LIMIT
                     if (linkedFileViewModelList.size() > FILES_LIMIT) {
-                        boolean continueOpening =
-                            dialogService.showConfirmationDialogAndWait(
-                                Localization.lang(
-                                    "Opening large number of files"
-                                ),
-                                Localization.lang(
-                                    "You are about to open %0 files. Continue?",
-                                    linkedFileViewModelList.size()
-                                ),
-                                Localization.lang("Continue"),
-                                Localization.lang("Cancel")
-                            );
+                        boolean continueOpening = dialogService.showConfirmationDialogAndWait(
+                            Localization.lang("Opening large number of files"),
+                            Localization.lang(
+                                "You are about to open %0 files. Continue?",
+                                linkedFileViewModelList.size()
+                            ),
+                            Localization.lang("Continue"),
+                            Localization.lang("Cancel")
+                        );
                         if (!continueOpening) {
                             return;
                         }
@@ -122,15 +110,14 @@ public class OpenExternalFileAction extends SimpleCommand {
 
                     linkedFileViewModelList.forEach(LinkedFileViewModel::open);
                 } else {
-                    LinkedFileViewModel linkedFileViewModel =
-                        new LinkedFileViewModel(
-                            linkedFile,
-                            entry,
-                            databaseContext,
-                            taskExecutor,
-                            dialogService,
-                            preferencesService
-                        );
+                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
+                        linkedFile,
+                        entry,
+                        databaseContext,
+                        taskExecutor,
+                        dialogService,
+                        preferencesService
+                    );
                     linkedFileViewModel.open();
                 }
             });

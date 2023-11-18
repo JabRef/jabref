@@ -29,15 +29,10 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsAuthorSearch() throws Exception {
-        StringJoiner queryBuilder = new StringJoiner(
-            "\" AND author:\"",
-            "author:\"",
-            "\""
-        );
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
-        List<BibEntry> result = getFetcher()
-            .performSearch(queryBuilder.toString());
+        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
@@ -47,9 +42,7 @@ interface SearchBasedFetcherCapabilityTest {
             // The co-authors differ, thus we check for the author present at all papers
             getTestAuthors()
                 .forEach(expectedAuthor ->
-                    Assertions.assertTrue(
-                        author.contains(expectedAuthor.replace("\"", ""))
-                    )
+                    Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", "")))
                 );
         });
     }
@@ -59,8 +52,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearSearch() throws Exception {
-        List<BibEntry> result = getFetcher()
-            .performSearch("year:" + getTestYear());
+        List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result
             .stream()
@@ -70,10 +62,7 @@ interface SearchBasedFetcherCapabilityTest {
             .distinct()
             .collect(Collectors.toList());
 
-        assertEquals(
-            Collections.singletonList(getTestYear().toString()),
-            differentYearsInResult
-        );
+        assertEquals(Collections.singletonList(getTestYear().toString()), differentYearsInResult);
     }
 
     /**
@@ -83,8 +72,7 @@ interface SearchBasedFetcherCapabilityTest {
     default void supportsYearRangeSearch() throws Exception {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
-        List<BibEntry> result = getFetcher()
-            .performSearch("year-range:2018-2020");
+        List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result
             .stream()
@@ -105,16 +93,13 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsJournalSearch() throws Exception {
-        List<BibEntry> result = getFetcher()
-            .performSearch("journal:\"" + getTestJournal() + "\"");
+        List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
             assertTrue(bibEntry.hasField(StandardField.JOURNAL));
-            String journal = bibEntry
-                .getField(StandardField.JOURNAL)
-                .orElse("");
+            String journal = bibEntry.getField(StandardField.JOURNAL).orElse("");
             assertTrue(journal.contains(getTestJournal().replace("\"", "")));
         });
     }

@@ -16,15 +16,9 @@ import javafx.scene.input.DragEvent;
 public class ControlHelper {
 
     // Pseudo-classes for drag and drop
-    private static PseudoClass dragOverBottom = PseudoClass.getPseudoClass(
-        "dragOver-bottom"
-    );
-    private static PseudoClass dragOverCenter = PseudoClass.getPseudoClass(
-        "dragOver-center"
-    );
-    private static PseudoClass dragOverTop = PseudoClass.getPseudoClass(
-        "dragOver-top"
-    );
+    private static PseudoClass dragOverBottom = PseudoClass.getPseudoClass("dragOver-bottom");
+    private static PseudoClass dragOverCenter = PseudoClass.getPseudoClass("dragOver-center");
+    private static PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
 
     public enum EllipsisPosition {
         BEGINNING,
@@ -79,10 +73,7 @@ public class ControlHelper {
         return new TextFormatter<>(filter);
     }
 
-    public static void removePseudoClasses(
-        Cell<?> cell,
-        PseudoClass... pseudoClasses
-    ) {
+    public static void removePseudoClasses(Cell<?> cell, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
             cell.pseudoClassStateChanged(pseudoClass, false);
         }
@@ -91,10 +82,7 @@ public class ControlHelper {
     /**
      * Determines where the mouse is in the given cell.
      */
-    public static DroppingMouseLocation getDroppingMouseLocation(
-        Cell<?> cell,
-        DragEvent event
-    ) {
+    public static DroppingMouseLocation getDroppingMouseLocation(Cell<?> cell, DragEvent event) {
         if ((cell.getHeight() * 0.25) > event.getY()) {
             return DroppingMouseLocation.TOP;
         } else if ((cell.getHeight() * 0.75) < event.getY()) {
@@ -165,10 +153,7 @@ public class ControlHelper {
                 case BEGINNING:
                     return (
                         ellipsisString +
-                        text.substring(
-                            text.length() -
-                            (maxCharacters - ellipsisString.length())
-                        )
+                        text.substring(text.length() - (maxCharacters - ellipsisString.length()))
                     );
                 case CENTER:
                     int partialLength = (int) Math.floor(
@@ -181,11 +166,7 @@ public class ControlHelper {
                     );
                 case ENDING:
                     return (
-                        text.substring(
-                            0,
-                            maxCharacters - ellipsisString.length()
-                        ) +
-                        ellipsisString
+                        text.substring(0, maxCharacters - ellipsisString.length()) + ellipsisString
                     );
             }
         }

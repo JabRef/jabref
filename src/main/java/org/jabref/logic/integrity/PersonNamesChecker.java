@@ -25,13 +25,11 @@ public class PersonNamesChecker implements ValueChecker {
 
         String valueTrimmedAndLowerCase = value.trim().toLowerCase(Locale.ROOT);
         if (
-            valueTrimmedAndLowerCase.startsWith("and ") ||
-            valueTrimmedAndLowerCase.startsWith(",")
+            valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")
         ) {
             return Optional.of(Localization.lang("should start with a name"));
         } else if (
-            valueTrimmedAndLowerCase.endsWith(" and") ||
-            valueTrimmedAndLowerCase.endsWith(",")
+            valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")
         ) {
             return Optional.of(Localization.lang("should end with a name"));
         }

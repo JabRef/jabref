@@ -25,8 +25,7 @@ class OOBibStyleTestHelper {
     /*
      * Minimal implementation for CitationMarkerNumericEntry
      */
-    static class CitationMarkerNumericEntryImpl
-        implements CitationMarkerNumericEntry {
+    static class CitationMarkerNumericEntryImpl implements CitationMarkerNumericEntry {
 
         /*
          * The number encoding "this entry is unresolved" for the constructor.
@@ -43,10 +42,7 @@ class OOBibStyleTestHelper {
             Optional<OOText> pageInfo
         ) {
             this.citationKey = citationKey;
-            this.num =
-                num == UNRESOLVED_ENTRY_NUMBER
-                    ? Optional.empty()
-                    : Optional.of(num);
+            this.num = num == UNRESOLVED_ENTRY_NUMBER ? Optional.empty() : Optional.of(num);
             this.pageInfo = PageInfo.normalizePageInfo(pageInfo);
         }
 
@@ -66,16 +62,12 @@ class OOBibStyleTestHelper {
         }
     }
 
-    static class CitationMarkerNumericBibEntryImpl
-        implements CitationMarkerNumericBibEntry {
+    static class CitationMarkerNumericBibEntryImpl implements CitationMarkerNumericBibEntry {
 
         String key;
         Optional<Integer> number;
 
-        public CitationMarkerNumericBibEntryImpl(
-            String key,
-            Optional<Integer> number
-        ) {
+        public CitationMarkerNumericBibEntryImpl(String key, Optional<Integer> number) {
             this.key = key;
             this.number = number;
         }
@@ -91,10 +83,7 @@ class OOBibStyleTestHelper {
         }
     }
 
-    static CitationMarkerNumericBibEntry numBibEntry(
-        String key,
-        Optional<Integer> number
-    ) {
+    static CitationMarkerNumericBibEntry numBibEntry(String key, Optional<Integer> number) {
         return new CitationMarkerNumericBibEntryImpl(key, number);
     }
 
@@ -112,46 +101,29 @@ class OOBibStyleTestHelper {
         if (inList) {
             if (num.size() != 1) {
                 throw new IllegalArgumentException(
-                    "Numeric label for the bibliography with " +
-                    num.size() +
-                    " numbers?"
+                    "Numeric label for the bibliography with " + num.size() + " numbers?"
                 );
             }
             int n = num.get(0);
-            CitationMarkerNumericBibEntryImpl x =
-                new CitationMarkerNumericBibEntryImpl(
-                    "key",
-                    n == 0 ? Optional.empty() : Optional.of(n)
-                );
+            CitationMarkerNumericBibEntryImpl x = new CitationMarkerNumericBibEntryImpl(
+                "key",
+                n == 0 ? Optional.empty() : Optional.of(n)
+            );
             return style.getNumCitationMarkerForBibliography(x).toString();
         } else {
             List<CitationMarkerNumericEntry> input = num
                 .stream()
-                .map(n ->
-                    new CitationMarkerNumericEntryImpl(
-                        "key" + n,
-                        n,
-                        Optional.empty()
-                    )
-                )
+                .map(n -> new CitationMarkerNumericEntryImpl("key" + n, n, Optional.empty()))
                 .collect(Collectors.toList());
-            return style
-                .getNumCitationMarker2(input, minGroupingCount)
-                .toString();
+            return style.getNumCitationMarker2(input, minGroupingCount).toString();
         }
     }
 
     /*
      * Unlike getNumCitationMarker, getNumCitationMarker2 can handle pageInfo.
      */
-    static CitationMarkerNumericEntry numEntry(
-        String key,
-        int num,
-        String pageInfoOrNull
-    ) {
-        Optional<OOText> pageInfo = Optional.ofNullable(
-            OOText.fromString(pageInfoOrNull)
-        );
+    static CitationMarkerNumericEntry numEntry(String key, int num, String pageInfoOrNull) {
+        Optional<OOText> pageInfo = Optional.ofNullable(OOText.fromString(pageInfoOrNull));
         return new CitationMarkerNumericEntryImpl(key, num, pageInfo);
     }
 
@@ -160,9 +132,7 @@ class OOBibStyleTestHelper {
         int minGroupingCount,
         CitationMarkerNumericEntry... s
     ) {
-        List<CitationMarkerNumericEntry> input = Stream
-            .of(s)
-            .collect(Collectors.toList());
+        List<CitationMarkerNumericEntry> input = Stream.of(s).collect(Collectors.toList());
         OOText res = style.getNumCitationMarker2(input, minGroupingCount);
         return res.toString();
     }
@@ -182,19 +152,13 @@ class OOBibStyleTestHelper {
         boolean isFirstAppearanceOfSource
     ) {
         if (entry.getCitationKey().isEmpty()) {
-            throw new IllegalArgumentException(
-                "entry.getCitationKey() is empty"
-            );
+            throw new IllegalArgumentException("entry.getCitationKey() is empty");
         }
         String citationKey = entry.getCitationKey().get();
         Citation result = new Citation(citationKey);
-        result.setLookupResult(
-            Optional.of(new CitationLookupResult(entry, database))
-        );
+        result.setLookupResult(Optional.of(new CitationLookupResult(entry, database)));
         result.setUniqueLetter(Optional.ofNullable(uniqueLetterQ));
-        Optional<OOText> pageInfo = Optional.ofNullable(
-            OOText.fromString(pageInfoQ)
-        );
+        Optional<OOText> pageInfo = Optional.ofNullable(OOText.fromString(pageInfoQ));
         result.setPageInfo(PageInfo.normalizePageInfo(pageInfo));
         result.setIsFirstAppearanceOfSource(isFirstAppearanceOfSource);
         return result;
@@ -239,11 +203,7 @@ class OOBibStyleTestHelper {
             citationMarkerEntries.add(e);
         }
         return style
-            .createCitationMarker(
-                citationMarkerEntries,
-                inParenthesis,
-                nonunique
-            )
+            .createCitationMarker(citationMarkerEntries, inParenthesis, nonunique)
             .toString();
     }
 

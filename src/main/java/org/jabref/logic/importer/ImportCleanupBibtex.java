@@ -5,8 +5,7 @@ import org.jabref.model.entry.BibEntry;
 
 public class ImportCleanupBibtex implements ImportCleanup {
 
-    private final ConvertToBibtexCleanup convertToBibtexCleanup =
-        new ConvertToBibtexCleanup();
+    private final ConvertToBibtexCleanup convertToBibtexCleanup = new ConvertToBibtexCleanup();
 
     /**
      * Performs a format conversion of the given entry into the targeted format.

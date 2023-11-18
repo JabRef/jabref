@@ -27,34 +27,22 @@ public class NormalizeEnDashesFormatterTest {
 
     @Test
     public void formatExampleOfChangelog() {
-        assertEquals(
-            "Example -- illustrative",
-            formatter.format("Example - illustrative")
-        );
+        assertEquals("Example -- illustrative", formatter.format("Example - illustrative"));
     }
 
     @Test
     public void dashesWithinWordsAreKept() {
-        assertEquals(
-            "Example-illustrative",
-            formatter.format("Example-illustrative")
-        );
+        assertEquals("Example-illustrative", formatter.format("Example-illustrative"));
     }
 
     @Test
     public void dashesPreceededByASpaceAreKept() {
-        assertEquals(
-            "Example -illustrative",
-            formatter.format("Example -illustrative")
-        );
+        assertEquals("Example -illustrative", formatter.format("Example -illustrative"));
     }
 
     @Test
     public void dashesFollowedByASpaceAreKept() {
-        assertEquals(
-            "Example- illustrative",
-            formatter.format("Example- illustrative")
-        );
+        assertEquals("Example- illustrative", formatter.format("Example- illustrative"));
     }
 
     @Test

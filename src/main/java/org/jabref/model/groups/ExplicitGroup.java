@@ -20,20 +20,8 @@ public class ExplicitGroup extends WordKeywordGroup {
      */
     private final List<String> legacyEntryKeys = new ArrayList<>();
 
-    public ExplicitGroup(
-        String name,
-        GroupHierarchyType context,
-        Character keywordSeparator
-    ) {
-        super(
-            name,
-            context,
-            StandardField.GROUPS,
-            name,
-            true,
-            keywordSeparator,
-            true
-        );
+    public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
+        super(name, context, StandardField.GROUPS, name, true, keywordSeparator, true);
     }
 
     public void addLegacyEntryKey(String key) {
@@ -62,10 +50,7 @@ public class ExplicitGroup extends WordKeywordGroup {
         ExplicitGroup other = (ExplicitGroup) o;
         return (
             Objects.equals(getName(), other.getName()) &&
-            Objects.equals(
-                getHierarchicalContext(),
-                other.getHierarchicalContext()
-            ) &&
+            Objects.equals(getHierarchicalContext(), other.getHierarchicalContext()) &&
             Objects.equals(getIconName(), other.getIconName()) &&
             Objects.equals(getDescription(), other.getDescription()) &&
             Objects.equals(getColor(), other.getColor()) &&

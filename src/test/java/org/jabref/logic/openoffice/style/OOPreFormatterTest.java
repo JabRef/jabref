@@ -50,36 +50,15 @@ public class OOPreFormatterTest {
 
     @Test
     public void testFormatting() {
-        assertEquals(
-            "<i>kkk</i>",
-            new OOPreFormatter().format("\\textit{kkk}")
-        );
+        assertEquals("<i>kkk</i>", new OOPreFormatter().format("\\textit{kkk}"));
         assertEquals("<i>kkk</i>", new OOPreFormatter().format("{\\it kkk}"));
         assertEquals("<i>kkk</i>", new OOPreFormatter().format("\\emph{kkk}"));
-        assertEquals(
-            "<b>kkk</b>",
-            new OOPreFormatter().format("\\textbf{kkk}")
-        );
-        assertEquals(
-            "<smallcaps>kkk</smallcaps>",
-            new OOPreFormatter().format("\\textsc{kkk}")
-        );
+        assertEquals("<b>kkk</b>", new OOPreFormatter().format("\\textbf{kkk}"));
+        assertEquals("<smallcaps>kkk</smallcaps>", new OOPreFormatter().format("\\textsc{kkk}"));
         assertEquals("<s>kkk</s>", new OOPreFormatter().format("\\sout{kkk}"));
-        assertEquals(
-            "<u>kkk</u>",
-            new OOPreFormatter().format("\\underline{kkk}")
-        );
-        assertEquals(
-            "<tt>kkk</tt>",
-            new OOPreFormatter().format("\\texttt{kkk}")
-        );
-        assertEquals(
-            "<sup>kkk</sup>",
-            new OOPreFormatter().format("\\textsuperscript{kkk}")
-        );
-        assertEquals(
-            "<sub>kkk</sub>",
-            new OOPreFormatter().format("\\textsubscript{kkk}")
-        );
+        assertEquals("<u>kkk</u>", new OOPreFormatter().format("\\underline{kkk}"));
+        assertEquals("<tt>kkk</tt>", new OOPreFormatter().format("\\texttt{kkk}"));
+        assertEquals("<sup>kkk</sup>", new OOPreFormatter().format("\\textsuperscript{kkk}"));
+        assertEquals("<sub>kkk</sub>", new OOPreFormatter().format("\\textsubscript{kkk}"));
     }
 }

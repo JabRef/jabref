@@ -28,23 +28,17 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DefaultFileUpdateMonitor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
-    private final Multimap<Path, FileUpdateListener> listeners =
-        ArrayListMultimap.create(20, 4);
+    private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
-    private final AtomicReference<
-        Optional<JabRefException>
-    > filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
+    private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure =
+        new AtomicReference<>(Optional.empty());
 
     @Override
     public void run() {
-        try (
-            WatchService watcher = FileSystems.getDefault().newWatchService()
-        ) {
+        try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
             this.watcher = watcher;
             filesystemMonitorFailure.set(Optional.empty());
 
@@ -69,8 +63,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                         // We only handle "ENTRY_CREATE" and "ENTRY_MODIFY" here, so the context is always a Path
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                        Path path =
-                            ((Path) key.watchable()).resolve(ev.context());
+                        Path path = ((Path) key.watchable()).resolve(ev.context());
                         notifyAboutChange(path);
                     }
                     key.reset();
@@ -98,8 +91,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     }
 
     @Override
-    public void addListenerForFile(Path file, FileUpdateListener listener)
-        throws IOException {
+    public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
         if (isActive()) {
             // We can't watch files directly, so monitor their parent directory for updates
             Path directory = file.toAbsolutePath().getParent();

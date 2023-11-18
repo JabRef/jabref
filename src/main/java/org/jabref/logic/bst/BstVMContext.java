@@ -18,11 +18,7 @@ public record BstVMContext(
     BibDatabase bibDatabase,
     Optional<Path> path
 ) {
-    public BstVMContext(
-        List<BstEntry> entries,
-        BibDatabase bibDatabase,
-        Path path
-    ) {
+    public BstVMContext(List<BstEntry> entries, BibDatabase bibDatabase, Path path) {
         // LinkedList instead of ArrayDeque, because we (currently) need null support
         this(
             entries,

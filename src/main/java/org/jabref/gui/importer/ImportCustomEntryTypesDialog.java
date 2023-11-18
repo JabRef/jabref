@@ -29,17 +29,12 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
     private CheckListView<BibEntryType> unknownEntryTypesCheckList;
 
     @FXML
-    private CheckListView<
-        BibEntryTypePrefsAndFileViewModel
-    > differentCustomizationCheckList;
+    private CheckListView<BibEntryTypePrefsAndFileViewModel> differentCustomizationCheckList;
 
     private final BibDatabaseMode mode;
     private ImportCustomEntryTypesDialogViewModel viewModel;
 
-    public ImportCustomEntryTypesDialog(
-        BibDatabaseMode mode,
-        List<BibEntryType> customEntryTypes
-    ) {
+    public ImportCustomEntryTypesDialog(BibDatabaseMode mode, List<BibEntryType> customEntryTypes) {
         this.mode = mode;
         this.customEntryTypes = customEntryTypes;
 
@@ -48,16 +43,12 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
         setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
                 viewModel.importBibEntryTypes(
-                    unknownEntryTypesCheckList
-                        .getCheckModel()
-                        .getCheckedItems(),
+                    unknownEntryTypesCheckList.getCheckModel().getCheckedItems(),
                     differentCustomizationCheckList
                         .getCheckModel()
                         .getCheckedItems()
                         .stream()
-                        .map(
-                            BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences
-                        )
+                        .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
                         .toList()
                 );
             }
@@ -70,11 +61,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel =
-            new ImportCustomEntryTypesDialogViewModel(
-                mode,
-                customEntryTypes,
-                preferencesService
-            );
+            new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
         boxDifferentCustomization
             .visibleProperty()
             .bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
@@ -83,25 +70,14 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
             .bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());
         unknownEntryTypesCheckList.setCellFactory(listView ->
-            new CheckBoxListCell<>(
-                unknownEntryTypesCheckList::getItemBooleanProperty
-            ) {
+            new CheckBoxListCell<>(unknownEntryTypesCheckList::getItemBooleanProperty) {
                 @Override
-                public void updateItem(
-                    BibEntryType bibEntryType,
-                    boolean empty
-                ) {
+                public void updateItem(BibEntryType bibEntryType, boolean empty) {
                     super.updateItem(bibEntryType, empty);
-                    setText(
-                        bibEntryType == null
-                            ? ""
-                            : bibEntryType.getType().getDisplayName()
-                    );
+                    setText(bibEntryType == null ? "" : bibEntryType.getType().getDisplayName());
                 }
             }
         );
-        differentCustomizationCheckList.setItems(
-            viewModel.differentCustomizations()
-        );
+        differentCustomizationCheckList.setItems(viewModel.differentCustomizations());
     }
 }

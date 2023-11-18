@@ -16,23 +16,13 @@ public class Citation {
     private final int colEnd;
     private final String lineText;
 
-    public Citation(
-        Path path,
-        int line,
-        int colStart,
-        int colEnd,
-        String lineText
-    ) {
+    public Citation(Path path, int line, int colStart, int colEnd, String lineText) {
         if (line <= 0) {
-            throw new IllegalArgumentException(
-                "Line has to be greater than 0."
-            );
+            throw new IllegalArgumentException("Line has to be greater than 0.");
         }
 
         if (colStart < 0 || colEnd > lineText.length()) {
-            throw new IllegalArgumentException(
-                "Citation has to be between 0 and line length."
-            );
+            throw new IllegalArgumentException("Citation has to be between 0 and line length.");
         }
 
         this.path = Objects.requireNonNull(path);

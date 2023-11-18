@@ -24,11 +24,7 @@ public class UndoableChangeType extends AbstractUndoableJabRefEdit {
         );
     }
 
-    public UndoableChangeType(
-        BibEntry entry,
-        EntryType oldType,
-        EntryType newType
-    ) {
+    public UndoableChangeType(BibEntry entry, EntryType oldType, EntryType newType) {
         this.oldType = oldType;
         this.newType = newType;
         this.entry = entry;
@@ -38,13 +34,8 @@ public class UndoableChangeType extends AbstractUndoableJabRefEdit {
     public String getPresentationName() {
         return Localization.lang(
             "change type of entry %0 from %1 to %2",
-            StringUtil.boldHTML(
-                entry.getCitationKey().orElse(Localization.lang("undefined"))
-            ),
-            StringUtil.boldHTML(
-                oldType.getDisplayName(),
-                Localization.lang("undefined")
-            ),
+            StringUtil.boldHTML(entry.getCitationKey().orElse(Localization.lang("undefined"))),
+            StringUtil.boldHTML(oldType.getDisplayName(), Localization.lang("undefined")),
             StringUtil.boldHTML(newType.getDisplayName())
         );
     }

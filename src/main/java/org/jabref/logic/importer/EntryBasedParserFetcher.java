@@ -51,8 +51,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
         URL UrlForEntry;
@@ -64,11 +63,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (
-            InputStream stream = new BufferedInputStream(
-                UrlForEntry.openStream()
-            )
-        ) {
+        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup

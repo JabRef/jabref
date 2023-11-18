@@ -44,10 +44,7 @@ public class LatexIntegrityCheckerTest {
             // Special characters and symbols
             Arguments.of(StandardField.TITLE, "Café"),
             Arguments.of(StandardField.TITLE, "αβγδε"),
-            Arguments.of(
-                StandardField.TITLE,
-                "\\# \\$ \\% \\& \\{ \\} \\_ \\^ \\\\"
-            ),
+            Arguments.of(StandardField.TITLE, "\\# \\$ \\% \\& \\{ \\} \\_ \\^ \\\\"),
             // Fonts and sizes
             Arguments.of(StandardField.TITLE, "\\tiny Tiny Text"),
             Arguments.of(StandardField.TITLE, "\\small Small Text"),
@@ -57,22 +54,13 @@ public class LatexIntegrityCheckerTest {
             Arguments.of(StandardField.TITLE, "$\\widetilde{i}$"),
             Arguments.of(StandardField.TITLE, "\\ldots"),
             // Simple environments
-            Arguments.of(
-                StandardField.TITLE,
-                "\\begin{quote}Quoted Text\\end{quote}\n"
-            ),
-            Arguments.of(
-                StandardField.TITLE,
-                "\\begin{center}Centered Text\\end{center}\n"
-            ),
+            Arguments.of(StandardField.TITLE, "\\begin{quote}Quoted Text\\end{quote}\n"),
+            Arguments.of(StandardField.TITLE, "\\begin{center}Centered Text\\end{center}\n"),
             // Math environment inputs
             Arguments.of(StandardField.TITLE, "$x + y = z$"),
             Arguments.of(StandardField.TITLE, "\\(a^2 + b^2 = c^2\\)"),
             Arguments.of(StandardField.TITLE, "\\[E = mc^2\\]"),
-            Arguments.of(
-                StandardField.TITLE,
-                "\\begin{math} V = I \\cdot R \\end{math}"
-            ),
+            Arguments.of(StandardField.TITLE, "\\begin{math} V = I \\cdot R \\end{math}"),
             // Equations and alignment
             // Currently Unsupported
             // Arguments.of(StandardField.TITLE, "\\begin{align} x + y &= z \\\\ a &= b + c \\end{align}"),
@@ -121,10 +109,7 @@ public class LatexIntegrityCheckerTest {
             // Arguments.of(StandardField.TITLE, "Some \\vspace{1cm} Space"),
 
             // Multiple commands and environments
-            Arguments.of(
-                StandardField.TITLE,
-                "\\textbf{\\emph{Bold and Emphasized Text}} $5-3_k$"
-            ),
+            Arguments.of(StandardField.TITLE, "\\textbf{\\emph{Bold and Emphasized Text}} $5-3_k$"),
             Arguments.of(
                 StandardField.TITLE,
                 "\\begin{itemize} \\item\\begin{quote} \\textbf{Quoted} \\emph{Text} \\end{quote} \\end{itemize}"
@@ -155,22 +140,13 @@ public class LatexIntegrityCheckerTest {
             // Mirrored from org.jabref.logic.integrity.AmpersandCheckerTest.provideAcceptedInputs
             Arguments.of(StandardField.TITLE, "No ampersand at all"),
             Arguments.of(StandardField.FOREWORD, "Properly escaped \\&"),
-            Arguments.of(
-                StandardField.AUTHOR,
-                "\\& Multiple properly escaped \\&"
-            ),
-            Arguments.of(
-                StandardField.BOOKTITLE,
-                "\\\\\\& With multiple backslashes"
-            ),
+            Arguments.of(StandardField.AUTHOR, "\\& Multiple properly escaped \\&"),
+            Arguments.of(StandardField.BOOKTITLE, "\\\\\\& With multiple backslashes"),
             Arguments.of(
                 StandardField.COMMENT,
                 "\\\\\\& With multiple backslashes multiple times \\\\\\\\\\&"
             ),
-            Arguments.of(
-                StandardField.NOTE,
-                "In the \\& middle of \\\\\\& something"
-            ),
+            Arguments.of(StandardField.NOTE, "In the \\& middle of \\\\\\& something"),
             Arguments.of(StandardField.DOI, "10.1007/0-387-22874-8_7"),
             Arguments.of(
                 new UserSpecificCommentField("test"),
@@ -181,11 +157,7 @@ public class LatexIntegrityCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideUnacceptedInputs")
-    void rejectsDisallowedInputs(
-        String expectedMessage,
-        Field field,
-        String value
-    ) {
+    void rejectsDisallowedInputs(String expectedMessage, Field field, String value) {
         entry.setField(field, value);
         assertEquals(
             List.of(new IntegrityMessage(expectedMessage, entry, field)),
@@ -203,18 +175,13 @@ public class LatexIntegrityCheckerTest {
             // ------------------------------------ LATEX PARSING/TOKENISATION ERRORS ------------------------------------
             // TTEG00: Finished reading document before finding required terminator "{0}"
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEG00,
-                    "}"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEG00, "}"),
                 StandardField.ABSTRACT,
                 "Unbalanced braces {"
             ),
             // TTEG01: Nothing following \
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEG01
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEG01),
                 StandardField.ABSTRACT,
                 "\\"
             ),
@@ -224,10 +191,7 @@ public class LatexIntegrityCheckerTest {
 
             // TTEG03: Delimiter {0} closing Math mode followed no matching opener
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEG03,
-                    "\\]"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEG03, "\\]"),
                 StandardField.TITLE,
                 "1+1=2\\]"
             ),
@@ -237,17 +201,13 @@ public class LatexIntegrityCheckerTest {
 
             // TTEM00: Already in math mode - cannot use \( or \[
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEM00
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM00),
                 StandardField.ABSTRACT,
                 "Braces inside: $\\(1+1\\)=2$"
             ),
             // TTEM01: $ was ended by $$
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEM01
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM01),
                 StandardField.TITLE,
                 "$1+1=2$$"
             ),
@@ -256,25 +216,19 @@ public class LatexIntegrityCheckerTest {
 
             // TTEM03: Math superscript (^) and subscript (_) characters are not allowed in text mode
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEM03
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM03),
                 StandardField.SUBTITLE,
                 "_ or ^ Outside Math-Environment"
             ),
             // TTEM04: $ characters cannot be used inside math mode
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEM04
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEM04),
                 StandardField.TITLE,
                 "\\$ inside math mode \\($1+1=2$\\)"
             ),
             // TTEV00: \verb or \verb* must be followed by a non-whitespace delimiter character
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEV00
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEV00),
                 StandardField.KEYWORDS,
                 "\\verb "
             ),
@@ -292,21 +246,13 @@ public class LatexIntegrityCheckerTest {
             ),
             // TTEC01: Command \{0} cannot be used in {1} mode
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEC01,
-                    "par",
-                    "MATH"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEC01, "par", "MATH"),
                 StandardField.TITLE,
                 "$\\par$"
             ),
             // TTEC02: Command \{0} is missing required argument #{1}
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEC02,
-                    "textbf",
-                    "1"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEC02, "textbf", "1"),
                 StandardField.KEYWORDS,
                 "\\textbf"
             ),
@@ -328,9 +274,7 @@ public class LatexIntegrityCheckerTest {
             ),
             // TTEE01: Expected to read valid environment name enclosed in braces without whitespace
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEE01
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEE01),
                 StandardField.TITLE,
                 "\\begin{ align }"
             ),
@@ -355,18 +299,13 @@ public class LatexIntegrityCheckerTest {
             ),
             // TTEE04: Environment {0} was still open at end of input document
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEE04,
-                    "itemize"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEE04, "itemize"),
                 StandardField.ABSTRACT,
                 "\\begin{itemize}"
             ),
             // TTEE05: Unexpected \end - no environment is currently open
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEE05
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEE05),
                 StandardField.KEYWORDS,
                 "\\end{itemize}"
             ),
@@ -385,34 +324,25 @@ public class LatexIntegrityCheckerTest {
 
             // TTEUC0: Input ended before name of new command was found
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC0
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC0),
                 StandardField.TITLE,
                 "\\newcommand{\\"
             ),
             // TTEUC1: Name of new command must be preceded by \
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC1
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC1),
                 StandardField.TITLE,
                 "\\newcommand{MyCommand}"
             ),
             // TTEUC2: Input ended before end of new command definition
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC2
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC2),
                 StandardField.TITLE,
                 "\\newcommand{\\MyCommand}{"
             ),
             // TTEUC3: No definition provided for new command {0}
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC3,
-                    "MyCommand"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC3, "MyCommand"),
                 StandardField.TITLE,
                 "\\newcommand{\\MyCommand}"
             ),
@@ -424,9 +354,7 @@ public class LatexIntegrityCheckerTest {
 
             // TTEUC6: No ’}’ found after new command name
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC6
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC6),
                 StandardField.TITLE,
                 "\\newcommand{\\MyCommand"
             ),
@@ -442,18 +370,13 @@ public class LatexIntegrityCheckerTest {
             ),
             // TTEUC8: Reserved command {0} cannot be redefined
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC8,
-                    "begin"
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC8, "begin"),
                 StandardField.TITLE,
                 "\\renewcommand{\\begin}{}"
             ),
             // TTEUC9: Input ended before end of argument count specification
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUC9
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUC9),
                 StandardField.TITLE,
                 "\\newcommand{\\MyCommand}["
             ),
@@ -470,9 +393,7 @@ public class LatexIntegrityCheckerTest {
             ),
             // TTEUE0: Expected to read name of new environment enclosed in braces
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TTEUE0
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TTEUE0),
                 StandardField.TITLE,
                 "\\newenvironment{}"
             ),
@@ -519,49 +440,37 @@ public class LatexIntegrityCheckerTest {
 
             // TFEL00: Found content before first \item
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TFEL00
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEL00),
                 StandardField.TITLE,
                 "\\begin{itemize}content before first \\item{}\\end{itemize}"
             ),
             // TFEM00: Ambiguous multiple use of \over at current level
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TFEM00
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM00),
                 StandardField.TITLE,
                 "$1 \\over \\over 3$"
             ),
             // TFEM01: Trailing subscript/superscript token
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TFEM01
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM01),
                 StandardField.TITLE,
                 "$x_$"
             ),
             // TFEM02: Double subscript/superscript token is ambiguous - use curly brackets
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TFEM02
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM02),
                 StandardField.TITLE,
                 "$x_i_j$"
             ),
             // TFEM03: \right had no preceding \left
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TFEM03
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM03),
                 StandardField.TITLE,
                 "$\\right)$"
             ),
             // TFEM04: \left had no following \right
             Arguments.of(
-                LatexIntegrityChecker.errorMessageFormatHelper(
-                    CoreErrorCode.TFEM04
-                ),
+                LatexIntegrityChecker.errorMessageFormatHelper(CoreErrorCode.TFEM04),
                 StandardField.TITLE,
                 "$\\left($"
             )

@@ -10,8 +10,7 @@ public class SpecialFieldsPreferences {
     private final BooleanProperty specialFieldsEnabled;
 
     public SpecialFieldsPreferences(boolean specialFieldsEnabled) {
-        this.specialFieldsEnabled =
-            new SimpleBooleanProperty(specialFieldsEnabled);
+        this.specialFieldsEnabled = new SimpleBooleanProperty(specialFieldsEnabled);
     }
 
     public boolean isSpecialFieldsEnabled() {

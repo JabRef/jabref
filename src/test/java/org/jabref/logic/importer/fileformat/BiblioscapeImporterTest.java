@@ -44,10 +44,7 @@ public class BiblioscapeImporterTest {
     @Test
     public void testImportEntriesAbortion() throws Throwable {
         Path file = Path.of(
-            BiblioscapeImporter.class.getResource(
-                    "BiblioscapeImporterTestCorrupt.txt"
-                )
-                .toURI()
+            BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI()
         );
         assertEquals(
             Collections.emptyList(),

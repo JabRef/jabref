@@ -33,8 +33,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     public static final String FETCHER_NAME = "DBLP";
 
-    private static final String BASIC_SEARCH_URL =
-        "https://dblp.org/search/publ/api";
+    private static final String BASIC_SEARCH_URL = "https://dblp.org/search/publ/api";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -49,9 +48,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
         uriBuilder.addParameter(
             "q",
-            new DBLPQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new DBLPQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
         uriBuilder.addParameter("h", String.valueOf(100)); // number of hits
         uriBuilder.addParameter("c", String.valueOf(0)); // no need for auto-completion
@@ -74,16 +71,11 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         FieldFormatterCleanups cleanups = new FieldFormatterCleanups(
             true,
             List.of(
-                new FieldFormatterCleanup(
-                    StandardField.TIMESTAMP,
-                    new ClearFormatter()
-                ),
+                new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
                 // unescape the the contents of the URL field, e.g., some\_url\_part becomes some_url_part
                 new FieldFormatterCleanup(
                     StandardField.URL,
-                    new LayoutFormatterBasedFormatter(
-                        new RemoveLatexCommandsFormatter()
-                    )
+                    new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter())
                 )
             )
         );

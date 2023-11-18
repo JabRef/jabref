@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 @Path("libraries/{id}")
 public class LibraryResource {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryResource.class
-    );
+    public static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
 
     @Inject
     PreferencesService preferences;
@@ -48,11 +46,7 @@ public class LibraryResource {
             .getDatabase()
             .getEntries()
             .stream()
-            .peek(bibEntry ->
-                bibEntry
-                    .getSharedBibEntryData()
-                    .setSharedID(Objects.hash(bibEntry))
-            )
+            .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
             .map(entry ->
                 new BibEntryDTO(
                     entry,
@@ -69,8 +63,7 @@ public class LibraryResource {
     @Produces(JabrefMediaType.JSON_CSL_ITEM)
     public String getClsItemJson(@PathParam("id") String id) {
         ParserResult parserResult = getParserResult(id);
-        JabRefItemDataProvider jabRefItemDataProvider =
-            new JabRefItemDataProvider();
+        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
         jabRefItemDataProvider.setData(
             parserResult.getDatabaseContext(),
             new BibEntryTypesManager()
@@ -90,10 +83,7 @@ public class LibraryResource {
                     .importDatabase(library);
         } catch (IOException e) {
             LOGGER.warn("Could not find open library file {}", library, e);
-            throw new InternalServerErrorException(
-                "Could not parse library",
-                e
-            );
+            throw new InternalServerErrorException("Could not parse library", e);
         }
         return parserResult;
     }
@@ -107,10 +97,7 @@ public class LibraryResource {
             libraryAsString = Files.readString(library);
         } catch (IOException e) {
             LOGGER.error("Could not read library {}", library, e);
-            throw new InternalServerErrorException(
-                "Could not read library " + library,
-                e
-            );
+            throw new InternalServerErrorException("Could not read library " + library, e);
         }
         return Response.ok().entity(libraryAsString).build();
     }
@@ -121,11 +108,7 @@ public class LibraryResource {
             .getLastFilesOpened()
             .stream()
             .map(java.nio.file.Path::of)
-            .filter(p ->
-                (p.getFileName() +
-                    "-" +
-                    BackupFileUtil.getUniqueFilePrefix(p)).equals(id)
-            )
+            .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
             .findAny()
             .orElseThrow(NotFoundException::new);
     }

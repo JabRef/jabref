@@ -16,17 +16,12 @@ import org.slf4j.LoggerFactory;
 
 public class EditExistingStudyAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        EditExistingStudyAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditExistingStudyAction.class);
 
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public EditExistingStudyAction(
-        DialogService dialogService,
-        StateManager stateManager
-    ) {
+    public EditExistingStudyAction(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.executable.bind(ActionHelper.needsStudyDatabase(stateManager));
@@ -42,9 +37,7 @@ public class EditExistingStudyAction extends SimpleCommand {
         ) {
             return;
         }
-        BibDatabaseContext bibDatabaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
 
         // The action can only be called on an existing AND saved study library
         // The saving is ensured at creation of a study library
@@ -63,21 +56,14 @@ public class EditExistingStudyAction extends SimpleCommand {
             study =
                 new StudyYamlParser()
                     .parseStudyYamlFile(
-                        studyDirectory.resolve(
-                            StudyRepository.STUDY_DEFINITION_FILE_NAME
-                        )
+                        studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME)
                     );
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(
-                Localization.lang("Error opening file"),
-                e
-            );
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), e);
             return;
         }
 
         // When the dialog returns, the study.yml file is updated (or kept unmodified at Cancel)
-        dialogService.showCustomDialogAndWait(
-            new ManageStudyDefinitionView(study, studyDirectory)
-        );
+        dialogService.showCustomDialogAndWait(new ManageStudyDefinitionView(study, studyDirectory));
     }
 }

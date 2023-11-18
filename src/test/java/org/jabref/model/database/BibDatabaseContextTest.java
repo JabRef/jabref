@@ -48,9 +48,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         assertEquals(
-            Collections.singletonList(
-                currentWorkingDir.resolve(file.getParent())
-            ),
+            Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
             database.getFileDirectories(fileDirPrefs)
         );
     }
@@ -62,9 +60,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         assertEquals(
-            Collections.singletonList(
-                currentWorkingDir.resolve(file.getParent())
-            ),
+            Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
             database.getFileDirectories(fileDirPrefs)
         );
     }
@@ -76,9 +72,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         assertEquals(
-            Collections.singletonList(
-                currentWorkingDir.resolve(file.getParent())
-            ),
+            Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
             database.getFileDirectories(fileDirPrefs)
         );
     }
@@ -115,14 +109,10 @@ class BibDatabaseContextTest {
 
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
-        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(false);
-        Path userDirJabRef = OS
-            .getNativeDesktop()
-            .getDefaultFileChooserDirectory();
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        Path userDirJabRef = OS.getNativeDesktop().getDefaultFileChooserDirectory();
 
-        when(fileDirPrefs.getMainFileDirectory())
-            .thenReturn(Optional.of(userDirJabRef));
+        when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(

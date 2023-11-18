@@ -24,12 +24,7 @@ public enum AMSField implements Field {
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
-    AMSField(
-        String name,
-        String displayName,
-        FieldProperty first,
-        FieldProperty... rest
-    ) {
+    AMSField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
         this.name = name;
         this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);

@@ -58,28 +58,19 @@ public class ACMPortalParserTest {
                         "Proceedings of the 11th European Conference on Software Architecture: Companion Proceedings"
                     )
                     .withField(StandardField.DOI, "10.1145/3129790.3129810")
-                    .withField(
-                        StandardField.LOCATION,
-                        "Canterbury, United Kingdom"
-                    )
+                    .withField(StandardField.LOCATION, "Canterbury, United Kingdom")
                     .withField(StandardField.ISBN, "9781450352178")
                     .withField(
                         StandardField.KEYWORDS,
                         "conformance checking, repository data mining, software architecture"
                     )
-                    .withField(
-                        StandardField.PUBLISHER,
-                        "Association for Computing Machinery"
-                    )
+                    .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
                     .withField(StandardField.ADDRESS, "New York, NY, USA")
                     .withField(
                         StandardField.TITLE,
                         "The relationship of code churn and architectural violations in the open source software JabRef"
                     )
-                    .withField(
-                        StandardField.URL,
-                        "https://doi.org/10.1145/3129790.3129810"
-                    )
+                    .withField(StandardField.URL, "https://doi.org/10.1145/3129790.3129810")
                     .withField(StandardField.PAGETOTAL, "7")
                     .withField(StandardField.PAGES, "152–158"),
                 new BibEntry(StandardEntryType.Book)
@@ -91,10 +82,7 @@ public class ACMPortalParserTest {
                     )
                     .withField(StandardField.LOCATION, "Seattle, WA, USA")
                     .withField(StandardField.ISBN, "9781450342186")
-                    .withField(
-                        StandardField.PUBLISHER,
-                        "Association for Computing Machinery"
-                    )
+                    .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
                     .withField(StandardField.ADDRESS, "New York, NY, USA")
             );
     }
@@ -102,16 +90,11 @@ public class ACMPortalParserTest {
     @Test
     void testParseEntries() throws IOException, ParseException {
         CookieHandler.setDefault(new CookieManager());
-        List<BibEntry> bibEntries = parser.parseEntries(
-            new URLDownload(searchUrl).asInputStream()
-        );
+        List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(searchUrl).asInputStream());
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertEquals(
-            Optional.of(searchEntryList.get(0)),
-            bibEntries.stream().findFirst()
-        );
+        assertEquals(Optional.of(searchEntryList.get(0)), bibEntries.stream().findFirst());
     }
 
     @Test
@@ -127,13 +110,8 @@ public class ACMPortalParserTest {
 
     @Test
     void testGetBibEntriesFromDoiList() throws FetcherException {
-        List<String> testDoiList = List.of(
-            "10.1145/3129790.3129810",
-            "10.1145/2950290"
-        );
-        List<BibEntry> bibEntries = parser.getBibEntriesFromDoiList(
-            testDoiList
-        );
+        List<String> testDoiList = List.of("10.1145/3129790.3129810", "10.1145/2950290");
+        List<BibEntry> bibEntries = parser.getBibEntriesFromDoiList(testDoiList);
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
@@ -141,15 +119,11 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testGetUrlFromDoiList()
-        throws MalformedURLException, URISyntaxException {
+    void testGetUrlFromDoiList() throws MalformedURLException, URISyntaxException {
         String target =
             "https://dl.acm.org/action/exportCiteProcCitation?targetFile=custom-bibtex&format=bibTex&dois=10.1145%2F3129790.3129810%2C10.1145%2F2950290";
 
-        List<String> doiList = List.of(
-            "10.1145/3129790.3129810",
-            "10.1145/2950290"
-        );
+        List<String> doiList = List.of("10.1145/3129790.3129810", "10.1145/2950290");
         URL url = parser.getUrlFromDoiList(doiList);
         assertEquals(target, url.toString());
     }
@@ -183,10 +157,7 @@ public class ACMPortalParserTest {
             .withField(StandardField.PAGES, "216–221")
             .withField(StandardField.ADDRESS, "New York, NY, USA")
             .withField(StandardField.MONTH, "12")
-            .withField(
-                StandardField.PUBLISHER,
-                "Association for Computing Machinery"
-            )
+            .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
             .withField(StandardField.LOCATION, "Ho Chi Minh City, Vietnam")
             .withField(StandardField.ISBN, "9781450348157")
             .withField(StandardField.DAY, "8")
@@ -196,27 +167,21 @@ public class ACMPortalParserTest {
                 StandardField.KEYWORDS,
                 "four-wave mixing (FWM), long-range passive optical network (LR PON), orthogonal frequency division multiplexing (OFDM), wavelength division multiplexing (WDM)"
             )
-            .withField(
-                StandardField.URL,
-                "https://doi.org/10.1145/3011077.3011113"
-            );
+            .withField(StandardField.URL, "https://doi.org/10.1145/3011077.3011113");
 
         BibEntry parsedEntry = parser.parseBibEntry(json);
         assertEquals(expectedEntry, parsedEntry);
     }
 
     @Test
-    void testNoEntryFound()
-        throws URISyntaxException, IOException, ParseException {
+    void testNoEntryFound() throws URISyntaxException, IOException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         URL url = new URIBuilder(
             "https://dl.acm.org/action/doSearch?AllField=10.1145/3129790.31298"
         )
             .build()
             .toURL();
-        List<BibEntry> bibEntries = parser.parseEntries(
-            new URLDownload(url).asInputStream()
-        );
+        List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(url).asInputStream());
         assertEquals(Collections.emptyList(), bibEntries);
     }
 }

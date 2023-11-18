@@ -21,19 +21,13 @@ public abstract class ThreeWayMergeCell extends HBox {
         EasyBind.subscribe(
             viewModel.oddProperty(),
             isOdd -> {
-                pseudoClassStateChanged(
-                    PseudoClass.getPseudoClass(ODD_PSEUDO_CLASS),
-                    isOdd
-                );
+                pseudoClassStateChanged(PseudoClass.getPseudoClass(ODD_PSEUDO_CLASS), isOdd);
             }
         );
         EasyBind.subscribe(
             viewModel.evenProperty(),
             isEven -> {
-                pseudoClassStateChanged(
-                    PseudoClass.getPseudoClass(EVEN_PSEUDO_CLASS),
-                    isEven
-                );
+                pseudoClassStateChanged(PseudoClass.getPseudoClass(EVEN_PSEUDO_CLASS), isEven);
             }
         );
     }

@@ -9,26 +9,14 @@ public class MsBibAuthorTest {
 
     @Test
     public void testGetFirstName() {
-        Author author = new Author(
-            "Gustav Peter Johann",
-            null,
-            null,
-            "Bach",
-            null
-        );
+        Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Gustav", msBibAuthor.getFirstName());
     }
 
     @Test
     public void testGetMiddleName() {
-        Author author = new Author(
-            "Gustav Peter Johann",
-            null,
-            null,
-            "Bach",
-            null
-        );
+        Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Peter Johann", msBibAuthor.getMiddleName());
     }
@@ -49,13 +37,7 @@ public class MsBibAuthorTest {
 
     @Test
     public void testGetLastName() {
-        Author author = new Author(
-            "Gustav Peter Johann",
-            null,
-            null,
-            "Bach",
-            null
-        );
+        Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Bach", msBibAuthor.getLastName());
     }

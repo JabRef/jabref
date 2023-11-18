@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class GenerateEntryFromIdAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        GenerateEntryFromIdAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEntryFromIdAction.class);
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -58,15 +56,12 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BackgroundTask<Optional<BibEntry>> backgroundTask =
-            searchAndImportEntryInBackground();
+        BackgroundTask<Optional<BibEntry>> backgroundTask = searchAndImportEntryInBackground();
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> {
             entryFromIdPopOver.hide();
-            dialogService.notify(
-                "%s".formatted(backgroundTask.messageProperty().get())
-            );
+            dialogService.notify("%s".formatted(backgroundTask.messageProperty().get()));
         });
         backgroundTask.onFailure(exception -> {
             String fetcherExceptionMessage = exception.getMessage();
@@ -87,11 +82,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     "\n" +
                     fetcherExceptionMessage;
             } else {
-                msg =
-                    Localization.lang(
-                        "Error message %0",
-                        fetcherExceptionMessage
-                    );
+                msg = Localization.lang("Error message %0", fetcherExceptionMessage);
             }
 
             LOGGER.info(fetcherExceptionMessage, exception);
@@ -127,10 +118,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     dialogService,
                     taskExecutor
                 );
-                handler.importEntryWithDuplicateCheck(
-                    libraryTab.getBibDatabaseContext(),
-                    entry
-                );
+                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
             } else {
                 dialogService.notify("No entry found or import canceled");
             }
@@ -138,9 +126,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.executeWith(taskExecutor);
     }
 
-    private BackgroundTask<
-        Optional<BibEntry>
-    > searchAndImportEntryInBackground() {
+    private BackgroundTask<Optional<BibEntry>> searchAndImportEntryInBackground() {
         return new BackgroundTask<>() {
             @Override
             protected Optional<BibEntry> call() throws FetcherException {
@@ -148,9 +134,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     return Optional.empty();
                 }
                 updateMessage(Localization.lang("Searching..."));
-                return new CompositeIdFetcher(
-                    preferencesService.getImportFormatPreferences()
-                )
+                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences())
                     .performSearchById(identifier);
             }
         };

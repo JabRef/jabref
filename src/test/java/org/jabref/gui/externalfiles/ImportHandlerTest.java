@@ -51,10 +51,8 @@ class ImportHandlerTest {
             ImportFormatPreferences.class,
             Answers.RETURNS_DEEP_STUBS
         );
-        when(preferencesService.getImportFormatPreferences())
-            .thenReturn(importFormatPreferences);
-        when(preferencesService.getFilePreferences())
-            .thenReturn(mock(FilePreferences.class));
+        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 
         bibDatabaseContext = mock(BibDatabaseContext.class);
         BibDatabase bibDatabase = new BibDatabase();
@@ -86,10 +84,8 @@ class ImportHandlerTest {
         );
 
         PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getImportFormatPreferences())
-            .thenReturn(importFormatPreferences);
-        when(preferencesService.getFilePreferences())
-            .thenReturn(mock(FilePreferences.class));
+        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 
         ImportHandler importHandler = new ImportHandler(
             mock(BibDatabaseContext.class),
@@ -118,24 +114,15 @@ class ImportHandlerTest {
 
     @Test
     void cleanUpEntryTest() {
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.AUTHOR, "Clear Author");
-        BibEntry cleanedEntry = importHandler.cleanUpEntry(
-            bibDatabaseContext,
-            entry
-        );
-        assertEquals(
-            new BibEntry().withField(StandardField.AUTHOR, "Clear Author"),
-            cleanedEntry
-        );
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
+        BibEntry cleanedEntry = importHandler.cleanUpEntry(bibDatabaseContext, entry);
+        assertEquals(new BibEntry().withField(StandardField.AUTHOR, "Clear Author"), cleanedEntry);
     }
 
     @Test
     void findDuplicateTest() {
         // Assume there is no duplicate initially
-        assertTrue(
-            importHandler.findDuplicate(bibDatabaseContext, testEntry).isEmpty()
-        );
+        assertTrue(importHandler.findDuplicate(bibDatabaseContext, testEntry).isEmpty());
     }
 
     @Test
@@ -168,11 +155,7 @@ class ImportHandlerTest {
         Mockito
             .doReturn(decisionResult)
             .when(importHandler)
-            .getDuplicateDecision(
-                testEntry,
-                duplicateEntry,
-                bibDatabaseContext
-            );
+            .getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
 
         // Act
         BibEntry result = importHandler
@@ -215,11 +198,7 @@ class ImportHandlerTest {
         Mockito
             .doReturn(decisionResult)
             .when(importHandler)
-            .getDuplicateDecision(
-                testEntry,
-                duplicateEntry,
-                bibDatabaseContext
-            );
+            .getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
 
         // Act
         BibEntry result = importHandler
@@ -265,11 +244,7 @@ class ImportHandlerTest {
         Mockito
             .doReturn(decisionResult)
             .when(importHandler)
-            .getDuplicateDecision(
-                testEntry,
-                duplicateEntry,
-                bibDatabaseContext
-            );
+            .getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
 
         // Act
         BibEntry result = importHandler

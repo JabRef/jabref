@@ -13,8 +13,7 @@ public class UnknownFileType implements FileType {
     public UnknownFileType(String... extensions) {
         for (int i = 0; i < extensions.length; i++) {
             if (extensions[i].contains(".")) {
-                extensions[i] =
-                    extensions[i].substring(extensions[i].indexOf('.') + 1);
+                extensions[i] = extensions[i].substring(extensions[i].indexOf('.') + 1);
             }
             extensions[i] = extensions[i].toLowerCase(Locale.ROOT);
         }

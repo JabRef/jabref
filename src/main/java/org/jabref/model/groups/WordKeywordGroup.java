@@ -20,9 +20,7 @@ import org.jabref.model.util.ListUtil;
 /**
  * Matches entries if a given field contains a specified word.
  */
-public class WordKeywordGroup
-    extends KeywordGroup
-    implements GroupEntryChanger {
+public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
     private final SearchStrategy searchStrategy;
@@ -64,10 +62,7 @@ public class WordKeywordGroup
         return true;
     }
 
-    private static boolean containsCaseInsensitive(
-        Set<String> searchIn,
-        String searchFor
-    ) {
+    private static boolean containsCaseInsensitive(Set<String> searchIn, String searchFor) {
         for (String word : searchIn) {
             if (word.equalsIgnoreCase(searchFor)) {
                 return true;
@@ -84,10 +79,7 @@ public class WordKeywordGroup
         for (BibEntry entry : new ArrayList<>(entriesToAdd)) {
             if (!contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
-                KeywordList wordlist = KeywordList.parse(
-                    oldContent,
-                    keywordSeparator
-                );
+                KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
                 wordlist.add(searchExpression);
                 String newContent = wordlist.getAsString(keywordSeparator);
                 entry.setField(searchField, newContent).ifPresent(changes::add);
@@ -103,10 +95,7 @@ public class WordKeywordGroup
         for (BibEntry entry : new ArrayList<>(entriesToRemove)) {
             if (contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
-                KeywordList wordlist = KeywordList.parse(
-                    oldContent,
-                    keywordSeparator
-                );
+                KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
                 wordlist.remove(searchExpression);
                 String newContent = wordlist.getAsString(keywordSeparator);
                 entry.setField(searchField, newContent).ifPresent(changes::add);
@@ -126,18 +115,12 @@ public class WordKeywordGroup
         WordKeywordGroup other = (WordKeywordGroup) o;
         return (
             Objects.equals(getName(), other.getName()) &&
-            Objects.equals(
-                getHierarchicalContext(),
-                other.getHierarchicalContext()
-            ) &&
+            Objects.equals(getHierarchicalContext(), other.getHierarchicalContext()) &&
             Objects.equals(searchField, other.searchField) &&
             Objects.equals(searchExpression, other.searchExpression) &&
             Objects.equals(caseSensitive, other.caseSensitive) &&
             Objects.equals(keywordSeparator, other.keywordSeparator) &&
-            Objects.equals(
-                onlySplitWordsAtSeparator,
-                other.onlySplitWordsAtSeparator
-            )
+            Objects.equals(onlySplitWordsAtSeparator, other.onlySplitWordsAtSeparator)
         );
     }
 
@@ -181,8 +164,7 @@ public class WordKeywordGroup
         Set<String> searchWords;
 
         StringSearchStrategy() {
-            searchWords =
-                new HashSet<>(StringUtil.getStringAsWords(searchExpression));
+            searchWords = new HashSet<>(StringUtil.getStringAsWords(searchExpression));
         }
 
         @Override
@@ -211,9 +193,7 @@ public class WordKeywordGroup
 
         @Override
         public boolean contains(BibEntry entry) {
-            return searchWords
-                .stream()
-                .anyMatch(word -> entry.getType().equals(word));
+            return searchWords.stream().anyMatch(word -> entry.getType().equals(word));
         }
     }
 
@@ -227,10 +207,7 @@ public class WordKeywordGroup
 
         @Override
         public boolean contains(BibEntry entry) {
-            KeywordList fieldValue = entry.getFieldAsKeywords(
-                searchField,
-                keywordSeparator
-            );
+            KeywordList fieldValue = entry.getFieldAsKeywords(searchField, keywordSeparator);
             return ListUtil.allMatch(searchWords, fieldValue::contains);
         }
     }

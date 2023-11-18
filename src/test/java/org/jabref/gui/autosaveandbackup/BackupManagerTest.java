@@ -44,10 +44,7 @@ public class BackupManagerTest {
     public void backupFileNameIsCorrectlyGeneratedInAppDataDirectory() {
         Path bibPath = Path.of("tmp", "test.bib");
         backupDir = OS.getNativeDesktop().getBackupDirectory();
-        Path bakPath = BackupManager.getBackupPathForNewBackup(
-            bibPath,
-            backupDir
-        );
+        Path bakPath = BackupManager.getBackupPathForNewBackup(bibPath, backupDir);
 
         // Pattern is "27182d3c--test.bib--", but the hashing is implemented differently on Linux than on Windows
         assertNotEquals("", bakPath);
@@ -55,39 +52,29 @@ public class BackupManagerTest {
 
     @Test
     public void backupFileIsEqualForNonExistingBackup() throws Exception {
-        Path originalFile = Path.of(
-            BackupManagerTest.class.getResource("no-autosave.bib").toURI()
-        );
+        Path originalFile = Path.of(BackupManagerTest.class.getResource("no-autosave.bib").toURI());
         assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
     public void backupFileIsEqual() throws Exception {
         // Prepare test: Create backup file on "right" path
-        Path source = Path.of(
-            BackupManagerTest.class.getResource("no-changes.bib.bak").toURI()
-        );
+        Path source = Path.of(BackupManagerTest.class.getResource("no-changes.bib.bak").toURI());
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
-            Path.of(
-                BackupManagerTest.class.getResource("no-changes.bib").toURI()
-            ),
+            Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI()),
             BackupFileType.BACKUP,
             backupDir
         );
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 
-        Path originalFile = Path.of(
-            BackupManagerTest.class.getResource("no-changes.bib").toURI()
-        );
+        Path originalFile = Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI());
         assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
     public void backupFileDiffers() throws Exception {
         // Prepare test: Create backup file on "right" path
-        Path source = Path.of(
-            BackupManagerTest.class.getResource("changes.bib.bak").toURI()
-        );
+        Path source = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
             Path.of(BackupManagerTest.class.getResource("changes.bib").toURI()),
             BackupFileType.BACKUP,
@@ -95,18 +82,13 @@ public class BackupManagerTest {
         );
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 
-        Path originalFile = Path.of(
-            BackupManagerTest.class.getResource("changes.bib").toURI()
-        );
+        Path originalFile = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
-    public void correctBackupFileDeterminedForMultipleBakFiles()
-        throws Exception {
-        Path noChangesBib = Path.of(
-            BackupManagerTest.class.getResource("no-changes.bib").toURI()
-        );
+    public void correctBackupFileDeterminedForMultipleBakFiles() throws Exception {
+        Path noChangesBib = Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI());
         Path noChangesBibBak = Path.of(
             BackupManagerTest.class.getResource("no-changes.bib.bak").toURI()
         );
@@ -118,11 +100,7 @@ public class BackupManagerTest {
             BackupFileType.BACKUP,
             backupDir
         );
-        Files.copy(
-            noChangesBibBak,
-            target,
-            StandardCopyOption.REPLACE_EXISTING
-        );
+        Files.copy(noChangesBibBak, target, StandardCopyOption.REPLACE_EXISTING);
 
         // create "older" .bak files containing changes
         for (int i = 0; i < 10; i++) {
@@ -137,11 +115,7 @@ public class BackupManagerTest {
                 timeSuffix +
                 ".bak";
             target = directory.resolve(fileName);
-            Files.copy(
-                changesBibBak,
-                target,
-                StandardCopyOption.REPLACE_EXISTING
-            );
+            Files.copy(changesBibBak, target, StandardCopyOption.REPLACE_EXISTING);
         }
 
         Path originalFile = noChangesBib;
@@ -150,9 +124,7 @@ public class BackupManagerTest {
 
     @Test
     public void bakFileWithNewerTimeStampLeadsToDiff() throws Exception {
-        Path changesBib = Path.of(
-            BackupManagerTest.class.getResource("changes.bib").toURI()
-        );
+        Path changesBib = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         Path changesBibBak = Path.of(
             BackupManagerTest.class.getResource("changes.bib.bak").toURI()
         );
@@ -169,9 +141,7 @@ public class BackupManagerTest {
 
     @Test
     public void bakFileWithOlderTimeStampDoesNotLeadToDiff() throws Exception {
-        Path changesBib = Path.of(
-            BackupManagerTest.class.getResource("changes.bib").toURI()
-        );
+        Path changesBib = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         Path changesBibBak = Path.of(
             BackupManagerTest.class.getResource("changes.bib.bak").toURI()
         );
@@ -190,18 +160,14 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void shouldNotCreateABackup(@TempDir Path customDir)
-        throws Exception {
+    public void shouldNotCreateABackup(@TempDir Path customDir) throws Exception {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 
         var database = new BibDatabaseContext(new BibDatabase());
         database.setDatabasePath(customDir.resolve("Bibfile.bib"));
 
-        var preferences = mock(
-            PreferencesService.class,
-            Answers.RETURNS_DEEP_STUBS
-        );
+        var preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         var filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
@@ -228,10 +194,7 @@ public class BackupManagerTest {
         var database = new BibDatabaseContext(new BibDatabase());
         database.setDatabasePath(customDir.resolve("Bibfile.bib"));
 
-        var preferences = mock(
-            PreferencesService.class,
-            Answers.RETURNS_DEEP_STUBS
-        );
+        var preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         var filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
@@ -245,9 +208,7 @@ public class BackupManagerTest {
         );
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
-        Optional<Path> fullBackupPath = manager.determineBackupPathForNewBackup(
-            backupDir
-        );
+        Optional<Path> fullBackupPath = manager.determineBackupPathForNewBackup(backupDir);
         fullBackupPath.ifPresent(manager::performBackup);
         manager.listen(new GroupUpdatedEvent(new MetaData()));
 

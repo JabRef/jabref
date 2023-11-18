@@ -39,19 +39,14 @@ import org.slf4j.LoggerFactory;
  */
 public class PdfIndexer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LibraryTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final Directory directoryToIndex;
     private BibDatabaseContext databaseContext;
 
     private final FilePreferences filePreferences;
 
-    public PdfIndexer(
-        Directory indexDirectory,
-        FilePreferences filePreferences
-    ) {
+    public PdfIndexer(Directory indexDirectory, FilePreferences filePreferences) {
         this.directoryToIndex = indexDirectory;
         this.filePreferences = filePreferences;
     }
@@ -149,9 +144,7 @@ public class PdfIndexer {
                     .setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
             )
         ) {
-            indexWriter.deleteDocuments(
-                new Term(SearchFieldConstants.PATH, linkedFilePath)
-            );
+            indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
             indexWriter.commit();
         } catch (IOException e) {
             LOGGER.warn("Could not initialize the IndexWriter!", e);
@@ -205,10 +198,7 @@ public class PdfIndexer {
         ) {
             return;
         }
-        Optional<Path> resolvedPath = linkedFile.findIn(
-            databaseContext,
-            filePreferences
-        );
+        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
@@ -226,9 +216,7 @@ public class PdfIndexer {
                 if (topDocs.scoreDocs.length > 0) {
                     Document doc = reader.document(topDocs.scoreDocs[0].doc);
                     long indexModificationTime = Long.parseLong(
-                        doc
-                            .getField(SearchFieldConstants.MODIFIED)
-                            .stringValue()
+                        doc.getField(SearchFieldConstants.MODIFIED).stringValue()
                     );
 
                     BasicFileAttributes attributes = Files.readAttributes(
@@ -237,8 +225,7 @@ public class PdfIndexer {
                     );
 
                     if (
-                        indexModificationTime >=
-                        attributes.lastModifiedTime().to(TimeUnit.SECONDS)
+                        indexModificationTime >= attributes.lastModifiedTime().to(TimeUnit.SECONDS)
                     ) {
                         return;
                     }
@@ -247,19 +234,14 @@ public class PdfIndexer {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
-            Optional<List<Document>> pages = new DocumentReader(
-                entry,
-                filePreferences
-            )
+            Optional<List<Document>> pages = new DocumentReader(entry, filePreferences)
                 .readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
                 try (
                     IndexWriter indexWriter = new IndexWriter(
                         directoryToIndex,
                         new IndexWriterConfig(new EnglishStemAnalyzer())
-                            .setOpenMode(
-                                IndexWriterConfig.OpenMode.CREATE_OR_APPEND
-                            )
+                            .setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
                     )
                 ) {
                     indexWriter.addDocuments(pages.get());
@@ -267,11 +249,7 @@ public class PdfIndexer {
                 }
             }
         } catch (IOException e) {
-            LOGGER.warn(
-                "Could not add the document {} to the index!",
-                linkedFile.getLink(),
-                e
-            );
+            LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
         }
     }
 
@@ -288,9 +266,7 @@ public class PdfIndexer {
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
                 Document doc = reader.document(scoreDoc.doc);
-                paths.add(
-                    doc.getField(SearchFieldConstants.PATH).stringValue()
-                );
+                paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
             }
         } catch (IOException e) {
             return paths;

@@ -30,10 +30,7 @@ public class GvkFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher =
-            new GvkFetcher(
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
-            );
+        fetcher = new GvkFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryPPN591166003 =
             new BibEntry(StandardEntryType.Book)
@@ -41,10 +38,7 @@ public class GvkFetcherTest {
                 .withField(StandardField.PUBLISHER, "Addison-Wesley")
                 .withField(StandardField.YEAR, "2008")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                .withField(
-                    StandardField.SERIES,
-                    "The Java series ... from the source"
-                )
+                .withField(StandardField.SERIES, "The Java series ... from the source")
                 .withField(StandardField.ADDRESS, "Upper Saddle River, NJ")
                 .withField(StandardField.EDITION, "2. ed., 5. print.")
                 .withField(
@@ -54,10 +48,7 @@ public class GvkFetcherTest {
                 .withField(StandardField.ISBN, "9780321356680")
                 .withField(StandardField.PAGETOTAL, "346")
                 .withField(new UnknownField("ppn_gvk"), "591166003")
-                .withField(
-                    StandardField.SUBTITLE,
-                    "[revised and updated for JAVA SE 6]"
-                );
+                .withField(StandardField.SUBTITLE, "[revised and updated for JAVA SE 6]");
 
         bibEntryPPN66391437X =
             new BibEntry(StandardEntryType.Book)
@@ -69,10 +60,7 @@ public class GvkFetcherTest {
                 .withField(StandardField.ISBN, "9781935182573")
                 .withField(StandardField.PAGETOTAL, "223")
                 .withField(new UnknownField("ppn_gvk"), "66391437X")
-                .withField(
-                    StandardField.SUBTITLE,
-                    "A guide for Java developers"
-                );
+                .withField(StandardField.SUBTITLE, "A guide for Java developers");
     }
 
     @Test
@@ -105,11 +93,8 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void testPerformSearchMatchingMultipleEntries()
-        throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch(
-            "title:\"effective java\""
-        );
+    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
+        List<BibEntry> searchResult = fetcher.performSearch("title:\"effective java\"");
         assertTrue(searchResult.contains(bibEntryPPN591166003));
         assertTrue(searchResult.contains(bibEntryPPN66391437X));
     }
@@ -117,19 +102,13 @@ public class GvkFetcherTest {
     @Test
     public void testPerformSearch591166003() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:591166003");
-        assertEquals(
-            Collections.singletonList(bibEntryPPN591166003),
-            searchResult
-        );
+        assertEquals(Collections.singletonList(bibEntryPPN591166003), searchResult);
     }
 
     @Test
     public void testPerformSearch66391437X() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:66391437X");
-        assertEquals(
-            Collections.singletonList(bibEntryPPN66391437X),
-            searchResult
-        );
+        assertEquals(Collections.singletonList(bibEntryPPN66391437X), searchResult);
     }
 
     @Test

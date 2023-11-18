@@ -57,26 +57,19 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
-        citation.setCellValueFactory(cellData ->
-            cellData.getValue().citationProperty()
-        );
+        citation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
         new ValueTableCellFactory<CitationEntryViewModel, String>()
             .withGraphic(this::getText)
             .install(citation);
 
-        extraInfo.setCellValueFactory(cellData ->
-            cellData.getValue().extraInformationProperty()
-        );
+        extraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
         extraInfo.setEditable(true);
 
         citationsTableView.setEditable(true);
 
-        citationsTableView
-            .itemsProperty()
-            .bindBidirectional(viewModel.citationsProperty());
+        citationsTableView.itemsProperty().bindBidirectional(viewModel.citationsProperty());
 
-        extraInfo.setOnEditCommit(
-                (CellEditEvent<CitationEntryViewModel, String> cell) ->
+        extraInfo.setOnEditCommit((CellEditEvent<CitationEntryViewModel, String> cell) ->
             cell.getRowValue().setExtraInfo(cell.getNewValue())
         );
         extraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -88,13 +81,9 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
             HTML_BOLD_START_TAG,
             HTML_BOLD_END_TAG
         );
-        String start = citationContext.substring(
-            0,
-            citationContext.indexOf(HTML_BOLD_START_TAG)
-        );
+        String start = citationContext.substring(0, citationContext.indexOf(HTML_BOLD_START_TAG));
         String end = citationContext.substring(
-            citationContext.lastIndexOf(HTML_BOLD_END_TAG) +
-            HTML_BOLD_END_TAG.length()
+            citationContext.lastIndexOf(HTML_BOLD_END_TAG) + HTML_BOLD_END_TAG.length()
         );
 
         Text startText = new Text(start);

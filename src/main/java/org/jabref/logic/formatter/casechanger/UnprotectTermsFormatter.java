@@ -41,9 +41,7 @@ public class UnprotectTermsFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Removes all balanced {} braces around words."
-        );
+        return Localization.lang("Removes all balanced {} braces around words.");
     }
 
     @Override

@@ -29,10 +29,7 @@ public class MergeEntriesAction extends SimpleCommand {
         this.preferencesService = preferencesService;
 
         this.executable.bind(
-                ActionHelper.needsEntriesSelected(
-                    NUMBER_OF_ENTRIES_NEEDED,
-                    stateManager
-                )
+                ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager)
             );
     }
 
@@ -48,9 +45,7 @@ public class MergeEntriesAction extends SimpleCommand {
             // Inform the user to select entries first.
             dialogService.showInformationDialogAndWait(
                 Localization.lang("Merge entries"),
-                Localization.lang(
-                    "You have to choose exactly two entries to merge."
-                )
+                Localization.lang("You have to choose exactly two entries to merge.")
             );
             return;
         }
@@ -75,26 +70,17 @@ public class MergeEntriesAction extends SimpleCommand {
             second = one;
         }
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(
-            first,
-            second,
-            preferencesService
-        );
+        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferencesService);
         dialog.setTitle(Localization.lang("Merge entries"));
 
-        Optional<EntriesMergeResult> mergeResultOpt =
-            dialogService.showCustomDialogAndWait(dialog);
+        Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(
             entriesMergeResult -> {
-                new MergeTwoEntriesAction(entriesMergeResult, stateManager)
-                    .execute();
+                new MergeTwoEntriesAction(entriesMergeResult, stateManager).execute();
 
                 dialogService.notify(Localization.lang("Merged entries"));
             },
-            () ->
-                dialogService.notify(
-                    Localization.lang("Canceled merging entries")
-                )
+            () -> dialogService.notify(Localization.lang("Canceled merging entries"))
         );
     }
 }

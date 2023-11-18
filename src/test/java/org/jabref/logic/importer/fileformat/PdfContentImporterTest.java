@@ -38,33 +38,21 @@ class PdfContentImporterTest {
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(
-            PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI()
-        );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Path.of(
-            PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI()
-        );
-        List<BibEntry> result = importer
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
         expected.setField(StandardField.AUTHOR, "1 ");
         expected.setField(StandardField.TITLE, "Hello World");
         expected.setFiles(
-            Collections.singletonList(
-                new LinkedFile("", file.toAbsolutePath(), "PDF")
-            )
+            Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF"))
         );
 
         List<BibEntry> resultSecondImport = importer
@@ -78,10 +66,7 @@ class PdfContentImporterTest {
     @Test
     void testParsingEditorWithoutPagesorSeriesInformation() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
-        entry.setField(
-            StandardField.AUTHOR,
-            "Anke Lüdeling and Merja Kytö (Eds.)"
-        );
+        entry.setField(StandardField.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
         entry.setField(StandardField.EDITOR, "Anke Lüdeling and Merja Kytö");
         entry.setField(StandardField.PUBLISHER, "Springer");
         entry.setField(
@@ -106,10 +91,7 @@ class PdfContentImporterTest {
             "vii, 578 pages\n" +
             "Corpus linguistics investigates human language by starting out from large\n";
 
-        assertEquals(
-            Optional.of(entry),
-            importer.getEntryFromPDFContent(firstPageContents, "\n")
-        );
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
     }
 
     @Test
@@ -138,9 +120,6 @@ class PdfContentImporterTest {
             "UNSPECIFIED\n" +
             "Master of Research (MRes) thesis, University of Kent,.";
 
-        assertEquals(
-            Optional.of(entry),
-            importer.getEntryFromPDFContent(firstPageContents, "\n")
-        );
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
     }
 }

@@ -17,8 +17,7 @@ public class PushToApplications {
     public static final String SUBLIME_TEXT = "Sublime Text";
     public static final String TEXSHOP = "TeXShop";
 
-    private static final List<PushToApplication> APPLICATIONS =
-        new ArrayList<>();
+    private static final List<PushToApplication> APPLICATIONS = new ArrayList<>();
 
     private PushToApplications() {}
 
@@ -53,9 +52,7 @@ public class PushToApplications {
     ) {
         return getAllApplications(dialogService, preferencesService)
             .stream()
-            .filter(application ->
-                application.getDisplayName().equals(applicationName)
-            )
+            .filter(application -> application.getDisplayName().equals(applicationName))
             .findAny();
     }
 }

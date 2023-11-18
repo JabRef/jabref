@@ -15,29 +15,20 @@ public class SearchDescribers {
      * @param searchQuery the search query
      * @return the search describer to turn the search into something human understandable
      */
-    public static SearchDescriber getSearchDescriberFor(
-        SearchQuery searchQuery
-    ) {
-        if (
-            searchQuery.getRule() instanceof
-            GrammarBasedSearchRule grammarBasedSearchRule
-        ) {
+    public static SearchDescriber getSearchDescriberFor(SearchQuery searchQuery) {
+        if (searchQuery.getRule() instanceof GrammarBasedSearchRule grammarBasedSearchRule) {
             return new GrammarBasedSearchRuleDescriber(
                 grammarBasedSearchRule.getSearchFlags(),
                 grammarBasedSearchRule.getTree()
             );
         } else if (
-            searchQuery.getRule() instanceof
-            ContainsBasedSearchRule containBasedSearchRule
+            searchQuery.getRule() instanceof ContainsBasedSearchRule containBasedSearchRule
         ) {
             return new ContainsAndRegexBasedSearchRuleDescriber(
                 containBasedSearchRule.getSearchFlags(),
                 searchQuery.getQuery()
             );
-        } else if (
-            searchQuery.getRule() instanceof
-            RegexBasedSearchRule regexBasedSearchRule
-        ) {
+        } else if (searchQuery.getRule() instanceof RegexBasedSearchRule regexBasedSearchRule) {
             return new ContainsAndRegexBasedSearchRuleDescriber(
                 regexBasedSearchRule.getSearchFlags(),
                 searchQuery.getQuery()

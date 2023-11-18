@@ -61,10 +61,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
                     numOfIndexedFiles + taskQueue.size()
                 )
             );
-            updateProgress(
-                numOfIndexedFiles,
-                numOfIndexedFiles + taskQueue.size()
-            );
+            updateProgress(numOfIndexedFiles, numOfIndexedFiles + taskQueue.size());
         });
     }
 
@@ -97,16 +94,11 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(indexer::createIndex);
     }
 
-    public void updateIndex(
-        PdfIndexer indexer,
-        BibDatabaseContext databaseContext
-    ) {
+    public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
         for (BibEntry entry : databaseContext.getEntries()) {
             for (LinkedFile file : entry.getFiles()) {
-                enqueueTask(() ->
-                    indexer.addToIndex(entry, file, databaseContext)
-                );
+                enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
                 pathsToRemove.remove(file.getLink());
             }
         }
@@ -115,11 +107,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    public void addToIndex(
-        PdfIndexer indexer,
-        BibEntry entry,
-        BibDatabaseContext databaseContext
-    ) {
+    public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
         addToIndex(indexer, entry, entry.getFiles(), databaseContext);
     }
 
@@ -134,11 +122,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    public void removeFromIndex(
-        PdfIndexer indexer,
-        BibEntry entry,
-        List<LinkedFile> linkedFiles
-    ) {
+    public void removeFromIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
         for (LinkedFile file : linkedFiles) {
             enqueueTask(() -> indexer.removeFromIndex(file.getLink()));
         }

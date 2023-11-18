@@ -29,9 +29,7 @@ public final class Word {
         Set<String> conjunctions = new HashSet<>();
 
         // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
-        conjunctions.addAll(
-            Arrays.asList("and", "but", "for", "nor", "or", "so", "yet")
-        );
+        conjunctions.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
         // Prepositions
@@ -172,9 +170,7 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] =
-                    i == 0
-                        ? Character.toUpperCase(chars[i])
-                        : Character.toLowerCase(chars[i]);
+                    i == 0 ? Character.toUpperCase(chars[i]) : Character.toLowerCase(chars[i]);
             }
         }
     }
@@ -194,9 +190,7 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] =
-                    i == 0 ||
-                        (DASHES.contains(chars[i - 1]) &&
-                            isConjunction(chars, i))
+                    i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i))
                         ? Character.toUpperCase(chars[i])
                         : Character.toLowerCase(chars[i]);
             }
@@ -225,9 +219,7 @@ public final class Word {
 
     public boolean isSmallerWord() {
         // "word:" is still a small "word"
-        return SMALLER_WORDS.contains(
-            this.toString().replace(":", "").toLowerCase(Locale.ROOT)
-        );
+        return SMALLER_WORDS.contains(this.toString().replace(":", "").toLowerCase(Locale.ROOT));
     }
 
     public boolean isLargerWord() {

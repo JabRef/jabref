@@ -41,13 +41,8 @@ class GroupSerializerTest {
     @Test
     void serializeSingleAllEntriesGroup() {
         AllEntriesGroup group = new AllEntriesGroup("");
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
-        assertEquals(
-            Collections.singletonList("0 AllEntriesGroup:"),
-            serialization
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 AllEntriesGroup:"), serialization);
     }
 
     @Test
@@ -57,9 +52,7 @@ class GroupSerializerTest {
             GroupHierarchyType.INDEPENDENT,
             ','
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
             Collections.singletonList("0 StaticGroup:myExplicitGroup;0;1;;;;"),
             serialization
@@ -77,9 +70,7 @@ class GroupSerializerTest {
         group.setExpanded(true);
         group.setColor(Color.ALICEBLUE);
         group.setDescription("test description");
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
             Collections.singletonList(
                 "0 StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;"
@@ -96,9 +87,7 @@ class GroupSerializerTest {
             GroupHierarchyType.INDEPENDENT,
             ','
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
             Collections.singletonList("0 StaticGroup:B{\\\\\"{o}}hmer;0;1;;;;"),
             serialization
@@ -116,13 +105,9 @@ class GroupSerializerTest {
             ',',
             false
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
-            Collections.singletonList(
-                "0 KeywordGroup:name;0;keywords;test;0;0;1;;;;"
-            ),
+            Collections.singletonList("0 KeywordGroup:name;0;keywords;test;0;0;1;;;;"),
             serialization
         );
     }
@@ -136,13 +121,9 @@ class GroupSerializerTest {
             "asdf",
             false
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
-            Collections.singletonList(
-                "0 KeywordGroup:myExplicitGroup;1;author;asdf;0;1;1;;;;"
-            ),
+            Collections.singletonList("0 KeywordGroup:myExplicitGroup;1;author;asdf;0;1;1;;;;"),
             serialization
         );
     }
@@ -158,13 +139,9 @@ class GroupSerializerTest {
                 SearchRules.SearchFlags.REGULAR_EXPRESSION
             )
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
-            Collections.singletonList(
-                "0 SearchGroup:myExplicitGroup;0;author=harrer;1;1;1;;;;"
-            ),
+            Collections.singletonList("0 SearchGroup:myExplicitGroup;0;author=harrer;1;1;1;;;;"),
             serialization
         );
     }
@@ -177,9 +154,7 @@ class GroupSerializerTest {
             "author=\"harrer\"",
             EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
             Collections.singletonList(
                 "0 SearchGroup:myExplicitGroup;2;author=\"harrer\";1;0;1;;;;"
@@ -197,9 +172,7 @@ class GroupSerializerTest {
             ',',
             '>'
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
             Collections.singletonList(
                 "0 AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;>;1;;;;"
@@ -215,13 +188,9 @@ class GroupSerializerTest {
             GroupHierarchyType.INDEPENDENT,
             StandardField.AUTHOR
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
-            Collections.singletonList(
-                "0 AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;"
-            ),
+            Collections.singletonList("0 AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;"),
             serialization
         );
     }
@@ -235,13 +204,9 @@ class GroupSerializerTest {
             new DefaultAuxParser(new BibDatabase()),
             new MetaData()
         );
-        List<String> serialization = groupSerializer.serializeTree(
-            GroupTreeNode.fromGroup(group)
-        );
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(
-            Collections.singletonList(
-                "0 TexGroup:myTexGroup;0;path/To/File;1;;;;"
-            ),
+            Collections.singletonList("0 TexGroup:myTexGroup;0;path/To/File;1;;;;"),
             serialization
         );
     }

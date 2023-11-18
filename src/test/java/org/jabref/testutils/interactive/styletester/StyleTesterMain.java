@@ -21,8 +21,7 @@ public class StyleTesterMain extends Application {
     @Override
     public void start(Stage stage) throws JabRefException {
         StyleTesterView view = new StyleTesterView();
-        DefaultFileUpdateMonitor fileUpdateMonitor =
-            new DefaultFileUpdateMonitor();
+        DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(
             fileUpdateMonitor,
             "FileUpdateMonitor"

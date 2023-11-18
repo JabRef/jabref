@@ -68,10 +68,7 @@ public class MinifyNameListFormatter extends Formatter {
         }
 
         // already abbreviated
-        if (
-            "others".equals(authors[authors.length - 1]) &&
-            (authors.length == 2)
-        ) {
+        if ("others".equals(authors[authors.length - 1]) && (authors.length == 2)) {
             return authorField;
         }
 

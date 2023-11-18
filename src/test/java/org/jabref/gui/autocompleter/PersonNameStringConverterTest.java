@@ -81,9 +81,7 @@ public class PersonNameStringConverterTest {
             nameFormat,
             Collections.emptySet()
         );
-        PersonNameStringConverter converter = new PersonNameStringConverter(
-            preferences
-        );
+        PersonNameStringConverter converter = new PersonNameStringConverter(preferences);
         String formattedStr = converter.toString(author);
         assertEquals(expectedResult, formattedStr);
     }

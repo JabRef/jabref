@@ -22,10 +22,8 @@ public final class AbbreviationWriter {
      * @param path          to a file (doesn't have to exist just yet)
      * @param abbreviations as a list specifying which entries should be written
      */
-    public static void writeOrCreate(
-        Path path,
-        List<Abbreviation> abbreviations
-    ) throws IOException {
+    public static void writeOrCreate(Path path, List<Abbreviation> abbreviations)
+        throws IOException {
         try (
             OutputStreamWriter writer = new OutputStreamWriter(
                 Files.newOutputStream(path),
@@ -38,10 +36,7 @@ public final class AbbreviationWriter {
         ) {
             for (Abbreviation entry : abbreviations) {
                 if (entry.isDefaultShortestUniqueAbbreviation()) {
-                    csvPrinter.printRecord(
-                        entry.getName(),
-                        entry.getAbbreviation()
-                    );
+                    csvPrinter.printRecord(entry.getName(), entry.getAbbreviation());
                 } else {
                     csvPrinter.printRecord(
                         entry.getName(),

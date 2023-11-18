@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class DBMSConnection implements DatabaseConnection {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DBMSConnection.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnection.class);
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;
@@ -71,12 +69,7 @@ public class DBMSConnection implements DatabaseConnection {
                 dbmsTypes.add(dbms);
             } catch (ClassNotFoundException e) {
                 // In case that the driver is not available do not perform tests for this system.
-                LOGGER.info(
-                    Localization.lang(
-                        "%0 driver not available.",
-                        dbms.toString()
-                    )
-                );
+                LOGGER.info(Localization.lang("%0 driver not available.", dbms.toString()));
             }
         }
         return dbmsTypes;

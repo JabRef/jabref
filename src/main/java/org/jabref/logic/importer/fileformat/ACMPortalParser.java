@@ -37,8 +37,7 @@ import org.jsoup.select.Elements;
 public class ACMPortalParser implements Parser {
 
     private static final String HOST = "https://dl.acm.org";
-    private static final String DOI_URL =
-        "https://dl.acm.org/action/exportCiteProcCitation";
+    private static final String DOI_URL = "https://dl.acm.org/action/exportCiteProcCitation";
 
     /**
      * Parse the DOI of the ACM Portal search result page and obtain the corresponding BibEntry
@@ -47,12 +46,10 @@ public class ACMPortalParser implements Parser {
      * @return BibEntry List
      */
     @Override
-    public List<BibEntry> parseEntries(InputStream stream)
-        throws ParseException {
+    public List<BibEntry> parseEntries(InputStream stream) throws ParseException {
         List<BibEntry> bibEntries;
         try {
-            bibEntries =
-                getBibEntriesFromDoiList(this.parseDoiSearchPage(stream));
+            bibEntries = getBibEntriesFromDoiList(this.parseDoiSearchPage(stream));
         } catch (FetcherException e) {
             throw new ParseException(e);
         }
@@ -65,15 +62,12 @@ public class ACMPortalParser implements Parser {
      * @param stream html stream
      * @return DOI list
      */
-    public List<String> parseDoiSearchPage(InputStream stream)
-        throws ParseException {
+    public List<String> parseDoiSearchPage(InputStream stream) throws ParseException {
         List<String> doiList = new ArrayList<>();
 
         try {
             Document doc = Jsoup.parse(stream, null, HOST);
-            Elements doiHrefs = doc.select(
-                "div.issue-item__content-right > h5 > span > a"
-            );
+            Elements doiHrefs = doc.select("div.issue-item__content-right > h5 > span > a");
 
             for (Element elem : doiHrefs) {
                 String fullSegment = elem.attr("href");
@@ -93,39 +87,23 @@ public class ACMPortalParser implements Parser {
      * @param doiList DOI List
      * @return BibEntry List
      */
-    public List<BibEntry> getBibEntriesFromDoiList(List<String> doiList)
-        throws FetcherException {
+    public List<BibEntry> getBibEntriesFromDoiList(List<String> doiList) throws FetcherException {
         List<BibEntry> bibEntries = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
-        try (
-            InputStream stream = new URLDownload(getUrlFromDoiList(doiList))
-                .asInputStream()
-        ) {
-            String jsonString = new String(
-                (stream.readAllBytes()),
-                StandardCharsets.UTF_8
-            );
+        try (InputStream stream = new URLDownload(getUrlFromDoiList(doiList)).asInputStream()) {
+            String jsonString = new String((stream.readAllBytes()), StandardCharsets.UTF_8);
 
             JsonElement jsonElement = JsonParser.parseString(jsonString);
             if (jsonElement.isJsonObject()) {
-                JsonArray items = jsonElement
-                    .getAsJsonObject()
-                    .getAsJsonArray("items");
+                JsonArray items = jsonElement.getAsJsonObject().getAsJsonArray("items");
                 for (JsonElement item : items) {
-                    for (Map.Entry<String, JsonElement> entry : item
-                        .getAsJsonObject()
-                        .entrySet()) {
-                        bibEntries.add(
-                            parseBibEntry(entry.getValue().toString())
-                        );
+                    for (Map.Entry<String, JsonElement> entry : item.getAsJsonObject().entrySet()) {
+                        bibEntries.add(parseBibEntry(entry.getValue().toString()));
                     }
                 }
             }
         } catch (IOException | URISyntaxException e) {
-            throw new FetcherException(
-                "A network error occurred while fetching from ",
-                e
-            );
+            throw new FetcherException("A network error occurred while fetching from ", e);
         }
 
         return bibEntries;
@@ -157,10 +135,7 @@ public class ACMPortalParser implements Parser {
             );
             type =
                 Enums
-                    .getIfPresent(
-                        StandardEntryType.class,
-                        upperUnderscoreTyeStr
-                    )
+                    .getIfPresent(StandardEntryType.class, upperUnderscoreTyeStr)
                     .or(StandardEntryType.Article);
         }
         return type;
@@ -173,22 +148,15 @@ public class ACMPortalParser implements Parser {
      * @return BibEntry parsed from query result
      */
     public BibEntry parseBibEntry(String jsonStr) {
-        JsonObject jsonObject = JsonParser
-            .parseString(jsonStr)
-            .getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
         BibEntry bibEntry = new BibEntry();
         if (jsonObject.has("type")) {
-            bibEntry.setType(
-                typeStrToEnum(jsonObject.get("type").getAsString())
-            );
+            bibEntry.setType(typeStrToEnum(jsonObject.get("type").getAsString()));
         }
 
         if (jsonObject.has("author")) {
             JsonArray authors = jsonObject.getAsJsonArray("author");
-            bibEntry.setField(
-                StandardField.AUTHOR,
-                getAuthorsLastFirst(authors)
-            );
+            bibEntry.setField(StandardField.AUTHOR, getAuthorsLastFirst(authors));
         }
 
         if (jsonObject.has("issued")) {
@@ -205,19 +173,13 @@ public class ACMPortalParser implements Parser {
                     StandardField.DAY,
                 };
                 for (int i = 0; i < dateArray.size(); i++) {
-                    bibEntry.setField(
-                        dateField[i],
-                        dateArray.get(i).getAsString()
-                    );
+                    bibEntry.setField(dateField[i], dateArray.get(i).getAsString());
                 }
             }
         }
 
         if (jsonObject.has("abstract")) {
-            bibEntry.setField(
-                StandardField.ABSTRACT,
-                jsonObject.get("abstract").getAsString()
-            );
+            bibEntry.setField(StandardField.ABSTRACT, jsonObject.get("abstract").getAsString());
         }
 
         if (jsonObject.has("collection-title")) {
@@ -235,31 +197,19 @@ public class ACMPortalParser implements Parser {
         }
 
         if (jsonObject.has("DOI")) {
-            bibEntry.setField(
-                StandardField.DOI,
-                jsonObject.get("DOI").getAsString()
-            );
+            bibEntry.setField(StandardField.DOI, jsonObject.get("DOI").getAsString());
         }
 
         if (jsonObject.has("event-place")) {
-            bibEntry.setField(
-                StandardField.LOCATION,
-                jsonObject.get("event-place").getAsString()
-            );
+            bibEntry.setField(StandardField.LOCATION, jsonObject.get("event-place").getAsString());
         }
 
         if (jsonObject.has("ISBN")) {
-            bibEntry.setField(
-                StandardField.ISBN,
-                jsonObject.get("ISBN").getAsString()
-            );
+            bibEntry.setField(StandardField.ISBN, jsonObject.get("ISBN").getAsString());
         }
 
         if (jsonObject.has("keyword")) {
-            String[] keywords = jsonObject
-                .get("keyword")
-                .getAsString()
-                .split(", ");
+            String[] keywords = jsonObject.get("keyword").getAsString().split(", ");
             String sortedKeywords = Arrays
                 .stream(keywords)
                 .sorted()
@@ -275,17 +225,11 @@ public class ACMPortalParser implements Parser {
         }
 
         if (jsonObject.has("page")) {
-            bibEntry.setField(
-                StandardField.PAGES,
-                jsonObject.get("page").getAsString()
-            );
+            bibEntry.setField(StandardField.PAGES, jsonObject.get("page").getAsString());
         }
 
         if (jsonObject.has("publisher")) {
-            bibEntry.setField(
-                StandardField.PUBLISHER,
-                jsonObject.get("publisher").getAsString()
-            );
+            bibEntry.setField(StandardField.PUBLISHER, jsonObject.get("publisher").getAsString());
         }
 
         if (jsonObject.has("publisher-place")) {
@@ -296,17 +240,11 @@ public class ACMPortalParser implements Parser {
         }
 
         if (jsonObject.has("title")) {
-            bibEntry.setField(
-                StandardField.TITLE,
-                jsonObject.get("title").getAsString()
-            );
+            bibEntry.setField(StandardField.TITLE, jsonObject.get("title").getAsString());
         }
 
         if (jsonObject.has("URL")) {
-            bibEntry.setField(
-                StandardField.URL,
-                jsonObject.get("URL").getAsString()
-            );
+            bibEntry.setField(StandardField.URL, jsonObject.get("URL").getAsString());
         }
 
         return bibEntry;

@@ -38,10 +38,10 @@ import org.jabref.preferences.SidePanePreferences;
 
 public class WebSearchPaneViewModel {
 
-    private final ObjectProperty<SearchBasedFetcher> selectedFetcher =
-        new SimpleObjectProperty<>();
-    private final ListProperty<SearchBasedFetcher> fetchers =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
+    private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -67,18 +67,12 @@ public class WebSearchPaneViewModel {
         );
 
         // Choose last-selected fetcher as default
-        SidePanePreferences sidePanePreferences =
-            preferencesService.getSidePanePreferences();
-        int defaultFetcherIndex =
-            sidePanePreferences.getWebSearchFetcherSelected();
-        if (
-            (defaultFetcherIndex <= 0) ||
-            (defaultFetcherIndex >= fetchers.size())
-        ) {
+        SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
+        int defaultFetcherIndex = sidePanePreferences.getWebSearchFetcherSelected();
+        if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
             selectedFetcherProperty().setValue(fetchers.get(0));
         } else {
-            selectedFetcherProperty()
-                .setValue(fetchers.get(defaultFetcherIndex));
+            selectedFetcherProperty().setValue(fetchers.get(defaultFetcherIndex));
         }
         EasyBind.subscribe(
             selectedFetcherProperty(),
@@ -110,10 +104,7 @@ public class WebSearchPaneViewModel {
                         int position = e.currentToken.beginColumn;
                         if (element == null) {
                             return ValidationMessage.error(
-                                Localization.lang(
-                                    "Invalid query. Check position %0.",
-                                    position
-                                )
+                                Localization.lang("Invalid query. Check position %0.", position)
                             );
                         } else {
                             return ValidationMessage.error(
@@ -157,11 +148,7 @@ public class WebSearchPaneViewModel {
 
     public void search() {
         if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
-            if (
-                !preferencesService
-                    .getImporterPreferences()
-                    .areImporterEnabled()
-            ) {
+            if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
                 dialogService.notify(Localization.lang("Web search disabled"));
                 return;
             }
@@ -169,16 +156,12 @@ public class WebSearchPaneViewModel {
 
         String query = getQuery().trim();
         if (StringUtil.isBlank(query)) {
-            dialogService.notify(
-                Localization.lang("Please enter a search string")
-            );
+            dialogService.notify(Localization.lang("Please enter a search string"));
             return;
         }
         if (stateManager.getActiveDatabase().isEmpty()) {
             dialogService.notify(
-                Localization.lang(
-                    "Please open or start a new library before searching"
-                )
+                Localization.lang("Please open or start a new library before searching")
             );
             return;
         }
@@ -195,9 +178,7 @@ public class WebSearchPaneViewModel {
             parserResultCallable =
                 () ->
                     new ParserResult(
-                        OptionalUtil.toList(
-                            compositeIdFetcher.performSearchById(query)
-                        )
+                        OptionalUtil.toList(compositeIdFetcher.performSearchById(query))
                     );
             fetcherName = Localization.lang("Identifier-based Web Search");
         }
@@ -206,11 +187,7 @@ public class WebSearchPaneViewModel {
         Telemetry
             .getTelemetryClient()
             .ifPresent(client ->
-                client.trackEvent(
-                    "search",
-                    Map.of("fetcher", finalFetcherName),
-                    Map.of()
-                )
+                client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of())
             );
 
         BackgroundTask<ParserResult> task = BackgroundTask

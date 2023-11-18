@@ -44,9 +44,7 @@ public class TemplateExporter extends Exporter {
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        TemplateExporter.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
 
     private final String lfFileName;
     private final String directory;
@@ -71,16 +69,7 @@ public class TemplateExporter extends Exporter {
         String directory,
         FileType extension
     ) {
-        this(
-            displayName,
-            consoleName,
-            lfFileName,
-            directory,
-            extension,
-            null,
-            null,
-            null
-        );
+        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);
     }
 
     /**
@@ -162,17 +151,13 @@ public class TemplateExporter extends Exporter {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName =
-                lfFileName.substring(
-                    0,
-                    lfFileName.length() - LAYOUT_EXTENSION.length()
-                );
+                lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
         } else {
             this.lfFileName = lfFileName;
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.saveOrder =
-            saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
+        this.saveOrder = saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
         this.blankLineBehaviour = blankLineBehaviour;
     }
 
@@ -225,11 +210,8 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(
-        BibDatabaseContext databaseContext,
-        Path file,
-        List<BibEntry> entries
-    ) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries)
+        throws Exception {
         export(
             databaseContext,
             file,
@@ -266,11 +248,7 @@ public class TemplateExporter extends Exporter {
             List<String> missingFormatters = new ArrayList<>(1);
 
             // Print header
-            try (
-                Reader reader = getReader(
-                    lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION
-                )
-            ) {
+            try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {
                 LayoutHelper layoutHelper = new LayoutHelper(
                     reader,
                     fileDirForDatabase,
@@ -292,10 +270,7 @@ public class TemplateExporter extends Exporter {
              * Write database entries; entries will be sorted as they appear on the
              * screen, or sorted by author, depending on Preferences.
              */
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
-                entries,
-                saveOrder
-            );
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(entries, saveOrder);
 
             // Load default layout
             Layout defLayout;
@@ -313,10 +288,7 @@ public class TemplateExporter extends Exporter {
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
                 if (!missingFormatters.isEmpty()) {
-                    LOGGER.warn(
-                        "Missing formatters found: {}",
-                        missingFormatters
-                    );
+                    LOGGER.warn("Missing formatters found: {}", missingFormatters);
                 }
             }
             Map<EntryType, Layout> layouts = new HashMap<>();
@@ -346,9 +318,7 @@ public class TemplateExporter extends Exporter {
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
-                            missingFormatters.addAll(
-                                layout.getMissingFormatters()
-                            );
+                            missingFormatters.addAll(layout.getMissingFormatters());
                         }
                     } catch (IOException ex) {
                         // The exception indicates that no type-specific layout
@@ -360,9 +330,7 @@ public class TemplateExporter extends Exporter {
 
                 // Write the entry
                 if (layout != null) {
-                    if (
-                        blankLineBehaviour == BlankLineBehaviour.DELETE_BLANKS
-                    ) {
+                    if (blankLineBehaviour == BlankLineBehaviour.DELETE_BLANKS) {
                         String[] lines = layout
                             .doLayout(entry, databaseContext.getDatabase())
                             .split(BLANK_LINE_PATTERN);
@@ -372,23 +340,14 @@ public class TemplateExporter extends Exporter {
                             }
                         }
                     } else {
-                        ps.write(
-                            layout.doLayout(
-                                entry,
-                                databaseContext.getDatabase()
-                            )
-                        );
+                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
                     }
                 }
             }
 
             // Print footer
             Layout endLayout = null;
-            try (
-                Reader reader = getReader(
-                    lfFileName + END_INFIX + LAYOUT_EXTENSION
-                )
-            ) {
+            try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
                 layoutHelper =
                     new LayoutHelper(
                         reader,
@@ -411,10 +370,7 @@ public class TemplateExporter extends Exporter {
             layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
-                LOGGER.warn(
-                    "Formatters {} not found",
-                    String.join(", ", missingFormatters)
-                );
+                LOGGER.warn("Formatters {} not found", String.join(", ", missingFormatters));
             }
         }
     }
@@ -426,12 +382,7 @@ public class TemplateExporter extends Exporter {
     private void readFormatterFile() {
         Path formatterFile = Path.of(lfFileName + FORMATTERS_EXTENSION);
         if (Files.exists(formatterFile)) {
-            try (
-                Reader in = Files.newBufferedReader(
-                    formatterFile,
-                    StandardCharsets.UTF_8
-                )
-            ) {
+            try (Reader in = Files.newBufferedReader(formatterFile, StandardCharsets.UTF_8)) {
                 // Ok, we found and opened the file. Read all contents:
                 StringBuilder sb = new StringBuilder();
                 int c;
@@ -450,10 +401,7 @@ public class TemplateExporter extends Exporter {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        layoutPreferences.putCustomExportNameFormatter(
-                            formatterName,
-                            contents
-                        );
+                        layoutPreferences.putCustomExportNameFormatter(formatterName, contents);
                     }
                 }
             } catch (IOException ex) {

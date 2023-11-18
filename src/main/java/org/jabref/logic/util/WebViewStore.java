@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WebViewStore {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        WebViewStore.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebViewStore.class);
     private static final Queue<WebView> WEB_VIEWS = new ArrayDeque<>();
     private static boolean isInitialized = false;
     private static Configuration config;
@@ -73,10 +71,7 @@ public class WebViewStore {
         return !WEB_VIEWS.isEmpty();
     }
 
-    public record Configuration(
-        int numberOfPreloadedInstances,
-        int minimumNumberOfInstances
-    ) {
+    public record Configuration(int numberOfPreloadedInstances, int minimumNumberOfInstances) {
         /**
          * @return The number of web view instances to be loaded at application startup
          */

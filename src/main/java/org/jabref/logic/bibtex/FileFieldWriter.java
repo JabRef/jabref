@@ -15,11 +15,7 @@ public class FileFieldWriter {
         int i = 0;
         for (LinkedFile entry : fields) {
             array[i] =
-                new String[] {
-                    entry.getDescription(),
-                    entry.getLink(),
-                    entry.getFileType(),
-                };
+                new String[] { entry.getDescription(), entry.getLink(), entry.getFileType() };
             i++;
         }
         return encodeStringArray(array);
@@ -51,10 +47,7 @@ public class FileFieldWriter {
      * @return The encoded String.
      */
     private static String encodeStringArray(String[] entry) {
-        return Arrays
-            .stream(entry)
-            .map(FileFieldWriter::quote)
-            .collect(Collectors.joining(":"));
+        return Arrays.stream(entry).map(FileFieldWriter::quote).collect(Collectors.joining(":"));
     }
 
     public static String quote(String s) {

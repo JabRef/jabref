@@ -29,9 +29,7 @@ public record BibEntryDTO(
     String bibtex
 )
     implements Comparable<BibEntryDTO> {
-    public static final Logger LOGGER = LoggerFactory.getLogger(
-        BibEntryDTO.class
-    );
+    public static final Logger LOGGER = LoggerFactory.getLogger(BibEntryDTO.class);
 
     public BibEntryDTO(
         BibEntry bibEntry,
@@ -43,12 +41,7 @@ public record BibEntryDTO(
             bibEntry.getSharedBibEntryData(),
             bibEntry.getUserComments(),
             bibEntry.getCitationKey().orElse(""),
-            convertToString(
-                bibEntry,
-                bibDatabaseMode,
-                fieldWriterPreferences,
-                bibEntryTypesManager
-            )
+            convertToString(bibEntry, bibDatabaseMode, fieldWriterPreferences, bibEntryTypesManager)
         );
     }
 

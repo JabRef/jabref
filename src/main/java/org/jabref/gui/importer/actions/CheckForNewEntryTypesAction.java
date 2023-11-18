@@ -19,19 +19,13 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult) {
-        return !getListOfUnknownAndUnequalCustomizations(parserResult)
-            .isEmpty();
+        return !getListOfUnknownAndUnequalCustomizations(parserResult).isEmpty();
     }
 
     @Override
-    public void performAction(
-        LibraryTab libraryTab,
-        ParserResult parserResult
-    ) {
+    public void performAction(LibraryTab libraryTab, ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         dialogService.showCustomDialogAndWait(
             new ImportCustomEntryTypesDialog(
                 mode,
@@ -40,33 +34,20 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
         );
     }
 
-    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(
-        ParserResult parserResult
-    ) {
+    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         return parserResult
             .getEntryTypes()
             .stream()
-            .filter(type ->
-                Globals.entryTypesManager.isDifferentCustomOrModifiedType(
-                    type,
-                    mode
-                )
-            )
+            .filter(type -> Globals.entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
             .collect(Collectors.toList());
     }
 
-    private BibDatabaseMode getBibDatabaseModeFromParserResult(
-        ParserResult parserResult
-    ) {
+    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult) {
         return parserResult
             .getMetaData()
             .getMode()
-            .orElse(
-                Globals.prefs
-                    .getLibraryPreferences()
-                    .getDefaultBibDatabaseMode()
-            );
+            .orElse(Globals.prefs.getLibraryPreferences().getDefaultBibDatabaseMode());
     }
 }

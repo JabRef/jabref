@@ -38,25 +38,21 @@ public class GrobidCitationFetcherTest {
         false,
         "http://grobid.jabref.org:8070"
     );
-    static GrobidCitationFetcher grobidCitationFetcher =
-        new GrobidCitationFetcher(grobidPreferences, importFormatPreferences);
+    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(
+        grobidPreferences,
+        importFormatPreferences
+    );
 
     static String example1 =
         "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
     static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article)
         .withCitationKey("-1")
-        .withField(
-            StandardField.AUTHOR,
-            "Derwing, Tracey and Rossiter, Marian and Munro, Murray"
-        )
+        .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
         .withField(
             StandardField.TITLE,
             "Teaching Native Speakers to Listen to Foreign-accented Speech"
         )
-        .withField(
-            StandardField.JOURNAL,
-            "Journal of Multilingual and Multicultural Development"
-        )
+        .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
         .withField(StandardField.DOI, "10.1080/01434630208666468")
         .withField(StandardField.DATE, "2002-09")
         .withField(StandardField.MONTH, "9")
@@ -84,10 +80,7 @@ public class GrobidCitationFetcherTest {
         "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
     static BibEntry example3AsBibEntry = new BibEntry(StandardEntryType.InBook)
         .withCitationKey("-1")
-        .withField(
-            StandardField.AUTHOR,
-            "Turk, Jeremy and Graham, Philip and Verhulst, Frank"
-        )
+        .withField(StandardField.AUTHOR, "Turk, Jeremy and Graham, Philip and Verhulst, Frank")
         .withField(StandardField.TITLE, "Developmental psychopathology")
         .withField(StandardField.BOOKTITLE, "Child and Adolescent Psychiatry")
         .withField(StandardField.PUBLISHER, "Oxford University Press")
@@ -103,10 +96,7 @@ public class GrobidCitationFetcherTest {
     static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.InBook)
         .withCitationKey("-1")
         .withField(StandardField.AUTHOR, "Carr, I and Kidner, R")
-        .withField(
-            StandardField.BOOKTITLE,
-            "Statutes and conventions on international trade law"
-        )
+        .withField(StandardField.BOOKTITLE, "Statutes and conventions on international trade law")
         .withField(StandardField.PUBLISHER, "Cavendish")
         .withField(StandardField.DATE, "2003")
         .withField(StandardField.YEAR, "2003")
@@ -123,10 +113,7 @@ public class GrobidCitationFetcherTest {
     }
 
     public static Stream<Arguments> provideInvalidInput() {
-        return Stream.of(
-            Arguments.of("😋😋😋"),
-            Arguments.of("¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°")
-        );
+        return Stream.of(Arguments.of("😋😋😋"), Arguments.of("¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°"));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -136,41 +123,24 @@ public class GrobidCitationFetcherTest {
         BibEntry expectedBibEntry,
         String searchQuery
     ) throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(
-            searchQuery
-        );
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(searchQuery);
         assertEquals(List.of(expectedBibEntry), entries);
     }
 
     @Test
-    public void grobidPerformSearchCorrectlySplitsStringTest()
-        throws FetcherException {
+    public void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch(
-            example1 +
-            "\n\n" +
-            example2 +
-            "\r\n\r\n" +
-            example3 +
-            "\r\r" +
-            example4
+            example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4
         );
         assertEquals(
-            List.of(
-                example1AsBibEntry,
-                example2AsBibEntry,
-                example3AsBibEntry,
-                example4AsBibEntry
-            ),
+            List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry),
             entries
         );
     }
 
     @Test
-    public void grobidPerformSearchWithEmptyStringsTest()
-        throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(
-            "   \n   "
-        );
+    public void grobidPerformSearchWithEmptyStringsTest() throws FetcherException {
+        List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ");
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -178,9 +148,7 @@ public class GrobidCitationFetcherTest {
     @MethodSource("provideInvalidInput")
     public void grobidPerformSearchWithInvalidDataTest(String invalidInput)
         throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(
-            invalidInput
-        );
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput);
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -191,10 +159,7 @@ public class GrobidCitationFetcherTest {
         when(grobidServiceMock.processCitation(anyString(), any(), any()))
             .thenThrow(new SocketTimeoutException("Timeout"));
         grobidCitationFetcher =
-            new GrobidCitationFetcher(
-                importFormatPreferences,
-                grobidServiceMock
-            );
+            new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
         assertThrows(
             FetcherException.class,

@@ -32,12 +32,7 @@ public enum BiblatexApaField implements Field {
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
-    BiblatexApaField(
-        String name,
-        String displayName,
-        FieldProperty first,
-        FieldProperty... rest
-    ) {
+    BiblatexApaField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
         this.name = name;
         this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);

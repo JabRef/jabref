@@ -44,9 +44,7 @@ class RTFCharsTest {
         assertEquals("{\\i hallo}", formatter.format("{\\emph hallo}"));
         assertEquals(
             "An article title with {\\i a book title} emphasized",
-            formatter.format(
-                "An article title with \\emph{a book title} emphasized"
-            )
+            formatter.format("An article title with \\emph{a book title} emphasized")
         );
 
         assertEquals("{\\i hallo}", formatter.format("\\textit{hallo}"));
@@ -60,9 +58,7 @@ class RTFCharsTest {
     void testComplicated() {
         assertEquals(
             "R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
-            formatter.format(
-                "Réflexions sur le timing de la quantité {\\ae} should be æ"
-            )
+            formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ")
         );
     }
 
@@ -207,10 +203,7 @@ class RTFCharsTest {
             "¡, \\u161!", // !
         }
     )
-    public void testMoreSpecialCharacters(
-        String specialChar,
-        String expectedResult
-    ) {
+    public void testMoreSpecialCharacters(String specialChar, String expectedResult) {
         String formattedStr = formatter.format(specialChar);
         assertEquals(expectedResult, formattedStr);
     }

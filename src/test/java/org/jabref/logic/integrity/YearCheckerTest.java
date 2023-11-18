@@ -42,10 +42,7 @@ public class YearCheckerTest {
 
     @Test
     void yearFieldRemovesSpecialCharactersFromYear() {
-        assertEquals(
-            Optional.empty(),
-            checker.checkValue("1986(){},.;!?<>%&$")
-        );
+        assertEquals(Optional.empty(), checker.checkValue("1986(){},.;!?<>%&$"));
     }
 
     @Test
@@ -85,10 +82,7 @@ public class YearCheckerTest {
 
     @Test
     void yearFieldDoesNotRemoveStringBeforeSpecialCharacters() {
-        assertNotEquals(
-            Optional.empty(),
-            checker.checkValue("1986a(){},.;!?<>%&$")
-        );
+        assertNotEquals(Optional.empty(), checker.checkValue("1986a(){},.;!?<>%&$"));
     }
 
     @Test

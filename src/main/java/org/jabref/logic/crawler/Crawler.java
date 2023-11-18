@@ -73,8 +73,7 @@ public class Crawler {
      *
      * @throws IOException Thrown if a problem occurred during the persistence of the result.
      */
-    public void performCrawl()
-        throws IOException, GitAPIException, SaveException {
+    public void performCrawl() throws IOException, GitAPIException, SaveException {
         List<QueryResult> results = studyFetcher.crawl();
         studyRepository.persist(results);
     }

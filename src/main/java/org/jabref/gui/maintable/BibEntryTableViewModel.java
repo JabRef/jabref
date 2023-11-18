@@ -34,11 +34,8 @@ import org.jabref.model.groups.GroupTreeNode;
 public class BibEntryTableViewModel {
 
     private final BibEntry entry;
-    private final ObservableValue<
-        MainTableFieldValueFormatter
-    > fieldValueFormatter;
-    private final Map<OrFields, ObservableValue<String>> fieldValues =
-        new HashMap<>();
+    private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
+    private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<
         SpecialField,
         OptionalBinding<SpecialFieldValueViewModel>
@@ -61,14 +58,11 @@ public class BibEntryTableViewModel {
                 .mapOpt(FileFieldParser::parse)
                 .orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
-        this.matchedGroups =
-            createMatchedGroupsBinding(bibDatabaseContext, entry);
+        this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
     }
 
-    private static EasyBinding<
-        Map<Field, String>
-    > createLinkedIdentifiersBinding(BibEntry entry) {
+    private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
         return EasyBind.combine(
             entry.getFieldBinding(StandardField.URL),
             entry.getFieldBinding(StandardField.DOI),
@@ -77,18 +71,11 @@ public class BibEntryTableViewModel {
             entry.getFieldBinding(StandardField.ISBN),
             (url, doi, uri, eprint, isbn) -> {
                 Map<Field, String> identifiers = new HashMap<>();
-                url.ifPresent(value -> identifiers.put(StandardField.URL, value)
-                );
-                doi.ifPresent(value -> identifiers.put(StandardField.DOI, value)
-                );
-                uri.ifPresent(value -> identifiers.put(StandardField.URI, value)
-                );
-                eprint.ifPresent(value ->
-                    identifiers.put(StandardField.EPRINT, value)
-                );
-                isbn.ifPresent(value ->
-                    identifiers.put(StandardField.ISBN, value)
-                );
+                url.ifPresent(value -> identifiers.put(StandardField.URL, value));
+                doi.ifPresent(value -> identifiers.put(StandardField.DOI, value));
+                uri.ifPresent(value -> identifiers.put(StandardField.URI, value));
+                eprint.ifPresent(value -> identifiers.put(StandardField.EPRINT, value));
+                isbn.ifPresent(value -> identifiers.put(StandardField.ISBN, value));
                 return identifiers;
             }
         );
@@ -115,13 +102,7 @@ public class BibEntryTableViewModel {
                                 .getMatchingGroups(entry)
                                 .stream()
                                 .map(GroupTreeNode::getGroup)
-                                .filter(
-                                    Predicate.not(
-                                        Predicate.isEqual(
-                                            groupTreeNode.getGroup()
-                                        )
-                                    )
-                                )
+                                .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
                                 .collect(Collectors.toList())
                         )
                         .orElse(Collections.emptyList())
@@ -145,39 +126,29 @@ public class BibEntryTableViewModel {
         return matchedGroups;
     }
 
-    public ObservableValue<
-        Optional<SpecialFieldValueViewModel>
-    > getSpecialField(SpecialField field) {
-        OptionalBinding<SpecialFieldValueViewModel> value =
-            specialFieldValues.get(field);
+    public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(
+        SpecialField field
+    ) {
+        OptionalBinding<SpecialFieldValueViewModel> value = specialFieldValues.get(field);
         // Fetch possibly updated value from BibEntry entry
         Optional<String> currentValue = this.entry.getField(field);
         if (value != null) {
             if (currentValue.isEmpty() && value.getValue().isEmpty()) {
                 var zeroValue = getField(field)
                     .flatMapOpt(fieldValue ->
-                        field
-                            .parseValue("CLEAR_RANK")
-                            .map(SpecialFieldValueViewModel::new)
+                        field.parseValue("CLEAR_RANK").map(SpecialFieldValueViewModel::new)
                     );
                 specialFieldValues.put(field, zeroValue);
                 return zeroValue;
             } else if (
                 value.getValue().isEmpty() ||
-                !value
-                    .getValue()
-                    .get()
-                    .getValue()
-                    .getFieldValue()
-                    .equals(currentValue)
+                !value.getValue().get().getValue().getFieldValue().equals(currentValue)
             ) {
                 // specialFieldValues value and BibEntry value differ => Set specialFieldValues value to BibEntry value
                 value =
                     getField(field)
                         .flatMapOpt(fieldValue ->
-                            field
-                                .parseValue(fieldValue)
-                                .map(SpecialFieldValueViewModel::new)
+                            field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new)
                         );
                 specialFieldValues.put(field, value);
                 return value;
@@ -186,9 +157,7 @@ public class BibEntryTableViewModel {
             value =
                 getField(field)
                     .flatMapOpt(fieldValue ->
-                        field
-                            .parseValue(fieldValue)
-                            .map(SpecialFieldValueViewModel::new)
+                        field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new)
                     );
             specialFieldValues.put(field, value);
         }
@@ -201,17 +170,12 @@ public class BibEntryTableViewModel {
             return value;
         }
 
-        ArrayList<Observable> observables = new ArrayList<>(
-            List.of(entry.getObservables())
-        );
+        ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
         observables.add(fieldValueFormatter);
 
         value =
             Bindings.createStringBinding(
-                () ->
-                    fieldValueFormatter
-                        .getValue()
-                        .formatFieldsValues(fields, entry),
+                () -> fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
                 observables.toArray(Observable[]::new)
             );
         fieldValues.put(fields, value);

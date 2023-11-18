@@ -32,9 +32,7 @@ public class RemoveNewlinesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-            "Removes all line breaks in the field content."
-        );
+        return Localization.lang("Removes all line breaks in the field content.");
     }
 
     @Override

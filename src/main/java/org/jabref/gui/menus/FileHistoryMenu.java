@@ -26,9 +26,7 @@ public class FileHistoryMenu extends Menu {
         setText(Localization.lang("Recent libraries"));
 
         this.clearRecentLibraries = new MenuItem();
-        clearRecentLibraries.setText(
-            Localization.lang("Clear recent libraries")
-        );
+        clearRecentLibraries.setText(Localization.lang("Clear recent libraries"));
         clearRecentLibraries.setOnAction(event -> clearLibrariesHistory());
 
         this.history = fileHistory;
@@ -56,9 +54,7 @@ public class FileHistoryMenu extends Menu {
         if (num <= 0 || num > history.size()) {
             return false;
         }
-        this.openFile(
-                history.get(Integer.parseInt(keyEvent.getCharacter()) - 1)
-            );
+        this.openFile(history.get(Integer.parseInt(keyEvent.getCharacter()) - 1));
         return true;
     }
 

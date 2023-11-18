@@ -180,10 +180,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("parseGermanShortMonthTest")
-    public void parseGermanShortMonthTest(
-        Optional<Month> expected,
-        String input
-    ) {
+    public void parseGermanShortMonthTest(Optional<Month> expected, String input) {
         assertEquals(expected, Month.parseGermanShortMonth(input));
     }
 
@@ -246,10 +243,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource({ "parseShortName", "getMonthByShortNameSpecialCases" })
-    public void getMonthByShortNameLowercaseTest(
-        Optional<Month> expected,
-        String input
-    ) {
+    public void getMonthByShortNameLowercaseTest(Optional<Month> expected, String input) {
         assertEquals(expected, Month.getMonthByShortName(input));
     }
 

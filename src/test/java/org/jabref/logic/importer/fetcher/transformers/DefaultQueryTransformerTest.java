@@ -1,9 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
 class DefaultQueryTransformerTest
-    extends YearAndYearRangeByFilteringQueryTransformerTest<
-        DefaultQueryTransformer
-    > {
+    extends YearAndYearRangeByFilteringQueryTransformerTest<DefaultQueryTransformer> {
 
     @Override
     protected DefaultQueryTransformer getTransformer() {

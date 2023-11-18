@@ -24,9 +24,7 @@ public class LibrariesResource {
             .getLastFilesOpened()
             .stream()
             .map(java.nio.file.Path::of)
-            .map(p ->
-                p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)
-            )
+            .map(p -> p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p))
             .toList();
         return new Gson().toJson(fileNamesWithUniqueSuffix);
     }

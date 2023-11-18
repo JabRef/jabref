@@ -28,15 +28,11 @@ import org.slf4j.LoggerFactory;
  */
 public class FieldRowView {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FieldRowView.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
 
     protected final FieldRowViewModel viewModel;
 
-    protected final BooleanProperty shouldShowDiffs = new SimpleBooleanProperty(
-        true
-    );
+    protected final BooleanProperty shouldShowDiffs = new SimpleBooleanProperty(true);
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
@@ -56,29 +52,14 @@ public class FieldRowView {
         int rowIndex
     ) {
         viewModel =
-            new FieldRowViewModel(
-                field,
-                leftEntry,
-                rightEntry,
-                mergedEntry,
-                fieldMergerFactory
-            );
+            new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
         fieldNameCell = new FieldNameCell(field.getDisplayName(), rowIndex);
         leftValueCell =
-            new FieldValueCell(
-                viewModel.getLeftFieldValue(),
-                rowIndex,
-                preferencesService
-            );
+            new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferencesService);
         rightValueCell =
-            new FieldValueCell(
-                viewModel.getRightFieldValue(),
-                rowIndex,
-                preferencesService
-            );
-        mergedValueCell =
-            new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+            new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferencesService);
+        mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
         // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
@@ -91,25 +72,15 @@ public class FieldRowView {
             });
 
         if (FieldMergerFactory.canMerge(field)) {
-            ToggleMergeUnmergeButton toggleMergeUnmergeButton =
-                new ToggleMergeUnmergeButton(field);
-            toggleMergeUnmergeButton.setCanMerge(
-                !viewModel.hasEqualLeftAndRightValues()
-            );
+            ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
+            toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
             fieldNameCell.addSideButton(toggleMergeUnmergeButton);
 
             EasyBind.listen(
                 toggleMergeUnmergeButton.fieldStateProperty(),
                 ((observableValue, old, fieldState) -> {
-                        LOGGER.debug(
-                            "Field merge state is {} for field {}",
-                            fieldState,
-                            field
-                        );
-                        if (
-                            fieldState ==
-                            ToggleMergeUnmergeButton.FieldState.MERGED
-                        ) {
+                        LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
+                        if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {
                             viewModel.mergeFields();
                         } else {
                             viewModel.unmergeFields();
@@ -120,15 +91,9 @@ public class FieldRowView {
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
 
-        mergedValueCell
-            .textProperty()
-            .bindBidirectional(viewModel.mergedFieldValueProperty());
-        leftValueCell
-            .textProperty()
-            .bindBidirectional(viewModel.leftFieldValueProperty());
-        rightValueCell
-            .textProperty()
-            .bindBidirectional(viewModel.rightFieldValueProperty());
+        mergedValueCell.textProperty().bindBidirectional(viewModel.mergedFieldValueProperty());
+        leftValueCell.textProperty().bindBidirectional(viewModel.leftFieldValueProperty());
+        rightValueCell.textProperty().bindBidirectional(viewModel.rightFieldValueProperty());
 
         EasyBind.subscribe(
             viewModel.selectionProperty(),
@@ -235,9 +200,7 @@ public class FieldRowView {
         // Clearing old diff styles based on previous diffConfig
         hideDiff();
         if (shouldShowDiffs.get()) {
-            if (
-                diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED
-            ) {
+            if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {
                 new UnifiedDiffHighlighter(
                     leftLabel,
                     rightLabel,
@@ -245,11 +208,7 @@ public class FieldRowView {
                 )
                     .highlight();
             } else {
-                new SplitDiffHighlighter(
-                    leftLabel,
-                    rightLabel,
-                    diffConfig.diffHighlightingMethod()
-                )
+                new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod())
                     .highlight();
             }
         }
@@ -259,12 +218,7 @@ public class FieldRowView {
         if (parent != null) {
             parent
                 .getChildren()
-                .removeAll(
-                    leftValueCell,
-                    rightValueCell,
-                    mergedValueCell,
-                    fieldNameCell
-                );
+                .removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
         }
     }
 
@@ -273,12 +227,7 @@ public class FieldRowView {
             if (!parent.getChildren().contains(leftValueCell)) {
                 parent
                     .getChildren()
-                    .addAll(
-                        leftValueCell,
-                        rightValueCell,
-                        mergedValueCell,
-                        fieldNameCell
-                    );
+                    .addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
             }
         }
     }
@@ -290,25 +239,13 @@ public class FieldRowView {
 
         LOGGER.debug("Hiding diffs...");
 
-        int leftValueLength = getLeftValueCell()
-            .getStyleClassedLabel()
-            .getLength();
-        getLeftValueCell()
-            .getStyleClassedLabel()
-            .clearStyle(0, leftValueLength);
-        getLeftValueCell()
-            .getStyleClassedLabel()
-            .replaceText(viewModel.getLeftFieldValue());
+        int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
+        getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
+        getLeftValueCell().getStyleClassedLabel().replaceText(viewModel.getLeftFieldValue());
 
-        int rightValueLength = getRightValueCell()
-            .getStyleClassedLabel()
-            .getLength();
-        getRightValueCell()
-            .getStyleClassedLabel()
-            .clearStyle(0, rightValueLength);
-        getRightValueCell()
-            .getStyleClassedLabel()
-            .replaceText(viewModel.getRightFieldValue());
+        int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
+        getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
+        getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
     }
 
     public boolean hasEqualLeftAndRightValues() {

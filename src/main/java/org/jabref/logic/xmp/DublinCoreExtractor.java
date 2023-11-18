@@ -38,17 +38,14 @@ public class DublinCoreExtractor {
     public static final String DC_RIGHTS = "rights";
     public static final String DC_SOURCE = "source";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DublinCoreExtractor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DublinCoreExtractor.class);
 
     private final DublinCoreSchema dcSchema;
     private final XmpPreferences xmpPreferences;
 
     private final BibEntry bibEntry;
 
-    private final UnprotectTermsFormatter unprotectTermsFormatter =
-        new UnprotectTermsFormatter();
+    private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
     /**
      * @param dcSchema      Metadata in DublinCore format.
@@ -70,10 +67,7 @@ public class DublinCoreExtractor {
     private void extractEditor() {
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
-            bibEntry.setField(
-                StandardField.EDITOR,
-                String.join(" and ", contributors)
-            );
+            bibEntry.setField(StandardField.EDITOR, String.join(" and ", contributors));
         }
     }
 
@@ -83,10 +77,7 @@ public class DublinCoreExtractor {
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
-            bibEntry.setField(
-                StandardField.AUTHOR,
-                String.join(" and ", creators)
-            );
+            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
         }
     }
 
@@ -103,19 +94,13 @@ public class DublinCoreExtractor {
                     dateValue
                         .getDay()
                         .ifPresent(day ->
-                            bibEntry.setField(
-                                StandardField.DAY,
-                                Integer.toString(day)
-                            )
+                            bibEntry.setField(StandardField.DAY, Integer.toString(day))
                         );
                     dateValue.getMonth().ifPresent(bibEntry::setMonth);
                     dateValue
                         .getYear()
                         .ifPresent(year ->
-                            bibEntry.setField(
-                                StandardField.YEAR,
-                                Integer.toString(year)
-                            )
+                            bibEntry.setField(StandardField.YEAR, Integer.toString(year))
                         );
                 });
         }
@@ -152,10 +137,7 @@ public class DublinCoreExtractor {
     private void extractPublisher() {
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
-            bibEntry.setField(
-                StandardField.PUBLISHER,
-                String.join(" and ", publishers)
-            );
+            bibEntry.setField(StandardField.PUBLISHER, String.join(" and ", publishers));
         }
     }
 
@@ -189,10 +171,7 @@ public class DublinCoreExtractor {
         };
         List<String> relationships = dcSchema.getRelations();
         if (relationships != null) {
-            relationships
-                .stream()
-                .filter(isBibTeXElement)
-                .forEach(splitBibTeXElement);
+            relationships.stream().filter(isBibTeXElement).forEach(splitBibTeXElement);
         }
     }
 
@@ -227,10 +206,7 @@ public class DublinCoreExtractor {
     private void extractSubject() {
         List<String> subjects = dcSchema.getSubjects();
         if ((subjects != null) && !subjects.isEmpty()) {
-            bibEntry.addKeywords(
-                subjects,
-                xmpPreferences.getKeywordSeparator()
-            );
+            bibEntry.addKeywords(subjects, xmpPreferences.getKeywordSeparator());
         }
     }
 
@@ -382,9 +358,7 @@ public class DublinCoreExtractor {
      * BibTeX: keywords; DC: 'dc:subject'
      */
     private void fillKeywords(String value) {
-        String[] keywords = value.split(
-            xmpPreferences.getKeywordSeparator().toString()
-        );
+        String[] keywords = value.split(xmpPreferences.getKeywordSeparator().toString());
         for (String keyword : keywords) {
             dcSchema.addSubject(keyword.trim());
         }
@@ -441,10 +415,7 @@ public class DublinCoreExtractor {
      */
     private void fillType() {
         // BibTeX: entry type; DC: 'dc:type'
-        TypedBibEntry typedEntry = new TypedBibEntry(
-            bibEntry,
-            BibDatabaseMode.BIBTEX
-        );
+        TypedBibEntry typedEntry = new TypedBibEntry(bibEntry, BibDatabaseMode.BIBTEX);
         String typeForDisplay = typedEntry.getTypeForDisplay();
         if (!typeForDisplay.isEmpty()) {
             dcSchema.addType(typeForDisplay);
@@ -461,24 +432,16 @@ public class DublinCoreExtractor {
      */
     public void fillDublinCoreSchema() {
         // Query privacy filter settings
-        boolean useXmpPrivacyFilter =
-            xmpPreferences.shouldUseXmpPrivacyFilter();
+        boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
-        SortedSet<Field> fields = new TreeSet<>(
-            Comparator.comparing(Field::getName)
-        );
+        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         fields.addAll(bibEntry.getFields());
         for (Field field : fields) {
-            if (
-                useXmpPrivacyFilter &&
-                xmpPreferences.getXmpPrivacyFilter().contains(field)
-            ) {
+            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 continue;
             }
 
-            String value = unprotectTermsFormatter.format(
-                bibEntry.getField(field).get()
-            );
+            String value = unprotectTermsFormatter.format(bibEntry.getField(field).get());
             if (field instanceof StandardField standardField) {
                 switch (standardField) {
                     case EDITOR -> this.fillContributor(value);

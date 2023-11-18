@@ -29,23 +29,15 @@ public class ModsExportFormatTest {
             new DummyFileUpdateMonitor()
         );
         Path.of(
-            ModsExportFormatTest.class.getResource(
-                    "ModsExportFormatTestAllFields.bib"
-                )
-                .toURI()
+            ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI()
         );
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile)
-        throws Exception {
+    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        modsExportFormat.export(
-            databaseContext,
-            tempFile,
-            Collections.emptyList()
-        );
+        modsExportFormat.export(databaseContext, tempFile, Collections.emptyList());
         assertEquals(Collections.emptyList(), Files.readAllLines(file));
     }
 }

@@ -52,9 +52,7 @@ public class OracleProcessor extends DBMSProcessor {
                 "CONSTRAINT \"ENTRY_PK\" PRIMARY KEY (\"SHARED_ID\"))"
             );
 
-        connection
-            .createStatement()
-            .executeUpdate("CREATE SEQUENCE \"ENTRY_SEQ\"");
+        connection.createStatement().executeUpdate("CREATE SEQUENCE \"ENTRY_SEQ\"");
 
         connection
             .createStatement()
@@ -97,10 +95,7 @@ public class OracleProcessor extends DBMSProcessor {
 
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
             // We can to migrate from old table in new table
-            metadata.put(
-                MetaData.VERSION_DB_STRUCT,
-                CURRENT_VERSION_DB_STRUCT.toString()
-            );
+            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
             setSharedMetaData(metadata);
         }
     }
@@ -129,10 +124,7 @@ public class OracleProcessor extends DBMSProcessor {
 
             Properties properties = new Properties();
             properties.setProperty(OracleConnection.DCN_NOTIFY_ROWIDS, "true");
-            properties.setProperty(
-                OracleConnection.DCN_QUERY_CHANGE_NOTIFICATION,
-                "true"
-            );
+            properties.setProperty(OracleConnection.DCN_QUERY_CHANGE_NOTIFICATION, "true");
 
             databaseChangeRegistration =
                 oracleConnection.registerDatabaseChangeNotification(properties);
@@ -151,10 +143,7 @@ public class OracleProcessor extends DBMSProcessor {
                 statement.executeQuery(selectQuery.toString());
             }
         } catch (SQLException e) {
-            LOGGER.error(
-                "SQL Error during starting the notification listener",
-                e
-            );
+            LOGGER.error("SQL Error during starting the notification listener", e);
         }
     }
 
@@ -163,11 +152,7 @@ public class OracleProcessor extends DBMSProcessor {
         try {
             for (BibEntry entry : entries) {
                 String insertIntoEntryQuery =
-                    "INSERT INTO " +
-                    escape_Table("ENTRY") +
-                    "(" +
-                    escape("TYPE") +
-                    ") VALUES(?)";
+                    "INSERT INTO " + escape_Table("ENTRY") + "(" + escape("TYPE") + ") VALUES(?)";
 
                 try (
                     PreparedStatement preparedEntryStatement = connection.prepareStatement(
@@ -175,19 +160,12 @@ public class OracleProcessor extends DBMSProcessor {
                         new String[] { "SHARED_ID" }
                     )
                 ) {
-                    preparedEntryStatement.setString(
-                        1,
-                        entry.getType().getName()
-                    );
+                    preparedEntryStatement.setString(1, entry.getType().getName());
                     preparedEntryStatement.executeUpdate();
 
-                    try (
-                        ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()
-                    ) {
+                    try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
-                            entry
-                                .getSharedBibEntryData()
-                                .setSharedID(generatedKeys.getInt(1)); // set generated ID locally
+                            entry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1)); // set generated ID locally
                         }
                     }
                 }
@@ -206,8 +184,7 @@ public class OracleProcessor extends DBMSProcessor {
                 .stream()
                 .map(entry -> new ArrayList<>(entry.getFields()))
                 .collect(Collectors.toList());
-            StringBuilder insertFieldQuery = new StringBuilder()
-                .append("INSERT ALL");
+            StringBuilder insertFieldQuery = new StringBuilder().append("INSERT ALL");
             int numFields = 0;
             for (List<Field> entryFields : fields) {
                 numFields += entryFields.size();
@@ -231,11 +208,7 @@ public class OracleProcessor extends DBMSProcessor {
                 )
             ) {
                 int fieldsCompleted = 0;
-                for (
-                    int entryIndex = 0;
-                    entryIndex < fields.size();
-                    entryIndex++
-                ) {
+                for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
                     for (
                         int entryFieldsIndex = 0;
                         entryFieldsIndex < fields.get(entryIndex).size();
@@ -244,25 +217,17 @@ public class OracleProcessor extends DBMSProcessor {
                         // columnIndex starts with 1
                         preparedFieldStatement.setInt(
                             (3 * fieldsCompleted) + 1,
-                            bibEntries
-                                .get(entryIndex)
-                                .getSharedBibEntryData()
-                                .getSharedID()
+                            bibEntries.get(entryIndex).getSharedBibEntryData().getSharedID()
                         );
                         preparedFieldStatement.setString(
                             (3 * fieldsCompleted) + 2,
-                            fields
-                                .get(entryIndex)
-                                .get(entryFieldsIndex)
-                                .getName()
+                            fields.get(entryIndex).get(entryFieldsIndex).getName()
                         );
                         preparedFieldStatement.setString(
                             (3 * fieldsCompleted) + 3,
                             bibEntries
                                 .get(entryIndex)
-                                .getField(
-                                    fields.get(entryIndex).get(entryFieldsIndex)
-                                )
+                                .getField(fields.get(entryIndex).get(entryFieldsIndex))
                                 .get()
                         );
                         fieldsCompleted += 1;
@@ -278,15 +243,10 @@ public class OracleProcessor extends DBMSProcessor {
     @Override
     public void stopNotificationListener() {
         try {
-            oracleConnection.unregisterDatabaseChangeNotification(
-                databaseChangeRegistration
-            );
+            oracleConnection.unregisterDatabaseChangeNotification(databaseChangeRegistration);
             oracleConnection.close();
         } catch (SQLException e) {
-            LOGGER.error(
-                "SQL Error during stopping the notification listener",
-                e
-            );
+            LOGGER.error("SQL Error during stopping the notification listener", e);
         }
     }
 

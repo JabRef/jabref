@@ -42,12 +42,9 @@ import org.slf4j.LoggerFactory;
  * The MedlineFetcher fetches the entries from the PubMed database.
  * See <a href="https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed">docs.jabref.org</a> for a detailed documentation of the available fields.
  */
-public class MedlineFetcher
-    implements IdBasedParserFetcher, SearchBasedFetcher {
+public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MedlineFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL =
@@ -64,8 +61,7 @@ public class MedlineFetcher
      *
      * @see <a href="https://www.ncbi.nlm.nih.gov/books/NBK25500/">www.ncbi.nlm.nih.gov/books/NBK25500/</a>
      */
-    private List<String> getPubMedIdsFromQuery(String query)
-        throws FetcherException {
+    private List<String> getPubMedIdsFromQuery(String query) throws FetcherException {
         boolean fetchIDs = false;
         boolean firstOccurrenceOfCount = false;
         List<String> idList = new ArrayList<>();
@@ -73,9 +69,7 @@ public class MedlineFetcher
             URL ncbi = createSearchUrl(query);
 
             XMLInputFactory inputFactory = XMLInputFactory.newFactory();
-            XMLStreamReader streamReader = inputFactory.createXMLStreamReader(
-                ncbi.openStream()
-            );
+            XMLStreamReader streamReader = inputFactory.createXMLStreamReader(ncbi.openStream());
 
             fetchLoop:while (streamReader.hasNext()) {
                 int event = streamReader.getEventType();
@@ -86,16 +80,13 @@ public class MedlineFetcher
                             firstOccurrenceOfCount = true;
                         }
 
-                        if (
-                            "IdList".equals(streamReader.getName().toString())
-                        ) {
+                        if ("IdList".equals(streamReader.getName().toString())) {
                             fetchIDs = true;
                         }
                         break;
                     case XMLStreamConstants.CHARACTERS:
                         if (firstOccurrenceOfCount) {
-                            numberOfResultsFound =
-                                Integer.parseInt(streamReader.getText());
+                            numberOfResultsFound = Integer.parseInt(streamReader.getText());
                             firstOccurrenceOfCount = false;
                         }
 
@@ -105,9 +96,7 @@ public class MedlineFetcher
                         break;
                     case XMLStreamConstants.END_ELEMENT:
                         // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-                        if (
-                            "IdList".equals(streamReader.getName().toString())
-                        ) {
+                        if ("IdList".equals(streamReader.getName().toString())) {
                             break fetchLoop;
                         }
                 }
@@ -157,36 +146,19 @@ public class MedlineFetcher
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(
-            new UnknownField("journal-abbreviation"),
-            new ClearFormatter()
-        )
+        new FieldFormatterCleanup(new UnknownField("journal-abbreviation"), new ClearFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            new UnknownField("status"),
-            new ClearFormatter()
-        )
-            .cleanup(entry);
-        new FieldFormatterCleanup(
-            new UnknownField("copyright"),
-            new ClearFormatter()
-        )
+        new FieldFormatterCleanup(new UnknownField("status"), new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(new UnknownField("copyright"), new ClearFormatter())
             .cleanup(entry);
 
-        new FieldFormatterCleanup(
-            StandardField.MONTH,
-            new NormalizeMonthFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.AUTHOR,
-            new NormalizeNamesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter())
             .cleanup(entry);
     }
 
-    private URL createSearchUrl(String query)
-        throws URISyntaxException, MalformedURLException {
+    private URL createSearchUrl(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
@@ -202,8 +174,7 @@ public class MedlineFetcher
      * @param ids A list of IDs to search for.
      * @return Will return an empty list on error.
      */
-    private List<BibEntry> fetchMedline(List<String> ids)
-        throws FetcherException {
+    private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
         try {
             // Separate the IDs with a comma to search multiple entries
             URL fetchURL = getUrlForIdentifier(String.join(",", ids));
@@ -211,10 +182,7 @@ public class MedlineFetcher
             ParserResult result = new MedlineImporter()
                 .importDatabase(
                     new BufferedReader(
-                        new InputStreamReader(
-                            data.getInputStream(),
-                            StandardCharsets.UTF_8
-                        )
+                        new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)
                     )
                 );
             if (result.hasWarnings()) {
@@ -239,13 +207,10 @@ public class MedlineFetcher
     }
 
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         List<BibEntry> entryList;
         MedlineQueryTransformer transformer = new MedlineQueryTransformer();
-        Optional<String> transformedQuery = transformer.transformLuceneQuery(
-            luceneQuery
-        );
+        Optional<String> transformedQuery = transformer.transformLuceneQuery(luceneQuery);
 
         if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
             return Collections.emptyList();

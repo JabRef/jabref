@@ -334,11 +334,7 @@ public class BibtexEntryTypeDefinitions {
      */
     private static final BibEntryType UNPUBLISHED = new BibEntryTypeBuilder()
         .withType(StandardEntryType.Unpublished)
-        .withRequiredFields(
-            StandardField.AUTHOR,
-            StandardField.TITLE,
-            StandardField.NOTE
-        )
+        .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.NOTE)
         .withImportantFields(StandardField.MONTH, StandardField.YEAR)
         .build();
 

@@ -31,9 +31,7 @@ class LayoutHelperTest {
 
     @Test
     public void unbalancedBeginEndIsParsed() throws Exception {
-        StringReader stringReader = new StringReader(
-            "\\begin{doi}, DOI: \\doi"
-        );
+        StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi");
         LayoutHelper layoutHelper = new LayoutHelper(
             stringReader,
             layoutFormatterPreferences,
@@ -45,9 +43,7 @@ class LayoutHelperTest {
 
     @Test
     public void minimalExampleWithDoiGetsParsed() throws Exception {
-        StringReader stringReader = new StringReader(
-            "\\begin{doi}, DOI: \\doi\\end{doi}"
-        );
+        StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi\\end{doi}");
         LayoutHelper layoutHelper = new LayoutHelper(
             stringReader,
             layoutFormatterPreferences,

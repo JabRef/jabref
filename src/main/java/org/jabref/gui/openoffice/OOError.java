@@ -39,11 +39,7 @@ class OOError extends JabRefException {
      */
 
     public static OOError from(JabRefException err) {
-        return new OOError(
-            Localization.lang("JabRefException"),
-            err.getLocalizedMessage(),
-            err
-        );
+        return new OOError(Localization.lang("JabRefException"), err.getLocalizedMessage(), err);
     }
 
     // For DisposedException
@@ -99,9 +95,7 @@ class OOError extends JabRefException {
     public static OOError noDataBaseIsOpenForCiting() {
         return new OOError(
             Localization.lang("No database"),
-            Localization.lang(
-                "No bibliography database is open for citation."
-            ) +
+            Localization.lang("No bibliography database is open for citation.") +
             "\n" +
             Localization.lang("Open one before citing.")
         );
@@ -110,9 +104,7 @@ class OOError extends JabRefException {
     public static OOError noDataBaseIsOpenForSyncingAfterCitation() {
         return new OOError(
             Localization.lang("No database"),
-            Localization.lang(
-                "No database is open for updating citation markers after citing."
-            ) +
+            Localization.lang("No database is open for updating citation markers after citing.") +
             "\n" +
             Localization.lang("Open one before citing.")
         );
@@ -130,9 +122,7 @@ class OOError extends JabRefException {
     public static OOError noDataBaseIsOpen() {
         return new OOError(
             Localization.lang("No database is open"),
-            Localization.lang(
-                "This operation requires a bibliography database."
-            )
+            Localization.lang("This operation requires a bibliography database.")
         );
     }
 
@@ -140,15 +130,12 @@ class OOError extends JabRefException {
     public static OOError noValidStyleSelected() {
         return new OOError(
             Localization.lang("No valid style file defined"),
-            Localization.lang(
-                "No bibliography style is selected for citation."
-            ) +
+            Localization.lang("No bibliography style is selected for citation.") +
             "\n" +
             Localization.lang("Select one before citing.") +
             "\n" +
             Localization.lang(
-                "You must select either a valid style file," +
-                " or use one of the default styles."
+                "You must select either a valid style file," + " or use one of the default styles."
             )
         );
     }
@@ -157,9 +144,7 @@ class OOError extends JabRefException {
     public static OOError noEntriesSelectedForCitation() {
         return new OOError(
             Localization.lang("No entries selected for citation"),
-            Localization.lang(
-                "No bibliography entries are selected for citation."
-            ) +
+            Localization.lang("No bibliography entries are selected for citation.") +
             "\n" +
             Localization.lang("Select some before citing.")
         );

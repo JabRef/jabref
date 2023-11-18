@@ -62,21 +62,16 @@ class StudyCatalogToFetcherConverter {
      * @param studyDatabase the entry that will be converted
      * @return An instance of the fetcher defined by the library entry.
      */
-    private SearchBasedFetcher createFetcherFromLibraryEntry(
-        StudyDatabase studyDatabase
-    ) {
-        Set<SearchBasedFetcher> searchBasedFetchers =
-            WebFetchers.getSearchBasedFetchers(
-                importFormatPreferences,
-                importerPreferences
-            );
+    private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(
+            importFormatPreferences,
+            importerPreferences
+        );
         String libraryNameFromFetcher = studyDatabase.getName();
         return searchBasedFetchers
             .stream()
             .filter(searchBasedFetcher ->
-                searchBasedFetcher
-                    .getName()
-                    .equalsIgnoreCase(libraryNameFromFetcher)
+                searchBasedFetcher.getName().equalsIgnoreCase(libraryNameFromFetcher)
             )
             .findAny()
             .orElse(null);

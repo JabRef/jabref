@@ -34,8 +34,7 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
             "PdfXmpImporter does not support importDatabase(BufferedReader reader)." +
@@ -56,17 +55,14 @@ public class PdfXmpImporter extends Importer {
     public ParserResult importDatabase(Path filePath) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(
-                new XmpUtilReader().readXmp(filePath, xmpPreferences)
-            );
+            return new ParserResult(new XmpUtilReader().readXmp(filePath, xmpPreferences));
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         return false;
     }

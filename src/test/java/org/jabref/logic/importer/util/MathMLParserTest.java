@@ -24,11 +24,8 @@ class MathMLParserTest {
 
     @ParameterizedTest
     @MethodSource("tests")
-    void parserConvertsMathMLIntoLatex(String expected, String input)
-        throws XMLStreamException {
-        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(
-            new StringReader(input)
-        );
+    void parserConvertsMathMLIntoLatex(String expected, String input) throws XMLStreamException {
+        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader(input));
         assertEquals(expected, MathMLParser.parse(reader));
     }
 

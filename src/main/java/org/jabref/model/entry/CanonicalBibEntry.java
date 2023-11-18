@@ -34,11 +34,7 @@ public class CanonicalBibEntry {
 
         // generate first line: type and citation key
         String citeKey = entry.getCitationKey().orElse("");
-        sb
-            .append(
-                String.format("@%s{%s,", entry.getType().getName(), citeKey)
-            )
-            .append('\n');
+        sb.append(String.format("@%s{%s,", entry.getType().getName(), citeKey)).append('\n');
 
         // we have to introduce a new Map as fields are stored case-sensitive in JabRef (see https://github.com/koppor/jabref/issues/45).
         Map<String, String> mapFieldToValue = new HashMap<>();
@@ -50,9 +46,7 @@ public class CanonicalBibEntry {
             String fieldValue = field.getValue();
             // JabRef stores the key in the field KEY_FIELD, which must not be serialized
             if (!fieldName.equals(InternalField.KEY_FIELD)) {
-                String lowerCaseFieldName = fieldName
-                    .getName()
-                    .toLowerCase(Locale.US);
+                String lowerCaseFieldName = fieldName.getName().toLowerCase(Locale.US);
                 sortedFields.add(lowerCaseFieldName);
                 mapFieldToValue.put(lowerCaseFieldName, fieldValue);
             }
@@ -61,11 +55,7 @@ public class CanonicalBibEntry {
         // generate field entries
         StringJoiner sj = new StringJoiner(",\n", "", "\n");
         for (String fieldName : sortedFields) {
-            String line = String.format(
-                "  %s = {%s}",
-                fieldName,
-                mapFieldToValue.get(fieldName)
-            );
+            String line = String.format("  %s = {%s}", fieldName, mapFieldToValue.get(fieldName));
             sj.add(line);
         }
 

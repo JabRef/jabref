@@ -11,10 +11,7 @@ public class EntryLinkList {
 
     private EntryLinkList() {}
 
-    public static List<ParsedEntryLink> parse(
-        String fieldValue,
-        BibDatabase database
-    ) {
+    public static List<ParsedEntryLink> parse(String fieldValue, BibDatabase database) {
         List<ParsedEntryLink> result = new ArrayList<>();
         if ((fieldValue != null) && !fieldValue.isEmpty()) {
             String[] entries = fieldValue.split(SEPARATOR);
@@ -29,10 +26,7 @@ public class EntryLinkList {
     public static String serialize(List<ParsedEntryLink> list) {
         return String.join(
             SEPARATOR,
-            list
-                .stream()
-                .map(ParsedEntryLink::getKey)
-                .collect(Collectors.toList())
+            list.stream().map(ParsedEntryLink::getKey).collect(Collectors.toList())
         );
     }
 }

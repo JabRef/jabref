@@ -27,14 +27,13 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MrDLibFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
     private static final String MDL_JABREF_PARTNER_ID = "1";
     private static final String MDL_URL = "api.mr-dlib.org";
-    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE =
-        Localization.lang("Error while fetching recommendations from Mr.DLib.");
+    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang(
+        "Error while fetching recommendations from Mr.DLib."
+    );
     private final String LANGUAGE;
     private final Version VERSION;
     private String heading;
@@ -42,11 +41,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String recommendationSetId;
     private final MrDlibPreferences preferences;
 
-    public MrDLibFetcher(
-        String language,
-        Version version,
-        MrDlibPreferences preferences
-    ) {
+    public MrDLibFetcher(String language, Version version, MrDlibPreferences preferences) {
         LANGUAGE = language;
         VERSION = version;
         this.preferences = preferences;
@@ -58,8 +53,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
         if (title.isPresent()) {
             String response = makeServerRequest(title.get());
@@ -102,12 +96,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @param queryByTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
      * @return Returns the server response. This is an XML document as a String.
      */
-    private String makeServerRequest(String queryByTitle)
-        throws FetcherException {
+    private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
-            URLDownload urlDownload = new URLDownload(
-                constructQuery(queryByTitle)
-            );
+            URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
             String response = urlDownload.asString();
 
             // Conversion of < and >
@@ -131,9 +122,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
         builder.setHost(MDL_URL);
-        builder.setPath(
-            "/v2/documents/" + queryWithTitle + "/related_documents"
-        );
+        builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
@@ -145,10 +134,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             builder.addParameter("os", System.getProperty("os.name"));
         }
         if (preferences.shouldSendTimezone()) {
-            builder.addParameter(
-                "timezone",
-                Calendar.getInstance().getTimeZone().getID()
-            );
+            builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
         }
 
         try {

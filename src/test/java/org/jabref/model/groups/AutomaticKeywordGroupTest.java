@@ -19,8 +19,7 @@ class AutomaticKeywordGroupTest {
             ',',
             '>'
         );
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.KEYWORDS, "A, B");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "A, B");
 
         Set<GroupTreeNode> expected = createIncludingKeywordsSubgroup();
 
@@ -36,8 +35,7 @@ class AutomaticKeywordGroupTest {
             ',',
             '>'
         );
-        BibEntry entry = new BibEntry()
-            .withField(StandardField.KEYWORDS, "A, ,B");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "A, ,B");
 
         Set<GroupTreeNode> expected = createIncludingKeywordsSubgroup();
 

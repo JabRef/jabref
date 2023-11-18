@@ -41,9 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public class ParseLatexDialogViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ParseLatexDialogViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParseLatexDialogViewModel.class);
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
@@ -74,15 +72,11 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
             new SimpleStringProperty(
                 databaseContext
                     .getMetaData()
-                    .getLatexFileDirectory(
-                        preferencesService.getFilePreferences().getUserAndHost()
-                    )
+                    .getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                     .orElse(
                         FileUtil.getInitialDirectory(
                             databaseContext,
-                            preferencesService
-                                .getFilePreferences()
-                                .getWorkingDirectory()
+                            preferencesService.getFilePreferences().getWorkingDirectory()
                         )
                     )
                     .toAbsolutePath()
@@ -94,15 +88,12 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        Predicate<String> isDirectory = path ->
-            Path.of(path).toFile().isDirectory();
+        Predicate<String> isDirectory = path -> Path.of(path).toFile().isDirectory();
         latexDirectoryValidator =
             new FunctionBasedValidator<>(
                 latexFileDirectory,
                 isDirectory,
-                ValidationMessage.error(
-                    Localization.lang("Please enter a valid file path.")
-                )
+                ValidationMessage.error(Localization.lang("Please enter a valid file path."))
             );
     }
 
@@ -143,9 +134,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         dialogService
             .showDirectorySelectionDialog(directoryDialogConfiguration)
             .ifPresent(selectedDirectory -> {
-                latexFileDirectory.set(
-                    selectedDirectory.toAbsolutePath().toString()
-                );
+                latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
                 preferencesService
                     .getFilePreferences()
                     .setWorkingDirectory(selectedDirectory.toAbsolutePath());
@@ -178,16 +167,11 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         final boolean permissionProblem =
             (exception instanceof IOException) &&
             (exception.getCause() instanceof FileSystemException) &&
-            exception
-                .getCause()
-                .getMessage()
-                .endsWith("Operation not permitted");
+            exception.getCause().getMessage().endsWith("Operation not permitted");
         if (permissionProblem) {
             dialogService.showErrorDialogAndWait(
                 String.format(
-                    Localization.lang(
-                        "JabRef does not have permission to access %s"
-                    ),
+                    Localization.lang("JabRef does not have permission to access %s"),
                     exception.getCause().getMessage()
                 )
             );
@@ -196,12 +180,9 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         }
     }
 
-    private FileNodeViewModel searchDirectory(Path directory)
-        throws IOException {
+    private FileNodeViewModel searchDirectory(Path directory) throws IOException {
         if ((directory == null) || !directory.toFile().isDirectory()) {
-            throw new IOException(
-                String.format("Invalid directory for searching: %s", directory)
-            );
+            throw new IOException(String.format("Invalid directory for searching: %s", directory));
         }
 
         FileNodeViewModel parent = new FileNodeViewModel(directory);
@@ -209,11 +190,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition =
-                filesStream.collect(
-                    Collectors.partitioningBy(path ->
-                        path.toFile().isDirectory()
-                    )
-                );
+                filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
             LOGGER.error(
                 String.format(
@@ -245,12 +222,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         parent.setFileCount(files.size() + fileCount);
         parent
             .getChildren()
-            .addAll(
-                files
-                    .stream()
-                    .map(FileNodeViewModel::new)
-                    .collect(Collectors.toList())
-            );
+            .addAll(files.stream().map(FileNodeViewModel::new).collect(Collectors.toList()));
         return parent;
     }
 
@@ -276,11 +248,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         );
 
         BackgroundTask
-            .wrap(() ->
-                entriesResolver.resolve(
-                    new DefaultLatexParser().parse(fileList)
-                )
-            )
+            .wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
             .onRunning(() -> searchInProgress.set(true))
             .onFinished(() -> searchInProgress.set(false))
             .onSuccess(result ->

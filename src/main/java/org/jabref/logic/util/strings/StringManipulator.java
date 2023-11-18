@@ -38,11 +38,7 @@ public class StringManipulator {
         int caretPosition,
         LetterCase targetCase
     ) {
-        int nextWordBoundary = getNextWordBoundary(
-            caretPosition,
-            text,
-            Direction.NEXT
-        );
+        int nextWordBoundary = getNextWordBoundary(caretPosition, text, Direction.NEXT);
 
         // Preserve whitespaces
         int wordStartPosition = caretPosition;
@@ -68,9 +64,7 @@ public class StringManipulator {
 
         return new ResultingStringState(
             nextWordBoundary,
-            text.substring(0, wordStartPosition) +
-            result +
-            text.substring(nextWordBoundary)
+            text.substring(0, wordStartPosition) + result + text.substring(nextWordBoundary)
         );
     }
 
@@ -89,23 +83,17 @@ public class StringManipulator {
         Direction direction
     ) {
         // Define cutout range
-        int nextWordBoundary = getNextWordBoundary(
-            caretPosition,
-            text,
-            direction
-        );
+        int nextWordBoundary = getNextWordBoundary(caretPosition, text, direction);
 
         // Construct new string without cutout
         return switch (direction) {
             case NEXT -> new ResultingStringState(
                 caretPosition,
-                text.substring(0, caretPosition) +
-                text.substring(nextWordBoundary)
+                text.substring(0, caretPosition) + text.substring(nextWordBoundary)
             );
             case PREVIOUS -> new ResultingStringState(
                 nextWordBoundary,
-                text.substring(0, nextWordBoundary) +
-                text.substring(caretPosition)
+                text.substring(0, nextWordBoundary) + text.substring(caretPosition)
             );
         };
     }
@@ -119,41 +107,27 @@ public class StringManipulator {
      *
      * @return              The position of the next whitespace after a word
      */
-    static int getNextWordBoundary(
-        int caretPosition,
-        String text,
-        Direction direction
-    ) {
+    static int getNextWordBoundary(int caretPosition, String text, Direction direction) {
         int i = caretPosition;
 
         if (direction == Direction.PREVIOUS) {
             // Swallow whitespaces
-            while (
-                i > 0 &&
-                Character.isWhitespace((text.charAt(i + direction.OFFSET)))
-            ) {
+            while (i > 0 && Character.isWhitespace((text.charAt(i + direction.OFFSET)))) {
                 i += direction.OFFSET;
             }
 
             // Read next word
-            while (
-                i > 0 &&
-                !Character.isWhitespace(text.charAt(i + direction.OFFSET))
-            ) {
+            while (i > 0 && !Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
                 i += direction.OFFSET;
             }
         } else if (direction == Direction.NEXT) {
             // Swallow whitespaces
-            while (
-                i < text.length() && Character.isWhitespace(text.charAt(i))
-            ) {
+            while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
                 i += direction.OFFSET;
             }
 
             // Read next word
-            while (
-                i < text.length() && !Character.isWhitespace((text.charAt(i)))
-            ) {
+            while (i < text.length() && !Character.isWhitespace((text.charAt(i)))) {
                 i += direction.OFFSET;
             }
         }
@@ -169,10 +143,7 @@ public class StringManipulator {
      *
      * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState capitalize(
-        int caretPosition,
-        String text
-    ) {
+    public static ResultingStringState capitalize(int caretPosition, String text) {
         return setWordCase(text, caretPosition, LetterCase.CAPITALIZED);
     }
 
@@ -184,10 +155,7 @@ public class StringManipulator {
      *
      * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState uppercase(
-        int caretPosition,
-        String text
-    ) {
+    public static ResultingStringState uppercase(int caretPosition, String text) {
         return setWordCase(text, caretPosition, LetterCase.UPPER);
     }
 
@@ -199,10 +167,7 @@ public class StringManipulator {
      *
      * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState lowercase(
-        int caretPosition,
-        String text
-    ) {
+    public static ResultingStringState lowercase(int caretPosition, String text) {
         return setWordCase(text, caretPosition, LetterCase.LOWER);
     }
 
@@ -214,10 +179,7 @@ public class StringManipulator {
      *
      * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState killWord(
-        int caretPosition,
-        String text
-    ) {
+    public static ResultingStringState killWord(int caretPosition, String text) {
         return deleteUntilWordBoundary(caretPosition, text, Direction.NEXT);
     }
 
@@ -229,10 +191,7 @@ public class StringManipulator {
      *
      * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState backwardKillWord(
-        int caretPosition,
-        String text
-    ) {
+    public static ResultingStringState backwardKillWord(int caretPosition, String text) {
         return deleteUntilWordBoundary(caretPosition, text, Direction.PREVIOUS);
     }
 }

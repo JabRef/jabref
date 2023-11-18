@@ -16,21 +16,14 @@ class FieldContentFormatterTest {
     void setUp() {
         parser =
             new FieldContentFormatter(
-                new FieldPreferences(
-                    false,
-                    Collections.emptyList(),
-                    Collections.emptyList()
-                )
+                new FieldPreferences(false, Collections.emptyList(), Collections.emptyList())
             );
     }
 
     @Test
     void doesNotUnifyLineBreaks() {
         String original = "I\r\nunify\nline\rbreaks.";
-        String processed = parser.format(
-            new StringBuilder(original),
-            StandardField.ABSTRACT
-        );
+        String processed = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
 
         // Normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
         assertEquals(original, processed);
@@ -40,14 +33,8 @@ class FieldContentFormatterTest {
     void retainsWhitespaceForMultiLineFields() {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
 
-        String abstrakt = parser.format(
-            new StringBuilder(original),
-            StandardField.ABSTRACT
-        );
-        String review = parser.format(
-            new StringBuilder(original),
-            StandardField.REVIEW
-        );
+        String abstrakt = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
+        String review = parser.format(new StringBuilder(original), StandardField.REVIEW);
 
         assertEquals(original, abstrakt);
         assertEquals(original, review);
@@ -55,19 +42,11 @@ class FieldContentFormatterTest {
 
     @Test
     void removeWhitespaceFromNonMultiLineFields() {
-        String original =
-            "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
-        String expected =
-            "I should not include additional whitespaces or tabs.";
+        String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
+        String expected = "I should not include additional whitespaces or tabs.";
 
-        String abstrakt = parser.format(
-            new StringBuilder(original),
-            StandardField.TITLE
-        );
-        String any = parser.format(
-            new StringBuilder(original),
-            new UnknownField("anyotherfield")
-        );
+        String abstrakt = parser.format(new StringBuilder(original), StandardField.TITLE);
+        String any = parser.format(new StringBuilder(original), new UnknownField("anyotherfield"));
 
         assertEquals(expected, abstrakt);
         assertEquals(expected, any);

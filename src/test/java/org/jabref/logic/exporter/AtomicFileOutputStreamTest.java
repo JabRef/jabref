@@ -20,24 +20,15 @@ import org.mockito.Mockito;
 class AtomicFileOutputStreamTest {
 
     private static final String FIFTY_CHARS = Strings.repeat("1234567890", 5);
-    private static final String FIVE_THOUSAND_CHARS = Strings.repeat(
-        "A",
-        5_000
-    );
+    private static final String FIVE_THOUSAND_CHARS = Strings.repeat("A", 5_000);
 
     @Test
     public void normalSaveWorks(@TempDir Path tempDir) throws Exception {
         Path out = tempDir.resolve("normal-save.txt");
         Files.writeString(out, FIFTY_CHARS);
 
-        try (
-            AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(
-                out
-            )
-        ) {
-            InputStream inputStream = new ByteArrayInputStream(
-                FIVE_THOUSAND_CHARS.getBytes()
-            );
+        try (AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out)) {
+            InputStream inputStream = new ByteArrayInputStream(FIVE_THOUSAND_CHARS.getBytes());
             inputStream.transferTo(atomicFileOutputStream);
         }
 
@@ -46,24 +37,17 @@ class AtomicFileOutputStreamTest {
     }
 
     @Test
-    public void originalContentExistsAtWriteError(@TempDir Path tempDir)
-        throws Exception {
+    public void originalContentExistsAtWriteError(@TempDir Path tempDir) throws Exception {
         Path pathToTestFile = tempDir.resolve("error-during-save.txt");
         Files.writeString(pathToTestFile, FIFTY_CHARS);
 
         Path pathToTmpFile = tempDir.resolve("error-during-save.txt.tmp");
 
-        try (
-            FileOutputStream outputStream = new FileOutputStream(
-                pathToTmpFile.toFile()
-            )
-        ) {
+        try (FileOutputStream outputStream = new FileOutputStream(pathToTmpFile.toFile())) {
             FileOutputStream spiedOutputStream = spy(outputStream);
             doAnswer(invocation -> {
                     // by writing one byte, we ensure that the `.tmp` file is created
-                    outputStream.write(
-                        ((byte[]) invocation.getRawArguments()[0])[0]
-                    );
+                    outputStream.write(((byte[]) invocation.getRawArguments()[0])[0]);
                     outputStream.flush();
                     throw new IOException();
                 })

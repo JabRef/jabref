@@ -35,9 +35,7 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
         }
     }
 
-    private List<ExplicitGroup> getExplicitGroupsWithLegacyKeys(
-        GroupTreeNode node
-    ) {
+    private List<ExplicitGroup> getExplicitGroupsWithLegacyKeys(GroupTreeNode node) {
         Objects.requireNonNull(node);
         List<ExplicitGroup> findings = new ArrayList<>();
 
@@ -50,9 +48,7 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
 
         node
             .getChildren()
-            .forEach(child ->
-                findings.addAll(getExplicitGroupsWithLegacyKeys(child))
-            );
+            .forEach(child -> findings.addAll(getExplicitGroupsWithLegacyKeys(child)));
 
         return findings;
     }

@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class SpecialFieldAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        SpecialFieldAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
     private final JabRefFrame frame;
     private final SpecialField specialField;
     private final String value;
@@ -81,9 +79,7 @@ public class SpecialFieldAction extends SimpleCommand {
                     nullFieldIfValueIsTheSame
                 );
 
-                change.ifPresent(fieldChange ->
-                    ce.addEdit(new UndoableFieldChange(fieldChange))
-                );
+                change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
             }
             ce.end();
             if (ce.hasEdits()) {
@@ -92,15 +88,9 @@ public class SpecialFieldAction extends SimpleCommand {
                 frame.getCurrentLibraryTab().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
-                    outText =
-                        getTextDone(specialField, Integer.toString(bes.size()));
+                    outText = getTextDone(specialField, Integer.toString(bes.size()));
                 } else {
-                    outText =
-                        getTextDone(
-                            specialField,
-                            value,
-                            Integer.toString(bes.size())
-                        );
+                    outText = getTextDone(specialField, value, Integer.toString(bes.size()));
                 }
                 dialogService.notify(outText);
             }
@@ -119,11 +109,7 @@ public class SpecialFieldAction extends SimpleCommand {
             undoManager
         );
 
-        if (
-            field.isSingleValueField() &&
-            (params.length == 1) &&
-            (params[0] != null)
-        ) {
+        if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // Single value fields can be toggled only
             return Localization.lang(
                 "Toggled '%0' for %1 entries",
@@ -137,20 +123,9 @@ public class SpecialFieldAction extends SimpleCommand {
             (params[1] != null)
         ) {
             // setting a multi value special field - the setted value is displayed, too
-            String[] allParams = {
-                viewModel.getLocalization(),
-                params[0],
-                params[1],
-            };
-            return Localization.lang(
-                "Set '%0' to '%1' for %2 entries",
-                allParams
-            );
-        } else if (
-            !field.isSingleValueField() &&
-            (params.length == 1) &&
-            (params[0] != null)
-        ) {
+            String[] allParams = { viewModel.getLocalization(), params[0], params[1] };
+            return Localization.lang("Set '%0' to '%1' for %2 entries", allParams);
+        } else if (!field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // clearing a multi value specialfield
             return Localization.lang(
                 "Cleared '%0' for %1 entries",

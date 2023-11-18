@@ -66,9 +66,7 @@ class FieldWriterTest {
     @Test
     void noNormalizationOfNewlinesInAbstractField() throws Exception {
         String text =
-            "lorem" +
-            OS.NEWLINE +
-            " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
+            "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
         String result = writer.write(StandardField.ABSTRACT, text);
         // The normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
         String expected = "{" + text + "}";
@@ -77,8 +75,7 @@ class FieldWriterTest {
 
     @Test
     void preserveNewlineInAbstractField() throws Exception {
-        String text =
-            "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
         String expected = "{" + text + "}";
@@ -89,10 +86,7 @@ class FieldWriterTest {
     @Test
     void preserveMultipleNewlinesInAbstractField() throws Exception {
         String text =
-            "lorem ipsum lorem ipsum" +
-            OS.NEWLINE +
-            OS.NEWLINE +
-            "lorem ipsum lorem ipsum";
+            "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
         String expected = "{" + text + "}";
@@ -102,8 +96,7 @@ class FieldWriterTest {
 
     @Test
     void preserveNewlineInReviewField() throws Exception {
-        String text =
-            "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.REVIEW, text);
         String expected = "{" + text + "}";
@@ -113,10 +106,8 @@ class FieldWriterTest {
 
     @Test
     void removeWhitespaceFromNonMultiLineFields() throws Exception {
-        String original =
-            "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
-        String expected =
-            "{I should not include additional whitespaces or tabs.}";
+        String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
+        String expected = "{I should not include additional whitespaces or tabs.}";
 
         String title = writer.write(StandardField.TITLE, original);
         String any = writer.write(new UnknownField("anyotherfield"), original);
@@ -147,43 +138,29 @@ class FieldWriterTest {
 
     @Test
     void tolerateBalancedBrace() throws Exception {
-        String text =
-            "Incorporating evolutionary {Measures into Conservation Prioritization}";
+        String text = "Incorporating evolutionary {Measures into Conservation Prioritization}";
 
-        assertEquals(
-            "{" + text + "}",
-            writer.write(new UnknownField("anyfield"), text)
-        );
+        assertEquals("{" + text + "}", writer.write(new UnknownField("anyfield"), text));
     }
 
     @Test
     void tolerateEscapeCharacters() throws Exception {
-        String text =
-            "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
+        String text = "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
 
-        assertEquals(
-            "{" + text + "}",
-            writer.write(new UnknownField("anyfield"), text)
-        );
+        assertEquals("{" + text + "}", writer.write(new UnknownField("anyfield"), text));
     }
 
     @Test
     void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
         String text = "#jan# - #feb#";
-        assertEquals(
-            "jan # { - } # feb",
-            writer.write(StandardField.MONTH, text)
-        );
+        assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
     }
 
     @ParameterizedTest
     @MethodSource("getMarkdowns")
     void keepHashSignInComment(String text) throws Exception {
         String writeResult = writer.write(StandardField.COMMENT, text);
-        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(
-            writeResult,
-            "\n"
-        );
+        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
         assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 }

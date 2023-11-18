@@ -60,9 +60,6 @@ public class MetaDataParserTest {
     @ParameterizedTest
     @MethodSource
     void parseCustomizedEntryType(BibEntryTypeBuilder expected, String source) {
-        assertEquals(
-            Optional.of(expected.build()),
-            MetaDataParser.parseCustomEntryType(source)
-        );
+        assertEquals(Optional.of(expected.build()), MetaDataParser.parseCustomEntryType(source));
     }
 }

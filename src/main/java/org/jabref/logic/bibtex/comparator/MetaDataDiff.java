@@ -40,10 +40,7 @@ public class MetaDataDiff {
         this.groupDiff = GroupDiff.compare(originalMetaData, newMetaData);
     }
 
-    public static Optional<MetaDataDiff> compare(
-        MetaData originalMetaData,
-        MetaData newMetaData
-    ) {
+    public static Optional<MetaDataDiff> compare(MetaData originalMetaData, MetaData newMetaData) {
         if (originalMetaData.equals(newMetaData)) {
             return Optional.empty();
         } else {
@@ -58,9 +55,7 @@ public class MetaDataDiff {
         Object newObject
     ) {
         if (!Objects.equals(originalObject, newObject)) {
-            changes.add(
-                new Difference(differenceType, originalObject, newObject)
-            );
+            changes.add(new Difference(differenceType, originalObject, newObject));
         }
     }
 

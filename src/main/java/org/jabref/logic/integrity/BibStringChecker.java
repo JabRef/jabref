@@ -31,9 +31,7 @@ public class BibStringChecker implements EntryChecker {
         Map<Field, String> fields = entry.getFieldMap();
 
         for (Map.Entry<Field, String> field : fields.entrySet()) {
-            if (
-                !field.getKey().getProperties().contains(FieldProperty.VERBATIM)
-            ) {
+            if (!field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
                 Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
                 int hashCount = 0;
                 while (hashMatcher.find()) {

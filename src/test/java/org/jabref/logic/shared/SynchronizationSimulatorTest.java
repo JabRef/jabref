@@ -29,25 +29,23 @@ public class SynchronizationSimulatorTest {
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
     private SynchronizationEventListenerTest eventListenerB; // used to monitor occurring events
-    private final GlobalCitationKeyPattern pattern =
-        GlobalCitationKeyPattern.fromPattern("[auth][year]");
+    private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern(
+        "[auth][year]"
+    );
 
     private BibEntry getBibEntryExample(int index) {
         return new BibEntry(StandardEntryType.InProceedings)
             .withField(
                 StandardField.AUTHOR,
-                "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L " +
-                index
+                "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L " + index
             )
             .withField(
                 StandardField.TITLE,
-                "The nano processor: a low resource reconfigurable processor " +
-                index
+                "The nano processor: a low resource reconfigurable processor " + index
             )
             .withField(
                 StandardField.BOOKTITLE,
-                "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on " +
-                index
+                "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on " + index
             )
             .withField(StandardField.YEAR, "199" + index)
             .withCitationKey("nanoproc199" + index);
@@ -82,9 +80,7 @@ public class SynchronizationSimulatorTest {
         clientContextB
             .getDBMSSynchronizer()
             .openSharedDatabase(
-                ConnectorTest.getTestDBMSConnection(
-                    TestManager.getDBMSTypeTestParameter()
-                )
+                ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter())
             );
         eventListenerB = new SynchronizationEventListenerTest();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
@@ -174,10 +170,7 @@ public class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getSharedEntriesNotPresentEvent());
         // client B tries to update the entry
-        BibEntry bibEntryOfClientB = clientContextB
-            .getDatabase()
-            .getEntries()
-            .get(0);
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
@@ -203,10 +196,7 @@ public class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getUpdateRefusedEvent());
 
-        BibEntry bibEntryOfClientB = clientContextB
-            .getDatabase()
-            .getEntries()
-            .get(0);
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         // B also tries to change something
         bibEntryOfClientB.setField(StandardField.YEAR, "2016");
 

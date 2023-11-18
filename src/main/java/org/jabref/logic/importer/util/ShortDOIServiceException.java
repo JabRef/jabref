@@ -16,11 +16,7 @@ public class ShortDOIServiceException extends JabRefException {
         super(message, localizedMessage);
     }
 
-    public ShortDOIServiceException(
-        String message,
-        String localizedMessage,
-        Throwable cause
-    ) {
+    public ShortDOIServiceException(String message, String localizedMessage, Throwable cause) {
         super(message, localizedMessage, cause);
     }
 

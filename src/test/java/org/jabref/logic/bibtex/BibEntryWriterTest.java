@@ -45,18 +45,14 @@ class BibEntryWriterTest {
 
     @BeforeEach
     void setUpWriter() {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FieldPreferences fieldPreferences = new FieldPreferences(
             true,
             List.of(StandardField.MONTH),
             Collections.emptyList()
         );
         bibEntryWriter =
-            new BibEntryWriter(
-                new FieldWriter(fieldPreferences),
-                new BibEntryTypesManager()
-            );
+            new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
     }
 
     @Test
@@ -64,10 +60,7 @@ class BibEntryWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         // set a required field
         entry.setField(StandardField.AUTHOR, "Foo Bar");
-        entry.setField(
-            StandardField.JOURNAL,
-            "International Journal of Something"
-        );
+        entry.setField(StandardField.JOURNAL, "International Journal of Something");
         // set an optional field
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
@@ -108,11 +101,7 @@ class BibEntryWriterTest {
     @Test
     void writeEntryWithFile() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        LinkedFile file = new LinkedFile(
-            "test",
-            Path.of("/home/uers/test.pdf"),
-            "PDF"
-        );
+        LinkedFile file = new LinkedFile("test", Path.of("/home/uers/test.pdf"), "PDF");
         entry.addFile(file);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -132,10 +121,7 @@ class BibEntryWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.InBook);
         // set an required OR field (author/editor)
         entry.setField(StandardField.EDITOR, "Foo Bar");
-        entry.setField(
-            StandardField.JOURNAL,
-            "International Journal of Something"
-        );
+        entry.setField(StandardField.JOURNAL, "International Journal of Something");
         // set an optional field
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
@@ -162,10 +148,7 @@ class BibEntryWriterTest {
         // set an required OR field with both fields(author/editor)
         entry.setField(StandardField.AUTHOR, "Foo Thor");
         entry.setField(StandardField.EDITOR, "Edi Bar");
-        entry.setField(
-            StandardField.JOURNAL,
-            "International Journal of Something"
-        );
+        entry.setField(StandardField.JOURNAL, "International Journal of Something");
         // set an optional field
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
@@ -404,8 +387,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase()
-        throws IOException {
+    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -508,10 +490,7 @@ class BibEntryWriterTest {
 
         // Only one appending newline is written by the writer
         // OS.NEWLINE is used, not the given one
-        assertEquals(
-            bibtexEntry.substring(0, bibtexEntry.length() - 2) + OS.NEWLINE,
-            actual
-        );
+        assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 2) + OS.NEWLINE, actual);
     }
 
     @Test
@@ -689,8 +668,7 @@ class BibEntryWriterTest {
 
     @Test
     void monthApril() throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Misc)
-            .withField(StandardField.MONTH, "apr");
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withField(StandardField.MONTH, "apr");
         // enable writing
         entry.setChanged(true);
 
@@ -778,12 +756,7 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected =
-            "@Article{," +
-            OS.NEWLINE +
-            "  note   = {some note}," +
-            OS.NEWLINE +
-            "}" +
-            OS.NEWLINE;
+            "@Article{," + OS.NEWLINE + "  note   = {some note}," + OS.NEWLINE + "}" + OS.NEWLINE;
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -791,10 +764,7 @@ class BibEntryWriterTest {
     @Test
     void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(
-            StandardField.NOTE,
-            "some text with unbalanced { braces"
-        );
+        entry.setField(StandardField.NOTE, "some text with unbalanced { braces");
 
         assertThrows(
             IOException.class,
@@ -874,10 +844,7 @@ class BibEntryWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         // required fields
         entry.setField(StandardField.AUTHOR, "Foo Bar");
-        entry.setField(
-            StandardField.JOURNALTITLE,
-            "International Journal of Something"
-        );
+        entry.setField(StandardField.JOURNALTITLE, "International Journal of Something");
         entry.setField(StandardField.TITLE, "Title");
         entry.setField(StandardField.DATE, "2019-10-16");
         // optional fields
@@ -988,32 +955,19 @@ class BibEntryWriterTest {
 
     @ParameterizedTest
     @MethodSource("testGetFormattedFieldNameData")
-    void testGetFormattedFieldName(
-        String expected,
-        String fieldName,
-        int indent
-    ) {
+    void testGetFormattedFieldName(String expected, String fieldName, int indent) {
         Field field = FieldFactory.parseField(fieldName);
-        assertEquals(
-            expected,
-            BibEntryWriter.getFormattedFieldName(field, indent)
-        );
+        assertEquals(expected, BibEntryWriter.getFormattedFieldName(field, indent));
     }
 
     static Stream<Arguments> testGetLengthOfLongestFieldNameData() {
         return Stream.of(
-            Arguments.of(
-                1,
-                new BibEntry().withField(FieldFactory.parseField("t"), "t")
-            ),
+            Arguments.of(1, new BibEntry().withField(FieldFactory.parseField("t"), "t")),
             Arguments.of(
                 5,
                 new BibEntry(EntryTypeFactory.parse("reference"))
                     .withCitationKey("Broecker1984")
-                    .withField(
-                        StandardField.TITLE,
-                        "International Center of Photography}"
-                    )
+                    .withField(StandardField.TITLE, "International Center of Photography}")
             )
         );
     }
@@ -1021,9 +975,6 @@ class BibEntryWriterTest {
     @ParameterizedTest
     @MethodSource("testGetLengthOfLongestFieldNameData")
     void testGetLengthOfLongestFieldName(int expected, BibEntry entry) {
-        assertEquals(
-            expected,
-            BibEntryWriter.getLengthOfLongestFieldName(entry)
-        );
+        assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
 }

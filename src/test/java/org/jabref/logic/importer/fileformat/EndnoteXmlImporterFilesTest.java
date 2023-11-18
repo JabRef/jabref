@@ -19,25 +19,19 @@ public class EndnoteXmlImporterFilesTest {
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name ->
-            name.startsWith("EndnoteXmlImporterTest") &&
-            name.endsWith(FILE_ENDING);
+            name.startsWith("EndnoteXmlImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name ->
-            !name.startsWith("EndnoteXmlImporterTest");
+        Predicate<String> fileName = name -> !name.startsWith("EndnoteXmlImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     @BeforeEach
     void setUp() {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(';');
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(';');
     }
 
     @ParameterizedTest

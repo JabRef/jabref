@@ -24,10 +24,8 @@ public class ExportPreferences {
         SaveOrder exportSaveOrder,
         List<TemplateExporter> customExporters
     ) {
-        this.lastExportExtension =
-            new SimpleStringProperty(lastExportExtension);
-        this.exportWorkingDirectory =
-            new SimpleObjectProperty<>(exportWorkingDirectory);
+        this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
+        this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
         this.exportSaveOrder = new SimpleObjectProperty<>(exportSaveOrder);
         this.customExporters = FXCollections.observableList(customExporters);
     }

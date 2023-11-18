@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AbstractPushToApplication.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
     private static final String CITE_KEY1 = "key1";
     private static final String CITE_KEY2 = "key2";
 
@@ -56,10 +54,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             .getExternalApplicationsPreferences()
             .getCiteCommand();
 
-        if (
-            preferencesCiteCommand != null &&
-            preferencesCiteCommand.equals(cachedCiteCommand)
-        ) {
+        if (preferencesCiteCommand != null && preferencesCiteCommand.equals(cachedCiteCommand)) {
             return;
         }
 
@@ -67,25 +62,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
         int indexKey1 = cachedCiteCommand.indexOf(CITE_KEY1);
         int indexKey2 = cachedCiteCommand.indexOf(CITE_KEY2);
-        if (
-            indexKey1 < 0 ||
-            indexKey2 < 0 ||
-            indexKey2 < (indexKey1 + CITE_KEY1.length())
-        ) {
+        if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
             return;
         }
 
         cachedCitePrefix = preferencesCiteCommand.substring(0, indexKey1);
         cachedCiteDelimiter =
             preferencesCiteCommand.substring(
-                preferencesCiteCommand.lastIndexOf(CITE_KEY1) +
-                CITE_KEY1.length(),
+                preferencesCiteCommand.lastIndexOf(CITE_KEY1) + CITE_KEY1.length(),
                 indexKey2
             );
         cachedCiteSuffix =
             preferencesCiteCommand.substring(
-                preferencesCiteCommand.lastIndexOf(CITE_KEY2) +
-                CITE_KEY2.length()
+                preferencesCiteCommand.lastIndexOf(CITE_KEY2) + CITE_KEY2.length()
             );
     }
 
@@ -96,10 +85,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang(
-            "Push entries to external application (%0)",
-            getDisplayName()
-        );
+        return Localization.lang("Push entries to external application (%0)", getDisplayName());
     }
 
     @Override
@@ -108,11 +94,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public void pushEntries(
-        BibDatabaseContext database,
-        List<BibEntry> entries,
-        String keyString
-    ) {
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -150,17 +132,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                 );
                 processBuilder.start();
             } else {
-                ProcessBuilder processBuilder = new ProcessBuilder(
-                    getCommandLine(keyString)
-                );
+                ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
                 processBuilder.start();
             }
         } catch (IOException excep) {
-            LOGGER.warn(
-                "Error: Could not call executable '{}'",
-                commandPath,
-                excep
-            );
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
         }
     }
@@ -170,27 +146,21 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         if (notDefined) {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("Error pushing entries"),
-                Localization.lang("Path to %0 not defined", getDisplayName()) +
-                "."
+                Localization.lang("Path to %0 not defined", getDisplayName()) + "."
             );
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("Error pushing entries"),
-                Localization.lang("Could not call executable") +
-                " '" +
-                commandPath +
-                "'."
+                Localization.lang("Could not call executable") + " '" + commandPath + "'."
             );
         } else if (couldNotPush) {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("Error pushing entries"),
-                Localization.lang("Could not connect to %0", getDisplayName()) +
-                "."
+                Localization.lang("Could not connect to %0", getDisplayName()) + "."
             );
         } else {
             dialogService.notify(
-                Localization.lang("Pushed citations to %0", getDisplayName()) +
-                "."
+                Localization.lang("Pushed citations to %0", getDisplayName()) + "."
             );
         }
     }
@@ -252,10 +222,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
         @Override
         public String getText() {
-            return Localization.lang(
-                "Push entries to external application (%0)",
-                getDisplayName()
-            );
+            return Localization.lang("Push entries to external application (%0)", getDisplayName());
         }
 
         @Override

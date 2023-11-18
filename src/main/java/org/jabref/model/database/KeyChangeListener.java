@@ -45,18 +45,8 @@ public class KeyChangeListener {
                 entry
                     .getField(field)
                     .ifPresent(fieldContent -> {
-                        if (
-                            field
-                                .getProperties()
-                                .contains(FieldProperty.SINGLE_ENTRY_LINK)
-                        ) {
-                            replaceSingleKeyInField(
-                                newKey,
-                                oldKey,
-                                entry,
-                                field,
-                                fieldContent
-                            );
+                        if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+                            replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
                         } else { // MULTIPLE_ENTRY_LINK
                             replaceKeyInMultiplesKeyField(
                                 newKey,
@@ -78,9 +68,7 @@ public class KeyChangeListener {
         Field field,
         String fieldContent
     ) {
-        List<String> keys = new ArrayList<>(
-            Arrays.asList(fieldContent.split(","))
-        );
+        List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(",")));
         int index = keys.indexOf(oldKey);
         if (index != -1) {
             if (newKey == null) {

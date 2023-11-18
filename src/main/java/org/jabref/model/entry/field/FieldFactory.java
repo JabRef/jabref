@@ -67,11 +67,7 @@ public class FieldFactory {
     }
 
     public static List<Field> getIdentifierFieldNames() {
-        return Arrays.asList(
-            StandardField.DOI,
-            StandardField.EPRINT,
-            StandardField.PMID
-        );
+        return Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
     }
 
     public static OrFields parseOrFields(String fieldNames) {
@@ -118,10 +114,7 @@ public class FieldFactory {
      * Type T is an entry type and is used to direct the mapping to the Java field class.
      * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
      */
-    public static <T extends EntryType> Field parseField(
-        T type,
-        String fieldName
-    ) {
+    public static <T extends EntryType> Field parseField(T type, String fieldName) {
         // Check if the field name starts with "comment-" which indicates it's a UserSpecificCommentField
         if (fieldName.startsWith("comment-")) {
             String username = fieldName.substring("comment-".length());
@@ -166,8 +159,7 @@ public class FieldFactory {
     }
 
     public static Set<Field> getJournalNameFields() {
-        return getFieldsFiltered(field ->
-            field.getProperties().contains(FieldProperty.JOURNAL_NAME)
+        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.JOURNAL_NAME)
         );
     }
 
@@ -177,13 +169,9 @@ public class FieldFactory {
     public static Set<Field> getCommonFields() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
-        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(
-            allFields.size() + 3
-        );
+        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size() + 3);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
-        publicAndInternalFields.add(
-            InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD
-        );
+        publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);
         publicAndInternalFields.addAll(allFields);
 
@@ -194,9 +182,7 @@ public class FieldFactory {
      * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones
      */
     public static Set<Field> getAllFieldsWithOutInternal() {
-        Set<Field> fields = new TreeSet<>(
-            Comparator.comparing(Field::getDisplayName)
-        );
+        Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getDisplayName));
         fields.addAll(getAllFields());
         fields.removeAll(EnumSet.allOf(InternalField.class));
 
@@ -219,22 +205,16 @@ public class FieldFactory {
     }
 
     public static Set<Field> getBookNameFields() {
-        return getFieldsFiltered(field ->
-            field.getProperties().contains(FieldProperty.BOOK_NAME)
-        );
+        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.BOOK_NAME));
     }
 
     public static Set<Field> getPersonNameFields() {
-        return getFieldsFiltered(field ->
-            field.getProperties().contains(FieldProperty.PERSON_NAMES)
+        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.PERSON_NAMES)
         );
     }
 
     private static Set<Field> getFieldsFiltered(Predicate<Field> selector) {
-        return getAllFields()
-            .stream()
-            .filter(selector)
-            .collect(Collectors.toSet());
+        return getAllFields().stream().filter(selector).collect(Collectors.toSet());
     }
 
     private static Set<Field> getAllFields() {
@@ -275,10 +255,7 @@ public class FieldFactory {
 
     // TODO: This should ideally be user configurable! (https://github.com/JabRef/jabref/issues/9840)
     // TODO: Move somewhere more appropriate in the future
-    public static boolean isMultiLineField(
-        final Field field,
-        List<Field> nonWrappableFields
-    ) {
+    public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         return (
             field.getProperties().contains(FieldProperty.MULTILINE_TEXT) ||
             nonWrappableFields.contains(field)

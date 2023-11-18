@@ -25,10 +25,6 @@ class RISImporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            new RisImporter(),
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(new RisImporter(), fileName, FILE_ENDING);
     }
 }

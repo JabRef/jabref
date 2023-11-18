@@ -22,21 +22,16 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
-public class CollectionOfComputerScienceBibliographiesFetcher
-    implements SearchBasedParserFetcher {
+public class CollectionOfComputerScienceBibliographiesFetcher implements SearchBasedParserFetcher {
 
-    private static final String BASIC_SEARCH_URL =
-        "http://liinwww.ira.uka.de/bibliography/rss?";
+    private static final String BASIC_SEARCH_URL = "http://liinwww.ira.uka.de/bibliography/rss?";
 
     private final CollectionOfComputerScienceBibliographiesParser parser;
 
     public CollectionOfComputerScienceBibliographiesFetcher(
         ImportFormatPreferences importFormatPreferences
     ) {
-        this.parser =
-            new CollectionOfComputerScienceBibliographiesParser(
-                importFormatPreferences
-            );
+        this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
     }
 
     @Override
@@ -66,26 +61,13 @@ public class CollectionOfComputerScienceBibliographiesFetcher
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(
-            StandardField.ABSTRACT,
-            new RemoveNewlinesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.ABSTRACT,
-            new ReplaceTabsBySpaceFormater()
-        )
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new ReplaceTabsBySpaceFormater())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.ABSTRACT,
-            new RemoveRedundantSpacesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveRedundantSpacesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(
-            StandardField.EDITOR,
-            new RemoveDigitsFormatter()
-        )
-            .cleanup(entry);
+        new FieldFormatterCleanup(StandardField.EDITOR, new RemoveDigitsFormatter()).cleanup(entry);
         // identifier fields is a key-value field
         // example: "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000505046100032; Scopus 2-s2.0-85037741580"
         // thus, key can contain multiple ":"; sometimes value separated by " " instead of ":"
@@ -96,9 +78,7 @@ public class CollectionOfComputerScienceBibliographiesFetcher
             .flatMap(value -> Arrays.stream(value.split("; ")))
             .forEach(identifierKeyValue -> {
                 // check for pattern "Scopus 2-..."
-                String[] identifierKeyValueSplit = identifierKeyValue.split(
-                    " "
-                );
+                String[] identifierKeyValueSplit = identifierKeyValue.split(" ");
                 if (identifierKeyValueSplit.length == 1) {
                     // check for pattern "doi:..."
                     identifierKeyValueSplit = identifierKeyValue.split(":");

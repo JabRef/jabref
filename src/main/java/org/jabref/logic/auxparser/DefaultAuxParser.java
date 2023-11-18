@@ -29,16 +29,12 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultAuxParser implements AuxParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DefaultAuxParser.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
 
     private static final Pattern CITE_PATTERN = Pattern.compile(
         "\\\\(citation|abx@aux@cite)(\\{\\d+\\})?\\{(?<citationkey>.+)\\}"
     );
-    private static final Pattern INPUT_PATTERN = Pattern.compile(
-        "\\\\@input\\{(.+)\\}"
-    );
+    private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
 
     private final BibDatabase masterDatabase;
 
@@ -136,15 +132,8 @@ public class DefaultAuxParser implements AuxParser {
         List<BibEntry> entriesToInsert = new ArrayList<>();
 
         for (String key : result.getUniqueKeys()) {
-            if (
-                !result
-                    .getGeneratedBibDatabase()
-                    .getEntryByCitationKey(key)
-                    .isPresent()
-            ) {
-                Optional<BibEntry> entry = masterDatabase.getEntryByCitationKey(
-                    key
-                );
+            if (!result.getGeneratedBibDatabase().getEntryByCitationKey(key).isPresent()) {
+                Optional<BibEntry> entry = masterDatabase.getEntryByCitationKey(key);
                 if (entry.isPresent()) {
                     entriesToInsert.add(entry.get());
                 } else {
@@ -159,9 +148,7 @@ public class DefaultAuxParser implements AuxParser {
         if (result.getGeneratedBibDatabase().hasEntries()) {
             result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
             result.insertStrings(
-                masterDatabase.getUsedStrings(
-                    result.getGeneratedBibDatabase().getEntries()
-                )
+                masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries())
             );
         }
     }
@@ -172,10 +159,7 @@ public class DefaultAuxParser implements AuxParser {
      * @param entries Entries to check for CrossRefs
      * @param result AUX file
      */
-    private void resolveCrossReferences(
-        List<BibEntry> entries,
-        AuxParserResult result
-    ) {
+    private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
         for (BibEntry entry : entries) {
             entry
@@ -187,8 +171,9 @@ public class DefaultAuxParser implements AuxParser {
                             .getEntryByCitationKey(crossref)
                             .isPresent()
                     ) {
-                        Optional<BibEntry> refEntry =
-                            masterDatabase.getEntryByCitationKey(crossref);
+                        Optional<BibEntry> refEntry = masterDatabase.getEntryByCitationKey(
+                            crossref
+                        );
 
                         if (refEntry.isPresent()) {
                             if (!entriesToInsert.contains(refEntry.get())) {

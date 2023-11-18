@@ -19,8 +19,9 @@ import org.slf4j.LoggerFactory;
 public class Date {
 
     public static final String DATE_REGEX;
-    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER =
-        DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
+    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern(
+        "uuuu[-MM][-dd]"
+    );
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
     private static final Logger LOGGER = LoggerFactory.getLogger(Date.class);
 
@@ -65,8 +66,7 @@ public class Date {
                 .reduce(
                     new DateTimeFormatterBuilder(),
                     DateTimeFormatterBuilder::appendOptional,
-                    (builder, formatterBuilder) ->
-                        builder.append(formatterBuilder.toFormatter())
+                    (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter())
                 )
                 .toFormatter(Locale.US);
 
@@ -145,12 +145,8 @@ public class Date {
         ) {
             try {
                 String[] strDates = dateString.split("/");
-                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(
-                    strDates[0].strip()
-                );
-                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(
-                    strDates[1].strip()
-                );
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
                 LOGGER.debug("Invalid Date format for range", e);
@@ -172,12 +168,8 @@ public class Date {
         ) {
             try {
                 String[] strDates = dateString.split(" / ");
-                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(
-                    strDates[0].strip()
-                );
-                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(
-                    strDates[1].strip()
-                );
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
                 LOGGER.debug("Invalid Date format range", e);
@@ -195,12 +187,8 @@ public class Date {
         ) {
             try {
                 String[] strDates = dateString.split("/");
-                TemporalAccessor parsedDate = parseDateWithEraIndicator(
-                    strDates[0]
-                );
-                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(
-                    strDates[1]
-                );
+                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);
+                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
                 LOGGER.debug("Invalid Date format range", e);
@@ -218,12 +206,8 @@ public class Date {
         ) {
             try {
                 String[] strDates = dateString.split(" / ");
-                TemporalAccessor parsedDate = parseDateWithEraIndicator(
-                    strDates[0]
-                );
-                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(
-                    strDates[1]
-                );
+                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);
+                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
                 LOGGER.debug("Invalid Date format range", e);
@@ -276,9 +260,7 @@ public class Date {
         Optional<String> monthValue,
         Optional<String> dayValue
     ) {
-        Optional<Year> year = yearValue
-            .flatMap(Date::convertToInt)
-            .map(Year::of);
+        Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);
 
@@ -286,18 +268,9 @@ public class Date {
             TemporalAccessor date;
             if (month.isPresent()) {
                 if (day.isPresent()) {
-                    date =
-                        LocalDate.of(
-                            year.get().getValue(),
-                            month.get().getNumber(),
-                            day.get()
-                        );
+                    date = LocalDate.of(year.get().getValue(), month.get().getNumber(), day.get());
                 } else {
-                    date =
-                        YearMonth.of(
-                            year.get().getValue(),
-                            month.get().getNumber()
-                        );
+                    date = YearMonth.of(year.get().getValue(), month.get().getNumber());
                 }
             } else {
                 date = year.get();
@@ -323,12 +296,8 @@ public class Date {
      * @param dateString the string which contain era indicator to extract the date information
      * @return the date information with TemporalAccessor type
      */
-    private static TemporalAccessor parseDateWithEraIndicator(
-        String dateString
-    ) {
-        String yearString = dateString
-            .strip()
-            .substring(0, dateString.length() - 2);
+    private static TemporalAccessor parseDateWithEraIndicator(String dateString) {
+        String yearString = dateString.strip().substring(0, dateString.length() - 2);
 
         String[] parts = yearString.split("-");
         int year = Integer.parseInt(parts[0].strip());
@@ -385,22 +354,13 @@ public class Date {
             Objects.equals(getYear(), date1.getYear()) &&
             Objects.equals(getMonth(), date1.getMonth()) &&
             Objects.equals(getDay(), date1.getDay()) &&
-            Objects.equals(
-                get(ChronoField.HOUR_OF_DAY),
-                date1.get(ChronoField.HOUR_OF_DAY)
-            ) &&
+            Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
             Objects.equals(
                 get(ChronoField.MINUTE_OF_HOUR),
                 date1.get(ChronoField.MINUTE_OF_HOUR)
             ) &&
-            Objects.equals(
-                get(ChronoField.SECOND_OF_DAY),
-                date1.get(ChronoField.SECOND_OF_DAY)
-            ) &&
-            Objects.equals(
-                get(ChronoField.OFFSET_SECONDS),
-                date1.get(ChronoField.OFFSET_SECONDS)
-            )
+            Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &&
+            Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS))
         );
     }
 

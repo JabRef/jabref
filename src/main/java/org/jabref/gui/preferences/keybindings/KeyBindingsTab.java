@@ -34,16 +34,10 @@ public class KeyBindingsTab
     private TreeTableColumn<KeyBindingViewModel, String> shortcutColumn;
 
     @FXML
-    private TreeTableColumn<
-        KeyBindingViewModel,
-        KeyBindingViewModel
-    > resetColumn;
+    private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> resetColumn;
 
     @FXML
-    private TreeTableColumn<
-        KeyBindingViewModel,
-        KeyBindingViewModel
-    > clearColumn;
+    private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> clearColumn;
 
     @FXML
     private MenuButton presetsButton;
@@ -63,15 +57,9 @@ public class KeyBindingsTab
     @FXML
     private void initialize() {
         viewModel =
-            new KeyBindingsTabViewModel(
-                keyBindingRepository,
-                dialogService,
-                preferencesService
-            );
+            new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferencesService);
 
-        keyBindingsTable
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.SINGLE);
+        keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel
             .selectedKeyBindingProperty()
             .bind(
@@ -87,44 +75,29 @@ public class KeyBindingsTab
                 EasyBind.map(
                     viewModel.rootKeyBindingProperty(),
                     keybinding ->
-                        new RecursiveTreeItem<>(
-                            keybinding,
-                            KeyBindingViewModel::getChildren
-                        )
+                        new RecursiveTreeItem<>(keybinding, KeyBindingViewModel::getChildren)
                 )
             );
-        actionColumn.setCellValueFactory(cellData ->
-            cellData.getValue().getValue().nameProperty()
-        );
+        actionColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().nameProperty());
         shortcutColumn.setCellValueFactory(cellData ->
             cellData.getValue().getValue().shownBindingProperty()
         );
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
             .withGraphic(keyBinding ->
-                keyBinding
-                    .getResetIcon()
-                    .map(JabRefIcon::getGraphicNode)
-                    .orElse(null)
+                keyBinding.getResetIcon().map(JabRefIcon::getGraphicNode).orElse(null)
             )
-            .withOnMouseClickedEvent(keyBinding ->
-                evt -> keyBinding.resetToDefault()
-            )
+            .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.resetToDefault())
             .install(resetColumn);
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
             .withGraphic(keyBinding ->
-                keyBinding
-                    .getClearIcon()
-                    .map(JabRefIcon::getGraphicNode)
-                    .orElse(null)
+                keyBinding.getClearIcon().map(JabRefIcon::getGraphicNode).orElse(null)
             )
             .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.clear())
             .install(clearColumn);
 
         viewModel
             .keyBindingPresets()
-            .forEach(preset ->
-                presetsButton.getItems().add(createMenuItem(preset))
-            );
+            .forEach(preset -> presetsButton.getItems().add(createMenuItem(preset)));
     }
 
     private MenuItem createMenuItem(KeyBindingPreset preset) {

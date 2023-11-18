@@ -14,8 +14,7 @@ import org.jabref.logic.importer.fileformat.MarcXmlParser;
 
 public class BvbFetcher implements SearchBasedParserFetcher {
 
-    private static final String URL_PATTERN =
-        "http://bvbr.bib-bvb.de:5661/bvb01sru?";
+    private static final String URL_PATTERN = "http://bvbr.bib-bvb.de:5661/bvb01sru?";
 
     @Override
     public String getName() {
@@ -28,8 +27,7 @@ public class BvbFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode query)
-        throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(QueryNode query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("recordSchema", "marcxml");

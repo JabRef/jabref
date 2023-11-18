@@ -40,13 +40,10 @@ public class SavingPropertiesView
     }
 
     public void initialize() {
-        this.viewModel =
-            new SavingPropertiesViewModel(databaseContext, preferencesService);
+        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferencesService);
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
-        protect
-            .selectedProperty()
-            .bindBidirectional(viewModel.libraryProtectedProperty());
+        protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
 
         saveOrderConfigPanel
             .saveInOriginalProperty()
@@ -57,9 +54,7 @@ public class SavingPropertiesView
         saveOrderConfigPanel
             .saveInSpecifiedOrderProperty()
             .bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        saveOrderConfigPanel
-            .sortableFieldsProperty()
-            .bind(viewModel.sortableFieldsProperty());
+        saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         saveOrderConfigPanel
             .sortCriteriaProperty()
             .bindBidirectional(viewModel.sortCriteriaProperty());

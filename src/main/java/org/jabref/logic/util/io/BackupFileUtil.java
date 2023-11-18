@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class BackupFileUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BackupFileUtil.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupFileUtil.class);
 
     private BackupFileUtil() {}
 
@@ -63,11 +61,7 @@ public class BackupFileUtil {
             return result;
         }
         String baseFileName =
-            getUniqueFilePrefix(targetFile) +
-            "--" +
-            targetFile.getFileName() +
-            "--" +
-            timeSuffix;
+            getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName() + "--" + timeSuffix;
         Path fileName = FileUtil.addExtension(Path.of(baseFileName), extension);
         return directory.resolve(fileName);
     }
@@ -92,8 +86,7 @@ public class BackupFileUtil {
         }
 
         // Search the directory for the latest file
-        final String prefix =
-            getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
+        final String prefix = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
         Optional<Path> mostRecentFile;
         try {
             mostRecentFile =

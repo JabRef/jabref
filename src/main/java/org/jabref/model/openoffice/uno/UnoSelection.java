@@ -14,22 +14,16 @@ import org.slf4j.LoggerFactory;
  */
 public class UnoSelection {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UnoSelection.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnoSelection.class);
 
     private UnoSelection() {}
 
-    private static Optional<XSelectionSupplier> getSelectionSupplier(
-        XTextDocument doc
-    ) {
+    private static Optional<XSelectionSupplier> getSelectionSupplier(XTextDocument doc) {
         if (doc == null) {
             LOGGER.warn("UnoSelection.getSelectionSupplier: doc is null");
             return Optional.empty();
         }
-        Optional<XController> controller = UnoTextDocument.getCurrentController(
-            doc
-        );
+        Optional<XController> controller = UnoTextDocument.getCurrentController(doc);
         if (controller.isEmpty()) {
             LOGGER.warn(
                 "UnoSelection.getSelectionSupplier: getCurrentController(doc) returned empty"
@@ -67,9 +61,7 @@ public class UnoSelection {
      * <p>
      * With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: "SwXTextGraphicObject" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextGraphicObject"
      */
-    public static Optional<XServiceInfo> getSelectionAsXServiceInfo(
-        XTextDocument doc
-    ) {
+    public static Optional<XServiceInfo> getSelectionAsXServiceInfo(XTextDocument doc) {
         Objects.requireNonNull(doc);
         Optional<XSelectionSupplier> supplier = getSelectionSupplier(doc);
         if (supplier.isEmpty()) {
@@ -80,10 +72,7 @@ public class UnoSelection {
         if (selection == null) {
             return Optional.empty();
         }
-        Optional<XServiceInfo> result = UnoCast.cast(
-            XServiceInfo.class,
-            selection
-        );
+        Optional<XServiceInfo> result = UnoCast.cast(XServiceInfo.class, selection);
         if (result.isEmpty()) {
             LOGGER.warn("cast to XServiceInfo returned empty");
             return Optional.empty();

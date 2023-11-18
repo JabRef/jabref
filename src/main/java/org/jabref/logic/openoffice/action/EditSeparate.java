@@ -38,12 +38,9 @@ public class EditSeparate {
         // style changed since refresh this is the last on the screen
         // as well.
         frontend.citationGroups.lookupCitations(databases);
-        frontend.citationGroups.imposeLocalOrder(
-            OOProcess.comparatorForMulticite(style)
-        );
+        frontend.citationGroups.imposeLocalOrder(OOProcess.comparatorForMulticite(style));
 
-        List<CitationGroup> groups =
-            frontend.citationGroups.getCitationGroupsUnordered();
+        List<CitationGroup> groups = frontend.citationGroups.getCitationGroupsUnordered();
 
         try {
             UnoScreenRefresh.lockControllers(doc);
@@ -52,9 +49,7 @@ public class EditSeparate {
                 XTextRange range1 = frontend
                     .getMarkRange(doc, group)
                     .orElseThrow(IllegalStateException::new);
-                XTextCursor textCursor = range1
-                    .getText()
-                    .createTextCursorByRange(range1);
+                XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
 
                 List<Citation> citations = group.citationsInStorageOrder;
                 if (citations.size() <= 1) {

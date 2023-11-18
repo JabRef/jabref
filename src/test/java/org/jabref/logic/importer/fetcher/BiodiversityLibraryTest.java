@@ -33,11 +33,8 @@ public class BiodiversityLibraryTest {
 
     @BeforeEach
     void setUp() {
-        ImporterPreferences importerPreferences = mock(
-            ImporterPreferences.class
-        );
-        when(importerPreferences.getApiKeys())
-            .thenReturn(FXCollections.emptyObservableSet());
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         fetcher = new BiodiversityLibrary(importerPreferences);
     }
 
@@ -55,8 +52,7 @@ public class BiodiversityLibraryTest {
     }
 
     @Test
-    public void baseURLConstruction()
-        throws MalformedURLException, URISyntaxException {
+    public void baseURLConstruction() throws MalformedURLException, URISyntaxException {
         String expected = fetcher
             .getTestUrl()
             .concat(buildInfo.biodiversityHeritageApiKey)
@@ -67,8 +63,7 @@ public class BiodiversityLibraryTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "1234", "331", "121" })
-    public void getPartMetadaUrl(String id)
-        throws MalformedURLException, URISyntaxException {
+    public void getPartMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
         String expected = fetcher
             .getTestUrl()
             .concat(buildInfo.biodiversityHeritageApiKey)
@@ -76,16 +71,12 @@ public class BiodiversityLibraryTest {
             .concat("&op=GetPartMetadata&pages=f&names=f")
             .concat("&id=");
 
-        assertEquals(
-            expected.concat(id),
-            fetcher.getPartMetadataURL(id).toString()
-        );
+        assertEquals(expected.concat(id), fetcher.getPartMetadataURL(id).toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "1234", "4321", "331" })
-    public void getItemMetadaUrl(String id)
-        throws MalformedURLException, URISyntaxException {
+    public void getItemMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
         String expected = fetcher
             .getTestUrl()
             .concat(buildInfo.biodiversityHeritageApiKey)
@@ -93,19 +84,13 @@ public class BiodiversityLibraryTest {
             .concat("&op=GetItemMetadata&pages=f&ocr=f&ocr=f")
             .concat("&id=");
 
-        assertEquals(
-            expected.concat(id),
-            fetcher.getItemMetadataURL(id).toString()
-        );
+        assertEquals(expected.concat(id), fetcher.getItemMetadataURL(id).toString());
     }
 
     @Test
     public void testPerformSearch() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.AUTHOR,
-                "Clark, John L. (John Littner)  and Neill, David A. "
-            )
+            .withField(StandardField.AUTHOR, "Clark, John L. (John Littner)  and Neill, David A. ")
             .withField(StandardField.JOURNALTITLE, "PhytoKeys")
             .withField(StandardField.LANGUAGE, "English")
             .withField(StandardField.PUBLISHER, "Pensoft Publishers")
@@ -113,19 +98,13 @@ public class BiodiversityLibraryTest {
                 StandardField.TITLE,
                 "\uFEFFAmanoa condorensis (Phyllanthaceae), a new shrubby species from the Cordillera del Condor in southern Ecuador"
             )
-            .withField(
-                StandardField.URL,
-                "https://www.biodiversitylibrary.org/part/356490"
-            )
+            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/part/356490")
             .withField(StandardField.DATE, "2023")
             .withField(StandardField.VOLUME, "227")
             .withField(StandardField.PAGES, "89-97")
             .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
 
-        assertEquals(
-            expected,
-            fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").get(0)
-        );
+        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").get(0));
     }
 
     @Test
@@ -134,10 +113,7 @@ public class BiodiversityLibraryTest {
             "{\n\"BHLType\": \"Part\",\n\"FoundIn\": \"Metadata\",\n\"Volume\": \"3\",\n\"Authors\": [\n{\n\"Name\": \"Dimmock, George,\"\n}\n],\n\"PartUrl\": \"https://www.biodiversitylibrary.org/part/181199\",\n\"PartID\": \"181199\",\n\"Genre\": \"Article\",\n\"Title\": \"The Cocoons of Cionus Scrophulariae\",\n\"ContainerTitle\": \"Psyche.\",\n\"Date\": \"1882\",\n\"PageRange\": \"411--413\"\n}"
         );
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-            .withField(
-                StandardField.TITLE,
-                "The Cocoons of Cionus Scrophulariae"
-            )
+            .withField(StandardField.TITLE, "The Cocoons of Cionus Scrophulariae")
             .withField(StandardField.AUTHOR, "Dimmock, George, ")
             .withField(StandardField.PAGES, "411--413")
             .withField(StandardField.DATE, "1882")
@@ -206,20 +182,11 @@ public class BiodiversityLibraryTest {
             );
         expected =
             new BibEntry(StandardEntryType.Book)
-                .withField(
-                    StandardField.TITLE,
-                    "The extra cost of producing clean milk."
-                )
-                .withField(
-                    StandardField.AUTHOR,
-                    "Whitaker, George M. (George Mason) "
-                )
+                .withField(StandardField.TITLE, "The extra cost of producing clean milk.")
+                .withField(StandardField.AUTHOR, "Whitaker, George M. (George Mason) ")
                 .withField(StandardField.YEAR, "1911")
                 .withField(StandardField.LOCATION, "Washington")
-                .withField(
-                    StandardField.PUBLISHER,
-                    "Government Prining Office,"
-                );
+                .withField(StandardField.PUBLISHER, "Government Prining Office,");
         assertEquals(expected, fetcher.jsonResultToBibEntry(input));
     }
 }

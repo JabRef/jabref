@@ -33,34 +33,19 @@ public class ProtectedTermsTab
     private TableView<ProtectedTermsListItemModel> filesTable;
 
     @FXML
-    private TableColumn<
-        ProtectedTermsListItemModel,
-        Boolean
-    > filesTableEnabledColumn;
+    private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableEnabledColumn;
 
     @FXML
-    private TableColumn<
-        ProtectedTermsListItemModel,
-        String
-    > filesTableDescriptionColumn;
+    private TableColumn<ProtectedTermsListItemModel, String> filesTableDescriptionColumn;
 
     @FXML
-    private TableColumn<
-        ProtectedTermsListItemModel,
-        String
-    > filesTableFileColumn;
+    private TableColumn<ProtectedTermsListItemModel, String> filesTableFileColumn;
 
     @FXML
-    private TableColumn<
-        ProtectedTermsListItemModel,
-        Boolean
-    > filesTableEditColumn;
+    private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableEditColumn;
 
     @FXML
-    private TableColumn<
-        ProtectedTermsListItemModel,
-        Boolean
-    > filesTableDeleteColumn;
+    private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableDeleteColumn;
 
     @Inject
     private ProtectedTermsLoader termsLoader;
@@ -79,12 +64,7 @@ public class ProtectedTermsTab
 
     @FXML
     public void initialize() {
-        viewModel =
-            new ProtectedTermsTabViewModel(
-                termsLoader,
-                dialogService,
-                preferencesService
-            );
+        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferencesService);
 
         new ViewModelTableRowFactory<ProtectedTermsListItemModel>()
             .withContextMenu(this::createContextMenu)
@@ -92,51 +72,34 @@ public class ProtectedTermsTab
         filesTableEnabledColumn.setCellFactory(
             CheckBoxTableCell.forTableColumn(filesTableEnabledColumn)
         );
-        filesTableEnabledColumn.setCellValueFactory(data ->
-            data.getValue().enabledProperty()
-        );
+        filesTableEnabledColumn.setCellValueFactory(data -> data.getValue().enabledProperty());
         filesTableDescriptionColumn.setCellValueFactory(data ->
-            BindingsHelper.constantOf(
-                data.getValue().getTermsList().getDescription()
-            )
+            BindingsHelper.constantOf(data.getValue().getTermsList().getDescription())
         );
 
         filesTableFileColumn.setCellValueFactory(data -> {
             ProtectedTermsList list = data.getValue().getTermsList();
             if (list.isInternalList()) {
-                return BindingsHelper.constantOf(
-                    Localization.lang("Internal list")
-                );
+                return BindingsHelper.constantOf(Localization.lang("Internal list"));
             } else {
                 return BindingsHelper.constantOf(list.getLocation());
             }
         });
 
-        filesTableEditColumn.setCellValueFactory(data ->
-            data.getValue().internalProperty().not()
-        );
+        filesTableEditColumn.setCellValueFactory(data -> data.getValue().internalProperty().not());
         new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
             .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
             .withVisibleExpression(ReadOnlyBooleanWrapper::new)
-            .withOnMouseClickedEvent((item, none) ->
-                event -> viewModel.edit(item)
-            )
+            .withOnMouseClickedEvent((item, none) -> event -> viewModel.edit(item))
             .install(filesTableEditColumn);
 
-        filesTableDeleteColumn.setCellValueFactory(data ->
-            data.getValue().internalProperty().not()
+        filesTableDeleteColumn.setCellValueFactory(data -> data.getValue().internalProperty().not()
         );
         new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
-            .withGraphic(none ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
+            .withGraphic(none -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
             .withVisibleExpression(ReadOnlyBooleanWrapper::new)
-            .withTooltip(none ->
-                Localization.lang("Remove protected terms file")
-            )
-            .withOnMouseClickedEvent((item, none) ->
-                event -> viewModel.removeList(item)
-            )
+            .withTooltip(none -> Localization.lang("Remove protected terms file"))
+            .withOnMouseClickedEvent((item, none) -> event -> viewModel.removeList(item))
             .install(filesTableDeleteColumn);
 
         filesTable.itemsProperty().set(viewModel.termsFilesProperty());
@@ -150,31 +113,19 @@ public class ProtectedTermsTab
             .addAll(
                 factory.createMenuItem(
                     StandardActions.EDIT_LIST,
-                    new ProtectedTermsTab.ContextAction(
-                        StandardActions.EDIT_LIST,
-                        file
-                    )
+                    new ProtectedTermsTab.ContextAction(StandardActions.EDIT_LIST, file)
                 ),
                 factory.createMenuItem(
                     StandardActions.VIEW_LIST,
-                    new ProtectedTermsTab.ContextAction(
-                        StandardActions.VIEW_LIST,
-                        file
-                    )
+                    new ProtectedTermsTab.ContextAction(StandardActions.VIEW_LIST, file)
                 ),
                 factory.createMenuItem(
                     StandardActions.REMOVE_LIST,
-                    new ProtectedTermsTab.ContextAction(
-                        StandardActions.REMOVE_LIST,
-                        file
-                    )
+                    new ProtectedTermsTab.ContextAction(StandardActions.REMOVE_LIST, file)
                 ),
                 factory.createMenuItem(
                     StandardActions.RELOAD_LIST,
-                    new ProtectedTermsTab.ContextAction(
-                        StandardActions.RELOAD_LIST,
-                        file
-                    )
+                    new ProtectedTermsTab.ContextAction(StandardActions.RELOAD_LIST, file)
                 )
             );
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
@@ -198,19 +149,14 @@ public class ProtectedTermsTab
         private final StandardActions command;
         private final ProtectedTermsListItemModel itemModel;
 
-        public ContextAction(
-            StandardActions command,
-            ProtectedTermsListItemModel itemModel
-        ) {
+        public ContextAction(StandardActions command, ProtectedTermsListItemModel itemModel) {
             this.command = command;
             this.itemModel = itemModel;
 
             this.executable.bind(
                     BindingsHelper.constantOf(
                         switch (command) {
-                            case EDIT_LIST,
-                                REMOVE_LIST,
-                                RELOAD_LIST -> !itemModel
+                            case EDIT_LIST, REMOVE_LIST, RELOAD_LIST -> !itemModel
                                 .getTermsList()
                                 .isInternalList();
                             default -> true;

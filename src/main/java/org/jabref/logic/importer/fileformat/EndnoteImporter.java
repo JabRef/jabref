@@ -55,15 +55,11 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "%A *" line.
         String str;
         while ((str = reader.readLine()) != null) {
-            if (
-                A_PATTERN.matcher(str).matches() ||
-                E_PATTERN.matcher(str).matches()
-            ) {
+            if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
                 return true;
             }
         }
@@ -71,8 +67,7 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;
@@ -171,8 +166,7 @@ public class EndnoteImporter extends Importer {
                     case "C" -> hm.put(StandardField.ADDRESS, val);
                     case "D" -> hm.put(StandardField.YEAR, val);
                     case "8" -> hm.put(StandardField.DATE, val);
-                    case "J" -> // "Alternate journal. Let's set it only if no journal
-                    // has been set with %B.
+                    case "J" -> // has been set with %B. // "Alternate journal. Let's set it only if no journal
                     hm.putIfAbsent(StandardField.JOURNAL, val);
                     case "B" -> {
                         // This prefix stands for "journal" in a journal entry, and
@@ -196,8 +190,7 @@ public class EndnoteImporter extends Importer {
                             hm.put(StandardField.PUBLISHER, val);
                         }
                     }
-                    case "P" -> // replace single dash page ranges (23-45) with double dashes (23--45):
-                    hm.put(
+                    case "P" -> hm.put( // replace single dash page ranges (23-45) with double dashes (23--45):
                         StandardField.PAGES,
                         val.replaceAll("([0-9]) *- *([0-9])", "$1--$2")
                     );

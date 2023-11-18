@@ -32,24 +32,14 @@ public class ViewModelTreeTableRowFactory<S>
     private BiConsumer<S, ? super MouseEvent> onMousePressedEvent;
     private Consumer<TreeTableRow<S>> toCustomInitializer;
     private Function<S, ContextMenu> contextMenuFactory;
-    private TriConsumer<
-        TreeTableRow<S>,
-        S,
-        ? super MouseEvent
-    > toOnDragDetected;
+    private TriConsumer<TreeTableRow<S>, S, ? super MouseEvent> toOnDragDetected;
     private TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragDropped;
     private BiConsumer<S, ? super DragEvent> toOnDragEntered;
     private TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragExited;
     private TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragOver;
-    private TriConsumer<
-        TreeTableRow<S>,
-        S,
-        ? super MouseDragEvent
-    > toOnMouseDragEntered;
-    private final Map<
-        EventType<? extends Event>,
-        BiConsumer<S, ? super Event>
-    > eventFilters = new HashMap<>();
+    private TriConsumer<TreeTableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
+    private final Map<EventType<? extends Event>, BiConsumer<S, ? super Event>> eventFilters =
+        new HashMap<>();
     private final Map<
         PseudoClass,
         Callback<TreeTableRow<S>, ObservableValue<Boolean>>
@@ -94,8 +84,7 @@ public class ViewModelTreeTableRowFactory<S>
         BiConsumer<S, ? super MouseEvent> toOnDragDetected
     ) {
         this.toOnDragDetected =
-            (row, viewModel, event) ->
-                toOnDragDetected.accept(viewModel, event);
+            (row, viewModel, event) -> toOnDragDetected.accept(viewModel, event);
         return this;
     }
 
@@ -109,8 +98,7 @@ public class ViewModelTreeTableRowFactory<S>
     public ViewModelTreeTableRowFactory<S> setOnDragDropped(
         BiConsumer<S, ? super DragEvent> toOnDragDropped
     ) {
-        return setOnDragDropped((row, viewModel, event) ->
-            toOnDragDropped.accept(viewModel, event)
+        return setOnDragDropped((row, viewModel, event) -> toOnDragDropped.accept(viewModel, event)
         );
     }
 
@@ -146,9 +134,7 @@ public class ViewModelTreeTableRowFactory<S>
     public ViewModelTreeTableRowFactory<S> setOnDragExited(
         BiConsumer<S, ? super DragEvent> toOnDragExited
     ) {
-        return setOnDragExited((row, viewModel, event) ->
-            toOnDragExited.accept(viewModel, event)
-        );
+        return setOnDragExited((row, viewModel, event) -> toOnDragExited.accept(viewModel, event));
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragOver(
@@ -161,9 +147,7 @@ public class ViewModelTreeTableRowFactory<S>
     public ViewModelTreeTableRowFactory<S> setOnDragOver(
         BiConsumer<S, ? super DragEvent> toOnDragOver
     ) {
-        return setOnDragOver((row, viewModel, event) ->
-            toOnDragOver.accept(viewModel, event)
-        );
+        return setOnDragOver((row, viewModel, event) -> toOnDragOver.accept(viewModel, event));
     }
 
     public ViewModelTreeTableRowFactory<S> withPseudoClass(
@@ -204,12 +188,7 @@ public class ViewModelTreeTableRowFactory<S>
                     setOnContextMenuRequested(event -> {
                         if (!isEmpty()) {
                             setContextMenu(contextMenuFactory.apply(row));
-                            getContextMenu()
-                                .show(
-                                    this,
-                                    event.getScreenX(),
-                                    event.getScreenY()
-                                );
+                            getContextMenu().show(this, event.getScreenX(), event.getScreenY());
                         }
                         event.consume();
                     });
@@ -220,36 +199,19 @@ public class ViewModelTreeTableRowFactory<S>
                         event -> {
                             boolean rowFocused =
                                 isEmpty() &&
-                                treeTableView
-                                        .getFocusModel()
-                                        .getFocusedIndex() ==
-                                    getIndex();
-                            if (
-                                event.getCode() == KeyCode.CONTEXT_MENU &&
-                                rowFocused
-                            ) {
+                                treeTableView.getFocusModel().getFocusedIndex() == getIndex();
+                            if (event.getCode() == KeyCode.CONTEXT_MENU && rowFocused) {
                                 // Get center of focused cell
                                 Bounds anchorBounds = getBoundsInParent();
-                                double x =
-                                    anchorBounds.getMinX() +
-                                    anchorBounds.getWidth() / 2;
-                                double y =
-                                    anchorBounds.getMinY() +
-                                    anchorBounds.getHeight() / 2;
-                                Point2D screenPosition = getParent()
-                                    .localToScreen(x, y);
+                                double x = anchorBounds.getMinX() + anchorBounds.getWidth() / 2;
+                                double y = anchorBounds.getMinY() + anchorBounds.getHeight() / 2;
+                                Point2D screenPosition = getParent().localToScreen(x, y);
 
                                 if (getContextMenu() == null) {
-                                    setContextMenu(
-                                        contextMenuFactory.apply(getItem())
-                                    );
+                                    setContextMenu(contextMenuFactory.apply(getItem()));
                                 }
                                 getContextMenu()
-                                    .show(
-                                        this,
-                                        screenPosition.getX(),
-                                        screenPosition.getY()
-                                    );
+                                    .show(this, screenPosition.getX(), screenPosition.getY());
                             }
                         }
                     );
@@ -257,15 +219,11 @@ public class ViewModelTreeTableRowFactory<S>
 
                 if (!empty && (row != null)) {
                     if (onMouseClickedEvent != null) {
-                        setOnMouseClicked(event ->
-                            onMouseClickedEvent.accept(getItem(), event)
-                        );
+                        setOnMouseClicked(event -> onMouseClickedEvent.accept(getItem(), event));
                     }
 
                     if (onMousePressedEvent != null) {
-                        setOnMousePressed(event ->
-                            onMousePressedEvent.accept(getItem(), event)
-                        );
+                        setOnMousePressed(event -> onMousePressedEvent.accept(getItem(), event));
                     }
 
                     if (toCustomInitializer != null) {
@@ -273,29 +231,19 @@ public class ViewModelTreeTableRowFactory<S>
                     }
 
                     if (toOnDragDetected != null) {
-                        setOnDragDetected(event ->
-                            toOnDragDetected.accept(this, getItem(), event)
-                        );
+                        setOnDragDetected(event -> toOnDragDetected.accept(this, getItem(), event));
                     }
                     if (toOnDragDropped != null) {
-                        setOnDragDropped(event ->
-                            toOnDragDropped.accept(this, getItem(), event)
-                        );
+                        setOnDragDropped(event -> toOnDragDropped.accept(this, getItem(), event));
                     }
                     if (toOnDragEntered != null) {
-                        setOnDragEntered(event ->
-                            toOnDragEntered.accept(getItem(), event)
-                        );
+                        setOnDragEntered(event -> toOnDragEntered.accept(getItem(), event));
                     }
                     if (toOnDragExited != null) {
-                        setOnDragExited(event ->
-                            toOnDragExited.accept(this, getItem(), event)
-                        );
+                        setOnDragExited(event -> toOnDragExited.accept(this, getItem(), event));
                     }
                     if (toOnDragOver != null) {
-                        setOnDragOver(event ->
-                            toOnDragOver.accept(this, getItem(), event)
-                        );
+                        setOnDragOver(event -> toOnDragOver.accept(this, getItem(), event));
                     }
 
                     if (toOnMouseDragEntered != null) {
@@ -310,8 +258,7 @@ public class ViewModelTreeTableRowFactory<S>
                     > eventFilter : eventFilters.entrySet()) {
                         addEventFilter(
                             eventFilter.getKey(),
-                            event ->
-                                eventFilter.getValue().accept(getItem(), event)
+                            event -> eventFilter.getValue().accept(getItem(), event)
                         );
                     }
 
@@ -319,8 +266,9 @@ public class ViewModelTreeTableRowFactory<S>
                         PseudoClass,
                         Callback<TreeTableRow<S>, ObservableValue<Boolean>>
                     > pseudoClassWithCondition : pseudoClasses.entrySet()) {
-                        ObservableValue<Boolean> condition =
-                            pseudoClassWithCondition.getValue().call(this);
+                        ObservableValue<Boolean> condition = pseudoClassWithCondition
+                            .getValue()
+                            .call(this);
                         subscriptions.add(
                             BindingsHelper.includePseudoClassWhen(
                                 this,

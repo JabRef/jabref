@@ -22,9 +22,7 @@ public class SearchResultsTableDataModel {
 
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
-    private final ObjectProperty<
-        MainTableFieldValueFormatter
-    > fieldValueFormatter;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
@@ -33,31 +31,20 @@ public class SearchResultsTableDataModel {
         PreferencesService preferencesService,
         StateManager stateManager
     ) {
-        this.nameDisplayPreferences =
-            preferencesService.getNameDisplayPreferences();
+        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = bibDatabaseContext;
         this.fieldValueFormatter =
             new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(
-                    nameDisplayPreferences,
-                    bibDatabaseContext
-                )
+                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext)
             );
 
         ObservableList<BibEntryTableViewModel> entriesViewModel =
             FXCollections.observableArrayList();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
-            ObservableList<BibEntry> entriesForDb = context
-                .getDatabase()
-                .getEntries();
+            ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
             List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(
                 entriesForDb,
-                entry ->
-                    new BibEntryTableViewModel(
-                        entry,
-                        context,
-                        fieldValueFormatter
-                    )
+                entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter)
             );
             entriesViewModel.addAll(viewModelForDb);
         }
@@ -76,13 +63,8 @@ public class SearchResultsTableDataModel {
         entriesSorted = new SortedList<>(entriesFiltered);
     }
 
-    private boolean isMatchedBySearch(
-        Optional<SearchQuery> query,
-        BibEntryTableViewModel entry
-    ) {
-        return query
-            .map(matcher -> matcher.isMatch(entry.getEntry()))
-            .orElse(true);
+    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
+        return query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
@@ -91,10 +73,7 @@ public class SearchResultsTableDataModel {
 
     public void refresh() {
         this.fieldValueFormatter.setValue(
-                new MainTableFieldValueFormatter(
-                    nameDisplayPreferences,
-                    bibDatabaseContext
-                )
+                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext)
             );
     }
 }

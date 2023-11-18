@@ -14,9 +14,7 @@ public class AuthorLF_FFAbbrTest {
         assertEquals(
             "von Neumann, J. and J. Smith and P. Black Brown, Jr",
             new AuthorLF_FFAbbr()
-                .format(
-                    "von Neumann,,John and John Smith and Black Brown, Jr, Peter"
-                )
+                .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter")
         );
     }
 }

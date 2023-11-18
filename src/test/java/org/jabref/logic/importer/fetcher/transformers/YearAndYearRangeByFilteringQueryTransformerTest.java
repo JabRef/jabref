@@ -13,8 +13,7 @@ public abstract class YearAndYearRangeByFilteringQueryTransformerTest<
 
     @Override
     public void convertYearField() throws Exception {
-        YearAndYearRangeByFilteringQueryTransformer transformer =
-            getTransformer();
+        YearAndYearRangeByFilteringQueryTransformer transformer = getTransformer();
         String queryString = "year:2021";
         QueryNode luceneQuery = new StandardSyntaxParser()
             .parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);

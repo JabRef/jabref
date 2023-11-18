@@ -25,10 +25,7 @@ public class URLCleanupTest {
             // Input Note field has two arguments stored , with the latter being a url.
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "https://hdl.handle.net/10442/hedi/6089"
-                    )
+                    .withField(StandardField.URL, "https://hdl.handle.net/10442/hedi/6089")
                     .withField(StandardField.NOTE, "this is a note"),
                 new BibEntry()
                     .withField(
@@ -39,10 +36,7 @@ public class URLCleanupTest {
             // Input Note field has two arguments stored, with the former being a url.
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "https://hdl.handle.net/10442/hedi/6089"
-                    )
+                    .withField(StandardField.URL, "https://hdl.handle.net/10442/hedi/6089")
                     .withField(StandardField.NOTE, "this is a note"),
                 new BibEntry()
                     .withField(
@@ -53,14 +47,8 @@ public class URLCleanupTest {
             // Input Note field has more than one URLs stored.
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "https://hdl.handle.net/10442/hedi/6089"
-                    )
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{http://142.42.1.1:8080}"
-                    ),
+                    .withField(StandardField.URL, "https://hdl.handle.net/10442/hedi/6089")
+                    .withField(StandardField.NOTE, "\\url{http://142.42.1.1:8080}"),
                 new BibEntry()
                     .withField(
                         StandardField.NOTE,
@@ -71,19 +59,10 @@ public class URLCleanupTest {
             // Input entry holds the same URL both in Note and Url field.
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "https://hdl.handle.net/10442/hedi/6089"
-                    ),
+                    .withField(StandardField.URL, "https://hdl.handle.net/10442/hedi/6089"),
                 new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{https://hdl.handle.net/10442/hedi/6089}"
-                    )
-                    .withField(
-                        StandardField.URL,
-                        "https://hdl.handle.net/10442/hedi/6089"
-                    )
+                    .withField(StandardField.NOTE, "\\url{https://hdl.handle.net/10442/hedi/6089}")
+                    .withField(StandardField.URL, "https://hdl.handle.net/10442/hedi/6089")
             ),
             // Input Note field has several values stored.
             Arguments.of(
@@ -102,57 +81,29 @@ public class URLCleanupTest {
              */
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "https://hdl.handle.net/10442/hedi/6089"
-                    ),
+                    .withField(StandardField.URL, "https://hdl.handle.net/10442/hedi/6089"),
                 new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{https://hdl.handle.net/10442/hedi/6089}"
-                    )
+                    .withField(StandardField.NOTE, "\\url{https://hdl.handle.net/10442/hedi/6089}")
             ),
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "http://hdl.handle.net/10442/hedi/6089"
-                    ),
+                    .withField(StandardField.URL, "http://hdl.handle.net/10442/hedi/6089"),
                 new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{http://hdl.handle.net/10442/hedi/6089}"
-                    )
+                    .withField(StandardField.NOTE, "\\url{http://hdl.handle.net/10442/hedi/6089}")
             ),
             Arguments.of(
                 new BibEntry()
-                    .withField(
-                        StandardField.URL,
-                        "http://userid:password@example.com:8080"
-                    ),
+                    .withField(StandardField.URL, "http://userid:password@example.com:8080"),
                 new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{http://userid:password@example.com:8080}"
-                    )
+                    .withField(StandardField.NOTE, "\\url{http://userid:password@example.com:8080}")
             ),
             Arguments.of(
-                new BibEntry()
-                    .withField(StandardField.URL, "http://142.42.1.1:8080"),
-                new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{http://142.42.1.1:8080}"
-                    )
+                new BibEntry().withField(StandardField.URL, "http://142.42.1.1:8080"),
+                new BibEntry().withField(StandardField.NOTE, "\\url{http://142.42.1.1:8080}")
             ),
             Arguments.of(
-                new BibEntry()
-                    .withField(StandardField.URL, "http://☺.damowmow.com"),
-                new BibEntry()
-                    .withField(
-                        StandardField.NOTE,
-                        "\\url{http://☺.damowmow.com}"
-                    )
+                new BibEntry().withField(StandardField.URL, "http://☺.damowmow.com"),
+                new BibEntry().withField(StandardField.NOTE, "\\url{http://☺.damowmow.com}")
             ),
             Arguments.of(
                 new BibEntry()
@@ -203,20 +154,15 @@ public class URLCleanupTest {
             ),
             // Input entry doesn't hold any URL in the Note field.
             Arguments.of(
-                new BibEntry()
-                    .withField(StandardField.NOTE, "Accessed on 2015-01-15"),
-                new BibEntry()
-                    .withField(StandardField.NOTE, "Accessed on 2015-01-15")
+                new BibEntry().withField(StandardField.NOTE, "Accessed on 2015-01-15"),
+                new BibEntry().withField(StandardField.NOTE, "Accessed on 2015-01-15")
             ),
             // Input entry has multiple url-dates stored in the Note field.
             Arguments.of(
                 new BibEntry()
                     .withField(StandardField.URL, "http://142.42.1.1:8080")
                     .withField(StandardField.URLDATE, "2021-01-15")
-                    .withField(
-                        StandardField.NOTE,
-                        "visited on February 12, 2017"
-                    ),
+                    .withField(StandardField.NOTE, "visited on February 12, 2017"),
                 new BibEntry()
                     .withField(
                         StandardField.NOTE,

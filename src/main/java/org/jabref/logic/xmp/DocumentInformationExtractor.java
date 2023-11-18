@@ -19,9 +19,7 @@ public class DocumentInformationExtractor {
 
     private final BibEntry bibEntry;
 
-    public DocumentInformationExtractor(
-        PDDocumentInformation documentInformation
-    ) {
+    public DocumentInformationExtractor(PDDocumentInformation documentInformation) {
         this.documentInformation = documentInformation;
 
         this.bibEntry = new BibEntry();

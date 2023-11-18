@@ -42,9 +42,7 @@ class EmbeddedBibFilePdfExporterTest {
 
     private static BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
     private static BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry vapnik2000 = new BibEntry(
-        StandardEntryType.Article
-    );
+    private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
     private EmbeddedBibFilePdfExporter exporter;
 
@@ -76,16 +74,10 @@ class EmbeddedBibFilePdfExporterTest {
         olly2018.setField(StandardField.REVIEW, "review");
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
-        LinkedFile linkedFile = createDefaultLinkedFile(
-            "existing.pdf",
-            tempDir
-        );
+        LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
         olly2018.setFiles(List.of(linkedFile));
 
-        toral2006.setField(
-            StandardField.AUTHOR,
-            "Toral, Antonio and Munoz, Rafael"
-        );
+        toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
         toral2006.setField(
             StandardField.TITLE,
             "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia"
@@ -96,21 +88,11 @@ class EmbeddedBibFilePdfExporterTest {
         toral2006.setField(StandardField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
-        toral2006.setFiles(
-            List.of(
-                new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")
-            )
-        );
+        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
 
         vapnik2000.setCitationKey("vapnik2000");
-        vapnik2000.setField(
-            StandardField.TITLE,
-            "The Nature of Statistical Learning Theory"
-        );
-        vapnik2000.setField(
-            StandardField.PUBLISHER,
-            "Springer Science + Business Media"
-        );
+        vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
+        vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
         vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
         vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
         vapnik2000.setField(StandardField.OWNER, "Ich");
@@ -124,10 +106,8 @@ class EmbeddedBibFilePdfExporterTest {
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.getUserAndHost())
-            .thenReturn(tempDir.toAbsolutePath().toString());
-        when(filePreferences.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(false);
+        when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
         BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
@@ -138,11 +118,7 @@ class EmbeddedBibFilePdfExporterTest {
         );
 
         exporter =
-            new EmbeddedBibFilePdfExporter(
-                bibDatabaseMode,
-                bibEntryTypesManager,
-                fieldPreferences
-            );
+            new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldPreferences);
 
         ImportFormatPreferences importFormatPreferences = mock(
             ImportFormatPreferences.class,
@@ -163,9 +139,7 @@ class EmbeddedBibFilePdfExporterTest {
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
-    void successfulExportToAllFilesOfEntry(
-        BibEntry bibEntryWithValidPdfFileLink
-    ) throws Exception {
+    void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
         assertTrue(
             exporter.exportToAllFilesOfEntry(
                 databaseContext,
@@ -179,9 +153,8 @@ class EmbeddedBibFilePdfExporterTest {
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithInvalidPdfFileLinks")
-    void unsuccessfulExportToAllFilesOfEntry(
-        BibEntry bibEntryWithValidPdfFileLink
-    ) throws Exception {
+    void unsuccessfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink)
+        throws Exception {
         assertFalse(
             exporter.exportToAllFilesOfEntry(
                 databaseContext,
@@ -228,36 +201,24 @@ class EmbeddedBibFilePdfExporterTest {
     }
 
     public static Stream<Arguments> providePathToNewPDFs() {
-        return Stream.of(
-            Arguments.of(tempDir.resolve("original.pdf").toAbsolutePath())
-        );
+        return Stream.of(Arguments.of(tempDir.resolve("original.pdf").toAbsolutePath()));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
-        return Stream.of(
-            Arguments.of(tempDir.resolve("existing.pdf").toAbsolutePath())
-        );
+        return Stream.of(Arguments.of(tempDir.resolve("existing.pdf").toAbsolutePath()));
     }
 
-    public static Stream<Arguments> providePathsToInvalidPDFs()
-        throws IOException {
-        LinkedFile existingFileThatIsNotLinked = createDefaultLinkedFile(
-            "notlinked.pdf",
-            tempDir
-        );
+    public static Stream<Arguments> providePathsToInvalidPDFs() throws IOException {
+        LinkedFile existingFileThatIsNotLinked = createDefaultLinkedFile("notlinked.pdf", tempDir);
         return Stream.of(
             Arguments.of(Path.of("")),
-            Arguments.of(
-                tempDir.resolve("path/to/nowhere.pdf").toAbsolutePath()
-            ),
+            Arguments.of(tempDir.resolve("path/to/nowhere.pdf").toAbsolutePath()),
             Arguments.of(Path.of(existingFileThatIsNotLinked.getLink()))
         );
     }
 
-    private static LinkedFile createDefaultLinkedFile(
-        String fileName,
-        Path tempDir
-    ) throws IOException {
+    private static LinkedFile createDefaultLinkedFile(String fileName, Path tempDir)
+        throws IOException {
         Path pdfFile = tempDir.resolve(fileName);
         try (PDDocument pdf = new PDDocument()) {
             pdf.addPage(new PDPage());
@@ -282,10 +243,7 @@ class EmbeddedBibFilePdfExporterTest {
 
         exporter.export(databaseContext, path, expectedEntries);
 
-        List<BibEntry> importedEntries = importer
-            .importDatabase(path)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> importedEntries = importer.importDatabase(path).getDatabase().getEntries();
 
         assertEquals(expectedEntries, importedEntries);
     }

@@ -42,20 +42,15 @@ import org.slf4j.LoggerFactory;
  */
 public class BibDatabase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BibDatabase.class
-    );
-    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(
-        ".*#[^#]+#.*"
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
+    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
 
     /**
      * State attributes
      */
-    private final ObservableList<BibEntry> entries =
-        FXCollections.synchronizedObservableList(
-            FXCollections.observableArrayList(BibEntry::getObservables)
-        );
+    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(
+        FXCollections.observableArrayList(BibEntry::getObservables)
+    );
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
     private final EventBus eventBus = new EventBus();
@@ -140,9 +135,7 @@ public class BibDatabase {
      * @return set of fieldnames, that are visible
      */
     public Set<Field> getAllVisibleFields() {
-        Set<Field> allFields = new TreeSet<>(
-            Comparator.comparing(Field::getName)
-        );
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFields());
         }
@@ -195,10 +188,7 @@ public class BibDatabase {
      * @param entry       entry to insert
      * @param eventSource source the event is sent from
      */
-    public synchronized void insertEntry(
-        BibEntry entry,
-        EntriesEventSource eventSource
-    ) {
+    public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
         insertEntries(Collections.singletonList(entry), eventSource);
     }
 
@@ -221,13 +211,7 @@ public class BibDatabase {
         if (newEntries.isEmpty()) {
             eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         } else {
-            eventBus.post(
-                new EntriesAddedEvent(
-                    newEntries,
-                    newEntries.get(0),
-                    eventSource
-                )
-            );
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
         }
         entries.addAll(newEntries);
     }
@@ -236,10 +220,7 @@ public class BibDatabase {
         removeEntries(Collections.singletonList(bibEntry));
     }
 
-    public synchronized void removeEntry(
-        BibEntry bibEntry,
-        EntriesEventSource eventSource
-    ) {
+    public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
         removeEntries(Collections.singletonList(bibEntry), eventSource);
     }
 
@@ -270,9 +251,7 @@ public class BibDatabase {
         for (BibEntry entry : toBeDeleted) {
             ids.add(entry.getId());
         }
-        boolean anyRemoved = entries.removeIf(entry ->
-            ids.contains(entry.getId())
-        );
+        boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
             eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
@@ -300,15 +279,11 @@ public class BibDatabase {
     /**
      * Inserts a Bibtex String.
      */
-    public synchronized void addString(BibtexString string)
-        throws KeyCollisionException {
+    public synchronized void addString(BibtexString string) throws KeyCollisionException {
         String id = string.getId();
 
         if (hasStringByName(string.getName())) {
-            throw new KeyCollisionException(
-                "A string with that label already exists",
-                id
-            );
+            throw new KeyCollisionException("A string with that label already exists", id);
         }
 
         if (bibtexStrings.containsKey(id)) {
@@ -396,10 +371,7 @@ public class BibDatabase {
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringByName(String label) {
-        return bibtexStrings
-            .values()
-            .stream()
-            .anyMatch(value -> value.getName().equals(label));
+        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /**
@@ -407,19 +379,14 @@ public class BibDatabase {
      * if possible.
      */
     public String resolveForStrings(String content) {
-        Objects.requireNonNull(
-            content,
-            "Content for resolveForStrings must not be null."
-        );
+        Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
         return resolveContent(content, new HashSet<>(), new HashSet<>());
     }
 
     /**
      * Get all strings used in the entries.
      */
-    public Collection<BibtexString> getUsedStrings(
-        Collection<BibEntry> entries
-    ) {
+    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
         List<BibtexString> result = new ArrayList<>();
         Set<String> allUsedIds = new HashSet<>();
 
@@ -487,13 +454,8 @@ public class BibDatabase {
             resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (Map.Entry<Field, String> field : resultingEntry
-            .getFieldMap()
-            .entrySet()) {
-            resultingEntry.setField(
-                field.getKey(),
-                this.resolveForStrings(field.getValue())
-            );
+        for (Map.Entry<Field, String> field : resultingEntry.getFieldMap().entrySet()) {
+            resultingEntry.setField(field.getKey(), this.resolveForStrings(field.getValue()));
         }
         return resultingEntry;
     }
@@ -504,11 +466,7 @@ public class BibDatabase {
      * care not to follow a circular reference pattern.
      * If the string is undefined, returns null.
      */
-    private String resolveString(
-        String label,
-        Set<String> usedIds,
-        Set<String> allUsedIds
-    ) {
+    private String resolveString(String label, Set<String> usedIds, Set<String> allUsedIds) {
         Objects.requireNonNull(label);
         Objects.requireNonNull(usedIds);
         Objects.requireNonNull(allUsedIds);
@@ -520,9 +478,7 @@ public class BibDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    LOGGER.info(
-                        "Stopped due to circular reference in strings: " + label
-                    );
+                    LOGGER.info("Stopped due to circular reference in strings: " + label);
                     return label;
                 }
                 // If not, log this string's ID now.
@@ -550,42 +506,24 @@ public class BibDatabase {
         return month.map(Month::getFullName).orElse(null);
     }
 
-    private String resolveContent(
-        String result,
-        Set<String> usedIds,
-        Set<String> allUsedIds
-    ) {
+    private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {
         String res = result;
         if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
             int next;
-            while (
-                (next =
-                        res.indexOf(
-                            FieldWriter.BIBTEX_STRING_START_END_SYMBOL,
-                            piv
-                        )) >=
-                0
-            ) {
+            while ((next = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, piv)) >= 0) {
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
                     newRes.append(res, piv, next);
                 }
-                int stringEnd = res.indexOf(
-                    FieldWriter.BIBTEX_STRING_START_END_SYMBOL,
-                    next + 1
-                );
+                int stringEnd = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, next + 1);
                 if (stringEnd >= 0) {
                     // We found the boundaries of the string ref,
                     // now resolve that one.
                     String refLabel = res.substring(next + 1, stringEnd);
-                    String resolved = resolveString(
-                        refLabel,
-                        usedIds,
-                        allUsedIds
-                    );
+                    String resolved = resolveString(refLabel, usedIds, allUsedIds);
 
                     if (resolved == null) {
                         // Could not resolve string. Display the #
@@ -656,9 +594,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
-        return entry
-            .getField(StandardField.CROSSREF)
-            .flatMap(this::getEntryByCitationKey);
+        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByCitationKey);
     }
 
     public Optional<String> getSharedDatabaseID() {
@@ -683,8 +619,7 @@ public class BibDatabase {
      * @return The generated sharedDatabaseID
      */
     public String generateSharedDatabaseID() {
-        this.sharedDatabaseID =
-            new BigInteger(128, new SecureRandom()).toString(32);
+        this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);
         return this.sharedDatabaseID;
     }
 

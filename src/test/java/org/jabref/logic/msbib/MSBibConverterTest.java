@@ -10,9 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class MSBibConverterTest {
 
-    private final BibEntry BIB_ENTRY_TEST = new BibEntry(
-        StandardEntryType.InProceedings
-    )
+    private final BibEntry BIB_ENTRY_TEST = new BibEntry(StandardEntryType.InProceedings)
         .withField(
             StandardField.AUTHOR,
             "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa"
@@ -52,9 +50,6 @@ class MSBibConverterTest {
         entry = BIB_ENTRY_TEST;
         MSBibConverter.convert(entry);
 
-        assertEquals(
-            Optional.of("english"),
-            entry.getField(StandardField.LANGUAGE)
-        );
+        assertEquals(Optional.of("english"), entry.getField(StandardField.LANGUAGE));
     }
 }

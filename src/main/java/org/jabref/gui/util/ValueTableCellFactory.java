@@ -21,16 +21,11 @@ import org.jabref.model.strings.StringUtil;
  * @param <S> view model of table row
  * @param <T> cell value
  */
-public class ValueTableCellFactory<S, T>
-    implements Callback<TableColumn<S, T>, TableCell<S, T>> {
+public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
-    private BiFunction<
-        S,
-        T,
-        EventHandler<? super MouseEvent>
-    > toOnMouseClickedEvent;
+    private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Function<T, BooleanExpression> toDisableExpression;
     private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;
@@ -42,30 +37,22 @@ public class ValueTableCellFactory<S, T>
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withGraphic(
-        Function<T, Node> toGraphic
-    ) {
+    public ValueTableCellFactory<S, T> withGraphic(Function<T, Node> toGraphic) {
         this.toGraphic = (rowItem, value) -> toGraphic.apply(value);
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withGraphic(
-        BiFunction<S, T, Node> toGraphic
-    ) {
+    public ValueTableCellFactory<S, T> withGraphic(BiFunction<S, T, Node> toGraphic) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withTooltip(
-        BiFunction<S, T, String> toTooltip
-    ) {
+    public ValueTableCellFactory<S, T> withTooltip(BiFunction<S, T, String> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withTooltip(
-        Function<T, String> toTooltip
-    ) {
+    public ValueTableCellFactory<S, T> withTooltip(Function<T, String> toTooltip) {
         this.toTooltip = (rowItem, value) -> toTooltip.apply(value);
         return this;
     }
@@ -80,8 +67,7 @@ public class ValueTableCellFactory<S, T>
     public ValueTableCellFactory<S, T> withOnMouseClickedEvent(
         Function<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent
     ) {
-        this.toOnMouseClickedEvent =
-            (rowItem, value) -> toOnMouseClickedEvent.apply(value);
+        this.toOnMouseClickedEvent = (rowItem, value) -> toOnMouseClickedEvent.apply(value);
         return this;
     }
 
@@ -106,9 +92,7 @@ public class ValueTableCellFactory<S, T>
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withMenu(
-        BiFunction<S, T, ContextMenu> menuFactory
-    ) {
+    public ValueTableCellFactory<S, T> withMenu(BiFunction<S, T, ContextMenu> menuFactory) {
         this.menuFactory = menuFactory;
         return this;
     }
@@ -143,9 +127,7 @@ public class ValueTableCellFactory<S, T>
                         String tooltipText = toTooltip.apply(rowItem, item);
                         if (StringUtil.isNotBlank(tooltipText)) {
                             Screen currentScreen = Screen.getPrimary();
-                            double maxWidth = currentScreen
-                                .getBounds()
-                                .getWidth();
+                            double maxWidth = currentScreen.getBounds().getWidth();
                             Tooltip tooltip = new Tooltip(tooltipText);
                             tooltip.setMaxWidth((maxWidth * 2) / 3);
                             tooltip.setWrapText(true);
@@ -158,12 +140,7 @@ public class ValueTableCellFactory<S, T>
                         setOnContextMenuRequested(event -> {
                             if (!isEmpty()) {
                                 setContextMenu(contextMenuFactory.apply(item));
-                                getContextMenu()
-                                    .show(
-                                        this,
-                                        event.getScreenX(),
-                                        event.getScreenY()
-                                    );
+                                getContextMenu().show(this, event.getScreenX(), event.getScreenY());
                             }
                             event.consume();
                         });
@@ -171,23 +148,14 @@ public class ValueTableCellFactory<S, T>
 
                     setOnMouseClicked(event -> {
                         if (toOnMouseClickedEvent != null) {
-                            toOnMouseClickedEvent
-                                .apply(rowItem, item)
-                                .handle(event);
+                            toOnMouseClickedEvent.apply(rowItem, item).handle(event);
                         }
 
                         if ((menuFactory != null) && !event.isConsumed()) {
                             if (event.getButton() == MouseButton.PRIMARY) {
-                                ContextMenu menu = menuFactory.apply(
-                                    rowItem,
-                                    item
-                                );
+                                ContextMenu menu = menuFactory.apply(rowItem, item);
                                 if (menu != null) {
-                                    menu.show(
-                                        this,
-                                        event.getScreenX(),
-                                        event.getScreenY()
-                                    );
+                                    menu.show(this, event.getScreenX(), event.getScreenY());
                                     event.consume();
                                 }
                             }

@@ -18,26 +18,19 @@ public class ContentSelectorSuggestionProviderTest {
 
     @Test
     void completeWithoutAddingAnythingReturnsNothing() {
-        SuggestionProvider<String> suggestionProvider =
-            new EmptySuggestionProvider();
+        SuggestionProvider<String> suggestionProvider = new EmptySuggestionProvider();
         autoCompleter =
-            new ContentSelectorSuggestionProvider(
-                suggestionProvider,
-                Collections.emptyList()
-            );
+            new ContentSelectorSuggestionProvider(suggestionProvider, Collections.emptyList());
 
         Collection<String> expected = Collections.emptyList();
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("test")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
 
     @Test
     void completeKeywordReturnsKeyword() {
-        SuggestionProvider<String> suggestionProvider =
-            new EmptySuggestionProvider();
+        SuggestionProvider<String> suggestionProvider = new EmptySuggestionProvider();
         autoCompleter =
             new ContentSelectorSuggestionProvider(
                 suggestionProvider,
@@ -45,17 +38,14 @@ public class ContentSelectorSuggestionProviderTest {
             );
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("test")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
 
     @Test
     void completeBeginningOfKeywordReturnsKeyword() {
-        SuggestionProvider<String> suggestionProvider =
-            new EmptySuggestionProvider();
+        SuggestionProvider<String> suggestionProvider = new EmptySuggestionProvider();
         autoCompleter =
             new ContentSelectorSuggestionProvider(
                 suggestionProvider,
@@ -63,9 +53,7 @@ public class ContentSelectorSuggestionProviderTest {
             );
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("te")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("te"));
 
         assertEquals(expected, result);
     }
@@ -77,26 +65,22 @@ public class ContentSelectorSuggestionProviderTest {
         bibEntry.addKeyword("test", ',');
         database.insertEntry(bibEntry);
 
-        SuggestionProvider<String> suggestionProvider =
-            new WordSuggestionProvider(StandardField.KEYWORDS, database);
+        SuggestionProvider<String> suggestionProvider = new WordSuggestionProvider(
+            StandardField.KEYWORDS,
+            database
+        );
         autoCompleter =
-            new ContentSelectorSuggestionProvider(
-                suggestionProvider,
-                Collections.emptyList()
-            );
+            new ContentSelectorSuggestionProvider(suggestionProvider, Collections.emptyList());
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("test")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
 
     @Test
     void completeUppercaseBeginningOfNameReturnsName() {
-        SuggestionProvider<String> suggestionProvider =
-            new EmptySuggestionProvider();
+        SuggestionProvider<String> suggestionProvider = new EmptySuggestionProvider();
         autoCompleter =
             new ContentSelectorSuggestionProvider(
                 suggestionProvider,
@@ -104,9 +88,7 @@ public class ContentSelectorSuggestionProviderTest {
             );
 
         Collection<String> expected = Collections.singletonList("test");
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("TE")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("TE"));
 
         assertEquals(expected, result);
     }
@@ -121,8 +103,7 @@ public class ContentSelectorSuggestionProviderTest {
 
     @Test
     void completeEmptyStringReturnsNothing() {
-        SuggestionProvider<String> suggestionProvider =
-            new EmptySuggestionProvider();
+        SuggestionProvider<String> suggestionProvider = new EmptySuggestionProvider();
         autoCompleter =
             new ContentSelectorSuggestionProvider(
                 suggestionProvider,
@@ -130,9 +111,7 @@ public class ContentSelectorSuggestionProviderTest {
             );
 
         Collection<String> expected = Collections.emptyList();
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(""));
 
         assertEquals(expected, result);
     }
@@ -144,8 +123,10 @@ public class ContentSelectorSuggestionProviderTest {
         bibEntry.addKeyword("testa", ',');
         database.insertEntry(bibEntry);
 
-        SuggestionProvider<String> suggestionProvider =
-            new WordSuggestionProvider(StandardField.KEYWORDS, database);
+        SuggestionProvider<String> suggestionProvider = new WordSuggestionProvider(
+            StandardField.KEYWORDS,
+            database
+        );
         autoCompleter =
             new ContentSelectorSuggestionProvider(
                 suggestionProvider,
@@ -153,9 +134,7 @@ public class ContentSelectorSuggestionProviderTest {
             );
 
         Collection<String> expected = Arrays.asList("testa", "testb");
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("test")
-        );
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }
@@ -168,23 +147,18 @@ public class ContentSelectorSuggestionProviderTest {
         bibEntry.addKeyword("testc", ',');
         database.insertEntry(bibEntry);
 
-        SuggestionProvider<String> suggestionProvider =
-            new WordSuggestionProvider(StandardField.KEYWORDS, database);
+        SuggestionProvider<String> suggestionProvider = new WordSuggestionProvider(
+            StandardField.KEYWORDS,
+            database
+        );
         autoCompleter =
             new ContentSelectorSuggestionProvider(
                 suggestionProvider,
                 Arrays.asList("testb", "testa")
             );
 
-        Collection<String> expected = Arrays.asList(
-            "testa",
-            "testb",
-            "testc",
-            "testd"
-        );
-        Collection<String> result = autoCompleter.provideSuggestions(
-            getRequest("test")
-        );
+        Collection<String> expected = Arrays.asList("testa", "testb", "testc", "testd");
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
 
         assertEquals(expected, result);
     }

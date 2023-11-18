@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class NewEntryAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        NewEntryAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
 
@@ -63,16 +61,12 @@ public class NewEntryAction extends SimpleCommand {
     @Override
     public void execute() {
         if (jabRefFrame.getBasePanelCount() <= 0) {
-            LOGGER.error(
-                "Action 'New entry' must be disabled when no database is open."
-            );
+            LOGGER.error("Action 'New entry' must be disabled when no database is open.");
             return;
         }
 
         if (type.isPresent()) {
-            jabRefFrame
-                .getCurrentLibraryTab()
-                .insertEntry(new BibEntry(type.get()));
+            jabRefFrame.getCurrentLibraryTab().insertEntry(new BibEntry(type.get()));
         } else {
             EntryTypeView typeChoiceDialog = new EntryTypeView(
                 jabRefFrame.getCurrentLibraryTab(),
@@ -87,9 +81,7 @@ public class NewEntryAction extends SimpleCommand {
             }
 
             trackNewEntry(selectedType);
-            jabRefFrame
-                .getCurrentLibraryTab()
-                .insertEntry(new BibEntry(selectedType));
+            jabRefFrame.getCurrentLibraryTab().insertEntry(new BibEntry(selectedType));
         }
     }
 
@@ -99,8 +91,6 @@ public class NewEntryAction extends SimpleCommand {
 
         Telemetry
             .getTelemetryClient()
-            .ifPresent(client ->
-                client.trackEvent("NewEntry", properties, new HashMap<>())
-            );
+            .ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
     }
 }

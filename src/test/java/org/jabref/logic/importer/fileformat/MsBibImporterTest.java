@@ -47,16 +47,10 @@ public class MsBibImporterTest {
     }
 
     @Test
-    public final void testImportEntriesEmpty()
-        throws IOException, URISyntaxException {
+    public final void testImportEntriesEmpty() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
-        Path file = Path.of(
-            MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI()
-        );
-        List<BibEntry> entries = testImporter
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI());
+        List<BibEntry> entries = testImporter.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -64,13 +58,8 @@ public class MsBibImporterTest {
     public final void testImportEntriesNotRecognizedFormat()
         throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
-        Path file = Path.of(
-            MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI()
-        );
-        List<BibEntry> entries = testImporter
-            .importDatabase(file)
-            .getDatabase()
-            .getEntries();
+        Path file = Path.of(MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI());
+        List<BibEntry> entries = testImporter.importDatabase(file).getDatabase().getEntries();
         assertEquals(0, entries.size());
     }
 

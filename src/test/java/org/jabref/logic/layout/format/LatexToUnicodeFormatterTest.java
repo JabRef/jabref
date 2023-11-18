@@ -105,9 +105,7 @@ class LatexToUnicodeFormatterTest {
         assertEquals("ḩ", formatter.format("{\\c{h}}"));
     }
 
-    @Disabled(
-        "This is not a standard LaTeX command. It is debatable why we should convert this."
-    )
+    @Disabled("This is not a standard LaTeX command. It is debatable why we should convert this.")
     @Test
     void testCombiningAccentsCase2() {
         assertEquals("a͍", formatter.format("\\spreadlips{a}"));
@@ -163,18 +161,12 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void testPreservationOfSingleUnderscore() {
-        assertEquals(
-            "Lorem ipsum_lorem ipsum",
-            formatter.format("Lorem ipsum_lorem ipsum")
-        );
+        assertEquals("Lorem ipsum_lorem ipsum", formatter.format("Lorem ipsum_lorem ipsum"));
     }
 
     @Test
     void testConversionOfUnderscoreWithBraces() {
-        assertEquals(
-            "Lorem ipsum_(lorem ipsum)",
-            formatter.format("Lorem ipsum_{lorem ipsum}")
-        );
+        assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
     }
 
     @Test

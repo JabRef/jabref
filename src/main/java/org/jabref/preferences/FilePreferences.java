@@ -27,26 +27,18 @@ public class FilePreferences {
     };
 
     private final StringProperty userAndHost = new SimpleStringProperty();
-    private final SimpleStringProperty mainFileDirectory =
-        new SimpleStringProperty();
-    private final BooleanProperty storeFilesRelativeToBibFile =
-        new SimpleBooleanProperty();
+    private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
+    private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
-    private final StringProperty fileDirectoryPattern =
-        new SimpleStringProperty();
-    private final BooleanProperty downloadLinkedFiles =
-        new SimpleBooleanProperty();
-    private final BooleanProperty fulltextIndexLinkedFiles =
-        new SimpleBooleanProperty();
-    private final ObjectProperty<Path> workingDirectory =
-        new SimpleObjectProperty<>();
-    private final ObservableSet<ExternalFileType> externalFileTypes =
-        FXCollections.observableSet(
-            new TreeSet<>(Comparator.comparing(ExternalFileType::getName))
-        );
+    private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
+    private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
+    private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
+    private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
+    private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(
+        new TreeSet<>(Comparator.comparing(ExternalFileType::getName))
+    );
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
-    private final ObjectProperty<Path> backupDirectory =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
 
     public FilePreferences(
         String userAndHost,
@@ -102,9 +94,7 @@ public class FilePreferences {
         return storeFilesRelativeToBibFile;
     }
 
-    public void setStoreFilesRelativeToBibFile(
-        boolean shouldStoreFilesRelativeToBibFile
-    ) {
+    public void setStoreFilesRelativeToBibFile(boolean shouldStoreFilesRelativeToBibFile) {
         this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);
     }
 
@@ -152,9 +142,7 @@ public class FilePreferences {
         return fulltextIndexLinkedFiles;
     }
 
-    public void setFulltextIndexLinkedFiles(
-        boolean shouldFulltextIndexLinkedFiles
-    ) {
+    public void setFulltextIndexLinkedFiles(boolean shouldFulltextIndexLinkedFiles) {
         this.fulltextIndexLinkedFiles.set(shouldFulltextIndexLinkedFiles);
     }
 

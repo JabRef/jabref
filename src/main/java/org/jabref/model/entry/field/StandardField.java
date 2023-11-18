@@ -30,12 +30,7 @@ public enum StandardField implements Field {
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
-    COMMENT(
-        "comment",
-        FieldProperty.COMMENT,
-        FieldProperty.MULTILINE_TEXT,
-        FieldProperty.VERBATIM
-    ),
+    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),
@@ -164,12 +159,7 @@ public enum StandardField implements Field {
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
-    StandardField(
-        String name,
-        String displayName,
-        FieldProperty first,
-        FieldProperty... rest
-    ) {
+    StandardField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
         this.name = name;
         this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);

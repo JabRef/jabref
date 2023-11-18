@@ -20,8 +20,7 @@ public class CitationKeyDuplicationCheckerTest {
             .withField(StandardField.AUTHOR, "Knuth")
             .withField(StandardField.YEAR, "2014");
         BibDatabase bibDatabase = new BibDatabase(List.of(entry));
-        CitationKeyDuplicationChecker checker =
-            new CitationKeyDuplicationChecker(bibDatabase);
+        CitationKeyDuplicationChecker checker = new CitationKeyDuplicationChecker(bibDatabase);
 
         List<IntegrityMessage> expected = Collections.emptyList();
         assertEquals(expected, checker.check(entry));
@@ -38,8 +37,7 @@ public class CitationKeyDuplicationCheckerTest {
             .withField(StandardField.AUTHOR, "Knuth")
             .withField(StandardField.YEAR, "2014");
         BibDatabase bibDatabase = new BibDatabase(List.of(entry, entry2));
-        CitationKeyDuplicationChecker checker =
-            new CitationKeyDuplicationChecker(bibDatabase);
+        CitationKeyDuplicationChecker checker = new CitationKeyDuplicationChecker(bibDatabase);
 
         List<IntegrityMessage> expected = Collections.singletonList(
             new IntegrityMessage(

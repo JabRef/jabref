@@ -48,19 +48,13 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
             .entrySet()) {
             String key = entry.getKey();
             referenceList.add(
-                new ReferenceViewModel(
-                    key,
-                    newEntryKeys.contains(key),
-                    entry.getValue()
-                )
+                new ReferenceViewModel(key, newEntryKeys.contains(key), entry.getValue())
             );
         }
 
         this.importButtonDisabled =
             new SimpleBooleanProperty(
-                referenceList
-                    .stream()
-                    .noneMatch(ReferenceViewModel::isHighlighted)
+                referenceList.stream().noneMatch(ReferenceViewModel::isHighlighted)
             );
     }
 
@@ -91,14 +85,10 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
      * Search and import unknown references from associated BIB files.
      */
     public void importButtonClicked() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         ImportEntriesDialog dialog = new ImportEntriesDialog(
             databaseContext,
-            BackgroundTask.wrap(() ->
-                new ParserResult(resolverResult.getNewEntries())
-            )
+            BackgroundTask.wrap(() -> new ParserResult(resolverResult.getNewEntries()))
         );
         dialog.setTitle(Localization.lang("Import entries from LaTeX files"));
         dialogService.showCustomDialogAndWait(dialog);

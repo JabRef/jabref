@@ -40,10 +40,7 @@ public class AbbreviationsFileViewModel {
      * a placeholder and its path will be null meaning it has no place on the filesystem. Its isPseudoFile property
      * will therefore be set to true.
      */
-    public AbbreviationsFileViewModel(
-        List<AbbreviationViewModel> abbreviations,
-        String name
-    ) {
+    public AbbreviationsFileViewModel(List<AbbreviationViewModel> abbreviations, String name) {
         this.abbreviations.addAll(abbreviations);
         this.name = name;
         this.path = Optional.empty();
@@ -53,9 +50,7 @@ public class AbbreviationsFileViewModel {
     public void readAbbreviations() throws IOException {
         if (path.isPresent()) {
             Collection<Abbreviation> abbreviationList =
-                JournalAbbreviationLoader.readAbbreviationsFromCsvFile(
-                    path.get()
-                );
+                JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path.get());
             abbreviationList.forEach(abbreviation ->
                 abbreviations.addAll(new AbbreviationViewModel(abbreviation))
             );

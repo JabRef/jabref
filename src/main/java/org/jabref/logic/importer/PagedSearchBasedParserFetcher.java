@@ -13,10 +13,8 @@ import org.jabref.model.paging.Page;
 public interface PagedSearchBasedParserFetcher
     extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
     @Override
-    default Page<BibEntry> performSearchPaged(
-        QueryNode luceneQuery,
-        int pageNumber
-    ) throws FetcherException {
+    default Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber)
+        throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
@@ -27,15 +25,10 @@ public interface PagedSearchBasedParserFetcher
                 e
             );
         }
-        return new Page<>(
-            luceneQuery.toString(),
-            pageNumber,
-            getBibEntries(urlForQuery)
-        );
+        return new Page<>(luceneQuery.toString(), pageNumber, getBibEntries(urlForQuery));
     }
 
-    private List<BibEntry> getBibEntries(URL urlForQuery)
-        throws FetcherException {
+    private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
         try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
@@ -47,8 +40,7 @@ public interface PagedSearchBasedParserFetcher
             );
         } catch (ParseException e) {
             throw new FetcherException(
-                "An internal parser error occurred while fetching from " +
-                urlForQuery,
+                "An internal parser error occurred while fetching from " + urlForQuery,
                 e
             );
         }
@@ -70,8 +62,7 @@ public interface PagedSearchBasedParserFetcher
     }
 
     @Override
-    default List<BibEntry> performSearch(QueryNode luceneQuery)
-        throws FetcherException {
+    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         return SearchBasedParserFetcher.super.performSearch(luceneQuery);
     }
 }

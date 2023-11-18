@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class UnoTextDocument {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UnoTextDocument.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnoTextDocument.class);
 
     private UnoTextDocument() {}
 
@@ -37,9 +35,7 @@ public class UnoTextDocument {
         return missing;
     }
 
-    public static Optional<XController> getCurrentController(
-        XTextDocument doc
-    ) {
+    public static Optional<XController> getCurrentController(XTextDocument doc) {
         if (doc == null) {
             return Optional.empty();
         }
@@ -56,16 +52,12 @@ public class UnoTextDocument {
      * @return The title or Optional.empty()
      */
     public static Optional<String> getFrameTitle(XTextDocument doc) {
-        Optional<XFrame> frame = getCurrentController(doc)
-            .map(XController::getFrame);
+        Optional<XFrame> frame = getCurrentController(doc).map(XController::getFrame);
         if (frame.isEmpty()) {
             return Optional.empty();
         }
 
-        Optional<XPropertySet> propertySet = UnoCast.cast(
-            XPropertySet.class,
-            frame.get()
-        );
+        Optional<XPropertySet> propertySet = UnoCast.cast(XPropertySet.class, frame.get());
         if (propertySet.isEmpty()) {
             return Optional.empty();
         }
@@ -86,9 +78,7 @@ public class UnoTextDocument {
         }
     }
 
-    static Optional<XDocumentProperties> getDocumentProperties(
-        XTextDocument doc
-    ) {
+    static Optional<XDocumentProperties> getDocumentProperties(XTextDocument doc) {
         return Optional
             .ofNullable(doc)
             .flatMap(e -> UnoCast.cast(XDocumentPropertiesSupplier.class, e))

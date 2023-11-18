@@ -46,17 +46,11 @@ public class HowPublishedCheckerTest {
 
     @Test
     void bibLaTexAcceptsStringWithCapitalFirstLetter() {
-        assertEquals(
-            Optional.empty(),
-            checkerBiblatex.checkValue("Lorem ipsum")
-        );
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("Lorem ipsum"));
     }
 
     @Test
     void bibLaTexAcceptsStringWithLowercaseFirstLetter() {
-        assertEquals(
-            Optional.empty(),
-            checkerBiblatex.checkValue("lorem ipsum")
-        );
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
     }
 }

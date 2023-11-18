@@ -38,9 +38,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
                 .map(ExternalFileTypeItemViewModel::new)
                 .toList()
         );
-        fileTypes.sort(
-            Comparator.comparing(ExternalFileTypeItemViewModel::getName)
-        );
+        fileTypes.sort(Comparator.comparing(ExternalFileTypeItemViewModel::getName));
     }
 
     public void storeSettings() {
@@ -70,14 +68,11 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
                 .map(ExternalFileTypeItemViewModel::new)
                 .toList()
         );
-        fileTypes.sort(
-            Comparator.comparing(ExternalFileTypeItemViewModel::getName)
-        );
+        fileTypes.sort(Comparator.comparing(ExternalFileTypeItemViewModel::getName));
     }
 
     public void addNewType() {
-        ExternalFileTypeItemViewModel item =
-            new ExternalFileTypeItemViewModel();
+        ExternalFileTypeItemViewModel item = new ExternalFileTypeItemViewModel();
         fileTypes.add(item);
         showEditDialog(item, Localization.lang("Add new file type"));
     }
@@ -86,10 +81,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         return fileTypes;
     }
 
-    private void showEditDialog(
-        ExternalFileTypeItemViewModel item,
-        String dialogTitle
-    ) {
+    private void showEditDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
         dialogService.showCustomDialogAndWait(
             new EditExternalFileTypeEntryDialog(item, dialogTitle)
         );

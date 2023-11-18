@@ -41,17 +41,12 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     private static final String APS_JOURNAL_ORG_DOI_ID = "1103";
     private static final String APS_SUFFIX = "([\\w]+\\.)([\\w]+\\.)([\\w]+)";
-    private static final Pattern APS_SUFFIX_PATTERN = Pattern.compile(
-        APS_SUFFIX
-    );
+    private static final Pattern APS_SUFFIX_PATTERN = Pattern.compile(APS_SUFFIX);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DoiFetcher.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
 
     // 1000 request per 5 minutes. See https://support.datacite.org/docs/is-there-a-rate-limit-for-making-requests-against-the-datacite-apis
-    private static final RateLimiter DATA_CITE_DCN_RATE_LIMITER =
-        RateLimiter.create(3.33);
+    private static final RateLimiter DATA_CITE_DCN_RATE_LIMITER = RateLimiter.create(3.33);
 
     /*
      * By default, it seems that CrossRef DOI Content Negotiation responses are returned by their API pools, more specifically the public one
@@ -60,8 +55,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
      * to default to 50 request / second. However, because of its dynamic nature, this rate could change between API calls, so we need to update it
      * atomically when that happens (as multiple threads might access it at the same time)
      */
-    private static final RateLimiter CROSSREF_DCN_RATE_LIMITER =
-        RateLimiter.create(50.0);
+    private static final RateLimiter CROSSREF_DCN_RATE_LIMITER = RateLimiter.create(50.0);
 
     private final ImportFormatPreferences preferences;
 
@@ -86,9 +80,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
         try {
             Optional<String> agency;
-            if (
-                doi.isPresent() && (agency = getAgency(doi.get())).isPresent()
-            ) {
+            if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
                 double waitingTime = 0.0;
                 if ("datacite".equalsIgnoreCase(agency.get())) {
                     waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();
@@ -110,9 +102,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
     }
 
-    protected CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(
-        String identifier
-    ) {
+    protected CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) {
         doAPILimiting(identifier);
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -124,8 +114,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier)
-        throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
 
         try {
@@ -134,9 +123,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
                 // mEDRA does not return a parsable bibtex string
                 Optional<String> agency = getAgency(doi.get());
-                if (
-                    agency.isPresent() && "medra".equalsIgnoreCase(agency.get())
-                ) {
+                if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
                     return new Medra().performSearchById(identifier);
                 }
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
@@ -159,35 +146,22 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 }
 
                 // BibTeX entry
-                fetchedEntry =
-                    BibtexParser.singleFromString(bibtexString, preferences);
+                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
-                if (
-                    agency.isPresent() &&
-                    "crossref".equalsIgnoreCase(agency.get())
-                ) {
+                if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
                     updateCrossrefAPIRate(openConnection);
                 }
 
                 // Check if the entry is an APS journal and add the article id as the page count if page field is missing
-                if (
-                    fetchedEntry.isPresent() &&
-                    fetchedEntry.get().hasField(StandardField.DOI)
-                ) {
+                if (fetchedEntry.isPresent() && fetchedEntry.get().hasField(StandardField.DOI)) {
                     BibEntry entry = fetchedEntry.get();
                     if (
-                        isAPSJournal(
-                            entry,
-                            entry.getField(StandardField.DOI).get()
-                        ) &&
+                        isAPSJournal(entry, entry.getField(StandardField.DOI).get()) &&
                         !entry.hasField(StandardField.PAGES)
                     ) {
-                        setPageCountToArticleId(
-                            entry,
-                            entry.getField(StandardField.DOI).get()
-                        );
+                        setPageCountToArticleId(entry, entry.getField(StandardField.DOI).get());
                     }
                 }
 
@@ -196,33 +170,21 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 }
                 return fetchedEntry;
             } else {
-                throw new FetcherException(
-                    Localization.lang("Invalid DOI: '%0'.", identifier)
-                );
+                throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
             }
         } catch (IOException e) {
-            throw new FetcherException(
-                Localization.lang("Connection error"),
-                e
-            );
+            throw new FetcherException(Localization.lang("Connection error"), e);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
         } catch (JSONException e) {
-            throw new FetcherException(
-                "Could not retrieve Registration Agency",
-                e
-            );
+            throw new FetcherException("Could not retrieve Registration Agency", e);
         }
     }
 
     private void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(
-            StandardField.PAGES,
-            new NormalizePagesFormatter()
-        )
+        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter())
             .cleanup(entry);
-        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter())
-            .cleanup(entry);
+        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
     }
 
     private void updateCrossrefAPIRate(URLConnection existingConnection) {
@@ -231,13 +193,10 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             String xRateLimitInterval = existingConnection
                 .getHeaderField("X-Rate-Limit-Interval")
                 .replaceAll("[^\\.0123456789]", "");
-            String xRateLimit = existingConnection.getHeaderField(
-                "X-Rate-Limit-Limit"
-            );
+            String xRateLimit = existingConnection.getHeaderField("X-Rate-Limit-Limit");
 
             double newRate =
-                Double.parseDouble(xRateLimit) /
-                Double.parseDouble(xRateLimitInterval);
+                Double.parseDouble(xRateLimit) / Double.parseDouble(xRateLimitInterval);
             double oldRate = CROSSREF_DCN_RATE_LIMITER.getRate();
 
             // In theory, the actual update might rarely happen...
@@ -259,8 +218,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> doi = entry.getField(StandardField.DOI);
         if (doi.isPresent()) {
             return OptionalUtil.toList(performSearchById(doi.get()));
@@ -280,8 +238,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             URLDownload download = getUrlDownload(
                 new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI())
             );
-            JSONObject response = new JSONArray(download.asString())
-                .getJSONObject(0);
+            JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));
             }
@@ -294,9 +251,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     private void setPageCountToArticleId(BibEntry entry, String doiAsString) {
-        String articleId = doiAsString.substring(
-            doiAsString.lastIndexOf('.') + 1
-        );
+        String articleId = doiAsString.substring(doiAsString.lastIndexOf('.') + 1);
         entry.setField(StandardField.PAGES, articleId);
     }
 

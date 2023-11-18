@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 
 class BstVMVisitor extends BstBaseVisitor<Integer> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BstVMVisitor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstVMVisitor.class);
 
     private final BstVMContext bstVMContext;
     private final StringBuilder bbl;
@@ -60,24 +58,18 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     public Integer visitFunctionCommand(BstParser.FunctionCommandContext ctx) {
         bstVMContext
             .functions()
-            .put(
-                ctx.id.getText(),
-                (visitor, functionContext) -> visitor.visit(ctx.function)
-            );
+            .put(ctx.id.getText(), (visitor, functionContext) -> visitor.visit(ctx.function));
         return BstVM.TRUE;
     }
 
     @Override
     public Integer visitMacroCommand(BstParser.MacroCommandContext ctx) {
-        String replacement = ctx.repl
-            .getText()
-            .substring(1, ctx.repl.getText().length() - 1);
+        String replacement = ctx.repl.getText().substring(1, ctx.repl.getText().length() - 1);
         bstVMContext
             .functions()
             .put(
                 ctx.id.getText(),
-                (visitor, functionContext) ->
-                    bstVMContext.stack().push(replacement)
+                (visitor, functionContext) -> bstVMContext.stack().push(replacement)
             );
         return BstVM.TRUE;
     }
@@ -85,11 +77,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     @Override
     public Integer visitReadCommand(BstParser.ReadCommandContext ctx) {
         FieldWriter fieldWriter = new FieldWriter(
-            new FieldPreferences(
-                true,
-                List.of(StandardField.MONTH),
-                Collections.emptyList()
-            )
+            new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList())
         );
         for (BstEntry e : bstVMContext.entries()) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
@@ -106,15 +94,10 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                             if (field == StandardField.MONTH) {
                                 // We don't have the internal BibTeX strings at hand.
                                 // Thus, we look up the full month name in the generic table.
-                                return Month
-                                    .parse(result)
-                                    .map(Month::getFullName)
-                                    .orElse(result);
+                                return Month.parse(result).map(Month::getFullName).orElse(result);
                             }
                             return result;
-                        } catch (
-                            InvalidFieldValueException invalidFieldValueException
-                        ) {
+                        } catch (InvalidFieldValueException invalidFieldValueException) {
                             // in case there is something wrong with the content, just return the content itself
                             return content;
                         }
@@ -199,9 +182,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitSortCommand(BstParser.SortCommandContext ctx) {
-        bstVMContext
-            .entries()
-            .sort(Comparator.comparing(o -> (o.localStrings.get("sort.key$"))));
+        bstVMContext.entries().sort(Comparator.comparing(o -> (o.localStrings.get("sort.key$"))));
         return BstVM.TRUE;
     }
 
@@ -218,15 +199,11 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 return;
             }
             if (selectedBstEntry.localStrings.containsKey(name)) {
-                bstVMContext
-                    .stack()
-                    .push(selectedBstEntry.localStrings.get(name));
+                bstVMContext.stack().push(selectedBstEntry.localStrings.get(name));
                 return;
             }
             if (selectedBstEntry.localIntegers.containsKey(name)) {
-                bstVMContext
-                    .stack()
-                    .push(selectedBstEntry.localIntegers.get(name));
+                bstVMContext.stack().push(selectedBstEntry.localIntegers.get(name));
                 return;
             }
         }
@@ -251,10 +228,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
         String name = ctx.getChild(0).getText();
         if (bstVMContext.functions().containsKey(name)) {
-            bstVMContext
-                .functions()
-                .get(name)
-                .execute(this, ctx, selectedBstEntry);
+            bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
         } else {
             visit(ctx.getChild(0));
         }
@@ -270,15 +244,11 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                     switch (token.getSymbol().getType()) {
                         case BstParser.STRING -> {
                             String s = token.getText();
-                            bstVMContext
-                                .stack()
-                                .push(s.substring(1, s.length() - 1));
+                            bstVMContext.stack().push(s.substring(1, s.length() - 1));
                         }
                         case BstParser.INTEGER -> bstVMContext
                             .stack()
-                            .push(
-                                Integer.parseInt(token.getText().substring(1))
-                            );
+                            .push(Integer.parseInt(token.getText().substring(1)));
                         case BstParser.QUOTED -> bstVMContext
                             .stack()
                             .push(new Identifier(token.getText().substring(1)));

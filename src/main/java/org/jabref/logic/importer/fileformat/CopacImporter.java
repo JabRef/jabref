@@ -46,8 +46,7 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         String str;
         while ((str = reader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
@@ -57,12 +56,7 @@ public class CopacImporter extends Importer {
         return false;
     }
 
-    private static void setOrAppend(
-        BibEntry b,
-        Field field,
-        String value,
-        String separator
-    ) {
+    private static void setOrAppend(BibEntry b, Field field, String value, String separator) {
         if (b.hasField(field) && b.getField(field).isPresent()) {
             b.setField(field, b.getField(field).get() + separator + value);
         } else {
@@ -71,8 +65,7 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
 
         List<String> entries = new LinkedList<>();
@@ -185,10 +178,7 @@ public class CopacImporter extends Importer {
                     );
                     default -> setOrAppend(
                         b,
-                        FieldFactory.parseField(
-                            StandardEntryType.Book,
-                            line.substring(0, 2)
-                        ),
+                        FieldFactory.parseField(StandardEntryType.Book, line.substring(0, 2)),
                         line.substring(4).trim(),
                         ", "
                     );

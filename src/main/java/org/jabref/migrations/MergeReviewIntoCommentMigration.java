@@ -21,34 +21,24 @@ public class MergeReviewIntoCommentMigration {
             .getDatabase()
             .getEntries()
             .stream()
-            .anyMatch(bibEntry ->
-                bibEntry.getField(StandardField.REVIEW).isPresent()
-            );
+            .anyMatch(bibEntry -> bibEntry.getField(StandardField.REVIEW).isPresent());
     }
 
     public void performMigration(ParserResult parserResult) {
         /* This migration only handles the non-conflicting entries.
          * For the other see this.performConflictingMigration().
          */
-        List<BibEntry> entries = Objects
-            .requireNonNull(parserResult)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
         entries
             .stream()
             .filter(MergeReviewIntoCommentMigration::hasReviewField)
-            .filter(entry ->
-                !MergeReviewIntoCommentMigration.hasCommentField(entry)
-            )
+            .filter(entry -> !MergeReviewIntoCommentMigration.hasCommentField(entry))
             .forEach(entry -> migrate(entry, parserResult));
     }
 
     public static List<BibEntry> collectConflicts(ParserResult parserResult) {
-        List<BibEntry> entries = Objects
-            .requireNonNull(parserResult)
-            .getDatabase()
-            .getEntries();
+        List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
         return entries
             .stream()
@@ -58,8 +48,7 @@ public class MergeReviewIntoCommentMigration {
     }
 
     public void performConflictingMigration(ParserResult parserResult) {
-        collectConflicts(parserResult)
-            .forEach(entry -> migrate(entry, parserResult));
+        collectConflicts(parserResult).forEach(entry -> migrate(entry, parserResult));
     }
 
     private static boolean hasCommentField(BibEntry entry) {
@@ -92,10 +81,7 @@ public class MergeReviewIntoCommentMigration {
         if (hasReviewField(entry)) {
             updateFields(
                 entry,
-                mergeCommentFieldIfPresent(
-                    entry,
-                    entry.getField(StandardField.REVIEW).get()
-                )
+                mergeCommentFieldIfPresent(entry, entry.getField(StandardField.REVIEW).get())
             );
             parserResult.wasChangedOnMigration();
         }

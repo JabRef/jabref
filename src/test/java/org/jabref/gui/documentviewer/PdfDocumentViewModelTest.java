@@ -19,9 +19,7 @@ class PdfDocumentViewModelTest {
             mockPDF.addPage(new PDPage());
             mockPDF.save(pdfFile.toAbsolutePath().toString());
 
-            PdfDocumentViewModel PDFviewModel = new PdfDocumentViewModel(
-                mockPDF
-            );
+            PdfDocumentViewModel PDFviewModel = new PdfDocumentViewModel(mockPDF);
 
             assertEquals(1, PDFviewModel.getPages().size());
         }

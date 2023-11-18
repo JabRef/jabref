@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class OpenConsoleAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        OpenConsoleAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenConsoleAction.class);
     private final Supplier<BibDatabaseContext> databaseContext;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
@@ -60,11 +58,7 @@ public class OpenConsoleAction extends SimpleCommand {
             .flatMap(BibDatabaseContext::getDatabasePath)
             .ifPresent(path -> {
                 try {
-                    JabRefDesktop.openConsole(
-                        path,
-                        preferencesService,
-                        dialogService
-                    );
+                    JabRefDesktop.openConsole(path, preferencesService, dialogService);
                 } catch (IOException e) {
                     LOGGER.info("Could not open console", e);
                 }

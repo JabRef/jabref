@@ -22,10 +22,7 @@ public class BibDatabaseModeDetection {
      * @return the inferred database type
      */
     public static BibDatabaseMode inferMode(BibDatabase database) {
-        final Stream<EntryType> entryTypes = database
-            .getEntries()
-            .stream()
-            .map(BibEntry::getType);
+        final Stream<EntryType> entryTypes = database.getEntries().stream().map(BibEntry::getType);
 
         if (entryTypes.anyMatch(EntryTypeFactory::isExclusiveBiblatex)) {
             return BibDatabaseMode.BIBLATEX;

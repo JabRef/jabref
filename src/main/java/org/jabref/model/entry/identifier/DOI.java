@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 )
 public class DOI implements Identifier {
 
-    public static final URI AGENCY_RESOLVER = URI.create(
-        "https://doi.org/doiRA"
-    );
+    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
     public static final URI RESOLVER = URI.create("https://doi.org/");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
@@ -56,8 +54,7 @@ public class DOI implements Identifier {
 
     // Regex (Short DOI)
     private static final String SHORT_DOI_SHORTCUT =
-        "" +
-        "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
+        "" + "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
     private static final String IN_TEXT_SHORT_DOI_SHORTCUT =
         "" + "(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})"; // eg https://doi.org/bfrhmx somewhere in the text
     private static final String SHORT_DOI_EXP_PREFIX =
@@ -92,8 +89,7 @@ public class DOI implements Identifier {
         ")"; // end group  \1
 
     private static final String HTTP_EXP = "https?://[^\\s]+?" + DOI_EXP;
-    private static final String SHORT_DOI_HTTP_EXP =
-        "https?://[^\\s]+?" + SHORT_DOI_EXP;
+    private static final String SHORT_DOI_HTTP_EXP = "https?://[^\\s]+?" + SHORT_DOI_EXP;
     // Pattern
     private static final Pattern EXACT_DOI_PATT = Pattern.compile(
         "^(?:https?://[^\\s]+?)?" + DOI_EXP + "$",
@@ -153,12 +149,9 @@ public class DOI implements Identifier {
             try {
                 // decodes path segment
                 URI url = new URI(trimmedDoi);
-                trimmedDoi =
-                    url.getScheme() + "://" + url.getHost() + url.getPath();
+                trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(
-                    doi + " is not a valid HTTP DOI/Short DOI."
-                );
+                throw new IllegalArgumentException(doi + " is not a valid HTTP DOI/Short DOI.");
             }
         }
 
@@ -175,9 +168,7 @@ public class DOI implements Identifier {
                 isShortDoi = true;
             } else {
                 // Shortcut DOI without the "10/" as in "doi.org/d8dn"
-                Matcher shortcutDoiMatcher = EXACT_SHORT_DOI_SHORTCUT.matcher(
-                    trimmedDoi
-                );
+                Matcher shortcutDoiMatcher = EXACT_SHORT_DOI_SHORTCUT.matcher(trimmedDoi);
                 if (shortcutDoiMatcher.find()) {
                     this.doi = "10/" + shortcutDoiMatcher.group(1);
                     isShortDoi = true;
@@ -298,12 +289,7 @@ public class DOI implements Identifier {
 
     private Optional<URI> getExternalURIFromBase(URI base) {
         try {
-            URI uri = new URI(
-                base.getScheme(),
-                base.getHost(),
-                "/" + doi,
-                null
-            );
+            URI uri = new URI(base.getScheme(), base.getHost(), "/" + doi, null);
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen

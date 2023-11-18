@@ -47,10 +47,7 @@ public class ProtectTermsFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(
-            "In {CDMA}",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("In {CDMA}", formatter.format(formatter.getExampleInput()));
     }
 
     @Test

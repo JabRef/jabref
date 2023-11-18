@@ -27,12 +27,9 @@ import org.jabref.model.strings.StringUtil;
  */
 public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
 
-    private static final String BASE_URL =
-        "https://doi-to-bibtex-converter.herokuapp.com";
+    private static final String BASE_URL = "https://doi-to-bibtex-converter.herokuapp.com";
 
-    public DoiToBibtexConverterComIsbnFetcher(
-        ImportFormatPreferences importFormatPreferences
-    ) {
+    public DoiToBibtexConverterComIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
     }
 
@@ -80,47 +77,20 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
             var type = getElementFromJSONArrayByKey(data, "type");
 
             BibEntry entry = new BibEntry(evaluateBibEntryTypeFromString(type));
-            entry.setField(
-                StandardField.AUTHOR,
-                getElementFromJSONArrayByKey(data, "author")
-            );
-            entry.setField(
-                StandardField.PAGES,
-                getElementFromJSONArrayByKey(data, "pagecount")
-            );
-            entry.setField(
-                StandardField.ISBN,
-                getElementFromJSONArrayByKey(data, "isbn")
-            );
-            entry.setField(
-                StandardField.TITLE,
-                getElementFromJSONArrayByKey(data, "title")
-            );
-            entry.setField(
-                StandardField.YEAR,
-                getElementFromJSONArrayByKey(data, "year")
-            );
-            entry.setField(
-                StandardField.MONTH,
-                getElementFromJSONArrayByKey(data, "month")
-            );
-            entry.setField(
-                StandardField.DAY,
-                getElementFromJSONArrayByKey(data, "day")
-            );
+            entry.setField(StandardField.AUTHOR, getElementFromJSONArrayByKey(data, "author"));
+            entry.setField(StandardField.PAGES, getElementFromJSONArrayByKey(data, "pagecount"));
+            entry.setField(StandardField.ISBN, getElementFromJSONArrayByKey(data, "isbn"));
+            entry.setField(StandardField.TITLE, getElementFromJSONArrayByKey(data, "title"));
+            entry.setField(StandardField.YEAR, getElementFromJSONArrayByKey(data, "year"));
+            entry.setField(StandardField.MONTH, getElementFromJSONArrayByKey(data, "month"));
+            entry.setField(StandardField.DAY, getElementFromJSONArrayByKey(data, "day"));
             return entry;
         } catch (JSONException exception) {
-            throw new ParseException(
-                "CrossRef API JSON format has changed",
-                exception
-            );
+            throw new ParseException("CrossRef API JSON format has changed", exception);
         }
     }
 
-    private String getElementFromJSONArrayByKey(
-        JSONArray jsonArray,
-        String key
-    ) {
+    private String getElementFromJSONArrayByKey(JSONArray jsonArray, String key) {
         return IntStream
             .range(0, jsonArray.length())
             .mapToObj(jsonArray::getJSONObject)

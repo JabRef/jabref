@@ -29,8 +29,7 @@ public class KeyBindingViewModel {
         FXCollections.observableArrayList();
     private final KeyBindingRepository keyBindingRepository;
     private final SimpleStringProperty displayName = new SimpleStringProperty();
-    private final SimpleStringProperty shownBinding =
-        new SimpleStringProperty();
+    private final SimpleStringProperty shownBinding = new SimpleStringProperty();
 
     private final KeyBindingCategory category;
 
@@ -75,20 +74,14 @@ public class KeyBindingViewModel {
         String[] parts = bind.split(" ");
         StringBuilder displayBind = new StringBuilder();
         for (String part : parts) {
-            displayBind
-                .append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part))
-                .append(" ");
+            displayBind.append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part)).append(" ");
         }
-        this.shownBinding.set(
-                displayBind.toString().trim().replace(" ", " + ")
-            );
+        this.shownBinding.set(displayBind.toString().trim().replace(" ", " + "));
     }
 
     private void setDisplayName() {
         this.displayName.set(
-                keyBinding == null
-                    ? this.category.getName()
-                    : keyBinding.getLocalization()
+                keyBinding == null ? this.category.getName() : keyBinding.getLocalization()
             );
     }
 
@@ -136,11 +129,7 @@ public class KeyBindingViewModel {
 
         // if no modifier keys are pressed, only special keys can be shortcuts
         if (modifiers.isEmpty()) {
-            if (
-                !(code.isFunctionKey() ||
-                    (code == KeyCode.ESCAPE) ||
-                    (code == KeyCode.DELETE))
-            ) {
+            if (!(code.isFunctionKey() || (code == KeyCode.ESCAPE) || (code == KeyCode.DELETE))) {
                 return false;
             }
         }
@@ -171,14 +160,10 @@ public class KeyBindingViewModel {
     }
 
     public Optional<JabRefIcon> getResetIcon() {
-        return isCategory()
-            ? Optional.empty()
-            : Optional.of(IconTheme.JabRefIcons.REFRESH);
+        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.REFRESH);
     }
 
     public Optional<JabRefIcon> getClearIcon() {
-        return isCategory()
-            ? Optional.empty()
-            : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
+        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
     }
 }

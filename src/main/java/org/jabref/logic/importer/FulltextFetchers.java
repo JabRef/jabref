@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FulltextFetchers {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FulltextFetchers.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
     // Timeout in seconds
     private static final int FETCHER_TIMEOUT = 10;
@@ -53,12 +51,7 @@ public class FulltextFetchers {
         ImportFormatPreferences importFormatPreferences,
         ImporterPreferences importerPreferences
     ) {
-        this(
-            WebFetchers.getFullTextFetchers(
-                importFormatPreferences,
-                importerPreferences
-            )
-        );
+        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences));
     }
 
     FulltextFetchers(Set<FulltextFetcher> fetcher) {
@@ -68,20 +61,17 @@ public class FulltextFetchers {
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        Optional<DOI> doi = clonedEntry
-            .getField(StandardField.DOI)
-            .flatMap(DOI::parse);
+        Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {
             findDoiForEntry(clonedEntry);
         }
 
-        List<Future<Optional<FetcherResult>>> result =
-            JabRefExecutorService.INSTANCE.executeAll(
-                getCallables(clonedEntry, finders),
-                FETCHER_TIMEOUT,
-                TimeUnit.SECONDS
-            );
+        List<Future<Optional<FetcherResult>>> result = JabRefExecutorService.INSTANCE.executeAll(
+            getCallables(clonedEntry, finders),
+            FETCHER_TIMEOUT,
+            TimeUnit.SECONDS
+        );
 
         return result
             .stream()
@@ -91,9 +81,7 @@ public class FulltextFetchers {
             .filter(res -> Objects.nonNull(res.getSource()))
             .sorted(
                 Comparator
-                    .comparingInt((FetcherResult res) ->
-                        res.getTrust().getTrustScore()
-                    )
+                    .comparingInt((FetcherResult res) -> res.getTrust().getTrustScore())
                     .reversed()
             )
             .map(FetcherResult::getSource)
@@ -105,17 +93,13 @@ public class FulltextFetchers {
             WebFetchers
                 .getIdFetcherForIdentifier(DOI.class)
                 .findIdentifier(clonedEntry)
-                .ifPresent(e ->
-                    clonedEntry.setField(StandardField.DOI, e.getDOI())
-                );
+                .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.getDOI()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }
     }
 
-    private static Optional<FetcherResult> getResults(
-        Future<Optional<FetcherResult>> future
-    ) {
+    private static Optional<FetcherResult> getResults(Future<Optional<FetcherResult>> future) {
         try {
             return future.get();
         } catch (InterruptedException ignore) {
@@ -126,17 +110,13 @@ public class FulltextFetchers {
         return Optional.empty();
     }
 
-    private Callable<Optional<FetcherResult>> getCallable(
-        BibEntry entry,
-        FulltextFetcher fetcher
-    ) {
+    private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
         return () -> {
             try {
                 return fetcher
                     .findFullText(entry)
                     .filter(url -> isPDF.test(url.toString()))
-                    .map(url -> new FetcherResult(fetcher.getTrustLevel(), url)
-                    );
+                    .map(url -> new FetcherResult(fetcher.getTrustLevel(), url));
             } catch (IOException | FetcherException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);
             }
@@ -148,9 +128,6 @@ public class FulltextFetchers {
         BibEntry entry,
         Set<FulltextFetcher> fetchers
     ) {
-        return fetchers
-            .stream()
-            .map(f -> getCallable(entry, f))
-            .collect(Collectors.toList());
+        return fetchers.stream().map(f -> getCallable(entry, f)).collect(Collectors.toList());
     }
 }

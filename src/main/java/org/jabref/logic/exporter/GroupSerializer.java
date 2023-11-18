@@ -107,17 +107,13 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(
             StringUtil.booleanToBinaryString(
-                group
-                    .getSearchFlags()
-                    .contains(SearchRules.SearchFlags.CASE_SENSITIVE)
+                group.getSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE)
             )
         );
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(
             StringUtil.booleanToBinaryString(
-                group
-                    .getSearchFlags()
-                    .contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)
+                group.getSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)
             )
         );
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -127,10 +123,7 @@ public class GroupSerializer {
         return sb.toString();
     }
 
-    private void appendGroupDetails(
-        StringBuilder builder,
-        AbstractGroup group
-    ) {
+    private void appendGroupDetails(StringBuilder builder, AbstractGroup group) {
         builder.append(StringUtil.booleanToBinaryString(group.isExpanded()));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         builder.append(group.getColor().map(Color::toString).orElse(""));
@@ -153,11 +146,7 @@ public class GroupSerializer {
         List<String> representation = new ArrayList<>();
 
         // Append current node
-        representation.add(
-            String.valueOf(node.getLevel()) +
-            ' ' +
-            serializeGroup(node.getGroup())
-        );
+        representation.add(String.valueOf(node.getLevel()) + ' ' + serializeGroup(node.getGroup()));
 
         // Append children
         for (GroupTreeNode child : node.getChildren()) {
@@ -218,9 +207,7 @@ public class GroupSerializer {
 
     private String serializeAutomaticPersonsGroup(AutomaticPersonsGroup group) {
         StringBuilder sb = new StringBuilder();
-        sb.append(
-            MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID
-        );
+        sb.append(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID);
         appendAutomaticGroupDetails(sb, group);
         sb.append(
             StringUtil.quote(
@@ -234,10 +221,7 @@ public class GroupSerializer {
         return sb.toString();
     }
 
-    private void appendAutomaticGroupDetails(
-        StringBuilder builder,
-        AutomaticGroup group
-    ) {
+    private void appendAutomaticGroupDetails(StringBuilder builder, AutomaticGroup group) {
         builder.append(
             StringUtil.quote(
                 group.getName(),
@@ -252,9 +236,7 @@ public class GroupSerializer {
 
     private String serializeAutomaticKeywordGroup(AutomaticKeywordGroup group) {
         StringBuilder sb = new StringBuilder();
-        sb.append(
-            MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID
-        );
+        sb.append(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID);
         appendAutomaticGroupDetails(sb, group);
         sb.append(
             StringUtil.quote(

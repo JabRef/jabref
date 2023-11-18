@@ -60,12 +60,8 @@ public class SlrGitHandler extends GitHandler {
             }
             Repository repository = git.getRepository();
             ObjectId branchHead = sourceBranchRef.get().getObjectId();
-            ObjectId treeIdHead = repository.resolve(
-                branchHead.getName() + "^{tree}"
-            );
-            ObjectId treeIdHeadParent = repository.resolve(
-                branchHead.getName() + "~1^{tree}"
-            );
+            ObjectId treeIdHead = repository.resolve(branchHead.getName() + "^{tree}");
+            ObjectId treeIdHeadParent = repository.resolve(branchHead.getName() + "~1^{tree}");
 
             try (ObjectReader reader = repository.newObjectReader()) {
                 CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
@@ -76,16 +72,9 @@ public class SlrGitHandler extends GitHandler {
                 ByteArrayOutputStream put = new ByteArrayOutputStream();
                 try (DiffFormatter formatter = new DiffFormatter(put)) {
                     formatter.setRepository(git.getRepository());
-                    List<DiffEntry> entries = formatter.scan(
-                        oldTreeIter,
-                        newTreeIter
-                    );
+                    List<DiffEntry> entries = formatter.scan(oldTreeIter, newTreeIter);
                     for (DiffEntry entry : entries) {
-                        if (
-                            entry
-                                .getChangeType()
-                                .equals(DiffEntry.ChangeType.MODIFY)
-                        ) {
+                        if (entry.getChangeType().equals(DiffEntry.ChangeType.MODIFY)) {
                             formatter.format(entry);
                         }
                     }
@@ -105,8 +94,7 @@ public class SlrGitHandler extends GitHandler {
      * @param patch the patch (diff) as a string
      * @return Returns a map where each file has its path as a key and the string contains the hunk of new results
      */
-    Map<Path, String> parsePatchForAddedEntries(String patch)
-        throws IOException, GitAPIException {
+    Map<Path, String> parsePatchForAddedEntries(String patch) throws IOException, GitAPIException {
         String[] tokens = patch.split("\n");
         // Tracks for each file the related diff. Represents each file by its relative path
         Map<Path, String> diffsPerFile = new HashMap<>();
@@ -118,11 +106,7 @@ public class SlrGitHandler extends GitHandler {
             if (currentToken.startsWith("diff --git a/")) {
                 // If the diff is related to a different file, save the diff for the previous file
                 if (!(Objects.isNull(relativePath) || Objects.isNull(joiner))) {
-                    if (
-                        !relativePath.contains(
-                            StudyRepository.STUDY_DEFINITION_FILE_NAME
-                        )
-                    ) {
+                    if (!relativePath.contains(StudyRepository.STUDY_DEFINITION_FILE_NAME)) {
                         diffsPerFile.put(
                             Path.of(repositoryPath.toString(), relativePath),
                             joiner.toString()
@@ -130,16 +114,13 @@ public class SlrGitHandler extends GitHandler {
                     }
                 }
                 // Find the relative path of the file that is related with the current diff
-                relativePath =
-                    currentToken.substring(13, currentToken.indexOf(" b/"));
+                relativePath = currentToken.substring(13, currentToken.indexOf(" b/"));
                 content = false;
                 joiner = new StringJoiner("\n");
                 continue;
             }
             // From here on content follows
-            if (
-                currentToken.startsWith("@@ ") && currentToken.endsWith(" @@")
-            ) {
+            if (currentToken.startsWith("@@ ") && currentToken.endsWith(" @@")) {
                 content = true;
                 continue;
             }
@@ -153,10 +134,7 @@ public class SlrGitHandler extends GitHandler {
         }
         if (!(Objects.isNull(relativePath) || Objects.isNull(joiner))) {
             // For the last file this has to be done at the end
-            diffsPerFile.put(
-                Path.of(repositoryPath.toString(), relativePath),
-                joiner.toString()
-            );
+            diffsPerFile.put(Path.of(repositoryPath.toString(), relativePath), joiner.toString());
         }
         return diffsPerFile;
     }
@@ -175,11 +153,8 @@ public class SlrGitHandler extends GitHandler {
                     if (currentContent.startsWith("% Encoding:")) {
                         int endOfEncoding = currentContent.indexOf("\n");
                         // Include Encoding and the empty line
-                        prefix =
-                            currentContent.substring(0, endOfEncoding + 1) +
-                            "\n";
-                        currentContent =
-                            currentContent.substring(endOfEncoding + 2);
+                        prefix = currentContent.substring(0, endOfEncoding + 1) + "\n";
+                        currentContent = currentContent.substring(endOfEncoding + 2);
                     }
                     Files.writeString(
                         path,

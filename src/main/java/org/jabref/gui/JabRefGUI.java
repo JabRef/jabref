@@ -35,9 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        JabRefGUI.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;
     private final PreferencesService preferencesService;
@@ -69,9 +67,7 @@ public class JabRefGUI {
         openWindow(mainStage);
 
         EasyBind.subscribe(
-            preferencesService
-                .getInternalPreferences()
-                .versionCheckEnabledProperty(),
+            preferencesService.getInternalPreferences().versionCheckEnabledProperty(),
             enabled -> {
                 if (enabled) {
                     new VersionWorker(
@@ -98,17 +94,13 @@ public class JabRefGUI {
 
         if (
             preferencesService.getProxyPreferences().shouldPersistPassword() &&
-            StringUtil.isNotBlank(
-                preferencesService.getProxyPreferences().getPassword()
-            )
+            StringUtil.isNotBlank(preferencesService.getProxyPreferences().getPassword())
         ) {
             ProxyRegisterer.register(preferencesService.getProxyPreferences());
             return;
         }
 
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         Optional<String> password = dialogService.showPasswordDialogAndWait(
             Localization.lang("Proxy configuration"),
             Localization.lang("Proxy requires password"),
@@ -116,9 +108,7 @@ public class JabRefGUI {
         );
 
         if (password.isPresent()) {
-            preferencesService
-                .getProxyPreferences()
-                .setPassword(password.get());
+            preferencesService.getProxyPreferences().setPassword(password.get());
             ProxyRegisterer.register(preferencesService.getProxyPreferences());
         } else {
             LOGGER.warn("No proxy password specified");
@@ -142,9 +132,7 @@ public class JabRefGUI {
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
         }
-        if (
-            (Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()
-        ) {
+        if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
             LOGGER.debug("The Jabref window is outside the main screen");
             mainStage.setX(0);
@@ -210,10 +198,7 @@ public class JabRefGUI {
      */
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (
-            !isBlank &&
-            preferencesService.getWorkspacePreferences().shouldOpenLastEdited()
-        ) {
+        if (!isBlank && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -297,30 +282,20 @@ public class JabRefGUI {
             String message =
                 Localization.lang(
                     "Error opening file '%0'",
-                    pr
-                        .getPath()
-                        .map(Path::toString)
-                        .orElse("(File name unknown)")
+                    pr.getPath().map(Path::toString).orElse("(File name unknown)")
                 ) +
                 "\n" +
                 pr.getErrorMessage();
 
             mainFrame
                 .getDialogService()
-                .showErrorDialogAndWait(
-                    Localization.lang("Error opening file"),
-                    message
-                );
+                .showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
 
         // Display warnings, if any
         int tabNumber = 0;
         for (ParserResult pr : parserResults) {
-            ParserResultWarningDialog.showParserResultWarningDialog(
-                pr,
-                mainFrame,
-                tabNumber++
-            );
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame, tabNumber++);
         }
 
         // After adding the databases, go through each and see if
@@ -332,11 +307,7 @@ public class JabRefGUI {
         // This is because importToOpen might have been used, which adds to
         // loadedDatabases, but not to getBasePanelCount()
 
-        for (
-            int i = 0;
-            (i < parserResults.size()) && (i < mainFrame.getBasePanelCount());
-            i++
-        ) {
+        for (int i = 0; (i < parserResults.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = parserResults.get(i);
             LibraryTab libraryTab = mainFrame.getLibraryTabAt(i);
 
@@ -401,17 +372,12 @@ public class JabRefGUI {
     }
 
     private void openLastEditedDatabases() {
-        List<String> lastFiles = preferencesService
-            .getGuiPreferences()
-            .getLastFilesOpened();
+        List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
         }
 
-        List<Path> filesToOpen = lastFiles
-            .stream()
-            .map(Path::of)
-            .collect(Collectors.toList());
+        List<Path> filesToOpen = lastFiles.stream().map(Path::of).collect(Collectors.toList());
         getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
     }
 

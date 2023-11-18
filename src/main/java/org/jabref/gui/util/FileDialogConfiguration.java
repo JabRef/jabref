@@ -50,16 +50,13 @@ public class FileDialogConfiguration {
         return selectedExtensionFilter;
     }
 
-    public void setSelectedExtensionFilter(
-        FileChooser.ExtensionFilter selectedExtensionFilter
-    ) {
+    public void setSelectedExtensionFilter(FileChooser.ExtensionFilter selectedExtensionFilter) {
         this.selectedExtensionFilter = selectedExtensionFilter;
     }
 
     public static class Builder {
 
-        private final List<FileChooser.ExtensionFilter> extensionFilters =
-            new ArrayList<>();
+        private final List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         private Path initialDirectory;
         private FileChooser.ExtensionFilter defaultExtension;
         private String initialFileName;
@@ -105,9 +102,7 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder withDefaultExtension(
-            FileChooser.ExtensionFilter extensionFilter
-        ) {
+        public Builder withDefaultExtension(FileChooser.ExtensionFilter extensionFilter) {
             defaultExtension = extensionFilter;
             return this;
         }
@@ -117,24 +112,17 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder withDefaultExtension(
-            String description,
-            FileType fileType
-        ) {
-            defaultExtension =
-                FileFilterConverter.toExtensionFilter(description, fileType);
+        public Builder withDefaultExtension(String description, FileType fileType) {
+            defaultExtension = FileFilterConverter.toExtensionFilter(description, fileType);
             return this;
         }
 
         public Builder withDefaultExtension(String fileTypeDescription) {
             extensionFilters
                 .stream()
-                .filter(type ->
-                    type.getDescription().equalsIgnoreCase(fileTypeDescription)
-                )
+                .filter(type -> type.getDescription().equalsIgnoreCase(fileTypeDescription))
                 .findFirst()
-                .ifPresent(extensionFilter -> defaultExtension = extensionFilter
-                );
+                .ifPresent(extensionFilter -> defaultExtension = extensionFilter);
 
             return this;
         }
@@ -144,9 +132,7 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder addExtensionFilter(
-            List<FileChooser.ExtensionFilter> filters
-        ) {
+        public Builder addExtensionFilter(List<FileChooser.ExtensionFilter> filters) {
             extensionFilters.addAll(filters);
             return this;
         }
@@ -159,13 +145,8 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder addExtensionFilter(
-            String description,
-            FileType fileType
-        ) {
-            extensionFilters.add(
-                FileFilterConverter.toExtensionFilter(description, fileType)
-            );
+        public Builder addExtensionFilter(String description, FileType fileType) {
+            extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));
             return this;
         }
     }

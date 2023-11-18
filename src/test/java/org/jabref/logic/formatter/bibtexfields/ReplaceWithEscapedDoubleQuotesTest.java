@@ -17,10 +17,7 @@ public class ReplaceWithEscapedDoubleQuotesTest {
 
     @Test
     public void replacingSingleDoubleQuote() {
-        assertEquals(
-            "single \"\"double quote",
-            formatter.format("single \"double quote")
-        );
+        assertEquals("single \"\"double quote", formatter.format("single \"double quote"));
     }
 
     @Test
@@ -33,10 +30,7 @@ public class ReplaceWithEscapedDoubleQuotesTest {
 
     @Test
     public void replacingSingleDoubleQuoteHavingCommas() {
-        assertEquals(
-            "this \"\"is\"\", a test",
-            formatter.format("this \"is\", a test")
-        );
+        assertEquals("this \"\"is\"\", a test", formatter.format("this \"is\", a test"));
     }
 
     @Test

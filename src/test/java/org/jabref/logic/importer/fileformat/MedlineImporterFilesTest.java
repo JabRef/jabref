@@ -21,37 +21,26 @@ public class MedlineImporterFilesTest {
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name ->
-            !name.startsWith("MedlineImporterTest");
+        Predicate<String> fileName = name -> !name.startsWith("MedlineImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(
-            new MedlineImporter(),
-            fileName
-        );
+        ImporterTestEngine.testIsRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
     public void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(
-            new MedlineImporter(),
-            fileName
-        );
+        ImporterTestEngine.testIsNotRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(
-            new MedlineImporter(),
-            fileName,
-            FILE_ENDING
-        );
+        ImporterTestEngine.testImportEntries(new MedlineImporter(), fileName, FILE_ENDING);
     }
 
     private static Stream<String> malformedFileNames() throws IOException {
@@ -64,9 +53,6 @@ public class MedlineImporterFilesTest {
     @ParameterizedTest
     @MethodSource("malformedFileNames")
     public void testImportMalfomedFiles(String fileName) throws IOException {
-        ImporterTestEngine.testImportMalformedFiles(
-            new MedlineImporter(),
-            fileName
-        );
+        ImporterTestEngine.testImportMalformedFiles(new MedlineImporter(), fileName);
     }
 }

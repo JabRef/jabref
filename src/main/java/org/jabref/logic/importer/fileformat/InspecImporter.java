@@ -23,9 +23,7 @@ import org.jabref.model.entry.types.StandardEntryType;
  */
 public class InspecImporter extends Importer {
 
-    private static final Pattern INSPEC_PATTERN = Pattern.compile(
-        "Record.*INSPEC.*"
-    );
+    private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
     @Override
     public String getName() {
@@ -43,8 +41,7 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader)
-        throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "PY <year>" line.
         String str;
         while ((str = reader.readLine()) != null) {
@@ -56,8 +53,7 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-        throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;
@@ -126,8 +122,7 @@ public class InspecImporter extends Importer {
                         ) {
                             type = StandardEntryType.InProceedings;
                         } else {
-                            type =
-                                EntryTypeFactory.parse(frest.replace(" ", ""));
+                            type = EntryTypeFactory.parse(frest.replace(" ", ""));
                         }
                     }
                 }

@@ -56,9 +56,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
             prefixedIdentifier = "rfc" + prefixedIdentifier;
         }
         URIBuilder uriBuilder = new URIBuilder(
-            "https://datatracker.ietf.org/doc/" +
-            prefixedIdentifier +
-            "/bibtex/"
+            "https://datatracker.ietf.org/doc/" + prefixedIdentifier + "/bibtex/"
         );
         return uriBuilder.build().toURL();
     }

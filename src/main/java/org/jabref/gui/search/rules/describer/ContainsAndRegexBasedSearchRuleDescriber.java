@@ -10,8 +10,7 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.search.rules.SentenceAnalyzer;
 
-public class ContainsAndRegexBasedSearchRuleDescriber
-    implements SearchDescriber {
+public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {
 
     private final EnumSet<SearchFlags> searchFlags;
     private final String query;
@@ -29,9 +28,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber
         List<String> words = new SentenceAnalyzer(query).getWords();
         String firstWord = words.isEmpty() ? "" : words.get(0);
 
-        String temp = searchFlags.contains(
-                SearchRules.SearchFlags.REGULAR_EXPRESSION
-            )
+        String temp = searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)
             ? Localization.lang(
                 "This search contains entries in which any field contains the regular expression <b>%0</b>"
             )
@@ -56,12 +53,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber
                         TooltipTextUtil.TextType.NORMAL
                     )
                 );
-                textList.add(
-                    TooltipTextUtil.createText(
-                        word,
-                        TooltipTextUtil.TextType.BOLD
-                    )
-                );
+                textList.add(TooltipTextUtil.createText(word, TooltipTextUtil.TextType.BOLD));
             }
         }
 

@@ -29,8 +29,7 @@ class AuxParserTest {
 
     @BeforeEach
     void setUp() {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @AfterEach
@@ -40,19 +39,15 @@ class AuxParserTest {
 
     @Test
     void testNormal() throws URISyntaxException, IOException {
-        InputStream originalStream =
-            AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(
-            AuxParserTest.class.getResource("paper.aux").toURI()
-        );
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
+        Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -67,10 +62,8 @@ class AuxParserTest {
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());
             assertEquals(
-                auxResult.getFoundKeysInAux() +
-                auxResult.getCrossRefEntriesCount(),
-                auxResult.getResolvedKeysCount() +
-                auxResult.getUnresolvedKeysCount()
+                auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
+                auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount()
             );
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
@@ -80,19 +73,15 @@ class AuxParserTest {
     void testTwoArgMacro() throws URISyntaxException, IOException {
         // Result should be identical to that of testNormal
 
-        InputStream originalStream =
-            AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(
-            AuxParserTest.class.getResource("papertwoargmacro.aux").toURI()
-        );
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
+        Path auxFile = Path.of(AuxParserTest.class.getResource("papertwoargmacro.aux").toURI());
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -107,10 +96,8 @@ class AuxParserTest {
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());
             assertEquals(
-                auxResult.getFoundKeysInAux() +
-                auxResult.getCrossRefEntriesCount(),
-                auxResult.getResolvedKeysCount() +
-                auxResult.getUnresolvedKeysCount()
+                auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
+                auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount()
             );
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
@@ -118,19 +105,15 @@ class AuxParserTest {
 
     @Test
     void testNotAllFound() throws URISyntaxException, IOException {
-        InputStream originalStream =
-            AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(
-            AuxParserTest.class.getResource("badpaper.aux").toURI()
-        );
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
+        Path auxFile = Path.of(AuxParserTest.class.getResource("badpaper.aux").toURI());
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -142,59 +125,45 @@ class AuxParserTest {
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(3, auxResult.getFoundKeysInAux());
             assertEquals(
-                auxResult.getFoundKeysInAux() +
-                auxResult.getCrossRefEntriesCount(),
-                auxResult.getResolvedKeysCount() +
-                auxResult.getUnresolvedKeysCount()
+                auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
+                auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount()
             );
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
     }
 
     @Test
-    void duplicateBibDatabaseConfiguration()
-        throws URISyntaxException, IOException {
-        InputStream originalStream =
-            AuxParserTest.class.getResourceAsStream("config.bib");
-        Path auxFile = Path.of(
-            AuxParserTest.class.getResource("paper.aux").toURI()
-        );
+    void duplicateBibDatabaseConfiguration() throws URISyntaxException, IOException {
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib");
+        Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
             BibDatabase db = auxResult.getGeneratedBibDatabase();
 
-            assertEquals(
-                Optional.of("\"Maintained by \" # maintainer"),
-                db.getPreamble()
-            );
+            assertEquals(Optional.of("\"Maintained by \" # maintainer"), db.getPreamble());
             assertEquals(1, db.getStringCount());
         }
     }
 
     @Test
     void testNestedAux() throws URISyntaxException, IOException {
-        InputStream originalStream =
-            AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(
-            AuxParserTest.class.getResource("nested.aux").toURI()
-        );
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
+        Path auxFile = Path.of(AuxParserTest.class.getResource("nested.aux").toURI());
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -206,10 +175,8 @@ class AuxParserTest {
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());
             assertEquals(
-                auxResult.getFoundKeysInAux() +
-                auxResult.getCrossRefEntriesCount(),
-                auxResult.getResolvedKeysCount() +
-                auxResult.getUnresolvedKeysCount()
+                auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
+                auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount()
             );
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
@@ -217,19 +184,15 @@ class AuxParserTest {
 
     @Test
     void testCrossRef() throws URISyntaxException, IOException {
-        InputStream originalStream =
-            AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(
-            AuxParserTest.class.getResource("crossref.aux").toURI()
-        );
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
+        Path auxFile = Path.of(AuxParserTest.class.getResource("crossref.aux").toURI());
         try (
             InputStreamReader originalReader = new InputStreamReader(
                 originalStream,
                 StandardCharsets.UTF_8
             )
         ) {
-            ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -241,10 +204,8 @@ class AuxParserTest {
             assertEquals(3, auxResult.getResolvedKeysCount());
             assertEquals(4, auxResult.getFoundKeysInAux());
             assertEquals(
-                auxResult.getFoundKeysInAux() +
-                auxResult.getCrossRefEntriesCount(),
-                auxResult.getResolvedKeysCount() +
-                auxResult.getUnresolvedKeysCount()
+                auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
+                auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount()
             );
             assertEquals(1, auxResult.getCrossRefEntriesCount());
         }
@@ -263,8 +224,7 @@ class AuxParserTest {
         assertEquals(0, auxResult.getFoundKeysInAux());
         assertEquals(
             auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
-            auxResult.getResolvedKeysCount() +
-            auxResult.getUnresolvedKeysCount()
+            auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount()
         );
         assertEquals(0, auxResult.getCrossRefEntriesCount());
     }

@@ -17,12 +17,10 @@ public class ProtectedTermsPreferences {
         List<String> disabledInternalTermLists,
         List<String> disabledExternalTermLists
     ) {
-        this.enabledInternalTermLists =
-            FXCollections.observableArrayList(enabledInternalTermLists);
+        this.enabledInternalTermLists = FXCollections.observableArrayList(enabledInternalTermLists);
         this.disabledInternalTermLists =
             FXCollections.observableArrayList(disabledInternalTermLists);
-        this.enabledExternalTermLists =
-            FXCollections.observableArrayList(enabledExternalTermLists);
+        this.enabledExternalTermLists = FXCollections.observableArrayList(enabledExternalTermLists);
         this.disabledExternalTermLists =
             FXCollections.observableArrayList(disabledExternalTermLists);
     }

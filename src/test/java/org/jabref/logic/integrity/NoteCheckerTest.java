@@ -41,10 +41,7 @@ public class NoteCheckerTest {
 
     @Test
     void bibLaTexAcceptsNoteWithFirstCapitalLetter() {
-        assertEquals(
-            Optional.empty(),
-            checkerBiblatex.checkValue("Lorem ipsum")
-        );
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("Lorem ipsum"));
     }
 
     @Test
@@ -54,9 +51,6 @@ public class NoteCheckerTest {
 
     @Test
     void bibLaTexAcceptsFirstLowercaseLetter() {
-        assertEquals(
-            Optional.empty(),
-            checkerBiblatex.checkValue("lorem ipsum")
-        );
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
     }
 }

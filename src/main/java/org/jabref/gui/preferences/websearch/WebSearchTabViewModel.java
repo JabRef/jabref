@@ -39,36 +39,23 @@ import org.jabref.preferences.PreferencesService;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty enableWebSearchProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty generateKeyOnImportProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty warnAboutDuplicatesOnImportProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty shouldDownloadLinkedOnlineFiles =
-        new SimpleBooleanProperty();
+    private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
+    private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
+    private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
 
-    private final BooleanProperty useCustomDOIProperty =
-        new SimpleBooleanProperty();
-    private final StringProperty useCustomDOINameProperty =
-        new SimpleStringProperty("");
+    private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
+    private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
-    private final ObservableList<StudyCatalogItem> catalogs =
-        FXCollections.observableArrayList();
-    private final BooleanProperty grobidEnabledProperty =
-        new SimpleBooleanProperty();
-    private final StringProperty grobidURLProperty = new SimpleStringProperty(
-        ""
-    );
+    private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList();
+    private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
+    private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    private final ListProperty<FetcherApiKey> apiKeys =
-        new SimpleListProperty<>();
+    private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
     private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty =
         new SimpleObjectProperty<>();
-    private final BooleanProperty apikeyPersistProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty apikeyPersistAvailableProperty =
-        new SimpleBooleanProperty();
+    private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
+    private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -88,24 +75,17 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.grobidPreferences = preferencesService.getGrobidPreferences();
         this.doiPreferences = preferencesService.getDOIPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
-        this.importFormatPreferences =
-            preferencesService.getImportFormatPreferences();
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
     }
 
     @Override
     public void setValues() {
-        enableWebSearchProperty.setValue(
-            importerPreferences.areImporterEnabled()
-        );
-        generateKeyOnImportProperty.setValue(
-            importerPreferences.isGenerateNewKeyOnImport()
-        );
+        enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
+        generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
         warnAboutDuplicatesOnImportProperty.setValue(
             importerPreferences.shouldWarnAboutDuplicatesOnImport()
         );
-        shouldDownloadLinkedOnlineFiles.setValue(
-            filePreferences.shouldDownloadLinkedFiles()
-        );
+        shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
@@ -120,25 +100,16 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         );
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
         apikeyPersistProperty.setValue(
-            preferencesService
-                .getImporterPreferences()
-                .shouldPersistCustomKeys()
+            preferencesService.getImporterPreferences().shouldPersistCustomKeys()
         );
         catalogs.addAll(
             WebFetchers
-                .getSearchBasedFetchers(
-                    importFormatPreferences,
-                    importerPreferences
-                )
+                .getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                 .stream()
                 .map(SearchBasedFetcher::getName)
-                .filter(name ->
-                    !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME)
-                )
+                .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
                 .map(name -> {
-                    boolean enabled = importerPreferences
-                        .getCatalogs()
-                        .contains(name);
+                    boolean enabled = importerPreferences.getCatalogs().contains(name);
                     return new StudyCatalogItem(name, enabled);
                 })
                 .toList()
@@ -147,26 +118,18 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        importerPreferences.setImporterEnabled(
-            enableWebSearchProperty.getValue()
-        );
-        importerPreferences.setGenerateNewKeyOnImport(
-            generateKeyOnImportProperty.getValue()
-        );
+        importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
+        importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(
             warnAboutDuplicatesOnImportProperty.getValue()
         );
-        filePreferences.setDownloadLinkedFiles(
-            shouldDownloadLinkedOnlineFiles.getValue()
-        );
+        filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
 
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
-        doiPreferences.setDefaultBaseURI(
-            useCustomDOINameProperty.getValue().trim()
-        );
+        doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
         importerPreferences.setCatalogs(
             FXCollections.observableList(
                 catalogs
@@ -179,10 +142,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         preferencesService.getImporterPreferences().getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
-            preferencesService
-                .getImporterPreferences()
-                .getApiKeys()
-                .addAll(apiKeys);
+            preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
         }
     }
 
@@ -286,10 +246,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                             .openConnection()).getResponseCode();
                 keyValid = (statusCode >= 200) && (statusCode < 300);
 
-                URLDownload.setSSLVerification(
-                    defaultSslSocketFactory,
-                    defaultHostnameVerifier
-                );
+                URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
             } catch (IOException | UnirestException e) {
                 keyValid = false;
             }

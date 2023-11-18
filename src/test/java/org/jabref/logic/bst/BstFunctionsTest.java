@@ -87,8 +87,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testArithmeticFunctionTypeMismatch()
-        throws RecognitionException {
+    public void testArithmeticFunctionTypeMismatch() throws RecognitionException {
         BstVM vm = new BstVM(
             """
             FUNCTION { test } {
@@ -98,10 +97,7 @@ class BstFunctionsTest {
             """
         );
 
-        assertThrows(
-            BstVMException.class,
-            () -> vm.render(Collections.emptyList())
-        );
+        assertThrows(BstVMException.class, () -> vm.render(Collections.emptyList()));
     }
 
     @Test
@@ -235,9 +231,7 @@ class BstFunctionsTest {
             ITERATE { test }
             """
         );
-        List<BibEntry> testEntry = List.of(
-            new BibEntry(StandardEntryType.Article)
-        );
+        List<BibEntry> testEntry = List.of(new BibEntry(StandardEntryType.Article));
 
         vm.render(testEntry);
 
@@ -261,10 +255,7 @@ class BstFunctionsTest {
 
         vm.render(v);
 
-        assertEquals(
-            "de~la Vall{\\'e}e~Poussin, C.~L. X.~J?",
-            vm.getStack().pop()
-        );
+        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
     }
 
@@ -293,10 +284,7 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertEquals(
-            "de~la Vall{\\'e}e~Poussin, C.~L. X.~J?",
-            vm.getStack().pop()
-        );
+        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
         assertEquals("Annabi, H?", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
     }
@@ -500,8 +488,7 @@ class BstFunctionsTest {
 
         vm.render(Collections.emptyList());
 
-        Map<String, BstFunctions.BstFunction> functions =
-            vm.latestContext.functions();
+        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("test.func"));
         assertNotNull(functions.get("test.func"));
         assertEquals(1, vm.latestContext.integers().get("test.var"));
@@ -684,9 +671,7 @@ class BstFunctionsTest {
 
         vm.render(testEntries);
 
-        assertTrue(
-            vm.latestContext.integers().containsKey("longest.label.width")
-        );
+        assertTrue(vm.latestContext.integers().containsKey("longest.label.width"));
         assertEquals("\\begin{thebibliography}{1}", vm.getStack().pop());
     }
 

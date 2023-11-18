@@ -19,26 +19,21 @@ import org.junit.jupiter.api.Test;
 
 public class EntryAnnotationImporterTest {
 
-    private final BibDatabaseContext databaseContext = mock(
-        BibDatabaseContext.class
-    );
+    private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private BibEntry entry;
 
     @BeforeEach
     public void setUp() {
         entry = new BibEntry();
         when(databaseContext.getFileDirectories(any()))
-            .thenReturn(
-                Collections.singletonList(Path.of("src/test/resources/pdfs/"))
-            );
+            .thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs/")));
     }
 
     @Test
     public void readEntryExampleThesis() {
         // given
         entry.setField(StandardField.FILE, ":thesis-example.pdf:PDF");
-        EntryAnnotationImporter entryAnnotationImporter =
-            new EntryAnnotationImporter(entry);
+        EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
         // when
         Map<Path, List<FileAnnotation>> annotations =

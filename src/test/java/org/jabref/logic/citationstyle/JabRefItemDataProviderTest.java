@@ -16,20 +16,12 @@ class JabRefItemDataProviderTest {
     void toJsonOneEntry() {
         BibDatabase bibDatabase = new BibDatabase(
             List.of(
-                new BibEntry()
-                    .withCitationKey("key")
-                    .withField(StandardField.AUTHOR, "Test Author")
+                new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, "Test Author")
             )
         );
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(
-            bibDatabase
-        );
-        JabRefItemDataProvider jabRefItemDataProvider =
-            new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(
-            bibDatabaseContext,
-            new BibEntryTypesManager()
-        );
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
+        jabRefItemDataProvider.setData(bibDatabaseContext, new BibEntryTypesManager());
         assertEquals(
             """
             [{"id":"key","type":"article","author":[{"family":"Author","given":"Test"}]}]""",
@@ -49,15 +41,9 @@ class JabRefItemDataProviderTest {
                     .withField(StandardField.AUTHOR, "Second Author")
             )
         );
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(
-            bibDatabase
-        );
-        JabRefItemDataProvider jabRefItemDataProvider =
-            new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(
-            bibDatabaseContext,
-            new BibEntryTypesManager()
-        );
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
+        jabRefItemDataProvider.setData(bibDatabaseContext, new BibEntryTypesManager());
         assertEquals(
             """
             [{"id":"key","type":"article","author":[{"family":"Author","given":"Test"}]},{"id":"key2","type":"article","author":[{"family":"Author","given":"Second"}]}]""",

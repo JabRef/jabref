@@ -23,10 +23,7 @@ public class KeywordListTest {
 
     @Test
     public void parseOneWordReturnsOneKeyword() throws Exception {
-        assertEquals(
-            new KeywordList("keywordOne"),
-            KeywordList.parse("keywordOne", ',')
-        );
+        assertEquals(new KeywordList("keywordOne"), KeywordList.parse("keywordOne", ','));
     }
 
     @Test
@@ -46,8 +43,7 @@ public class KeywordListTest {
     }
 
     @Test
-    public void parseTwoWordReturnsTwoKeywordsWithDifferentDelimiter()
-        throws Exception {
+    public void parseTwoWordReturnsTwoKeywordsWithDifferentDelimiter() throws Exception {
         assertEquals(
             new KeywordList("keywordOne", "keywordTwo"),
             KeywordList.parse("keywordOne| keywordTwo", '|')
@@ -56,15 +52,11 @@ public class KeywordListTest {
 
     @Test
     public void parseWordsWithWhitespaceReturnsOneKeyword() throws Exception {
-        assertEquals(
-            new KeywordList("keyword and one"),
-            KeywordList.parse("keyword and one", ',')
-        );
+        assertEquals(new KeywordList("keyword and one"), KeywordList.parse("keyword and one", ','));
     }
 
     @Test
-    public void parseWordsWithWhitespaceAndCommaReturnsTwoKeyword()
-        throws Exception {
+    public void parseWordsWithWhitespaceAndCommaReturnsTwoKeyword() throws Exception {
         assertEquals(
             new KeywordList("keyword and one", "and two"),
             KeywordList.parse("keyword and one, and two", ',')
@@ -89,10 +81,7 @@ public class KeywordListTest {
 
     @Test
     public void parseWordsWithBracketsReturnsOneKeyword() throws Exception {
-        assertEquals(
-            new KeywordList("[a] keyword"),
-            KeywordList.parse("[a] keyword", ',')
-        );
+        assertEquals(new KeywordList("[a] keyword"), KeywordList.parse("[a] keyword", ','));
     }
 
     @Test
@@ -117,51 +106,31 @@ public class KeywordListTest {
 
         assertEquals(
             new KeywordList(expectedOne, expectedTwo),
-            KeywordList.parse(
-                "Parent1 > Node1 > Child1, Parent2 > Node2 > Child2",
-                ',',
-                '>'
-            )
+            KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>')
         );
     }
 
     @Test
     public void mergeTwoIdenticalKeywordsShouldReturnOnKeyword() {
-        assertEquals(
-            new KeywordList("JabRef"),
-            KeywordList.merge("JabRef", "JabRef", ',')
-        );
+        assertEquals(new KeywordList("JabRef"), KeywordList.merge("JabRef", "JabRef", ','));
     }
 
     @Test
     public void mergeOneEmptyKeywordAnAnotherNonEmptyShouldReturnTheNonEmptyKeyword() {
-        assertEquals(
-            new KeywordList("JabRef"),
-            KeywordList.merge("", "JabRef", ',')
-        );
+        assertEquals(new KeywordList("JabRef"), KeywordList.merge("", "JabRef", ','));
     }
 
     @Test
     public void mergeTwoDistinctKeywordsShouldReturnTheTwoKeywordsMerged() {
-        assertEquals(
-            new KeywordList("Figma", "JabRef"),
-            KeywordList.merge("Figma", "JabRef", ',')
-        );
-        assertEquals(
-            new KeywordList("JabRef", "Figma"),
-            KeywordList.merge("Figma", "JabRef", ',')
-        );
+        assertEquals(new KeywordList("Figma", "JabRef"), KeywordList.merge("Figma", "JabRef", ','));
+        assertEquals(new KeywordList("JabRef", "Figma"), KeywordList.merge("Figma", "JabRef", ','));
     }
 
     @Test
     public void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(
             new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"),
-            KeywordList.merge(
-                "Figma, Adobe, JetBrains, Eclipse",
-                "Adobe, JabRef",
-                ','
-            )
+            KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ',')
         );
     }
 }

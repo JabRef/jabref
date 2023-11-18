@@ -53,9 +53,6 @@ public class TrimWhitespaceFormatterTest {
     public void removeMixedWhitespaceChars() {
         assertEquals("whitespace", formatter.format(" \r\t\fwhitespace"));
         assertEquals("whitespace", formatter.format("whitespace \n \r"));
-        assertEquals(
-            "whitespace",
-            formatter.format("   \f\t whitespace  \r \n")
-        );
+        assertEquals("whitespace", formatter.format("   \f\t whitespace  \r \n"));
     }
 }

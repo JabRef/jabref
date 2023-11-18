@@ -34,9 +34,7 @@ public class PdfAnnotationImporterTest {
     public void invalidDocumentType() {
         assertEquals(
             Collections.emptyList(),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/write-protected.docx")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/write-protected.docx"))
         );
     }
 
@@ -44,9 +42,7 @@ public class PdfAnnotationImporterTest {
     public void noAnnotationsWriteProtected() {
         assertEquals(
             Collections.emptyList(),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/write-protected.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/write-protected.pdf"))
         );
     }
 
@@ -54,9 +50,7 @@ public class PdfAnnotationImporterTest {
     public void noAnnotationsEncrypted() {
         assertEquals(
             Collections.emptyList(),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/encrypted.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/encrypted.pdf"))
         );
     }
 
@@ -64,11 +58,7 @@ public class PdfAnnotationImporterTest {
     public void twoAnnotationsThesisExample() {
         assertEquals(
             2,
-            importer
-                .importAnnotations(
-                    Path.of("src/test/resources/pdfs/thesis-example.pdf")
-                )
-                .size()
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/thesis-example.pdf")).size()
         );
     }
 
@@ -76,9 +66,7 @@ public class PdfAnnotationImporterTest {
     public void noAnnotationsMinimal() {
         assertEquals(
             Collections.emptyList(),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal.pdf"))
         );
     }
 
@@ -95,9 +83,7 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(
             Collections.singletonList(expected),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal-inlinenote.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-inlinenote.pdf"))
         );
     }
 
@@ -114,9 +100,7 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(
             Collections.singletonList(expected),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal-popup.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-popup.pdf"))
         );
     }
 
@@ -194,9 +178,7 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(
             Collections.singletonList(expected),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal-squiggly.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-squiggly.pdf"))
         );
     }
 
@@ -221,9 +203,7 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(
             Collections.singletonList(expected),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal-strikeout.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-strikeout.pdf"))
         );
     }
 
@@ -249,9 +229,7 @@ public class PdfAnnotationImporterTest {
         assertEquals(
             Collections.singletonList(expected),
             importer.importAnnotations(
-                Path.of(
-                    "src/test/resources/pdfs/minimal-highlight-with-note.pdf"
-                )
+                Path.of("src/test/resources/pdfs/minimal-highlight-with-note.pdf")
             )
         );
     }
@@ -277,9 +255,7 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(
             Collections.singletonList(expected),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal-underline.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-underline.pdf"))
         );
     }
 
@@ -296,9 +272,7 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(
             Collections.singletonList(expected),
-            importer.importAnnotations(
-                Path.of("src/test/resources/pdfs/minimal-polygon.pdf")
-            )
+            importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-polygon.pdf"))
         );
     }
 }

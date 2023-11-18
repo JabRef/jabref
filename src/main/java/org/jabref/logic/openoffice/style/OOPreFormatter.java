@@ -59,9 +59,7 @@ public class OOPreFormatter implements LayoutFormatter {
                     currentCommand.append(c);
                     testCharCom:if (
                         (currentCommand.length() == 1) &&
-                        StringUtil.SPECIAL_COMMAND_CHARS.contains(
-                            currentCommand.toString()
-                        )
+                        StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
                     ) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -74,19 +72,13 @@ public class OOPreFormatter implements LayoutFormatter {
                         c = finalResult.charAt(i);
                         String combody;
                         if (c == '{') {
-                            String part = StringUtil.getPart(
-                                finalResult,
-                                i,
-                                false
-                            );
+                            String part = StringUtil.getPart(finalResult, i, false);
                             i += part.length();
                             combody = part;
                         } else {
                             combody = finalResult.substring(i, i + 1);
                         }
-                        String result = OOPreFormatter.CHARS.get(
-                            command + combody
-                        );
+                        String result = OOPreFormatter.CHARS.get(command + combody);
 
                         if (result != null) {
                             sb.append(result);
@@ -100,9 +92,7 @@ public class OOPreFormatter implements LayoutFormatter {
                             String command = currentCommand.toString();
                             String result = OOPreFormatter.CHARS.get(command);
                             // If found, then use translated version. If not, then keep the text of the parameter intact.
-                            sb.append(
-                                Objects.requireNonNullElse(result, command)
-                            );
+                            sb.append(Objects.requireNonNullElse(result, command));
                         }
                     }
                 }
@@ -111,9 +101,7 @@ public class OOPreFormatter implements LayoutFormatter {
 
                 if (!incommand) {
                     sb.append(c);
-                } else if (
-                    Character.isWhitespace(c) || (c == '{') || (c == '}')
-                ) {
+                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
                     String command = currentCommand.toString();
 
                     // Test if we are dealing with a formatting command. If so, handle.
@@ -134,9 +122,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         i += part.length();
                         argument = part;
                         // handle common case of general latex command
-                        String result = OOPreFormatter.CHARS.get(
-                            command + argument
-                        );
+                        String result = OOPreFormatter.CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep the text of the parameter intact.
                         sb.append(Objects.requireNonNullElse(result, argument));
                     } else if (c == '}') {

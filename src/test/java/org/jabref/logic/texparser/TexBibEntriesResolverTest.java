@@ -38,20 +38,15 @@ public class TexBibEntriesResolverTest {
 
     @BeforeEach
     void setUp() {
-        libraryPreferences =
-            mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         database = new BibDatabase();
         database2 = new BibDatabase();
 
         BibEntry darwin = new BibEntry(StandardEntryType.Book)
             .withCitationKey(DARWIN)
-            .withField(
-                StandardField.TITLE,
-                "The descent of man, and selection in relation to sex"
-            )
+            .withField(StandardField.TITLE, "The descent of man, and selection in relation to sex")
             .withField(StandardField.PUBLISHER, "J. Murray")
             .withField(StandardField.YEAR, "1888")
             .withField(StandardField.AUTHOR, "Darwin, Charles");
@@ -59,10 +54,7 @@ public class TexBibEntriesResolverTest {
 
         BibEntry einstein = new BibEntry(StandardEntryType.Book)
             .withCitationKey(EINSTEIN)
-            .withField(
-                StandardField.TITLE,
-                "Relativity: The special and general theory"
-            )
+            .withField(StandardField.TITLE, "Relativity: The special and general theory")
             .withField(StandardField.PUBLISHER, "Penguin")
             .withField(StandardField.YEAR, "1920")
             .withField(StandardField.AUTHOR, "Einstein, Albert");
@@ -100,10 +92,7 @@ public class TexBibEntriesResolverTest {
         bibEntry =
             new BibEntry(StandardEntryType.InBook)
                 .withCitationKey(EINSTEIN_A)
-                .withField(
-                    StandardField.TITLE,
-                    "Relativity: The special and general theory"
-                )
+                .withField(StandardField.TITLE, "Relativity: The special and general theory")
                 .withField(StandardField.PUBLISHER, "Penguin")
                 .withField(StandardField.YEAR, "1920")
                 .withField(StandardField.AUTHOR, "Einstein, Albert")
@@ -113,69 +102,59 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testSingleFile() throws URISyntaxException {
-        Path texFile = Path.of(
-            TexBibEntriesResolverTest.class.getResource("paper.tex").toURI()
-        );
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult =
-            new TexBibEntriesResolver(
-                database,
-                libraryPreferences,
-                importFormatPreferences,
-                fileMonitor
-            )
-                .resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult =
-            new LatexBibEntriesResolverResult(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(
+            database,
+            libraryPreferences,
+            importFormatPreferences,
+            fileMonitor
+        )
+            .resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(
+            parserResult
+        );
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testTwoFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            TexBibEntriesResolverTest.class.getResource("paper.tex").toURI()
-        );
-        Path texFile2 = Path.of(
-            TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI()
-        );
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        Path texFile2 = Path.of(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser()
             .parse(Arrays.asList(texFile, texFile2));
 
-        LatexBibEntriesResolverResult crossingResult =
-            new TexBibEntriesResolver(
-                database,
-                libraryPreferences,
-                importFormatPreferences,
-                fileMonitor
-            )
-                .resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult =
-            new LatexBibEntriesResolverResult(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(
+            database,
+            libraryPreferences,
+            importFormatPreferences,
+            fileMonitor
+        )
+            .resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(
+            parserResult
+        );
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testDuplicateFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            TexBibEntriesResolverTest.class.getResource("paper.tex").toURI()
-        );
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult =
-            new TexBibEntriesResolver(
-                database,
-                libraryPreferences,
-                importFormatPreferences,
-                fileMonitor
-            )
-                .resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult =
-            new LatexBibEntriesResolverResult(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(
+            database,
+            libraryPreferences,
+            importFormatPreferences,
+            fileMonitor
+        )
+            .resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(
+            parserResult
+        );
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
@@ -183,66 +162,58 @@ public class TexBibEntriesResolverTest {
     @Test
     public void testUnknownKey() throws URISyntaxException {
         Path texFile = Path.of(
-            TexBibEntriesResolverTest.class.getResource("unknown_key.tex")
-                .toURI()
+            TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI()
         );
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult =
-            new TexBibEntriesResolver(
-                database,
-                libraryPreferences,
-                importFormatPreferences,
-                fileMonitor
-            )
-                .resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult =
-            new LatexBibEntriesResolverResult(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(
+            database,
+            libraryPreferences,
+            importFormatPreferences,
+            fileMonitor
+        )
+            .resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(
+            parserResult
+        );
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testNestedFiles() throws URISyntaxException {
-        Path texFile = Path.of(
-            TexBibEntriesResolverTest.class.getResource("nested.tex").toURI()
-        );
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult =
-            new TexBibEntriesResolver(
-                database,
-                libraryPreferences,
-                importFormatPreferences,
-                fileMonitor
-            )
-                .resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult =
-            new LatexBibEntriesResolverResult(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(
+            database,
+            libraryPreferences,
+            importFormatPreferences,
+            fileMonitor
+        )
+            .resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(
+            parserResult
+        );
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testCrossRef() throws URISyntaxException {
-        Path texFile = Path.of(
-            TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI()
-        );
-        LatexParserResult parserResult = new DefaultLatexParser()
-            .parse(texFile);
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult =
-            new TexBibEntriesResolver(
-                database,
-                libraryPreferences,
-                importFormatPreferences,
-                fileMonitor
-            )
-                .resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult =
-            new LatexBibEntriesResolverResult(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(
+            database,
+            libraryPreferences,
+            importFormatPreferences,
+            fileMonitor
+        )
+            .resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(
+            parserResult
+        );
 
         expectedCrossingResult.addEntry(bibEntry);
 

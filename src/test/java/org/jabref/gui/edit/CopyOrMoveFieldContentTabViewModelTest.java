@@ -30,12 +30,9 @@ public class CopyOrMoveFieldContentTabViewModelTest {
                 .withField(StandardField.YEAR, "2015")
                 .withField(StandardField.DATE, "2014");
 
-        entryB =
-            new BibEntry(BibEntry.DEFAULT_TYPE)
-                .withField(StandardField.DATE, "1998");
+        entryB = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.DATE, "1998");
         bibDatabase = new BibDatabase();
-        copyOrMoveFieldContentTabViewModel =
-            newTwoFieldsViewModel(entryA, entryB);
+        copyOrMoveFieldContentTabViewModel = newTwoFieldsViewModel(entryA, entryB);
     }
 
     @Test
@@ -43,15 +40,9 @@ public class CopyOrMoveFieldContentTabViewModelTest {
         CopyOrMoveFieldContentTabViewModel copyOrMoveFieldContentTabViewModel =
             newTwoFieldsViewModel(entryA, entryB);
 
-        copyOrMoveFieldContentTabViewModel
-            .fromFieldProperty()
-            .set(StandardField.YEAR);
-        copyOrMoveFieldContentTabViewModel
-            .toFieldProperty()
-            .set(StandardField.DATE);
-        copyOrMoveFieldContentTabViewModel
-            .overwriteFieldContentProperty()
-            .set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
         copyOrMoveFieldContentTabViewModel.copyValue();
 
         assertEquals(
@@ -73,15 +64,9 @@ public class CopyOrMoveFieldContentTabViewModelTest {
 
     @Test
     void swapValuesShouldNotSwapFieldValuesIfOneOfTheValuesIsBlank() {
-        copyOrMoveFieldContentTabViewModel
-            .fromFieldProperty()
-            .set(StandardField.YEAR);
-        copyOrMoveFieldContentTabViewModel
-            .toFieldProperty()
-            .set(StandardField.DATE);
-        copyOrMoveFieldContentTabViewModel
-            .overwriteFieldContentProperty()
-            .set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
 
         copyOrMoveFieldContentTabViewModel.swapValues();
 
@@ -91,39 +76,24 @@ public class CopyOrMoveFieldContentTabViewModelTest {
 
     @Test
     void swapValuesShouldSwapFieldValuesIfBothValuesAreNotBlank() {
-        copyOrMoveFieldContentTabViewModel
-            .fromFieldProperty()
-            .set(StandardField.YEAR);
-        copyOrMoveFieldContentTabViewModel
-            .toFieldProperty()
-            .set(StandardField.DATE);
-        copyOrMoveFieldContentTabViewModel
-            .overwriteFieldContentProperty()
-            .set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
 
         copyOrMoveFieldContentTabViewModel.swapValues();
 
         assertEquals(
             List.of(Optional.of("2014"), Optional.of("2015")),
-            List.of(
-                entryA.getField(StandardField.YEAR),
-                entryA.getField(StandardField.DATE)
-            ),
+            List.of(entryA.getField(StandardField.YEAR), entryA.getField(StandardField.DATE)),
             "YEAR and DATE values didn't swap"
         );
     }
 
     @Test
     void moveValueShouldNotMoveValueIfToFieldIsNotBlankAndOverwriteIsNotEnabled() {
-        copyOrMoveFieldContentTabViewModel
-            .fromFieldProperty()
-            .set(StandardField.YEAR);
-        copyOrMoveFieldContentTabViewModel
-            .toFieldProperty()
-            .set(StandardField.DATE);
-        copyOrMoveFieldContentTabViewModel
-            .overwriteFieldContentProperty()
-            .set(false);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(false);
 
         copyOrMoveFieldContentTabViewModel.moveValue();
 
@@ -133,15 +103,9 @@ public class CopyOrMoveFieldContentTabViewModelTest {
 
     @Test
     void moveValueShouldMoveValueIfOverwriteIsEnabled() {
-        copyOrMoveFieldContentTabViewModel
-            .fromFieldProperty()
-            .set(StandardField.DATE);
-        copyOrMoveFieldContentTabViewModel
-            .toFieldProperty()
-            .set(StandardField.YEAR);
-        copyOrMoveFieldContentTabViewModel
-            .overwriteFieldContentProperty()
-            .set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
 
         copyOrMoveFieldContentTabViewModel.moveValue();
 
@@ -149,9 +113,7 @@ public class CopyOrMoveFieldContentTabViewModelTest {
         assertEquals(Optional.empty(), entryB.getField(StandardField.DATE));
     }
 
-    private CopyOrMoveFieldContentTabViewModel newTwoFieldsViewModel(
-        BibEntry... selectedEntries
-    ) {
+    private CopyOrMoveFieldContentTabViewModel newTwoFieldsViewModel(BibEntry... selectedEntries) {
         return new CopyOrMoveFieldContentTabViewModel(
             List.of(selectedEntries),
             bibDatabase,

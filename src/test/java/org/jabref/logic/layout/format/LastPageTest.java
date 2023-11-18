@@ -15,10 +15,7 @@ public class LastPageTest {
     @ParameterizedTest
     @MethodSource("provideArguments")
     void formatLastPage(String formattedText, String originalText) {
-        assertEquals(
-            formattedText,
-            lastPageLayoutFormatter.format(originalText)
-        );
+        assertEquals(formattedText, lastPageLayoutFormatter.format(originalText));
     }
 
     private static Stream<Arguments> provideArguments() {

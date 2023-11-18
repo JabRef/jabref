@@ -68,11 +68,7 @@ public class PersonNamesCheckerTest {
     }
 
     private static Stream<String> provideCorrectFormats() {
-        return Stream.of(
-            "",
-            "Knuth",
-            "Donald E. Knuth and Kurt Cobain and A. Einstein"
-        );
+        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein");
     }
 
     private static Stream<String> provideIncorrectFormats() {

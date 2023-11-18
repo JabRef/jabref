@@ -59,9 +59,7 @@ class FileFieldParserTest {
             Arguments.of(Collections.emptyList(), ""),
             // correct input
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("Desc", Path.of("File.PDF"), "PDF")
-                ),
+                Collections.singletonList(new LinkedFile("Desc", Path.of("File.PDF"), "PDF")),
                 "Desc:File.PDF:PDF"
             ),
             // Mendeley input
@@ -80,21 +78,14 @@ class FileFieldParserTest {
             // parseCorrectOnlineInput
             Arguments.of(
                 Collections.singletonList(
-                    new LinkedFile(
-                        new URL("http://arxiv.org/pdf/2010.08497v1"),
-                        "PDF"
-                    )
+                    new LinkedFile(new URL("http://arxiv.org/pdf/2010.08497v1"), "PDF")
                 ),
                 ":http\\://arxiv.org/pdf/2010.08497v1:PDF"
             ),
             // parseFaultyOnlineInput
             Arguments.of(
                 Collections.singletonList(
-                    new LinkedFile(
-                        "",
-                        "htt://arxiv.org/pdf/2010.08497v1",
-                        "PDF"
-                    )
+                    new LinkedFile("", "htt://arxiv.org/pdf/2010.08497v1", "PDF")
                 ),
                 ":htt\\://arxiv.org/pdf/2010.08497v1:PDF"
             ),
@@ -111,16 +102,12 @@ class FileFieldParserTest {
             ),
             // ignoreMissingDescription
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("", Path.of("wei2005ahp.pdf"), "PDF")
-                ),
+                Collections.singletonList(new LinkedFile("", Path.of("wei2005ahp.pdf"), "PDF")),
                 ":wei2005ahp.pdf:PDF"
             ),
             // interpretLinkAsOnlyMandatoryField: single
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("", Path.of("wei2005ahp.pdf"), "")
-                ),
+                Collections.singletonList(new LinkedFile("", Path.of("wei2005ahp.pdf"), "")),
                 "wei2005ahp.pdf"
             ),
             // interpretLinkAsOnlyMandatoryField: multiple
@@ -141,26 +128,18 @@ class FileFieldParserTest {
             // handleXmlCharacters
             Arguments.of(
                 Collections.singletonList(
-                    new LinkedFile(
-                        "test&#44;st:;",
-                        Path.of("wei2005ahp.pdf"),
-                        "PDF"
-                    )
+                    new LinkedFile("test&#44;st:;", Path.of("wei2005ahp.pdf"), "PDF")
                 ),
                 "test&#44\\;st\\:\\;:wei2005ahp.pdf:PDF"
             ),
             // handleEscapedFilePath
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("desc", Path.of("C:\\test.pdf"), "PDF")
-                ),
+                Collections.singletonList(new LinkedFile("desc", Path.of("C:\\test.pdf"), "PDF")),
                 "desc:C\\:\\\\test.pdf:PDF"
             ),
             // handleNonEscapedFilePath
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("desc", Path.of("C:\\test.pdf"), "PDF")
-                ),
+                Collections.singletonList(new LinkedFile("desc", Path.of("C:\\test.pdf"), "PDF")),
                 "desc:C:\\test.pdf:PDF"
             ),
             // Source: https://github.com/JabRef/jabref/issues/8991#issuecomment-1214131042
@@ -176,30 +155,22 @@ class FileFieldParserTest {
             ),
             // subsetOfFieldsResultsInFileLink: description only
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("", Path.of("file.pdf"), "")
-                ),
+                Collections.singletonList(new LinkedFile("", Path.of("file.pdf"), "")),
                 "file.pdf::"
             ),
             // subsetOfFieldsResultsInFileLink: file only
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("", Path.of("file.pdf"), "")
-                ),
+                Collections.singletonList(new LinkedFile("", Path.of("file.pdf"), "")),
                 ":file.pdf"
             ),
             // subsetOfFieldsResultsInFileLink: type only
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("", Path.of("file.pdf"), "")
-                ),
+                Collections.singletonList(new LinkedFile("", Path.of("file.pdf"), "")),
                 "::file.pdf"
             ),
             // tooManySeparators
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile("desc", Path.of("file.pdf"), "PDF")
-                ),
+                Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF")),
                 "desc:file.pdf:PDF:asdf"
             ),
             // www inside filename
@@ -211,37 +182,25 @@ class FileFieldParserTest {
             ),
             // url
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile(new URL("https://books.google.de/"), "")
-                ),
+                Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
                 "https://books.google.de/"
             ),
             // url with www
             Arguments.of(
-                Collections.singletonList(
-                    new LinkedFile(new URL("https://www.google.de/"), "")
-                ),
+                Collections.singletonList(new LinkedFile(new URL("https://www.google.de/"), "")),
                 "https://www.google.de/"
             ),
             // url as file
             Arguments.of(
                 Collections.singletonList(
-                    new LinkedFile(
-                        "",
-                        new URL("http://ceur-ws.org/Vol-438"),
-                        "URL"
-                    )
+                    new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")
                 ),
                 ":http\\://ceur-ws.org/Vol-438:URL"
             ),
             // url as file with desc
             Arguments.of(
                 Collections.singletonList(
-                    new LinkedFile(
-                        "desc",
-                        new URL("http://ceur-ws.org/Vol-438"),
-                        "URL"
-                    )
+                    new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")
                 ),
                 "desc:http\\://ceur-ws.org/Vol-438:URL"
             )

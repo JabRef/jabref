@@ -22,13 +22,9 @@ class StudyYamlParserTest {
 
     @BeforeEach
     void setupStudy() throws Exception {
-        Path destination = testDirectory.resolve(
-            StudyRepository.STUDY_DEFINITION_FILE_NAME
-        );
+        Path destination = testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         URL studyDefinition =
-            StudyYamlParser.class.getResource(
-                    StudyRepository.STUDY_DEFINITION_FILE_NAME
-                );
+            StudyYamlParser.class.getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, true);
 
         List<String> authors = List.of("Jab Ref");
@@ -47,23 +43,13 @@ class StudyYamlParserTest {
         );
 
         expectedStudy =
-            new Study(
-                authors,
-                studyName,
-                researchQuestions,
-                queryEntries,
-                libraryEntries
-            );
+            new Study(authors, studyName, researchQuestions, queryEntries, libraryEntries);
     }
 
     @Test
     public void parseStudyFileSuccessfully() throws Exception {
         Study study = new StudyYamlParser()
-            .parseStudyYamlFile(
-                testDirectory.resolve(
-                    StudyRepository.STUDY_DEFINITION_FILE_NAME
-                )
-            );
+            .parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
@@ -72,16 +58,10 @@ class StudyYamlParserTest {
         new StudyYamlParser()
             .writeStudyYamlFile(
                 expectedStudy,
-                testDirectory.resolve(
-                    StudyRepository.STUDY_DEFINITION_FILE_NAME
-                )
+                testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME)
             );
         Study study = new StudyYamlParser()
-            .parseStudyYamlFile(
-                testDirectory.resolve(
-                    StudyRepository.STUDY_DEFINITION_FILE_NAME
-                )
-            );
+            .parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
@@ -91,10 +71,8 @@ class StudyYamlParserTest {
         // If the field is "just" removed from the datamodel, one gets following exception:
         //   com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "last-search-date" (class org.jabref.model.study.Study), not marked as ignorable (5 known properties: "authors", "research-questions", "queries", "title", "databases"])
         // This tests ensures that this exception does not occur
-        URL studyDefinition =
-            StudyYamlParser.class.getResource("study-jabref-5.7.yml");
-        Study study = new StudyYamlParser()
-            .parseStudyYamlFile(Path.of(studyDefinition.toURI()));
+        URL studyDefinition = StudyYamlParser.class.getResource("study-jabref-5.7.yml");
+        Study study = new StudyYamlParser().parseStudyYamlFile(Path.of(studyDefinition.toURI()));
         assertEquals(expectedStudy, study);
     }
 }

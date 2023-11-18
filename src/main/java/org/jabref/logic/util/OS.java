@@ -51,28 +51,18 @@ public class OS {
     public static boolean isKeyringAvailable() {
         try (Keyring keyring = Keyring.create()) {
             keyring.setPassword("JabRef", "keyringTest", "keyringTest");
-            if (
-                !"keyringTest".equals(
-                        keyring.getPassword("JabRef", "keyringTest")
-                    )
-            ) {
+            if (!"keyringTest".equals(keyring.getPassword("JabRef", "keyringTest"))) {
                 return false;
             }
             keyring.deletePassword("JabRef", "keyringTest");
         } catch (BackendNotSupportedException ex) {
-            LoggerFactory
-                .getLogger(OS.class)
-                .warn("Credential store not supported.");
+            LoggerFactory.getLogger(OS.class).warn("Credential store not supported.");
             return false;
         } catch (PasswordAccessException ex) {
-            LoggerFactory
-                .getLogger(OS.class)
-                .warn("Password storage in credential store failed.");
+            LoggerFactory.getLogger(OS.class).warn("Password storage in credential store failed.");
             return false;
         } catch (Exception ex) {
-            LoggerFactory
-                .getLogger(OS.class)
-                .warn("Connection to credential store failed");
+            LoggerFactory.getLogger(OS.class).warn("Connection to credential store failed");
             return false;
         }
         return true;

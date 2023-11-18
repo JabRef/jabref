@@ -32,19 +32,14 @@ public class CitationStyleCache {
                         @Override
                         public String load(BibEntry entry) {
                             if (citationStyle != null) {
-                                return citationStyle.generatePreview(
-                                    entry,
-                                    databaseContext
-                                );
+                                return citationStyle.generatePreview(entry, databaseContext);
                             } else {
                                 return "";
                             }
                         }
                     }
                 );
-        databaseContext
-            .getDatabase()
-            .registerListener(new BibDatabaseEntryListener());
+        databaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
     }
 
     /**

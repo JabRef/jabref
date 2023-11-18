@@ -35,26 +35,22 @@ public class MainTableFieldValueFormatter {
      * @param entry the BibEntry of {@link BibEntryTableViewModel}.
      * @return The formatted name field.
      */
-    public String formatFieldsValues(
-        final OrFields fields,
-        final BibEntry entry
-    ) {
+    public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields.getFields()) {
             if (
                 field.getProperties().contains(FieldProperty.PERSON_NAMES) &&
                 (displayStyle != DisplayStyle.AS_IS)
             ) {
-                Optional<String> name = entry.getResolvedFieldOrAlias(
-                    field,
-                    bibDatabase
-                );
+                Optional<String> name = entry.getResolvedFieldOrAlias(field, bibDatabase);
 
                 if (name.isPresent()) {
                     return formatFieldWithAuthorValue(name.get());
                 }
             } else {
-                Optional<String> content =
-                    entry.getResolvedFieldOrAliasLatexFree(field, bibDatabase);
+                Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(
+                    field,
+                    bibDatabase
+                );
 
                 if (content.isPresent()) {
                     return content.get();
@@ -90,16 +86,10 @@ public class MainTableFieldValueFormatter {
             default -> nameToFormat;
             case FIRSTNAME_LASTNAME -> authors
                 .latexFree()
-                .getAsFirstLastNames(
-                    abbreviationStyle == AbbreviationStyle.FULL,
-                    false
-                );
+                .getAsFirstLastNames(abbreviationStyle == AbbreviationStyle.FULL, false);
             case LASTNAME_FIRSTNAME -> authors
                 .latexFree()
-                .getAsLastFirstNames(
-                    abbreviationStyle == AbbreviationStyle.FULL,
-                    false
-                );
+                .getAsLastFirstNames(abbreviationStyle == AbbreviationStyle.FULL, false);
             case NATBIB -> authors.latexFree().getAsNatbib();
         };
     }

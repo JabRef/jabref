@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-public class ScholarQueryTransformer
-    extends YearAndYearRangeByFilteringQueryTransformer {
+public class ScholarQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
 
     // Start year and end year have to be integrated into the query URL itself as these are just supported as query parameters
     private int startYear = Integer.MAX_VALUE;

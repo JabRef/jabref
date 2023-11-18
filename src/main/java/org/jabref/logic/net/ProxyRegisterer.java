@@ -16,16 +16,10 @@ public class ProxyRegisterer {
             // NetworkTabView.java ensures that proxyUsername and proxyPassword are neither null nor empty
             if (proxyPrefs.shouldUseAuthentication()) {
                 System.setProperty("http.proxyUser", proxyPrefs.getUsername());
-                System.setProperty(
-                    "http.proxyPassword",
-                    proxyPrefs.getPassword()
-                );
+                System.setProperty("http.proxyPassword", proxyPrefs.getPassword());
 
                 System.setProperty("https.proxyUser", proxyPrefs.getUsername());
-                System.setProperty(
-                    "https.proxyPassword",
-                    proxyPrefs.getPassword()
-                );
+                System.setProperty("https.proxyPassword", proxyPrefs.getPassword());
             } else {
                 System.clearProperty("http.proxyUser");
                 System.clearProperty("http.proxyPassword");

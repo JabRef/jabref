@@ -41,9 +41,7 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
                 );
 
         fetcher =
-            new EbookDeIsbnFetcher(
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
-            );
+            new EbookDeIsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
@@ -55,18 +53,14 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "0134685997"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
         assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
     @Test
     @Override
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "9780134685991"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991");
         assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
@@ -75,10 +69,7 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
     public void authorsAreCorrectlyFormatted() throws Exception {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
             .withCitationKey("9783662585856")
-            .withField(
-                StandardField.TITLE,
-                "Fundamentals of Business Process Management"
-            )
+            .withField(StandardField.TITLE, "Fundamentals of Business Process Management")
             .withField(StandardField.PUBLISHER, "Springer Berlin Heidelberg")
             .withField(StandardField.YEAR, "2019")
             .withField(
@@ -94,9 +85,7 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
                 "https://www.ebook.de/de/product/35805105/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html"
             );
 
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(
-            "3662585855"
-        );
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3662585855");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -106,9 +95,6 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
      */
     @Test
     public void searchForValidButNotFoundISBN() throws Exception {
-        assertThrows(
-            FetcherClientException.class,
-            () -> fetcher.performSearchById("3728128155")
-        );
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));
     }
 }

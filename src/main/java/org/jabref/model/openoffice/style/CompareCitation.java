@@ -11,12 +11,8 @@ public class CompareCitation implements Comparator<ComparableCitation> {
 
     private final CompareCitedKey citedKeyComparator;
 
-    CompareCitation(
-        Comparator<BibEntry> entryComparator,
-        boolean unresolvedComesFirst
-    ) {
-        this.citedKeyComparator =
-            new CompareCitedKey(entryComparator, unresolvedComesFirst);
+    CompareCitation(Comparator<BibEntry> entryComparator, boolean unresolvedComesFirst) {
+        this.citedKeyComparator = new CompareCitedKey(entryComparator, unresolvedComesFirst);
     }
 
     public int compare(ComparableCitation a, ComparableCitation b) {

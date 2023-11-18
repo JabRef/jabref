@@ -34,17 +34,14 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void setUp() throws SQLException {
         if (
-            CURRENT_VERSION_DB_STRUCT == 1 &&
-            checkTableAvailability("ENTRY", "FIELD", "METADATA")
+            CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")
         ) {
             // checkTableAvailability does not distinguish if same table name exists in different schemas
             // VERSION_DB_STRUCT_DEFAULT must be forced
             VERSION_DB_STRUCT_DEFAULT = 0;
         }
 
-        connection
-            .createStatement()
-            .executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
 
         connection
             .createStatement()
@@ -86,11 +83,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             try {
                 // replace semicolon so we can parse it
                 VERSION_DB_STRUCT_DEFAULT =
-                    Integer.parseInt(
-                        metadata
-                            .get(MetaData.VERSION_DB_STRUCT)
-                            .replace(";", "")
-                    );
+                    Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
             } catch (Exception e) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
             }
@@ -100,30 +93,22 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
             // We can to migrate from old table in new table
-            if (
-                VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1
-            ) {
+            if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
                 LOGGER.info("Migrating from VersionDBStructure == 0");
                 connection
                     .createStatement()
                     .executeUpdate(
-                        "INSERT INTO " +
-                        escape_Table("ENTRY") +
-                        " SELECT * FROM \"ENTRY\""
+                        "INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\""
                     );
                 connection
                     .createStatement()
                     .executeUpdate(
-                        "INSERT INTO " +
-                        escape_Table("FIELD") +
-                        " SELECT * FROM \"FIELD\""
+                        "INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\""
                     );
                 connection
                     .createStatement()
                     .executeUpdate(
-                        "INSERT INTO " +
-                        escape_Table("METADATA") +
-                        " SELECT * FROM \"METADATA\""
+                        "INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\""
                     );
                 connection
                     .createStatement()
@@ -133,10 +118,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 metadata = getSharedMetaData();
             }
 
-            metadata.put(
-                MetaData.VERSION_DB_STRUCT,
-                String.valueOf(CURRENT_VERSION_DB_STRUCT)
-            );
+            metadata.put(MetaData.VERSION_DB_STRUCT, String.valueOf(CURRENT_VERSION_DB_STRUCT));
             setSharedMetaData(metadata);
         }
     }
@@ -150,9 +132,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             .append(escape("TYPE"))
             .append(") VALUES(?)");
         // Number of commas is bibEntries.size() - 1
-        insertIntoEntryQuery.append(
-            ", (?)".repeat(Math.max(0, bibEntries.size() - 1))
-        );
+        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, bibEntries.size() - 1)));
         try (
             PreparedStatement preparedEntryStatement = connection.prepareStatement(
                 insertIntoEntryQuery.toString(),
@@ -160,23 +140,16 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             )
         ) {
             for (int i = 0; i < bibEntries.size(); i++) {
-                preparedEntryStatement.setString(
-                    i + 1,
-                    bibEntries.get(i).getType().getName()
-                );
+                preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
             preparedEntryStatement.executeUpdate();
 
-            try (
-                ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()
-            ) {
+            try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
                 // The following assumes that we get the generated keys in the order the entries were inserted
                 // This should be the case
                 for (BibEntry bibEntry : bibEntries) {
                     generatedKeys.next();
-                    bibEntry
-                        .getSharedBibEntryData()
-                        .setSharedID(generatedKeys.getInt(1));
+                    bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
                 }
                 if (generatedKeys.next()) {
                     LOGGER.error("Some shared IDs left unassigned");
@@ -211,17 +184,10 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
             // Otherwise, the listener is going to be deleted by Java's garbage collector.
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
-            listener =
-                new PostgresSQLNotificationListener(
-                    dbmsSynchronizer,
-                    pgConnection
-                );
+            listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
             JabRefExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {
-            LOGGER.error(
-                "SQL Error during starting the notification listener",
-                e
-            );
+            LOGGER.error("SQL Error during starting the notification listener", e);
         }
     }
 
@@ -231,10 +197,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             listener.stop();
             connection.close();
         } catch (SQLException e) {
-            LOGGER.error(
-                "SQL Error during stopping the notification listener",
-                e
-            );
+            LOGGER.error("SQL Error during stopping the notification listener", e);
         }
     }
 

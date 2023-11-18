@@ -44,9 +44,7 @@ final class StyleSheetFile extends StyleSheet {
      */
     static final int MAX_IN_MEMORY_CSS_LENGTH = 48000;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        StyleSheetFile.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheetFile.class);
 
     private final URL url;
     private final Path path;
@@ -72,10 +70,7 @@ final class StyleSheetFile extends StyleSheet {
     @Override
     public URL getSceneStylesheet() {
         if (!Files.exists(path)) {
-            LOGGER.warn(
-                "Cannot load additional css {} because the file does not exist.",
-                path
-            );
+            LOGGER.warn("Cannot load additional css {} because the file does not exist.", path);
             return null;
         }
 
@@ -120,12 +115,8 @@ final class StyleSheetFile extends StyleSheet {
                 byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);
                 if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
                     String embeddedDataUrl =
-                        DATA_URL_PREFIX +
-                        Base64.getEncoder().encodeToString(data);
-                    LOGGER.debug(
-                        "Embedded css in data URL of length {}",
-                        embeddedDataUrl.length()
-                    );
+                        DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);
+                    LOGGER.debug("Embedded css in data URL of length {}", embeddedDataUrl.length());
                     return Optional.of(embeddedDataUrl);
                 } else {
                     LOGGER.debug(

@@ -32,12 +32,8 @@ public class GrobidServiceTest {
 
     @BeforeAll
     public static void setup() {
-        importFormatPreferences =
-            mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(
-            importFormatPreferences.bibEntryPreferences().getKeywordSeparator()
-        )
-            .thenReturn(',');
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         GrobidPreferences grobidPreferences = new GrobidPreferences(
             true,
@@ -108,12 +104,11 @@ public class GrobidServiceTest {
 
     @Test
     public void failsWhenGrobidDisabled() {
-        GrobidPreferences importSettingsWithGrobidDisabled =
-            new GrobidPreferences(
-                false,
-                false,
-                "http://grobid.jabref.org:8070"
-            );
+        GrobidPreferences importSettingsWithGrobidDisabled = new GrobidPreferences(
+            false,
+            false,
+            "http://grobid.jabref.org:8070"
+        );
         assertThrows(
             UnsupportedOperationException.class,
             () -> new GrobidService(importSettingsWithGrobidDisabled)
@@ -121,21 +116,12 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processPdfTest()
-        throws IOException, ParseException, URISyntaxException {
-        Path file = Path.of(
-            PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI()
-        );
-        List<BibEntry> response = grobidService.processPDF(
-            file,
-            importFormatPreferences
-        );
+    public void processPdfTest() throws IOException, ParseException, URISyntaxException {
+        Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
+        List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());
         BibEntry be0 = response.get(0);
-        assertEquals(
-            Optional.of("Lastname, Firstname"),
-            be0.getField(StandardField.AUTHOR)
-        );
+        assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         // assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
         // assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));
     }

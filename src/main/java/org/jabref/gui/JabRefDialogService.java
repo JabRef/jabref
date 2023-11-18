@@ -65,12 +65,8 @@ public class JabRefDialogService implements DialogService {
     // Snackbar dialog maximum size
     public static final int DIALOG_SIZE_LIMIT = 300;
 
-    private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(
-        3000
-    );
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        JabRefDialogService.class
-    );
+    private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
     private final Window mainWindow;
 
@@ -78,11 +74,7 @@ public class JabRefDialogService implements DialogService {
         this.mainWindow = mainWindow;
     }
 
-    private FXDialog createDialog(
-        AlertType type,
-        String title,
-        String content
-    ) {
+    private FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.setContentText(content);
@@ -111,9 +103,7 @@ public class JabRefDialogService implements DialogService {
                 protected Node createDetailsButton() {
                     CheckBox optOut = new CheckBox();
                     optOut.setText(optOutMessage);
-                    optOut.setOnAction(e ->
-                        optOutAction.accept(optOut.isSelected())
-                    );
+                    optOut.setOnAction(e -> optOutAction.accept(optOut.isSelected()));
                     return optOut;
                 }
             }
@@ -139,10 +129,7 @@ public class JabRefDialogService implements DialogService {
         return (
             dialogMessage.substring(
                 0,
-                Math.min(
-                    dialogMessage.length(),
-                    JabRefDialogService.DIALOG_SIZE_LIMIT
-                )
+                Math.min(dialogMessage.length(), JabRefDialogService.DIALOG_SIZE_LIMIT)
             ) +
             "..."
         ).trim();
@@ -156,20 +143,11 @@ public class JabRefDialogService implements DialogService {
         T defaultChoice,
         Collection<T> choices
     ) {
-        ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(
-            defaultChoice,
-            choices
-        );
+        ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
         ((Stage) choiceDialog.getDialogPane().getScene().getWindow()).getIcons()
             .add(IconTheme.getJabRefImage());
-        ButtonType okButtonType = new ButtonType(
-            okButtonLabel,
-            ButtonBar.ButtonData.OK_DONE
-        );
-        choiceDialog
-            .getDialogPane()
-            .getButtonTypes()
-            .setAll(ButtonType.CANCEL, okButtonType);
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         choiceDialog.setHeaderText(title);
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
@@ -178,10 +156,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public Optional<String> showInputDialogAndWait(
-        String title,
-        String content
-    ) {
+    public Optional<String> showInputDialogAndWait(String title, String content) {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
@@ -230,11 +205,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void showErrorDialogAndWait(
-        String title,
-        String content,
-        Throwable exception
-    ) {
+    public void showErrorDialogAndWait(String title, String content, Throwable exception) {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.setHeaderText(title);
         exceptionDialog.setContentText(content);
@@ -255,10 +226,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
-        return alert
-            .showAndWait()
-            .filter(buttonType -> buttonType == ButtonType.OK)
-            .isPresent();
+        return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.OK).isPresent();
     }
 
     @Override
@@ -268,15 +236,9 @@ public class JabRefDialogService implements DialogService {
         String okButtonLabel
     ) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
-        ButtonType okButtonType = new ButtonType(
-            okButtonLabel,
-            ButtonBar.ButtonData.OK_DONE
-        );
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         alert.getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
-        return alert
-            .showAndWait()
-            .filter(buttonType -> buttonType == okButtonType)
-            .isPresent();
+        return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
     @Override
@@ -287,19 +249,10 @@ public class JabRefDialogService implements DialogService {
         String cancelButtonLabel
     ) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
-        ButtonType okButtonType = new ButtonType(
-            okButtonLabel,
-            ButtonBar.ButtonData.OK_DONE
-        );
-        ButtonType cancelButtonType = new ButtonType(
-            cancelButtonLabel,
-            ButtonBar.ButtonData.NO
-        );
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
-        return alert
-            .showAndWait()
-            .filter(buttonType -> buttonType == okButtonType)
-            .isPresent();
+        return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
     @Override
@@ -317,10 +270,7 @@ public class JabRefDialogService implements DialogService {
             optOutAction
         );
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-        return alert
-            .showAndWait()
-            .filter(buttonType -> buttonType == ButtonType.YES)
-            .isPresent();
+        return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
     }
 
     @Override
@@ -339,19 +289,10 @@ public class JabRefDialogService implements DialogService {
             optOutMessage,
             optOutAction
         );
-        ButtonType okButtonType = new ButtonType(
-            okButtonLabel,
-            ButtonBar.ButtonData.YES
-        );
-        ButtonType cancelButtonType = new ButtonType(
-            cancelButtonLabel,
-            ButtonBar.ButtonData.NO
-        );
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.YES);
+        ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
-        return alert
-            .showAndWait()
-            .filter(buttonType -> buttonType == okButtonType)
-            .isPresent();
+        return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
     @Override
@@ -382,9 +323,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <R> Optional<R> showCustomDialogAndWait(
-        javafx.scene.control.Dialog<R> dialog
-    ) {
+    public <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog) {
         if (dialog.getOwner() == null) {
             dialog.initOwner(mainWindow);
         }
@@ -392,13 +331,8 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public Optional<String> showPasswordDialogAndWait(
-        String title,
-        String header,
-        String content
-    ) {
-        javafx.scene.control.Dialog<String> dialog =
-            new javafx.scene.control.Dialog<>();
+    public Optional<String> showPasswordDialogAndWait(String title, String header, String content) {
+        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(header);
 
@@ -410,10 +344,7 @@ public class JabRefDialogService implements DialogService {
         dialog.setTitle(title);
         dialog.getDialogPane().setContent(box);
 
-        dialog
-            .getDialogPane()
-            .getButtonTypes()
-            .addAll(ButtonType.CANCEL, ButtonType.OK);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
                 return passwordField.getText();
@@ -424,27 +355,18 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <V> void showProgressDialog(
-        String title,
-        String content,
-        Task<V> task
-    ) {
+    public <V> void showProgressDialog(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
         progressDialog.setHeaderText(null);
         progressDialog.setTitle(title);
         progressDialog.setContentText(content);
         progressDialog.setGraphic(null);
-        ((Stage) progressDialog
-                .getDialogPane()
-                .getScene()
-                .getWindow()).getIcons()
+        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons()
             .add(IconTheme.getJabRefImage());
         progressDialog.setOnCloseRequest(evt -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);
-        Button cancelButton = (Button) dialogPane.lookupButton(
-            ButtonType.CANCEL
-        );
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
         cancelButton.setOnAction(evt -> {
             task.cancel();
             progressDialog.close();
@@ -460,10 +382,7 @@ public class JabRefDialogService implements DialogService {
         StateManager stateManager
     ) {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-        EasyBind.bindContent(
-            taskProgressView.getTasks(),
-            stateManager.getBackgroundTasks()
-        );
+        EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
         taskProgressView.setRetainTasks(false);
         taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
@@ -512,9 +431,7 @@ public class JabRefDialogService implements DialogService {
                         // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
                         .text(
                             "(" +
-                            Localization.lang(
-                                "Check the event log to see all notifications"
-                            ) +
+                            Localization.lang("Check the event log to see all notifications") +
                             ")" +
                             "\n\n" +
                             message
@@ -530,9 +447,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public Optional<Path> showFileSaveDialog(
-        FileDialogConfiguration fileDialogConfiguration
-    ) {
+    public Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showSaveDialog(mainWindow);
         Optional
@@ -542,9 +457,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public Optional<Path> showFileOpenDialog(
-        FileDialogConfiguration fileDialogConfiguration
-    ) {
+    public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showOpenDialog(mainWindow);
         Optional
@@ -557,9 +470,7 @@ public class JabRefDialogService implements DialogService {
     public Optional<Path> showDirectorySelectionDialog(
         DirectoryDialogConfiguration directoryDialogConfiguration
     ) {
-        DirectoryChooser chooser = getConfiguredDirectoryChooser(
-            directoryDialogConfiguration
-        );
+        DirectoryChooser chooser = getConfiguredDirectoryChooser(directoryDialogConfiguration);
         File file = chooser.showDialog(mainWindow);
         return Optional.ofNullable(file).map(File::toPath);
     }
@@ -586,19 +497,11 @@ public class JabRefDialogService implements DialogService {
         return chooser;
     }
 
-    private FileChooser getConfiguredFileChooser(
-        FileDialogConfiguration fileDialogConfiguration
-    ) {
+    private FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = new FileChooser();
-        chooser
-            .getExtensionFilters()
-            .addAll(fileDialogConfiguration.getExtensionFilters());
-        chooser.setSelectedExtensionFilter(
-            fileDialogConfiguration.getDefaultExtension()
-        );
-        chooser.setInitialFileName(
-            fileDialogConfiguration.getInitialFileName()
-        );
+        chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
+        chooser.setSelectedExtensionFilter(fileDialogConfiguration.getDefaultExtension());
+        chooser.setInitialFileName(fileDialogConfiguration.getInitialFileName());
         fileDialogConfiguration
             .getInitialDirectory()
             .map(Path::toFile)
@@ -612,20 +515,11 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public Optional<Path> showFileOpenFromArchiveDialog(Path archivePath)
-        throws IOException {
-        try (
-            FileSystem zipFile = FileSystems.newFileSystem(
-                archivePath,
-                (ClassLoader) null
-            )
-        ) {
+    public Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException {
+        try (FileSystem zipFile = FileSystems.newFileSystem(archivePath, (ClassLoader) null)) {
             return new ZipFileChooser(zipFile).showAndWait();
         } catch (NoClassDefFoundError exc) {
-            throw new IOException(
-                "Could not instantiate ZIP-archive reader.",
-                exc
-            );
+            throw new IOException("Could not instantiate ZIP-archive reader.", exc);
         }
     }
 

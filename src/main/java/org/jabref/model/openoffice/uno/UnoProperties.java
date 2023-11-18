@@ -20,15 +20,11 @@ public class UnoProperties {
 
     private UnoProperties() {}
 
-    public static Optional<XPropertySet> asPropertySet(
-        XPropertyContainer propertyContainer
-    ) {
+    public static Optional<XPropertySet> asPropertySet(XPropertyContainer propertyContainer) {
         return UnoCast.cast(XPropertySet.class, propertyContainer);
     }
 
-    public static Optional<XPropertySetInfo> getPropertySetInfo(
-        XPropertySet propertySet
-    ) {
+    public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertySet propertySet) {
         return Optional
             .ofNullable(propertySet)
             .flatMap(e -> Optional.ofNullable(e.getPropertySetInfo()));
@@ -37,22 +33,15 @@ public class UnoProperties {
     public static Optional<XPropertySetInfo> getPropertySetInfo(
         XPropertyContainer propertyContainer
     ) {
-        return Optional
-            .ofNullable(propertyContainer)
-            .flatMap(UnoProperties::getPropertySetInfo);
+        return Optional.ofNullable(propertyContainer).flatMap(UnoProperties::getPropertySetInfo);
     }
 
     public static List<String> getPropertyNames(Property[] properties) {
         Objects.requireNonNull(properties);
-        return Arrays
-            .stream(properties)
-            .map(p -> p.Name)
-            .collect(Collectors.toList());
+        return Arrays.stream(properties).map(p -> p.Name).collect(Collectors.toList());
     }
 
-    public static List<String> getPropertyNames(
-        XPropertySetInfo propertySetInfo
-    ) {
+    public static List<String> getPropertyNames(XPropertySetInfo propertySetInfo) {
         return getPropertyNames(propertySetInfo.getProperties());
     }
 
@@ -60,18 +49,14 @@ public class UnoProperties {
         return getPropertyNames(propertySet.getPropertySetInfo());
     }
 
-    public static List<String> getPropertyNames(
-        XPropertyContainer propertyContainer
-    ) {
+    public static List<String> getPropertyNames(XPropertyContainer propertyContainer) {
         return asPropertySet(propertyContainer)
             .map(UnoProperties::getPropertyNames)
             .orElse(new ArrayList<>());
     }
 
-    public static Optional<Object> getValueAsObject(
-        XPropertySet propertySet,
-        String property
-    ) throws WrappedTargetException {
+    public static Optional<Object> getValueAsObject(XPropertySet propertySet, String property)
+        throws WrappedTargetException {
         Objects.requireNonNull(propertySet);
         Objects.requireNonNull(property);
         try {

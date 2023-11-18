@@ -51,14 +51,10 @@ public class ManageStudyDefinitionViewModel {
     );
 
     private final StringProperty title = new SimpleStringProperty();
-    private final ObservableList<String> authors =
-        FXCollections.observableArrayList();
-    private final ObservableList<String> researchQuestions =
-        FXCollections.observableArrayList();
-    private final ObservableList<String> queries =
-        FXCollections.observableArrayList();
-    private final ObservableList<StudyCatalogItem> databases =
-        FXCollections.observableArrayList();
+    private final ObservableList<String> authors = FXCollections.observableArrayList();
+    private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
+    private final ObservableList<String> queries = FXCollections.observableArrayList();
+    private final ObservableList<StudyCatalogItem> databases = FXCollections.observableArrayList();
 
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
@@ -75,17 +71,12 @@ public class ManageStudyDefinitionViewModel {
     ) {
         databases.addAll(
             WebFetchers
-                .getSearchBasedFetchers(
-                    importFormatPreferences,
-                    importerPreferences
-                )
+                .getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                 .stream()
                 .map(SearchBasedFetcher::getName)
                 // The user wants to select specific fetchers
                 // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
-                .filter(name ->
-                    !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME)
-                )
+                .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
                 .map(name -> {
                     boolean enabled = DEFAULT_SELECTION.contains(name);
                     return new StudyCatalogItem(name, enabled);
@@ -112,27 +103,18 @@ public class ManageStudyDefinitionViewModel {
         authors.addAll(Objects.requireNonNull(study).getAuthors());
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
-        queries.addAll(
-            study.getQueries().stream().map(StudyQuery::getQuery).toList()
-        );
+        queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
         List<StudyDatabase> studyDatabases = study.getDatabases();
         databases.addAll(
             WebFetchers
-                .getSearchBasedFetchers(
-                    importFormatPreferences,
-                    importerPreferences
-                )
+                .getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                 .stream()
                 .map(SearchBasedFetcher::getName)
                 // The user wants to select specific fetchers
                 // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
-                .filter(name ->
-                    !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME)
-                )
+                .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
                 .map(name -> {
-                    boolean enabled = studyDatabases.contains(
-                        new StudyDatabase(name, true)
-                    );
+                    boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
                     return new StudyCatalogItem(name, enabled);
                 })
                 .toList()
@@ -174,10 +156,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public void addResearchQuestion(String researchQuestion) {
-        if (
-            researchQuestion.isBlank() ||
-            researchQuestions.contains(researchQuestion)
-        ) {
+        if (researchQuestion.isBlank() || researchQuestions.contains(researchQuestion)) {
             return;
         }
         researchQuestions.add(researchQuestion);
@@ -199,10 +178,7 @@ public class ManageStudyDefinitionViewModel {
             databases
                 .stream()
                 .map(studyDatabaseItem ->
-                    new StudyDatabase(
-                        studyDatabaseItem.getName(),
-                        studyDatabaseItem.isEnabled()
-                    )
+                    new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())
                 )
                 .filter(StudyDatabase::isEnabled)
                 .collect(Collectors.toList())
@@ -212,15 +188,9 @@ public class ManageStudyDefinitionViewModel {
         try {
             studyDirectory = Path.of(studyDirectoryAsString);
         } catch (InvalidPathException e) {
-            LOGGER.error(
-                "Invalid path was provided: {}",
-                studyDirectoryAsString
-            );
+            LOGGER.error("Invalid path was provided: {}", studyDirectoryAsString);
             dialogService.notify(
-                Localization.lang(
-                    "Unable to write to %0.",
-                    studyDirectoryAsString
-                )
+                Localization.lang("Unable to write to %0.", studyDirectoryAsString)
             );
             // We do not assume another path - we return that there is an invalid object.
             return null;
@@ -229,18 +199,11 @@ public class ManageStudyDefinitionViewModel {
             StudyRepository.STUDY_DEFINITION_FILE_NAME
         );
         try {
-            new StudyYamlParser()
-                .writeStudyYamlFile(study, studyDefinitionFile);
+            new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
         } catch (IOException e) {
-            LOGGER.error(
-                "Could not write study file {}",
-                studyDefinitionFile,
-                e
-            );
+            LOGGER.error("Could not write study file {}", studyDefinitionFile, e);
             dialogService.notify(
-                Localization.lang("Please enter a valid file path.") +
-                ": " +
-                studyDirectoryAsString
+                Localization.lang("Please enter a valid file path.") + ": " + studyDirectoryAsString
             );
             // We do not assume another path - we return that there is an invalid object.
             return null;
@@ -256,9 +219,7 @@ public class ManageStudyDefinitionViewModel {
                 e
             );
             dialogService.notify(
-                Localization.lang("Please enter a valid file path.") +
-                ": " +
-                studyDirectory
+                Localization.lang("Please enter a valid file path.") + ": " + studyDirectory
             );
             // We continue nevertheless as the directory itself could be valid
         }

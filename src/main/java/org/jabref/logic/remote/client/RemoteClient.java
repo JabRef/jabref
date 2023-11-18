@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class RemoteClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RemoteClient.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteClient.class);
 
     private static final int TIMEOUT = 1000;
     private final int port;
@@ -57,10 +55,7 @@ public class RemoteClient {
      */
     public boolean sendCommandLineArguments(String[] args) {
         try (Protocol protocol = openNewConnection()) {
-            protocol.sendMessage(
-                RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS,
-                args
-            );
+            protocol.sendMessage(RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS, args);
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
             return response.getKey() == RemoteMessage.OK;
         } catch (IOException e) {
@@ -77,10 +72,7 @@ public class RemoteClient {
     private Protocol openNewConnection() throws IOException {
         Socket socket = new Socket();
         socket.setSoTimeout(TIMEOUT);
-        socket.connect(
-            new InetSocketAddress(RemotePreferences.getIpAddress(), port),
-            TIMEOUT
-        );
+        socket.connect(new InetSocketAddress(RemotePreferences.getIpAddress(), port), TIMEOUT);
         return new Protocol(socket);
     }
 }

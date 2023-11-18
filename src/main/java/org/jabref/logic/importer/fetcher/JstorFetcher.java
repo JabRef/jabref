@@ -52,9 +52,7 @@ public class JstorFetcher
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
         uriBuilder.addParameter(
             "Query",
-            new JstorQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new JstorQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         );
         return uriBuilder.build().toURL();
     }
@@ -100,26 +98,16 @@ public class JstorFetcher
                 Document doc = Jsoup.parse(inputStream, null, HOST);
 
                 StringBuilder stringBuilder = new StringBuilder();
-                List<Element> elements = doc
-                    .body()
-                    .getElementsByClass("cite-this-item");
+                List<Element> elements = doc.body().getElementsByClass("cite-this-item");
                 for (Element element : elements) {
-                    String id = element
-                        .attr("href")
-                        .replace("citation/info/", "");
+                    String id = element.attr("href").replace("citation/info/", "");
 
                     String data = new URLDownload(CITE_HOST + id).asString();
                     stringBuilder.append(data);
                 }
-                entries =
-                    new ArrayList<>(
-                        parser.parseEntries(stringBuilder.toString())
-                    );
+                entries = new ArrayList<>(parser.parseEntries(stringBuilder.toString()));
             } catch (IOException e) {
-                throw new ParseException(
-                    "Could not download data from jstor.org",
-                    e
-                );
+                throw new ParseException("Could not download data from jstor.org", e);
             }
             return entries;
         };
@@ -136,8 +124,7 @@ public class JstorFetcher
             return Optional.empty();
         }
 
-        String page = new URLDownload(entry.getField(StandardField.URL).get())
-            .asString();
+        String page = new URLDownload(entry.getField(StandardField.URL).get()).asString();
 
         Document doc = Jsoup.parse(page);
 

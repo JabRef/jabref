@@ -21,10 +21,7 @@ public class CapitalizeFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(
-            "I Have {a} Dream",
-            formatter.format(formatter.getExampleInput())
-        );
+        assertEquals("I Have {a} Dream", formatter.format(formatter.getExampleInput()));
     }
 
     @ParameterizedTest(name = "input={0}, formattedStr={1}")

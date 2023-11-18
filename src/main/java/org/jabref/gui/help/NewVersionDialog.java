@@ -50,8 +50,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
                 }
                 return true;
             });
-        Button defaultButton = (Button) this.getDialogPane()
-            .lookupButton(btnDownloadUpdate);
+        Button defaultButton = (Button) this.getDialogPane().lookupButton(btnDownloadUpdate);
         defaultButton.setDefaultButton(true);
 
         Hyperlink lblMoreInformation = new Hyperlink(
@@ -66,19 +65,11 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
         );
 
         VBox container = new VBox(
+            new Label(Localization.lang("A new version of JabRef has been released.")),
             new Label(
-                Localization.lang("A new version of JabRef has been released.")
+                Localization.lang("Installed version") + ": " + currentVersion.getFullVersion()
             ),
-            new Label(
-                Localization.lang("Installed version") +
-                ": " +
-                currentVersion.getFullVersion()
-            ),
-            new Label(
-                Localization.lang("Latest version") +
-                ": " +
-                latestVersion.getFullVersion()
-            ),
+            new Label(Localization.lang("Latest version") + ": " + latestVersion.getFullVersion()),
             lblMoreInformation
         );
         getDialogPane().setContent(container);

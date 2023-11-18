@@ -22,10 +22,7 @@ class BibtexBiblatexRoundtripTest {
                     StandardField.AUTHOR,
                     "Frame, J. S. and Robinson, G. de B. and Thrall, R. M."
                 )
-                .withField(
-                    StandardField.TITLE,
-                    "The hook graphs of the symmetric groups"
-                )
+                .withField(StandardField.TITLE, "The hook graphs of the symmetric groups")
                 .withField(StandardField.JOURNAL, "Canadian J. Math.")
                 .withField(
                     new UnknownField("fjournal"),
@@ -45,10 +42,7 @@ class BibtexBiblatexRoundtripTest {
                     StandardField.AUTHOR,
                     "Frame, J. S. and Robinson, G. de B. and Thrall, R. M."
                 )
-                .withField(
-                    StandardField.TITLE,
-                    "The hook graphs of the symmetric groups"
-                )
+                .withField(StandardField.TITLE, "The hook graphs of the symmetric groups")
                 .withField(StandardField.JOURNALTITLE, "Canadian J. Math.")
                 .withField(
                     new UnknownField("fjournal"),

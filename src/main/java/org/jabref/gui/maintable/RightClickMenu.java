@@ -55,11 +55,7 @@ public class RightClickMenu {
             .addAll(
                 factory.createMenuItem(
                     StandardActions.COPY,
-                    new EditAction(
-                        StandardActions.COPY,
-                        libraryTab.frame(),
-                        stateManager
-                    )
+                    new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager)
                 ),
                 createCopySubMenu(
                     factory,
@@ -72,35 +68,19 @@ public class RightClickMenu {
                 ),
                 factory.createMenuItem(
                     StandardActions.PASTE,
-                    new EditAction(
-                        StandardActions.PASTE,
-                        libraryTab.frame(),
-                        stateManager
-                    )
+                    new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager)
                 ),
                 factory.createMenuItem(
                     StandardActions.CUT,
-                    new EditAction(
-                        StandardActions.CUT,
-                        libraryTab.frame(),
-                        stateManager
-                    )
+                    new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager)
                 ),
                 factory.createMenuItem(
                     StandardActions.MERGE_ENTRIES,
-                    new MergeEntriesAction(
-                        dialogService,
-                        stateManager,
-                        preferencesService
-                    )
+                    new MergeEntriesAction(dialogService, stateManager, preferencesService)
                 ),
                 factory.createMenuItem(
                     StandardActions.DELETE_ENTRY,
-                    new EditAction(
-                        StandardActions.DELETE_ENTRY,
-                        libraryTab.frame(),
-                        stateManager
-                    )
+                    new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager)
                 ),
                 new SeparatorMenuItem(),
                 createSendSubMenu(
@@ -204,19 +184,11 @@ public class RightClickMenu {
                 ),
                 factory.createMenuItem(
                     StandardActions.OPEN_URL,
-                    new OpenUrlAction(
-                        dialogService,
-                        stateManager,
-                        preferencesService
-                    )
+                    new OpenUrlAction(dialogService, stateManager, preferencesService)
                 ),
                 factory.createMenuItem(
                     StandardActions.SEARCH_SHORTSCIENCE,
-                    new SearchShortScienceAction(
-                        dialogService,
-                        stateManager,
-                        preferencesService
-                    )
+                    new SearchShortScienceAction(dialogService, stateManager, preferencesService)
                 ),
                 new SeparatorMenuItem(),
                 new ChangeEntryTypeMenu(
@@ -337,12 +309,8 @@ public class RightClickMenu {
             );
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
-        PreviewPreferences previewPreferences =
-            preferencesService.getPreviewPreferences();
-        if (
-            previewPreferences.getSelectedPreviewLayout() instanceof
-            CitationStylePreviewLayout
-        ) {
+        PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
+        if (previewPreferences.getSelectedPreviewLayout() instanceof CitationStylePreviewLayout) {
             copySpecialMenu
                 .getItems()
                 .addAll(

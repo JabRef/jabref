@@ -77,20 +77,15 @@ public class ThreeWayMergeCellViewModelTest {
 
     @ParameterizedTest
     @MethodSource
-    void isEvenShouldReturnTrueIfRowIndexIsEven(
-        int rowIndex,
-        boolean expected
-    ) {
-        ThreeWayMergeCellViewModel newViewModel =
-            new ThreeWayMergeCellViewModel("", rowIndex);
+    void isEvenShouldReturnTrueIfRowIndexIsEven(int rowIndex, boolean expected) {
+        ThreeWayMergeCellViewModel newViewModel = new ThreeWayMergeCellViewModel("", rowIndex);
         assertEquals(expected, newViewModel.isEven());
     }
 
     @ParameterizedTest
     @MethodSource
     void isOddShouldReturnTrueIfRowIndexIsOdd(int rowIndex, boolean expected) {
-        ThreeWayMergeCellViewModel newViewModel =
-            new ThreeWayMergeCellViewModel("", rowIndex);
+        ThreeWayMergeCellViewModel newViewModel = new ThreeWayMergeCellViewModel("", rowIndex);
         assertEquals(expected, newViewModel.isOdd());
     }
 

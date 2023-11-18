@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class BstPreviewLayoutTest {
 
-    private final BibDatabaseContext bibDatabaseContext =
-        new BibDatabaseContext();
+    private final BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
     @Test
     public void generatePreviewForSimpleEntryUsingAbbr() throws Exception {
@@ -25,10 +24,7 @@ class BstPreviewLayoutTest {
             .withField(StandardField.AUTHOR, "Oliver Kopp")
             .withField(StandardField.TITLE, "Thoughts on Development");
         BibDatabase bibDatabase = mock(BibDatabase.class);
-        String preview = bstPreviewLayout.generatePreview(
-            entry,
-            bibDatabaseContext
-        );
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O. Kopp. Thoughts on development.", preview);
     }
 
@@ -42,16 +38,12 @@ class BstPreviewLayoutTest {
             .withField(StandardField.TITLE, "Thoughts on Development")
             .withField(StandardField.MONTH, "#May#");
         BibDatabase bibDatabase = mock(BibDatabase.class);
-        String preview = bstPreviewLayout.generatePreview(
-            entry,
-            bibDatabaseContext
-        );
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O. Kopp. Thoughts on development, May.", preview);
     }
 
     @Test
-    public void generatePreviewForSliceTheoremPaperUsingAbbr()
-        throws Exception {
+    public void generatePreviewForSliceTheoremPaperUsingAbbr() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(
             Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI())
         );
@@ -66,8 +58,7 @@ class BstPreviewLayoutTest {
     }
 
     @Test
-    public void generatePreviewForSliceTheoremPaperUsingIEEE()
-        throws Exception {
+    public void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(
             Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI())
         );
@@ -94,10 +85,7 @@ class BstPreviewLayoutTest {
                 "A general slice theorem for the action of a Fr\\'echet Lie group on a Fr\\'echet manifolds is established. The Nash-Moser theorem provides the fundamental tool to generalize the result of Palais to this infinite-dimensional setting. The presented slice theorem is illustrated by its application to gauge theories: the action of the gauge transformation group admits smooth slices at every point and thus the gauge orbit space is stratified by Fr\\'echet manifolds. Furthermore, a covariant and symplectic formulation of classical field theory is proposed and extensively discussed. At the root of this novel framework is the incorporation of field degrees of freedom F and spacetime M into the product manifold F * M. The induced bigrading of differential forms is used in order to carry over the usual symplectic theory to this new setting. The examples of the Klein-Gordon field and general Yang-Mills theory illustrate that the presented approach conveniently handles the occurring symmetries."
             )
             .withField(StandardField.EPRINT, "1405.2249v1")
-            .withField(
-                StandardField.FILE,
-                ":http\\://arxiv.org/pdf/1405.2249v1:PDF"
-            )
+            .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1405.2249v1:PDF")
             .withField(StandardField.EPRINTTYPE, "arXiv")
             .withField(StandardField.EPRINTCLASS, "math-ph")
             .withField(

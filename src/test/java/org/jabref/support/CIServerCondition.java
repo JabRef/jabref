@@ -10,8 +10,9 @@ import org.junit.platform.commons.support.AnnotationSupport;
 
 public class CIServerCondition implements ExecutionCondition {
 
-    private static final ConditionEvaluationResult ENABLED =
-        ConditionEvaluationResult.enabled("not on CI server");
+    private static final ConditionEvaluationResult ENABLED = ConditionEvaluationResult.enabled(
+        "not on CI server"
+    );
 
     private static boolean isCIServer() {
         // See http://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
@@ -24,16 +25,16 @@ public class CIServerCondition implements ExecutionCondition {
      * the CI server.
      */
     @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(
-        ExtensionContext context
-    ) {
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
         if (!isCIServer()) {
             return ENABLED;
         }
 
         Optional<AnnotatedElement> element = context.getElement();
-        Optional<DisabledOnCIServer> disabled =
-            AnnotationSupport.findAnnotation(element, DisabledOnCIServer.class);
+        Optional<DisabledOnCIServer> disabled = AnnotationSupport.findAnnotation(
+            element,
+            DisabledOnCIServer.class
+        );
         if (disabled.isPresent()) {
             String reason = disabled
                 .map(DisabledOnCIServer::value)

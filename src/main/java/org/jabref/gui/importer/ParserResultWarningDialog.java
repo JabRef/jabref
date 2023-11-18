@@ -57,9 +57,7 @@ public class ParserResultWarningDialog {
         final StringBuilder dialogContent = new StringBuilder();
         int warningCount = 1;
         for (final String warning : warnings) {
-            dialogContent.append(
-                String.format("%d. %s%n", warningCount++, warning)
-            );
+            dialogContent.append(String.format("%d. %s%n", warningCount++, warning));
         }
         dialogContent.deleteCharAt(dialogContent.length() - 1);
 

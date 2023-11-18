@@ -63,16 +63,10 @@ public class EditInsert {
         String pageInfo
     )
         throws NoDocumentException, NotRemoveableException, WrappedTargetException, PropertyVetoException, CreationException, IllegalTypeException {
-        List<String> citationKeys = OOListUtil.map(
-            entries,
-            EditInsert::insertEntryGetCitationKey
-        );
+        List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
         final int totalEntries = entries.size();
-        List<Optional<OOText>> pageInfos = OODataModel.fakePageInfos(
-            pageInfo,
-            totalEntries
-        );
+        List<Optional<OOText>> pageInfos = OODataModel.fakePageInfos(pageInfo, totalEntries);
 
         List<CitationMarkerEntry> citations = new ArrayList<>(totalEntries);
         for (int i = 0; i < totalEntries; i++) {

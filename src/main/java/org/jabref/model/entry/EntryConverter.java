@@ -54,9 +54,7 @@ public class EntryConverter {
             EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX
                 .entrySet()
                 .stream()
-                .collect(
-                    Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey)
-                );
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
         // all aliases
         FIELD_ALIASES = new HashMap<>();

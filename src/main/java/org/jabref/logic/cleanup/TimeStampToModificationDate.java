@@ -25,9 +25,7 @@ public class TimeStampToModificationDate implements CleanupJob {
 
     private final Field timeStampField;
 
-    public TimeStampToModificationDate(
-        TimestampPreferences timestampPreferences
-    ) {
+    public TimeStampToModificationDate(TimestampPreferences timestampPreferences) {
         timeStampField = timestampPreferences.getTimestampField();
     }
 
@@ -46,18 +44,10 @@ public class TimeStampToModificationDate implements CleanupJob {
             int year = date.getYear().orElse(1);
             int month = getMonth(date);
             int day = date.getDay().orElse(1);
-            LocalDateTime localDateTime = LocalDateTime.of(
-                year,
-                month,
-                day,
-                0,
-                0
-            );
+            LocalDateTime localDateTime = LocalDateTime.of(year, month, day, 0, 0);
             // Remove any time unites smaller than seconds
             localDateTime.truncatedTo(ChronoUnit.SECONDS);
-            return Optional.of(
-                localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-            );
+            return Optional.of(localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
     }
 
@@ -84,20 +74,12 @@ public class TimeStampToModificationDate implements CleanupJob {
                 return Collections.emptyList();
             }
             // Setting the EventSource is necessary to circumvent the update of the modification date during timestamp migration
-            entry.clearField(
-                timeStampField,
-                EntriesEventSource.CLEANUP_TIMESTAMP
-            );
+            entry.clearField(timeStampField, EntriesEventSource.CLEANUP_TIMESTAMP);
             List<FieldChange> changeList = new ArrayList<>();
             FieldChange changeTo;
             // Add removal of timestamp field
             changeList.add(
-                new FieldChange(
-                    entry,
-                    StandardField.TIMESTAMP,
-                    formattedTimeStamp.get(),
-                    ""
-                )
+                new FieldChange(entry, StandardField.TIMESTAMP, formattedTimeStamp.get(), "")
             );
             entry.setField(
                 StandardField.MODIFICATIONDATE,

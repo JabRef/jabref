@@ -81,9 +81,7 @@ public class WebFetchers {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Identifier> IdFetcher<T> getIdFetcherForIdentifier(
-        Class<T> clazz
-    ) {
+    public static <T extends Identifier> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz) {
         if (clazz == DOI.class) {
             return (IdFetcher<T>) new CrossRef();
         } else {
@@ -93,9 +91,7 @@ public class WebFetchers {
         }
     }
 
-    public static Optional<
-        IdFetcher<? extends Identifier>
-    > getIdFetcherForField(Field field) {
+    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(Field field) {
         if (field == StandardField.DOI) {
             return Optional.of(new CrossRef());
         }
@@ -109,20 +105,13 @@ public class WebFetchers {
         ImportFormatPreferences importFormatPreferences,
         ImporterPreferences importerPreferences
     ) {
-        SortedSet<SearchBasedFetcher> set = new TreeSet<>(
-            new CompositeSearchFirstComparator()
-        );
+        SortedSet<SearchBasedFetcher> set = new TreeSet<>(new CompositeSearchFirstComparator());
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
         set.add(new MedlineFetcher());
-        set.add(
-            new AstrophysicsDataSystem(
-                importFormatPreferences,
-                importerPreferences
-            )
-        );
+        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new ACMPortalFetcher());
@@ -152,16 +141,9 @@ public class WebFetchers {
         ImportFormatPreferences importFormatPreferences,
         ImporterPreferences importerPreferences
     ) {
-        SortedSet<IdBasedFetcher> set = new TreeSet<>(
-            Comparator.comparing(WebFetcher::getName)
-        );
+        SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new ArXivFetcher(importFormatPreferences));
-        set.add(
-            new AstrophysicsDataSystem(
-                importFormatPreferences,
-                importerPreferences
-            )
-        );
+        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
         // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
@@ -189,16 +171,9 @@ public class WebFetchers {
         FilePreferences filePreferences,
         BibDatabaseContext databaseContext
     ) {
-        SortedSet<EntryBasedFetcher> set = new TreeSet<>(
-            Comparator.comparing(WebFetcher::getName)
-        );
+        SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new INSPIREFetcher(importFormatPreferences));
-        set.add(
-            new AstrophysicsDataSystem(
-                importFormatPreferences,
-                importerPreferences
-            )
-        );
+        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new IssnFetcher());
@@ -225,9 +200,7 @@ public class WebFetchers {
     public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(
         ImportFormatPreferences importFormatPreferences
     ) {
-        SortedSet<IdFetcher<?>> set = new TreeSet<>(
-            Comparator.comparing(WebFetcher::getName)
-        );
+        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new CrossRef());
         set.add(new ArXivFetcher(importFormatPreferences));
         return set;
@@ -243,9 +216,7 @@ public class WebFetchers {
         Set<FulltextFetcher> fetchers = new HashSet<>();
 
         // Original
-        fetchers.add(
-            new DoiResolution(importFormatPreferences.doiPreferences())
-        );
+        fetchers.add(new DoiResolution(importFormatPreferences.doiPreferences()));
 
         // Publishers
         fetchers.add(new ScienceDirect(importerPreferences));
@@ -277,12 +248,7 @@ public class WebFetchers {
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new SpringerFetcher(importerPreferences));
         fetchers.add(new ScienceDirect(importerPreferences));
-        fetchers.add(
-            new AstrophysicsDataSystem(
-                importFormatPreferences,
-                importerPreferences
-            )
-        );
+        fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         return fetchers;
     }
@@ -295,12 +261,7 @@ class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
 
     @Override
     public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {
-        if (
-            Objects.equals(
-                s1.getName(),
-                CompositeSearchBasedFetcher.FETCHER_NAME
-            )
-        ) {
+        if (Objects.equals(s1.getName(), CompositeSearchBasedFetcher.FETCHER_NAME)) {
             return -1;
         } else {
             return s1.getName().compareTo(s2.getName());

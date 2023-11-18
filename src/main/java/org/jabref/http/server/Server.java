@@ -32,8 +32,7 @@ public class Server {
      * Starts an http server serving the last files opened in JabRef<br>
      * More files can be provided as args.
      */
-    public static void main(final String[] args)
-        throws InterruptedException, URISyntaxException {
+    public static void main(final String[] args) throws InterruptedException, URISyntaxException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
@@ -55,10 +54,7 @@ public class Server {
                 .filter(path -> !lastFilesOpened.contains(path))
                 .toList();
 
-            LOGGER.debug(
-                "Adding following files to the list of opened libraries: {}",
-                filesToAdd
-            );
+            LOGGER.debug("Adding following files to the list of opened libraries: {}", filesToAdd);
 
             // add the files in the front of the last opened libraries
             Collections.reverse(filesToAdd);
@@ -68,15 +64,11 @@ public class Server {
         }
 
         if (lastFilesOpened.isEmpty()) {
-            LOGGER.debug(
-                "still no library available to serve, serve the demo library"
-            );
+            LOGGER.debug("still no library available to serve, serve the demo library");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
             Path bibPath = Path
-                .of(
-                    "src/main/resources/org/jabref/http/server/http-server-demo.bib"
-                )
+                .of("src/main/resources/org/jabref/http/server/http-server-demo.bib")
                 .toAbsolutePath();
             LOGGER.debug("Location of demo library: {}", bibPath);
             lastFilesOpened.add(bibPath.toString());
@@ -128,11 +120,7 @@ public class Server {
             .of(
                 AppDirsFactory
                     .getInstance()
-                    .getUserDataDir(
-                        OS.APP_DIR_APP_NAME,
-                        "ssl",
-                        OS.APP_DIR_APP_AUTHOR
-                    )
+                    .getUserDataDir(OS.APP_DIR_APP_NAME, "ssl", OS.APP_DIR_APP_AUTHOR)
             )
             .resolve("server.p12");
         if (Files.exists(serverKeyStore)) {

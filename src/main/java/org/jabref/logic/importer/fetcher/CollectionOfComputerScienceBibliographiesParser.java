@@ -35,13 +35,9 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     }
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream)
-        throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            List<String> links = matchRegexFromInputStreamHtml(
-                inputStream,
-                REGEX_FOR_LINKS
-            );
+            List<String> links = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_LINKS);
             String bibtexDataString = parseBibtexStringsFromLinks(links)
                 .stream()
                 .collect(Collectors.joining());
@@ -52,10 +48,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
         }
     }
 
-    private List<String> matchRegexFromInputStreamHtml(
-        InputStream inputStream,
-        Pattern pattern
-    ) {
+    private List<String> matchRegexFromInputStreamHtml(InputStream inputStream, Pattern pattern) {
         try (Scanner scanner = new Scanner(inputStream)) {
             return scanner
                 .findAll(pattern)
@@ -64,18 +57,14 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
         }
     }
 
-    private List<String> parseBibtexStringsFromLinks(List<String> links)
-        throws IOException {
+    private List<String> parseBibtexStringsFromLinks(List<String> links) throws IOException {
         List<String> bibtexStringsFromAllLinks = new ArrayList<>();
         for (String link : links) {
-            try (
-                InputStream inputStream = new URLDownload(link).asInputStream()
-            ) {
-                List<String> bibtexStringsFromLink =
-                    matchRegexFromInputStreamHtml(
-                        inputStream,
-                        REGEX_FOR_BIBTEX
-                    );
+            try (InputStream inputStream = new URLDownload(link).asInputStream()) {
+                List<String> bibtexStringsFromLink = matchRegexFromInputStreamHtml(
+                    inputStream,
+                    REGEX_FOR_BIBTEX
+                );
                 bibtexStringsFromAllLinks.addAll(bibtexStringsFromLink);
             }
         }

@@ -11,11 +11,7 @@ public class OwnerPreferences {
     private final StringProperty defaultOwner;
     private final BooleanProperty overwriteOwner;
 
-    public OwnerPreferences(
-        boolean useOwner,
-        String defaultOwner,
-        boolean overwriteOwner
-    ) {
+    public OwnerPreferences(boolean useOwner, String defaultOwner, boolean overwriteOwner) {
         this.useOwner = new SimpleBooleanProperty(useOwner);
         this.defaultOwner = new SimpleStringProperty(defaultOwner);
         this.overwriteOwner = new SimpleBooleanProperty(overwriteOwner);

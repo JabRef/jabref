@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UndoableInsertEntries.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableInsertEntries.class);
     private final BibDatabase database;
     private final List<BibEntry> entries;
     private final boolean paste;
@@ -31,11 +29,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
         this(database, entries, false);
     }
 
-    public UndoableInsertEntries(
-        BibDatabase database,
-        List<BibEntry> entries,
-        boolean paste
-    ) {
+    public UndoableInsertEntries(BibDatabase database, List<BibEntry> entries, boolean paste) {
         this.database = database;
         this.entries = entries;
         this.paste = paste;
@@ -50,10 +44,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
                 return Localization.lang(
                     "paste entry %0",
                     StringUtil.boldHTML(
-                        entries
-                            .get(0)
-                            .getCitationKey()
-                            .orElse(Localization.lang("undefined"))
+                        entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))
                     )
                 );
             } else {
@@ -66,10 +57,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
                 return Localization.lang(
                     "insert entry %0",
                     StringUtil.boldHTML(
-                        entries
-                            .get(0)
-                            .getCitationKey()
-                            .orElse(Localization.lang("undefined"))
+                        entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))
                     )
                 );
             } else {

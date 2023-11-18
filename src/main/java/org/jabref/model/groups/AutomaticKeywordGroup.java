@@ -73,10 +73,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        KeywordList keywordList = entry.getFieldAsKeywords(
-            field,
-            keywordDelimiter
-        );
+        KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
         return keywordList
             .stream()
             .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
@@ -95,10 +92,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
             true
         );
         GroupTreeNode root = new GroupTreeNode(rootGroup);
-        keywordChain
-            .getChild()
-            .map(this::createGroup)
-            .ifPresent(root::addChild);
+        keywordChain.getChild().map(this::createGroup).ifPresent(root::addChild);
         return root;
     }
 }

@@ -47,10 +47,7 @@ public class SentenceCaseFormatterTest {
                 "Example case. {EXCLUDED SENTENCE.}",
                 "Example case. {EXCLUDED SENTENCE.}"
             ),
-            Arguments.of(
-                "I have {Aa} dream",
-                new SentenceCaseFormatter().getExampleInput()
-            )
+            Arguments.of("I have {Aa} dream", new SentenceCaseFormatter().getExampleInput())
         );
     }
 

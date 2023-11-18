@@ -58,15 +58,10 @@ public class OptionalUtil {
         Optional<T> value,
         Function<? super T, ? extends Collection<? extends R>> mapper
     ) {
-        return value
-            .stream()
-            .flatMap(element -> mapper.apply(element).stream());
+        return value.stream().flatMap(element -> mapper.apply(element).stream());
     }
 
-    public static <T> Boolean isPresentAnd(
-        Optional<T> value,
-        Predicate<T> check
-    ) {
+    public static <T> Boolean isPresentAnd(Optional<T> value, Predicate<T> check) {
         return value.isPresent() && check.test(value.get());
     }
 
@@ -80,9 +75,7 @@ public class OptionalUtil {
         BiFunction<T, S, R> combine
     ) {
         if (valueOne.isPresent() && valueTwo.isPresent()) {
-            return Optional.ofNullable(
-                combine.apply(valueOne.get(), valueTwo.get())
-            );
+            return Optional.ofNullable(combine.apply(valueOne.get(), valueTwo.get()));
         } else {
             return Optional.empty();
         }

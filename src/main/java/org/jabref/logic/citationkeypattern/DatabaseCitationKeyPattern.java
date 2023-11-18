@@ -7,9 +7,7 @@ public class DatabaseCitationKeyPattern extends AbstractCitationKeyPattern {
 
     private final GlobalCitationKeyPattern globalCitationKeyPattern;
 
-    public DatabaseCitationKeyPattern(
-        GlobalCitationKeyPattern globalCitationKeyPattern
-    ) {
+    public DatabaseCitationKeyPattern(GlobalCitationKeyPattern globalCitationKeyPattern) {
         this.globalCitationKeyPattern = globalCitationKeyPattern;
     }
 

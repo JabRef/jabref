@@ -42,12 +42,7 @@ public class SidePaneComponent extends BorderPane {
         getStyleClass().add("sidePaneComponent");
         setTop(createHeaderView());
         setCenter(contentFactory.create(sidePaneType));
-        VBox.setVgrow(
-            this,
-            sidePaneType == SidePaneType.GROUPS
-                ? Priority.ALWAYS
-                : Priority.NEVER
-        );
+        VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);
     }
 
     private Node createHeaderView() {
@@ -60,9 +55,7 @@ public class SidePaneComponent extends BorderPane {
         upButton.setOnAction(e -> moveUpCommand.execute());
 
         Button downButton = IconTheme.JabRefIcons.DOWN.asButton();
-        downButton.setTooltip(
-            new Tooltip(Localization.lang("Move panel down"))
-        );
+        downButton.setTooltip(new Tooltip(Localization.lang("Move panel down")));
         downButton.setOnAction(e -> moveDownCommand.execute());
 
         this.buttonContainer = new HBox();

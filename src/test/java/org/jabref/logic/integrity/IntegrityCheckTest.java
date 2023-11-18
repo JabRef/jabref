@@ -47,11 +47,7 @@ class IntegrityCheckTest {
     void bibTexAcceptsStandardEntryType() {
         assertCorrect(
             withMode(
-                createContext(
-                    StandardField.TITLE,
-                    "sometitle",
-                    StandardEntryType.Article
-                ),
+                createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article),
                 BibDatabaseMode.BIBTEX
             )
         );
@@ -61,11 +57,7 @@ class IntegrityCheckTest {
     void bibTexDoesNotAcceptIEEETranEntryType() {
         assertWrong(
             withMode(
-                createContext(
-                    StandardField.TITLE,
-                    "sometitle",
-                    IEEETranEntryType.Patent
-                ),
+                createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent),
                 BibDatabaseMode.BIBTEX
             )
         );
@@ -75,11 +67,7 @@ class IntegrityCheckTest {
     void bibLaTexAcceptsIEEETranEntryType() {
         assertCorrect(
             (withMode(
-                    createContext(
-                        StandardField.TITLE,
-                        "sometitle",
-                        IEEETranEntryType.Patent
-                    ),
+                    createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent),
                     BibDatabaseMode.BIBLATEX
                 ))
         );
@@ -89,11 +77,7 @@ class IntegrityCheckTest {
     void bibLaTexAcceptsStandardEntryType() {
         assertCorrect(
             withMode(
-                createContext(
-                    StandardField.TITLE,
-                    "sometitle",
-                    StandardEntryType.Article
-                ),
+                createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article),
                 BibDatabaseMode.BIBLATEX
             )
         );
@@ -103,9 +87,7 @@ class IntegrityCheckTest {
     @MethodSource("provideCorrectFormat")
     void authorNameChecksCorrectFormat(String input) {
         for (Field field : FieldFactory.getPersonNameFields()) {
-            assertCorrect(
-                withMode(createContext(field, input), BibDatabaseMode.BIBLATEX)
-            );
+            assertCorrect(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
         }
     }
 
@@ -113,18 +95,12 @@ class IntegrityCheckTest {
     @MethodSource("provideIncorrectFormat")
     void authorNameChecksIncorrectFormat(String input) {
         for (Field field : FieldFactory.getPersonNameFields()) {
-            assertWrong(
-                withMode(createContext(field, input), BibDatabaseMode.BIBLATEX)
-            );
+            assertWrong(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
         }
     }
 
     private static Stream<String> provideCorrectFormat() {
-        return Stream.of(
-            "",
-            "Knuth",
-            "Donald E. Knuth and Kurt Cobain and A. Einstein"
-        );
+        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein");
     }
 
     private static Stream<String> provideIncorrectFormat() {
@@ -141,44 +117,26 @@ class IntegrityCheckTest {
     @Test
     void testFileChecks() {
         MetaData metaData = mock(MetaData.class);
-        Mockito
-            .when(metaData.getDefaultFileDirectory())
-            .thenReturn(Optional.of("."));
-        Mockito
-            .when(metaData.getUserFileDirectory(any(String.class)))
-            .thenReturn(Optional.empty());
+        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
-        Mockito
-            .when(metaData.getMode())
-            .thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
+        Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
+        assertCorrect(createContext(StandardField.FILE, ":build.gradle:gradle", metaData));
         assertCorrect(
-            createContext(StandardField.FILE, ":build.gradle:gradle", metaData)
+            createContext(StandardField.FILE, "description:build.gradle:gradle", metaData)
         );
-        assertCorrect(
-            createContext(
-                StandardField.FILE,
-                "description:build.gradle:gradle",
-                metaData
-            )
-        );
-        assertWrong(
-            createContext(StandardField.FILE, ":asflakjfwofja:PDF", metaData)
-        );
+        assertWrong(createContext(StandardField.FILE, ":asflakjfwofja:PDF", metaData));
     }
 
     @Test
-    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder)
-        throws IOException {
+    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
         Path bibFile = testFolder.resolve("lit.bib");
         Files.createFile(bibFile);
         Path pdfFile = testFolder.resolve("file.pdf");
         Files.createFile(pdfFile);
 
-        BibDatabaseContext databaseContext = createContext(
-            StandardField.FILE,
-            ":file.pdf:PDF"
-        );
+        BibDatabaseContext databaseContext = createContext(StandardField.FILE, ":file.pdf:PDF");
         databaseContext.setDatabasePath(bibFile);
 
         assertCorrect(databaseContext);
@@ -214,22 +172,14 @@ class IntegrityCheckTest {
         assertEquals(clonedEntry, entry);
     }
 
-    private BibDatabaseContext createContext(
-        Field field,
-        String value,
-        EntryType type
-    ) {
+    private BibDatabaseContext createContext(Field field, String value, EntryType type) {
         BibEntry entry = new BibEntry(type).withField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
         return new BibDatabaseContext(bibDatabase);
     }
 
-    private BibDatabaseContext createContext(
-        Field field,
-        String value,
-        MetaData metaData
-    ) {
+    private BibDatabaseContext createContext(Field field, String value, MetaData metaData) {
         BibEntry entry = new BibEntry().withField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
@@ -256,8 +206,7 @@ class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context) {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
-        when(filePreferencesMock.shouldStoreFilesRelativeToBibFile())
-            .thenReturn(true);
+        when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(
             context,
             filePreferencesMock,
@@ -284,10 +233,7 @@ class IntegrityCheckTest {
         );
     }
 
-    private BibDatabaseContext withMode(
-        BibDatabaseContext context,
-        BibDatabaseMode mode
-    ) {
+    private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
         context.setMode(mode);
         return context;
     }

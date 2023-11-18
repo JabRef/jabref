@@ -22,14 +22,9 @@ public class PushToLyx extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.LYX;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PushToLyx.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
-    public PushToLyx(
-        DialogService dialogService,
-        PreferencesService preferencesService
-    ) {
+    public PushToLyx(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 
@@ -48,9 +43,7 @@ public class PushToLyx extends AbstractPushToApplication {
         if (couldNotPush) {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("Error pushing entries"),
-                Localization.lang(
-                    "Verify that LyX is running and that the lyxpipe is valid."
-                ) +
+                Localization.lang("Verify that LyX is running and that the lyxpipe is valid.") +
                 "[" +
                 commandPath +
                 "]"
@@ -118,8 +111,7 @@ public class PushToLyx extends AbstractPushToApplication {
                 FileWriter fw = new FileWriter(lyxpipe, StandardCharsets.UTF_8);
                 BufferedWriter lyxOut = new BufferedWriter(fw)
             ) {
-                String citeStr =
-                    "LYXCMD:sampleclient:citation-insert:" + keyString;
+                String citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                 lyxOut.write(citeStr + "\n");
             } catch (IOException excep) {
                 couldNotCall = true;

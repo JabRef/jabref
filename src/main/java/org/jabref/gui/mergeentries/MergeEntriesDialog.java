@@ -15,11 +15,7 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final BibEntry one;
     private final BibEntry two;
 
-    public MergeEntriesDialog(
-        BibEntry one,
-        BibEntry two,
-        PreferencesService preferencesService
-    ) {
+    public MergeEntriesDialog(BibEntry one, BibEntry two, PreferencesService preferencesService) {
         threeWayMergeView = new ThreeWayMergeView(one, two, preferencesService);
         this.one = one;
         this.two = two;
@@ -41,9 +37,7 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
             Localization.lang("Merge entries"),
             ButtonBar.ButtonData.OK_DONE
         );
-        this.getDialogPane()
-            .getButtonTypes()
-            .setAll(ButtonType.CANCEL, replaceEntries);
+        this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
                 threeWayMergeView.saveConfiguration();
                 if (buttonType.equals(replaceEntries)) {

@@ -42,14 +42,9 @@ import org.slf4j.LoggerFactory;
  * Fetches data from the MathSciNet (http://www.ams.org/mathscinet)
  */
 public class MathSciNet
-    implements
-        SearchBasedParserFetcher,
-        EntryBasedParserFetcher,
-        IdBasedParserFetcher {
+    implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MathSciNet.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MathSciNet.class);
     private final ImportFormatPreferences preferences;
 
     public MathSciNet(ImportFormatPreferences preferences) {
@@ -68,9 +63,7 @@ public class MathSciNet
     @Override
     public URL getURLForEntry(BibEntry entry)
         throws URISyntaxException, MalformedURLException, FetcherException {
-        Optional<String> mrNumberInEntry = entry.getField(
-            StandardField.MR_NUMBER
-        );
+        Optional<String> mrNumberInEntry = entry.getField(StandardField.MR_NUMBER);
         if (mrNumberInEntry.isPresent()) {
             // We are lucky and already know the id, so use it instead
             return getUrlForIdentifier(mrNumberInEntry.get());
@@ -80,22 +73,10 @@ public class MathSciNet
             "https://mathscinet.ams.org/mathscinet/api/freetools/mrlookup"
         );
 
-        uriBuilder.addParameter(
-            "author",
-            entry.getFieldOrAlias(StandardField.AUTHOR).orElse("")
-        );
-        uriBuilder.addParameter(
-            "title",
-            entry.getFieldOrAlias(StandardField.TITLE).orElse("")
-        );
-        uriBuilder.addParameter(
-            "journal",
-            entry.getFieldOrAlias(StandardField.JOURNAL).orElse("")
-        );
-        uriBuilder.addParameter(
-            "year",
-            entry.getFieldOrAlias(StandardField.YEAR).orElse("")
-        );
+        uriBuilder.addParameter("author", entry.getFieldOrAlias(StandardField.AUTHOR).orElse(""));
+        uriBuilder.addParameter("title", entry.getFieldOrAlias(StandardField.TITLE).orElse(""));
+        uriBuilder.addParameter("journal", entry.getFieldOrAlias(StandardField.JOURNAL).orElse(""));
+        uriBuilder.addParameter("year", entry.getFieldOrAlias(StandardField.YEAR).orElse(""));
         uriBuilder.addParameter("firstPage", "");
         uriBuilder.addParameter("lastPage", "");
 
@@ -111,9 +92,7 @@ public class MathSciNet
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
         uriBuilder.addParameter(
             "s7",
-            new DefaultQueryTransformer()
-                .transformLuceneQuery(luceneQuery)
-                .orElse("")
+            new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")
         ); // query
         uriBuilder.addParameter("r", "1"); // start index
         uriBuilder.addParameter("extend", "1"); // should return up to 100 items (instead of default 10)
@@ -138,18 +117,14 @@ public class MathSciNet
     @Override
     public Parser getParser() {
         return inputStream -> {
-            String response = new BufferedReader(
-                new InputStreamReader(inputStream)
-            )
+            String response = new BufferedReader(new InputStreamReader(inputStream))
                 .lines()
                 .collect(Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
             try {
                 JSONObject jsonResponse = new JSONObject(response);
-                JSONArray entriesArray = jsonResponse
-                    .getJSONObject("all")
-                    .getJSONArray("results");
+                JSONArray entriesArray = jsonResponse.getJSONObject("all").getJSONArray("results");
 
                 BibtexParser bibtexParser = new BibtexParser(
                     preferences,
@@ -157,9 +132,7 @@ public class MathSciNet
                 );
 
                 for (int i = 0; i < entriesArray.length(); i++) {
-                    String bibTexFormat = entriesArray
-                        .getJSONObject(i)
-                        .getString("bibTexFormat");
+                    String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
                     entries.addAll(bibtexParser.parseEntries(bibTexFormat));
                 }
             } catch (JSONException | TokenMgrException e) {
@@ -172,21 +145,12 @@ public class MathSciNet
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL)
-            .cleanup(entry);
-        new MoveFieldCleanup(
-            new UnknownField("mrclass"),
-            StandardField.KEYWORDS
-        )
-            .cleanup(entry);
-        new FieldFormatterCleanup(
-            new UnknownField("mrreviewer"),
-            new ClearFormatter()
-        )
+        new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("mrclass"), StandardField.KEYWORDS).cleanup(entry);
+        new FieldFormatterCleanup(new UnknownField("mrreviewer"), new ClearFormatter())
             .cleanup(entry);
         new DoiCleanup().cleanup(entry);
-        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter())
-            .cleanup(entry);
+        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
 
         // Remove comments: MathSciNet prepends a <pre> html tag
         entry.setCommentsBeforeEntry("");

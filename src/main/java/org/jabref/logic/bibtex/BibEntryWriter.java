@@ -29,25 +29,18 @@ import org.slf4j.LoggerFactory;
 
 public class BibEntryWriter {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(
-        BibEntryWriter.class
-    );
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
 
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
 
-    public BibEntryWriter(
-        FieldWriter fieldWriter,
-        BibEntryTypesManager entryTypesManager
-    ) {
+    public BibEntryWriter(FieldWriter fieldWriter, BibEntryTypesManager entryTypesManager) {
         this.fieldWriter = fieldWriter;
         this.entryTypesManager = entryTypesManager;
     }
 
-    public String serializeAll(
-        List<BibEntry> entries,
-        BibDatabaseMode databaseMode
-    ) throws IOException {
+    public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode)
+        throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         for (BibEntry entry : entries) {
@@ -56,11 +49,8 @@ public class BibEntryWriter {
         return writer.toString();
     }
 
-    public void write(
-        BibEntry entry,
-        BibWriter out,
-        BibDatabaseMode bibDatabaseMode
-    ) throws IOException {
+    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode)
+        throws IOException {
         write(entry, out, bibDatabaseMode, false);
     }
 
@@ -86,16 +76,11 @@ public class BibEntryWriter {
         }
 
         writeUserComments(entry, out);
-        writeRequiredFieldsFirstRemainingFieldsSecond(
-            entry,
-            out,
-            bibDatabaseMode
-        );
+        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
         out.finishBlock();
     }
 
-    private void writeUserComments(BibEntry entry, BibWriter out)
-        throws IOException {
+    private void writeUserComments(BibEntry entry, BibWriter out) throws IOException {
         String userComments = entry.getUserComments();
 
         if (!userComments.isEmpty()) {
@@ -123,10 +108,7 @@ public class BibEntryWriter {
         written.add(InternalField.KEY_FIELD);
         final int indent = getLengthOfLongestFieldName(entry);
 
-        Optional<BibEntryType> type = entryTypesManager.enrich(
-            entry.getType(),
-            bibDatabaseMode
-        );
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), bibDatabaseMode);
         if (type.isPresent()) {
             // Write required fields first
             List<Field> requiredFields = type
@@ -164,9 +146,7 @@ public class BibEntryWriter {
             .stream()
             .filter(key -> !written.contains(key))
             .collect(
-                Collectors.toCollection(() ->
-                    new TreeSet<>(Comparator.comparing(Field::getName))
-                )
+                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName)))
             );
 
         for (Field field : remainingFields) {
@@ -177,11 +157,8 @@ public class BibEntryWriter {
         out.writeLine("}");
     }
 
-    private void writeKeyField(BibEntry entry, BibWriter out)
-        throws IOException {
-        String keyField = StringUtil.shaveString(
-            entry.getCitationKey().orElse("")
-        );
+    private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {
+        String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
         out.writeLine(keyField + ',');
     }
 
@@ -193,12 +170,8 @@ public class BibEntryWriter {
      * @param field the field
      * @throws IOException In case of an IO error
      */
-    private void writeField(
-        BibEntry entry,
-        BibWriter out,
-        Field field,
-        int indent
-    ) throws IOException {
+    private void writeField(BibEntry entry, BibWriter out, Field field, int indent)
+        throws IOException {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
         // field.ifPresent does not work as an IOException may be thrown
@@ -230,8 +203,7 @@ public class BibEntryWriter {
     }
 
     static int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<Field> isNotCitationKey = field ->
-            InternalField.KEY_FIELD != field;
+        Predicate<Field> isNotCitationKey = field -> InternalField.KEY_FIELD != field;
         return entry
             .getFields()
             .stream()
