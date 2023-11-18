@@ -173,7 +173,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.90.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
@@ -235,14 +235,14 @@ dependencies {
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.163'
+    testImplementation 'io.github.classgraph:classgraph:4.8.164'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.1'
 
-    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.mockito:mockito-core:5.7.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.1.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.2.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.2.0'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
