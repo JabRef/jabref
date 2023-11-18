@@ -16,13 +16,9 @@ public class SpecialFieldComparatorTest {
     private final SpecialFieldValue value1 = SpecialFieldValue.PRIORITY_HIGH;
     private final SpecialFieldValue value2 = SpecialFieldValue.PRIORITY_LOW;
     private final SpecialFieldValue value3 = SpecialFieldValue.READ;
-    private final SpecialFieldValue value4 = SpecialFieldValue.RELEVANT;
-    private final SpecialFieldValue value5 = SpecialFieldValue.IRRELEVANT;
     private final Optional<SpecialFieldValueViewModel> prio1 = Optional.of(new SpecialFieldValueViewModel(value1));
     private final Optional<SpecialFieldValueViewModel> prio3 = Optional.of(new SpecialFieldValueViewModel(value2));
     private final Optional<SpecialFieldValueViewModel> read = Optional.of(new SpecialFieldValueViewModel(value3));
-    private final Optional<SpecialFieldValueViewModel> relevant = Optional.of(new SpecialFieldValueViewModel(value4));
-    private final Optional<SpecialFieldValueViewModel> irrelevant = Optional.of(new SpecialFieldValueViewModel(value5));
 
     @BeforeEach
     public void setUp() {
@@ -62,20 +58,5 @@ public class SpecialFieldComparatorTest {
     @Test
     public void compareTwoInputsWithSecondEmpty() {
         assertEquals(-1, comparator.compare(prio1, Optional.empty()));
-    }
-
-    @Test
-    public void compareRelevantFirst() {
-        assertEquals(-1, comparator.compare(relevant, irrelevant));
-    }
-
-    @Test
-    public void compareIrrelevantFirst() {
-        assertEquals(1, comparator.compare(irrelevant, relevant));
-    }
-
-    @Test
-    public void compareSameRelevance() {
-        assertEquals(0, comparator.compare(relevant, relevant));
     }
 }

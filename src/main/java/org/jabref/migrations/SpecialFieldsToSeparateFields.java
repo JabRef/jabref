@@ -67,7 +67,6 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
         map.put("skimmed", SpecialField.READ_STATUS);
 
         map.put("relevant", SpecialField.RELEVANCE);
-        map.put("irrelevant", SpecialField.RELEVANCE);
 
         return map;
     }

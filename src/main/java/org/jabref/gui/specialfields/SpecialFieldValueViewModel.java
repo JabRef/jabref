@@ -48,7 +48,6 @@ public class SpecialFieldValueViewModel {
             case READ -> Localization.lang("Read status read");
             case SKIMMED -> Localization.lang("Read status skimmed");
             case RELEVANT -> Localization.lang("Toggle relevance");
-            case IRRELEVANT -> Localization.lang("Toggle irrelevance");
         };
     }
 
@@ -70,7 +69,6 @@ public class SpecialFieldValueViewModel {
             case READ -> StandardActions.READ;
             case SKIMMED -> StandardActions.SKIMMED;
             case RELEVANT -> StandardActions.RELEVANT;
-            case IRRELEVANT -> StandardActions.IRRELEVANT;
         };
     }
 }
