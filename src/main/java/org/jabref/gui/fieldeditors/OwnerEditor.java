@@ -47,10 +47,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
         textArea.initContextMenu(EditorMenus.getNameMenu(textArea));
 
         new EditorValidator(preferencesService)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textArea
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {

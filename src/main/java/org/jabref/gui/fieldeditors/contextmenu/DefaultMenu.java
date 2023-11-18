@@ -50,11 +50,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
             menuItem.setOnAction(event ->
                 textInputControl
                     .textProperty()
-                    .set(
-                        caseChanger.format(
-                            textInputControl.textProperty().get()
-                        )
-                    )
+                    .set(caseChanger.format(textInputControl.textProperty().get()))
             );
             submenu.getItems().add(menuItem);
         }
@@ -74,9 +70,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
             menuItem.setOnAction(event ->
                 textInputControl
                     .textProperty()
-                    .set(
-                        converter.format(textInputControl.textProperty().get())
-                    )
+                    .set(converter.format(textInputControl.textProperty().get()))
             );
             submenu.getItems().add(menuItem);
         }
@@ -85,9 +79,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
     }
 
     // Icon: DELETE_SWEEP
-    private static MenuItem getClearFieldMenuItem(
-        TextInputControl textInputControl
-    ) {
+    private static MenuItem getClearFieldMenuItem(TextInputControl textInputControl) {
         MenuItem menuItem = new MenuItem(Localization.lang("Clear"));
         menuItem.setOnAction(event -> textInputControl.setText(""));
 

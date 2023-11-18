@@ -73,9 +73,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EntryEditor extends BorderPane {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        EntryEditor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditor.class);
 
     private final LibraryTab libraryTab;
     private final BibDatabaseContext databaseContext;
@@ -145,8 +143,7 @@ public class EntryEditor extends BorderPane {
 
         ViewLoader.view(this).root(this).load();
 
-        this.entryEditorPreferences =
-            preferencesService.getEntryEditorPreferences();
+        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.fileLinker =
             new ExternalFilesEntryLinker(
                 preferencesService.getFilePreferences(),
@@ -227,8 +224,7 @@ public class EntryEditor extends BorderPane {
         this.addEventHandler(
                 KeyEvent.KEY_PRESSED,
                 event -> {
-                    Optional<KeyBinding> keyBinding =
-                        keyBindingRepository.mapToKeyBinding(event);
+                    Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
                     if (keyBinding.isPresent()) {
                         switch (keyBinding.get()) {
                             case ENTRY_EDITOR_NEXT_PANEL:
@@ -283,14 +279,13 @@ public class EntryEditor extends BorderPane {
 
     @FXML
     void generateCiteKeyButton() {
-        GenerateCitationKeySingleAction action =
-            new GenerateCitationKeySingleAction(
-                getEntry(),
-                databaseContext,
-                dialogService,
-                preferencesService,
-                undoManager
-            );
+        GenerateCitationKeySingleAction action = new GenerateCitationKeySingleAction(
+            getEntry(),
+            databaseContext,
+            dialogService,
+            preferencesService,
+            undoManager
+        );
         action.execute();
     }
 
@@ -441,10 +436,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabList.remove(SciteTab.NAME);
         entryEditorTabList.remove("Comments");
         // Then show the remaining configured
-        for (Map.Entry<
-            String,
-            Set<Field>
-        > tab : entryEditorTabList.entrySet()) {
+        for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
             entryEditorTabs.add(
                 new UserDefinedFieldsTab(
                     tab.getKey(),
@@ -465,9 +457,7 @@ public class EntryEditor extends BorderPane {
 
         // "Special" tabs
         entryEditorTabs.add(new MathSciNetTab());
-        entryEditorTabs.add(
-            new FileAnnotationTab(libraryTab.getAnnotationCache())
-        );
+        entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         entryEditorTabs.add(
             new RelatedArticlesTab(
                 entryEditorPreferences,
@@ -504,12 +494,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(sourceTab);
 
         entryEditorTabs.add(
-            new LatexCitationsTab(
-                databaseContext,
-                preferencesService,
-                taskExecutor,
-                dialogService
-            )
+            new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService)
         );
 
         entryEditorTabs.add(
@@ -521,9 +506,7 @@ public class EntryEditor extends BorderPane {
             )
         );
 
-        entryEditorTabs.add(
-            new SciteTab(preferencesService, taskExecutor, dialogService)
-        );
+        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
 
         return entryEditorTabs;
     }
@@ -584,9 +567,7 @@ public class EntryEditor extends BorderPane {
 
         recalculateVisibleTabs();
         EasyBind.listen(
-            preferencesService
-                .getPreviewPreferences()
-                .showPreviewAsExtraTabProperty(),
+            preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
             (obs, oldValue, newValue) -> recalculateVisibleTabs()
         );
 
@@ -605,8 +586,7 @@ public class EntryEditor extends BorderPane {
                 this.entry.typeProperty(),
                 type -> {
                     typeLabel.setText(
-                        new TypedBibEntry(entry, databaseContext.getMode())
-                            .getTypeForDisplay()
+                        new TypedBibEntry(entry, databaseContext.getMode()).getTypeForDisplay()
                     );
                     recalculateVisibleTabs();
                     getSelectedTab().notifyAboutFocus(entry);
@@ -620,10 +600,7 @@ public class EntryEditor extends BorderPane {
 
     private void setupToolBar() {
         // Update type label
-        TypedBibEntry typedEntry = new TypedBibEntry(
-            entry,
-            databaseContext.getMode()
-        );
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext.getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
@@ -635,28 +612,22 @@ public class EntryEditor extends BorderPane {
             bibEntryTypesManager
         )
             .asContextMenu();
-        typeLabel.setOnMouseClicked(event ->
-            typeMenu.show(typeLabel, Side.RIGHT, 0, 0)
-        );
+        typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event ->
             typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0)
         );
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        SortedSet<EntryBasedFetcher> entryBasedFetchers =
-            WebFetchers.getEntryBasedFetchers(
-                preferencesService.getImporterPreferences(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getFilePreferences(),
-                databaseContext
-            );
+        SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
+            preferencesService.getImporterPreferences(),
+            preferencesService.getImportFormatPreferences(),
+            preferencesService.getFilePreferences(),
+            databaseContext
+        );
         for (EntryBasedFetcher fetcher : entryBasedFetchers) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
-            if (
-                fetcher instanceof
-                PdfMergeMetadataImporter.EntryBasedFetcherWrapper
-            ) {
+            if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
                     GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(
@@ -677,9 +648,7 @@ public class EntryEditor extends BorderPane {
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
 
-        fetcherButton.setOnMouseClicked(event ->
-            fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0)
-        );
+        fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {

@@ -10,20 +10,15 @@ import org.jabref.model.entry.field.Field;
 
 public class SaveOrderConfigPanelViewModel {
 
-    private final BooleanProperty saveInOriginalProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty saveInTableOrderProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty saveInSpecifiedOrderProperty =
-        new SimpleBooleanProperty();
+    private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
+    private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
 
-    private final ListProperty<Field> sortableFieldsProperty =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<
-        SortCriterionViewModel
-    > selectedSortCriteriaProperty = new SimpleListProperty<>(
+    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(
         FXCollections.observableArrayList()
     );
+    private final ListProperty<SortCriterionViewModel> selectedSortCriteriaProperty =
+        new SimpleListProperty<>(FXCollections.observableArrayList());
 
     public SaveOrderConfigPanelViewModel() {}
 
@@ -37,32 +32,18 @@ public class SaveOrderConfigPanelViewModel {
 
     public void moveCriterionUp(SortCriterionViewModel sortCriterionViewModel) {
         if (selectedSortCriteriaProperty.contains(sortCriterionViewModel)) {
-            int index = selectedSortCriteriaProperty.indexOf(
-                sortCriterionViewModel
-            );
+            int index = selectedSortCriteriaProperty.indexOf(sortCriterionViewModel);
             if (index > 0) {
-                Collections.swap(
-                    selectedSortCriteriaProperty,
-                    index - 1,
-                    index
-                );
+                Collections.swap(selectedSortCriteriaProperty, index - 1, index);
             }
         }
     }
 
-    public void moveCriterionDown(
-        SortCriterionViewModel sortCriterionViewModel
-    ) {
+    public void moveCriterionDown(SortCriterionViewModel sortCriterionViewModel) {
         if (selectedSortCriteriaProperty.contains(sortCriterionViewModel)) {
-            int index = selectedSortCriteriaProperty.indexOf(
-                sortCriterionViewModel
-            );
+            int index = selectedSortCriteriaProperty.indexOf(sortCriterionViewModel);
             if (index >= 0 && index < selectedSortCriteriaProperty.size() - 1) {
-                Collections.swap(
-                    selectedSortCriteriaProperty,
-                    index + 1,
-                    index
-                );
+                Collections.swap(selectedSortCriteriaProperty, index + 1, index);
             }
         }
     }

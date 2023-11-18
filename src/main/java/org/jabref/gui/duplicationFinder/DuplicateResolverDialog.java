@@ -20,8 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
-public class DuplicateResolverDialog
-    extends BaseDialog<DuplicateResolverResult> {
+public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
     private final BibDatabaseContext database;
     private final StateManager stateManager;
@@ -60,17 +59,13 @@ public class DuplicateResolverDialog
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.actionFactory =
-            new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         init(one, two, type);
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
         ButtonType cancel = ButtonType.CANCEL;
-        ButtonType merge = new ButtonType(
-            Localization.lang("Keep merged"),
-            ButtonData.OK_DONE
-        );
+        ButtonType merge = new ButtonType(Localization.lang("Keep merged"), ButtonData.OK_DONE);
 
         ButtonType both;
         ButtonType second;
@@ -83,60 +78,22 @@ public class DuplicateResolverDialog
 
         switch (type) {
             case DUPLICATE_SEARCH -> {
-                first =
-                    new ButtonType(
-                        Localization.lang("Keep left"),
-                        ButtonData.LEFT
-                    );
-                second =
-                    new ButtonType(
-                        Localization.lang("Keep right"),
-                        ButtonData.LEFT
-                    );
-                both =
-                    new ButtonType(
-                        Localization.lang("Keep both"),
-                        ButtonData.LEFT
-                    );
-                threeWayMerge =
-                    new ThreeWayMergeView(one, two, preferencesService);
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
-                first =
-                    new ButtonType(
-                        Localization.lang("Keep left"),
-                        ButtonData.LEFT
-                    );
-                second =
-                    new ButtonType(
-                        Localization.lang("Keep right"),
-                        ButtonData.LEFT
-                    );
-                both =
-                    new ButtonType(
-                        Localization.lang("Keep both"),
-                        ButtonData.LEFT
-                    );
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-                threeWayMerge =
-                    new ThreeWayMergeView(one, two, preferencesService);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
             }
             case IMPORT_CHECK -> {
-                first =
-                    new ButtonType(
-                        Localization.lang("Keep old entry"),
-                        ButtonData.LEFT
-                    );
-                second =
-                    new ButtonType(
-                        Localization.lang("Keep from import"),
-                        ButtonData.LEFT
-                    );
-                both =
-                    new ButtonType(
-                        Localization.lang("Keep both"),
-                        ButtonData.LEFT
-                    );
+                first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge =
                     new ThreeWayMergeView(
                         one,
@@ -146,14 +103,10 @@ public class DuplicateResolverDialog
                         preferencesService
                     );
             }
-            default -> throw new IllegalStateException(
-                "Switch expression should be exhaustive"
-            );
+            default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }
 
-        this.getDialogPane()
-            .getButtonTypes()
-            .addAll(first, second, both, merge, cancel);
+        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel);
         this.getDialogPane().setFocusTraversable(false);
 
         if (removeExactVisible) {
@@ -169,12 +122,9 @@ public class DuplicateResolverDialog
         }
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
-        DialogWindowState state = stateManager.getDialogWindowState(
-            getClass().getSimpleName()
-        );
+        DialogWindowState state = stateManager.getDialogWindowState(getClass().getSimpleName());
         if (state != null) {
-            this.getDialogPane()
-                .setPrefSize(state.getWidth(), state.getHeight());
+            this.getDialogPane().setPrefSize(state.getWidth(), state.getHeight());
             this.setX(state.getX());
             this.setY(state.getY());
         }
@@ -213,10 +163,7 @@ public class DuplicateResolverDialog
             dialogService,
             preferencesService.getFilePreferences()
         );
-        Button helpButton = actionFactory.createIconButton(
-            StandardActions.HELP,
-            helpCommand
-        );
+        Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
         borderPane.setRight(helpButton);
 
         getDialogPane().setContent(borderPane);

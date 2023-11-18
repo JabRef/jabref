@@ -19,23 +19,16 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.PreferencesService;
 
-public class CitationKeyPatternPanel
-    extends TableView<CitationKeyPatternPanelItemModel> {
+public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelItemModel> {
 
     @FXML
-    public TableColumn<
-        CitationKeyPatternPanelItemModel,
-        EntryType
-    > entryTypeColumn;
+    public TableColumn<CitationKeyPatternPanelItemModel, EntryType> entryTypeColumn;
 
     @FXML
     public TableColumn<CitationKeyPatternPanelItemModel, String> patternColumn;
 
     @FXML
-    public TableColumn<
-        CitationKeyPatternPanelItemModel,
-        EntryType
-    > actionsColumn;
+    public TableColumn<CitationKeyPatternPanelItemModel, EntryType> actionsColumn;
 
     @Inject
     private PreferencesService preferences;
@@ -53,54 +46,37 @@ public class CitationKeyPatternPanel
     @FXML
     private void initialize() {
         viewModel =
-            new CitationKeyPatternPanelViewModel(
-                preferences.getCitationKeyPatternPreferences()
-            );
+            new CitationKeyPatternPanelViewModel(preferences.getCitationKeyPatternPreferences());
 
         this.setEditable(true);
 
         entryTypeColumn.setSortable(true);
         entryTypeColumn.setReorderable(false);
-        entryTypeColumn.setCellValueFactory(cellData ->
-            cellData.getValue().entryType()
-        );
+        entryTypeColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
         new ValueTableCellFactory<CitationKeyPatternPanelItemModel, EntryType>()
             .withText(EntryType::getDisplayName)
             .install(entryTypeColumn);
         this.setOnSort(event ->
                 viewModel
                     .patternListProperty()
-                    .sort(
-                        CitationKeyPatternPanelViewModel.defaultOnTopComparator
-                    )
+                    .sort(CitationKeyPatternPanelViewModel.defaultOnTopComparator)
             );
 
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
-        patternColumn.setCellValueFactory(cellData ->
-            cellData.getValue().pattern()
-        );
+        patternColumn.setCellValueFactory(cellData -> cellData.getValue().pattern());
         patternColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
-                (
-                    TableColumn.CellEditEvent<
-                        CitationKeyPatternPanelItemModel,
-                        String
-                    > event
-                ) ->
+                (TableColumn.CellEditEvent<CitationKeyPatternPanelItemModel, String> event) ->
             event.getRowValue().setPattern(event.getNewValue())
         );
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData ->
-            cellData.getValue().entryType()
-        );
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
         new ValueTableCellFactory<CitationKeyPatternPanelItemModel, EntryType>()
-            .withGraphic(entryType ->
-                IconTheme.JabRefIcons.REFRESH.getGraphicNode()
-            )
+            .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
             .withTooltip(entryType ->
                 String.format(
                     Localization.lang("Reset %s to default value"),
@@ -108,10 +84,7 @@ public class CitationKeyPatternPanel
                 )
             )
             .withOnMouseClickedEvent(item ->
-                evt ->
-                    viewModel.setItemToDefaultPattern(
-                        this.getFocusModel().getFocusedItem()
-                    )
+                evt -> viewModel.setItemToDefaultPattern(this.getFocusModel().getFocusedItem())
             )
             .install(actionsColumn);
 
@@ -131,15 +104,11 @@ public class CitationKeyPatternPanel
         viewModel.resetAll();
     }
 
-    public ListProperty<
-        CitationKeyPatternPanelItemModel
-    > patternListProperty() {
+    public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<
-        CitationKeyPatternPanelItemModel
-    > defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty() {
         return viewModel.defaultKeyPatternProperty();
     }
 
@@ -158,25 +127,15 @@ public class CitationKeyPatternPanel
 
         this.getItems()
             .stream()
-            .filter(item ->
-                item
-                    .getEntryType()
-                    .getName()
-                    .toLowerCase()
-                    .startsWith(tableSearchTerm)
-            )
+            .filter(item -> item.getEntryType().getName().toLowerCase().startsWith(tableSearchTerm))
             .findFirst()
             .ifPresent(this::scrollTo);
     }
 
-    private static class HighlightTableRow
-        extends TableRow<CitationKeyPatternPanelItemModel> {
+    private static class HighlightTableRow extends TableRow<CitationKeyPatternPanelItemModel> {
 
         @Override
-        public void updateItem(
-            CitationKeyPatternPanelItemModel item,
-            boolean empty
-        ) {
+        public void updateItem(CitationKeyPatternPanelItemModel item, boolean empty) {
             super.updateItem(item, empty);
             if (item == null || item.getEntryType() == null) {
                 setStyle("");
@@ -186,9 +145,7 @@ public class CitationKeyPatternPanel
                 item
                     .getEntryType()
                     .getName()
-                    .equals(
-                        CitationKeyPatternPanelViewModel.ENTRY_TYPE_DEFAULT_NAME
-                    )
+                    .equals(CitationKeyPatternPanelViewModel.ENTRY_TYPE_DEFAULT_NAME)
             ) {
                 setStyle("-fx-background-color: -fx-default-button");
             } else {

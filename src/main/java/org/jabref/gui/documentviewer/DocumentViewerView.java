@@ -70,8 +70,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel =
-            new DocumentViewerViewModel(stateManager, preferencesService);
+        viewModel = new DocumentViewerViewModel(stateManager, preferencesService);
 
         setupViewer();
         setupScrollbar();
@@ -92,25 +91,22 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupPageControls() {
         OnlyIntegerFormatter integerFormatter = new OnlyIntegerFormatter(1);
-        viewModel
-            .currentPageProperty()
-            .bindBidirectional(integerFormatter.valueProperty());
+        viewModel.currentPageProperty().bindBidirectional(integerFormatter.valueProperty());
         currentPage.setTextFormatter(integerFormatter);
         maxPages.textProperty().bind(viewModel.maxPagesProperty().asString());
     }
 
     private void setupFileChoice() {
-        ViewModelListCellFactory<LinkedFile> cellFactory =
-            new ViewModelListCellFactory<LinkedFile>()
-                .withText(LinkedFile::getLink);
+        ViewModelListCellFactory<LinkedFile> cellFactory = new ViewModelListCellFactory<
+            LinkedFile
+        >()
+            .withText(LinkedFile::getLink);
         fileChoice.setButtonCell(cellFactory.call(null));
         fileChoice.setCellFactory(cellFactory);
         fileChoice
             .getSelectionModel()
             .selectedItemProperty()
-            .addListener((observable, oldValue, newValue) ->
-                viewModel.switchToFile(newValue)
-            );
+            .addListener((observable, oldValue, newValue) -> viewModel.switchToFile(newValue));
         // We always want that the first item is selected after a change
         // This also automatically selects the first file on the initial load
         fileChoice
@@ -130,9 +126,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
                     viewer.show(newDocument);
                 }
             });
-        viewModel
-            .currentPageProperty()
-            .bindBidirectional(viewer.currentPageProperty());
+        viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
         mainPane.setCenter(viewer);
     }
 

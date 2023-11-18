@@ -5,8 +5,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class BibTexStringAddDetailsView
-    extends DatabaseChangeDetailsView {
+public final class BibTexStringAddDetailsView extends DatabaseChangeDetailsView {
 
     public BibTexStringAddDetailsView(BibTexStringAdd stringAdd) {
         VBox container = new VBox();
@@ -16,18 +15,8 @@ public final class BibTexStringAddDetailsView
             .getChildren()
             .addAll(
                 header,
-                new Label(
-                    Localization.lang(
-                        "Label: %0",
-                        stringAdd.getAddedString().getName()
-                    )
-                ),
-                new Label(
-                    Localization.lang(
-                        "Content: %0",
-                        stringAdd.getAddedString().getContent()
-                    )
-                )
+                new Label(Localization.lang("Label: %0", stringAdd.getAddedString().getName())),
+                new Label(Localization.lang("Content: %0", stringAdd.getAddedString().getContent()))
             );
         setLeftAnchor(container, 8d);
         setTopAnchor(container, 8d);

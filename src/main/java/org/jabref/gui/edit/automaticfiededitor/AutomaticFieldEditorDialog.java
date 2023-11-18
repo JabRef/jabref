@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AutomaticFieldEditorDialog.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticFieldEditorDialog.class);
 
     @FXML
     private TabPane tabPane;
@@ -41,8 +39,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     public AutomaticFieldEditorDialog(StateManager stateManager) {
         this.selectedEntries = stateManager.getSelectedEntries();
-        this.database =
-            stateManager.getActiveDatabase().orElseThrow().getDatabase();
+        this.database = stateManager.getActiveDatabase().orElseThrow().getDatabase();
         this.stateManager = stateManager;
         this.undoManager = Globals.undoManager;
 
@@ -51,10 +48,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
         ViewLoader.view(this).load().setAsDialogPane(this);
 
         setResultConverter(buttonType -> {
-            if (
-                buttonType != null &&
-                buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE
-            ) {
+            if (buttonType != null && buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 saveChanges();
             } else {
                 cancelChanges();
@@ -74,20 +68,14 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     @FXML
     public void initialize() {
         viewModel =
-            new AutomaticFieldEditorViewModel(
-                selectedEntries,
-                database,
-                undoManager,
-                stateManager
-            );
+            new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager, stateManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
-            NotificationPaneAdapter notificationPane =
-                new NotificationPaneAdapter(tabModel.getContent());
+            NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(
+                tabModel.getContent()
+            );
             notificationPanes.add(notificationPane);
-            tabPane
-                .getTabs()
-                .add(new Tab(tabModel.getTabName(), notificationPane));
+            tabPane.getTabs().add(new Tab(tabModel.getTabName(), notificationPane));
         }
 
         EasyBind.listen(
@@ -96,10 +84,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
                 viewModel.getDialogEdits().addEdit(lastEdit.getEdit());
                 notificationPanes
                     .get(lastEdit.getTabIndex())
-                    .notify(
-                        lastEdit.getAffectedEntries(),
-                        selectedEntries.size()
-                    );
+                    .notify(lastEdit.getAffectedEntries(), selectedEntries.size());
             }
         );
     }

@@ -9,10 +9,7 @@ import org.jabref.logic.l10n.Localization;
 public enum StandardActions implements Action {
     COPY_MORE(Localization.lang("Copy") + "..."),
     COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
-    COPY_KEY(
-        Localization.lang("Copy citation key"),
-        KeyBinding.COPY_CITATION_KEY
-    ),
+    COPY_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
     COPY_CITE_KEY(
         Localization.lang("Copy \\cite{citation key}"),
         KeyBinding.COPY_CITE_CITATION_KEY
@@ -25,15 +22,9 @@ public enum StandardActions implements Action {
         Localization.lang("Copy citation key and link"),
         KeyBinding.COPY_CITATION_KEY_AND_LINK
     ),
-    COPY_CITATION_HTML(
-        Localization.lang("Copy citation (html)"),
-        KeyBinding.COPY_PREVIEW
-    ),
+    COPY_CITATION_HTML(Localization.lang("Copy citation (html)"), KeyBinding.COPY_PREVIEW),
     COPY_CITATION_TEXT(Localization.lang("Copy citation (text)")),
-    COPY_CITATION_PREVIEW(
-        Localization.lang("Copy preview"),
-        KeyBinding.COPY_PREVIEW
-    ),
+    COPY_CITATION_PREVIEW(Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW),
     EXPORT_TO_CLIPBOARD(
         Localization.lang("Export to clipboard"),
         IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD
@@ -42,16 +33,8 @@ public enum StandardActions implements Action {
         Localization.lang("Export selected entries to clipboard"),
         IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD
     ),
-    COPY(
-        Localization.lang("Copy"),
-        IconTheme.JabRefIcons.COPY,
-        KeyBinding.COPY
-    ),
-    PASTE(
-        Localization.lang("Paste"),
-        IconTheme.JabRefIcons.PASTE,
-        KeyBinding.PASTE
-    ),
+    COPY(Localization.lang("Copy"), IconTheme.JabRefIcons.COPY, KeyBinding.COPY),
+    PASTE(Localization.lang("Paste"), IconTheme.JabRefIcons.PASTE, KeyBinding.PASTE),
     CUT(Localization.lang("Cut"), IconTheme.JabRefIcons.CUT, KeyBinding.CUT),
     DELETE(Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY),
     DELETE_ENTRY(
@@ -77,31 +60,20 @@ public enum StandardActions implements Action {
         KeyBinding.OPEN_URL_OR_DOI
     ),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
-    MERGE_WITH_FETCHED_ENTRY(
-        Localization.lang("Get bibliographic data from %0", "DOI/ISBN/...")
-    ),
-    ATTACH_FILE(
-        Localization.lang("Attach file"),
-        IconTheme.JabRefIcons.ATTACH_FILE
-    ),
+    MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0", "DOI/ISBN/...")),
+    ATTACH_FILE(Localization.lang("Attach file"), IconTheme.JabRefIcons.ATTACH_FILE),
     ATTACH_FILE_FROM_URL(
         Localization.lang("Attach file from URL"),
         IconTheme.JabRefIcons.DOWNLOAD_FILE
     ),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),
     CLEAR_PRIORITY(Localization.lang("Clear priority")),
-    PRIORITY_HIGH(
-        Localization.lang("Set priority to high"),
-        IconTheme.JabRefIcons.PRIORITY_HIGH
-    ),
+    PRIORITY_HIGH(Localization.lang("Set priority to high"), IconTheme.JabRefIcons.PRIORITY_HIGH),
     PRIORITY_MEDIUM(
         Localization.lang("Set priority to medium"),
         IconTheme.JabRefIcons.PRIORITY_MEDIUM
     ),
-    PRIORITY_LOW(
-        Localization.lang("Set priority to low"),
-        IconTheme.JabRefIcons.PRIORITY_LOW
-    ),
+    PRIORITY_LOW(Localization.lang("Set priority to low"), IconTheme.JabRefIcons.PRIORITY_LOW),
     QUALITY(Localization.lang("Quality"), IconTheme.JabRefIcons.QUALITY),
     QUALITY_ASSURED(
         Localization.lang("Toggle quality assured"),
@@ -115,18 +87,9 @@ public enum StandardActions implements Action {
     RANK_4(Localization.lang("Set rank to four"), IconTheme.JabRefIcons.RANK4),
     RANK_5(Localization.lang("Set rank to five"), IconTheme.JabRefIcons.RANK5),
     PRINTED(Localization.lang("Printed"), IconTheme.JabRefIcons.PRINTED),
-    TOGGLE_PRINTED(
-        Localization.lang("Toggle print status"),
-        IconTheme.JabRefIcons.PRINTED
-    ),
-    READ_STATUS(
-        Localization.lang("Read status"),
-        IconTheme.JabRefIcons.READ_STATUS
-    ),
-    CLEAR_READ_STATUS(
-        Localization.lang("Clear read status"),
-        KeyBinding.CLEAR_READ_STATUS
-    ),
+    TOGGLE_PRINTED(Localization.lang("Toggle print status"), IconTheme.JabRefIcons.PRINTED),
+    READ_STATUS(Localization.lang("Read status"), IconTheme.JabRefIcons.READ_STATUS),
+    CLEAR_READ_STATUS(Localization.lang("Clear read status"), KeyBinding.CLEAR_READ_STATUS),
     READ(
         Localization.lang("Set read status to read"),
         IconTheme.JabRefIcons.READ_STATUS_READ,
@@ -138,10 +101,7 @@ public enum StandardActions implements Action {
         KeyBinding.SKIMMED
     ),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
-    RELEVANT(
-        Localization.lang("Toggle relevance"),
-        IconTheme.JabRefIcons.RELEVANCE
-    ),
+    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
     NEW_LIBRARY(Localization.lang("New library"), IconTheme.JabRefIcons.NEW),
     OPEN_LIBRARY(
         Localization.lang("Open library"),
@@ -149,23 +109,14 @@ public enum StandardActions implements Action {
         KeyBinding.OPEN_DATABASE
     ),
     IMPORT(Localization.lang("Import"), IconTheme.JabRefIcons.IMPORT),
-    EXPORT(
-        Localization.lang("Export"),
-        IconTheme.JabRefIcons.EXPORT,
-        KeyBinding.EXPORT
-    ),
+    EXPORT(Localization.lang("Export"), IconTheme.JabRefIcons.EXPORT, KeyBinding.EXPORT),
     SAVE_LIBRARY(
         Localization.lang("Save library"),
         IconTheme.JabRefIcons.SAVE,
         KeyBinding.SAVE_DATABASE
     ),
-    SAVE_LIBRARY_AS(
-        Localization.lang("Save library as..."),
-        KeyBinding.SAVE_DATABASE_AS
-    ),
-    SAVE_SELECTED_AS_PLAIN_BIBTEX(
-        Localization.lang("Save selected as plain BibTeX...")
-    ),
+    SAVE_LIBRARY_AS(Localization.lang("Save library as..."), KeyBinding.SAVE_DATABASE_AS),
+    SAVE_SELECTED_AS_PLAIN_BIBTEX(Localization.lang("Save selected as plain BibTeX...")),
     SAVE_ALL(
         Localization.lang("Save all"),
         Localization.lang("Save all open libraries"),
@@ -181,14 +132,8 @@ public enum StandardActions implements Action {
         KeyBinding.IMPORT_INTO_CURRENT_DATABASE
     ),
     EXPORT_ALL(Localization.lang("Export all entries")),
-    REMOTE_DB(
-        Localization.lang("Shared database"),
-        IconTheme.JabRefIcons.REMOTE_DATABASE
-    ),
-    EXPORT_SELECTED(
-        Localization.lang("Export selected entries"),
-        KeyBinding.EXPORT_SELECTED
-    ),
+    REMOTE_DB(Localization.lang("Shared database"), IconTheme.JabRefIcons.REMOTE_DATABASE),
+    EXPORT_SELECTED(Localization.lang("Export selected entries"), KeyBinding.EXPORT_SELECTED),
     CONNECT_TO_SHARED_DB(
         Localization.lang("Connect to shared database"),
         IconTheme.JabRefIcons.CONNECT_DB
@@ -219,20 +164,9 @@ public enum StandardActions implements Action {
         IconTheme.JabRefIcons.CLOSE_JABREF,
         KeyBinding.QUIT_JABREF
     ),
-    UNDO(
-        Localization.lang("Undo"),
-        IconTheme.JabRefIcons.UNDO,
-        KeyBinding.UNDO
-    ),
-    REDO(
-        Localization.lang("Redo"),
-        IconTheme.JabRefIcons.REDO,
-        KeyBinding.REDO
-    ),
-    REPLACE_ALL(
-        Localization.lang("Find and replace"),
-        KeyBinding.REPLACE_STRING
-    ),
+    UNDO(Localization.lang("Undo"), IconTheme.JabRefIcons.UNDO, KeyBinding.UNDO),
+    REDO(Localization.lang("Redo"), IconTheme.JabRefIcons.REDO, KeyBinding.REDO),
+    REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
 
@@ -268,18 +202,12 @@ public enum StandardActions implements Action {
     ),
     WRITE_METADATA_TO_PDF(
         Localization.lang("Write metadata to PDF files"),
-        Localization.lang(
-            "Will write metadata to the PDFs linked from selected entries."
-        ),
+        Localization.lang("Will write metadata to the PDFs linked from selected entries."),
         KeyBinding.WRITE_METADATA_TO_PDF
     ),
 
-    START_NEW_STUDY(
-        Localization.lang("Start new systematic literature review")
-    ),
-    UPDATE_SEARCH_RESULTS_OF_STUDY(
-        Localization.lang("Update study search results")
-    ),
+    START_NEW_STUDY(Localization.lang("Start new systematic literature review")),
+    UPDATE_SEARCH_RESULTS_OF_STUDY(Localization.lang("Update study search results")),
     EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
 
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
@@ -314,9 +242,7 @@ public enum StandardActions implements Action {
     ),
     ABBREVIATE_DOTLESS(
         Localization.lang("dotless"),
-        Localization.lang(
-            "Abbreviate journal names of the selected entries (DOTLESS abbreviation)"
-        )
+        Localization.lang("Abbreviate journal names of the selected entries (DOTLESS abbreviation)")
     ),
     ABBREVIATE_SHORTEST_UNIQUE(
         Localization.lang("shortest unique"),
@@ -336,10 +262,7 @@ public enum StandardActions implements Action {
     SETUP_GENERAL_FIELDS(Localization.lang("Set up general fields")),
     MANAGE_PROTECTED_TERMS(Localization.lang("Manage protected terms")),
     CITATION_KEY_PATTERN(Localization.lang("Citation key patterns")),
-    SHOW_PREFS(
-        Localization.lang("Preferences"),
-        IconTheme.JabRefIcons.PREFERENCES
-    ),
+    SHOW_PREFS(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES),
     MANAGE_JOURNALS(Localization.lang("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(
         Localization.lang("Customize key bindings"),
@@ -351,14 +274,8 @@ public enum StandardActions implements Action {
         IconTheme.JabRefIcons.EDIT_ENTRY,
         KeyBinding.EDIT_ENTRY
     ),
-    SHOW_PDF_VIEWER(
-        Localization.lang("Open document viewer"),
-        IconTheme.JabRefIcons.PDF_FILE
-    ),
-    NEXT_PREVIEW_STYLE(
-        Localization.lang("Next preview style"),
-        KeyBinding.NEXT_PREVIEW_LAYOUT
-    ),
+    SHOW_PDF_VIEWER(Localization.lang("Open document viewer"), IconTheme.JabRefIcons.PDF_FILE),
+    NEXT_PREVIEW_STYLE(Localization.lang("Next preview style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
     PREVIOUS_PREVIEW_STYLE(
         Localization.lang("Previous preview style"),
         KeyBinding.PREVIOUS_PREVIEW_LAYOUT
@@ -374,20 +291,14 @@ public enum StandardActions implements Action {
         IconTheme.JabRefIcons.ADD_ENTRY,
         KeyBinding.NEW_ENTRY
     ),
-    NEW_ARTICLE(
-        Localization.lang("New article"),
-        IconTheme.JabRefIcons.ADD_ARTICLE
-    ),
+    NEW_ARTICLE(Localization.lang("New article"), IconTheme.JabRefIcons.ADD_ARTICLE),
     NEW_ENTRY_FROM_PLAIN_TEXT(
         Localization.lang("New entry from plain text"),
         IconTheme.JabRefIcons.NEW_ENTRY_FROM_PLAIN_TEXT,
         KeyBinding.NEW_ENTRY_FROM_PLAIN_TEXT
     ),
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
-    FIND_DUPLICATES(
-        Localization.lang("Find duplicates"),
-        IconTheme.JabRefIcons.FIND_DUPLICATES
-    ),
+    FIND_DUPLICATES(Localization.lang("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),
     MERGE_ENTRIES(
         Localization.lang("Merge entries"),
         IconTheme.JabRefIcons.MERGE_ENTRIES,
@@ -398,10 +309,7 @@ public enum StandardActions implements Action {
         Localization.lang("Find and remove duplicate citation keys"),
         KeyBinding.RESOLVE_DUPLICATE_CITATION_KEYS
     ),
-    CHECK_INTEGRITY(
-        Localization.lang("Check integrity"),
-        KeyBinding.CHECK_INTEGRITY
-    ),
+    CHECK_INTEGRITY(Localization.lang("Check integrity"), KeyBinding.CHECK_INTEGRITY),
     FIND_UNLINKED_FILES(
         Localization.lang("Search for unlinked local files"),
         IconTheme.JabRefIcons.SEARCH,
@@ -412,9 +320,7 @@ public enum StandardActions implements Action {
         IconTheme.JabRefIcons.AUTO_FILE_LINK,
         KeyBinding.AUTOMATICALLY_LINK_FILES
     ),
-    LOOKUP_DOC_IDENTIFIER(
-        Localization.lang("Search document identifier online")
-    ),
+    LOOKUP_DOC_IDENTIFIER(Localization.lang("Search document identifier online")),
     LOOKUP_FULLTEXT(
         Localization.lang("Search full text documents online"),
         IconTheme.JabRefIcons.FILE_SEARCH,
@@ -445,15 +351,8 @@ public enum StandardActions implements Action {
         KeyBinding.AUTOMATICALLY_LINK_FILES
     ),
 
-    EDIT_FILE_LINK(
-        Localization.lang("Edit"),
-        IconTheme.JabRefIcons.EDIT,
-        KeyBinding.EDIT_ENTRY
-    ),
-    DOWNLOAD_FILE(
-        Localization.lang("Download file"),
-        IconTheme.JabRefIcons.DOWNLOAD_FILE
-    ),
+    EDIT_FILE_LINK(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT, KeyBinding.EDIT_ENTRY),
+    DOWNLOAD_FILE(Localization.lang("Download file"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     RENAME_FILE_TO_PATTERN(
         Localization.lang("Rename file to defined pattern"),
         IconTheme.JabRefIcons.AUTO_RENAME
@@ -475,21 +374,14 @@ public enum StandardActions implements Action {
         IconTheme.JabRefIcons.COPY_TO_FOLDER,
         KeyBinding.COPY
     ),
-    REMOVE_LINK(
-        Localization.lang("Remove link"),
-        IconTheme.JabRefIcons.REMOVE_LINK
-    ),
+    REMOVE_LINK(Localization.lang("Remove link"), IconTheme.JabRefIcons.REMOVE_LINK),
     DELETE_FILE(
         Localization.lang("Permanently delete local file"),
         IconTheme.JabRefIcons.DELETE_FILE,
         KeyBinding.DELETE_ENTRY
     ),
 
-    HELP(
-        Localization.lang("Online help"),
-        IconTheme.JabRefIcons.HELP,
-        KeyBinding.HELP
-    ),
+    HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_KEY_PATTERNS(
         Localization.lang("Help on key patterns"),
         IconTheme.JabRefIcons.HELP,
@@ -538,9 +430,7 @@ public enum StandardActions implements Action {
     ),
     OPEN_DEV_VERSION_LINK(
         Localization.lang("Development version"),
-        Localization.lang(
-            "Opens a link where the current development version can be downloaded"
-        )
+        Localization.lang("Opens a link where the current development version can be downloaded")
     ),
     OPEN_CHANGELOG(
         Localization.lang("View change log"),
@@ -581,16 +471,12 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_REMOVE(Localization.lang("Remove subgroups")),
     GROUP_SUBGROUP_SORT(Localization.lang("Sort subgroups A-Z")),
     GROUP_SUBGROUP_SORT_REVERSE(Localization.lang("Sort subgroups Z-A")),
-    GROUP_SUBGROUP_SORT_ENTRIES(
-        Localization.lang("Sort subgroups by # of entries (Descending)")
-    ),
+    GROUP_SUBGROUP_SORT_ENTRIES(Localization.lang("Sort subgroups by # of entries (Descending)")),
     GROUP_SUBGROUP_SORT_ENTRIES_REVERSE(
         Localization.lang("Sort subgroups by # of entries (Ascending)")
     ),
     GROUP_ENTRIES_ADD(Localization.lang("Add selected entries to this group")),
-    GROUP_ENTRIES_REMOVE(
-        Localization.lang("Remove selected entries from this group")
-    );
+    GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group"));
 
     private final String text;
     private final String description;
@@ -608,22 +494,14 @@ public enum StandardActions implements Action {
         this.keyBinding = Optional.empty();
     }
 
-    StandardActions(
-        String text,
-        IconTheme.JabRefIcons icon,
-        KeyBinding keyBinding
-    ) {
+    StandardActions(String text, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
         this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.of(keyBinding);
     }
 
-    StandardActions(
-        String text,
-        String description,
-        IconTheme.JabRefIcons icon
-    ) {
+    StandardActions(String text, String description, IconTheme.JabRefIcons icon) {
         this.text = text;
         this.description = description;
         this.icon = Optional.of(icon);

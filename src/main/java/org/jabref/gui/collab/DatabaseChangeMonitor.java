@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseChangeMonitor implements FileUpdateListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DatabaseChangeMonitor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
@@ -59,9 +57,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         addListener(changes ->
             notificationPane.notify(
                 IconTheme.JabRefIcons.SAVE.getGraphicNode(),
-                Localization.lang(
-                    "The library has been modified by another program."
-                ),
+                Localization.lang("The library has been modified by another program."),
                 List.of(
                     new Action(
                         Localization.lang("Dismiss changes"),
@@ -74,9 +70,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                 new DatabaseChangesResolverDialog(
                                     changes,
                                     database,
-                                    Localization.lang(
-                                        "External Changes Resolver"
-                                    )
+                                    Localization.lang("External Changes Resolver")
                                 )
                             );
                             notificationPane.hide();
@@ -92,23 +86,15 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void fileUpdated() {
         synchronized (database) {
             // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-            ChangeScanner scanner = new ChangeScanner(
-                database,
-                dialogService,
-                preferencesService
-            );
+            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService);
             BackgroundTask
                 .wrap(scanner::scanForChanges)
                 .onSuccess(changes -> {
                     if (!changes.isEmpty()) {
-                        listeners.forEach(listener ->
-                            listener.databaseChanged(changes)
-                        );
+                        listeners.forEach(listener -> listener.databaseChanged(changes));
                     }
                 })
-                .onFailure(e ->
-                    LOGGER.error("Error while watching for changes", e)
-                )
+                .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                 .executeWith(taskExecutor);
         }
     }
@@ -118,8 +104,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
-        database
-            .getDatabasePath()
-            .ifPresent(file -> fileMonitor.removeListener(file, this));
+        database.getDatabasePath().ifPresent(file -> fileMonitor.removeListener(file, this));
     }
 }

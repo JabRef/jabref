@@ -11,10 +11,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
  */
 class JabRefAction extends org.controlsfx.control.action.Action {
 
-    public JabRefAction(
-        Action action,
-        KeyBindingRepository keyBindingRepository
-    ) {
+    public JabRefAction(Action action, KeyBindingRepository keyBindingRepository) {
         super(action.getText());
         action.getIcon().ifPresent(icon -> setGraphic(icon.getGraphicNode()));
         action
@@ -28,11 +25,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         setLongText(action.getDescription());
     }
 
-    public JabRefAction(
-        Action action,
-        Command command,
-        KeyBindingRepository keyBindingRepository
-    ) {
+    public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository) {
         this(action, command, keyBindingRepository, null);
     }
 
@@ -61,12 +54,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
 
         if (command instanceof SimpleCommand ourCommand) {
             longTextProperty()
-                .bind(
-                    Bindings.concat(
-                        action.getDescription(),
-                        ourCommand.statusMessageProperty()
-                    )
-                );
+                .bind(Bindings.concat(action.getDescription(), ourCommand.statusMessageProperty()));
         }
     }
 
@@ -92,8 +80,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
     private void trackExecute(String actionName) {
         Telemetry
             .getTelemetryClient()
-            .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName)
-            );
+            .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName));
     }
 
     private void trackUserActionSource(String actionName, Sources source) {

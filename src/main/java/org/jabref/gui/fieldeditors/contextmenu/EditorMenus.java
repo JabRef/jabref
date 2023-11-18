@@ -32,22 +32,17 @@ public class EditorMenus {
      * @param textInput text-input-control that this menu will be connected to
      * @return menu containing items of the default menu and an item for normalizing person names
      */
-    public static Supplier<List<MenuItem>> getNameMenu(
-        final TextInputControl textInput
-    ) {
+    public static Supplier<List<MenuItem>> getNameMenu(final TextInputControl textInput) {
         return () -> {
             MenuItem normalizeNames = new MenuItem(
                 Localization.lang("Normalize to BibTeX name format")
             );
             EasyBind.subscribe(
                 textInput.textProperty(),
-                value ->
-                    normalizeNames.setDisable(StringUtil.isNullOrEmpty(value))
+                value -> normalizeNames.setDisable(StringUtil.isNullOrEmpty(value))
             );
             normalizeNames.setOnAction(event ->
-                textInput.setText(
-                    new NormalizeNamesFormatter().format(textInput.getText())
-                )
+                textInput.setText(new NormalizeNamesFormatter().format(textInput.getText()))
             );
             List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
@@ -68,24 +63,14 @@ public class EditorMenus {
         PreferencesService preferencesService
     ) {
         return () -> {
-            ActionFactory factory = new ActionFactory(
-                preferencesService.getKeyBindingRepository()
-            );
+            ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
             MenuItem copyDoiMenuItem = factory.createMenuItem(
                 StandardActions.COPY_DOI,
-                new CopyDoiUrlAction(
-                    textArea,
-                    StandardActions.COPY_DOI,
-                    dialogService
-                )
+                new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI, dialogService)
             );
             MenuItem copyDoiUrlMenuItem = factory.createMenuItem(
                 StandardActions.COPY_DOI_URL,
-                new CopyDoiUrlAction(
-                    textArea,
-                    StandardActions.COPY_DOI_URL,
-                    dialogService
-                )
+                new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI_URL, dialogService)
             );
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiMenuItem);
@@ -102,18 +87,12 @@ public class EditorMenus {
      * @param textArea text-area that this menu will be connected to
      * @return menu containing items of the default menu and an item to cleanup a URL
      */
-    public static Supplier<List<MenuItem>> getCleanupUrlMenu(
-        TextArea textArea
-    ) {
+    public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextArea textArea) {
         return () -> {
-            MenuItem cleanupURL = new MenuItem(
-                Localization.lang("Cleanup URL link")
-            );
+            MenuItem cleanupURL = new MenuItem(Localization.lang("Cleanup URL link"));
             cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
             cleanupURL.setOnAction(event ->
-                textArea.setText(
-                    new CleanupUrlFormatter().format(textArea.getText())
-                )
+                textArea.setText(new CleanupUrlFormatter().format(textArea.getText()))
             );
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);

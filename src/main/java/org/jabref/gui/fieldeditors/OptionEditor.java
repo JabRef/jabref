@@ -29,14 +29,10 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
         comboBox.setConverter(viewModel.getStringConverter());
         comboBox.setCellFactory(
-            new ViewModelListCellFactory<T>()
-                .withText(viewModel::convertToDisplayText)
+            new ViewModelListCellFactory<T>().withText(viewModel::convertToDisplayText)
         );
         comboBox.getItems().setAll(viewModel.getItems());
-        comboBox
-            .getEditor()
-            .textProperty()
-            .bindBidirectional(viewModel.textProperty());
+        comboBox.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
 
         comboBox
             .getEditor()
@@ -50,11 +46,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
                             Globals.getKeyPrefs()
                         )
                     );
-                TextInputControlBehavior.showContextMenu(
-                    comboBox.getEditor(),
-                    contextMenu,
-                    event
-                );
+                TextInputControlBehavior.showContextMenu(comboBox.getEditor(), contextMenu, event);
             });
     }
 

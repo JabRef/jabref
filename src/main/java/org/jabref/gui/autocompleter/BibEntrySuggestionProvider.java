@@ -32,10 +32,7 @@ public class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> {
     }
 
     @Override
-    protected boolean isMatch(
-        BibEntry entry,
-        AutoCompletionBinding.ISuggestionRequest request
-    ) {
+    protected boolean isMatch(BibEntry entry, AutoCompletionBinding.ISuggestionRequest request) {
         String userText = request.getUserText();
         return entry
             .getCitationKey()

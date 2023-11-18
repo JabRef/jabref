@@ -17,10 +17,7 @@ public class NewSubLibraryAction extends SimpleCommand {
 
     private final JabRefFrame jabRefFrame;
 
-    public NewSubLibraryAction(
-        JabRefFrame jabRefFrame,
-        StateManager stateManager
-    ) {
+    public NewSubLibraryAction(JabRefFrame jabRefFrame, StateManager stateManager) {
         this.jabRefFrame = jabRefFrame;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -28,9 +25,7 @@ public class NewSubLibraryAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         dialogService.showCustomDialogAndWait(new FromAuxDialog(jabRefFrame));
     }
 }

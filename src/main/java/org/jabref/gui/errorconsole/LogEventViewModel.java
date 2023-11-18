@@ -45,17 +45,12 @@ public class LogEventViewModel {
     }
 
     public Optional<String> getStackTrace() {
-        return Optional
-            .ofNullable(logEvent.getException())
-            .map(Throwables::getStackTraceAsString);
+        return Optional.ofNullable(logEvent.getException()).map(Throwables::getStackTraceAsString);
     }
 
     public String getDetailedText() {
         return (
-            getDisplayText() +
-            getStackTrace()
-                .map(stacktrace -> OS.NEWLINE + stacktrace)
-                .orElse("")
+            getDisplayText() + getStackTrace().map(stacktrace -> OS.NEWLINE + stacktrace).orElse("")
         );
     }
 }

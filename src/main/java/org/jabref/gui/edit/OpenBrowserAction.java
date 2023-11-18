@@ -23,10 +23,6 @@ public class OpenBrowserAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        JabRefDesktop.openBrowserShowPopup(
-            urlToOpen,
-            dialogService,
-            filePreferences
-        );
+        JabRefDesktop.openBrowserShowPopup(urlToOpen, dialogService, filePreferences);
     }
 }

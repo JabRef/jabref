@@ -23,13 +23,13 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
-public class RenameFieldViewModel
-    extends AbstractAutomaticFieldEditorTabViewModel {
+public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewModel {
 
     public static final int TAB_INDEX = 2;
     private final StringProperty newFieldName = new SimpleStringProperty("");
-    private final ObjectProperty<Field> selectedField =
-        new SimpleObjectProperty<>(StandardField.AUTHOR);
+    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>(
+        StandardField.AUTHOR
+    );
     private final List<BibEntry> selectedEntries;
 
     private final Validator fieldValidator;
@@ -57,9 +57,7 @@ public class RenameFieldViewModel
                 newFieldName,
                 fieldName -> {
                     if (StringUtil.isBlank(fieldName)) {
-                        return ValidationMessage.error(
-                            "Field name cannot be empty"
-                        );
+                        return ValidationMessage.error("Field name cannot be empty");
                     } else if (StringUtil.containsWhitespace(fieldName)) {
                         return ValidationMessage.error(
                             "Field name cannot have whitespace characters"
@@ -132,11 +130,7 @@ public class RenameFieldViewModel
         }
 
         stateManager.setLastAutomaticFieldEditorEdit(
-            new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                renameEdit
-            )
+            new LastAutomaticFieldEditorEdit(affectedEntriesCount, TAB_INDEX, renameEdit)
         );
     }
 }

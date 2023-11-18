@@ -24,9 +24,7 @@ class ProtectedTermsMenu extends Menu {
         Globals.protectedTermsLoader
     );
     private final TextInputControl textInputControl;
-    private final ActionFactory factory = new ActionFactory(
-        Globals.getKeyPrefs()
-    );
+    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
     private final Action protectSelectionActionInformation = new Action() {
         @Override
@@ -60,9 +58,7 @@ class ProtectedTermsMenu extends Menu {
     private class ProtectSelectionAction extends SimpleCommand {
 
         ProtectSelectionAction() {
-            this.executable.bind(
-                    textInputControl.selectedTextProperty().isNotEmpty()
-                );
+            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
         }
 
         @Override
@@ -77,25 +73,20 @@ class ProtectedTermsMenu extends Menu {
             if (selectedText.endsWith(" ")) {
                 lastStr = "} ";
             }
-            textInputControl.replaceSelection(
-                firstStr + selectedText.strip() + lastStr
-            );
+            textInputControl.replaceSelection(firstStr + selectedText.strip() + lastStr);
         }
     }
 
     private class UnprotectSelectionAction extends SimpleCommand {
 
         public UnprotectSelectionAction() {
-            this.executable.bind(
-                    textInputControl.selectedTextProperty().isNotEmpty()
-                );
+            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
         }
 
         @Override
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
-            String formattedString = new UnprotectTermsFormatter()
-                .format(selectedText);
+            String formattedString = new UnprotectTermsFormatter().format(selectedText);
             textInputControl.replaceSelection(formattedString);
         }
     }
@@ -108,9 +99,7 @@ class ProtectedTermsMenu extends Menu {
 
         @Override
         public void execute() {
-            textInputControl.setText(
-                FORMATTER.format(textInputControl.getText())
-            );
+            textInputControl.setText(FORMATTER.format(textInputControl.getText()));
         }
     }
 
@@ -143,9 +132,7 @@ class ProtectedTermsMenu extends Menu {
                 list.addProtectedTerm(text.substring(beginIdx, endIdx));
             } else {
                 // Remove leading and trailing whitespaces
-                list.addProtectedTerm(
-                    textInputControl.getSelectedText().strip()
-                );
+                list.addProtectedTerm(textInputControl.getSelectedText().strip());
             }
         }
     }
@@ -194,9 +181,7 @@ class ProtectedTermsMenu extends Menu {
             );
 
         if (protectedTermsMenu.getItems().isEmpty()) {
-            MenuItem emptyItem = new MenuItem(
-                Localization.lang("No list enabled")
-            );
+            MenuItem emptyItem = new MenuItem(Localization.lang("No list enabled"));
             emptyItem.setDisable(true);
             protectedTermsMenu.getItems().add(emptyItem);
         }

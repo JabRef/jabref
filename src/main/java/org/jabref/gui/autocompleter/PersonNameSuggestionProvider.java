@@ -24,16 +24,10 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
     private final BibDatabase database;
 
     PersonNameSuggestionProvider(Field field, BibDatabase database) {
-        this(
-            Collections.singletonList(Objects.requireNonNull(field)),
-            database
-        );
+        this(Collections.singletonList(Objects.requireNonNull(field)), database);
     }
 
-    public PersonNameSuggestionProvider(
-        Collection<Field> fields,
-        BibDatabase database
-    ) {
+    public PersonNameSuggestionProvider(Collection<Field> fields, BibDatabase database) {
         super();
         this.fields = Objects.requireNonNull(fields);
         this.database = database;
@@ -61,14 +55,8 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
     }
 
     @Override
-    protected boolean isMatch(
-        Author candidate,
-        AutoCompletionBinding.ISuggestionRequest request
-    ) {
-        return StringUtil.containsIgnoreCase(
-            candidate.getLastFirst(false),
-            request.getUserText()
-        );
+    protected boolean isMatch(Author candidate, AutoCompletionBinding.ISuggestionRequest request) {
+        return StringUtil.containsIgnoreCase(candidate.getLastFirst(false), request.getUserText());
     }
 
     @Override

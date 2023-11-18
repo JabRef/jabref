@@ -52,28 +52,20 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(
                 Localization.lang("Autogenerate citation keys"),
-                Localization.lang(
-                    "First select the entries you want keys to be generated for."
-                )
+                Localization.lang("First select the entries you want keys to be generated for.")
             );
             return;
         }
         dialogService.notify(
-            formatOutputMessage(
-                Localization.lang("Generating citation key for"),
-                entries.size()
-            )
+            formatOutputMessage(Localization.lang("Generating citation key for"), entries.size())
         );
 
         checkOverwriteKeysChosen();
 
         if (!this.isCanceled) {
-            BackgroundTask<Void> backgroundTask =
-                this.generateKeysInBackground();
+            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground();
             backgroundTask.showToUser(true);
-            backgroundTask
-                .titleProperty()
-                .set(Localization.lang("Autogenerate citation keys"));
+            backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
             backgroundTask
                 .messageProperty()
                 .set(Localization.lang("%0/%1 entries", 0, entries.size()));
@@ -87,15 +79,11 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         PreferencesService preferencesService
     ) {
         if (
-            preferencesService
-                .getCitationKeyPatternPreferences()
-                .shouldWarnBeforeOverwriteCiteKey()
+            preferencesService.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()
         ) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                 Localization.lang("Overwrite keys"),
-                Localization.lang(
-                    "One or more keys will be overwritten. Continue?"
-                ),
+                Localization.lang("One or more keys will be overwritten. Continue?"),
                 Localization.lang("Overwrite keys"),
                 Localization.lang("Cancel"),
                 Localization.lang("Do not ask again"),
@@ -113,18 +101,12 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (
-            this.preferencesService.getCitationKeyPatternPreferences()
-                .shouldAvoidOverwriteCiteKey()
+            this.preferencesService.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()
         ) {
             entries.removeIf(BibEntry::hasCitationKey);
             // if we're going to override some citation keys warn the user about it
-        } else if (
-            entries.parallelStream().anyMatch(BibEntry::hasCitationKey)
-        ) {
-            boolean overwriteKeys = confirmOverwriteKeys(
-                dialogService,
-                this.preferencesService
-            );
+        } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {
+            boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferencesService);
 
             // The user doesn't want to override citation keys
             if (!overwriteKeys) {
@@ -144,44 +126,29 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 }
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
                     updateProgress(0, entries.size());
-                    messageProperty()
-                        .set(
-                            Localization.lang(
-                                "%0/%1 entries",
-                                0,
-                                entries.size()
-                            )
-                        );
+                    messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
                 });
                 stateManager
                     .getActiveDatabase()
                     .ifPresent(databaseContext -> {
                         // generate the new citation keys for each entry
                         compound =
-                            new NamedCompound(
-                                Localization.lang("Autogenerate citation keys")
-                            );
-                        CitationKeyGenerator keyGenerator =
-                            new CitationKeyGenerator(
-                                databaseContext,
-                                preferencesService.getCitationKeyPatternPreferences()
-                            );
+                            new NamedCompound(Localization.lang("Autogenerate citation keys"));
+                        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
+                            databaseContext,
+                            preferencesService.getCitationKeyPatternPreferences()
+                        );
                         int entriesDone = 0;
                         for (BibEntry entry : entries) {
                             keyGenerator
                                 .generateAndSetKey(entry)
                                 .ifPresent(fieldChange ->
-                                    compound.addEdit(
-                                        new UndoableKeyChange(fieldChange)
-                                    )
+                                    compound.addEdit(new UndoableKeyChange(fieldChange))
                                 );
                             entriesDone++;
                             int finalEntriesDone = entriesDone;
                             DefaultTaskExecutor.runInJavaFXThread(() -> {
-                                updateProgress(
-                                    finalEntriesDone,
-                                    entries.size()
-                                );
+                                updateProgress(finalEntriesDone, entries.size());
                                 messageProperty()
                                     .set(
                                         Localization.lang(
@@ -221,9 +188,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             "%s %d %s.",
             start,
             count,
-            (count > 1
-                    ? Localization.lang("entries")
-                    : Localization.lang("entry"))
+            (count > 1 ? Localization.lang("entries") : Localization.lang("entry"))
         );
     }
 }

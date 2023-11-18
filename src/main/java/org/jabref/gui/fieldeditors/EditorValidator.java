@@ -19,8 +19,7 @@ public class EditorValidator {
         final TextInputControl textInput
     ) {
         if (preferences.getEntryEditorPreferences().shouldEnableValidation()) {
-            ControlsFxVisualizer validationVisualizer =
-                new ControlsFxVisualizer();
+            ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
             validationVisualizer.setDecoration(new IconValidationDecorator());
             validationVisualizer.initVisualization(status, textInput);
         }

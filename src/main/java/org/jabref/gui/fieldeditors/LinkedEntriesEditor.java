@@ -36,9 +36,7 @@ import org.slf4j.LoggerFactory;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LinkedEntriesEditor.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedEntriesEditor.class);
 
     @FXML
     public TagsField<ParsedEntryLink> entryLinkField;
@@ -75,8 +73,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
             );
 
         entryLinkField.setCellFactory(
-            new ViewModelListCellFactory<ParsedEntryLink>()
-                .withText(ParsedEntryLink::getKey)
+            new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey)
         );
         // Mind the .collect(Collectors.toList()) as the list needs to be mutable
         entryLinkField.setSuggestionProvider(request ->
@@ -99,14 +96,9 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
             viewModel.getStringConverter().fromString(searchText)
         );
         entryLinkField.setMatcher((entryLink, searchText) ->
-            entryLink
-                .getKey()
-                .toLowerCase()
-                .startsWith(searchText.toLowerCase())
+            entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase())
         );
-        entryLinkField.setComparator(
-            Comparator.comparing(ParsedEntryLink::getKey)
-        );
+        entryLinkField.setComparator(Comparator.comparing(ParsedEntryLink::getKey));
         entryLinkField.setShowSearchIcon(false);
         entryLinkField.getEditor().getStyleClass().clear();
         entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
@@ -121,15 +113,10 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         Label tagLabel = new Label();
         tagLabel.setText(entryLinkField.getConverter().toString(entryLink));
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
-        tagLabel
-            .getGraphic()
-            .setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
+        tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
-            if (
-                event.getClickCount() == 2 &&
-                event.getButton().equals(MouseButton.PRIMARY)
-            ) {
+            if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {
                 viewModel.jumpToEntry(entryLink);
             }
         });
@@ -175,10 +162,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         private final StandardActions command;
         private final ParsedEntryLink entryLink;
 
-        public TagContextAction(
-            StandardActions command,
-            ParsedEntryLink entryLink
-        ) {
+        public TagContextAction(StandardActions command, ParsedEntryLink entryLink) {
             this.command = command;
             this.entryLink = entryLink;
         }
@@ -191,9 +175,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                     dialogService.notify(
                         Localization.lang(
                             "Copied '%0' to clipboard.",
-                            JabRefDialogService.shortenDialogMessage(
-                                entryLink.getKey()
-                            )
+                            JabRefDialogService.shortenDialogMessage(entryLink.getKey())
                         )
                     );
                 }
@@ -202,18 +184,13 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                     dialogService.notify(
                         Localization.lang(
                             "Copied '%0' to clipboard.",
-                            JabRefDialogService.shortenDialogMessage(
-                                entryLink.getKey()
-                            )
+                            JabRefDialogService.shortenDialogMessage(entryLink.getKey())
                         )
                     );
                     entryLinkField.removeTags(entryLink);
                 }
                 case DELETE -> entryLinkField.removeTags(entryLink);
-                default -> LOGGER.info(
-                    "Action {} not defined",
-                    command.getText()
-                );
+                default -> LOGGER.info("Action {} not defined", command.getText());
             }
         }
     }

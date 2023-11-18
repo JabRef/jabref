@@ -25,21 +25,13 @@ public class FileDownloadTask extends BackgroundTask<Path> {
         try (ProgressInputStream inputStream = download.asInputStream()) {
             EasyBind.subscribe(
                 inputStream.totalNumBytesReadProperty(),
-                bytesRead ->
-                    updateProgress(
-                        bytesRead.longValue(),
-                        inputStream.getMaxNumBytes()
-                    )
+                bytesRead -> updateProgress(bytesRead.longValue(), inputStream.getMaxNumBytes())
             );
 
             // Make sure directory exists since otherwise copy fails
             Files.createDirectories(destination.getParent());
 
-            Files.copy(
-                inputStream,
-                destination,
-                StandardCopyOption.REPLACE_EXISTING
-            );
+            Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
         }
 
         return destination;

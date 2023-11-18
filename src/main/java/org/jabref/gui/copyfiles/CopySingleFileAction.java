@@ -21,10 +21,7 @@ public class CopySingleFileAction extends SimpleCommand {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    private final BiFunction<Path, Path, Path> resolvePathFilename = (
-            path,
-            file
-        ) ->
+    private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) ->
         path.resolve(file.getFileName());
 
     public CopySingleFileAction(
@@ -42,9 +39,7 @@ public class CopySingleFileAction extends SimpleCommand {
                 Bindings.createBooleanBinding(
                     () ->
                         !linkedFile.isOnlineLink() &&
-                        linkedFile
-                            .findIn(databaseContext, this.filePreferences)
-                            .isPresent(),
+                        linkedFile.findIn(databaseContext, this.filePreferences).isPresent(),
                     linkedFile.linkProperty()
                 )
             );
@@ -63,10 +58,7 @@ public class CopySingleFileAction extends SimpleCommand {
     }
 
     private void copyFileToDestination(Path exportPath) {
-        Optional<Path> fileToExport = linkedFile.findIn(
-            databaseContext,
-            filePreferences
-        );
+        Optional<Path> fileToExport = linkedFile.findIn(databaseContext, filePreferences);
         Optional<Path> newPath = OptionalUtil.combine(
             Optional.of(exportPath),
             fileToExport,
@@ -76,17 +68,13 @@ public class CopySingleFileAction extends SimpleCommand {
         if (newPath.isPresent()) {
             Path newFile = newPath.get();
             boolean success =
-                fileToExport.isPresent() &&
-                FileUtil.copyFile(fileToExport.get(), newFile, false);
+                fileToExport.isPresent() && FileUtil.copyFile(fileToExport.get(), newFile, false);
             if (success) {
                 dialogService.showInformationDialogAndWait(
                     Localization.lang("Copy linked file"),
                     Localization.lang(
                         "Successfully copied file to %0.",
-                        newPath
-                            .map(Path::getParent)
-                            .map(Path::toString)
-                            .orElse("")
+                        newPath.map(Path::getParent).map(Path::toString).orElse("")
                     )
                 );
             } else {
@@ -94,10 +82,7 @@ public class CopySingleFileAction extends SimpleCommand {
                     Localization.lang("Copy linked file"),
                     Localization.lang(
                         "Could not copy file to %0, maybe the file is already existing?",
-                        newPath
-                            .map(Path::getParent)
-                            .map(Path::toString)
-                            .orElse("")
+                        newPath.map(Path::getParent).map(Path::toString).orElse("")
                     )
                 );
             }
@@ -105,10 +90,7 @@ public class CopySingleFileAction extends SimpleCommand {
             dialogService.showErrorDialogAndWait(
                 Localization.lang(
                     "Could not resolve the file %0",
-                    fileToExport
-                        .map(Path::getParent)
-                        .map(Path::toString)
-                        .orElse("")
+                    fileToExport.map(Path::getParent).map(Path::toString).orElse("")
                 )
             );
         }

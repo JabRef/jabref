@@ -41,12 +41,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void showJournalInfo(Button journalInfoButton) {
-        PopOverUtil.showJournalInfo(
-            journalInfoButton,
-            entry,
-            dialogService,
-            taskExecutor
-        );
+        PopOverUtil.showJournalInfo(journalInfoButton, entry, dialogService, taskExecutor);
     }
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
@@ -62,10 +57,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
                         undoManager
                     )
                         .fetchAndMerge(bibEntry, StandardField.ISSN),
-                () ->
-                    dialogService.notify(
-                        Localization.lang("No library selected")
-                    )
+                () -> dialogService.notify(Localization.lang("No library selected"))
             );
     }
 }

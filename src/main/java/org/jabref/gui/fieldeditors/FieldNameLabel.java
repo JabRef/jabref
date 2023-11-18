@@ -44,43 +44,31 @@ public class FieldNameLabel extends Label {
                         "Miscellaneous bibliographic data usually printed at the end of the entry."
                     );
                 case AFTERWORD:
-                    return Localization.lang(
-                        "Author(s) of an afterword to the work."
-                    );
+                    return Localization.lang("Author(s) of an afterword to the work.");
                 case ANNOTATION:
                 case ANNOTE:
                     return Localization.lang(
                         "This field may be useful when implementing a style for annotated bibliographies."
                     );
                 case ANNOTATOR:
-                    return Localization.lang(
-                        "Author(s) of annotations to the work."
-                    );
+                    return Localization.lang("Author(s) of annotations to the work.");
                 case AUTHOR:
                     return Localization.lang("Author(s) of the work.");
                 case BOOKSUBTITLE:
-                    return Localization.lang(
-                        "Subtitle related to the \"Booktitle\"."
-                    );
+                    return Localization.lang("Subtitle related to the \"Booktitle\".");
                 case BOOKTITLE:
-                    return Localization.lang(
-                        "Title of the main publication this work is part of."
-                    );
+                    return Localization.lang("Title of the main publication this work is part of.");
                 case BOOKTITLEADDON:
                     return Localization.lang(
                         "Annex to the \"Booktitle\", to be printed in a different font."
                     );
                 case CHAPTER:
-                    return Localization.lang(
-                        "Chapter or section or any other unit of a work."
-                    );
+                    return Localization.lang("Chapter or section or any other unit of a work.");
                 case COMMENT:
                     return Localization.lang("Comment to this entry.");
                 case COMMENTATOR:
                     return (
-                        Localization.lang(
-                            "Author(s) of a commentary to the work."
-                        ) +
+                        Localization.lang("Author(s) of a commentary to the work.") +
                         "\n" +
                         Localization.lang(
                             "Note that this field is intended for commented editions which have a commentator in addition to the author. If the work is a stand-alone commentary, the commentator should be given in the author field."
@@ -89,13 +77,9 @@ public class FieldNameLabel extends Label {
                 case DATE:
                     return Localization.lang("Publication date of the work.");
                 case DOI:
-                    return Localization.lang(
-                        "Digital Object Identifier of the work."
-                    );
+                    return Localization.lang("Digital Object Identifier of the work.");
                 case EDITION:
-                    return Localization.lang(
-                        "Edition of a printed publication."
-                    );
+                    return Localization.lang("Edition of a printed publication.");
                 case EDITOR:
                     return Localization.lang(
                         "Editor(s) of the work or the main publication, depending on the type of the entry."
@@ -113,9 +97,7 @@ public class FieldNameLabel extends Label {
                         "Another secondary editor performing a different role."
                     );
                 case EDITORTYPE:
-                    return Localization.lang(
-                        "Type of editorial role performed by the \"Editor\"."
-                    );
+                    return Localization.lang("Type of editorial role performed by the \"Editor\".");
                 case EDITORATYPE:
                     return Localization.lang(
                         "Type of editorial role performed by the \"Editora\"."
@@ -138,9 +120,7 @@ public class FieldNameLabel extends Label {
                     );
                 case EPRINT:
                     return (
-                        Localization.lang(
-                            "Electronic identifier of an online publication."
-                        ) +
+                        Localization.lang("Electronic identifier of an online publication.") +
                         "\n" +
                         Localization.lang(
                             "This is roughly comparable to a DOI but specific to a certain archive, repository, service, or system."
@@ -180,9 +160,7 @@ public class FieldNameLabel extends Label {
                     return (
                         Localization.lang("Annex to the eventtitle field.") +
                         "\n" +
-                        Localization.lang(
-                            "Can be used for known event acronyms."
-                        )
+                        Localization.lang("Can be used for known event acronyms.")
                     );
                 case FILE:
                 case PDF:
@@ -190,26 +168,18 @@ public class FieldNameLabel extends Label {
                         "Link(s) to a local PDF or other document of the work."
                     );
                 case FOREWORD:
-                    return Localization.lang(
-                        "Author(s) of a foreword to the work."
-                    );
+                    return Localization.lang("Author(s) of a foreword to the work.");
                 case HOWPUBLISHED:
                     return Localization.lang(
                         "Publication notice for unusual publications which do not fit into any of the common categories."
                     );
                 case INSTITUTION:
                 case SCHOOL:
-                    return Localization.lang(
-                        "Name of a university or some other institution."
-                    );
+                    return Localization.lang("Name of a university or some other institution.");
                 case INTRODUCTION:
-                    return Localization.lang(
-                        "Author(s) of an introduction to the work."
-                    );
+                    return Localization.lang("Author(s) of an introduction to the work.");
                 case ISBN:
-                    return Localization.lang(
-                        "International Standard Book Number of a book."
-                    );
+                    return Localization.lang("International Standard Book Number of a book.");
                 case ISRN:
                     return Localization.lang(
                         "International Standard Technical Report Number of a technical report."
@@ -261,9 +231,7 @@ public class FieldNameLabel extends Label {
                         "Place(s) of publication, i. e., the location of the publisher or institution, depending on the entry type."
                     );
                 case MAINSUBTITLE:
-                    return Localization.lang(
-                        "Subtitle related to the \"Maintitle\"."
-                    );
+                    return Localization.lang("Subtitle related to the \"Maintitle\".");
                 case MAINTITLE:
                     return Localization.lang(
                         "Main title of a multi-volume book, such as \"Collected Works\"."
@@ -300,18 +268,14 @@ public class FieldNameLabel extends Label {
                     );
                 case PAGES:
                     return (
-                        Localization.lang(
-                            "One or more page numbers or page ranges."
-                        ) +
+                        Localization.lang("One or more page numbers or page ranges.") +
                         "\n" +
                         Localization.lang(
                             "If the work is published as part of another one, such as an article in a journal or a collection, this field holds the relevant page range in that other work. It may also be used to limit the reference to a specific part of a work (a chapter in a book, for example). For papers in electronic journals with anon-classical pagination setup the eid field may be more suitable."
                         )
                     );
                 case PAGETOTAL:
-                    return Localization.lang(
-                        "Total number of pages of the work."
-                    );
+                    return Localization.lang("Total number of pages of the work.");
                 case PAGINATION:
                     return Localization.lang(
                         "Pagination of the work. The key should be given in the singular form."
@@ -323,9 +287,7 @@ public class FieldNameLabel extends Label {
                 case PUBLISHER:
                     return Localization.lang("Name(s) of the publisher(s).");
                 case PUBSTATE:
-                    return Localization.lang(
-                        "Publication state of the work, e. g., \"in press\"."
-                    );
+                    return Localization.lang("Publication state of the work, e. g., \"in press\".");
                 case SERIES:
                     return Localization.lang(
                         "Name of a publication series, such as \"Studies in...\", or the number of a journal series."
@@ -363,13 +325,9 @@ public class FieldNameLabel extends Label {
                         "Revision number of a piece of software, a manual, etc."
                     );
                 case VOLUME:
-                    return Localization.lang(
-                        "Volume of a multi-volume book or a periodical."
-                    );
+                    return Localization.lang("Volume of a multi-volume book or a periodical.");
                 case VOLUMES:
-                    return Localization.lang(
-                        "Total number of volumes of a multi-volume work."
-                    );
+                    return Localization.lang("Total number of volumes of a multi-volume work.");
                 case YEAR:
                     return Localization.lang("Year of publication.");
                 case CROSSREF:
@@ -404,9 +362,7 @@ public class FieldNameLabel extends Label {
         } else if (field instanceof InternalField internalField) {
             switch (internalField) {
                 case KEY_FIELD:
-                    return Localization.lang(
-                        "Key by which the work may be cited."
-                    );
+                    return Localization.lang("Key by which the work may be cited.");
             }
         } else if (field instanceof SpecialField specialField) {
             switch (specialField) {

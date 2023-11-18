@@ -50,11 +50,7 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         setText(Localization.lang("LaTeX Citations"));
         setTooltip(
-            new Tooltip(
-                Localization.lang(
-                    "Search citations for this entry in LaTeX files"
-                )
-            )
+            new Tooltip(Localization.lang("Search citations for this entry in LaTeX files"))
         );
         setGraphic(IconTheme.JabRefIcons.LATEX_CITATIONS.getGraphicNode());
         setSearchPane();
@@ -62,9 +58,7 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private void setSearchPane() {
         progressIndicator.setMaxSize(100, 100);
-        citationsDisplay
-            .basePathProperty()
-            .bindBidirectional(viewModel.directoryProperty());
+        citationsDisplay.basePathProperty().bindBidirectional(viewModel.directoryProperty());
         citationsDisplay.setItems(viewModel.getCitationList());
 
         RowConstraints mainRow = new RowConstraints();
@@ -106,23 +100,14 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private HBox getLatexDirectoryBox() {
-        Text latexDirectoryText = new Text(
-            Localization.lang("Current search directory:")
-        );
-        Text latexDirectoryPath = new Text(
-            viewModel.directoryProperty().get().toString()
-        );
-        latexDirectoryPath.setStyle(
-            "-fx-font-family:monospace;-fx-font-weight: bold;"
-        );
-        Button latexDirectoryButton = new Button(
-            Localization.lang("Set LaTeX file directory")
-        );
+        Text latexDirectoryText = new Text(Localization.lang("Current search directory:"));
+        Text latexDirectoryPath = new Text(viewModel.directoryProperty().get().toString());
+        latexDirectoryPath.setStyle("-fx-font-family:monospace;-fx-font-weight: bold;");
+        Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setGraphic(
             IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode()
         );
-        latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory()
-        );
+        latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
         HBox latexDirectoryBox = new HBox(
             10,
             latexDirectoryText,
@@ -144,9 +129,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         titleLabel.getStyleClass().add("heading");
 
         Text notFoundText = new Text(
-            Localization.lang(
-                "No LaTeX files containing this entry were found."
-            )
+            Localization.lang("No LaTeX files containing this entry were found.")
         );
         notFoundText.getStyleClass().add("description");
 

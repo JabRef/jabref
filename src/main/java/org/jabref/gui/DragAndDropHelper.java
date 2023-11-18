@@ -35,9 +35,7 @@ public class DragAndDropHelper {
         if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
             return Collections.emptyList();
         } else {
-            return (List<String>) dragboard.getContent(
-                DragAndDropDataFormats.GROUP
-            );
+            return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
         }
     }
 }

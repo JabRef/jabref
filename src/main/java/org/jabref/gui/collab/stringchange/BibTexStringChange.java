@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public final class BibTexStringChange extends DatabaseChange {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BibTexStringChange.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringChange.class);
 
     private final BibtexString oldString;
     private final BibtexString newString;
@@ -29,9 +27,7 @@ public final class BibTexStringChange extends DatabaseChange {
         this.oldString = oldString;
         this.newString = newString;
 
-        setChangeName(
-            Localization.lang("Modified string: '%0'", oldString.getName())
-        );
+        setChangeName(Localization.lang("Modified string: '%0'", oldString.getName()));
     }
 
     @Override
@@ -39,9 +35,7 @@ public final class BibTexStringChange extends DatabaseChange {
         String oldContent = oldString.getContent();
         String newContent = newString.getContent();
         oldString.setContent(newContent);
-        undoEdit.addEdit(
-            new UndoableStringChange(oldString, false, oldContent, newContent)
-        );
+        undoEdit.addEdit(new UndoableStringChange(oldString, false, oldContent, newContent));
     }
 
     public BibtexString getOldString() {

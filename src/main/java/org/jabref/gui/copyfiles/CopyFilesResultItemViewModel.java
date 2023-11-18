@@ -16,11 +16,7 @@ public class CopyFilesResultItemViewModel {
     );
     private final StringProperty message = new SimpleStringProperty("");
 
-    public CopyFilesResultItemViewModel(
-        Path file,
-        boolean success,
-        String message
-    ) {
+    public CopyFilesResultItemViewModel(Path file, boolean success, String message) {
         this.file.setValue(file.toString());
         this.message.setValue(message);
         if (success) {
@@ -43,11 +39,7 @@ public class CopyFilesResultItemViewModel {
     @Override
     public String toString() {
         return (
-            "CopyFilesResultItemViewModel [file=" +
-            file.get() +
-            ", message=" +
-            message.get() +
-            "]"
+            "CopyFilesResultItemViewModel [file=" + file.get() + ", message=" + message.get() + "]"
         );
     }
 }

@@ -29,19 +29,17 @@ import org.slf4j.LoggerFactory;
 
 public class FileAnnotationTabViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileAnnotationTabViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationTabViewModel.class);
 
-    private final ListProperty<FileAnnotationViewModel> annotations =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
     private final ListProperty<Path> files = new SimpleListProperty<>(
         FXCollections.observableArrayList()
     );
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation =
         new SimpleObjectProperty<>();
-    private final ReadOnlyBooleanProperty annotationEmpty =
-        annotations.emptyProperty();
+    private final ReadOnlyBooleanProperty annotationEmpty = annotations.emptyProperty();
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
@@ -79,9 +77,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         return files;
     }
 
-    public void notifyNewSelectedAnnotation(
-        FileAnnotationViewModel newAnnotation
-    ) {
+    public void notifyNewSelectedAnnotation(FileAnnotationViewModel newAnnotation) {
         currentAnnotation.set(newAnnotation);
     }
 
@@ -89,9 +85,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         fileMonitor.removeListener(currentFile, fileListener);
         currentFile = newFile;
 
-        Comparator<FileAnnotation> byPage = Comparator.comparingInt(
-            FileAnnotation::getPage
-        );
+        Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
 
         List<FileAnnotationViewModel> newAnnotations = fileAnnotations
             .getOrDefault(currentFile, new ArrayList<>())
@@ -105,10 +99,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {
-            LOGGER.error(
-                "Problem while watching file for changes " + currentFile,
-                e
-            );
+            LOGGER.error("Problem while watching file for changes " + currentFile, e);
         }
     }
 
@@ -133,26 +124,12 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
             return;
         }
         StringJoiner sj = new StringJoiner("," + OS.NEWLINE);
+        sj.add(Localization.lang("Author") + ": " + getCurrentAnnotation().getAuthor());
+        sj.add(Localization.lang("Date") + ": " + getCurrentAnnotation().getDate());
+        sj.add(Localization.lang("Page") + ": " + getCurrentAnnotation().getPage());
+        sj.add(Localization.lang("Content") + ": " + getCurrentAnnotation().getContent());
         sj.add(
-            Localization.lang("Author") +
-            ": " +
-            getCurrentAnnotation().getAuthor()
-        );
-        sj.add(
-            Localization.lang("Date") + ": " + getCurrentAnnotation().getDate()
-        );
-        sj.add(
-            Localization.lang("Page") + ": " + getCurrentAnnotation().getPage()
-        );
-        sj.add(
-            Localization.lang("Content") +
-            ": " +
-            getCurrentAnnotation().getContent()
-        );
-        sj.add(
-            Localization.lang("Marking") +
-            ": " +
-            getCurrentAnnotation().markingProperty().get()
+            Localization.lang("Marking") + ": " + getCurrentAnnotation().markingProperty().get()
         );
 
         Globals.getClipboardManager().setContent(sj.toString());

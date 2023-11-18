@@ -45,11 +45,8 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
 
     private void setupTable() {
         colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
-        colMessage.setCellValueFactory(cellData ->
-            cellData.getValue().getMessage()
-        );
-        colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon()
-        );
+        colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
+        colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
 
         colFile.setCellFactory(
             new ValueTableCellFactory<CopyFilesResultItemViewModel, String>()
@@ -57,10 +54,7 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
                 .withTooltip(item -> item)
         );
         colStatus.setCellFactory(
-            new ValueTableCellFactory<
-                CopyFilesResultItemViewModel,
-                JabRefIcon
-            >()
+            new ValueTableCellFactory<CopyFilesResultItemViewModel, JabRefIcon>()
                 .withGraphic(item -> {
                     if (item == IconTheme.JabRefIcons.CHECK) {
                         item = item.withColor(Color.GREEN);

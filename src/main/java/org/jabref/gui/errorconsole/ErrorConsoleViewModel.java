@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class ErrorConsoleViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ErrorConsoleViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -108,8 +106,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                 BuildInfo.JAVA_VERSION
             );
             // Steps to reproduce
-            String howToReproduce =
-                "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
+            String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
             // Log messages
             String issueDetails =
                 "<details>\n" +
@@ -121,15 +118,9 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             clipBoardManager.setContent(issueDetails);
             // Bug report body
             String issueBody =
-                systemInfo +
-                "\n\n" +
-                howToReproduce +
-                "\n\n" +
-                "Paste your log details here.";
+                systemInfo + "\n\n" + howToReproduce + "\n\n" + "Paste your log details here.";
 
-            dialogService.notify(
-                Localization.lang("Issue on GitHub successfully reported.")
-            );
+            dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
             dialogService.showInformationDialogAndWait(
                 Localization.lang("Issue report successful"),
                 Localization.lang("Your issue was reported in your browser.") +
@@ -142,9 +133,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     "Please paste this information (with Ctrl+V) in the issue description."
                 ) +
                 "\n" +
-                Localization.lang(
-                    "Please also add all steps to reproduce this issue, if possible."
-                )
+                Localization.lang("Please also add all steps to reproduce this issue, if possible.")
             );
 
             URIBuilder uriBuilder = new URIBuilder()

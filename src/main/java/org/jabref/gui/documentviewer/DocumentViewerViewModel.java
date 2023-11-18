@@ -29,18 +29,14 @@ import org.slf4j.LoggerFactory;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DocumentViewerViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
-    private final ObjectProperty<DocumentViewModel> currentDocument =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty();
-    private final ObjectProperty<Integer> currentPage =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
     public DocumentViewerViewModel(
@@ -55,9 +51,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
                 (ListChangeListener<? super BibEntry>) c -> {
                     // Switch to currently selected entry in live mode
                     if (isLiveMode()) {
-                        setCurrentEntries(
-                            this.stateManager.getSelectedEntries()
-                        );
+                        setCurrentEntries(this.stateManager.getSelectedEntries());
                     }
                 }
             );
@@ -136,12 +130,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         if (file != null) {
             stateManager
                 .getActiveDatabase()
-                .flatMap(database ->
-                    file.findIn(
-                        database,
-                        preferencesService.getFilePreferences()
-                    )
-                )
+                .flatMap(database -> file.findIn(database, preferencesService.getFilePreferences()))
                 .ifPresent(this::setCurrentDocument);
         }
     }

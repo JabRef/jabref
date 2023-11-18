@@ -15,13 +15,7 @@ public class KeywordsEditor extends SimpleEditor implements FieldEditorFX {
         PreferencesService preferences,
         UndoManager undoManager
     ) {
-        super(
-            field,
-            suggestionProvider,
-            fieldCheckers,
-            preferences,
-            undoManager
-        );
+        super(field, suggestionProvider, fieldCheckers, preferences, undoManager);
     }
 
     @Override

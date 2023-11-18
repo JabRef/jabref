@@ -12,12 +12,10 @@ import org.jabref.model.entry.BibEntry;
 
 public class SemanticScholarFetcher implements CitationFetcher {
 
-    private static final String SEMANTIC_SCHOLAR_API =
-        "https://api.semanticscholar.org/graph/v1/";
+    private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     @Override
-    public List<BibEntry> searchCitedBy(BibEntry entry)
-        throws FetcherException {
+    public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
             StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
                 .append("paper/")
@@ -38,12 +36,8 @@ public class SemanticScholarFetcher implements CitationFetcher {
                 return citationsResponse
                     .getData()
                     .stream()
-                    .filter(citationDataItem ->
-                        citationDataItem.getCitingPaper() != null
-                    )
-                    .map(citationDataItem ->
-                        citationDataItem.getCitingPaper().toBibEntry()
-                    )
+                    .filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
+                    .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry())
                     .toList();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -74,12 +68,8 @@ public class SemanticScholarFetcher implements CitationFetcher {
                 return referencesResponse
                     .getData()
                     .stream()
-                    .filter(citationDataItem ->
-                        citationDataItem.getCitedPaper() != null
-                    )
-                    .map(referenceDataItem ->
-                        referenceDataItem.getCitedPaper().toBibEntry()
-                    )
+                    .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
+                    .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry())
                     .toList();
             } catch (IOException e) {
                 throw new RuntimeException(e);

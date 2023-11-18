@@ -24,32 +24,20 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
     private final int pageNumber;
     private final PDDocument document;
 
-    public PdfDocumentPageViewModel(
-        PDPage page,
-        int pageNumber,
-        PDDocument document
-    ) {
+    public PdfDocumentPageViewModel(PDPage page, int pageNumber, PDDocument document) {
         this.page = Objects.requireNonNull(page);
         this.pageNumber = pageNumber;
         this.document = document;
     }
 
     // Taken from http://stackoverflow.com/a/9417836/873661
-    private static BufferedImage resize(
-        BufferedImage img,
-        int newWidth,
-        int newHeight
-    ) {
+    private static BufferedImage resize(BufferedImage img, int newWidth, int newHeight) {
         java.awt.Image tmp = img.getScaledInstance(
             newWidth,
             newHeight,
             java.awt.Image.SCALE_SMOOTH
         );
-        BufferedImage dimg = new BufferedImage(
-            newWidth,
-            newHeight,
-            BufferedImage.TYPE_INT_ARGB
-        );
+        BufferedImage dimg = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2d = dimg.createGraphics();
         g2d.drawImage(tmp, 0, 0, null);

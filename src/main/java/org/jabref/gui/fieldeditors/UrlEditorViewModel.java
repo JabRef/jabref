@@ -18,8 +18,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final BooleanProperty validUrlIsNotPresent =
-        new SimpleBooleanProperty(true);
+    private final BooleanProperty validUrlIsNotPresent = new SimpleBooleanProperty(true);
 
     public UrlEditorViewModel(
         Field field,
@@ -34,10 +33,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
         this.preferencesService = preferencesService;
 
         validUrlIsNotPresent.bind(
-            EasyBind.map(
-                text,
-                input -> StringUtil.isBlank(input) || !URLUtil.isURL(input)
-            )
+            EasyBind.map(text, input -> StringUtil.isBlank(input) || !URLUtil.isURL(input))
         );
     }
 
@@ -55,10 +51,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
         }
 
         try {
-            JabRefDesktop.openBrowser(
-                text.get(),
-                preferencesService.getFilePreferences()
-            );
+            JabRefDesktop.openBrowser(text.get(), preferencesService.getFilePreferences());
         } catch (IOException ex) {
             dialogService.notify(Localization.lang("Unable to open link."));
         }

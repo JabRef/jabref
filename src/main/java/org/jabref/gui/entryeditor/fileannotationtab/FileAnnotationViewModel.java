@@ -91,14 +91,10 @@ public class FileAnnotationViewModel {
     @Override
     public String toString() {
         if (annotation.hasLinkedAnnotation() && this.getContent().isEmpty()) {
-            if (
-                FileAnnotationType.UNDERLINE == annotation.getAnnotationType()
-            ) {
+            if (FileAnnotationType.UNDERLINE == annotation.getAnnotationType()) {
                 return Localization.lang("Empty Underline");
             }
-            if (
-                FileAnnotationType.HIGHLIGHT == annotation.getAnnotationType()
-            ) {
+            if (FileAnnotationType.HIGHLIGHT == annotation.getAnnotationType()) {
                 return Localization.lang("Empty Highlight");
             }
             return Localization.lang("Empty Marking");

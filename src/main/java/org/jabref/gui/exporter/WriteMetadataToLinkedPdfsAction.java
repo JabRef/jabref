@@ -67,9 +67,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = stateManager
-            .getActiveDatabase()
-            .get();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
@@ -81,17 +79,13 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
             if (entries.isEmpty()) {
                 LOGGER.warn("No entry selected for fulltext download.");
                 dialogService.notify(
-                    Localization.lang(
-                        "This operation requires one or more entries to be selected."
-                    )
+                    Localization.lang("This operation requires one or more entries to be selected.")
                 );
                 return;
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Write metadata to PDF files"),
-                    Localization.lang(
-                        "Write metadata for all PDFs in current library?"
-                    )
+                    Localization.lang("Write metadata for all PDFs in current library?")
                 );
                 if (!confirm) {
                     return;
@@ -171,10 +165,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                     .getFiles()
                     .stream()
                     .map(file ->
-                        file.findIn(
-                            stateManager.getActiveDatabase().get(),
-                            filePreferences
-                        )
+                        file.findIn(stateManager.getActiveDatabase().get(), filePreferences)
                     )
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -183,18 +174,13 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                 if (files.isEmpty()) {
                     LOGGER.debug(
                         "Skipped empty entry '{}'",
-                        entry
-                            .getCitationKey()
-                            .orElse(entry.getAuthorTitleYear(16))
+                        entry.getCitationKey().orElse(entry.getAuthorTitleYear(16))
                     );
                     skipped++;
                 } else {
                     for (Path file : files) {
                         updateMessage(
-                            Localization.lang(
-                                "Writing metadata to %0",
-                                file.getFileName()
-                            )
+                            Localization.lang("Writing metadata to %0", file.getFileName())
                         );
 
                         if (Files.exists(file)) {
@@ -211,11 +197,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                                 );
                                 entriesChanged++;
                             } catch (Exception e) {
-                                LOGGER.error(
-                                    "Error while writing XMP data to pdf '{}'",
-                                    file,
-                                    e
-                                );
+                                LOGGER.error("Error while writing XMP data to pdf '{}'", file, e);
                                 failedWrittenFiles.add(file);
                                 errors++;
                             }
@@ -232,10 +214,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
             dialogService.notify(
                 Localization.lang(
                     "Finished writing metadata for library %0 (%1 succeeded, %2 skipped, %3 errors).",
-                    databaseContext
-                        .getDatabasePath()
-                        .map(Path::toString)
-                        .orElse("undefined"),
+                    databaseContext.getDatabasePath().map(Path::toString).orElse("undefined"),
                     String.valueOf(entriesChanged),
                     String.valueOf(skipped),
                     String.valueOf(errors)
@@ -243,9 +222,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
             );
 
             if (!failedWrittenFiles.isEmpty()) {
-                LOGGER.error(
-                    "Failed to write XMP data to PDFs:\n" + failedWrittenFiles
-                );
+                LOGGER.error("Failed to write XMP data to PDFs:\n" + failedWrittenFiles);
             }
 
             return null;

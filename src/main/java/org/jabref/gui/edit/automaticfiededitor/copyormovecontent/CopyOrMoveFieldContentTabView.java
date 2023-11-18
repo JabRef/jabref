@@ -48,12 +48,8 @@ public class CopyOrMoveFieldContentTabView
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public CopyOrMoveFieldContentTabView(
-        BibDatabase database,
-        StateManager stateManager
-    ) {
-        this.selectedEntries =
-            new ArrayList<>(stateManager.getSelectedEntries());
+    public CopyOrMoveFieldContentTabView(BibDatabase database, StateManager stateManager) {
+        this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
         this.stateManager = stateManager;
 
@@ -61,26 +57,15 @@ public class CopyOrMoveFieldContentTabView
     }
 
     public void initialize() {
-        viewModel =
-            new CopyOrMoveFieldContentTabViewModel(
-                selectedEntries,
-                database,
-                stateManager
-            );
+        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, database, stateManager);
         initializeFromAndToComboBox();
 
         viewModel
             .overwriteFieldContentProperty()
-            .bindBidirectional(
-                overwriteFieldContentCheckBox.selectedProperty()
-            );
+            .bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
 
-        moveContentButton
-            .disableProperty()
-            .bind(viewModel.canMoveProperty().not());
-        swapContentButton
-            .disableProperty()
-            .bind(viewModel.canSwapProperty().not());
+        moveContentButton.disableProperty().bind(viewModel.canMoveProperty().not());
+        swapContentButton.disableProperty().bind(viewModel.canSwapProperty().not());
         copyContentButton
             .disableProperty()
             .bind(viewModel.toFieldValidationStatus().validProperty().not());
@@ -105,12 +90,8 @@ public class CopyOrMoveFieldContentTabView
 
         toFieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
-        fromFieldComboBox
-            .valueProperty()
-            .bindBidirectional(viewModel.fromFieldProperty());
-        toFieldComboBox
-            .valueProperty()
-            .bindBidirectional(viewModel.toFieldProperty());
+        fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());
+        toFieldComboBox.valueProperty().bindBidirectional(viewModel.toFieldProperty());
 
         EasyBind.listen(
             fromFieldComboBox.getEditor().textProperty(),

@@ -78,10 +78,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(
-            entry.getType(),
-            mode
-        );
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             Set<Field> allKnownFields = entryType.get().getAllFields();
             Set<Field> otherFields = entry

@@ -27,14 +27,12 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     ) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.databaseContext = databaseContext;
-        linkedEntries =
-            new SimpleListProperty<>(FXCollections.observableArrayList());
+        linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
         BindingsHelper.bindContentBidirectional(
             linkedEntries,
             text,
             EntryLinkList::serialize,
-            newText ->
-                EntryLinkList.parse(newText, databaseContext.getDatabase())
+            newText -> EntryLinkList.parse(newText, databaseContext.getDatabase())
         );
     }
 

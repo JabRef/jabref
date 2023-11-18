@@ -42,14 +42,8 @@ public class TextInputControlBehavior {
                 menuPos = skin.getMenuPosition();
             } else {
                 menuPos = skin.getMenuPosition();
-                if (
-                    menuPos != null &&
-                    (menuPos.getX() <= 0 || menuPos.getY() <= 0)
-                ) {
-                    skin.positionCaret(
-                        skin.getIndex(e.getX(), e.getY()),
-                        false
-                    );
+                if (menuPos != null && (menuPos.getX() <= 0 || menuPos.getY() <= 0)) {
+                    skin.positionCaret(skin.getIndex(e.getX(), e.getY()), false);
                     menuPos = skin.getMenuPosition();
                 }
             }
@@ -69,8 +63,7 @@ public class TextInputControlBehavior {
         }
 
         double menuWidth = contextMenu.prefWidth(-1);
-        double menuX =
-            screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
+        double menuX = screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
         Screen currentScreen = Screen.getPrimary();
         Rectangle2D bounds = currentScreen.getBounds();
 
@@ -113,14 +106,8 @@ public class TextInputControlBehavior {
                 menuPos = skin.getMenuPosition();
             } else {
                 menuPos = skin.getMenuPosition();
-                if (
-                    menuPos != null &&
-                    (menuPos.getX() <= 0 || menuPos.getY() <= 0)
-                ) {
-                    skin.positionCaret(
-                        skin.getIndex(e.getX(), e.getY()),
-                        false
-                    );
+                if (menuPos != null && (menuPos.getX() <= 0 || menuPos.getY() <= 0)) {
+                    skin.positionCaret(skin.getIndex(e.getX(), e.getY()), false);
                     menuPos = skin.getMenuPosition();
                 }
             }
@@ -140,8 +127,7 @@ public class TextInputControlBehavior {
         }
 
         double menuWidth = contextMenu.prefWidth(-1);
-        double menuX =
-            screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
+        double menuX = screenX - (Properties.IS_TOUCH_SUPPORTED ? (menuWidth / 2) : 0);
         Screen currentScreen = Screen.getPrimary();
         Rectangle2D bounds = currentScreen.getBounds();
 

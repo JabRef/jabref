@@ -11,10 +11,7 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public FindUnlinkedFilesAction(
-        DialogService dialogService,
-        StateManager stateManager
-    ) {
+    public FindUnlinkedFilesAction(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 

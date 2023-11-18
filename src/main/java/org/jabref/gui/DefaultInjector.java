@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultInjector implements PresenterFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DefaultInjector.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
 
     /**
      * This method takes care of creating dependencies.
@@ -62,10 +60,7 @@ public class DefaultInjector implements PresenterFactory {
     }
 
     @Override
-    public <T> T instantiatePresenter(
-        Class<T> clazz,
-        Function<String, Object> injectionContext
-    ) {
+    public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
         LOGGER.debug("Instantiate {}", clazz.getName());
 
         // Use our own method to construct dependencies
@@ -75,10 +70,7 @@ public class DefaultInjector implements PresenterFactory {
     }
 
     @Override
-    public void injectMembers(
-        Object instance,
-        Function<String, Object> injectionContext
-    ) {
+    public void injectMembers(Object instance, Function<String, Object> injectionContext) {
         LOGGER.debug("Inject into {}", instance.getClass().getName());
 
         // Use our own method to construct dependencies

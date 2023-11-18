@@ -23,10 +23,8 @@ import org.jabref.preferences.PreferencesService;
 
 public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
 
-    private final PreviewWithSourceTab oldPreviewWithSourcesTab =
-        new PreviewWithSourceTab();
-    private final PreviewWithSourceTab newPreviewWithSourcesTab =
-        new PreviewWithSourceTab();
+    private final PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();
+    private final PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
     private boolean scrolling = false;
 
     public EntryChangeDetailsView(
@@ -63,31 +61,27 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         synchronizeScrolling(previewViewerView, previewCloneView);
         // TODO: Also sync scrolling for BibTeX view.
 
-        TabPane oldEntryTabPane =
-            oldPreviewWithSourcesTab.getPreviewWithSourceTab(
-                oldEntry,
-                databaseContext,
-                preferencesService,
-                entryTypesManager,
-                previewClone,
-                Localization.lang("Entry Preview")
-            );
-        TabPane newEntryTabPane =
-            newPreviewWithSourcesTab.getPreviewWithSourceTab(
-                newEntry,
-                databaseContext,
-                preferencesService,
-                entryTypesManager,
-                previewViewer,
-                Localization.lang("Entry Preview")
-            );
+        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(
+            oldEntry,
+            databaseContext,
+            preferencesService,
+            entryTypesManager,
+            previewClone,
+            Localization.lang("Entry Preview")
+        );
+        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(
+            newEntry,
+            databaseContext,
+            preferencesService,
+            entryTypesManager,
+            previewViewer,
+            Localization.lang("Entry Preview")
+        );
 
         EasyBind.subscribe(
             oldEntryTabPane.getSelectionModel().selectedIndexProperty(),
             selectedIndex -> {
-                newEntryTabPane
-                    .getSelectionModel()
-                    .select(selectedIndex.intValue());
+                newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
             }
         );
 
@@ -98,9 +92,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                     oldEntryTabPane.getSelectionModel().getSelectedIndex() !=
                     selectedIndex.intValue()
                 ) {
-                    oldEntryTabPane
-                        .getSelectionModel()
-                        .select(selectedIndex.intValue());
+                    oldEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
                 }
             }
         );
@@ -135,14 +127,10 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                 .executeScript("window.scrollY");
                             otherWebView
                                 .getEngine()
-                                .executeScript(
-                                    "window.scrollTo(0, " + value + ")"
-                                );
+                                .executeScript("window.scrollTo(0, " + value + ")");
                         }
                     } else {
-                        otherWebView.fireEvent(
-                            event.copyFor(otherWebView, otherWebView)
-                        );
+                        otherWebView.fireEvent(event.copyFor(otherWebView, otherWebView));
                     }
                     scrolling = false;
                 }

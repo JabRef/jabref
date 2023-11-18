@@ -54,9 +54,7 @@ public class JournalInfoView extends VBox {
         this.getStylesheets()
             .add(
                 Objects
-                    .requireNonNull(
-                        JournalInfoView.class.getResource("JournalInfo.css")
-                    )
+                    .requireNonNull(JournalInfoView.class.getResource("JournalInfo.css"))
                     .toExternalForm()
             );
 
@@ -80,13 +78,9 @@ public class JournalInfoView extends VBox {
 
     private void bindChartProperties() {
         sjrChart.setData(viewModel.getSjrData());
-        citableDocsPrevious3YearsChart.setData(
-            viewModel.getCitableDocsPrevious3YearsData()
-        );
+        citableDocsPrevious3YearsChart.setData(viewModel.getCitableDocsPrevious3YearsData());
         citesOutgoingChart.setData(viewModel.getCitesOutgoingData());
-        citesOutgoingPerDocChart.setData(
-            viewModel.getCitesOutgoingPerDocData()
-        );
+        citesOutgoingPerDocChart.setData(viewModel.getCitesOutgoingPerDocData());
         citesIncomingByRecentlyPublishedChart.setData(
             viewModel.getCitesIncomingByRecentlyPublishedData()
         );

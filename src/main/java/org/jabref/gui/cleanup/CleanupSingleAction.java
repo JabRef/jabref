@@ -54,37 +54,30 @@ public class CleanupSingleAction extends SimpleCommand {
             preferences.getFilePreferences()
         );
 
-        Optional<CleanupPreferences> chosenPreset =
-            dialogService.showCustomDialogAndWait(cleanupDialog);
+        Optional<CleanupPreferences> chosenPreset = dialogService.showCustomDialogAndWait(
+            cleanupDialog
+        );
 
         chosenPreset.ifPresent(preset -> {
             if (
                 preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF) &&
                 preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()
             ) {
-                boolean confirmed =
-                    dialogService.showConfirmationDialogWithOptOutAndWait(
-                        Localization.lang("Autogenerate PDF Names"),
-                        Localization.lang(
-                            "Auto-generating PDF-Names does not support undo. Continue?"
-                        ),
-                        Localization.lang("Autogenerate PDF Names"),
-                        Localization.lang("Cancel"),
-                        Localization.lang("Do not ask again"),
-                        optOut ->
-                            preferences
-                                .getAutoLinkPreferences()
-                                .setAskAutoNamingPdfs(!optOut)
-                    );
+                boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Do not ask again"),
+                    optOut -> preferences.getAutoLinkPreferences().setAskAutoNamingPdfs(!optOut)
+                );
                 if (!confirmed) {
                     isCanceled = true;
                     return;
                 }
             }
 
-            preferences
-                .getCleanupPreferences()
-                .setActiveJobs(preset.getActiveJobs());
+            preferences.getCleanupPreferences().setActiveJobs(preset.getActiveJobs());
             preferences
                 .getCleanupPreferences()
                 .setFieldFormatterCleanups(preset.getFieldFormatterCleanups());
@@ -122,9 +115,7 @@ public class CleanupSingleAction extends SimpleCommand {
         CleanupPreferences cleanupPreferences
     ) {
         // undo granularity is on entry level
-        NamedCompound ce = new NamedCompound(
-            Localization.lang("Cleanup entry")
-        );
+        NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
         doCleanup(databaseContext, cleanupPreferences, entry, ce);
 

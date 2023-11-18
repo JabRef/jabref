@@ -40,22 +40,15 @@ public abstract class NativeDesktop {
      * @param filePath    The filename.
      * @param application Link to the app that opens the file.
      */
-    public abstract void openFileWithApplication(
-        String filePath,
-        String application
-    ) throws IOException;
+    public abstract void openFileWithApplication(String filePath, String application)
+        throws IOException;
 
     public abstract void openFolderAndSelectFile(Path file) throws IOException;
 
-    public abstract void openConsole(
-        String absolutePath,
-        DialogService dialogService
-    ) throws IOException;
+    public abstract void openConsole(String absolutePath, DialogService dialogService)
+        throws IOException;
 
-    public abstract String detectProgramPath(
-        String programName,
-        String directoryName
-    );
+    public abstract String detectProgramPath(String programName, String directoryName);
 
     /**
      * Returns the path to the system's applications folder.
@@ -92,11 +85,7 @@ public abstract class NativeDesktop {
             .of(
                 AppDirsFactory
                     .getInstance()
-                    .getUserDataDir(
-                        OS.APP_DIR_APP_NAME,
-                        "logs",
-                        OS.APP_DIR_APP_AUTHOR
-                    )
+                    .getUserDataDir(OS.APP_DIR_APP_NAME, "logs", OS.APP_DIR_APP_AUTHOR)
             )
             .resolve(new BuildInfo().version.toString());
     }
@@ -105,11 +94,7 @@ public abstract class NativeDesktop {
         return Path.of(
             AppDirsFactory
                 .getInstance()
-                .getUserDataDir(
-                    OS.APP_DIR_APP_NAME,
-                    "backups",
-                    OS.APP_DIR_APP_AUTHOR
-                )
+                .getUserDataDir(OS.APP_DIR_APP_NAME, "backups", OS.APP_DIR_APP_AUTHOR)
         );
     }
 
@@ -129,11 +114,7 @@ public abstract class NativeDesktop {
         return Path.of(
             AppDirsFactory
                 .getInstance()
-                .getUserDataDir(
-                    OS.APP_DIR_APP_NAME,
-                    "ssl",
-                    OS.APP_DIR_APP_AUTHOR
-                )
+                .getUserDataDir(OS.APP_DIR_APP_NAME, "ssl", OS.APP_DIR_APP_AUTHOR)
         );
     }
 
@@ -151,10 +132,7 @@ public abstract class NativeDesktop {
             } catch (UnknownHostException e) {
                 LoggerFactory
                     .getLogger(OS.class)
-                    .info(
-                        "Hostname not found. Using \"localhost\" as fallback.",
-                        e
-                    );
+                    .info("Hostname not found. Using \"localhost\" as fallback.", e);
                 hostName = "localhost";
             }
         }

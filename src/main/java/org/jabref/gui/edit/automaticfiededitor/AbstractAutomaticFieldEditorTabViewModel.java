@@ -16,8 +16,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractAutomaticFieldEditorTabViewModel
-    extends AbstractViewModel {
+public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractViewModel {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(
         AbstractAutomaticFieldEditorTabViewModel.class
@@ -25,8 +24,7 @@ public abstract class AbstractAutomaticFieldEditorTabViewModel
 
     protected final StateManager stateManager;
 
-    private final ObservableList<Field> allFields =
-        FXCollections.observableArrayList();
+    private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
     public AbstractAutomaticFieldEditorTabViewModel(
         BibDatabase bibDatabase,

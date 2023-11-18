@@ -72,10 +72,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
         textArea.initContextMenu(new DefaultMenu(textArea));
 
         new EditorValidator(preferencesService)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textArea
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public ISSNEditorViewModel getViewModel() {

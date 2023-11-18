@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeScanner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ChangeScanner.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
 
@@ -31,11 +29,7 @@ public class ChangeScanner {
         this.database = database;
         this.preferencesService = preferencesService;
         this.databaseChangeResolverFactory =
-            new DatabaseChangeResolverFactory(
-                dialogService,
-                database,
-                preferencesService
-            );
+            new DatabaseChangeResolverFactory(dialogService, database, preferencesService);
     }
 
     public List<DatabaseChange> scanForChanges() {

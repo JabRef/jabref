@@ -60,8 +60,7 @@ public class CommentsTab extends FieldsEditorTab {
 
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        UserSpecificCommentField defaultCommentField =
-            new UserSpecificCommentField(defaultOwner);
+        UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(defaultOwner);
 
         // As default: Show BibTeX comment field and the user-specific comment field of the default owner
         Set<Field> comments = new LinkedHashSet<>(
@@ -86,10 +85,7 @@ public class CommentsTab extends FieldsEditorTab {
     protected void setupPanel(BibEntry entry, boolean compressed) {
         super.setupPanel(entry, compressed);
 
-        for (Map.Entry<
-            Field,
-            FieldEditorFX
-        > fieldEditorEntry : editors.entrySet()) {
+        for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
@@ -100,9 +96,7 @@ public class CommentsTab extends FieldsEditorTab {
             } else {
                 editor
                     .getNode()
-                    .setDisable(
-                        !field.getName().equals(StandardField.COMMENT.getName())
-                    );
+                    .setDisable(!field.getName().equals(StandardField.COMMENT.getName()));
             }
         }
     }

@@ -84,32 +84,20 @@ public class FieldFormatterCleanupsPanel extends VBox {
             new ReadOnlyObjectWrapper<>(cellData.getValue().getField())
         );
         new ValueTableCellFactory<FieldFormatterCleanup, Field>()
-            .withGraphic(field ->
-                IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode()
-            )
+            .withGraphic(field -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
             .withTooltip(field ->
-                Localization.lang(
-                    "Remove formatter for %0",
-                    field.getDisplayName()
-                )
+                Localization.lang("Remove formatter for %0", field.getDisplayName())
             )
             .withOnMouseClickedEvent(item ->
-                event ->
-                    viewModel.removeCleanup(
-                        cleanupsList.getSelectionModel().getSelectedItem()
-                    )
+                event -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem())
             )
             .install(actionsColumn);
 
-        viewModel
-            .selectedCleanupProperty()
-            .setValue(cleanupsList.getSelectionModel());
+        viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
 
         cleanupsList.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE) {
-                viewModel.removeCleanup(
-                    cleanupsList.getSelectionModel().getSelectedItem()
-                );
+                viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem());
             }
         });
     }
@@ -120,10 +108,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
             .install(addableFields);
         addableFields.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addableFields.setOnKeyPressed(event -> {
-            if (
-                event.getCode() == KeyCode.TAB ||
-                event.getCode() == KeyCode.ENTER
-            ) {
+            if (event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.ENTER) {
                 addableFormatters.requestFocus();
                 event.consume();
             }
@@ -151,15 +136,9 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
         cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
         addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());
-        addableFields
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedFieldProperty());
-        addableFormatters
-            .itemsProperty()
-            .bind(viewModel.availableFormattersProperty());
-        addableFormatters
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedFormatterProperty());
+        addableFields.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
+        addableFormatters.itemsProperty().bind(viewModel.availableFormattersProperty());
+        addableFormatters.valueProperty().bindBidirectional(viewModel.selectedFormatterProperty());
     }
 
     @FXML

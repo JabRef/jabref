@@ -61,18 +61,13 @@ public class FromAuxDialog extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        Button generateButton = (Button) this.getDialogPane()
-            .lookupButton(generateButtonType);
+        Button generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
         generateButton
             .disableProperty()
             .bind(
-                viewModel
-                    .parseFailedProperty()
-                    .or(viewModel.notFoundList().emptyProperty().not())
+                viewModel.parseFailedProperty().or(viewModel.notFoundList().emptyProperty().not())
             );
-        generateButton
-            .defaultButtonProperty()
-            .bind(generateButton.disableProperty().not());
+        generateButton.defaultButtonProperty().bind(generateButton.disableProperty().not());
         setResultConverter(button -> {
             if (button == generateButtonType) {
                 viewModel.addResultToTabContainer();
@@ -86,26 +81,15 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         viewModel =
-            new FromAuxDialogViewModel(
-                tabContainer,
-                dialogService,
-                preferences,
-                stateManager
-            );
+            new FromAuxDialogViewModel(tabContainer, dialogService, preferences, stateManager);
 
-        auxFileField
-            .textProperty()
-            .bindBidirectional(viewModel.auxFileProperty());
-        statusInfos
-            .textProperty()
-            .bindBidirectional(viewModel.statusTextProperty());
+        auxFileField.textProperty().bindBidirectional(viewModel.auxFileProperty());
+        statusInfos.textProperty().bindBidirectional(viewModel.statusTextProperty());
         notFoundList.itemsProperty().bind(viewModel.notFoundList());
 
         libraryListView.setEditable(false);
         libraryListView.itemsProperty().bind(viewModel.librariesProperty());
-        libraryListView
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedLibraryProperty());
+        libraryListView.valueProperty().bindBidirectional(viewModel.selectedLibraryProperty());
         new ViewModelListCellFactory<BibDatabaseContext>()
             .withText(viewModel::getDatabaseName)
             .install(libraryListView);

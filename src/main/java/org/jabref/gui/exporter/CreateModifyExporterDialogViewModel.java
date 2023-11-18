@@ -52,9 +52,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     public ExporterViewModel saveExporter() {
         Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
-            preferences
-                .getExportPreferences()
-                .setExportWorkingDirectory(layoutFileDir);
+            preferences.getExportPreferences().setExportWorkingDirectory(layoutFileDir);
         }
 
         // Check that there are no empty strings.
@@ -74,31 +72,18 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             layoutFile.get(),
             extension.get(),
             preferences.getLayoutFormatterPreferences(),
-            preferences
-                .getSelfContainedExportConfiguration()
-                .getSelfContainedSaveOrder()
+            preferences.getSelfContainedExportConfiguration().getSelfContainedSaveOrder()
         );
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }
 
     public void browse() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(
-                    Localization.lang("Custom layout file"),
-                    StandardFileType.LAYOUT
-                )
-                .withDefaultExtension(
-                    Localization.lang("Custom layout file"),
-                    StandardFileType.LAYOUT
-                )
-                .withInitialDirectory(
-                    preferences
-                        .getExportPreferences()
-                        .getExportWorkingDirectory()
-                )
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
+            .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
+            .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory())
+            .build();
         dialogService
             .showFileOpenDialog(fileDialogConfiguration)
             .ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString()));

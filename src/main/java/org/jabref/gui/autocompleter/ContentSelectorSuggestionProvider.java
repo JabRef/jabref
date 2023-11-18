@@ -8,8 +8,7 @@ import java.util.stream.Stream;
 /**
  * Enriches a suggestion provider by a given set of content selector values.
  */
-public class ContentSelectorSuggestionProvider
-    extends StringSuggestionProvider {
+public class ContentSelectorSuggestionProvider extends StringSuggestionProvider {
 
     private final SuggestionProvider<String> suggestionProvider;
     private final List<String> contentSelectorValues;
@@ -24,10 +23,7 @@ public class ContentSelectorSuggestionProvider
 
     @Override
     public Stream<String> getSource() {
-        return Stream.concat(
-            contentSelectorValues.stream(),
-            suggestionProvider.getSource()
-        );
+        return Stream.concat(contentSelectorValues.stream(), suggestionProvider.getSource());
     }
 
     @Override

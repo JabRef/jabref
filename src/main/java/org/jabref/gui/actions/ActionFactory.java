@@ -26,15 +26,12 @@ import org.slf4j.LoggerFactory;
  */
 public class ActionFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ActionFactory.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
 
     private final KeyBindingRepository keyBindingRepository;
 
     public ActionFactory(KeyBindingRepository keyBindingRepository) {
-        this.keyBindingRepository =
-            Objects.requireNonNull(keyBindingRepository);
+        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
     }
 
     /**
@@ -42,9 +39,7 @@ public class ActionFactory {
      */
     private static void setGraphic(MenuItem node, Action action) {
         node.graphicProperty().unbind();
-        action
-            .getIcon()
-            .ifPresent(icon -> node.setGraphic(icon.getGraphicNode()));
+        action.getIcon().ifPresent(icon -> node.setGraphic(icon.getGraphicNode()));
     }
 
     /*
@@ -69,9 +64,7 @@ public class ActionFactory {
             // We have to use reflection to get the associated label
             try {
                 Method getLabel =
-                    ContextMenuContent.MenuItemContainer.class.getDeclaredMethod(
-                            "getLabel"
-                        );
+                    ContextMenuContent.MenuItemContainer.class.getDeclaredMethod("getLabel");
                 getLabel.setAccessible(true);
                 return (Label) getLabel.invoke(container);
             } catch (
@@ -86,18 +79,9 @@ public class ActionFactory {
         return null;
     }
 
-    public MenuItem configureMenuItem(
-        Action action,
-        Command command,
-        MenuItem menuItem
-    ) {
+    public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
         ActionUtils.configureMenuItem(
-            new JabRefAction(
-                action,
-                command,
-                keyBindingRepository,
-                Sources.FromMenu
-            ),
+            new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu),
             menuItem
         );
         setGraphic(menuItem, action);
@@ -129,18 +113,9 @@ public class ActionFactory {
         return menuItem;
     }
 
-    public CheckMenuItem createCheckMenuItem(
-        Action action,
-        Command command,
-        boolean selected
-    ) {
+    public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
         CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(
-            new JabRefAction(
-                action,
-                command,
-                keyBindingRepository,
-                Sources.FromMenu
-            )
+            new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu)
         );
         checkMenuItem.setSelected(selected);
         setGraphic(checkMenuItem, action);
@@ -154,12 +129,7 @@ public class ActionFactory {
         BooleanExpression selectedBinding
     ) {
         CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(
-            new JabRefAction(
-                action,
-                command,
-                keyBindingRepository,
-                Sources.FromMenu
-            )
+            new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu)
         );
         EasyBind.subscribe(selectedBinding, checkMenuItem::setSelected);
         setGraphic(checkMenuItem, action);
@@ -168,9 +138,7 @@ public class ActionFactory {
     }
 
     public Menu createMenu(Action action) {
-        Menu menu = ActionUtils.createMenu(
-            new JabRefAction(action, keyBindingRepository)
-        );
+        Menu menu = ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));
 
         // For some reason the graphic is not set correctly, so let's fix this
         setGraphic(menu, action);
@@ -185,12 +153,7 @@ public class ActionFactory {
 
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(
-            new JabRefAction(
-                action,
-                command,
-                keyBindingRepository,
-                Sources.FromButton
-            ),
+            new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
             ActionUtils.ActionTextBehavior.HIDE
         );
 
@@ -198,27 +161,16 @@ public class ActionFactory {
 
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();
-        action
-            .getIcon()
-            .ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
+        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
         button.setFocusTraversable(false); // Prevent the buttons from stealing the focus
         return button;
     }
 
-    public ButtonBase configureIconButton(
-        Action action,
-        Command command,
-        ButtonBase button
-    ) {
+    public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
         ActionUtils.unconfigureButton(button);
         ActionUtils.configureButton(
-            new JabRefAction(
-                action,
-                command,
-                keyBindingRepository,
-                Sources.FromButton
-            ),
+            new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
             button,
             ActionUtils.ActionTextBehavior.HIDE
         );
@@ -228,9 +180,7 @@ public class ActionFactory {
         // For some reason the graphic is not set correctly, so let's fix this
         // ToDO: Find a way to reuse JabRefIconView
         button.graphicProperty().unbind();
-        action
-            .getIcon()
-            .ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
+        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
         return button;
     }

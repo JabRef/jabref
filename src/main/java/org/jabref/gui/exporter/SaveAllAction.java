@@ -14,10 +14,7 @@ public class SaveAllAction extends SimpleCommand {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
 
-    public SaveAllAction(
-        JabRefFrame frame,
-        PreferencesService preferencesService
-    ) {
+    public SaveAllAction(JabRefFrame frame, PreferencesService preferencesService) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.preferencesService = preferencesService;

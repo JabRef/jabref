@@ -22,10 +22,7 @@ public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
                 .getChildren()
                 .add(
                     new Label(
-                        Localization.lang(
-                            "Current value: %0",
-                            preambleDiff.getOriginalPreamble()
-                        )
+                        Localization.lang("Current value: %0", preambleDiff.getOriginalPreamble())
                     )
                 );
         }
@@ -35,16 +32,11 @@ public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
                 .getChildren()
                 .add(
                     new Label(
-                        Localization.lang(
-                            "Value set externally: %0",
-                            preambleDiff.getNewPreamble()
-                        )
+                        Localization.lang("Value set externally: %0", preambleDiff.getNewPreamble())
                     )
                 );
         } else {
-            container
-                .getChildren()
-                .add(new Label(Localization.lang("Value cleared externally")));
+            container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
         }
         setLeftAnchor(container, 8d);
         setTopAnchor(container, 8d);

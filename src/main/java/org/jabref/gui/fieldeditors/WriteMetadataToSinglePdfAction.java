@@ -69,10 +69,7 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
     @Override
     public void execute() {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
-            Optional<Path> file = linkedFile.findIn(
-                databaseContext,
-                filePreferences
-            );
+            Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
             if (file.isEmpty()) {
                 dialogService.notify(
                     Localization.lang(
@@ -92,9 +89,7 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
                         filePreferences,
                         xmpPreferences
                     );
-                    dialogService.notify(
-                        Localization.lang("Success! Finished writing metadata.")
-                    );
+                    dialogService.notify(Localization.lang("Success! Finished writing metadata."));
                 } catch (IOException | TransformerException ex) {
                     dialogService.notify(
                         Localization.lang(
@@ -110,9 +105,7 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
             }
             return null;
         });
-        writeTask
-            .onRunning(() -> setExecutable(false))
-            .onFinished(() -> setExecutable(true));
+        writeTask.onRunning(() -> setExecutable(false)).onFinished(() -> setExecutable(true));
         taskExecutor.execute(writeTask);
     }
 
@@ -127,15 +120,13 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
         XmpPreferences xmpPreferences
     ) throws Exception {
         // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
-        new XmpUtilWriter(xmpPreferences)
-            .writeXmp(file, entry, databaseContext.getDatabase());
+        new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, databaseContext.getDatabase());
 
-        EmbeddedBibFilePdfExporter embeddedBibExporter =
-            new EmbeddedBibFilePdfExporter(
-                databaseContext.getMode(),
-                bibEntryTypesManager,
-                fieldPreferences
-            );
+        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(
+            databaseContext.getMode(),
+            bibEntryTypesManager,
+            fieldPreferences
+        );
         embeddedBibExporter.exportToFileByPath(
             databaseContext,
             filePreferences,

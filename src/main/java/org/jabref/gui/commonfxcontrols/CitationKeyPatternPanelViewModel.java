@@ -17,9 +17,10 @@ public class CitationKeyPatternPanelViewModel {
 
     public static final String ENTRY_TYPE_DEFAULT_NAME = "default";
 
-    public static Comparator<
-        CitationKeyPatternPanelItemModel
-    > defaultOnTopComparator = (o1, o2) -> {
+    public static Comparator<CitationKeyPatternPanelItemModel> defaultOnTopComparator = (
+        o1,
+        o2
+    ) -> {
         String itemOneName = o1.getEntryType().getName();
         String itemTwoName = o2.getEntryType().getName();
 
@@ -34,18 +35,14 @@ public class CitationKeyPatternPanelViewModel {
         return 0;
     };
 
-    private final ListProperty<
-        CitationKeyPatternPanelItemModel
-    > patternListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<
-        CitationKeyPatternPanelItemModel
-    > defaultItemProperty = new SimpleObjectProperty<>();
+    private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty =
+        new SimpleListProperty<>();
+    private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultItemProperty =
+        new SimpleObjectProperty<>();
 
     private final CitationKeyPatternPreferences keyPatternPreferences;
 
-    public CitationKeyPatternPanelViewModel(
-        CitationKeyPatternPreferences keyPatternPreferences
-    ) {
+    public CitationKeyPatternPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
         this.keyPatternPreferences = keyPatternPreferences;
     }
 
@@ -64,10 +61,7 @@ public class CitationKeyPatternPanelViewModel {
         }
 
         defaultItemProperty.setValue(
-            new CitationKeyPatternPanelItemModel(
-                new DefaultEntryType(),
-                defaultPattern
-            )
+            new CitationKeyPatternPanelItemModel(new DefaultEntryType(), defaultPattern)
         );
         patternListProperty.setValue(FXCollections.observableArrayList());
         patternListProperty.add(defaultItemProperty.getValue());
@@ -80,12 +74,9 @@ public class CitationKeyPatternPanelViewModel {
                 if (initialKeyPattern.isDefaultValue(entryType)) {
                     pattern = "";
                 } else {
-                    pattern =
-                        initialKeyPattern.getPatterns().get(entryType).get(0);
+                    pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
                 }
-                patternListProperty.add(
-                    new CitationKeyPatternPanelItemModel(entryType, pattern)
-                );
+                patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
             });
     }
 
@@ -95,20 +86,14 @@ public class CitationKeyPatternPanelViewModel {
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty
-            .getValue()
-            .setPattern(keyPatternPreferences.getDefaultPattern());
+        defaultItemProperty.getValue().setPattern(keyPatternPreferences.getDefaultPattern());
     }
 
-    public ListProperty<
-        CitationKeyPatternPanelItemModel
-    > patternListProperty() {
+    public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<
-        CitationKeyPatternPanelItemModel
-    > defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty() {
         return defaultItemProperty;
     }
 

@@ -35,10 +35,7 @@ public abstract class EntryEditorTab extends Tab {
      * Notifies the tab that it got focus and should display the given entry.
      */
     public void notifyAboutFocus(BibEntry entry) {
-        if (
-            !entry.equals(currentEntry) ||
-            !entry.getType().equals(currentEntryType)
-        ) {
+        if (!entry.equals(currentEntry) || !entry.getType().equals(currentEntryType)) {
             currentEntry = entry;
             currentEntryType = entry.getType();
             bindToEntry(entry);

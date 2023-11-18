@@ -40,18 +40,14 @@ import org.jabref.preferences.PreferencesService;
 public class DuplicateSearch extends SimpleCommand {
 
     private final JabRefFrame frame;
-    private final BlockingQueue<List<BibEntry>> duplicates =
-        new LinkedBlockingQueue<>();
+    private final BlockingQueue<List<BibEntry>> duplicates = new LinkedBlockingQueue<>();
 
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
-    private final SimpleStringProperty duplicateCountObservable =
-        new SimpleStringProperty();
-    private final SimpleStringProperty duplicateTotal =
-        new SimpleStringProperty();
-    private final SimpleIntegerProperty duplicateProgress =
-        new SimpleIntegerProperty(0);
+    private final SimpleStringProperty duplicateCountObservable = new SimpleStringProperty();
+    private final SimpleStringProperty duplicateTotal = new SimpleStringProperty();
+    private final SimpleIntegerProperty duplicateProgress = new SimpleIntegerProperty(0);
     private final DialogService dialogService;
     private final StateManager stateManager;
 
@@ -95,9 +91,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         duplicateCountObservable.addListener((obj, oldValue, newValue) ->
-            DefaultTaskExecutor.runAndWaitInJavaFXThread(() ->
-                duplicateTotal.set(newValue)
-            )
+            DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue))
         );
 
         JabRefExecutorService.INSTANCE.executeInterruptableTask(
@@ -110,10 +104,7 @@ public class DuplicateSearch extends SimpleCommand {
             .executeWith(taskExecutor);
     }
 
-    private void searchPossibleDuplicates(
-        List<BibEntry> entries,
-        BibDatabaseMode databaseMode
-    ) {
+    private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
         for (int i = 0; i < (entries.size() - 1); i++) {
             for (int j = i + 1; j < entries.size(); j++) {
                 if (Thread.interrupted()) {
@@ -124,13 +115,10 @@ public class DuplicateSearch extends SimpleCommand {
                 BibEntry second = entries.get(j);
 
                 if (
-                    new DuplicateCheck(entryTypesManager)
-                        .isDuplicate(first, second, databaseMode)
+                    new DuplicateCheck(entryTypesManager).isDuplicate(first, second, databaseMode)
                 ) {
                     duplicates.add(Arrays.asList(first, second));
-                    duplicateCountObservable.set(
-                        String.valueOf(duplicateCount.incrementAndGet())
-                    );
+                    duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
                 }
             }
         }
@@ -248,10 +236,7 @@ public class DuplicateSearch extends SimpleCommand {
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
             compoundEdit.addEdit(
-                new UndoableRemoveEntries(
-                    libraryTab.getDatabase(),
-                    result.getToRemove()
-                )
+                new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove())
             );
             libraryTab.getDatabase().removeEntries(result.getToRemove());
             libraryTab.markBaseChanged();
@@ -259,10 +244,7 @@ public class DuplicateSearch extends SimpleCommand {
         // and adding merged entries:
         if (!result.getToAdd().isEmpty()) {
             compoundEdit.addEdit(
-                new UndoableInsertEntries(
-                    libraryTab.getDatabase(),
-                    result.getToAdd()
-                )
+                new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd())
             );
             libraryTab.getDatabase().insertEntries(result.getToAdd());
             libraryTab.markBaseChanged();
@@ -308,11 +290,7 @@ public class DuplicateSearch extends SimpleCommand {
             duplicates++;
         }
 
-        public synchronized void replace(
-            BibEntry first,
-            BibEntry second,
-            BibEntry replacement
-        ) {
+        public synchronized void replace(BibEntry first, BibEntry second, BibEntry replacement) {
             remove(first);
             remove(second);
             toAdd.add(replacement);

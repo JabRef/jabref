@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public final class BibTexStringRename extends DatabaseChange {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BibTexStringRename.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringRename.class);
 
     private final BibtexString oldString;
     private final BibtexString newString;
@@ -29,16 +27,12 @@ public final class BibTexStringRename extends DatabaseChange {
         this.oldString = oldString;
         this.newString = newString;
 
-        setChangeName(
-            Localization.lang("Renamed string: '%0'", oldString.getName())
-        );
+        setChangeName(Localization.lang("Renamed string: '%0'", oldString.getName()));
     }
 
     @Override
     public void applyChange(NamedCompound undoEdit) {
-        if (
-            databaseContext.getDatabase().hasStringByName(newString.getName())
-        ) {
+        if (databaseContext.getDatabase().hasStringByName(newString.getName())) {
             // The name to change to is already in the database, so we can't comply.
             LOGGER.info(
                 "Cannot rename string '{}' to '{}' because the name is already in use",
@@ -50,9 +44,7 @@ public final class BibTexStringRename extends DatabaseChange {
         String currentName = oldString.getName();
         String newName = newString.getName();
         oldString.setName(newName);
-        undoEdit.addEdit(
-            new UndoableStringChange(oldString, true, currentName, newName)
-        );
+        undoEdit.addEdit(new UndoableStringChange(oldString, true, currentName, newName));
     }
 
     public BibtexString getOldString() {

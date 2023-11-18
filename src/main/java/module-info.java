@@ -25,10 +25,8 @@ open module org.jabref {
     uses org.kordamp.ikonli.IkonHandler;
     uses org.kordamp.ikonli.IkonProvider;
 
-    provides org.kordamp.ikonli.IkonHandler
-        with org.jabref.gui.icon.JabRefIkonHandler;
-    provides org.kordamp.ikonli.IkonProvider
-        with org.jabref.gui.icon.JabrefIconProvider;
+    provides org.kordamp.ikonli.IkonHandler with org.jabref.gui.icon.JabRefIkonHandler;
+    provides org.kordamp.ikonli.IkonProvider with org.jabref.gui.icon.JabrefIconProvider;
 
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;

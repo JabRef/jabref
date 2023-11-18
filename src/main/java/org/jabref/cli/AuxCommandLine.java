@@ -26,9 +26,7 @@ public class AuxCommandLine {
             AuxParserResult result = auxParser.parse(Path.of(auxFile));
             subDatabase = result.getGeneratedBibDatabase();
             // print statistics
-            System.out.println(
-                new AuxParserResultViewModel(result).getInformation(true)
-            );
+            System.out.println(new AuxParserResultViewModel(result).getInformation(true));
         }
         return subDatabase;
     }

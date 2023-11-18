@@ -37,9 +37,7 @@ import org.slf4j.LoggerFactory;
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
     public static final String NAME = "Search results";
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FulltextSearchResultsTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
@@ -62,8 +60,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
-        this.actionFactory =
-            new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         this.taskExecutor = taskExecutor;
 
         content = new TextFlow();
@@ -73,8 +70,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
         this.stateManager.activeSearchQueryProperty()
-            .addListener((observable, oldValue, newValue) -> bindToEntry(entry)
-            );
+            .addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
     @Override
@@ -87,12 +83,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 .get()
                 .getSearchFlags()
                 .contains(SearchRules.SearchFlags.FULLTEXT) &&
-            this.stateManager.activeSearchQueryProperty()
-                    .get()
-                    .get()
-                    .getQuery()
-                    .length() >
-                0
+            this.stateManager.activeSearchQueryProperty().get().get().getQuery().length() > 0
         );
     }
 
@@ -118,22 +109,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.getChildren().clear();
 
         if (searchResults.numSearchResults() == 0) {
-            content
-                .getChildren()
-                .add(new Text(Localization.lang("No search matches.")));
+            content.getChildren().add(new Text(Localization.lang("No search matches.")));
         }
 
         // Iterate through files with search hits
-        for (Map.Entry<
-            String,
-            List<SearchResult>
-        > resultsForPath : searchResults.getSearchResultsByPath().entrySet()) {
-            content
-                .getChildren()
-                .addAll(
-                    createFileLink(resultsForPath.getKey()),
-                    lineSeparator()
-                );
+        for (Map.Entry<String, List<SearchResult>> resultsForPath : searchResults
+            .getSearchResultsByPath()
+            .entrySet()) {
+            content.getChildren().addAll(createFileLink(resultsForPath.getKey()), lineSeparator());
 
             // Iterate through pages (within file) with search hits
             for (SearchResult searchResult : resultsForPath.getValue()) {
@@ -194,14 +177,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
         Path resolvedPath = linkedFile
-            .findIn(
-                stateManager.getActiveDatabase().get(),
-                preferencesService.getFilePreferences()
-            )
+            .findIn(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences())
             .orElse(Path.of(pathToFile));
-        Tooltip fileLinkTooltip = new Tooltip(
-            resolvedPath.toAbsolutePath().toString()
-        );
+        Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY.equals(event.getButton())) {
@@ -214,11 +192,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                     LOGGER.error("Cannot open {}.", resolvedPath.toString(), e);
                 }
             } else {
-                fileContextMenu.show(
-                    fileLinkText,
-                    event.getScreenX(),
-                    event.getScreenY()
-                );
+                fileContextMenu.show(fileLinkText, event.getScreenX(), event.getScreenY());
             }
         });
         return fileLinkText;
@@ -281,9 +255,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Separator lineSeparator(double widthMultiplier) {
         Separator lineSeparator = new Separator(Orientation.HORIZONTAL);
-        lineSeparator
-            .prefWidthProperty()
-            .bind(content.widthProperty().multiply(widthMultiplier));
+        lineSeparator.prefWidthProperty().bind(content.widthProperty().multiply(widthMultiplier));
         lineSeparator.setPrefHeight(15);
         return lineSeparator;
     }

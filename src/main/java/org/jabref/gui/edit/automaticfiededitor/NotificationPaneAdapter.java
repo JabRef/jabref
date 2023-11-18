@@ -18,8 +18,7 @@ public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
             affectedEntries,
             totalEntries
         );
-        Node notificationGraphic =
-            IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
+        Node notificationGraphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
 
         notify(
             notificationGraphic,

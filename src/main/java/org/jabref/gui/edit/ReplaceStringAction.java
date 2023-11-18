@@ -19,11 +19,7 @@ public class ReplaceStringAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
-        dialogService.showCustomDialogAndWait(
-            new ReplaceStringView(frame.getCurrentLibraryTab())
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialogAndWait(new ReplaceStringView(frame.getCurrentLibraryTab()));
     }
 }

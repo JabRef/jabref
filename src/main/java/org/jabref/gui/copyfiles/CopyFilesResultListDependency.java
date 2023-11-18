@@ -14,9 +14,7 @@ public class CopyFilesResultListDependency {
         // empty, workaround for injection into FXML controller
     }
 
-    public CopyFilesResultListDependency(
-        List<CopyFilesResultItemViewModel> results
-    ) {
+    public CopyFilesResultListDependency(List<CopyFilesResultItemViewModel> results) {
         this.results = results;
     }
 

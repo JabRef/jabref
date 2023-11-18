@@ -21,8 +21,7 @@ public class ExternalFileTypes {
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
-    private static final ExternalFileType HTML_FALLBACK_TYPE =
-        StandardExternalFileType.URL;
+    private static final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
     private ExternalFileTypes() {}
 
@@ -66,9 +65,7 @@ public class ExternalFileTypes {
         return filePreferences
             .getExternalFileTypes()
             .stream()
-            .filter(type ->
-                type.getExtension().equalsIgnoreCase(extensionCleaned)
-            )
+            .filter(type -> type.getExtension().equalsIgnoreCase(extensionCleaned))
             .findFirst();
     }
 
@@ -148,9 +145,7 @@ public class ExternalFileTypes {
     ) {
         final String filePath = file.toString();
         final Optional<String> extension = FileUtil.getFileExtension(filePath);
-        return extension.flatMap(ext ->
-            getExternalFileTypeByExt(ext, filePreferences)
-        );
+        return extension.flatMap(ext -> getExternalFileTypeByExt(ext, filePreferences));
     }
 
     public static Optional<ExternalFileType> getExternalFileTypeByLinkedFile(
@@ -162,8 +157,7 @@ public class ExternalFileTypes {
             linkedFile.getFileType(),
             filePreferences
         );
-        boolean isUnknownType =
-            type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
+        boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
 
         if (isUnknownType && deduceUnknownType) {
             // No file type was recognized. Try to find a usable file type based on mime type:
@@ -178,9 +172,7 @@ public class ExternalFileTypes {
             // No type could be found from mime type. Try based on the extension:
             return FileUtil
                 .getFileExtension(linkedFile.getLink())
-                .flatMap(extension ->
-                    getExternalFileTypeByExt(extension, filePreferences)
-                );
+                .flatMap(extension -> getExternalFileTypeByExt(extension, filePreferences));
         } else {
             return type;
         }
@@ -191,9 +183,7 @@ public class ExternalFileTypes {
      */
     public static String toStringList(Collection<ExternalFileType> fileTypes) {
         // First find a list of the default types:
-        List<ExternalFileType> defTypes = new ArrayList<>(
-            getDefaultExternalFileTypes()
-        );
+        List<ExternalFileType> defTypes = new ArrayList<>(getDefaultExternalFileTypes());
         // Make a list of types that are unchanged:
         List<ExternalFileType> unchanged = new ArrayList<>();
         // Create a result list
@@ -248,9 +238,7 @@ public class ExternalFileTypes {
      */
     public static Set<ExternalFileType> fromString(String storedFileTypes) {
         // First get a list of the default file types as a starting point:
-        Set<ExternalFileType> types = new HashSet<>(
-            getDefaultExternalFileTypes()
-        );
+        Set<ExternalFileType> types = new HashSet<>(getDefaultExternalFileTypes());
 
         // If no changes have been stored, simply use the defaults:
         if (StringUtil.isBlank(storedFileTypes)) {
@@ -275,9 +263,7 @@ public class ExternalFileTypes {
                 }
             } else {
                 // A new or modified entry type. Construct it from the string array:
-                ExternalFileType type = CustomExternalFileType.buildFromArgs(
-                    val
-                );
+                ExternalFileType type = CustomExternalFileType.buildFromArgs(val);
                 // Check if there is a default type with the same name. If so, this is a
                 // modification of that type, so remove the default one:
                 ExternalFileType toRemove = null;

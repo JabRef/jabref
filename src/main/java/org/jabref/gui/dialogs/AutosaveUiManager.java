@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AutosaveUiManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AutosaveUiManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUiManager.class);
 
     private final SaveDatabaseAction saveDatabaseAction;
 
@@ -40,9 +38,7 @@ public class AutosaveUiManager {
     @Subscribe
     public void listen(AutosaveEvent event) {
         try {
-            this.saveDatabaseAction.save(
-                    SaveDatabaseAction.SaveDatabaseMode.SILENT
-                );
+            this.saveDatabaseAction.save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
             LOGGER.error("Problem occurred while saving.", e);
         }

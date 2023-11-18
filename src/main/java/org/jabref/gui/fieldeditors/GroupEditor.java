@@ -24,20 +24,9 @@ public class GroupEditor extends SimpleEditor {
         final boolean isMultiLine,
         final UndoManager undoManager
     ) {
-        super(
-            field,
-            suggestionProvider,
-            fieldCheckers,
-            preferences,
-            isMultiLine,
-            undoManager
-        );
+        super(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
         this.setOnDragOver(event -> {
-                if (
-                    event
-                        .getDragboard()
-                        .hasContent(DragAndDropDataFormats.GROUP)
-                ) {
+                if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                     event.acceptTransferModes(TransferMode.MOVE);
                 }
                 event.consume();
@@ -45,11 +34,7 @@ public class GroupEditor extends SimpleEditor {
 
         this.setOnDragDropped(event -> {
                 boolean success = false;
-                if (
-                    event
-                        .getDragboard()
-                        .hasContent(DragAndDropDataFormats.GROUP)
-                ) {
+                if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                     List<String> draggedGroups = (List<String>) event
                         .getDragboard()
                         .getContent(DragAndDropDataFormats.GROUP);
@@ -68,9 +53,7 @@ public class GroupEditor extends SimpleEditor {
                                     .orElse(draggedGroups.get(0))
                             )
                             .orElse(null);
-                        bibEntry.map(entry ->
-                            entry.setField(StandardField.GROUPS, newGroup)
-                        );
+                        bibEntry.map(entry -> entry.setField(StandardField.GROUPS, newGroup));
                         success = true;
                     }
                 }

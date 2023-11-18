@@ -48,9 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BackupManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BackupManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
@@ -100,10 +98,7 @@ public class BackupManager {
     /**
      * Determines the most recent existing backup file name
      */
-    static Optional<Path> getLatestBackupPath(
-        Path originalPath,
-        Path backupDir
-    ) {
+    static Optional<Path> getLatestBackupPath(Path originalPath, Path backupDir) {
         return BackupFileUtil.getPathOfLatestExistingBackupFile(
             originalPath,
             BackupFileType.BACKUP,
@@ -131,9 +126,7 @@ public class BackupManager {
             entryTypesManager,
             preferences
         );
-        backupManager.startBackupTask(
-            preferences.getFilePreferences().getBackupDirectory()
-        );
+        backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         runningInstances.add(backupManager);
         return backupManager;
     }
@@ -143,15 +136,10 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static void discardBackup(
-        BibDatabaseContext bibDatabaseContext,
-        Path backupDir
-    ) {
+    public static void discardBackup(BibDatabaseContext bibDatabaseContext, Path backupDir) {
         runningInstances
             .stream()
-            .filter(instance ->
-                instance.bibDatabaseContext == bibDatabaseContext
-            )
+            .filter(instance -> instance.bibDatabaseContext == bibDatabaseContext)
             .forEach(backupManager -> backupManager.discardBackup(backupDir));
     }
 
@@ -169,15 +157,9 @@ public class BackupManager {
     ) {
         runningInstances
             .stream()
-            .filter(instance ->
-                instance.bibDatabaseContext == bibDatabaseContext
-            )
-            .forEach(backupManager ->
-                backupManager.shutdown(backupDir, createBackup)
-            );
-        runningInstances.removeIf(instance ->
-            instance.bibDatabaseContext == bibDatabaseContext
-        );
+            .filter(instance -> instance.bibDatabaseContext == bibDatabaseContext)
+            .forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
+        runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
     /**
@@ -198,11 +180,7 @@ public class BackupManager {
             try {
                 Files.delete(discardedFile);
             } catch (IOException e) {
-                LOGGER.error(
-                    "Could not remove discarded file {}",
-                    discardedFile,
-                    e
-                );
+                LOGGER.error("Could not remove discarded file {}", discardedFile, e);
                 return true;
             }
             return false;
@@ -211,21 +189,15 @@ public class BackupManager {
             .map(latestBackupPath -> {
                 FileTime latestBackupFileLastModifiedTime;
                 try {
-                    latestBackupFileLastModifiedTime =
-                        Files.getLastModifiedTime(latestBackupPath);
+                    latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
                 } catch (IOException e) {
-                    LOGGER.debug(
-                        "Could not get timestamp of backup file {}",
-                        latestBackupPath,
-                        e
-                    );
+                    LOGGER.debug("Could not get timestamp of backup file {}", latestBackupPath, e);
                     // If we cannot get the timestamp, we do show any warning
                     return false;
                 }
                 FileTime currentFileLastModifiedTime;
                 try {
-                    currentFileLastModifiedTime =
-                        Files.getLastModifiedTime(originalPath);
+                    currentFileLastModifiedTime = Files.getLastModifiedTime(originalPath);
                 } catch (IOException e) {
                     LOGGER.debug(
                         "Could not get timestamp of current file file {}",
@@ -235,25 +207,15 @@ public class BackupManager {
                     // If we cannot get the timestamp, we do show any warning
                     return false;
                 }
-                if (
-                    latestBackupFileLastModifiedTime.compareTo(
-                        currentFileLastModifiedTime
-                    ) <=
-                    0
-                ) {
+                if (latestBackupFileLastModifiedTime.compareTo(currentFileLastModifiedTime) <= 0) {
                     // Backup is older than current file
                     // We treat the backup as non-different (even if it could differ)
                     return false;
                 }
                 try {
-                    return (
-                        Files.mismatch(originalPath, latestBackupPath) != -1L
-                    );
+                    return (Files.mismatch(originalPath, latestBackupPath) != -1L);
                 } catch (IOException e) {
-                    LOGGER.debug(
-                        "Could not compare original file and backup file.",
-                        e
-                    );
+                    LOGGER.debug("Could not compare original file and backup file.", e);
                     // User has to investigate in this case
                     return true;
                 }
@@ -267,20 +229,13 @@ public class BackupManager {
      * @param originalPath Path to the file which should be equalized to the backup file.
      */
     public static void restoreBackup(Path originalPath, Path backupDir) {
-        Optional<Path> backupPath = getLatestBackupPath(
-            originalPath,
-            backupDir
-        );
+        Optional<Path> backupPath = getLatestBackupPath(originalPath, backupDir);
         if (backupPath.isEmpty()) {
             LOGGER.error("There is no backup file");
             return;
         }
         try {
-            Files.copy(
-                backupPath.get(),
-                originalPath,
-                StandardCopyOption.REPLACE_EXISTING
-            );
+            Files.copy(backupPath.get(), originalPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.error("Error while restoring the backup file.", e);
         }
@@ -289,9 +244,7 @@ public class BackupManager {
     Optional<Path> determineBackupPathForNewBackup(Path backupDir) {
         return bibDatabaseContext
             .getDatabasePath()
-            .map(path ->
-                BackupManager.getBackupPathForNewBackup(path, backupDir)
-            );
+            .map(path -> BackupManager.getBackupPathForNewBackup(path, backupDir));
     }
 
     /**
@@ -312,11 +265,7 @@ public class BackupManager {
             try {
                 Files.delete(oldestBackupFile);
             } catch (IOException e) {
-                LOGGER.error(
-                    "Could not delete backup file {}",
-                    oldestBackupFile,
-                    e
-                );
+                LOGGER.error("Could not delete backup file {}", oldestBackupFile, e);
             }
         }
 
@@ -327,16 +276,15 @@ public class BackupManager {
             .map(so -> {
                 if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
                     // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                    List<TableColumn<BibEntryTableViewModel, ?>> sortOrder =
-                        libraryTab.getMainTable().getSortOrder();
+                    List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab
+                        .getMainTable()
+                        .getSortOrder();
                     return new SelfContainedSaveOrder(
                         SaveOrder.OrderType.SPECIFIED,
                         sortOrder
                             .stream()
                             .filter(col -> col instanceof MainTableColumn<?>)
-                            .map(column ->
-                                ((MainTableColumn<?>) column).getModel()
-                            )
+                            .map(column -> ((MainTableColumn<?>) column).getModel())
                             .flatMap(model -> model.getSortCriteria().stream())
                             .toList()
                     );
@@ -350,9 +298,7 @@ public class BackupManager {
                 .withMakeBackup(false)
                 .withSaveOrder(saveOrder)
                 .withReformatOnSave(
-                    preferences
-                        .getLibraryPreferences()
-                        .shouldAlwaysReformatOnSave()
+                    preferences.getLibraryPreferences().shouldAlwaysReformatOnSave()
                 );
 
         Charset encoding = bibDatabaseContext
@@ -363,9 +309,7 @@ public class BackupManager {
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
         // Example: What happens if one hard powers off the machine (or kills the jabref process) during the write of the backup?
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
-        try (
-            Writer writer = new AtomicFileWriter(backupPath, encoding, false)
-        ) {
+        try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(
                 writer,
                 bibDatabaseContext.getDatabase().getNewLineSeparator()
@@ -390,10 +334,7 @@ public class BackupManager {
 
     private static Path determineDiscardedFile(Path file, Path backupDir) {
         return backupDir.resolve(
-            BackupFileUtil.getUniqueFilePrefix(file) +
-            "--" +
-            file.getFileName() +
-            "--discarded"
+            BackupFileUtil.getUniqueFilePrefix(file) + "--" + file.getFileName() + "--discarded"
         );
     }
 
@@ -404,10 +345,7 @@ public class BackupManager {
      * Therefore, we mark discarded backups by a --discarded file.
      */
     public void discardBackup(Path backupDir) {
-        Path path = determineDiscardedFile(
-            bibDatabaseContext.getDatabasePath().get(),
-            backupDir
-        );
+        Path path = determineDiscardedFile(bibDatabaseContext.getDatabasePath().get(), backupDir);
         try {
             Files.createFile(path);
         } catch (IOException e) {
@@ -420,8 +358,7 @@ public class BackupManager {
         while (innermostCause.getCause() != null) {
             innermostCause = innermostCause.getCause();
         }
-        boolean isErrorInField =
-            innermostCause instanceof InvalidFieldValueException;
+        boolean isErrorInField = innermostCause instanceof InvalidFieldValueException;
 
         // do not print errors in field values into the log during autosave
         if (!isErrorInField) {
@@ -468,9 +405,7 @@ public class BackupManager {
                     List<Path> allSavFiles = Files
                         .list(backupDir)
                         // just list the .sav belonging to the given targetFile
-                        .filter(p ->
-                            p.getFileName().toString().startsWith(prefix)
-                        )
+                        .filter(p -> p.getFileName().toString().startsWith(prefix))
                         .sorted()
                         .toList();
                     backupFilesQueue.addAll(allSavFiles);
@@ -494,8 +429,7 @@ public class BackupManager {
 
         if (createBackup) {
             // Ensure that backup is a recent one
-            determineBackupPathForNewBackup(backupDir)
-                .ifPresent(this::performBackup);
+            determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup);
         }
     }
 }

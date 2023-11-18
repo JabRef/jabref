@@ -22,13 +22,12 @@ public class EprintIdentifierEditorViewModel
     // The following listener will be wrapped in a weak reference change listener, thus it will be garbage collected
     // automatically once this object is disposed.
     // https://en.wikipedia.org/wiki/Lapsed_listener_problem
-    private MapChangeListener<Field, String> eprintTypeFieldListener =
-        change -> {
-            Field changedField = change.getKey();
-            if (StandardField.EPRINTTYPE == changedField) {
-                updateIdentifier();
-            }
-        };
+    private MapChangeListener<Field, String> eprintTypeFieldListener = change -> {
+        Field changedField = change.getKey();
+        if (StandardField.EPRINTTYPE == changedField) {
+            updateIdentifier();
+        }
+    };
 
     public EprintIdentifierEditorViewModel(
         SuggestionProvider<?> suggestionProvider,

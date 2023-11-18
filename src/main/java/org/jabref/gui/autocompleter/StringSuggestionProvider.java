@@ -19,10 +19,7 @@ abstract class StringSuggestionProvider extends SuggestionProvider<String> {
     }
 
     @Override
-    protected boolean isMatch(
-        String candidate,
-        AutoCompletionBinding.ISuggestionRequest request
-    ) {
+    protected boolean isMatch(String candidate, AutoCompletionBinding.ISuggestionRequest request) {
         return StringUtil.containsIgnoreCase(candidate, request.getUserText());
     }
 

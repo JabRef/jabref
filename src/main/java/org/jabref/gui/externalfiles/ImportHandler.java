@@ -55,9 +55,7 @@ import org.slf4j.LoggerFactory;
 
 public class ImportHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ImportHandler.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext bibDatabaseContext;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -91,9 +89,7 @@ public class ImportHandler {
                 dialogService
             );
         this.contentImporter =
-            new ExternalFilesContentImporter(
-                preferencesService.getImportFormatPreferences()
-            );
+            new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -101,13 +97,12 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<
-        List<ImportFilesResultItemViewModel>
-    > importFilesInBackground(final List<Path> files) {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(
+        final List<Path> files
+    ) {
         return new BackgroundTask<>() {
             private int counter;
-            private final List<ImportFilesResultItemViewModel> results =
-                new ArrayList<>();
+            private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
             @Override
             protected List<ImportFilesResultItemViewModel> call() {
@@ -121,19 +116,13 @@ public class ImportHandler {
                     }
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
-                        updateMessage(
-                            Localization.lang(
-                                "Processing file %0",
-                                file.getFileName()
-                            )
-                        );
+                        updateMessage(Localization.lang("Processing file %0", file.getFileName()));
                         updateProgress(counter, files.size() - 1d);
                     });
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
-                            var pdfImporterResult =
-                                contentImporter.importPDFContent(file);
+                            var pdfImporterResult = contentImporter.importPDFContent(file);
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult
                                 .getDatabase()
                                 .getEntries();
@@ -159,9 +148,7 @@ public class ImportHandler {
                                     )
                                 );
                             } else {
-                                entriesToAdd.add(
-                                    createEmptyEntryWithLink(file)
-                                );
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(
                                     file,
                                     false,
@@ -171,30 +158,21 @@ public class ImportHandler {
                                 );
                             }
                         } else if (FileUtil.isBibFile(file)) {
-                            var bibtexParserResult =
-                                contentImporter.importFromBibFile(
-                                    file,
-                                    fileUpdateMonitor
-                                );
+                            var bibtexParserResult = contentImporter.importFromBibFile(
+                                file,
+                                fileUpdateMonitor
+                            );
                             if (bibtexParserResult.hasWarnings()) {
-                                addResultToList(
-                                    file,
-                                    false,
-                                    bibtexParserResult.getErrorMessage()
-                                );
+                                addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
                             entriesToAdd.addAll(
-                                bibtexParserResult
-                                    .getDatabaseContext()
-                                    .getEntries()
+                                bibtexParserResult.getDatabaseContext().getEntries()
                             );
                             addResultToList(
                                 file,
                                 true,
-                                Localization.lang(
-                                    "Bib entry was successfully imported"
-                                )
+                                Localization.lang("Bib entry was successfully imported")
                             );
                         } else {
                             entriesToAdd.add(createEmptyEntryWithLink(file));
@@ -211,10 +189,7 @@ public class ImportHandler {
                         addResultToList(
                             file,
                             false,
-                            Localization.lang(
-                                "Error from import: %0",
-                                ex.getLocalizedMessage()
-                            )
+                            Localization.lang("Error from import: %0", ex.getLocalizedMessage())
                         );
 
                         DefaultTaskExecutor.runInJavaFXThread(() ->
@@ -223,15 +198,10 @@ public class ImportHandler {
                     }
 
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
-                    DefaultTaskExecutor.runInJavaFXThread(() ->
-                        importEntries(entriesToAdd)
-                    );
+                    DefaultTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
                     ce.addEdit(
-                        new UndoableInsertEntries(
-                            bibDatabaseContext.getDatabase(),
-                            entriesToAdd
-                        )
+                        new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd)
                     );
                     ce.end();
                     undoManager.addEdit(ce);
@@ -241,16 +211,8 @@ public class ImportHandler {
                 return results;
             }
 
-            private void addResultToList(
-                Path newFile,
-                boolean success,
-                String logMessage
-            ) {
-                var result = new ImportFilesResultItemViewModel(
-                    newFile,
-                    success,
-                    logMessage
-                );
+            private void addResultToList(Path newFile, boolean success, String logMessage) {
+                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
                 results.add(result);
             }
         };
@@ -268,9 +230,7 @@ public class ImportHandler {
      * There is no automatic download done.
      */
     public void importEntries(List<BibEntry> entries) {
-        ImportCleanup cleanup = ImportCleanup.targeting(
-            bibDatabaseContext.getMode()
-        );
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
         cleanup.doPostCleanup(entries);
         importCleanedEntries(entries);
     }
@@ -307,13 +267,8 @@ public class ImportHandler {
     }
 
     @VisibleForTesting
-    BibEntry cleanUpEntry(
-        BibDatabaseContext bibDatabaseContext,
-        BibEntry entry
-    ) {
-        ImportCleanup cleanup = ImportCleanup.targeting(
-            bibDatabaseContext.getMode()
-        );
+    BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
         return cleanup.doPostCleanup(entry);
     }
 
@@ -386,9 +341,7 @@ public class ImportHandler {
     }
 
     public void downloadLinkedFiles(BibEntry entry) {
-        if (
-            preferencesService.getFilePreferences().shouldDownloadLinkedFiles()
-        ) {
+        if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry
                 .getFiles()
                 .stream()
@@ -407,10 +360,7 @@ public class ImportHandler {
         }
     }
 
-    private void addToGroups(
-        List<BibEntry> entries,
-        Collection<GroupTreeNode> groups
-    ) {
+    private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
             if (node.getGroup() instanceof GroupEntryChanger entryChanger) {
                 List<FieldChange> undo = entryChanger.add(entries);
@@ -429,20 +379,14 @@ public class ImportHandler {
      * @param entries entries to generate keys for
      */
     private void generateKeys(List<BibEntry> entries) {
-        if (
-            !preferencesService
-                .getImporterPreferences()
-                .isGenerateNewKeyOnImport()
-        ) {
+        if (!preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
             bibDatabaseContext
                 .getMetaData()
                 .getCiteKeyPattern(
-                    preferencesService
-                        .getCitationKeyPatternPreferences()
-                        .getKeyPattern()
+                    preferencesService.getCitationKeyPatternPreferences().getKeyPattern()
                 ),
             bibDatabaseContext.getDatabase(),
             preferencesService.getCitationKeyPatternPreferences()
@@ -457,9 +401,7 @@ public class ImportHandler {
         );
         try {
             return parser.parseEntries(
-                new ByteArrayInputStream(
-                    entries.getBytes(StandardCharsets.UTF_8)
-                )
+                new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8))
             );
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
@@ -467,8 +409,7 @@ public class ImportHandler {
         }
     }
 
-    public List<BibEntry> handleStringData(String data)
-        throws FetcherException {
+    public List<BibEntry> handleStringData(String data) throws FetcherException {
         if ((data == null) || data.isEmpty()) {
             return Collections.emptyList();
         }
@@ -498,45 +439,31 @@ public class ImportHandler {
                 preferencesService.getImportFormatPreferences(),
                 fileUpdateMonitor
             );
-            UnknownFormatImport unknownFormatImport =
-                importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport
-                .parserResult()
-                .getDatabase()
-                .getEntries();
+            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
+            return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
-            dialogService.showErrorDialogAndWait(
-                Localization.lang("Import error"),
-                ex
-            );
+            dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return Collections.emptyList();
         }
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
         LOGGER.info("Found DOI identifer in clipboard");
-        Optional<BibEntry> entry = new DoiFetcher(
-            preferencesService.getImportFormatPreferences()
-        )
+        Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences())
             .performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
 
-    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier)
-        throws FetcherException {
+    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
         LOGGER.info("Found arxiv identifier in clipboard");
-        Optional<BibEntry> entry = new ArXivFetcher(
-            preferencesService.getImportFormatPreferences()
-        )
+        Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences())
             .performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
         return OptionalUtil.toList(entry);
     }
 
     private List<BibEntry> fetchByISBN(ISBN isbn) throws FetcherException {
         LOGGER.info("Found ISBN identifier in clipboard");
-        Optional<BibEntry> entry = new IsbnFetcher(
-            preferencesService.getImportFormatPreferences()
-        )
+        Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences())
             .performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }

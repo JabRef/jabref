@@ -46,10 +46,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
             );
 
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
-        datePicker
-            .getEditor()
-            .textProperty()
-            .bindBidirectional(viewModel.textProperty());
+        datePicker.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
 
         new EditorValidator(preferencesService)
             .configureValidation(

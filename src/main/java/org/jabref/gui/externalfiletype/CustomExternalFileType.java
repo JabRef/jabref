@@ -89,14 +89,7 @@ public class CustomExternalFileType implements ExternalFileType {
             }
         }
 
-        return new CustomExternalFileType(
-            name,
-            extension,
-            mimeType,
-            openWith,
-            iconName,
-            icon
-        );
+        return new CustomExternalFileType(name, extension, mimeType, openWith, iconName, icon);
     }
 
     @Override
@@ -178,14 +171,7 @@ public class CustomExternalFileType implements ExternalFileType {
     }
 
     public ExternalFileType copy() {
-        return new CustomExternalFileType(
-            name,
-            extension,
-            mimeType,
-            openWith,
-            iconName,
-            icon
-        );
+        return new CustomExternalFileType(name, extension, mimeType, openWith, iconName, icon);
     }
 
     @Override

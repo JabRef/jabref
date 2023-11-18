@@ -36,10 +36,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
      * It is also useless because changes are static and if the change data is static then the view doesn't have to change
      * either. This cache is used to ensure that we only create the detail view instance once for each {@link DatabaseChange}.
      */
-    private final Map<
-        DatabaseChange,
-        DatabaseChangeDetailsView
-    > DETAILS_VIEW_CACHE = new HashMap<>();
+    private final Map<DatabaseChange, DatabaseChangeDetailsView> DETAILS_VIEW_CACHE =
+        new HashMap<>();
 
     @FXML
     private TableView<DatabaseChange> changesTableView;
@@ -132,18 +130,14 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
         viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 
-        changeName.setCellValueFactory(data ->
-            new SimpleStringProperty(data.getValue().getName())
-        );
+        changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         askUserToResolveChangeButton
             .disableProperty()
             .bind(viewModel.canAskUserToResolveChangeProperty().not());
 
         changesTableView.setItems(viewModel.getVisibleChanges());
         // Think twice before setting this to MULTIPLE...
-        changesTableView
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.SINGLE);
+        changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         changesTableView.getSelectionModel().selectFirst();
 
         viewModel
@@ -153,11 +147,10 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
             viewModel.selectedChangeProperty(),
             selectedChange -> {
                 if (selectedChange != null) {
-                    DatabaseChangeDetailsView detailsView =
-                        DETAILS_VIEW_CACHE.computeIfAbsent(
-                            selectedChange,
-                            databaseChangeDetailsViewFactory::create
-                        );
+                    DatabaseChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(
+                        selectedChange,
+                        databaseChangeDetailsViewFactory::create
+                    );
                     changeInfoPane.setCenter(detailsView);
                 }
             }

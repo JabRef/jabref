@@ -43,16 +43,13 @@ public class AutoLinkFilesAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(
-                needsDatabase(this.stateManager)
-                    .and(needsEntriesSelected(stateManager))
+                needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager))
             );
         this.statusMessage.bind(
                 BindingsHelper.ifThenElse(
                     executable,
                     "",
-                    Localization.lang(
-                        "This operation requires one or more entries to be selected."
-                    )
+                    Localization.lang("This operation requires one or more entries to be selected.")
                 )
             );
     }
@@ -72,56 +69,49 @@ public class AutoLinkFilesAction extends SimpleCommand {
             Localization.lang("Automatically set file links")
         );
 
-        Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask =
-            new Task<>() {
-                @Override
-                protected AutoSetFileLinksUtil.LinkFilesResult call() {
-                    return util.linkAssociatedFiles(entries, nc);
-                }
+        Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
+            @Override
+            protected AutoSetFileLinksUtil.LinkFilesResult call() {
+                return util.linkAssociatedFiles(entries, nc);
+            }
 
-                @Override
-                protected void succeeded() {
-                    AutoSetFileLinksUtil.LinkFilesResult result = getValue();
+            @Override
+            protected void succeeded() {
+                AutoSetFileLinksUtil.LinkFilesResult result = getValue();
 
-                    if (!result.getFileExceptions().isEmpty()) {
-                        dialogService.showWarningDialogAndWait(
-                            Localization.lang("Automatically set file links"),
-                            Localization.lang(
-                                "Problem finding files. See error log for details."
-                            )
-                        );
-                        return;
-                    }
-
-                    if (result.getChangedEntries().isEmpty()) {
-                        dialogService.showWarningDialogAndWait(
-                            "Automatically set file links",
-                            Localization.lang(
-                                "Finished automatically setting external links."
-                            ) +
-                            "\n" +
-                            Localization.lang("No files found.")
-                        );
-                        return;
-                    }
-
-                    if (nc.hasEdits()) {
-                        nc.end();
-                        undoManager.addEdit(nc);
-                    }
-
-                    dialogService.notify(
-                        Localization.lang(
-                            "Finished automatically setting external links."
-                        ) +
-                        " " +
-                        Localization.lang(
-                            "Changed %0 entries.",
-                            String.valueOf(result.getChangedEntries().size())
-                        )
+                if (!result.getFileExceptions().isEmpty()) {
+                    dialogService.showWarningDialogAndWait(
+                        Localization.lang("Automatically set file links"),
+                        Localization.lang("Problem finding files. See error log for details.")
                     );
+                    return;
                 }
-            };
+
+                if (result.getChangedEntries().isEmpty()) {
+                    dialogService.showWarningDialogAndWait(
+                        "Automatically set file links",
+                        Localization.lang("Finished automatically setting external links.") +
+                        "\n" +
+                        Localization.lang("No files found.")
+                    );
+                    return;
+                }
+
+                if (nc.hasEdits()) {
+                    nc.end();
+                    undoManager.addEdit(nc);
+                }
+
+                dialogService.notify(
+                    Localization.lang("Finished automatically setting external links.") +
+                    " " +
+                    Localization.lang(
+                        "Changed %0 entries.",
+                        String.valueOf(result.getChangedEntries().size())
+                    )
+                );
+            }
+        };
 
         dialogService.showProgressDialog(
             Localization.lang("Automatically setting file links"),

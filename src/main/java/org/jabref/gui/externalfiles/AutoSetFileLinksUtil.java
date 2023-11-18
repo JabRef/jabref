@@ -50,9 +50,7 @@ public class AutoSetFileLinksUtil {
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AutoSetFileLinksUtil.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
     private final FilePreferences filePreferences;
@@ -79,10 +77,7 @@ public class AutoSetFileLinksUtil {
         this.filePreferences = filePreferences;
     }
 
-    public LinkFilesResult linkAssociatedFiles(
-        List<BibEntry> entries,
-        NamedCompound ce
-    ) {
+    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
@@ -100,12 +95,8 @@ public class AutoSetFileLinksUtil {
 
                 for (LinkedFile linkedFile : linkedFiles) {
                     // store undo information
-                    String newVal = FileFieldWriter.getStringRepresentation(
-                        linkedFile
-                    );
-                    String oldVal = entry
-                        .getField(StandardField.FILE)
-                        .orElse(null);
+                    String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
+                    String oldVal = entry.getField(StandardField.FILE).orElse(null);
                     UndoableFieldChange fieldChange = new UndoableFieldChange(
                         entry,
                         StandardField.FILE,
@@ -128,8 +119,7 @@ public class AutoSetFileLinksUtil {
         return result;
     }
 
-    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry)
-        throws IOException {
+    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
         List<String> extensions = filePreferences
@@ -139,14 +129,8 @@ public class AutoSetFileLinksUtil {
             .collect(Collectors.toList());
 
         // Run the search operation
-        FileFinder fileFinder = FileFinders.constructFromConfiguration(
-            autoLinkPreferences
-        );
-        List<Path> result = fileFinder.findAssociatedFiles(
-            entry,
-            directories,
-            extensions
-        );
+        FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
+        List<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
 
         // Collect the found files that are not yet linked
         for (Path foundFile : result) {
@@ -156,10 +140,7 @@ public class AutoSetFileLinksUtil {
                 .map(file -> file.findIn(directories))
                 .anyMatch(file -> {
                     try {
-                        return (
-                            file.isPresent() &&
-                            Files.isSameFile(file.get(), foundFile)
-                        );
+                        return (file.isPresent() && Files.isSameFile(file.get(), foundFile));
                     } catch (IOException e) {
                         LOGGER.error("Problem with isSameFile", e);
                     }
@@ -170,23 +151,13 @@ public class AutoSetFileLinksUtil {
                 Optional<ExternalFileType> type = FileUtil
                     .getFileExtension(foundFile)
                     .map(extension ->
-                        ExternalFileTypes.getExternalFileTypeByExt(
-                            extension,
-                            filePreferences
-                        )
+                        ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences)
                     )
                     .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
-                Path relativeFilePath = FileUtil.relativize(
-                    foundFile,
-                    directories
-                );
-                LinkedFile linkedFile = new LinkedFile(
-                    "",
-                    relativeFilePath,
-                    strType
-                );
+                Path relativeFilePath = FileUtil.relativize(foundFile, directories);
+                LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
             }
         }

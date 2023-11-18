@@ -49,29 +49,22 @@ public class RenameFieldTabView
 
     @FXML
     public void initialize() {
-        viewModel =
-            new RenameFieldViewModel(selectedEntries, database, stateManager);
+        viewModel = new RenameFieldViewModel(selectedEntries, database, stateManager);
 
         fieldComboBox.getItems().setAll(viewModel.getAllFields());
         fieldComboBox.getSelectionModel().selectFirst();
 
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
-        fieldComboBox
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedFieldProperty());
+        fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
         EasyBind.listen(
             fieldComboBox.getEditor().textProperty(),
             observable -> fieldComboBox.commitValue()
         );
 
-        renameButton
-            .disableProperty()
-            .bind(viewModel.canRenameProperty().not());
+        renameButton.disableProperty().bind(viewModel.canRenameProperty().not());
 
-        newFieldNameTextField
-            .textProperty()
-            .bindBidirectional(viewModel.newFieldNameProperty());
+        newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(

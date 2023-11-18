@@ -33,9 +33,7 @@ public class PersonsEditorViewModel extends AbstractEditorViewModel {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<Author> complete(
-        AutoCompletionBinding.ISuggestionRequest request
-    ) {
+    public Collection<Author> complete(AutoCompletionBinding.ISuggestionRequest request) {
         return (Collection<Author>) super.complete(request);
     }
 

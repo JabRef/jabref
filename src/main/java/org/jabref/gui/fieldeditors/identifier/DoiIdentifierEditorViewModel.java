@@ -18,12 +18,9 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DoiIdentifierEditorViewModel
-    extends BaseIdentifierEditorViewModel<DOI> {
+public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<DOI> {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(
-        DoiIdentifierEditorViewModel.class
-    );
+    public static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
 
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -63,9 +60,7 @@ public class DoiIdentifierEditorViewModel
                 if (identifier.isPresent()) {
                     entry.setField(field, identifier.get().getNormalized());
                 } else {
-                    dialogService.notify(
-                        Localization.lang("No %0 found", field.getDisplayName())
-                    );
+                    dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
                 }
             })
             .onFailure(e -> handleIdentifierFetchingError(e, doiFetcher))
@@ -86,10 +81,7 @@ public class DoiIdentifierEditorViewModel
                         undoManager
                     )
                         .fetchAndMerge(entry, field),
-                () ->
-                    dialogService.notify(
-                        Localization.lang("No library selected")
-                    )
+                () -> dialogService.notify(Localization.lang("No library selected"))
             );
     }
 
@@ -98,8 +90,6 @@ public class DoiIdentifierEditorViewModel
         identifier
             .get()
             .map(DOI::getDOI)
-            .ifPresent(s ->
-                JabRefDesktop.openCustomDoi(s, preferences, dialogService)
-            );
+            .ifPresent(s -> JabRefDesktop.openCustomDoi(s, preferences, dialogService));
     }
 }

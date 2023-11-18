@@ -5,8 +5,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class BibTexStringDeleteDetailsView
-    extends DatabaseChangeDetailsView {
+public final class BibTexStringDeleteDetailsView extends DatabaseChangeDetailsView {
 
     public BibTexStringDeleteDetailsView(BibTexStringDelete stringDelete) {
         VBox container = new VBox();
@@ -17,16 +16,10 @@ public final class BibTexStringDeleteDetailsView
             .addAll(
                 header,
                 new Label(
-                    Localization.lang(
-                        "Label: %0",
-                        stringDelete.getDeletedString().getName()
-                    )
+                    Localization.lang("Label: %0", stringDelete.getDeletedString().getName())
                 ),
                 new Label(
-                    Localization.lang(
-                        "Content: %0",
-                        stringDelete.getDeletedString().getContent()
-                    )
+                    Localization.lang("Content: %0", stringDelete.getDeletedString().getContent())
                 )
             );
         setLeftAnchor(container, 8d);

@@ -38,9 +38,7 @@ public class Globals {
      */
     public static StateManager stateManager = new StateManager();
 
-    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(
-        stateManager
-    );
+    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
 
     /**
      * Each test case initializes this field if required
@@ -119,11 +117,7 @@ public class Globals {
         RemotePreferences remotePreferences = prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             Globals.REMOTE_LISTENER.openAndStart(
-                new CLIMessageHandler(
-                    prefs,
-                    fileUpdateMonitor,
-                    entryTypesManager
-                ),
+                new CLIMessageHandler(prefs, fileUpdateMonitor, entryTypesManager),
                 remotePreferences.getPort()
             );
         }

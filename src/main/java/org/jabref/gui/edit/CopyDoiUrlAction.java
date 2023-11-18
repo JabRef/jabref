@@ -33,10 +33,7 @@ public class CopyDoiUrlAction extends SimpleCommand {
         String identifier = component.getText();
 
         if (action == StandardActions.COPY_DOI_URL) {
-            copy(
-                DOI.parse(identifier).map(DOI::getURIAsASCIIString),
-                identifier
-            );
+            copy(DOI.parse(identifier).map(DOI::getURIAsASCIIString), identifier);
         } else {
             copy(DOI.parse(identifier).map(DOI::getDOI), identifier);
         }
@@ -45,13 +42,9 @@ public class CopyDoiUrlAction extends SimpleCommand {
     private void copy(Optional<String> urlOptional, String identifier) {
         if (urlOptional.isPresent()) {
             Globals.getClipboardManager().setContent(urlOptional.get());
-            dialogService.notify(
-                Localization.lang("The link has been copied to the clipboard.")
-            );
+            dialogService.notify(Localization.lang("The link has been copied to the clipboard."));
         } else {
-            dialogService.notify(
-                Localization.lang("Invalid DOI: '%0'.", identifier)
-            );
+            dialogService.notify(Localization.lang("Invalid DOI: '%0'.", identifier));
         }
     }
 }

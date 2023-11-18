@@ -19,9 +19,7 @@ public class MathSciNetTab extends EntryEditorTab {
     }
 
     private Optional<MathSciNetId> getMathSciNetId(BibEntry entry) {
-        return entry
-            .getField(StandardField.MR_NUMBER)
-            .flatMap(MathSciNetId::parse);
+        return entry.getField(StandardField.MR_NUMBER).flatMap(MathSciNetId::parse);
     }
 
     private StackPane getPane(BibEntry entry) {

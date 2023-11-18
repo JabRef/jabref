@@ -46,21 +46,14 @@ public final class GroupChange extends DatabaseChange {
             });
 
         final UndoableModifySubtree undo = new UndoableModifySubtree(
-            new GroupTreeNodeViewModel(
-                databaseContext.getMetaData().getGroups().orElse(null)
-            ),
+            new GroupTreeNodeViewModel(databaseContext.getMetaData().getGroups().orElse(null)),
             new GroupTreeNodeViewModel(root),
             Localization.lang("Modified groups")
         );
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
-            root.setGroup(
-                DefaultGroupsFactory.getAllEntriesGroup(),
-                false,
-                false,
-                null
-            );
+            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup(), false, false, null);
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(newRoot.getGroup(), false, false, null);

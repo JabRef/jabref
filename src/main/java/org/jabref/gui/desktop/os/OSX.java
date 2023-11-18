@@ -20,23 +20,14 @@ import org.jabref.preferences.FilePreferences;
 public class OSX extends NativeDesktop {
 
     @Override
-    public void openFile(
-        String filePath,
-        String fileType,
-        FilePreferences filePreferences
-    ) throws IOException {
-        Optional<ExternalFileType> type =
-            ExternalFileTypes.getExternalFileTypeByExt(
-                fileType,
-                filePreferences
-            );
-        if (
-            type.isPresent() && !type.get().getOpenWithApplication().isEmpty()
-        ) {
-            openFileWithApplication(
-                filePath,
-                type.get().getOpenWithApplication()
-            );
+    public void openFile(String filePath, String fileType, FilePreferences filePreferences)
+        throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(
+            fileType,
+            filePreferences
+        );
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
+            openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
             String[] cmd = { "/usr/bin/open", filePath };
             Runtime.getRuntime().exec(cmd);
@@ -44,8 +35,7 @@ public class OSX extends NativeDesktop {
     }
 
     @Override
-    public void openFileWithApplication(String filePath, String application)
-        throws IOException {
+    public void openFileWithApplication(String filePath, String application) throws IOException {
         // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
         String[] cmd = (application != null) && !application.isEmpty()
             ? new String[] { "/usr/bin/open", "-a", application, filePath }
@@ -60,8 +50,7 @@ public class OSX extends NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath, DialogService dialogService)
-        throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
     }
 

@@ -38,10 +38,7 @@ public class EditorTextField
             contextMenu
                 .getItems()
                 .setAll(
-                    EditorContextAction.getDefaultContextMenuItems(
-                        this,
-                        Globals.getKeyPrefs()
-                    )
+                    EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs())
                 );
             contextMenu.getItems().addAll(0, items.get());
 

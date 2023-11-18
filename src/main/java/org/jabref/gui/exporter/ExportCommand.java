@@ -43,9 +43,7 @@ public class ExportCommand extends SimpleCommand {
         EXPORT_SELECTED,
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ExportCommand.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
 
     private final ExportMethod exportMethod;
     private final JabRefFrame frame;
@@ -85,38 +83,22 @@ public class ExportCommand extends SimpleCommand {
     @Override
     public void execute() {
         // Get list of exporters and sort before adding to file dialog
-        ExporterFactory exporterFactory = ExporterFactory.create(
-            preferences,
-            entryTypesManager
-        );
+        ExporterFactory exporterFactory = ExporterFactory.create(preferences, entryTypesManager);
         List<Exporter> exporters = exporterFactory
             .getExporters()
             .stream()
             .sorted(Comparator.comparing(Exporter::getName))
             .collect(Collectors.toList());
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(
-                    FileFilterConverter.exporterToExtensionFilter(exporters)
-                )
-                .withDefaultExtension(
-                    preferences.getExportPreferences().getLastExportExtension()
-                )
-                .withInitialDirectory(
-                    preferences
-                        .getExportPreferences()
-                        .getExportWorkingDirectory()
-                )
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
+            .withDefaultExtension(preferences.getExportPreferences().getLastExportExtension())
+            .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory())
+            .build();
         dialogService
             .showFileSaveDialog(fileDialogConfiguration)
             .ifPresent(path ->
-                export(
-                    path,
-                    fileDialogConfiguration.getSelectedExtensionFilter(),
-                    exporters
-                )
+                export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters)
             );
     }
 
@@ -125,10 +107,7 @@ public class ExportCommand extends SimpleCommand {
         FileChooser.ExtensionFilter selectedExtensionFilter,
         List<Exporter> exporters
     ) {
-        String selectedExtension = selectedExtensionFilter
-            .getExtensions()
-            .get(0)
-            .replace("*", "");
+        String selectedExtension = selectedExtensionFilter.getExtensions().get(0).replace("*", "");
         if (!file.endsWith(selectedExtension)) {
             FileUtil.addExtension(file, selectedExtension);
         }
@@ -136,9 +115,7 @@ public class ExportCommand extends SimpleCommand {
         final Exporter format = FileFilterConverter
             .getExporter(selectedExtensionFilter, exporters)
             .orElseThrow(() ->
-                new IllegalStateException(
-                    "User didn't selected a file type for the extension"
-                )
+                new IllegalStateException("User didn't selected a file type for the extension")
             );
         List<BibEntry> entries;
         if (exportMethod == ExportMethod.EXPORT_SELECTED) {
@@ -156,18 +133,12 @@ public class ExportCommand extends SimpleCommand {
         List<Path> fileDirForDatabase = stateManager
             .getActiveDatabase()
             .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
-            .orElse(
-                List.of(preferences.getFilePreferences().getWorkingDirectory())
-            );
+            .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        preferences
-            .getExportPreferences()
-            .setLastExportExtension(format.getName());
-        preferences
-            .getExportPreferences()
-            .setExportWorkingDirectory(file.getParent());
+        preferences.getExportPreferences().setLastExportExtension(format.getName());
+        preferences.getExportPreferences().setExportWorkingDirectory(file.getParent());
 
         final List<BibEntry> finEntries = entries;
 
@@ -188,9 +159,7 @@ public class ExportCommand extends SimpleCommand {
                     .getNotificationPane();
                 notificationPane.notify(
                     IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
-                    Localization.lang(
-                        "Export operation finished successfully."
-                    ),
+                    Localization.lang("Export operation finished successfully."),
                     List.of(
                         new Action(
                             Localization.lang("Reveal in File Explorer"),
@@ -202,10 +171,7 @@ public class ExportCommand extends SimpleCommand {
                                         dialogService
                                     );
                                 } catch (IOException e) {
-                                    LOGGER.error(
-                                        "Could not open export folder.",
-                                        e
-                                    );
+                                    LOGGER.error("Could not open export folder.", e);
                                 }
                                 notificationPane.hide();
                             }

@@ -43,10 +43,7 @@ public class SciteTabViewModel extends AbstractViewModel {
 
     private Future<?> searchTask;
 
-    public SciteTabViewModel(
-        PreferencesService preferencesService,
-        TaskExecutor taskExecutor
-    ) {
+    public SciteTabViewModel(PreferencesService preferencesService, TaskExecutor taskExecutor) {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
@@ -54,9 +51,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     public boolean shouldShow() {
-        return preferencesService
-            .getEntryEditorPreferences()
-            .shouldShowSciteTab();
+        return preferencesService.getEntryEditorPreferences().shouldShowSciteTab();
     }
 
     public void bindToEntry(BibEntry entry) {
@@ -71,9 +66,7 @@ public class SciteTabViewModel extends AbstractViewModel {
 
         // The scite.ai api requires a DOI
         if (entry.getDOI().isEmpty()) {
-            searchError.set(
-                Localization.lang("This entry does not have a DOI")
-            );
+            searchError.set(Localization.lang("This entry does not have a DOI"));
             status.set(SciteStatus.ERROR);
             return;
         }
@@ -94,11 +87,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     private void cancelSearch() {
-        if (
-            searchTask == null ||
-            searchTask.isCancelled() ||
-            searchTask.isDone()
-        ) {
+        if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {
             return;
         }
 
@@ -123,10 +112,7 @@ public class SciteTabViewModel extends AbstractViewModel {
         } catch (MalformedURLException | URISyntaxException ex) {
             throw new FetcherException("Malformed url for DOs", ex);
         } catch (IOException ioex) {
-            throw new FetcherException(
-                "Failed to retrieve tallies for DOI - IO Exception",
-                ioex
-            );
+            throw new FetcherException("Failed to retrieve tallies for DOI - IO Exception", ioex);
         }
     }
 

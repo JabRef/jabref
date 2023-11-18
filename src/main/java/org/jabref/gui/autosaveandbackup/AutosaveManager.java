@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AutosaveManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        AutosaveManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
 
     private static final int DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS = 31;
 
@@ -56,9 +54,7 @@ public class AutosaveManager {
     }
 
     @Subscribe
-    public void listen(
-        @SuppressWarnings("unused") BibDatabaseContextChangedEvent event
-    ) {
+    public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
         if (!event.isFilteredOut()) {
             this.needsSave = true;
         }
@@ -76,9 +72,7 @@ public class AutosaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
-        AutosaveManager autosaveManager = new AutosaveManager(
-            bibDatabaseContext
-        );
+        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext);
         runningInstances.add(autosaveManager);
         return autosaveManager;
     }
@@ -91,9 +85,7 @@ public class AutosaveManager {
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
         runningInstances
             .stream()
-            .filter(instance ->
-                instance.bibDatabaseContext == bibDatabaseContext
-            )
+            .filter(instance -> instance.bibDatabaseContext == bibDatabaseContext)
             .findAny()
             .ifPresent(instance -> {
                 instance.shutdown();

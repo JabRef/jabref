@@ -27,14 +27,11 @@ public class DocumentViewerControl extends StackPane {
 
     private final TaskExecutor taskExecutor;
 
-    private final ObjectProperty<Integer> currentPage =
-        new SimpleObjectProperty<>(1);
+    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>(1);
     private final DoubleProperty scrollY = new SimpleDoubleProperty();
     private final DoubleProperty scrollYMax = new SimpleDoubleProperty();
     private VirtualFlow<DocumentPageViewModel, DocumentViewerPage> flow;
-    private PageDimension desiredPageDimension = PageDimension.ofFixedWidth(
-        600
-    );
+    private PageDimension desiredPageDimension = PageDimension.ofFixedWidth(600);
 
     public DocumentViewerControl(TaskExecutor taskExecutor) {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
@@ -68,11 +65,7 @@ public class DocumentViewerControl extends StackPane {
     }
 
     public void show(DocumentViewModel document) {
-        flow =
-            VirtualFlow.createVertical(
-                document.getPages(),
-                DocumentViewerPage::new
-            );
+        flow = VirtualFlow.createVertical(document.getPages(), DocumentViewerPage::new);
         getChildren().setAll(flow);
         flow
             .visibleCells()
@@ -84,22 +77,16 @@ public class DocumentViewerControl extends StackPane {
         // (Bidirectional) binding does not work, so use listeners instead
         flow
             .estimatedScrollYProperty()
-            .addListener((observable, oldValue, newValue) ->
-                scrollY.setValue(newValue)
-            );
+            .addListener((observable, oldValue, newValue) -> scrollY.setValue(newValue));
         scrollY.addListener((observable, oldValue, newValue) ->
             flow.estimatedScrollYProperty().setValue((double) newValue)
         );
         flow
             .totalLengthEstimateProperty()
-            .addListener((observable, oldValue, newValue) ->
-                scrollYMax.setValue(newValue)
-            );
+            .addListener((observable, oldValue, newValue) -> scrollYMax.setValue(newValue));
     }
 
-    private void updateCurrentPage(
-        ObservableList<DocumentViewerPage> visiblePages
-    ) {
+    private void updateCurrentPage(ObservableList<DocumentViewerPage> visiblePages) {
         if (flow == null) {
             return;
         }
@@ -107,10 +94,7 @@ public class DocumentViewerControl extends StackPane {
         // We try to find the page that is displayed in the center of the viewport
         Optional<DocumentViewerPage> inMiddleOfViewport = Optional.empty();
         try {
-            VirtualFlowHit<DocumentViewerPage> hit = flow.hit(
-                0,
-                flow.getHeight() / 2
-            );
+            VirtualFlowHit<DocumentViewerPage> hit = flow.hit(0, flow.getHeight() / 2);
             if (hit.isCellHit()) {
                 // Successful hit
                 inMiddleOfViewport = Optional.of(hit.getCell());
@@ -125,11 +109,7 @@ public class DocumentViewerControl extends StackPane {
         } else {
             // Heuristic missed, so try to get page number from first shown page
             currentPage.set(
-                visiblePages
-                    .stream()
-                    .findFirst()
-                    .map(DocumentViewerPage::getPageNumber)
-                    .orElse(1)
+                visiblePages.stream().findFirst().map(DocumentViewerPage::getPageNumber).orElse(1)
             );
         }
     }
@@ -164,8 +144,7 @@ public class DocumentViewerControl extends StackPane {
      * Represents the viewport for a page. Note: the instances of {@link DocumentViewerPage} are reused, i.e., not every
      * page is rendered in a new instance but instead {@link DocumentViewerPage#updateItem(Object)} is called.
      */
-    private class DocumentViewerPage
-        implements Cell<DocumentPageViewModel, StackPane> {
+    private class DocumentViewerPage implements Cell<DocumentPageViewModel, StackPane> {
 
         private final ImageView imageView;
         private final StackPane imageHolder;
@@ -233,10 +212,7 @@ public class DocumentViewerControl extends StackPane {
                     imageView.setImage(image);
 
                     // Fade new page in for smoother transition
-                    FadeTransition fadeIn = new FadeTransition(
-                        Duration.millis(100),
-                        imageView
-                    );
+                    FadeTransition fadeIn = new FadeTransition(Duration.millis(100), imageView);
                     fadeIn.setFromValue(0);
                     fadeIn.setToValue(1);
                     fadeIn.play();

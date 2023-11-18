@@ -27,23 +27,15 @@ public class BibEntryView {
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
-        Label authors = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse("")
-        );
+        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
         authors.getStyleClass().add("authors");
         authors.setWrapText(true);
-        Label title = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("")
-        );
+        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
         title.getStyleClass().add("title");
         title.setWrapText(true);
-        Label year = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse("")
-        );
+        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
-        Label journal = new Label(
-            entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("")
-        );
+        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
         journal.getStyleClass().add("journal");
 
         VBox entryContainer = new VBox(
@@ -54,9 +46,7 @@ public class BibEntryView {
         entry
             .getFieldOrAliasLatexFree(StandardField.ABSTRACT)
             .ifPresent(summaryText -> {
-                TextFlowLimited summary = new TextFlowLimited(
-                    new Text(summaryText)
-                );
+                TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
                 summary.getStyleClass().add("summary");
                 entryContainer.getChildren().add(summary);
             });

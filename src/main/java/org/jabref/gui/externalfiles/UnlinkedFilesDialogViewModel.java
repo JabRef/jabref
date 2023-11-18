@@ -53,25 +53,17 @@ public class UnlinkedFilesDialogViewModel {
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension =
         new SimpleObjectProperty<>();
-    private final ObjectProperty<DateRange> selectedDate =
-        new SimpleObjectProperty<>();
-    private final ObjectProperty<ExternalFileSorter> selectedSort =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty =
         new SimpleObjectProperty<>();
-    private final SimpleListProperty<
-        TreeItem<FileNodeViewModel>
-    > checkedFileListProperty = new SimpleListProperty<>(
-        FXCollections.observableArrayList()
-    );
+    private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty =
+        new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final BooleanProperty taskActiveProperty =
-        new SimpleBooleanProperty(false);
-    private final DoubleProperty progressValueProperty =
-        new SimpleDoubleProperty(0);
-    private final StringProperty progressTextProperty =
-        new SimpleStringProperty();
+    private final BooleanProperty taskActiveProperty = new SimpleBooleanProperty(false);
+    private final DoubleProperty progressValueProperty = new SimpleDoubleProperty(0);
+    private final StringProperty progressTextProperty = new SimpleStringProperty();
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList =
         FXCollections.observableArrayList();
@@ -82,9 +74,7 @@ public class UnlinkedFilesDialogViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
-    private BackgroundTask<
-        List<ImportFilesResultItemViewModel>
-    > importFilesBackgroundTask;
+    private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
     private final BibDatabaseContext bibDatabase;
     private final TaskExecutor taskExecutor;
@@ -123,35 +113,24 @@ public class UnlinkedFilesDialogViewModel {
                     StandardFileType.ANY_FILE,
                     preferences.getFilePreferences()
                 ),
-                new FileExtensionViewModel(
-                    StandardFileType.HTML,
-                    preferences.getFilePreferences()
-                ),
+                new FileExtensionViewModel(StandardFileType.HTML, preferences.getFilePreferences()),
                 new FileExtensionViewModel(
                     StandardFileType.MARKDOWN,
                     preferences.getFilePreferences()
                 ),
-                new FileExtensionViewModel(
-                    StandardFileType.PDF,
-                    preferences.getFilePreferences()
-                )
+                new FileExtensionViewModel(StandardFileType.PDF, preferences.getFilePreferences())
             );
 
-        this.dateFilterList =
-            FXCollections.observableArrayList(DateRange.values());
+        this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
-        this.fileSortList =
-            FXCollections.observableArrayList(ExternalFileSorter.values());
+        this.fileSortList = FXCollections.observableArrayList(ExternalFileSorter.values());
 
-        Predicate<String> isDirectory = path ->
-            Files.isDirectory(Path.of(path));
+        Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator =
             new FunctionBasedValidator<>(
                 directoryPath,
                 isDirectory,
-                ValidationMessage.error(
-                    Localization.lang("Please enter a valid file path.")
-                )
+                ValidationMessage.error(Localization.lang("Please enter a valid file path."))
             );
 
         treeRootProperty.setValue(Optional.empty());
@@ -159,9 +138,7 @@ public class UnlinkedFilesDialogViewModel {
 
     public void startSearch() {
         Path directory = this.getSearchDirectory();
-        Filter<Path> selectedFileFilter = selectedExtension
-            .getValue()
-            .dirFilter();
+        Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
         DateRange selectedDateFilter = selectedDate.getValue();
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
@@ -177,15 +154,9 @@ public class UnlinkedFilesDialogViewModel {
                 preferences.getFilePreferences()
             )
                 .onRunning(() -> {
-                    progressValueProperty.set(
-                        ProgressIndicator.INDETERMINATE_PROGRESS
-                    );
-                    progressTextProperty.setValue(
-                        Localization.lang("Searching file system...")
-                    );
-                    progressTextProperty.bind(
-                        findUnlinkedFilesTask.messageProperty()
-                    );
+                    progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+                    progressTextProperty.setValue(Localization.lang("Searching file system..."));
+                    progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());
                     taskActiveProperty.setValue(true);
                     treeRootProperty.setValue(Optional.empty());
                 })
@@ -193,9 +164,7 @@ public class UnlinkedFilesDialogViewModel {
                     progressValueProperty.set(0);
                     taskActiveProperty.setValue(false);
                 })
-                .onSuccess(treeRoot ->
-                    treeRootProperty.setValue(Optional.of(treeRoot))
-                );
+                .onSuccess(treeRoot -> treeRootProperty.setValue(Optional.of(treeRoot)));
 
         findUnlinkedFilesTask.executeWith(taskExecutor);
     }
@@ -219,9 +188,7 @@ public class UnlinkedFilesDialogViewModel {
                     progressValueProperty.bind(
                         importFilesBackgroundTask.workDonePercentageProperty()
                     );
-                    progressTextProperty.bind(
-                        importFilesBackgroundTask.messageProperty()
-                    );
+                    progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
                     taskActiveProperty.setValue(true);
                 })
                 .onFinished(() -> {
@@ -247,17 +214,12 @@ public class UnlinkedFilesDialogViewModel {
             return;
         }
 
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .withInitialDirectory(
-                    preferences.getFilePreferences().getWorkingDirectory()
-                )
-                .addExtensionFilter(StandardFileType.TXT)
-                .withDefaultExtension(StandardFileType.TXT)
-                .build();
-        Optional<Path> exportPath = dialogService.showFileSaveDialog(
-            fileDialogConfiguration
-        );
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+            .addExtensionFilter(StandardFileType.TXT)
+            .withDefaultExtension(StandardFileType.TXT)
+            .build();
+        Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
 
         if (exportPath.isEmpty()) {
             return;
@@ -302,17 +264,13 @@ public class UnlinkedFilesDialogViewModel {
     public void browseFileDirectory() {
         DirectoryDialogConfiguration directoryDialogConfiguration =
             new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(
-                    preferences.getFilePreferences().getWorkingDirectory()
-                )
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
         dialogService
             .showDirectorySelectionDialog(directoryDialogConfiguration)
             .ifPresent(selectedDirectory -> {
-                directoryPath.setValue(
-                    selectedDirectory.toAbsolutePath().toString()
-                );
+                directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());
                 preferences
                     .getFilePreferences()
                     .setWorkingDirectory(selectedDirectory.toAbsolutePath());
@@ -372,9 +330,7 @@ public class UnlinkedFilesDialogViewModel {
         return this.taskActiveProperty;
     }
 
-    public SimpleListProperty<
-        TreeItem<FileNodeViewModel>
-    > checkedFileListProperty() {
+    public SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty() {
         return checkedFileListProperty;
     }
 }

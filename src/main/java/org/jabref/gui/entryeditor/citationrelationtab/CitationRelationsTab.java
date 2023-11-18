@@ -49,9 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CitationRelationsTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
     private static BackgroundTask<List<BibEntry>> citingTask;
@@ -85,9 +83,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.preferencesService = preferencesService;
         this.libraryTab = lTab;
         setText(Localization.lang("Citation relations"));
-        setTooltip(
-            new Tooltip(Localization.lang("Show articles related by citation"))
-        );
+        setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
         this.bibEntryRelationsRepository =
             new BibEntryRelationsRepository(
@@ -122,35 +118,25 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleLabel(citedByLabel);
 
         // Create ListViews
-        CheckListView<CitationRelationItem> citingListView =
-            new CheckListView<>();
-        CheckListView<CitationRelationItem> citedByListView =
-            new CheckListView<>();
+        CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
+        CheckListView<CitationRelationItem> citedByListView = new CheckListView<>();
 
         // Create refresh Buttons for both sides
         Button refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
-        refreshCitingButton.setTooltip(
-            new Tooltip(Localization.lang("Restart search"))
-        );
+        refreshCitingButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitingButton, 15.0);
         Button refreshCitedByButton = IconTheme.JabRefIcons.REFRESH.asButton();
-        refreshCitedByButton.setTooltip(
-            new Tooltip(Localization.lang("Restart search"))
-        );
+        refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
 
         // Create abort buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitingButton.getGraphic().resize(30, 30);
-        abortCitingButton.setTooltip(
-            new Tooltip(Localization.lang("Cancel search"))
-        );
+        abortCitingButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(abortCitingButton, 15.0);
         Button abortCitedButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitedButton.getGraphic().resize(30, 30);
-        abortCitedButton.setTooltip(
-            new Tooltip(Localization.lang("Cancel search"))
-        );
+        abortCitedButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(abortCitedButton, 15.0);
 
         ProgressIndicator citingProgress = new ProgressIndicator();
@@ -259,9 +245,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param listView CheckListView to style
      */
-    private void styleFetchedListView(
-        CheckListView<CitationRelationItem> listView
-    ) {
+    private void styleFetchedListView(CheckListView<CitationRelationItem> listView) {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<CitationRelationItem>()
             .withGraphic(entry -> {
@@ -270,17 +254,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                 Node entryNode = BibEntryView.getEntryNode(entry.getEntry());
                 HBox.setHgrow(entryNode, Priority.ALWAYS);
                 HBox hContainer = new HBox();
-                hContainer
-                    .prefWidthProperty()
-                    .bind(listView.widthProperty().subtract(25));
+                hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
                 if (entry.isLocal()) {
                     Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
-                    jumpTo.setTooltip(
-                        new Tooltip(
-                            Localization.lang("Jump to entry in database")
-                        )
-                    );
+                    jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in database")));
                     jumpTo.getStyleClass().add("addEntryButton");
                     jumpTo.setOnMouseClicked(event -> {
                         libraryTab.showAndEdit(entry.getEntry());
@@ -288,15 +266,10 @@ public class CitationRelationsTab extends EntryEditorTab {
                         citingTask.cancel();
                         citedByTask.cancel();
                     });
-                    hContainer
-                        .getChildren()
-                        .addAll(entryNode, separator, jumpTo);
+                    hContainer.getChildren().addAll(entryNode, separator, jumpTo);
                 } else {
-                    ToggleButton addToggle =
-                        IconTheme.JabRefIcons.ADD.asToggleButton();
-                    addToggle.setTooltip(
-                        new Tooltip(Localization.lang("Select entry"))
-                    );
+                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                    addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
                     EasyBind.subscribe(
                         addToggle.selectedProperty(),
                         selected -> {
@@ -307,21 +280,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                                         .getGraphicNode()
                                 );
                             } else {
-                                addToggle.setGraphic(
-                                    IconTheme.JabRefIcons.ADD.getGraphicNode()
-                                );
+                                addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                             }
                         }
                     );
                     addToggle.getStyleClass().add("addEntryButton");
                     addToggle
                         .selectedProperty()
-                        .bindBidirectional(
-                            listView.getItemBooleanProperty(entry)
-                        );
-                    hContainer
-                        .getChildren()
-                        .addAll(entryNode, separator, addToggle);
+                        .bindBidirectional(listView.getItemBooleanProperty(entry));
+                    hContainer.getChildren().addAll(entryNode, separator, addToggle);
                 }
                 hContainer.getStyleClass().add("entry-container");
 
@@ -413,8 +380,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             return;
         }
 
-        ObservableList<CitationRelationItem> observableList =
-            FXCollections.observableArrayList();
+        ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
 
         listView.setItems(observableList);
 
@@ -438,9 +404,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             task =
                 BackgroundTask.wrap(() -> {
                     if (shouldRefresh) {
-                        bibEntryRelationsRepository.forceRefreshReferences(
-                            entry
-                        );
+                        bibEntryRelationsRepository.forceRefreshReferences(entry);
                     }
                     return bibEntryRelationsRepository.getReferences(entry);
                 });
@@ -449,9 +413,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             task =
                 BackgroundTask.wrap(() -> {
                     if (shouldRefresh) {
-                        bibEntryRelationsRepository.forceRefreshCitations(
-                            entry
-                        );
+                        bibEntryRelationsRepository.forceRefreshCitations(entry);
                     }
                     return bibEntryRelationsRepository.getCitations(entry);
                 });
@@ -522,21 +484,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         if (!observableList.isEmpty()) {
             listView.refresh();
         } else {
-            Label placeholder = new Label(
-                Localization.lang("No articles found")
-            );
+            Label placeholder = new Label(Localization.lang("No articles found"));
             listView.setPlaceholder(placeholder);
         }
-        BooleanBinding booleanBind = Bindings.isEmpty(
-            listView.getCheckModel().getCheckedItems()
-        );
+        BooleanBinding booleanBind = Bindings.isEmpty(listView.getCheckModel().getCheckedItems());
         importButton.disableProperty().bind(booleanBind);
         importButton.setOnMouseClicked(event ->
-            importEntries(
-                listView.getCheckModel().getCheckedItems(),
-                searchType,
-                entry
-            )
+            importEntries(listView.getCheckModel().getCheckedItems(), searchType, entry)
         );
         showNodes(refreshButton, importButton);
     }

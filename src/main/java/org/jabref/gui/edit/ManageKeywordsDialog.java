@@ -58,11 +58,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel =
-            new ManageKeywordsViewModel(
-                preferences.getBibEntryPreferences(),
-                entries
-            );
+        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries);
 
         viewModel
             .displayTypeProperty()
@@ -85,19 +81,11 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
         );
         keywordsTableMainColumn.setOnEditCommit(event -> {
             // Poor mans reverse databinding (necessary because we use a constant value above)
-            viewModel
-                .getKeywords()
-                .set(event.getTablePosition().getRow(), event.getNewValue());
+            viewModel.getKeywords().set(event.getTablePosition().getRow(), event.getNewValue());
         });
-        keywordsTableMainColumn.setCellFactory(
-            TextFieldTableCell.forTableColumn()
-        );
-        keywordsTableEditColumn.setCellValueFactory(data ->
-            BindingsHelper.constantOf(true)
-        );
-        keywordsTableDeleteColumn.setCellValueFactory(data ->
-            BindingsHelper.constantOf(true)
-        );
+        keywordsTableMainColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        keywordsTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
+        keywordsTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
         new ValueTableCellFactory<String, Boolean>()
             .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
             .withOnMouseClickedEvent(none ->
@@ -110,9 +98,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
             .install(keywordsTableEditColumn);
         new ValueTableCellFactory<String, Boolean>()
             .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
-            .withOnMouseClickedEvent((keyword, none) ->
-                event -> viewModel.removeKeyword(keyword)
-            )
+            .withOnMouseClickedEvent((keyword, none) -> event -> viewModel.removeKeyword(keyword))
             .install(keywordsTableDeleteColumn);
     }
 }

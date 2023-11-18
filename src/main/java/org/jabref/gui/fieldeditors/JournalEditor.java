@@ -65,16 +65,10 @@ public class JournalEditor extends HBox implements FieldEditorFX {
         textField.textProperty().bindBidirectional(viewModel.textProperty());
         textField.initContextMenu(new DefaultMenu(textField));
 
-        AutoCompletionTextInputBinding.autoComplete(
-            textField,
-            viewModel::complete
-        );
+        AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
 
         new EditorValidator(preferencesService)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textField
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public JournalEditorViewModel getViewModel() {

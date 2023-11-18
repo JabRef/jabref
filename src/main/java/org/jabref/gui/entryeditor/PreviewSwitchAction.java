@@ -16,11 +16,7 @@ public class PreviewSwitchAction extends SimpleCommand {
     private final JabRefFrame frame;
     private final Direction direction;
 
-    public PreviewSwitchAction(
-        Direction direction,
-        JabRefFrame frame,
-        StateManager stateManager
-    ) {
+    public PreviewSwitchAction(Direction direction, JabRefFrame frame, StateManager stateManager) {
         this.frame = frame;
         this.direction = direction;
 
@@ -32,10 +28,7 @@ public class PreviewSwitchAction extends SimpleCommand {
         if (direction == Direction.NEXT) {
             frame.getCurrentLibraryTab().getEntryEditor().nextPreviewStyle();
         } else {
-            frame
-                .getCurrentLibraryTab()
-                .getEntryEditor()
-                .previousPreviewStyle();
+            frame.getCurrentLibraryTab().getEntryEditor().previousPreviewStyle();
         }
     }
 }

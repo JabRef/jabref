@@ -9,14 +9,10 @@ import org.jabref.model.entry.types.EntryType;
 
 public class CitationKeyPatternPanelItemModel {
 
-    private final ObjectProperty<EntryType> entryType =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<EntryType> entryType = new SimpleObjectProperty<>();
     private final StringProperty pattern = new SimpleStringProperty("");
 
-    public CitationKeyPatternPanelItemModel(
-        EntryType entryType,
-        String pattern
-    ) {
+    public CitationKeyPatternPanelItemModel(EntryType entryType, String pattern) {
         Objects.requireNonNull(entryType);
         Objects.requireNonNull(pattern);
         this.entryType.setValue(entryType);
@@ -45,12 +41,6 @@ public class CitationKeyPatternPanelItemModel {
 
     @Override
     public String toString() {
-        return (
-            "[" +
-            entryType.getValue().getName() +
-            "," +
-            pattern.getValue() +
-            "]"
-        );
+        return ("[" + entryType.getValue().getName() + "," + pattern.getValue() + "]");
     }
 }

@@ -30,9 +30,7 @@ public final class MetadataChange extends DatabaseChange {
         metaDataDiff
             .getGroupDifferences()
             .ifPresent(groupDiff ->
-                databaseContext
-                    .getMetaData()
-                    .setGroups(groupDiff.getOriginalGroupRoot())
+                databaseContext.getMetaData().setGroups(groupDiff.getOriginalGroupRoot())
             );
     }
 

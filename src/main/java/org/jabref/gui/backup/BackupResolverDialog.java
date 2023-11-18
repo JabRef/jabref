@@ -31,9 +31,7 @@ public class BackupResolverDialog extends FXDialog {
         ButtonBar.ButtonData.CANCEL_CLOSE
     );
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BackupResolverDialog.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);
 
     public BackupResolverDialog(
         Path originalPath,
@@ -43,16 +41,13 @@ public class BackupResolverDialog extends FXDialog {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
         getDialogPane().setMinHeight(180);
-        getDialogPane()
-            .getButtonTypes()
-            .setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
+        getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
-        Optional<Path> backupPathOpt =
-            BackupFileUtil.getPathOfLatestExistingBackupFile(
-                originalPath,
-                BackupFileType.BACKUP,
-                backupDir
-            );
+        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(
+            originalPath,
+            BackupFileType.BACKUP,
+            backupDir
+        );
         String backupFilename = backupPathOpt
             .map(Path::getFileName)
             .map(Path::toString)
@@ -68,9 +63,7 @@ public class BackupResolverDialog extends FXDialog {
                 "This could indicate that JabRef did not shut down cleanly last time the file was used."
             ) +
             "\n\n" +
-            Localization.lang(
-                "Do you want to recover the library from the backup file?"
-            );
+            Localization.lang("Do you want to recover the library from the backup file?");
         setContentText(content);
 
         HyperlinkLabel contentLabel = new HyperlinkLabel(content);
@@ -80,8 +73,7 @@ public class BackupResolverDialog extends FXDialog {
                 if (!(e.getSource() instanceof Hyperlink)) {
                     return;
                 }
-                String clickedLinkText =
-                    ((Hyperlink) (e.getSource())).getText();
+                String clickedLinkText = ((Hyperlink) (e.getSource())).getText();
                 if (backupFilename.equals(clickedLinkText)) {
                     try {
                         JabRefDesktop.openFolderAndSelectFile(

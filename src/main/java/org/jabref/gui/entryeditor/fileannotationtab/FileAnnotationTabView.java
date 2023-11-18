@@ -58,22 +58,14 @@ public class FileAnnotationTabView {
     @Inject
     private FileUpdateMonitor fileMonitor;
 
-    public FileAnnotationTabView(
-        BibEntry entry,
-        FileAnnotationCache fileAnnotationCache
-    ) {
+    public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {
         this.entry = entry;
         this.fileAnnotationCache = fileAnnotationCache;
     }
 
     @FXML
     public void initialize() {
-        viewModel =
-            new FileAnnotationTabViewModel(
-                fileAnnotationCache,
-                entry,
-                fileMonitor
-            );
+        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
@@ -86,9 +78,7 @@ public class FileAnnotationTabView {
         files.getSelectionModel().selectFirst();
 
         // Set-up annotation list
-        annotationList
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.SINGLE);
+        annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         annotationList
             .getSelectionModel()
             .selectedItemProperty()
@@ -102,10 +92,7 @@ public class FileAnnotationTabView {
         annotationList.setPlaceholder(
             new Label(Localization.lang("File has no attached annotations"))
         );
-        Bindings.bindContent(
-            annotationList.itemsProperty().get(),
-            viewModel.annotationsProperty()
-        );
+        Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());
         annotationList.getSelectionModel().selectFirst();
         annotationList
             .itemsProperty()
@@ -147,9 +134,7 @@ public class FileAnnotationTabView {
         Label marking = new Label(annotation.getMarking());
         Label author = new Label(annotation.getAuthor());
         Label date = new Label(annotation.getDate());
-        Label page = new Label(
-            Localization.lang("Page") + ": " + annotation.getPage()
-        );
+        Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
 
         marking.setStyle("-fx-font-size: 0.75em; -fx-font-weight: bold");
         marking.setMaxHeight(30);

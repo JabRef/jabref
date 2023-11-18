@@ -5,14 +5,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 
 public enum StandardExternalFileType implements ExternalFileType {
-    PDF(
-        "PDF",
-        "pdf",
-        "application/pdf",
-        "evince",
-        "pdfSmall",
-        IconTheme.JabRefIcons.PDF_FILE
-    ),
+    PDF("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcons.PDF_FILE),
     PostScript(
         "PostScript",
         "ps",
@@ -125,38 +118,10 @@ public enum StandardExternalFileType implements ExternalFileType {
         "picture",
         IconTheme.JabRefIcons.PICTURE
     ),
-    Djvu(
-        "Djvu",
-        "djvu",
-        "image/vnd.djvu",
-        "evince",
-        "psSmall",
-        IconTheme.JabRefIcons.FILE
-    ),
-    TXT(
-        "Text",
-        "txt",
-        "text/plain",
-        "emacs",
-        "emacs",
-        IconTheme.JabRefIcons.FILE_TEXT
-    ),
-    TEX(
-        "LaTeX",
-        "tex",
-        "application/x-latex",
-        "emacs",
-        "emacs",
-        IconTheme.JabRefIcons.FILE_TEXT
-    ),
-    CHM(
-        "CHM",
-        "chm",
-        "application/mshelp",
-        "gnochm",
-        "www",
-        IconTheme.JabRefIcons.WWW
-    ),
+    Djvu("Djvu", "djvu", "image/vnd.djvu", "evince", "psSmall", IconTheme.JabRefIcons.FILE),
+    TXT("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcons.FILE_TEXT),
+    TEX("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcons.FILE_TEXT),
+    CHM("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcons.WWW),
     TIFF(
         Localization.lang("%0 image", "TIFF"),
         "tiff",
@@ -165,38 +130,10 @@ public enum StandardExternalFileType implements ExternalFileType {
         "picture",
         IconTheme.JabRefIcons.PICTURE
     ),
-    URL(
-        "URL",
-        "html",
-        "text/html",
-        "firefox",
-        "www",
-        IconTheme.JabRefIcons.WWW
-    ),
-    MHT(
-        "MHT",
-        "mht",
-        "multipart/related",
-        "firefox",
-        "www",
-        IconTheme.JabRefIcons.WWW
-    ),
-    ePUB(
-        "ePUB",
-        "epub",
-        "application/epub+zip",
-        "firefox",
-        "www",
-        IconTheme.JabRefIcons.WWW
-    ),
-    MARKDOWN(
-        "Markdown",
-        "md",
-        "text/markdown",
-        "emacs",
-        "emacs",
-        IconTheme.JabRefIcons.FILE_TEXT
-    );
+    URL("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcons.WWW),
+    MHT("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcons.WWW),
+    ePUB("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcons.WWW),
+    MARKDOWN("Markdown", "md", "text/markdown", "emacs", "emacs", IconTheme.JabRefIcons.FILE_TEXT);
 
     private final String name;
     private final String extension;

@@ -33,15 +33,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier>
         BaseIdentifierEditorViewModel.class
     );
     protected BooleanProperty isInvalidIdentifier = new SimpleBooleanProperty();
-    protected final BooleanProperty identifierLookupInProgress =
-        new SimpleBooleanProperty(false);
-    protected final BooleanProperty canLookupIdentifier =
-        new SimpleBooleanProperty(true);
+    protected final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
+    protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);
     protected final BooleanProperty canFetchBibliographyInformationById =
         new SimpleBooleanProperty();
     protected IdentifierParser identifierParser;
-    protected final ObjectProperty<Optional<T>> identifier =
-        new SimpleObjectProperty<>(Optional.empty());
+    protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(
+        Optional.empty()
+    );
     protected DialogService dialogService;
     protected TaskExecutor taskExecutor;
     protected PreferencesService preferences;
@@ -73,9 +72,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier>
         boolean canLookupIdentifier
     ) {
         this.canLookupIdentifier.set(canLookupIdentifier);
-        this.canFetchBibliographyInformationById.set(
-                canFetchBibliographyInformationById
-            );
+        this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
     }
 
     protected Optional<T> updateIdentifier() {
@@ -87,10 +84,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier>
         return identifier.get();
     }
 
-    protected void handleIdentifierFetchingError(
-        Exception exception,
-        IdFetcher<T> fetcher
-    ) {
+    protected void handleIdentifierFetchingError(Exception exception, IdFetcher<T> fetcher) {
         LOGGER.error("Error while fetching identifier", exception);
         if (exception instanceof FetcherClientException) {
             dialogService.showInformationDialogAndWait(
@@ -105,18 +99,12 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier>
         } else if (exception.getCause() != null) {
             dialogService.showWarningDialogAndWait(
                 Localization.lang("Look up %0", fetcher.getName()),
-                Localization.lang(
-                    "Error occurred %0",
-                    exception.getCause().getMessage()
-                )
+                Localization.lang("Error occurred %0", exception.getCause().getMessage())
             );
         } else {
             dialogService.showWarningDialogAndWait(
                 Localization.lang("Look up %0", fetcher.getName()),
-                Localization.lang(
-                    "Error occurred %0",
-                    exception.getCause().getMessage()
-                )
+                Localization.lang("Error occurred %0", exception.getCause().getMessage())
             );
         }
     }
@@ -161,10 +149,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier>
     }
 
     public void lookupIdentifier(BibEntry bibEntry) {
-        LOGGER.warn(
-            "Unable to lookup identifier for '{}'",
-            field.getDisplayName()
-        );
+        LOGGER.warn("Unable to lookup identifier for '{}'", field.getDisplayName());
     }
 
     public void openExternalLink() {
@@ -173,10 +158,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier>
             .flatMap(Identifier::getExternalURI)
             .ifPresent(url -> {
                 try {
-                    JabRefDesktop.openBrowser(
-                        url,
-                        preferences.getFilePreferences()
-                    );
+                    JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(
                         Localization.lang("Unable to open link."),

@@ -76,45 +76,36 @@ public class CleanupAction extends SimpleCommand {
             preferences.getFilePreferences()
         );
 
-        Optional<CleanupPreferences> chosenPreset =
-            dialogService.showCustomDialogAndWait(cleanupDialog);
+        Optional<CleanupPreferences> chosenPreset = dialogService.showCustomDialogAndWait(
+            cleanupDialog
+        );
 
         chosenPreset.ifPresent(preset -> {
             if (
                 preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF) &&
                 preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()
             ) {
-                boolean confirmed =
-                    dialogService.showConfirmationDialogWithOptOutAndWait(
-                        Localization.lang("Autogenerate PDF Names"),
-                        Localization.lang(
-                            "Auto-generating PDF-Names does not support undo. Continue?"
-                        ),
-                        Localization.lang("Autogenerate PDF Names"),
-                        Localization.lang("Cancel"),
-                        Localization.lang("Do not ask again"),
-                        optOut ->
-                            preferences
-                                .getAutoLinkPreferences()
-                                .setAskAutoNamingPdfs(!optOut)
-                    );
+                boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Do not ask again"),
+                    optOut -> preferences.getAutoLinkPreferences().setAskAutoNamingPdfs(!optOut)
+                );
                 if (!confirmed) {
                     isCanceled = true;
                     return;
                 }
             }
 
-            preferences
-                .getCleanupPreferences()
-                .setActiveJobs(preset.getActiveJobs());
+            preferences.getCleanupPreferences().setActiveJobs(preset.getActiveJobs());
             preferences
                 .getCleanupPreferences()
                 .setFieldFormatterCleanups(preset.getFieldFormatterCleanups());
 
             BackgroundTask
-                .wrap(() ->
-                    cleanup(stateManager.getActiveDatabase().get(), preset)
-                )
+                .wrap(() -> cleanup(stateManager.getActiveDatabase().get(), preset))
                 .onSuccess(result -> showResults())
                 .onFailure(dialogService::showErrorDialogAndWait)
                 .executeWith(taskExecutor);
@@ -156,13 +147,9 @@ public class CleanupAction extends SimpleCommand {
         }
 
         if (modifiedEntriesCount == 0) {
-            dialogService.notify(
-                Localization.lang("No entry needed a clean up")
-            );
+            dialogService.notify(Localization.lang("No entry needed a clean up"));
         } else if (modifiedEntriesCount == 1) {
-            dialogService.notify(
-                Localization.lang("One entry needed a clean up")
-            );
+            dialogService.notify(Localization.lang("One entry needed a clean up"));
         } else {
             dialogService.notify(
                 Localization.lang(
@@ -179,9 +166,7 @@ public class CleanupAction extends SimpleCommand {
     ) {
         for (BibEntry entry : stateManager.getSelectedEntries()) {
             // undo granularity is on entry level
-            NamedCompound ce = new NamedCompound(
-                Localization.lang("Cleanup entry")
-            );
+            NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
             doCleanup(databaseContext, cleanupPreferences, entry, ce);
 

@@ -35,10 +35,7 @@ public class CopyFilesAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
-        this.executable.bind(
-                needsDatabase(stateManager)
-                    .and(needsEntriesSelected(stateManager))
-            );
+        this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
@@ -64,17 +61,19 @@ public class CopyFilesAction extends SimpleCommand {
         DirectoryDialogConfiguration dirDialogConfiguration =
             new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(
-                    preferencesService
-                        .getExportPreferences()
-                        .getExportWorkingDirectory()
+                    preferencesService.getExportPreferences().getExportWorkingDirectory()
                 )
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(
             dirDialogConfiguration
         );
         exportPath.ifPresent(path -> {
-            Task<List<CopyFilesResultItemViewModel>> exportTask =
-                new CopyFilesTask(database, entries, path, preferencesService);
+            Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(
+                database,
+                entries,
+                path,
+                preferencesService
+            );
             dialogService.showProgressDialog(
                 Localization.lang("Copy linked files to folder..."),
                 Localization.lang("Copy linked files to folder..."),

@@ -26,9 +26,7 @@ public class ExtractBibtexAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(
-            DialogService.class
-        );
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(
             dialogService,
             preferencesService.getGrobidPreferences()

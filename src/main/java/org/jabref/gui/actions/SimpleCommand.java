@@ -11,9 +11,7 @@ import org.jabref.gui.util.BindingsHelper;
  */
 public abstract class SimpleCommand extends CommandBase {
 
-    protected ReadOnlyStringWrapper statusMessage = new ReadOnlyStringWrapper(
-        ""
-    );
+    protected ReadOnlyStringWrapper statusMessage = new ReadOnlyStringWrapper("");
 
     public String getStatusMessage() {
         return statusMessage.get();

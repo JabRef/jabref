@@ -13,8 +13,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.PreferencesService;
 
-public class ISBNIdentifierEditorViewModel
-    extends BaseIdentifierEditorViewModel<ISBN> {
+public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<ISBN> {
 
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -56,10 +55,7 @@ public class ISBNIdentifierEditorViewModel
                         undoManager
                     )
                         .fetchAndMerge(entry, field),
-                () ->
-                    dialogService.notify(
-                        Localization.lang("No library selected")
-                    )
+                () -> dialogService.notify(Localization.lang("No library selected"))
             );
     }
 }

@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ChainedFilters implements DirectoryStream.Filter<Path> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ChainedFilters.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChainedFilters.class);
 
     private DirectoryStream.Filter<Path>[] filters;
 

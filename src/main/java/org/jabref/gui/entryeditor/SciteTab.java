@@ -24,8 +24,7 @@ import org.jabref.preferences.PreferencesService;
 public class SciteTab extends EntryEditorTab {
 
     public static final String NAME = "Scite";
-    public static final String SCITE_REPORTS_URL_BASE =
-        "https://scite.ai/reports/";
+    public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
 
     private final GridPane sciteResultsPane;
     private final ProgressIndicator progressIndicator;
@@ -39,17 +38,12 @@ public class SciteTab extends EntryEditorTab {
         DialogService dialogService
     ) {
         this.preferencesService = preferencesService;
-        this.viewModel =
-            new SciteTabViewModel(preferencesService, taskExecutor);
+        this.viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
         this.dialogService = dialogService;
         this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
         setText(NAME);
-        setTooltip(
-            new Tooltip(
-                Localization.lang("Search scite.ai for Smart Citations")
-            )
-        );
+        setTooltip(new Tooltip(Localization.lang("Search scite.ai for Smart Citations")));
         setSciteResultsPane();
     }
 
@@ -70,16 +64,10 @@ public class SciteTab extends EntryEditorTab {
             status -> {
                 sciteResultsPane.getChildren().clear();
                 switch (status) {
-                    case IN_PROGRESS -> sciteResultsPane.add(
-                        progressIndicator,
-                        0,
-                        0
-                    );
+                    case IN_PROGRESS -> sciteResultsPane.add(progressIndicator, 0, 0);
                     case FOUND -> viewModel
                         .getCurrentResult()
-                        .ifPresent(result ->
-                            sciteResultsPane.add(getTalliesPane(result), 0, 0)
-                        );
+                        .ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
                     case ERROR -> sciteResultsPane.add(getErrorPane(), 0, 0);
                 }
             }
@@ -106,9 +94,7 @@ public class SciteTab extends EntryEditorTab {
     }
 
     private VBox getTalliesPane(SciteTallyModel tallModel) {
-        Label titleLabel = new Label(
-            Localization.lang("Tallies for %0", tallModel.doi())
-        );
+        Label titleLabel = new Label(Localization.lang("Tallies for %0", tallModel.doi()));
         titleLabel.getStyleClass().add("scite-tallies-label");
         Text message = new Text(
             String.format(
@@ -123,17 +109,14 @@ public class SciteTab extends EntryEditorTab {
         );
 
         String url =
-            SCITE_REPORTS_URL_BASE +
-            URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
+            SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
         VBox messageBox = getMessageBox(url, titleLabel, message);
         messageBox.getStyleClass().add("scite-message-box");
         return messageBox;
     }
 
     private VBox getMessageBox(String url, Label titleLabel, Text message) {
-        HyperlinkLabel link = new HyperlinkLabel(
-            Localization.lang("See full report at [%0]", url)
-        );
+        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("See full report at [%0]", url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 var filePreferences = preferencesService.getFilePreferences();

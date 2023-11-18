@@ -112,8 +112,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             return type;
         });
 
-        Button btnGenerate = (Button) this.getDialogPane()
-            .lookupButton(generateButton);
+        Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
         btnGenerate.getStyleClass().add("customGenerateButton");
 
         btnGenerate
@@ -147,18 +146,11 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         );
     }
 
-    private void addEntriesToPane(
-        FlowPane pane,
-        Collection<? extends BibEntryType> entryTypes
-    ) {
+    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entryTypes) {
         for (BibEntryType entryType : entryTypes) {
-            Button entryButton = new Button(
-                entryType.getType().getDisplayName()
-            );
+            Button entryButton = new Button(entryType.getType().getDisplayName());
             entryButton.setUserData(entryType);
-            entryButton.setOnAction(event ->
-                setEntryTypeForReturnAndClose(Optional.of(entryType))
-            );
+            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));
             pane.getChildren().add(entryButton);
 
             EntryType selectedType = entryType.getType();
@@ -188,12 +180,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             );
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
-        idTextField
-            .textProperty()
-            .bindBidirectional(viewModel.idTextProperty());
-        idBasedFetchers
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedItemProperty());
+        idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
+        idBasedFetchers.valueProperty().bindBidirectional(viewModel.selectedItemProperty());
 
         EasyBind.subscribe(
             viewModel.getFocusAndSelectAllProperty(),
@@ -214,30 +202,20 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         recommendedEntriesTitlePane
             .managedProperty()
             .bind(recommendedEntriesTitlePane.visibleProperty());
-        otherEntriesTitlePane
-            .managedProperty()
-            .bind(otherEntriesTitlePane.visibleProperty());
-        customTitlePane
-            .managedProperty()
-            .bind(customTitlePane.visibleProperty());
+        otherEntriesTitlePane.managedProperty().bind(otherEntriesTitlePane.visibleProperty());
+        customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
 
         otherEntriesTitlePane
             .expandedProperty()
             .addListener((obs, wasExpanded, isNowExpanded) -> {
                 if (isNowExpanded) {
-                    this.setHeight(
-                            this.getHeight() + otherEntriesPane.getHeight()
-                        );
+                    this.setHeight(this.getHeight() + otherEntriesPane.getHeight());
                 } else {
-                    this.setHeight(
-                            this.getHeight() - otherEntriesPane.getHeight()
-                        );
+                    this.setHeight(this.getHeight() - otherEntriesPane.getHeight());
                 }
             });
 
-        boolean isBiblatexMode = libraryTab
-            .getBibDatabaseContext()
-            .isBiblatexMode();
+        boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
         List<BibEntryType> recommendedEntries;
         List<BibEntryType> otherEntries;
         if (isBiblatexMode) {
@@ -264,8 +242,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         BibDatabaseMode customTypeDatabaseMode = isBiblatexMode
             ? BibDatabaseMode.BIBLATEX
             : BibDatabaseMode.BIBTEX;
-        List<BibEntryType> customTypes =
-            Globals.entryTypesManager.getAllCustomTypes(customTypeDatabaseMode);
+        List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(
+            customTypeDatabaseMode
+        );
         if (customTypes.isEmpty()) {
             customTitlePane.setVisible(false);
         } else {
@@ -275,11 +254,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         viewModel
             .idTextProperty()
             .addListener((obs, oldValue, newValue) ->
-                visualizer.initVisualization(
-                    viewModel.idFieldValidationStatus(),
-                    idTextField,
-                    true
-                )
+                visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true)
             );
 
         Platform.runLater(() -> idTextField.requestFocus());
@@ -300,9 +275,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         idTextField.selectAll();
     }
 
-    private void setEntryTypeForReturnAndClose(
-        Optional<BibEntryType> entryType
-    ) {
+    private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
         type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
         this.stateManager.clearSearchQuery();
@@ -336,9 +309,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     );
                 }
                 case Conference -> {
-                    return Localization.lang(
-                        "A legacy alias for \"InProceedings\"."
-                    );
+                    return Localization.lang("A legacy alias for \"InProceedings\".");
                 }
                 case InBook -> {
                     return Localization.lang(
@@ -351,9 +322,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     );
                 }
                 case InProceedings -> {
-                    return Localization.lang(
-                        "An article in a conference proceedings."
-                    );
+                    return Localization.lang("An article in a conference proceedings.");
                 }
                 case Manual -> {
                     return Localization.lang(
@@ -407,9 +376,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     return Localization.lang("A multi-volume \"Collection\".");
                 }
                 case MvProceedings -> {
-                    return Localization.lang(
-                        "A multi-volume \"Proceedings\" entry."
-                    );
+                    return Localization.lang("A multi-volume \"Proceedings\" entry.");
                 }
                 case MvReference -> {
                     return Localization.lang(
@@ -442,9 +409,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     );
                 }
                 case SuppCollection -> {
-                    return Localization.lang(
-                        "Supplemental material in a \"Collection\"."
-                    );
+                    return Localization.lang("Supplemental material in a \"Collection\".");
                 }
                 case SuppPeriodical -> {
                     return Localization.lang(

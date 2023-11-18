@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExternalFilesEntryLinker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        ExternalFilesEntryLinker.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
     private final FilePreferences filePreferences;
     private final BibDatabaseContext bibDatabaseContext;
@@ -44,20 +42,17 @@ public class ExternalFilesEntryLinker {
     ) {
         this.filePreferences = filePreferences;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.moveFilesCleanup =
-            new MoveFilesCleanup(bibDatabaseContext, filePreferences);
-        this.renameFilesCleanup =
-            new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
+        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
+        this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
         this.dialogService = dialogService;
     }
 
     public Optional<Path> copyFileToFileDir(Path file) {
-        Optional<Path> firstExistingFileDir =
-            bibDatabaseContext.getFirstExistingFileDir(filePreferences);
+        Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(
+            filePreferences
+        );
         if (firstExistingFileDir.isPresent()) {
-            Path targetFile = firstExistingFileDir
-                .get()
-                .resolve(file.getFileName());
+            Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
             if (FileUtil.copyFile(file, targetFile, false)) {
                 return Optional.of(targetFile);
             }
@@ -86,11 +81,7 @@ public class ExternalFilesEntryLinker {
                         file,
                         bibDatabaseContext.getFileDirectories(filePreferences)
                     );
-                    LinkedFile linkedfile = new LinkedFile(
-                        "",
-                        relativePath,
-                        type.getName()
-                    );
+                    LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
                     entry.addFile(linkedfile);
                 });
         }
@@ -129,10 +120,7 @@ public class ExternalFilesEntryLinker {
             for (Path file : files) {
                 copyFileToFileDir(file)
                     .ifPresent(copiedFile ->
-                        addFilesToEntry(
-                            entry,
-                            Collections.singletonList(copiedFile)
-                        )
+                        addFilesToEntry(entry, Collections.singletonList(copiedFile))
                     );
             }
             renameLinkedFilesToPattern(entry);
@@ -160,18 +148,14 @@ public class ExternalFilesEntryLinker {
                     fileToAdd.getFileName().toString()
                 );
 
-                boolean correctButtonPressed =
-                    dialogService.showConfirmationDialogAndWait(
-                        Localization.lang(
-                            "File \"%0\" cannot be added!",
-                            fileToAdd.getFileName()
-                        ),
-                        Localization.lang(
-                            "Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.",
-                            newFilename
-                        ),
-                        Localization.lang("Rename and add")
-                    );
+                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
+                    Localization.lang(
+                        "Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.",
+                        newFilename
+                    ),
+                    Localization.lang("Rename and add")
+                );
 
                 if (correctButtonPressed) {
                     Path correctPath = fileToAdd.resolveSibling(newFilename);

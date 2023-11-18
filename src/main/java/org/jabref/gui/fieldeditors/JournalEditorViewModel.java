@@ -49,11 +49,6 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void showJournalInfo(Button journalInfoButton) {
-        PopOverUtil.showJournalInfo(
-            journalInfoButton,
-            entry,
-            dialogService,
-            taskExecutor
-        );
+        PopOverUtil.showJournalInfo(journalInfoButton, entry, dialogService, taskExecutor);
     }
 }

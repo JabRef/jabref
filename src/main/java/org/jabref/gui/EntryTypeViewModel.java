@@ -36,22 +36,18 @@ import org.slf4j.LoggerFactory;
 
 public class EntryTypeViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        EntryTypeViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeViewModel.class);
 
     private final PreferencesService preferencesService;
-    private final BooleanProperty searchingProperty =
-        new SimpleBooleanProperty();
-    private final BooleanProperty searchSuccesfulProperty =
-        new SimpleBooleanProperty();
+    private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
+    private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty =
         new SimpleObjectProperty<>();
-    private final ListProperty<IdBasedFetcher> fetchers =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<IdBasedFetcher> fetchers = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
     private final StringProperty idText = new SimpleStringProperty();
-    private final BooleanProperty focusAndSelectAllProperty =
-        new SimpleBooleanProperty();
+    private final BooleanProperty focusAndSelectAllProperty = new SimpleBooleanProperty();
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -87,10 +83,7 @@ public class EntryTypeViewModel {
                 idText,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(
-                    Localization.lang(
-                        "Required field \"%0\" is empty.",
-                        Localization.lang("ID")
-                    )
+                    Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))
                 )
             );
     }
@@ -122,9 +115,7 @@ public class EntryTypeViewModel {
     public void storeSelectedFetcher() {
         preferencesService
             .getGuiPreferences()
-            .setLastSelectedIdBasedFetcher(
-                selectedItemProperty.getValue().getName()
-            );
+            .setLastSelectedIdBasedFetcher(selectedItemProperty.getValue().getName());
     }
 
     private IdBasedFetcher getLastSelectedFetcher() {
@@ -133,16 +124,10 @@ public class EntryTypeViewModel {
             .filter(fetcher ->
                 fetcher
                     .getName()
-                    .equals(
-                        preferencesService
-                            .getGuiPreferences()
-                            .getLastSelectedIdBasedFetcher()
-                    )
+                    .equals(preferencesService.getGuiPreferences().getLastSelectedIdBasedFetcher())
             )
             .findFirst()
-            .orElse(
-                new DoiFetcher(preferencesService.getImportFormatPreferences())
-            );
+            .orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
     }
 
     public ListProperty<IdBasedFetcher> fetcherItemsProperty() {
@@ -203,10 +188,7 @@ public class EntryTypeViewModel {
             } else {
                 dialogService.showInformationDialogAndWait(
                     Localization.lang("Failed to import by ID"),
-                    Localization.lang(
-                        "Error message %0",
-                        fetcherExceptionMessage
-                    )
+                    Localization.lang("Error message %0", fetcherExceptionMessage)
                 );
             }
 
@@ -235,10 +217,7 @@ public class EntryTypeViewModel {
                     dialogService,
                     taskExecutor
                 );
-                handler.importEntryWithDuplicateCheck(
-                    libraryTab.getBibDatabaseContext(),
-                    entry
-                );
+                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
                 searchSuccesfulProperty.set(true);
             } else if (StringUtil.isBlank(idText.getValue())) {
@@ -253,17 +232,16 @@ public class EntryTypeViewModel {
                 String searchId = idText.getValue();
 
                 // When DOI ID is not found, allow the user to either return to the dialog or add entry manually
-                boolean addEntryFlag =
-                    dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Identifier not found"),
-                        Localization.lang(
-                            "Fetcher '%0' did not find an entry for id '%1'.",
-                            fetcher,
-                            searchId
-                        ),
-                        Localization.lang("Add entry manually"),
-                        Localization.lang("Return to dialog")
-                    );
+                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Identifier not found"),
+                    Localization.lang(
+                        "Fetcher '%0' did not find an entry for id '%1'.",
+                        fetcher,
+                        searchId
+                    ),
+                    Localization.lang("Add entry manually"),
+                    Localization.lang("Return to dialog")
+                );
                 if (addEntryFlag) {
                     new NewEntryAction(
                         libraryTab.frame(),

@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BackupUIManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BackupUIManager.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 
     private BackupUIManager() {}
 
@@ -76,11 +74,7 @@ public class BackupUIManager {
     ) {
         return DefaultTaskExecutor.runInJavaFXThread(() ->
             dialogService.showCustomDialogAndWait(
-                new BackupResolverDialog(
-                    originalPath,
-                    backupDir,
-                    externalApplicationsPreferences
-                )
+                new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)
             )
         );
     }
@@ -102,8 +96,7 @@ public class BackupUIManager {
                 fileUpdateMonitor
             );
             // This will be modified by using the `DatabaseChangesResolverDialog`.
-            BibDatabaseContext originalDatabase =
-                originalParserResult.getDatabaseContext();
+            BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
             Path backupPath = BackupFileUtil
                 .getPathOfLatestExistingBackupFile(
@@ -113,36 +106,24 @@ public class BackupUIManager {
                 )
                 .orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase
-                .loadDatabase(
-                    backupPath,
-                    importFormatPreferences,
-                    new DummyFileUpdateMonitor()
-                )
+                .loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor())
                 .getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory =
-                new DatabaseChangeResolverFactory(
-                    dialogService,
-                    originalDatabase,
-                    preferencesService
-                );
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(
+                dialogService,
+                originalDatabase,
+                preferencesService
+            );
 
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
-                List<DatabaseChange> changes =
-                    DatabaseChangeList.compareAndGetChanges(
-                        originalDatabase,
-                        backupDatabase,
-                        changeResolverFactory
-                    );
-                DatabaseChangesResolverDialog reviewBackupDialog =
-                    new DatabaseChangesResolverDialog(
-                        changes,
-                        originalDatabase,
-                        "Review Backup"
-                    );
-                var allChangesResolved = dialogService.showCustomDialogAndWait(
-                    reviewBackupDialog
+                List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(
+                    originalDatabase,
+                    backupDatabase,
+                    changeResolverFactory
                 );
+                DatabaseChangesResolverDialog reviewBackupDialog =
+                    new DatabaseChangesResolverDialog(changes, originalDatabase, "Review Backup");
+                var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
                     // In case not all changes are resolved, start from scratch
                     return showRestoreBackupDialog(

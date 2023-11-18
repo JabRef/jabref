@@ -17,19 +17,13 @@ import org.slf4j.LoggerFactory;
  */
 public class EditAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        EditAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     private final JabRefFrame frame;
     private final StandardActions action;
     private final StateManager stateManager;
 
-    public EditAction(
-        StandardActions action,
-        JabRefFrame frame,
-        StateManager stateManager
-    ) {
+    public EditAction(StandardActions action, JabRefFrame frame, StateManager stateManager) {
         this.action = action;
         this.frame = frame;
         this.stateManager = stateManager;
@@ -37,9 +31,7 @@ public class EditAction extends SimpleCommand {
         if (action == StandardActions.PASTE) {
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
         } else {
-            this.executable.bind(
-                    ActionHelper.needsEntriesSelected(stateManager)
-                );
+            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
         }
     }
 
@@ -53,11 +45,7 @@ public class EditAction extends SimpleCommand {
         stateManager
             .getFocusOwner()
             .ifPresent(focusOwner -> {
-                LOGGER.debug(
-                    "focusOwner: {}; Action: {}",
-                    focusOwner,
-                    action.getText()
-                );
+                LOGGER.debug("focusOwner: {}; Action: {}", focusOwner, action.getText());
                 if (focusOwner instanceof TextInputControl textInput) {
                     // Focus is on text field -> copy/paste/cut selected text
                     // DELETE_ENTRY in text field should do forward delete
@@ -78,26 +66,18 @@ public class EditAction extends SimpleCommand {
                             throw new IllegalStateException(message);
                         }
                     }
-                } else if (
-                    (focusOwner instanceof CodeArea) ||
-                    (focusOwner instanceof WebView)
-                ) {
+                } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
                     LOGGER.debug("Ignoring request in CodeArea or WebView");
                     return;
                 } else {
-                    LOGGER.debug(
-                        "Else: {}",
-                        focusOwner.getClass().getSimpleName()
-                    );
+                    LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                     // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                     switch (action) {
                         case COPY -> frame.getCurrentLibraryTab().copy();
                         case CUT -> frame.getCurrentLibraryTab().cut();
                         case PASTE -> frame.getCurrentLibraryTab().paste();
-                        case DELETE_ENTRY -> frame
-                            .getCurrentLibraryTab()
-                            .delete(false);
+                        case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
                         case UNDO -> {
                             if (frame.getUndoManager().canUndo()) {
                                 frame.getUndoManager().undo();

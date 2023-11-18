@@ -17,21 +17,13 @@ public class ImportFilesResultItemViewModel {
     );
     private final StringProperty message = new SimpleStringProperty("");
 
-    public ImportFilesResultItemViewModel(
-        Path file,
-        boolean success,
-        String message
-    ) {
+    public ImportFilesResultItemViewModel(Path file, boolean success, String message) {
         this.file.setValue(file.toString());
         this.message.setValue(message);
         if (success) {
-            this.icon.setValue(
-                    IconTheme.JabRefIcons.CHECK.withColor(Color.GREEN)
-                );
+            this.icon.setValue(IconTheme.JabRefIcons.CHECK.withColor(Color.GREEN));
         } else {
-            this.icon.setValue(
-                    IconTheme.JabRefIcons.WARNING.withColor(Color.RED)
-                );
+            this.icon.setValue(IconTheme.JabRefIcons.WARNING.withColor(Color.RED));
         }
     }
 

@@ -72,9 +72,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
                 } else {
                     setTooltip(
                         new Tooltip(
-                            Localization.lang(
-                                "Shows fields having a successor in biblatex."
-                            )
+                            Localization.lang("Shows fields having a successor in biblatex.")
                         )
                     );
                 }
@@ -86,10 +84,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(
-            entry.getType(),
-            mode
-        );
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             return entryType
                 .get()

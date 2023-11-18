@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class CopyMoreAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        CopyMoreAction.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyMoreAction.class);
     private final StandardActions action;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -83,9 +81,7 @@ public class CopyMoreAction extends SimpleCommand {
             .collect(Collectors.toList());
 
         if (titles.isEmpty()) {
-            dialogService.notify(
-                Localization.lang("None of the selected entries have titles.")
-            );
+            dialogService.notify(Localization.lang("None of the selected entries have titles."));
             return;
         }
 
@@ -123,9 +119,7 @@ public class CopyMoreAction extends SimpleCommand {
 
         if (keys.isEmpty()) {
             dialogService.notify(
-                Localization.lang(
-                    "None of the selected entries have citation keys."
-                )
+                Localization.lang("None of the selected entries have citation keys.")
             );
             return;
         }
@@ -179,9 +173,7 @@ public class CopyMoreAction extends SimpleCommand {
 
     private void copyDoiList(List<String> dois, int size) {
         if (dois.isEmpty()) {
-            dialogService.notify(
-                Localization.lang("None of the selected entries have DOIs.")
-            );
+            dialogService.notify(Localization.lang("None of the selected entries have DOIs."));
             return;
         }
 
@@ -219,24 +211,17 @@ public class CopyMoreAction extends SimpleCommand {
 
         if (keys.isEmpty()) {
             dialogService.notify(
-                Localization.lang(
-                    "None of the selected entries have citation keys."
-                )
+                Localization.lang("None of the selected entries have citation keys.")
             );
             return;
         }
 
         String citeCommand = Optional
-            .ofNullable(
-                preferencesService
-                    .getExternalApplicationsPreferences()
-                    .getCiteCommand()
-            )
+            .ofNullable(preferencesService.getExternalApplicationsPreferences().getCiteCommand())
             .filter(cite -> cite.contains("\\")) // must contain \
             .orElse("\\cite");
 
-        final String copiedCiteCommand =
-            citeCommand + "{" + String.join(",", keys) + '}';
+        final String copiedCiteCommand = citeCommand + "{" + String.join(",", keys) + '}';
         clipBoardManager.setContent(copiedCiteCommand);
 
         if (keys.size() == entries.size()) {
@@ -287,19 +272,14 @@ public class CopyMoreAction extends SimpleCommand {
             if (entry.hasCitationKey()) {
                 entriesWithKeys++;
                 keyAndTitle.append(
-                    layout.doLayout(
-                        entry,
-                        stateManager.getActiveDatabase().get().getDatabase()
-                    )
+                    layout.doLayout(entry, stateManager.getActiveDatabase().get().getDatabase())
                 );
             }
         }
 
         if (entriesWithKeys == 0) {
             dialogService.notify(
-                Localization.lang(
-                    "None of the selected entries have citation keys."
-                )
+                Localization.lang("None of the selected entries have citation keys.")
             );
             return;
         }
@@ -311,9 +291,7 @@ public class CopyMoreAction extends SimpleCommand {
             dialogService.notify(
                 Localization.lang(
                     "Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(
-                        keyAndTitle.toString()
-                    )
+                    JabRefDialogService.shortenDialogMessage(keyAndTitle.toString())
                 )
             );
         } else {
@@ -345,9 +323,7 @@ public class CopyMoreAction extends SimpleCommand {
 
         if (entriesWithKey.isEmpty()) {
             dialogService.notify(
-                Localization.lang(
-                    "None of the selected entries have citation keys."
-                )
+                Localization.lang("None of the selected entries have citation keys.")
             );
             return;
         }
@@ -356,30 +332,21 @@ public class CopyMoreAction extends SimpleCommand {
             String key = entry.getCitationKey().get();
             String url = entry.getField(StandardField.URL).orElse("");
             keyAndLink.append(
-                url.isEmpty()
-                    ? key
-                    : String.format("<a href=\"%s\">%s</a>", url, key)
+                url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key)
             );
             keyAndLink.append(OS.NEWLINE);
-            fallbackString.append(
-                url.isEmpty() ? key : String.format("%s - %s", key, url)
-            );
+            fallbackString.append(url.isEmpty() ? key : String.format("%s - %s", key, url));
             fallbackString.append(OS.NEWLINE);
         }
 
-        clipBoardManager.setHtmlContent(
-            keyAndLink.toString(),
-            fallbackString.toString()
-        );
+        clipBoardManager.setHtmlContent(keyAndLink.toString(), fallbackString.toString());
 
         if (entriesWithKey.size() == entries.size()) {
             // All entries had keys.
             dialogService.notify(
                 Localization.lang(
                     "Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(
-                        keyAndLink.toString()
-                    )
+                    JabRefDialogService.shortenDialogMessage(keyAndLink.toString())
                 )
             );
         } else {

@@ -5,8 +5,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class BibTexStringChangeDetailsView
-    extends DatabaseChangeDetailsView {
+public final class BibTexStringChangeDetailsView extends DatabaseChangeDetailsView {
 
     public BibTexStringChangeDetailsView(BibTexStringChange stringChange) {
         VBox container = new VBox();
@@ -16,17 +15,9 @@ public final class BibTexStringChangeDetailsView
             .getChildren()
             .addAll(
                 header,
+                new Label(Localization.lang("Label: %0", stringChange.getOldString().getName())),
                 new Label(
-                    Localization.lang(
-                        "Label: %0",
-                        stringChange.getOldString().getName()
-                    )
-                ),
-                new Label(
-                    Localization.lang(
-                        "Content: %0",
-                        stringChange.getNewString().getContent()
-                    )
+                    Localization.lang("Content: %0", stringChange.getNewString().getContent())
                 )
             );
 

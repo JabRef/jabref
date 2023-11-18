@@ -12,23 +12,15 @@ public class AutomaticFieldEditorAction extends SimpleCommand {
     private final StateManager stateManager;
     private final DialogService dialogService;
 
-    public AutomaticFieldEditorAction(
-        StateManager stateManager,
-        DialogService dialogService
-    ) {
+    public AutomaticFieldEditorAction(StateManager stateManager, DialogService dialogService) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
-        this.executable.bind(
-                needsDatabase(stateManager)
-                    .and(needsEntriesSelected(stateManager))
-            );
+        this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
     }
 
     @Override
     public void execute() {
-        dialogService.showCustomDialogAndWait(
-            new AutomaticFieldEditorDialog(stateManager)
-        );
+        dialogService.showCustomDialogAndWait(new AutomaticFieldEditorDialog(stateManager));
     }
 }

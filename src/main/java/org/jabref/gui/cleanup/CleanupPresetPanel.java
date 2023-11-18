@@ -80,12 +80,8 @@ public class CleanupPresetPanel extends VBox {
         init(cleanupPreferences, filePreferences);
     }
 
-    private void init(
-        CleanupPreferences cleanupPreferences,
-        FilePreferences filePreferences
-    ) {
-        Optional<Path> firstExistingDir =
-            databaseContext.getFirstExistingFileDir(filePreferences);
+    private void init(CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
+        Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
             cleanUpMovePDF.setText(
                 Localization.lang(
@@ -95,10 +91,7 @@ public class CleanupPresetPanel extends VBox {
             );
         } else {
             cleanUpMovePDF.setText(
-                Localization.lang(
-                    "Move linked files to default file directory %0",
-                    "..."
-                )
+                Localization.lang("Move linked files to default file directory %0", "...")
             );
 
             // Since the directory does not exist, we cannot move it to there. So, this option is not checked - regardless of the presets stored in the preferences.
@@ -140,53 +133,35 @@ public class CleanupPresetPanel extends VBox {
             .selectedProperty()
             .addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
-                    cleanUpTimestampToModificationDate
-                        .selectedProperty()
-                        .setValue(false);
+                    cleanUpTimestampToModificationDate.selectedProperty().setValue(false);
                 }
             });
         cleanUpTimestampToModificationDate
             .selectedProperty()
             .addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
-                    cleanUpTimestampToCreationDate
-                        .selectedProperty()
-                        .setValue(false);
+                    cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
                 }
             });
         updateDisplay(cleanupPreferences);
     }
 
     private void updateDisplay(CleanupPreferences preset) {
-        cleanUpDOI.setSelected(
-            preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI)
-        );
-        cleanUpEprint.setSelected(
-            preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT)
-        );
-        cleanUpURL.setSelected(
-            preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL)
-        );
+        cleanUpDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
+        cleanUpEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
+        cleanUpURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
         if (!cleanUpMovePDF.isDisabled()) {
-            cleanUpMovePDF.setSelected(
-                preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF)
-            );
+            cleanUpMovePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
         }
         cleanUpMakePathsRelative.setSelected(
             preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE)
         );
-        cleanUpRenamePDF.setSelected(
-            preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF)
-        );
+        cleanUpRenamePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
         cleanUpRenamePDFonlyRelativePaths.setSelected(
-            preset.isActive(
-                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS
-            )
+            preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS)
         );
         cleanUpUpgradeExternalLinks.setSelected(
-            preset.isActive(
-                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS
-            )
+            preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS)
         );
         cleanUpBiblatex.setSelected(
             preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX)
@@ -195,23 +170,15 @@ public class CleanupPresetPanel extends VBox {
             preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX)
         );
         cleanUpTimestampToCreationDate.setSelected(
-            preset.isActive(
-                CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE
-            )
+            preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE)
         );
         cleanUpTimestampToModificationDate.setSelected(
-            preset.isActive(
-                CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
-            )
+            preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE)
         );
         cleanUpTimestampToModificationDate.setSelected(
-            preset.isActive(
-                CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP
-            )
+            preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP)
         );
-        cleanUpISSN.setSelected(
-            preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN)
-        );
+        cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
         formatterCleanupsPanel
             .cleanupsDisableProperty()
             .setValue(!preset.getFieldFormatterCleanups().isEnabled());
@@ -249,17 +216,13 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpRenamePDF.isSelected()) {
             if (cleanUpRenamePDFonlyRelativePaths.isSelected()) {
-                activeJobs.add(
-                    CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS
-                );
+                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
             } else {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);
             }
         }
         if (cleanUpUpgradeExternalLinks.isSelected()) {
-            activeJobs.add(
-                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS
-            );
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         }
         if (cleanUpBiblatex.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
@@ -268,14 +231,10 @@ public class CleanupPresetPanel extends VBox {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
         }
         if (cleanUpTimestampToCreationDate.isSelected()) {
-            activeJobs.add(
-                CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE
-            );
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
         }
         if (cleanUpTimestampToModificationDate.isSelected()) {
-            activeJobs.add(
-                CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
-            );
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 
         activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);

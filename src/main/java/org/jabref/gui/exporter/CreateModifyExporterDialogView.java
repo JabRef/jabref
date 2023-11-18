@@ -11,8 +11,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
-public class CreateModifyExporterDialogView
-    extends BaseDialog<ExporterViewModel> {
+public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel> {
 
     private final ExporterViewModel exporter;
 
@@ -53,16 +52,9 @@ public class CreateModifyExporterDialogView
 
     @FXML
     private void initialize() {
-        viewModel =
-            new CreateModifyExporterDialogViewModel(
-                exporter,
-                dialogService,
-                preferences
-            );
+        viewModel = new CreateModifyExporterDialogViewModel(exporter, dialogService, preferences);
         name.textProperty().bindBidirectional(viewModel.getName());
-        fileName
-            .textProperty()
-            .bindBidirectional(viewModel.getLayoutFileName());
+        fileName.textProperty().bindBidirectional(viewModel.getLayoutFileName());
         extension.textProperty().bindBidirectional(viewModel.getExtension());
     }
 

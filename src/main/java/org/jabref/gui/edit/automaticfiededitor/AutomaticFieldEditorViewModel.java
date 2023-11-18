@@ -18,9 +18,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs =
         FXCollections.observableArrayList();
-    private final NamedCompound dialogEdits = new NamedCompound(
-        NAMED_COMPOUND_EDITS
-    );
+    private final NamedCompound dialogEdits = new NamedCompound(NAMED_COMPOUND_EDITS);
 
     private final UndoManager undoManager;
 

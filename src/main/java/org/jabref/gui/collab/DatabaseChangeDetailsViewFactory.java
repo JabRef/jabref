@@ -99,10 +99,7 @@ public class DatabaseChangeDetailsViewFactory {
         } else if (databaseChange instanceof BibTexStringRename stringRename) {
             return new BibTexStringRenameDetailsView(stringRename);
         } else if (databaseChange instanceof MetadataChange metadataChange) {
-            return new MetadataChangeDetailsView(
-                metadataChange,
-                preferencesService
-            );
+            return new MetadataChangeDetailsView(metadataChange, preferencesService);
         } else if (databaseChange instanceof GroupChange groupChange) {
             return new GroupChangeDetailsView(groupChange);
         } else if (databaseChange instanceof PreambleChange preambleChange) {

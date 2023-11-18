@@ -41,15 +41,10 @@ public class AbstractEditorViewModel extends AbstractViewModel {
 
         this.fieldValidator = new CompositeValidator();
         for (ValueChecker checker : fieldCheckers.getForField(field)) {
-            FunctionBasedValidator<String> validator =
-                new FunctionBasedValidator<>(
-                    text,
-                    value ->
-                        checker
-                            .checkValue(value)
-                            .map(ValidationMessage::warning)
-                            .orElse(null)
-                );
+            FunctionBasedValidator<String> validator = new FunctionBasedValidator<>(
+                text,
+                value -> checker.checkValue(value).map(ValidationMessage::warning).orElse(null)
+            );
             fieldValidator.addValidators(validator);
         }
     }
@@ -85,12 +80,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                     if (!(newValue.trim()).equals(oldValue)) {
                         entry.setField(field, newValue);
                         undoManager.addEdit(
-                            new UndoableFieldChange(
-                                entry,
-                                field,
-                                oldValue,
-                                newValue
-                            )
+                            new UndoableFieldChange(entry, field, oldValue, newValue)
                         );
                     }
                 }
@@ -98,9 +88,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
         );
     }
 
-    public Collection<?> complete(
-        AutoCompletionBinding.ISuggestionRequest request
-    ) {
+    public Collection<?> complete(AutoCompletionBinding.ISuggestionRequest request) {
         return suggestionProvider.provideSuggestions(request);
     }
 }

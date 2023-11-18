@@ -65,17 +65,12 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(
-            entry.getType(),
-            mode
-        );
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             if (isPrimaryOptionalFields) {
                 return entryType.get().getPrimaryOptionalFields();
             } else {
-                return entryType
-                    .get()
-                    .getSecondaryOptionalNotDeprecatedFields(mode);
+                return entryType.get().getSecondaryOptionalNotDeprecatedFields(mode);
             }
         } else {
             // Entry type unknown -> treat all fields as required

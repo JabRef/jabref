@@ -30,11 +30,7 @@ public class GenerateCitationKeySingleAction extends SimpleCommand {
         this.preferencesService = preferencesService;
         this.undoManager = undoManager;
 
-        if (
-            preferencesService
-                .getCitationKeyPatternPreferences()
-                .shouldAvoidOverwriteCiteKey()
-        ) {
+        if (preferencesService.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
             this.executable.bind(entry.getCiteKeyBinding().isEmpty());
         }
     }
@@ -43,19 +39,14 @@ public class GenerateCitationKeySingleAction extends SimpleCommand {
     public void execute() {
         if (
             !entry.hasCitationKey() ||
-            GenerateCitationKeyAction.confirmOverwriteKeys(
-                dialogService,
-                preferencesService
-            )
+            GenerateCitationKeyAction.confirmOverwriteKeys(dialogService, preferencesService)
         ) {
             new CitationKeyGenerator(
                 databaseContext,
                 preferencesService.getCitationKeyPatternPreferences()
             )
                 .generateAndSetKey(entry)
-                .ifPresent(change ->
-                    undoManager.addEdit(new UndoableKeyChange(change))
-                );
+                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
         }
     }
 }

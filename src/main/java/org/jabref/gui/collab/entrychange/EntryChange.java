@@ -32,11 +32,7 @@ public final class EntryChange extends DatabaseChange {
         );
     }
 
-    public EntryChange(
-        BibEntry oldEntry,
-        BibEntry newEntry,
-        BibDatabaseContext databaseContext
-    ) {
+    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext) {
         this(oldEntry, newEntry, databaseContext, null);
     }
 
@@ -53,12 +49,8 @@ public final class EntryChange extends DatabaseChange {
         databaseContext.getDatabase().removeEntry(oldEntry);
         databaseContext.getDatabase().insertEntry(newEntry);
         CompoundEdit changeEntryEdit = new CompoundEdit();
-        changeEntryEdit.addEdit(
-            new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry)
-        );
-        changeEntryEdit.addEdit(
-            new UndoableInsertEntries(databaseContext.getDatabase(), newEntry)
-        );
+        changeEntryEdit.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
+        changeEntryEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
         changeEntryEdit.end();
 
         undoEdit.addEdit(changeEntryEdit);

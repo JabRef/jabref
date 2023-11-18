@@ -30,10 +30,7 @@ public class SuggestionProviders {
     }
 
     public SuggestionProvider<?> getForField(Field field) {
-        if (
-            isEmpty ||
-            !autoCompletePreferences.getCompleteFields().contains(field)
-        ) {
+        if (isEmpty || !autoCompletePreferences.getCompleteFields().contains(field)) {
             return new EmptySuggestionProvider();
         }
 
@@ -46,14 +43,9 @@ public class SuggestionProviders {
         ) {
             return new BibEntrySuggestionProvider(database);
         } else if (
-            fieldProperties.contains(FieldProperty.JOURNAL_NAME) ||
-            StandardField.PUBLISHER == field
+            fieldProperties.contains(FieldProperty.JOURNAL_NAME) || StandardField.PUBLISHER == field
         ) {
-            return new JournalsSuggestionProvider(
-                field,
-                database,
-                abbreviationRepository
-            );
+            return new JournalsSuggestionProvider(field, database, abbreviationRepository);
         } else {
             return new WordSuggestionProvider(field, database);
         }

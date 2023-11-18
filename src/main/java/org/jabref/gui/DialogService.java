@@ -46,13 +46,7 @@ public interface DialogService {
         String okButtonLabel,
         Collection<T> choices
     ) {
-        return showChoiceDialogAndWait(
-            title,
-            content,
-            okButtonLabel,
-            null,
-            choices
-        );
+        return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
     }
 
     /**
@@ -107,10 +101,7 @@ public interface DialogService {
      * @param exception the exception causing the error
      */
     default void showErrorDialogAndWait(Exception exception) {
-        showErrorDialogAndWait(
-            Localization.lang("Unhandled exception occurred."),
-            exception
-        );
+        showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
     }
 
     /**
@@ -118,11 +109,7 @@ public interface DialogService {
      *
      * @param exception the exception causing the error
      */
-    void showErrorDialogAndWait(
-        String title,
-        String content,
-        Throwable exception
-    );
+    void showErrorDialogAndWait(String title, String content, Throwable exception);
 
     /**
      * Create and display error dialog displaying the given message.
@@ -149,11 +136,7 @@ public interface DialogService {
      *
      * @return true if the use clicked "OK" otherwise false
      */
-    boolean showConfirmationDialogAndWait(
-        String title,
-        String content,
-        String okButtonLabel
-    );
+    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel);
 
     /**
      * Create and display a new confirmation dialog.
@@ -210,11 +193,7 @@ public interface DialogService {
      *
      * @return the entered password if pressed "OK", null otherwise
      */
-    Optional<String> showPasswordDialogAndWait(
-        String title,
-        String header,
-        String content
-    );
+    Optional<String> showPasswordDialogAndWait(String title, String header, String content);
 
     /**
      * Shows a custom dialog without returning any results.
@@ -255,9 +234,7 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(
-        javafx.scene.control.Dialog<R> dialog
-    );
+    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
@@ -298,9 +275,7 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showFileSaveDialog(
-        FileDialogConfiguration fileDialogConfiguration
-    );
+    Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration);
 
     /**
      * Shows a new file open dialog. The method doesn't return until the
@@ -311,9 +286,7 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showFileOpenDialog(
-        FileDialogConfiguration fileDialogConfiguration
-    );
+    Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
 
     /**
      * Shows a new file open dialog. The method doesn't return until the
@@ -356,6 +329,5 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showFileOpenFromArchiveDialog(Path archivePath)
-        throws IOException;
+    Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 }

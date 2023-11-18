@@ -32,11 +32,9 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
      * Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
      * track of changes even when they're removed from the UI.
      */
-    private final ObservableList<DatabaseChange> changes =
-        FXCollections.observableArrayList();
+    private final ObservableList<DatabaseChange> changes = FXCollections.observableArrayList();
 
-    private final ObjectProperty<DatabaseChange> selectedChange =
-        new SimpleObjectProperty<>();
+    private final ObjectProperty<DatabaseChange> selectedChange = new SimpleObjectProperty<>();
 
     private final BooleanBinding areAllChangesResolved;
 
@@ -56,18 +54,12 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
 
         areAllChangesResolved =
-            Bindings.createBooleanBinding(
-                visibleChanges::isEmpty,
-                visibleChanges
-            );
+            Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
         canAskUserToResolveChange =
             Bindings.createBooleanBinding(
                 () ->
                     selectedChange.isNotNull().get() &&
-                    selectedChange
-                        .get()
-                        .getExternalChangeResolver()
-                        .isPresent(),
+                    selectedChange.get().getExternalChangeResolver().isPresent(),
                 selectedChange
             );
     }

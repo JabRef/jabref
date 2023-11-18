@@ -21,9 +21,7 @@ public class PopOverUtil {
         TaskExecutor taskExecutor
     ) {
         Optional<String> optionalIssn = entry.getField(StandardField.ISSN);
-        Optional<String> optionalJournalName = entry.getFieldOrAlias(
-            StandardField.JOURNAL
-        );
+        Optional<String> optionalJournalName = entry.getFieldOrAlias(StandardField.JOURNAL);
 
         if (optionalIssn.isPresent() || optionalJournalName.isPresent()) {
             PopOver popOver = new PopOver();
@@ -59,9 +57,7 @@ public class PopOverUtil {
                 .executeWith(taskExecutor);
         } else {
             dialogService.notify(
-                Localization.lang(
-                    "ISSN or journal name required for fetching journal information"
-                )
+                Localization.lang("ISSN or journal name required for fetching journal information")
             );
         }
     }

@@ -24,13 +24,9 @@ import org.slf4j.LoggerFactory;
 
 public class BibtexExtractorViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        BibtexExtractorViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
 
-    private final StringProperty inputTextProperty = new SimpleStringProperty(
-        ""
-    );
+    private final StringProperty inputTextProperty = new SimpleStringProperty("");
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
@@ -73,8 +69,7 @@ public class BibtexExtractorViewModel {
     }
 
     private void parseUsingBibtexExtractor() {
-        BibEntry parsedEntry = new BibtexExtractor()
-            .extract(inputTextProperty.getValue());
+        BibEntry parsedEntry = new BibtexExtractor().extract(inputTextProperty.getValue());
         importHandler.importEntries(List.of(parsedEntry));
         trackNewEntry(parsedEntry, "ParseWithBibTeXExtractor");
     }
@@ -85,15 +80,8 @@ public class BibtexExtractorViewModel {
             preferencesService.getImportFormatPreferences()
         );
         BackgroundTask
-            .wrap(() ->
-                grobidCitationFetcher.performSearch(
-                    inputTextProperty.getValue()
-                )
-            )
-            .onRunning(() ->
-                dialogService.notify(
-                    Localization.lang("Your text is being parsed...")
-                )
+            .wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
+            .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed..."))
             )
             .onFailure(e -> {
                 if (e instanceof FetcherException) {
@@ -123,14 +111,9 @@ public class BibtexExtractorViewModel {
 
     private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
         Map<String, String> properties = new HashMap<>();
-        properties.put(
-            "EntryType",
-            bibEntry.typeProperty().getValue().getName()
-        );
+        properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
         Telemetry
             .getTelemetryClient()
-            .ifPresent(client ->
-                client.trackEvent(eventMessage, properties, new HashMap<>())
-            );
+            .ifPresent(client -> client.trackEvent(eventMessage, properties, new HashMap<>()));
     }
 }

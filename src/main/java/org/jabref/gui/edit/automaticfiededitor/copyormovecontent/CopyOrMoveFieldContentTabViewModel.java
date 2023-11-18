@@ -23,20 +23,16 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
-public class CopyOrMoveFieldContentTabViewModel
-    extends AbstractAutomaticFieldEditorTabViewModel {
+public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEditorTabViewModel {
 
     public static final int TAB_INDEX = 1;
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>(
         StandardField.ABSTRACT
     );
 
-    private final ObjectProperty<Field> toField = new SimpleObjectProperty<>(
-        StandardField.AUTHOR
-    );
+    private final ObjectProperty<Field> toField = new SimpleObjectProperty<>(StandardField.AUTHOR);
 
-    private final BooleanProperty overwriteFieldContent =
-        new SimpleBooleanProperty(Boolean.FALSE);
+    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);
     private final List<BibEntry> selectedEntries;
 
     private final Validator toFieldValidator;
@@ -58,9 +54,7 @@ public class CopyOrMoveFieldContentTabViewModel
                 toField,
                 field -> {
                     if (StringUtil.isBlank(field.getName())) {
-                        return ValidationMessage.error(
-                            "Field name cannot be empty"
-                        );
+                        return ValidationMessage.error("Field name cannot be empty");
                     } else if (StringUtil.containsWhitespace(field.getName())) {
                         return ValidationMessage.error(
                             "Field name cannot have whitespace characters"
@@ -118,26 +112,17 @@ public class CopyOrMoveFieldContentTabViewModel
     }
 
     public void copyValue() {
-        NamedCompound copyFieldValueEdit = new NamedCompound(
-            "COPY_FIELD_VALUE"
-        );
+        NamedCompound copyFieldValueEdit = new NamedCompound("COPY_FIELD_VALUE");
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
             String toFieldValue = entry.getField(toField.get()).orElse("");
 
-            if (
-                overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)
-            ) {
+            if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
                     copyFieldValueEdit.addEdit(
-                        new UndoableFieldChange(
-                            entry,
-                            toField.get(),
-                            toFieldValue,
-                            fromFieldValue
-                        )
+                        new UndoableFieldChange(entry, toField.get(), toFieldValue, fromFieldValue)
                     );
                     affectedEntriesCount++;
                 }
@@ -147,11 +132,7 @@ public class CopyOrMoveFieldContentTabViewModel
             copyFieldValueEdit.end();
         }
         stateManager.setLastAutomaticFieldEditorEdit(
-            new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                copyFieldValueEdit
-            )
+            new LastAutomaticFieldEditorEdit(affectedEntriesCount, TAB_INDEX, copyFieldValueEdit)
         );
     }
 
@@ -160,12 +141,7 @@ public class CopyOrMoveFieldContentTabViewModel
         int affectedEntriesCount = 0;
         if (overwriteFieldContent.get()) {
             affectedEntriesCount =
-                new MoveFieldValueAction(
-                    fromField.get(),
-                    toField.get(),
-                    selectedEntries,
-                    moveEdit
-                )
+                new MoveFieldValueAction(fromField.get(), toField.get(), selectedEntries, moveEdit)
                     .executeAndGetAffectedEntriesCount();
 
             if (moveEdit.hasEdits()) {
@@ -173,18 +149,12 @@ public class CopyOrMoveFieldContentTabViewModel
             }
         }
         stateManager.setLastAutomaticFieldEditorEdit(
-            new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                moveEdit
-            )
+            new LastAutomaticFieldEditorEdit(affectedEntriesCount, TAB_INDEX, moveEdit)
         );
     }
 
     public void swapValues() {
-        NamedCompound swapFieldValuesEdit = new NamedCompound(
-            "SWAP_FIELD_VALUES"
-        );
+        NamedCompound swapFieldValuesEdit = new NamedCompound("SWAP_FIELD_VALUES");
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
@@ -199,21 +169,11 @@ public class CopyOrMoveFieldContentTabViewModel
                 entry.setField(fromField.get(), toFieldValue);
 
                 swapFieldValuesEdit.addEdit(
-                    new UndoableFieldChange(
-                        entry,
-                        toField.get(),
-                        toFieldValue,
-                        fromFieldValue
-                    )
+                    new UndoableFieldChange(entry, toField.get(), toFieldValue, fromFieldValue)
                 );
 
                 swapFieldValuesEdit.addEdit(
-                    new UndoableFieldChange(
-                        entry,
-                        fromField.get(),
-                        fromFieldValue,
-                        toFieldValue
-                    )
+                    new UndoableFieldChange(entry, fromField.get(), fromFieldValue, toFieldValue)
                 );
                 affectedEntriesCount++;
             }
@@ -223,11 +183,7 @@ public class CopyOrMoveFieldContentTabViewModel
             swapFieldValuesEdit.end();
         }
         stateManager.setLastAutomaticFieldEditorEdit(
-            new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                swapFieldValuesEdit
-            )
+            new LastAutomaticFieldEditorEdit(affectedEntriesCount, TAB_INDEX, swapFieldValuesEdit)
         );
     }
 

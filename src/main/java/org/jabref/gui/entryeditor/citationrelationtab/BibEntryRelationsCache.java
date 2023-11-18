@@ -9,10 +9,8 @@ import org.jabref.model.entry.identifier.DOI;
 
 public class BibEntryRelationsCache {
 
-    private static final Map<String, List<BibEntry>> CITATIONS_MAP =
-        new HashMap<>();
-    private static final Map<String, List<BibEntry>> REFERENCES_MAP =
-        new HashMap<>();
+    private static final Map<String, List<BibEntry>> CITATIONS_MAP = new HashMap<>();
+    private static final Map<String, List<BibEntry>> REFERENCES_MAP = new HashMap<>();
 
     public List<BibEntry> getCitations(BibEntry entry) {
         return CITATIONS_MAP.getOrDefault(
@@ -28,35 +26,19 @@ public class BibEntryRelationsCache {
         );
     }
 
-    public void cacheOrMergeCitations(
-        BibEntry entry,
-        List<BibEntry> citations
-    ) {
-        entry
-            .getDOI()
-            .ifPresent(doi -> CITATIONS_MAP.put(doi.getDOI(), citations));
+    public void cacheOrMergeCitations(BibEntry entry, List<BibEntry> citations) {
+        entry.getDOI().ifPresent(doi -> CITATIONS_MAP.put(doi.getDOI(), citations));
     }
 
-    public void cacheOrMergeReferences(
-        BibEntry entry,
-        List<BibEntry> references
-    ) {
-        entry
-            .getDOI()
-            .ifPresent(doi ->
-                REFERENCES_MAP.putIfAbsent(doi.getDOI(), references)
-            );
+    public void cacheOrMergeReferences(BibEntry entry, List<BibEntry> references) {
+        entry.getDOI().ifPresent(doi -> REFERENCES_MAP.putIfAbsent(doi.getDOI(), references));
     }
 
     public boolean citationsCached(BibEntry entry) {
-        return CITATIONS_MAP.containsKey(
-            entry.getDOI().map(DOI::getDOI).orElse("")
-        );
+        return CITATIONS_MAP.containsKey(entry.getDOI().map(DOI::getDOI).orElse(""));
     }
 
     public boolean referencesCached(BibEntry entry) {
-        return REFERENCES_MAP.containsKey(
-            entry.getDOI().map(DOI::getDOI).orElse("")
-        );
+        return REFERENCES_MAP.containsKey(entry.getDOI().map(DOI::getDOI).orElse(""));
     }
 }

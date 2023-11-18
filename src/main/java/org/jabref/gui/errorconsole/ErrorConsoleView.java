@@ -72,21 +72,9 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(
-            copyLogButton,
-            getDialogPane(),
-            event -> copyLog()
-        );
-        ControlHelper.setAction(
-            clearLogButton,
-            getDialogPane(),
-            event -> clearLog()
-        );
-        ControlHelper.setAction(
-            createIssueButton,
-            getDialogPane(),
-            event -> createIssue()
-        );
+        ControlHelper.setAction(copyLogButton, getDialogPane(), event -> copyLog());
+        ControlHelper.setAction(clearLogButton, getDialogPane(), event -> clearLog());
+        ControlHelper.setAction(createIssueButton, getDialogPane(), event -> createIssue());
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
@@ -101,15 +89,9 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                 buildInfo
             );
         messagesListView.setCellFactory(createCellFactory());
-        messagesListView
-            .itemsProperty()
-            .bind(viewModel.allMessagesDataProperty());
-        messagesListView.scrollTo(
-            viewModel.allMessagesDataProperty().getSize() - 1
-        );
-        messagesListView
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
+        messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
+        messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
+        messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         viewModel
             .allMessagesDataProperty()
             .addListener(
@@ -120,15 +102,10 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                         }
                     })
             );
-        descriptionLabel.setGraphic(
-            IconTheme.JabRefIcons.CONSOLE.getGraphicNode()
-        );
+        descriptionLabel.setGraphic(IconTheme.JabRefIcons.CONSOLE.getGraphicNode());
     }
 
-    private Callback<
-        ListView<LogEventViewModel>,
-        ListCell<LogEventViewModel>
-    > createCellFactory() {
+    private Callback<ListView<LogEventViewModel>, ListCell<LogEventViewModel>> createCellFactory() {
         return cell ->
             new ListCell<>() {
                 private HBox graphic;
@@ -167,12 +144,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     @FXML
     private void copySelectedLogEntries(KeyEvent event) {
-        if (
-            keyBindingRepository.checkKeyCombinationEquality(
-                KeyBinding.COPY,
-                event
-            )
-        ) {
+        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
             ObservableList<LogEventViewModel> selectedEntries = messagesListView
                 .getSelectionModel()
                 .getSelectedItems();

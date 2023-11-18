@@ -33,9 +33,8 @@ public abstract sealed class DatabaseChange
         BibTexStringRename {
 
     protected final BibDatabaseContext databaseContext;
-    protected final OptionalObjectProperty<
-        DatabaseChangeResolver
-    > externalChangeResolver = OptionalObjectProperty.empty();
+    protected final OptionalObjectProperty<DatabaseChangeResolver> externalChangeResolver =
+        OptionalObjectProperty.empty();
     private final BooleanProperty accepted = new SimpleBooleanProperty();
     private final StringProperty name = new SimpleStringProperty();
 
@@ -47,9 +46,7 @@ public abstract sealed class DatabaseChange
         setChangeName("Unnamed Change!");
 
         if (databaseChangeResolverFactory != null) {
-            externalChangeResolver.set(
-                databaseChangeResolverFactory.create(this)
-            );
+            externalChangeResolver.set(databaseChangeResolverFactory.create(this));
         }
     }
 

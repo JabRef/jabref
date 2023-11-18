@@ -42,10 +42,7 @@ public final class EntryChangeResolver extends DatabaseChangeResolver {
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("In JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
         mergeEntriesDialog.configureDiff(
-            new ShowDiffConfig(
-                ThreeWayMergeToolbar.DiffView.SPLIT,
-                BasicDiffMethod.WORDS
-            )
+            new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS)
         );
 
         return dialogService
@@ -53,9 +50,7 @@ public final class EntryChangeResolver extends DatabaseChangeResolver {
             .map(this::mapMergeResultToExternalChange);
     }
 
-    private EntryChange mapMergeResultToExternalChange(
-        EntriesMergeResult entriesMergeResult
-    ) {
+    private EntryChange mapMergeResultToExternalChange(EntriesMergeResult entriesMergeResult) {
         return new EntryChange(
             entryChange.getOldEntry(),
             entriesMergeResult.mergedEntry(),

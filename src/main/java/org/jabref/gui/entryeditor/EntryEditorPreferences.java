@@ -30,9 +30,7 @@ public class EntryEditorPreferences {
                     return value;
                 }
             }
-            throw new IllegalArgumentException(
-                "No enum found with value: " + status
-            );
+            throw new IllegalArgumentException("No enum found with value: " + status);
         }
     }
 
@@ -64,24 +62,15 @@ public class EntryEditorPreferences {
         boolean showSciteTab
     ) {
         this.entryEditorTabList =
-            new SimpleMapProperty<>(
-                FXCollections.observableMap(entryEditorTabList)
-            );
+            new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
         this.defaultEntryEditorTabList =
-            new SimpleMapProperty<>(
-                FXCollections.observableMap(defaultEntryEditorTabList)
-            );
-        this.shouldOpenOnNewEntry =
-            new SimpleBooleanProperty(shouldOpenOnNewEntry);
-        this.shouldShowRecommendationsTab =
-            new SimpleBooleanProperty(shouldShowRecommendationsTab);
-        this.shouldShowLatexCitationsTab =
-            new SimpleBooleanProperty(shouldShowLatexCitationsTab);
-        this.showSourceTabByDefault =
-            new SimpleBooleanProperty(showSourceTabByDefault);
+            new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
+        this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
+        this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
+        this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
+        this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
-        this.allowIntegerEditionBibtex =
-            new SimpleBooleanProperty(allowIntegerEditionBibtex);
+        this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
         this.dividerPosition = new SimpleDoubleProperty(dividerPosition);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
@@ -96,12 +85,8 @@ public class EntryEditorPreferences {
         return entryEditorTabList;
     }
 
-    public void setEntryEditorTabList(
-        Map<String, Set<Field>> entryEditorTabList
-    ) {
-        this.entryEditorTabList.set(
-                FXCollections.observableMap(entryEditorTabList)
-            );
+    public void setEntryEditorTabList(Map<String, Set<Field>> entryEditorTabList) {
+        this.entryEditorTabList.set(FXCollections.observableMap(entryEditorTabList));
     }
 
     public ObservableMap<String, Set<Field>> getDefaultEntryEditorTabs() {
@@ -128,9 +113,7 @@ public class EntryEditorPreferences {
         return shouldShowRecommendationsTab;
     }
 
-    public void setShouldShowRecommendationsTab(
-        boolean shouldShowRecommendationsTab
-    ) {
+    public void setShouldShowRecommendationsTab(boolean shouldShowRecommendationsTab) {
         this.shouldShowRecommendationsTab.set(shouldShowRecommendationsTab);
     }
 
@@ -142,9 +125,7 @@ public class EntryEditorPreferences {
         return shouldShowLatexCitationsTab;
     }
 
-    public void setShouldShowLatexCitationsTab(
-        boolean shouldShowLatexCitationsTab
-    ) {
+    public void setShouldShowLatexCitationsTab(boolean shouldShowLatexCitationsTab) {
         this.shouldShowLatexCitationsTab.set(shouldShowLatexCitationsTab);
     }
 
@@ -180,9 +161,7 @@ public class EntryEditorPreferences {
         return allowIntegerEditionBibtex;
     }
 
-    public void setAllowIntegerEditionBibtex(
-        boolean allowIntegerEditionBibtex
-    ) {
+    public void setAllowIntegerEditionBibtex(boolean allowIntegerEditionBibtex) {
         this.allowIntegerEditionBibtex.set(allowIntegerEditionBibtex);
     }
 

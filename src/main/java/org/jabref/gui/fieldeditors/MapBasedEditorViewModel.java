@@ -14,12 +14,9 @@ import org.slf4j.LoggerFactory;
 /**
  * View model for a field editor that shows various options backed by a map.
  */
-public abstract class MapBasedEditorViewModel<T>
-    extends OptionEditorViewModel<T> {
+public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MapBasedEditorViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);
 
     public MapBasedEditorViewModel(
         Field field,
@@ -40,9 +37,7 @@ public abstract class MapBasedEditorViewModel<T>
                 if (object == null) {
                     return null;
                 } else {
-                    return getItemMap()
-                        .inverse()
-                        .getOrDefault(object, object.toString()); // if the object is not found we simply return itself as string
+                    return getItemMap().inverse().getOrDefault(object, object.toString()); // if the object is not found we simply return itself as string
                 }
             }
 
@@ -51,8 +46,7 @@ public abstract class MapBasedEditorViewModel<T>
                 if (string == null) {
                     return null;
                 } else {
-                    return getItemMap()
-                        .getOrDefault(string, getValueFromString(string));
+                    return getItemMap().getOrDefault(string, getValueFromString(string));
                 }
             }
         };

@@ -18,16 +18,12 @@ import org.jabref.logic.util.OS;
 
 public class EditorContextAction extends SimpleCommand {
 
-    private static final boolean SHOW_HANDLES =
-        Properties.IS_TOUCH_SUPPORTED && !OS.OS_X;
+    private static final boolean SHOW_HANDLES = Properties.IS_TOUCH_SUPPORTED && !OS.OS_X;
 
     private final StandardActions command;
     private final TextInputControl textInputControl;
 
-    public EditorContextAction(
-        StandardActions command,
-        TextInputControl textInputControl
-    ) {
+    public EditorContextAction(StandardActions command, TextInputControl textInputControl) {
         this.command = command;
         this.textInputControl = textInputControl;
 
@@ -36,22 +32,19 @@ public class EditorContextAction extends SimpleCommand {
             () -> textInputControl.getLength() > 0,
             textInputControl.textProperty()
         );
-        BooleanBinding hasStringInClipboardBinding =
-            (BooleanBinding) BindingsHelper.constantOf(
-                Clipboard.getSystemClipboard().hasString()
-            );
+        BooleanBinding hasStringInClipboardBinding = (BooleanBinding) BindingsHelper.constantOf(
+            Clipboard.getSystemClipboard().hasString()
+        );
         BooleanBinding hasSelectionBinding = Bindings.createBooleanBinding(
             () -> textInputControl.getSelection().getLength() > 0,
             textInputControl.selectionProperty()
         );
         BooleanBinding allSelectedBinding = Bindings.createBooleanBinding(() ->
-            textInputControl.getSelection().getLength() ==
-            textInputControl.getLength()
+            textInputControl.getSelection().getLength() == textInputControl.getLength()
         );
-        BooleanBinding maskTextBinding =
-            (BooleanBinding) BindingsHelper.constantOf(
-                textInputControl instanceof PasswordField
-            ); // (maskText("A") != "A");
+        BooleanBinding maskTextBinding = (BooleanBinding) BindingsHelper.constantOf(
+            textInputControl instanceof PasswordField
+        ); // (maskText("A") != "A");
 
         this.executable.bind(
                 switch (command) {
@@ -59,9 +52,7 @@ public class EditorContextAction extends SimpleCommand {
                         .and(maskTextBinding.not())
                         .and(hasSelectionBinding);
                     case CUT -> maskTextBinding.not().and(hasSelectionBinding);
-                    case PASTE -> editableBinding.and(
-                        hasStringInClipboardBinding
-                    );
+                    case PASTE -> editableBinding.and(hasStringInClipboardBinding);
                     case DELETE -> editableBinding.and(hasSelectionBinding);
                     case SELECT_ALL -> {
                         if (SHOW_HANDLES) {
@@ -81,9 +72,7 @@ public class EditorContextAction extends SimpleCommand {
             case COPY -> textInputControl.copy();
             case CUT -> textInputControl.cut();
             case PASTE -> textInputControl.paste();
-            case DELETE -> textInputControl.deleteText(
-                textInputControl.getSelection()
-            );
+            case DELETE -> textInputControl.deleteText(textInputControl.getSelection());
             case SELECT_ALL -> textInputControl.selectAll();
         }
         textInputControl.requestFocus();
@@ -100,10 +89,7 @@ public class EditorContextAction extends SimpleCommand {
 
         MenuItem selectAllMenuItem = factory.createMenuItem(
             StandardActions.SELECT_ALL,
-            new EditorContextAction(
-                StandardActions.SELECT_ALL,
-                textInputControl
-            )
+            new EditorContextAction(StandardActions.SELECT_ALL, textInputControl)
         );
         if (SHOW_HANDLES) {
             selectAllMenuItem.getProperties().put("refreshMenu", Boolean.TRUE);
@@ -124,10 +110,7 @@ public class EditorContextAction extends SimpleCommand {
             ),
             factory.createMenuItem(
                 StandardActions.DELETE,
-                new EditorContextAction(
-                    StandardActions.DELETE,
-                    textInputControl
-                )
+                new EditorContextAction(StandardActions.DELETE, textInputControl)
             ),
             selectAllMenuItem
         );

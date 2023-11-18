@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        UnlinkedFilesCrawler.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesCrawler.class);
 
     private final Path directory;
     private final Filter<Path> fileFilter;
@@ -84,19 +82,14 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * @return FileNodeViewModel containing the data of the current directory and all subdirectories
      * @throws IOException if directory is not a directory or empty
      */
-    FileNodeViewModel searchDirectory(
-        Path directory,
-        UnlinkedPDFFileFilter unlinkedPDFFileFilter
-    ) throws IOException {
+    FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter)
+        throws IOException {
         // Return null if the directory is not valid.
         if ((directory == null) || !Files.isDirectory(directory)) {
-            throw new IOException(
-                String.format("Invalid directory for searching: %s", directory)
-            );
+            throw new IOException(String.format("Invalid directory for searching: %s", directory));
         }
 
-        FileNodeViewModel fileNodeViewModelForCurrentDirectory =
-            new FileNodeViewModel(directory);
+        FileNodeViewModel fileNodeViewModelForCurrentDirectory = new FileNodeViewModel(directory);
 
         // Map from isDirectory (true/false) to full path
         // Result: Contains only files not matching the filter (i.e., PDFs not linked and files not ignored)
@@ -115,9 +108,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
             )
         ) {
             directoryAndFilePartition =
-                filesStream.collect(
-                    Collectors.partitioningBy(Files::isDirectory)
-                );
+                filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
         } catch (IOException e) {
             LOGGER.error("Error while searching files", e);
             return fileNodeViewModelForCurrentDirectory;
@@ -132,10 +123,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
         // now we crawl into the found subdirectories first (!)
         for (Path subDirectory : subDirectories) {
-            FileNodeViewModel subRoot = searchDirectory(
-                subDirectory,
-                unlinkedPDFFileFilter
-            );
+            FileNodeViewModel subRoot = searchDirectory(subDirectory, unlinkedPDFFileFilter);
             if (!subRoot.getChildren().isEmpty()) {
                 fileCountOfSubdirectories += subRoot.getFileCount();
                 fileNodeViewModelForCurrentDirectory.getChildren().add(subRoot);
@@ -167,10 +155,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         fileNodeViewModelForCurrentDirectory
             .getChildren()
             .addAll(
-                resultingFiles
-                    .stream()
-                    .map(FileNodeViewModel::new)
-                    .collect(Collectors.toList())
+                resultingFiles.stream().map(FileNodeViewModel::new).collect(Collectors.toList())
             );
 
         return fileNodeViewModelForCurrentDirectory;

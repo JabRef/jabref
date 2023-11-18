@@ -199,9 +199,7 @@ public class JabRefCLI {
             "g",
             "generateCitationKeys",
             false,
-            Localization.lang(
-                "Regenerate all keys for the entries in a BibTeX file"
-            )
+            Localization.lang("Regenerate all keys for the entries in a BibTeX file")
         );
         options.addOption(
             "b",
@@ -209,40 +207,22 @@ public class JabRefCLI {
             false,
             Localization.lang("Do not open any files at startup")
         );
-        options.addOption(
-            "v",
-            "version",
-            false,
-            Localization.lang("Display version")
-        );
-        options.addOption(
-            null,
-            "debug",
-            false,
-            Localization.lang("Show debug level messages")
-        );
+        options.addOption("v", "version", false, Localization.lang("Display version"));
+        options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
         // The "-console" option is handled by the install4j launcher
         options.addOption(
             null,
             "console",
             false,
-            Localization.lang(
-                "Show console output (only when the launcher is used)"
-            )
+            Localization.lang("Show console output (only when the launcher is used)")
         );
 
         options.addOption(
             Option
                 .builder("i")
                 .longOpt("import")
-                .desc(
-                    String.format(
-                        "%s: '%s'",
-                        Localization.lang("Import file"),
-                        "-i library.bib"
-                    )
-                )
+                .desc(String.format("%s: '%s'", Localization.lang("Import file"), "-i library.bib"))
                 .hasArg()
                 .argName("FILE[,FORMAT]")
                 .build()
@@ -252,11 +232,7 @@ public class JabRefCLI {
             Option
                 .builder()
                 .longOpt("importToOpen")
-                .desc(
-                    Localization.lang(
-                        "Same as --import, but will be imported to the opened tab"
-                    )
-                )
+                .desc(Localization.lang("Same as --import, but will be imported to the opened tab"))
                 .hasArg()
                 .argName("FILE[,FORMAT]")
                 .build()
@@ -397,16 +373,12 @@ public class JabRefCLI {
                 .desc(
                     String.format(
                         "%s: '%s'",
-                        Localization.lang(
-                            "Write BibTeXEntry as XMP metadata to PDF."
-                        ),
+                        Localization.lang("Write BibTeXEntry as XMP metadata to PDF."),
                         "-w pathToMyOwnPaper.pdf"
                     )
                 )
                 .hasArg()
-                .argName(
-                    "CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all"
-                )
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build()
         );
 
@@ -422,9 +394,7 @@ public class JabRefCLI {
                     )
                 )
                 .hasArg()
-                .argName(
-                    "CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all"
-                )
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build()
         );
 
@@ -435,16 +405,12 @@ public class JabRefCLI {
                 .desc(
                     String.format(
                         "%s: '%s'",
-                        Localization.lang(
-                            "Write BibTeXEntry as metadata to PDF."
-                        ),
+                        Localization.lang("Write BibTeXEntry as metadata to PDF."),
                         "-w pathToMyOwnPaper.pdf"
                     )
                 )
                 .hasArg()
-                .argName(
-                    "CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all"
-                )
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build()
         );
 
@@ -468,9 +434,7 @@ public class JabRefCLI {
             .stream()
             .map(format -> new Pair<>(format.getName(), format.getId()))
             .toList();
-        String importFormatsIntro = Localization.lang(
-            "Available import formats"
-        );
+        String importFormatsIntro = Localization.lang("Available import formats");
         String importFormatsList = String.format(
             "%s:%n%s%n",
             importFormatsIntro,
@@ -523,9 +487,7 @@ public class JabRefCLI {
 
         int maxLength = table
             .stream()
-            .mapToInt(pair ->
-                Objects.requireNonNullElse(pair.getKey(), "").length()
-            )
+            .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
             .max()
             .orElse(0);
 
@@ -547,10 +509,7 @@ public class JabRefCLI {
     /**
      * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
      */
-    protected static String wrapStringList(
-        List<String> list,
-        int firstLineIndentation
-    ) {
+    protected static String wrapStringList(List<String> list, int firstLineIndentation) {
         StringBuilder builder = new StringBuilder();
         int lastBreak = -firstLineIndentation;
 

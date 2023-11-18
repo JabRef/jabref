@@ -38,9 +38,7 @@ public class SaveAction extends SimpleCommand {
         this.preferencesService = preferencesService;
 
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
-            this.executable.bind(
-                    ActionHelper.needsEntriesSelected(stateManager)
-                );
+            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
         } else {
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
         }

@@ -9,9 +9,7 @@ import org.jabref.logic.preview.PreviewLayout;
  */
 public class DragAndDropDataFormats {
 
-    public static final DataFormat FIELD = new DataFormat(
-        "dnd/org.jabref.model.entry.field.Field"
-    );
+    public static final DataFormat FIELD = new DataFormat("dnd/org.jabref.model.entry.field.Field");
     public static final DataFormat GROUP = new DataFormat(
         "dnd/org.jabref.model.groups.GroupTreeNode"
     );
@@ -26,6 +24,7 @@ public class DragAndDropDataFormats {
     );
 
     @SuppressWarnings("unchecked")
-    public static final Class<List<PreviewLayout>> PREVIEWLAYOUT_LIST_CLASS =
-        (Class<List<PreviewLayout>>) (Class<?>) List.class;
+    public static final Class<List<PreviewLayout>> PREVIEWLAYOUT_LIST_CLASS = (Class<
+            List<PreviewLayout>
+        >) (Class<?>) List.class;
 }

@@ -54,21 +54,9 @@ public class MoveFieldValueAction extends SimpleCommand {
                     entry.setField(toField, fromFieldValue);
                     entry.setField(fromField, "");
 
+                    edits.addEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
                     edits.addEdit(
-                        new UndoableFieldChange(
-                            entry,
-                            fromField,
-                            fromFieldValue,
-                            null
-                        )
-                    );
-                    edits.addEdit(
-                        new UndoableFieldChange(
-                            entry,
-                            toField,
-                            toFieldValue,
-                            fromFieldValue
-                        )
+                        new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue)
                     );
                     affectedEntriesCount++;
                 }

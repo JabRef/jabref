@@ -19,10 +19,7 @@ public class AuxParserResultViewModel {
      */
     public String getInformation(boolean includeMissingEntries) {
         String missingEntries = "";
-        if (
-            includeMissingEntries &&
-            (this.auxParserResult.getUnresolvedKeysCount() > 0)
-        ) {
+        if (includeMissingEntries && (this.auxParserResult.getUnresolvedKeysCount() > 0)) {
             missingEntries =
                 this.auxParserResult.getUnresolvedKeys()
                     .stream()

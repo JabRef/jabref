@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class PreviewWithSourceTab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PreviewWithSourceTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewWithSourceTab.class);
 
     public TabPane getPreviewWithSourceTab(
         BibEntry entry,
@@ -53,9 +51,7 @@ public class PreviewWithSourceTab {
         String label
     ) {
         previewViewer.setLayout(
-            preferencesService
-                .getPreviewPreferences()
-                .getSelectedPreviewLayout()
+            preferencesService.getPreviewPreferences().getSelectedPreviewLayout()
         );
         previewViewer.setEntry(entry);
 
@@ -88,10 +84,7 @@ public class PreviewWithSourceTab {
         }
         codeArea.setEditable(false);
         Tab codeTab = new Tab(
-            Localization.lang(
-                "%0 source",
-                bibDatabaseContext.getMode().getFormattedName()
-            ),
+            Localization.lang("%0 source", bibDatabaseContext.getMode().getFormattedName()),
             codeArea
         );
 
@@ -107,11 +100,8 @@ public class PreviewWithSourceTab {
     ) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(
-            fieldPreferences
-        );
-        new BibEntryWriter(fieldWriter, entryTypesManager)
-            .write(entry, bibWriter, type);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
 }

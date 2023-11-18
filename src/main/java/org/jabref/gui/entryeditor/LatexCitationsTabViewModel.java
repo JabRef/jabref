@@ -39,9 +39,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         ERROR,
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        LatexCitationsTabViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;
@@ -69,15 +67,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             new SimpleObjectProperty<>(
                 databaseContext
                     .getMetaData()
-                    .getLatexFileDirectory(
-                        preferencesService.getFilePreferences().getUserAndHost()
-                    )
+                    .getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                     .orElse(
                         FileUtil.getInitialDirectory(
                             databaseContext,
-                            preferencesService
-                                .getFilePreferences()
-                                .getWorkingDirectory()
+                            preferencesService.getFilePreferences().getWorkingDirectory()
                         )
                     )
             );
@@ -96,9 +90,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             startSearch(citeKey.get());
         } else {
             searchError.set(
-                Localization.lang(
-                    "Selected entry does not have an associated citation key."
-                )
+                Localization.lang("Selected entry does not have an associated citation key.")
             );
             status.set(Status.ERROR);
         }
@@ -127,11 +119,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .onRunning(() -> status.set(Status.IN_PROGRESS))
                 .onSuccess(result -> {
                     citationList.setAll(result);
-                    status.set(
-                        citationList.isEmpty()
-                            ? Status.NO_RESULTS
-                            : Status.CITATIONS_FOUND
-                    );
+                    status.set(citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND);
                 })
                 .onFailure(error -> {
                     searchError.set(error.getMessage());
@@ -141,11 +129,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private void cancelSearch() {
-        if (
-            searchTask == null ||
-            searchTask.isCancelled() ||
-            searchTask.isDone()
-        ) {
+        if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {
             return;
         }
 
@@ -153,34 +137,24 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    private Collection<Citation> searchAndParse(String citeKey)
-        throws IOException {
+    private Collection<Citation> searchAndParse(String citeKey) throws IOException {
         // we need to check whether the user meanwhile set the LaTeX file directory or the database changed locations
         Path newDirectory = databaseContext
             .getMetaData()
-            .getLatexFileDirectory(
-                preferencesService.getFilePreferences().getUserAndHost()
-            )
+            .getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
             .orElse(
                 FileUtil.getInitialDirectory(
                     databaseContext,
-                    preferencesService
-                        .getFilePreferences()
-                        .getWorkingDirectory()
+                    preferencesService.getFilePreferences().getWorkingDirectory()
                 )
             );
 
-        if (
-            latexParserResult == null || !newDirectory.equals(directory.get())
-        ) {
+        if (latexParserResult == null || !newDirectory.equals(directory.get())) {
             directory.set(newDirectory);
 
             if (!newDirectory.toFile().exists()) {
                 throw new IOException(
-                    String.format(
-                        "Current search directory does not exist: %s",
-                        newDirectory
-                    )
+                    String.format("Current search directory does not exist: %s", newDirectory)
                 );
             }
 
@@ -221,9 +195,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 databaseContext
                     .getMetaData()
                     .setLatexFileDirectory(
-                        preferencesService
-                            .getFilePreferences()
-                            .getUserAndHost(),
+                        preferencesService.getFilePreferences().getUserAndHost(),
                         selectedDirectory.toAbsolutePath()
                     )
             );
@@ -232,8 +204,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     public boolean shouldShow() {
-        return preferencesService
-            .getEntryEditorPreferences()
-            .shouldShowLatexCitationsTab();
+        return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
     }
 }

@@ -115,12 +115,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchInformationByIdentifierButton.setTooltip(
-            new Tooltip(
-                Localization.lang(
-                    "Get bibliographic data from %0",
-                    field.getDisplayName()
-                )
-            )
+            new Tooltip(Localization.lang("Get bibliographic data from %0", field.getDisplayName()))
         );
         lookupIdentifierButton.setTooltip(
             new Tooltip(Localization.lang("Look up %0", field.getDisplayName()))
@@ -128,21 +123,14 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         if (field.equals(DOI)) {
             textArea.initContextMenu(
-                EditorMenus.getDOIMenu(
-                    textArea,
-                    dialogService,
-                    preferencesService
-                )
+                EditorMenus.getDOIMenu(textArea, dialogService, preferencesService)
             );
         } else {
             textArea.initContextMenu(new DefaultMenu(textArea));
         }
 
         new EditorValidator(preferencesService)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textArea
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {

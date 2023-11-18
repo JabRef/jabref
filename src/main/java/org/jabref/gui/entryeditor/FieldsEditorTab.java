@@ -79,25 +79,16 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.preferences = Objects.requireNonNull(preferences);
         this.themeManager = themeManager;
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.journalAbbreviationRepository =
-            Objects.requireNonNull(journalAbbreviationRepository);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.stateManager = stateManager;
         this.indexingTaskManager = indexingTaskManager;
     }
 
-    private static void addColumn(
-        GridPane gridPane,
-        int columnIndex,
-        List<Label> nodes
-    ) {
+    private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
         gridPane.addColumn(columnIndex, nodes.toArray(new Node[0]));
     }
 
-    private static void addColumn(
-        GridPane gridPane,
-        int columnIndex,
-        Stream<Parent> nodes
-    ) {
+    private static void addColumn(GridPane gridPane, int columnIndex, Stream<Parent> nodes) {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
@@ -148,11 +139,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             addColumn(
                 gridPane,
                 1,
-                editors
-                    .values()
-                    .stream()
-                    .map(FieldEditorFX::getNode)
-                    .limit(rows)
+                editors.values().stream().map(FieldEditorFX::getNode).limit(rows)
             );
             addColumn(
                 gridPane,
@@ -174,15 +161,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             setCompressedRowLayout(gridPane, rows);
         } else {
             addColumn(gridPane, 0, labels);
-            addColumn(
-                gridPane,
-                1,
-                editors.values().stream().map(FieldEditorFX::getNode)
-            );
+            addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
 
-            gridPane
-                .getColumnConstraints()
-                .addAll(columnDoNotContract, columnExpand);
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
             setRegularRowLayout(gridPane);
         }
@@ -199,9 +180,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             RowConstraints rowExpand = new RowConstraints();
             rowExpand.setVgrow(Priority.ALWAYS);
             rowExpand.setValignment(VPos.TOP);
-            rowExpand.setPercentHeight(
-                (100 * editors.get(field).getWeight()) / totalWeight
-            );
+            rowExpand.setPercentHeight((100 * editors.get(field).getWeight()) / totalWeight);
             constraints.add(rowExpand);
         }
         gridPane.getRowConstraints().addAll(constraints);
@@ -287,9 +266,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     taskExecutor
                 );
             EasyBind.subscribe(
-                preferences
-                    .getPreviewPreferences()
-                    .showPreviewAsExtraTabProperty(),
+                preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 show -> {
                     if (show) {
                         container.getItems().remove(previewPanel);

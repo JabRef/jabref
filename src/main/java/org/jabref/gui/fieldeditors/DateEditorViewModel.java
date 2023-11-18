@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class DateEditorViewModel extends AbstractEditorViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        DateEditorViewModel.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DateEditorViewModel.class);
     private final DateTimeFormatter dateFormatter;
 
     public DateEditorViewModel(
@@ -55,10 +53,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                         return dateFormatter.parse(string);
                     } catch (DateTimeParseException exception) {
                         // We accept all kinds of dates (not just in the format specified)
-                        return Date
-                            .parse(string)
-                            .map(Date::toTemporalAccessor)
-                            .orElse(null);
+                        return Date.parse(string).map(Date::toTemporalAccessor).orElse(null);
                     }
                 } else {
                     return null;

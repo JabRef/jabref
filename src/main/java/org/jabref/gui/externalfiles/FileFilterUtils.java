@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileFilterUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        FileFilterUtils.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
 
     /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
@@ -119,10 +117,7 @@ public class FileFilterUtils {
      * Sorts a list of Path objects according to the last edited date
      * the order depends on the specified sorter type.
      */
-    public static List<Path> sortByDate(
-        List<Path> files,
-        ExternalFileSorter sortType
-    ) {
+    public static List<Path> sortByDate(List<Path> files, ExternalFileSorter sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         List<Path> sortedFiles =
             switch (sortType) {

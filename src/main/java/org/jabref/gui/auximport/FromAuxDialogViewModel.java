@@ -30,16 +30,15 @@ import org.jabref.preferences.PreferencesService;
 
 public class FromAuxDialogViewModel {
 
-    private final BooleanProperty parseFailedProperty =
-        new SimpleBooleanProperty(false);
+    private final BooleanProperty parseFailedProperty = new SimpleBooleanProperty(false);
     private final StringProperty auxFileProperty = new SimpleStringProperty();
-    private final StringProperty statusTextProperty =
-        new SimpleStringProperty();
+    private final StringProperty statusTextProperty = new SimpleStringProperty();
     private final ListProperty<String> notFoundList = new SimpleListProperty<>(
         FXCollections.observableArrayList()
     );
-    private final ListProperty<BibDatabaseContext> librariesProperty =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<BibDatabaseContext> librariesProperty = new SimpleListProperty<>(
+        FXCollections.observableArrayList()
+    );
     private final ObjectProperty<BibDatabaseContext> selectedLibraryProperty =
         new SimpleObjectProperty<>();
 
@@ -62,9 +61,7 @@ public class FromAuxDialogViewModel {
         this.stateManager = stateManager;
 
         librariesProperty.setAll(stateManager.getOpenDatabases());
-        selectedLibraryProperty.set(
-            tabContainer.getCurrentLibraryTab().getBibDatabaseContext()
-        );
+        selectedLibraryProperty.set(tabContainer.getCurrentLibraryTab().getBibDatabaseContext());
         EasyBind.listen(
             selectedLibraryProperty,
             (obs, oldValue, newValue) -> {
@@ -97,51 +94,35 @@ public class FromAuxDialogViewModel {
     }
 
     public void browse() {
-        FileDialogConfiguration fileDialogConfiguration =
-            new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.AUX)
-                .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(
-                    preferencesService
-                        .getFilePreferences()
-                        .getWorkingDirectory()
-                )
-                .build();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(StandardFileType.AUX)
+            .withDefaultExtension(StandardFileType.AUX)
+            .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+            .build();
         dialogService
             .showFileOpenDialog(fileDialogConfiguration)
-            .ifPresent(file ->
-                auxFileProperty.setValue(file.toAbsolutePath().toString())
-            );
+            .ifPresent(file -> auxFileProperty.setValue(file.toAbsolutePath().toString()));
     }
 
     public void parse() {
         parseFailedProperty.set(false);
         notFoundList.clear();
         statusTextProperty.setValue("");
-        BibDatabase referenceDatabase = selectedLibraryProperty
-            .get()
-            .getDatabase();
+        BibDatabase referenceDatabase = selectedLibraryProperty.get().getDatabase();
         String auxName = auxFileProperty.get();
 
-        if (
-            (auxName != null) &&
-            (referenceDatabase != null) &&
-            !auxName.isEmpty()
-        ) {
+        if ((auxName != null) && (referenceDatabase != null) && !auxName.isEmpty()) {
             AuxParser auxParser = new DefaultAuxParser(referenceDatabase);
             auxParserResult = auxParser.parse(Path.of(auxName));
             notFoundList.setAll(auxParserResult.getUnresolvedKeys());
             statusTextProperty.set(
-                new AuxParserResultViewModel(auxParserResult)
-                    .getInformation(false)
+                new AuxParserResultViewModel(auxParserResult).getInformation(false)
             );
 
             if (!auxParserResult.getGeneratedBibDatabase().hasEntries()) {
                 // The generated database contains no entries -> no active generate-button
                 statusTextProperty.set(
-                    statusTextProperty.get() +
-                    "\n" +
-                    Localization.lang("empty library")
+                    statusTextProperty.get() + "\n" + Localization.lang("empty library")
                 );
                 parseFailedProperty.set(true);
             }

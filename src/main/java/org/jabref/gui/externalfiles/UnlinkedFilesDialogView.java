@@ -163,12 +163,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         this.bibDatabaseContext =
             stateManager
                 .getActiveDatabase()
-                .orElseThrow(() -> new NullPointerException("No active library")
-                );
+                .orElseThrow(() -> new NullPointerException("No active library"));
 
-        progressDisplay
-            .progressProperty()
-            .bind(viewModel.progressValueProperty());
+        progressDisplay.progressProperty().bind(viewModel.progressValueProperty());
         progressText.textProperty().bind(viewModel.progressTextProperty());
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
@@ -203,9 +200,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void initDirectorySelection() {
         validationVisualizer.setDecoration(new IconValidationDecorator());
 
-        directoryPathField
-            .textProperty()
-            .bindBidirectional(viewModel.directoryPathProperty());
+        directoryPathField.textProperty().bindBidirectional(viewModel.directoryPathProperty());
         Platform.runLater(() ->
             validationVisualizer.initVisualization(
                 viewModel.directoryPathValidationStatus(),
@@ -218,32 +213,24 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             .withIcon(FileExtensionViewModel::getIcon)
             .install(fileTypeCombo);
         fileTypeCombo.setItems(viewModel.getFileFilters());
-        fileTypeCombo
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedExtensionProperty());
+        fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());
         fileTypeCombo.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<DateRange>()
             .withText(DateRange::getDateRange)
             .install(fileDateCombo);
         fileDateCombo.setItems(viewModel.getDateFilters());
-        fileDateCombo
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedDateProperty());
+        fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());
         fileDateCombo.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<ExternalFileSorter>()
             .withText(ExternalFileSorter::getSorter)
             .install(fileSortCombo);
         fileSortCombo.setItems(viewModel.getSorters());
-        fileSortCombo
-            .valueProperty()
-            .bindBidirectional(viewModel.selectedSortProperty());
+        fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
         fileSortCombo.getSelectionModel().selectFirst();
 
         directoryPathField.setText(
             bibDatabaseContext
-                .getFirstExistingFileDir(
-                    preferencesService.getFilePreferences()
-                )
+                .getFirstExistingFileDir(preferencesService.getFilePreferences())
                 .map(Path::toString)
                 .orElse("")
         );
@@ -256,12 +243,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         unlinkedFilesList
             .maxHeightProperty()
-            .bind(
-                ((Control) filePane.contentProperty().get()).heightProperty()
-            );
-        unlinkedFilesList
-            .getSelectionModel()
-            .setSelectionMode(SelectionMode.MULTIPLE);
+            .bind(((Control) filePane.contentProperty().get()).heightProperty());
+        unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList
             .rootProperty()
             .bind(
@@ -285,9 +268,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             unlinkedFilesList.rootProperty(),
             root -> {
                 if (root != null) {
-                    ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(
-                            true
-                        );
+                    ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
                     root.setExpanded(true);
                     EasyBind.bindContent(
                         viewModel.checkedFileListProperty(),
@@ -310,8 +291,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             .withTooltip(item -> item)
             .install(colFile);
 
-        colMessage.setCellValueFactory(cellData -> cellData.getValue().message()
-        );
+        colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
             .withText(item -> item)
             .withTooltip(item -> item)
@@ -319,10 +299,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
         colStatus.setCellFactory(
-            new ValueTableCellFactory<
-                ImportFilesResultItemViewModel,
-                JabRefIcon
-            >()
+            new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>()
                 .withGraphic(JabRefIcon::getGraphicNode)
         );
         importResultTable.setColumnResizePolicy(param -> true);
@@ -343,12 +320,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             .bind(
                 viewModel
                     .taskActiveProperty()
-                    .or(
-                        viewModel
-                            .directoryPathValidationStatus()
-                            .validProperty()
-                            .not()
-                    )
+                    .or(viewModel.directoryPathValidationStatus().validProperty().not())
             );
     }
 
@@ -386,9 +358,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     private ContextMenu createSearchContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(
-            preferencesService.getKeyBindingRepository()
-        );
+        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
 
         contextMenu
             .getItems()
@@ -440,17 +410,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         public void execute() {
             switch (command) {
                 case SELECT_ALL -> unlinkedFilesList.getCheckModel().checkAll();
-                case UNSELECT_ALL -> unlinkedFilesList
-                    .getCheckModel()
-                    .clearChecks();
-                case EXPAND_ALL -> expandTree(
-                    unlinkedFilesList.getRoot(),
-                    true
-                );
-                case COLLAPSE_ALL -> expandTree(
-                    unlinkedFilesList.getRoot(),
-                    false
-                );
+                case UNSELECT_ALL -> unlinkedFilesList.getCheckModel().clearChecks();
+                case EXPAND_ALL -> expandTree(unlinkedFilesList.getRoot(), true);
+                case COLLAPSE_ALL -> expandTree(unlinkedFilesList.getRoot(), false);
             }
         }
     }

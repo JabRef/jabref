@@ -69,9 +69,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
             )
         );
         buttonParse.setOnAction(event -> viewModel.startParsing());
-        buttonParse
-            .disableProperty()
-            .bind(viewModel.inputTextProperty().isEmpty());
+        buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
     }
 
     @FXML

@@ -41,13 +41,9 @@ public class Linux extends NativeDesktop {
                 Desktop.getDesktop().open(file);
                 LoggerFactory
                     .getLogger(Linux.class)
-                    .debug(
-                        "Open file in default application with Desktop integration"
-                    );
+                    .debug("Open file in default application with Desktop integration");
             } catch (IllegalArgumentException e) {
-                LoggerFactory
-                    .getLogger(Linux.class)
-                    .debug("Fail back to xdg-open");
+                LoggerFactory.getLogger(Linux.class).debug("Fail back to xdg-open");
                 try {
                     String[] cmd = { "xdg-open", filePath };
                     Runtime.getRuntime().exec(cmd);
@@ -65,26 +61,17 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public void openFile(
-        String filePath,
-        String fileType,
-        FilePreferences filePreferences
-    ) throws IOException {
-        Optional<ExternalFileType> type =
-            ExternalFileTypes.getExternalFileTypeByExt(
-                fileType,
-                filePreferences
-            );
+    public void openFile(String filePath, String fileType, FilePreferences filePreferences)
+        throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(
+            fileType,
+            filePreferences
+        );
         String viewer;
 
-        if (
-            type.isPresent() && !type.get().getOpenWithApplication().isEmpty()
-        ) {
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             viewer = type.get().getOpenWithApplication();
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                viewer,
-                filePath
-            );
+            ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(
                 process.getInputStream(),
@@ -103,8 +90,7 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public void openFileWithApplication(String filePath, String application)
-        throws IOException {
+    public void openFileWithApplication(String filePath, String application) throws IOException {
         // Use the given app if specified, and the universal "xdg-open" otherwise:
         String[] openWith;
         if ((application != null) && !application.isEmpty()) {
@@ -143,10 +129,7 @@ public class Linux extends NativeDesktop {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
             if (desktopSession.contains("gnome")) {
                 cmd = new String[] { "nautilus", "--select", absoluteFilePath };
-            } else if (
-                desktopSession.contains("kde") ||
-                desktopSession.contains("plasma")
-            ) {
+            } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
                 cmd = new String[] { "dolphin", "--select", absoluteFilePath };
             } else if (desktopSession.contains("mate")) {
                 cmd = new String[] { "caja", "--select", absoluteFilePath };
@@ -158,10 +141,7 @@ public class Linux extends NativeDesktop {
         }
         LoggerFactory
             .getLogger(Linux.class)
-            .debug(
-                "Opening folder and selecting file using {}",
-                String.join(" ", cmd)
-            );
+            .debug("Opening folder and selecting file using {}", String.join(" ", cmd));
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         Process process = processBuilder.start();
 
@@ -179,8 +159,7 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath, DialogService dialogService)
-        throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         if (!Files.exists(Path.of(ETC_ALTERNATIVES_X_TERMINAL_EMULATOR))) {
             dialogService.showErrorDialogAndWait(
                 Localization.lang(
@@ -204,26 +183,14 @@ public class Linux extends NativeDesktop {
         ) {
             String emulatorName = reader.readLine();
             if (emulatorName != null) {
-                emulatorName =
-                    emulatorName.substring(
-                        emulatorName.lastIndexOf(File.separator) + 1
-                    );
+                emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
 
                 String[] cmd;
                 if (emulatorName.contains("gnome")) {
-                    cmd =
-                        new String[] {
-                            "gnome-terminal",
-                            "--working-directory",
-                            absolutePath,
-                        };
+                    cmd = new String[] { "gnome-terminal", "--working-directory", absolutePath };
                 } else if (emulatorName.contains("xfce4")) {
                     // xfce4-terminal requires "--working-directory=<directory>" format (one arg)
-                    cmd =
-                        new String[] {
-                            "xfce4-terminal",
-                            "--working-directory=" + absolutePath,
-                        };
+                    cmd = new String[] { "xfce4-terminal", "--working-directory=" + absolutePath };
                 } else if (emulatorName.contains("konsole")) {
                     cmd = new String[] { "konsole", "--workdir", absolutePath };
                 } else {
@@ -273,20 +240,14 @@ public class Linux extends NativeDesktop {
         // Make use of xdg-user-dirs
         // See https://www.freedesktop.org/wiki/Software/xdg-user-dirs/ for details
         try {
-            Process process = new ProcessBuilder("xdg-user-dir", "DOCUMENTS")
-                .start(); // Package name with 's', command without
+            Process process = new ProcessBuilder("xdg-user-dir", "DOCUMENTS").start(); // Package name with 's', command without
             List<String> strings = new BufferedReader(
-                new InputStreamReader(
-                    process.getInputStream(),
-                    StandardCharsets.UTF_8
-                )
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
             )
                 .lines()
                 .toList();
             if (strings.isEmpty()) {
-                LoggerFactory
-                    .getLogger(Linux.class)
-                    .error("xdg-user-dir returned nothing");
+                LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned nothing");
                 return getUserDirectory();
             }
             String documentsDirectory = strings.get(0);
@@ -294,20 +255,13 @@ public class Linux extends NativeDesktop {
             if (!Files.exists(documentsPath)) {
                 LoggerFactory
                     .getLogger(Linux.class)
-                    .error(
-                        "xdg-user-dir returned non-existant directory {}",
-                        documentsDirectory
-                    );
+                    .error("xdg-user-dir returned non-existant directory {}", documentsDirectory);
                 return getUserDirectory();
             }
-            LoggerFactory
-                .getLogger(Linux.class)
-                .debug("Got documents path {}", documentsPath);
+            LoggerFactory.getLogger(Linux.class).debug("Got documents path {}", documentsPath);
             return documentsPath;
         } catch (IOException e) {
-            LoggerFactory
-                .getLogger(Linux.class)
-                .error("Error while executing xdg-user-dir", e);
+            LoggerFactory.getLogger(Linux.class).error("Error while executing xdg-user-dir", e);
         }
 
         // Fallback

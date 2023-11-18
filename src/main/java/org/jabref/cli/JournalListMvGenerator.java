@@ -19,16 +19,10 @@ public class JournalListMvGenerator {
     public static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
-        Path abbreviationsDirectory = Path.of(
-            "buildres",
-            "abbrv.jabref.org",
-            "journals"
-        );
+        Path abbreviationsDirectory = Path.of("buildres", "abbrv.jabref.org", "journals");
         if (!Files.exists(abbreviationsDirectory)) {
             System.out.println(
-                "Path " +
-                abbreviationsDirectory.toAbsolutePath() +
-                " does not exist"
+                "Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist"
             );
             System.exit(0);
         }
@@ -62,9 +56,7 @@ public class JournalListMvGenerator {
                 .compressHigh()
                 .open()
         ) {
-            MVMap<String, Abbreviation> fullToAbbreviation = store.openMap(
-                "FullToAbbreviation"
-            );
+            MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
             stream.forEach(
                 Unchecked.consumer(path -> {
                     String fileName = path.getFileName().toString();
@@ -75,27 +67,23 @@ public class JournalListMvGenerator {
                     } else {
                         System.out.println("...");
                         Collection<Abbreviation> abbreviations =
-                            JournalAbbreviationLoader.readAbbreviationsFromCsvFile(
-                                path
-                            );
-                        Map<String, Abbreviation> abbreviationMap =
-                            abbreviations
-                                .stream()
-                                .collect(
-                                    Collectors.toMap(
-                                        Abbreviation::getName,
-                                        abbreviation -> abbreviation,
-                                        (abbreviation1, abbreviation2) -> {
-                                            if (verbose) {
-                                                System.out.println(
-                                                    "Double entry " +
-                                                    abbreviation1.getName()
-                                                );
-                                            }
-                                            return abbreviation2;
+                            JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path);
+                        Map<String, Abbreviation> abbreviationMap = abbreviations
+                            .stream()
+                            .collect(
+                                Collectors.toMap(
+                                    Abbreviation::getName,
+                                    abbreviation -> abbreviation,
+                                    (abbreviation1, abbreviation2) -> {
+                                        if (verbose) {
+                                            System.out.println(
+                                                "Double entry " + abbreviation1.getName()
+                                            );
                                         }
-                                    )
-                                );
+                                        return abbreviation2;
+                                    }
+                                )
+                            );
                         fullToAbbreviation.putAll(abbreviationMap);
                     }
                 })

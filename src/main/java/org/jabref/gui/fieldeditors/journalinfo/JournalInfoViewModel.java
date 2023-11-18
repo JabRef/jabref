@@ -18,8 +18,7 @@ public class JournalInfoViewModel extends AbstractViewModel {
 
     private final ReadOnlyStringWrapper title = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper country = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper categories =
-        new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper categories = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper publisher = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper scimagoId = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper hIndex = new ReadOnlyStringWrapper();
@@ -28,28 +27,22 @@ public class JournalInfoViewModel extends AbstractViewModel {
         FXCollections.observableArrayList();
     private final ObservableList<XYChart.Series<String, Double>> snipData =
         FXCollections.observableArrayList();
-    private final ObservableList<
-        XYChart.Series<String, Double>
-    > citableDocsPrevious3YearsData = FXCollections.observableArrayList();
-    private final ObservableList<
-        XYChart.Series<String, Double>
-    > citesOutgoingData = FXCollections.observableArrayList();
-    private final ObservableList<
-        XYChart.Series<String, Double>
-    > citesOutgoingPerDocData = FXCollections.observableArrayList();
-    private final ObservableList<
-        XYChart.Series<String, Double>
-    > citesIncomingByRecentlyPublishedData =
+    private final ObservableList<XYChart.Series<String, Double>> citableDocsPrevious3YearsData =
+        FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> citesOutgoingData =
+        FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> citesOutgoingPerDocData =
         FXCollections.observableArrayList();
     private final ObservableList<
         XYChart.Series<String, Double>
-    > docsThisYearData = FXCollections.observableArrayList();
+    > citesIncomingByRecentlyPublishedData = FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> docsThisYearData =
+        FXCollections.observableArrayList();
 
     public void populateJournalInformation(String issn, String journalName)
         throws FetcherException {
-        Optional<JournalInformation> journalInformationOptional =
-            new JournalInformationFetcher()
-                .getJournalInformation(issn, journalName);
+        Optional<JournalInformation> journalInformationOptional = new JournalInformationFetcher()
+            .getJournalInformation(issn, journalName);
 
         journalInformationOptional.ifPresent(journalInformation -> {
             setTitle(journalInformation.title());
@@ -64,20 +57,12 @@ public class JournalInfoViewModel extends AbstractViewModel {
             citableDocsPrevious3YearsData.add(
                 convertToSeries(journalInformation.citableDocsPrevious3Years())
             );
-            citesOutgoingData.add(
-                convertToSeries(journalInformation.citesOutgoing())
-            );
-            citesOutgoingPerDocData.add(
-                convertToSeries(journalInformation.citesOutgoingPerDoc())
-            );
+            citesOutgoingData.add(convertToSeries(journalInformation.citesOutgoing()));
+            citesOutgoingPerDocData.add(convertToSeries(journalInformation.citesOutgoingPerDoc()));
             citesIncomingByRecentlyPublishedData.add(
-                convertToSeries(
-                    journalInformation.citesIncomingByRecentlyPublished()
-                )
+                convertToSeries(journalInformation.citesIncomingByRecentlyPublished())
             );
-            docsThisYearData.add(
-                convertToSeries(journalInformation.docsThisYear())
-            );
+            docsThisYearData.add(convertToSeries(journalInformation.docsThisYear()));
         });
     }
 
@@ -173,21 +158,15 @@ public class JournalInfoViewModel extends AbstractViewModel {
         return snipData;
     }
 
-    public ObservableList<
-        XYChart.Series<String, Double>
-    > getCitableDocsPrevious3YearsData() {
+    public ObservableList<XYChart.Series<String, Double>> getCitableDocsPrevious3YearsData() {
         return citableDocsPrevious3YearsData;
     }
 
-    public ObservableList<
-        XYChart.Series<String, Double>
-    > getCitesOutgoingData() {
+    public ObservableList<XYChart.Series<String, Double>> getCitesOutgoingData() {
         return citesOutgoingData;
     }
 
-    public ObservableList<
-        XYChart.Series<String, Double>
-    > getCitesOutgoingPerDocData() {
+    public ObservableList<XYChart.Series<String, Double>> getCitesOutgoingPerDocData() {
         return citesOutgoingPerDocData;
     }
 
@@ -197,37 +176,27 @@ public class JournalInfoViewModel extends AbstractViewModel {
         return citesIncomingByRecentlyPublishedData;
     }
 
-    public ObservableList<
-        XYChart.Series<String, Double>
-    > getDocsThisYearData() {
+    public ObservableList<XYChart.Series<String, Double>> getDocsThisYearData() {
         return docsThisYearData;
     }
 
-    public XYChart.Series<String, Double> convertToSeries(
-        List<Pair<Integer, Double>> data
-    ) {
+    public XYChart.Series<String, Double> convertToSeries(List<Pair<Integer, Double>> data) {
         XYChart.Series<String, Double> series = new XYChart.Series<>();
         data
             .stream()
-            .map(pair ->
-                new XYChart.Data<>(pair.getKey().toString(), pair.getValue())
-            )
+            .map(pair -> new XYChart.Data<>(pair.getKey().toString(), pair.getValue()))
             .forEach(series.getData()::add);
         return series;
     }
 
-    private static String getFormattedCategories(
-        JournalInformation journalInformation
-    ) {
+    private static String getFormattedCategories(JournalInformation journalInformation) {
         return Arrays
             .stream(journalInformation.categories().split(","))
             .map(String::trim)
             .collect(Collectors.joining("\n"));
     }
 
-    private static String getFormattedPublisher(
-        JournalInformation journalInformation
-    ) {
+    private static String getFormattedPublisher(JournalInformation journalInformation) {
         StringBuilder publisher = new StringBuilder();
         publisher.append(journalInformation.publisher());
         String country = journalInformation.country();

@@ -28,20 +28,13 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         final UndoManager undoManager
     ) {
         this.viewModel =
-            new SimpleEditorViewModel(
-                field,
-                suggestionProvider,
-                fieldCheckers,
-                undoManager
-            );
+            new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager);
 
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
         textInput.textProperty().bindBidirectional(viewModel.textProperty());
-        ((ContextMenuAddable) textInput).initContextMenu(
-                new DefaultMenu(textInput)
-            );
+        ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput));
         this.getChildren().add(textInput);
 
         if (!isMultiLine) {
@@ -51,19 +44,14 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                     viewModel::complete,
                     viewModel.getAutoCompletionStrategy()
                 );
-            if (
-                suggestionProvider instanceof ContentSelectorSuggestionProvider
-            ) {
+            if (suggestionProvider instanceof ContentSelectorSuggestionProvider) {
                 // If content selector values are present, then we want to show the auto complete suggestions immediately on focus
                 autoCompleter.setShowOnFocus(true);
             }
         }
 
         new EditorValidator(preferences)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textInput
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
     public SimpleEditor(
@@ -73,14 +61,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         final PreferencesService preferences,
         UndoManager undoManager
     ) {
-        this(
-            field,
-            suggestionProvider,
-            fieldCheckers,
-            preferences,
-            false,
-            undoManager
-        );
+        this(field, suggestionProvider, fieldCheckers, preferences, false, undoManager);
     }
 
     @Override

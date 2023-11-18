@@ -38,12 +38,9 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
 
-        decoratedStringProperty =
-            new UiThreadStringProperty(viewModel.textProperty());
+        decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
         textInput.textProperty().bindBidirectional(decoratedStringProperty);
-        ((ContextMenuAddable) textInput).initContextMenu(
-                EditorMenus.getNameMenu(textInput)
-            );
+        ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput));
         this.getChildren().add(textInput);
 
         AutoCompletionTextInputBinding.autoComplete(
@@ -54,10 +51,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
         );
 
         new EditorValidator(preferencesService)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textInput
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
     @Override

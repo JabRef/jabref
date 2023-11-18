@@ -39,9 +39,7 @@ import org.slf4j.LoggerFactory;
 public class RelatedArticlesTab extends EntryEditorTab {
 
     public static final String NAME = "Related articles";
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        RelatedArticlesTab.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -83,15 +81,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
             .onRunning(() -> progress.setVisible(true))
             .onSuccess(relatedArticles -> {
                 ImportCleanup cleanup = ImportCleanup.targeting(
-                    BibDatabaseModeDetection.inferMode(
-                        new BibDatabase(List.of(entry))
-                    )
+                    BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry)))
                 );
                 cleanup.doPostCleanup(relatedArticles);
                 progress.setVisible(false);
-                root
-                    .getChildren()
-                    .add(getRelatedArticleInfo(relatedArticles, fetcher));
+                root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
             })
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching from Mr. DLib", exception);
@@ -111,10 +105,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
      * @param list List of BibEntries of related articles
      * @return VBox of related article descriptions to be displayed in the Related Articles tab
      */
-    private ScrollPane getRelatedArticleInfo(
-        List<BibEntry> list,
-        MrDLibFetcher fetcher
-    ) {
+    private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
         VBox vBox = new VBox();
@@ -168,9 +159,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 }
             });
 
-            hBox
-                .getChildren()
-                .addAll(titleLink, journalText, authorsText, yearText);
+            hBox.getChildren().addAll(titleLink, journalText, authorsText, yearText);
             vBox.getChildren().add(hBox);
         }
         scrollPane.setContent(vBox);
@@ -189,9 +178,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vBox.setSpacing(20.0);
 
         Text descriptionText = new Text(
-            Localization.lang(
-                "No recommendations received from Mr. DLib for this entry."
-            )
+            Localization.lang("No recommendations received from Mr. DLib for this entry.")
         );
         descriptionText.getStyleClass().add("description");
         vBox.getChildren().add(descriptionText);
@@ -234,15 +221,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
         );
         line2.wrappingWidthProperty().bind(rootWidth);
         Text line3 = new Text(
-            Localization.lang(
-                "This setting may be changed in preferences at any time."
-            )
+            Localization.lang("This setting may be changed in preferences at any time.")
         );
         line3.wrappingWidthProperty().bind(rootWidth);
         Hyperlink mdlLink = new Hyperlink(
-            Localization.lang(
-                "Further information about Mr. DLib for JabRef users."
-            )
+            Localization.lang("Further information about Mr. DLib for JabRef users.")
         );
         mdlLink.setOnAction(event -> {
             try {
@@ -251,18 +234,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
                     preferencesService.getFilePreferences()
                 );
             } catch (IOException e) {
-                LOGGER.error(
-                    "Error opening the browser to Mr. DLib information page.",
-                    e
-                );
+                LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
                 dialogService.showErrorDialogAndWait(e);
             }
         });
         VBox vb = new VBox();
         CheckBox cbTitle = new CheckBox(
-            Localization.lang(
-                "Entry Title (Required to deliver recommendations.)"
-            )
+            Localization.lang("Entry Title (Required to deliver recommendations.)")
         );
         cbTitle.setSelected(true);
         cbTitle.setDisable(true);
@@ -288,14 +266,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 "Timezone (Provides for better recommendations by indicating the time of day the request is being made.)"
             )
         );
-        vb
-            .getChildren()
-            .addAll(cbTitle, cbVersion, cbLanguage, cbOS, cbTimezone);
+        vb.getChildren().addAll(cbTitle, cbVersion, cbLanguage, cbOS, cbTimezone);
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
-            MrDlibPreferences mrDlibPreferences =
-                preferencesService.getMrDlibPreferences();
+            MrDlibPreferences mrDlibPreferences = preferencesService.getMrDlibPreferences();
             mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
             mrDlibPreferences.setSendOs(cbOS.isSelected());
@@ -303,16 +278,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
             dialogService.showWarningDialogAndWait(
                 Localization.lang("Restart"),
-                Localization.lang(
-                    "Please restart JabRef for preferences to take effect."
-                )
+                Localization.lang("Please restart JabRef for preferences to take effect.")
             );
             setContent(getRelatedArticlesPane(entry));
         });
 
-        vbox
-            .getChildren()
-            .addAll(title, line1, line2, mdlLink, line3, vb, button);
+        vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, button);
         root.setContent(vbox);
 
         return root;
@@ -326,11 +297,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         // Ask for consent to send data to Mr. DLib on first time to tab
-        if (
-            preferencesService
-                .getMrDlibPreferences()
-                .shouldAcceptRecommendations()
-        ) {
+        if (preferencesService.getMrDlibPreferences().shouldAcceptRecommendations()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
             setContent(getPrivacyDialog(entry));

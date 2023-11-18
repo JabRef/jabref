@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public final class PreambleChange extends DatabaseChange {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        PreambleChange.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreambleChange.class);
 
     private final PreambleDiff preambleDiff;
 
@@ -31,9 +29,7 @@ public final class PreambleChange extends DatabaseChange {
 
     @Override
     public void applyChange(NamedCompound undoEdit) {
-        databaseContext
-            .getDatabase()
-            .setPreamble(preambleDiff.getNewPreamble());
+        databaseContext.getDatabase().setPreamble(preambleDiff.getNewPreamble());
         undoEdit.addEdit(
             new UndoablePreambleChange(
                 databaseContext.getDatabase(),

@@ -26,8 +26,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private StringProperty findStringProperty = new SimpleStringProperty();
     private StringProperty replaceStringProperty = new SimpleStringProperty();
     private StringProperty fieldStringProperty = new SimpleStringProperty();
-    private BooleanProperty allFieldReplaceProperty =
-        new SimpleBooleanProperty();
+    private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
     private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
     public ReplaceStringViewModel(LibraryTab libraryTab) {
@@ -42,9 +41,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
-        final NamedCompound compound = new NamedCompound(
-            Localization.lang("Replace string")
-        );
+        final NamedCompound compound = new NamedCompound(Localization.lang("Replace string"));
         int counter = 0;
         if (selOnly) {
             for (BibEntry bibEntry : this.panel.getSelectedEntries()) {
@@ -76,11 +73,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         return counter;
     }
 
-    private int replaceField(
-        BibEntry entry,
-        Field field,
-        NamedCompound compound
-    ) {
+    private int replaceField(BibEntry entry, Field field, NamedCompound compound) {
         if (!entry.hasField(field)) {
             return 0;
         }

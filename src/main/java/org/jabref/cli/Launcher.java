@@ -65,16 +65,10 @@ public class Launcher {
             Globals.entryTypesManager = entryTypesManager;
 
             // Initialize preferences
-            final JabRefPreferences preferences =
-                JabRefPreferences.getInstance();
+            final JabRefPreferences preferences = JabRefPreferences.getInstance();
 
             // Early exit in case another instance is already running
-            if (
-                !handleMultipleAppInstances(
-                    ARGUMENTS,
-                    preferences.getRemotePreferences()
-                )
-            ) {
+            if (!handleMultipleAppInstances(ARGUMENTS, preferences.getRemotePreferences())) {
                 return;
             }
 
@@ -88,8 +82,7 @@ public class Launcher {
             clearOldSearchIndices();
 
             try {
-                FileUpdateMonitor fileUpdateMonitor =
-                    Globals.getFileUpdateMonitor();
+                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
@@ -101,9 +94,7 @@ public class Launcher {
                 );
                 argumentProcessor.processArguments();
                 if (argumentProcessor.shouldShutDown()) {
-                    LOGGER.debug(
-                        "JabRef shut down after processing command line arguments"
-                    );
+                    LOGGER.debug("JabRef shut down after processing command line arguments");
                     // A clean shutdown takes 60s time
                     // We don't need the clean shutdown here
                     System.exit(0);
@@ -161,9 +152,7 @@ public class Launcher {
 
         configuration
             .entrySet()
-            .forEach(config ->
-                Configuration.set(config.getKey(), config.getValue())
-            );
+            .forEach(config -> Configuration.set(config.getKey(), config.getValue()));
         initializeLogger();
     }
 
@@ -177,9 +166,7 @@ public class Launcher {
     ) {
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
-            RemoteClient remoteClient = new RemoteClient(
-                remotePreferences.getPort()
-            );
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
                 // We are not alone, there is already a server out there, send command line
                 // arguments to other instance
@@ -192,9 +179,7 @@ public class Launcher {
                     );
                     return false;
                 } else {
-                    LOGGER.warn(
-                        "Could not communicate with other running JabRef instance."
-                    );
+                    LOGGER.warn("Could not communicate with other running JabRef instance.");
                 }
             }
         }
@@ -210,17 +195,12 @@ public class Launcher {
 
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader =
-            new ProtectedTermsLoader(
-                preferences.getProtectedTermsPreferences()
-            );
+            new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
         ProxyRegisterer.register(proxyPreferences);
-        if (
-            proxyPreferences.shouldUseProxy() &&
-            proxyPreferences.shouldUseAuthentication()
-        ) {
+        if (proxyPreferences.shouldUseProxy() && proxyPreferences.shouldUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
     }
@@ -232,9 +212,7 @@ public class Launcher {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = OS
-            .getNativeDesktop()
-            .getFulltextIndexBaseDirectory();
+        Path currentIndexPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {
@@ -251,10 +229,7 @@ public class Launcher {
                     path.toString().contains("lucene") &&
                     !path.equals(currentIndexPath)
                 ) {
-                    LOGGER.info(
-                        "Deleting out-of-date fulltext search index at {}.",
-                        path
-                    );
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files
                         .walk(path)
                         .sorted(Comparator.reverseOrder())

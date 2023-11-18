@@ -36,20 +36,13 @@ public class DatabaseChangeList {
     ) {
         List<DatabaseChange> changes = new ArrayList<>();
 
-        BibDatabaseDiff differences = BibDatabaseDiff.compare(
-            originalDatabase,
-            otherDatabase
-        );
+        BibDatabaseDiff differences = BibDatabaseDiff.compare(originalDatabase, otherDatabase);
 
         differences
             .getMetaDataDifferences()
             .ifPresent(diff -> {
                 changes.add(
-                    new MetadataChange(
-                        diff,
-                        originalDatabase,
-                        databaseChangeResolverFactory
-                    )
+                    new MetadataChange(diff, originalDatabase, databaseChangeResolverFactory)
                 );
                 diff
                     .getGroupDifferences()
@@ -67,33 +60,21 @@ public class DatabaseChangeList {
             .getPreambleDifferences()
             .ifPresent(diff ->
                 changes.add(
-                    new PreambleChange(
-                        diff,
-                        originalDatabase,
-                        databaseChangeResolverFactory
-                    )
+                    new PreambleChange(diff, originalDatabase, databaseChangeResolverFactory)
                 )
             );
         differences
             .getBibStringDifferences()
             .forEach(diff ->
                 changes.add(
-                    createBibStringDiff(
-                        originalDatabase,
-                        databaseChangeResolverFactory,
-                        diff
-                    )
+                    createBibStringDiff(originalDatabase, databaseChangeResolverFactory, diff)
                 )
             );
         differences
             .getEntryDifferences()
             .forEach(diff ->
                 changes.add(
-                    createBibEntryDiff(
-                        originalDatabase,
-                        databaseChangeResolverFactory,
-                        diff
-                    )
+                    createBibEntryDiff(originalDatabase, databaseChangeResolverFactory, diff)
                 )
             );
 
@@ -121,12 +102,7 @@ public class DatabaseChangeList {
             );
         }
 
-        if (
-            diff
-                .getOriginalString()
-                .getName()
-                .equals(diff.getNewString().getName())
-        ) {
+        if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {
             return new BibTexStringChange(
                 diff.getOriginalString(),
                 diff.getNewString(),

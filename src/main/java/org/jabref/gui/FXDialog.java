@@ -23,12 +23,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
  */
 public class FXDialog extends Alert {
 
-    public FXDialog(
-        AlertType type,
-        String title,
-        Image image,
-        boolean isModal
-    ) {
+    public FXDialog(AlertType type, String title, Image image, boolean isModal) {
         this(type, title, isModal);
         setDialogIcon(image);
     }
@@ -63,14 +58,8 @@ public class FXDialog extends Alert {
         dialogWindow
             .getScene()
             .setOnKeyPressed(event -> {
-                KeyBindingRepository keyBindingRepository =
-                    Globals.getKeyPrefs();
-                if (
-                    keyBindingRepository.checkKeyCombinationEquality(
-                        KeyBinding.CLOSE,
-                        event
-                    )
-                ) {
+                KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+                if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                     dialogWindow.close();
                 }
             });

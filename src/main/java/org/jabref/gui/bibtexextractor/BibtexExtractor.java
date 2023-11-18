@@ -76,14 +76,9 @@ public class BibtexExtractor {
     }
 
     private BibEntry generateEntity(String input) {
-        EntryType type = isArticle
-            ? StandardEntryType.Article
-            : StandardEntryType.Book;
+        EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;
         BibEntry extractedEntity = new BibEntry(type);
-        extractedEntity.setField(
-            StandardField.AUTHOR,
-            String.join(" and ", authors)
-        );
+        extractedEntity.setField(StandardField.AUTHOR, String.join(" and ", authors));
         extractedEntity.setField(StandardField.URL, String.join(", ", urls));
         extractedEntity.setField(StandardField.YEAR, year);
         extractedEntity.setField(StandardField.PAGES, pages);
@@ -91,10 +86,7 @@ public class BibtexExtractor {
         if (isArticle) {
             extractedEntity.setField(StandardField.JOURNAL, journalOrPublisher);
         } else {
-            extractedEntity.setField(
-                StandardField.PUBLISHER,
-                journalOrPublisher
-            );
+            extractedEntity.setField(StandardField.PUBLISHER, journalOrPublisher);
         }
         extractedEntity.setField(StandardField.COMMENT, input);
         return extractedEntity;
@@ -111,10 +103,7 @@ public class BibtexExtractor {
     private String findYear(String input) {
         Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
-            String yearCandidate = input.substring(
-                matcher.start(),
-                matcher.end()
-            );
+            String yearCandidate = input.substring(matcher.start(), matcher.end());
             int intYearCandidate = Integer.parseInt(yearCandidate);
             if (
                 (intYearCandidate > 1700) &&
@@ -136,10 +125,7 @@ public class BibtexExtractor {
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             authors.add(
-                GenerateAuthor(
-                    matcher.group(LASTNAME_GROUP),
-                    matcher.group(INITIALS_GROUP)
-                )
+                GenerateAuthor(matcher.group(LASTNAME_GROUP), matcher.group(INITIALS_GROUP))
             );
         }
         return fixSpaces(matcher.replaceAll(AUTHOR_TAG));
@@ -181,15 +167,9 @@ public class BibtexExtractor {
                     .replace(YEAR_TAG, "")
                     .replace(PAGES_TAG, "")
             );
-            lastParts.addAll(
-                Arrays.asList(
-                    input.substring(delimiterIndex + 2).split(",|\\.")
-                )
-            );
+            lastParts.addAll(Arrays.asList(input.substring(delimiterIndex + 2).split(",|\\.")));
         } else {
-            lastParts.addAll(
-                Arrays.asList(input.substring(afterAuthorsIndex).split(",|\\."))
-            );
+            lastParts.addAll(Arrays.asList(input.substring(afterAuthorsIndex).split(",|\\.")));
         }
         int nonDigitParts = 0;
         for (String part : lastParts) {

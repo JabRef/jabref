@@ -62,10 +62,7 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
         textField.initContextMenu(Collections::emptyList);
 
         new EditorValidator(preferencesService)
-            .configureValidation(
-                viewModel.getFieldValidator().getValidationStatus(),
-                textField
-            );
+            .configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public CitationKeyEditorViewModel getViewModel() {
