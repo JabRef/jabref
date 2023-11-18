@@ -1,4 +1,4 @@
-package org.jabref.model.database;
+package org.jabref.model.git;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents everything related to a BIB file.
  *
- * <p> The entries are stored in BibDatabase, the other data in MetaData
+ * <p> The entries are stored in GitDatabase, the other data in MetaData
  * and the options relevant for this file in Defaults.
  * </p>
  * <p>
@@ -49,26 +49,27 @@ public class BibGitContext {
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
+    private GitDatabase database;
 
     public BibGitContext() {
-        this(new BibDatabase());
+        this(new GitDatabase());
     }
 
-    public BibGitContext(BibDatabase database) {
+    public BibGitContext(GitDatabase database) {
         this(database, new MetaData());
     }
 
-    public BibGitContext(BibDatabase database, MetaData metaData) {
+    public BibGitContext(GitDatabase database, MetaData metaData) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibGitContext(BibDatabase database, MetaData metaData, Path path) {
+    public BibGitContext(GitDatabase database, MetaData metaData, Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibGitContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
+    public BibGitContext(GitDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
         Objects.requireNonNull(location);
         this.path = path;
@@ -76,14 +77,6 @@ public class BibGitContext {
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
         }
-    }
-
-    public BibDatabaseMode getMode() {
-        return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
-    }
-
-    public void setMode(BibDatabaseMode bibDatabaseMode) {
-        metaData.setMode(bibDatabaseMode);
     }
 
     public void setDatabasePath(Path file) {
@@ -103,7 +96,7 @@ public class BibGitContext {
         this.path = null;
     }
 
-    public BibDatabase getDatabase() {
+    public GitDatabase getDatabase() {
         return database;
     }
 
@@ -113,10 +106,6 @@ public class BibGitContext {
 
     public void setMetaData(MetaData metaData) {
         this.metaData = Objects.requireNonNull(metaData);
-    }
-
-    public boolean isBiblatexMode() {
-        return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
     /**
@@ -217,8 +206,8 @@ public class BibGitContext {
     public void convertToSharedDatabase(DatabaseSynchronizer dmbsSynchronizer) {
         this.dbmsSynchronizer = dmbsSynchronizer;
 
-        this.dbmsListener = new CoarseChangeFilter(this);
-        dbmsListener.registerListener(dbmsSynchronizer);
+        //this.dbmsListener = new CoarseChangeFilter(this);
+        //dbmsListener.registerListener(dbmsSynchronizer);
 
         this.location = DatabaseLocation.SHARED;
     }
@@ -249,16 +238,5 @@ public class BibGitContext {
         indexPath = appData.resolve("unsaved");
         LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
-    }
-
-    @Override
-    public String toString() {
-        return "BibGitContext{" +
-                "metaData=" + metaData +
-                ", mode=" + getMode() +
-                ", databasePath=" + getDatabasePath() +
-                ", biblatexMode=" + isBiblatexMode() +
-                ", fulltextIndexPath=" + getFulltextIndexPath() +
-                '}';
     }
 }

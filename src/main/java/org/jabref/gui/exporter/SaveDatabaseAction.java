@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,7 +27,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.git.GitCredentialsDialogView;
-import org.jabref.gui.git.GitChangesResolverDialog;
+import org.jabref.gui.git.GitChange;
+import org.jabref.gui.git.GitChangeResolverDialog;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
@@ -46,6 +48,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.git.BibGitContext;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
@@ -331,6 +334,8 @@ public class SaveDatabaseAction {
      */
     public void automaticGitUpdate(Path filePath) throws IOException, GitAPIException {
         GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
+        List<GitChange> changes = new ArrayList<GitChange>();
+        BibGitContext bibGitContext = new BibGitContext();
         if (preferences.getGitPreferences().getAutoCommit()) {
             String automaticCommitMsg = "Automatic update via JabRef";
             git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
@@ -354,14 +359,14 @@ public class SaveDatabaseAction {
                         git.pullOnCurrentBranch();
                     } catch (IOException ex2) {
                         if (ex2.getMessage().equals("HEAD is detached")) {
-                            GitChangesResolverDialog GitChangesResolverDialog = new GitChangesResolverDialog(Path filePath);
+                            GitChangeResolverDialog GitChangeResolverDialog = new GitChangeResolverDialog(changes, bibGitContext, "Merge issues");
                         } else {
                             throw new RuntimeException(ex2.getMessage());
                         }
                     }
                     
                 } else if (ex1.getMessage().equals("HEAD is detached")) {
-                    GitChangesResolverDialog GitChangesResolverDialog = new GitChangesResolverDialog();
+                    GitChangeResolverDialog GitChangeResolverDialog = new GitChangeResolverDialog(changes, bibGitContext, "Merge issues");
                 } 
                 else {
                     throw new IOException(ex1.getMessage());

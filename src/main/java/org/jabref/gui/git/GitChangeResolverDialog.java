@@ -16,13 +16,14 @@ package org.jabref.gui.git;
 
  import org.jabref.gui.DialogService;
  import org.jabref.gui.StateManager;
- import org.jabref.gui.collab.ExternalChangesResolverViewModel;
+ import org.jabref.gui.git.ExternalChangesResolverViewModel;
  import org.jabref.gui.preview.PreviewViewer;
  import org.jabref.gui.theme.ThemeManager;
  import org.jabref.gui.util.BaseDialog;
  import org.jabref.gui.util.TaskExecutor;
  import org.jabref.model.entry.BibEntryTypesManager;
- import org.jabref.preferences.PreferencesService;
+import org.jabref.model.git.BibGitContext;
+import org.jabref.preferences.PreferencesService;
 
  import com.airhacks.afterburner.views.ViewLoader;
  import com.tobiasdiez.easybind.EasyBind;
@@ -30,8 +31,8 @@ package org.jabref.gui.git;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
 
- public class GitChangesResolverDialog extends BaseDialog<Boolean> {
-     private final static Logger LOGGER = LoggerFactory.getLogger(GitChangesResolverDialog.class);
+ public class GitChangeResolverDialog extends BaseDialog<Boolean> {
+     private final static Logger LOGGER = LoggerFactory.getLogger(GitChangeResolverDialog.class);
      /**
       * Reconstructing the details view to preview an {@link GitChange} every time it's selected is a heavy operation.
       * It is also useless because changes are static and if the change data is static then the view doesn't have to change
@@ -68,7 +69,7 @@ package org.jabref.gui.git;
       * @param changes The list of changes
       * @param git The git to apply the changes to
       */
-     public GitChangesResolverDialog(List<GitChange> changes, BibGitContext git, String dialogTitle) {
+     public GitChangeResolverDialog(List<GitChange> changes, BibGitContext git, String dialogTitle) {
          this.changes = changes;
          this.git = git;
 
@@ -103,16 +104,9 @@ package org.jabref.gui.git;
          changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
          changesTableView.getSelectionModel().selectFirst();
 
-         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
-         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
-             if (selectedChange != null) {
-                 GitChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(selectedChange, gitChangeDetailsViewFactory::create);
-                 changeInfoPane.setCenter(detailsView);
-             }
-         });
 
          EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
-             if (isResolved) {
+             if ((boolean) isResolved) {
                  viewModel.applyChanges();
                  close();
              }
@@ -131,7 +125,7 @@ package org.jabref.gui.git;
 
      @FXML
      public void askUserToResolveChange() {
-         viewModel.getSelectedChange().flatMap(GitChange::getExternalChangeResolver)
-                  .flatMap(GitChangesResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
+         viewModel.getSelectedChange().flatMap(null)
+                  .flatMap(null);
      }
  }

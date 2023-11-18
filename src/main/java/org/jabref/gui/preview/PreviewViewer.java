@@ -30,6 +30,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.git.BibGitContext;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -196,6 +197,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
 
         themeManager.installCss(previewView.getEngine());
+    }
+
+    public PreviewViewer(BibGitContext git, DialogService dialogService2, PreferencesService preferencesService2, StateManager stateManager, ThemeManager themeManager, TaskExecutor taskExecutor2) {
     }
 
     private void highlightSearchPattern() {

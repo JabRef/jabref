@@ -10,25 +10,19 @@ package org.jabref.gui.git;
  import org.jabref.gui.git.entryadd.EntryAdd;
  import org.jabref.gui.git.entrychange.EntryChange;
  import org.jabref.gui.git.entrydelete.EntryDelete;
- import org.jabref.gui.git.groupchange.GroupChange;
- import org.jabref.gui.git.metedatachange.MetadataChange;
- import org.jabref.gui.git.preamblechange.PreambleChange;
- import org.jabref.gui.git.stringadd.BibTexStringAdd;
- import org.jabref.gui.git.stringchange.BibTexStringChange;
- import org.jabref.gui.git.stringdelete.BibTexStringDelete;
- import org.jabref.gui.git.stringrename.BibTexStringRename;
+
  import org.jabref.gui.undo.NamedCompound;
  import org.jabref.gui.util.OptionalObjectProperty;
- import org.jabref.model.git.GitContext;
+ import org.jabref.model.git.BibGitContext;
 
- public sealed abstract class GitChange permits EntryAdd, EntryChange, EntryDelete, GroupChange, MetadataChange, PreambleChange, BibTexStringAdd, BibTexStringChange, BibTexStringDelete, BibTexStringRename {
-     protected final GitContext gitContext;
-     protected final OptionalObjectProperty<GitChangesResolver> externalChangeResolver = OptionalObjectProperty.empty();
+ public sealed abstract class GitChange permits EntryAdd, EntryChange, EntryDelete {
+     protected final BibGitContext BibGitContext;
+     protected final OptionalObjectProperty<GitChangeResolver> externalChangeResolver = OptionalObjectProperty.empty();
      private final BooleanProperty accepted = new SimpleBooleanProperty();
      private final StringProperty name = new SimpleStringProperty();
 
-     protected GitChange(GitContext gitContext, GitChangeResolverFactory gitChangeResolverFactory) {
-         this.gitContext = gitContext;
+     protected GitChange(BibGitContext BibGitContext, GitChangeResolverFactory gitChangeResolverFactory) {
+         this.BibGitContext = BibGitContext;
          setChangeName("Unnamed Change!");
 
          if (gitChangeResolverFactory != null) {
@@ -63,7 +57,7 @@ package org.jabref.gui.git;
          name.set(changeName);
      }
 
-     public Optional<DatabaseChangeResolver> getExternalChangeResolver() {
+     public Optional<GitChangeResolver> getExternalChangeResolver() {
          return externalChangeResolver.get();
      }
 

@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.git.GitChange;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 
@@ -51,6 +52,9 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
         areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
+    }
+
+    public ExternalChangesResolverViewModel(List<GitChange> changes2, UndoManager undoManager2) {
     }
 
     public ObservableList<DatabaseChange> getVisibleChanges() {
