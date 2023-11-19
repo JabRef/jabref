@@ -6,11 +6,24 @@
     - \format[Authors(LastFirst, MiddleInitial, Sep =\n    - , LastSep =\n    - )]{\author}
 \end{author}
 \begin{date}  date: \date\end{date}
+\begin{journal}
+  parent:
+    type: periodical
+    title: \journal
+\end{journal}
+    \begin{journal&&volume}volume: \volume\end{journal&&volume}
+    \begin{journal&&number}issue: \number\end{journal&&number}
+    \begin{journal&&publisher}publisher: \publisher\end{journal&&publisher}
+\begin{series}
+  parent:
+    type: book
+    title: "\series"
+\end{series}
+\begin{editor&&number}  issue: \number\end{editor&&number}
+\begin{editor&&publisher}  publisher: \publisher\end{editor&&publisher}
 \begin{editor}  editor: \editor\end{editor}
-\begin{publisher}  publisher: \publisher\end{publisher}
 \begin{address}  location: \address\end{address}
 \begin{institution}  organization: \institution\end{institution}
-\begin{volume}  volume: \volume\end{volume}
 \begin{edition}  edition: \edition\end{edition}
 \begin{pages}  page-range: \pages\end{pages}
 \begin{url}  url: \url\end{url}
