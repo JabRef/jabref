@@ -180,7 +180,7 @@ dependencies {
     }
 
     implementation 'org.controlsfx:controlsfx:11.2.0'
-    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
+    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.8'
 
     implementation 'org.jsoup:jsoup:1.16.2'
     implementation 'com.konghq:unirest-java:3.14.5'
