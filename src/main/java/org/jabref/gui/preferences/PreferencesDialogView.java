@@ -105,12 +105,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         });
 
         if (this.preferencesTabToSelectName.isPresent()){
-            preferenceTabList.getItems().forEach(preferencesTab -> {
-              if (preferencesTab.getTabName().equals(this.preferencesTabToSelectName.get())) {
-
-                  preferenceTabList.getSelectModel().select(preferencesTab);
-              }
-           });
+            Optional<PreferencesTab> preferencesTabToSelect = preferenceTabList.getItems()
+                                                                               .stream()
+                                                                               .filter(prefTab -> prefTab.getTabName().equals(this.preferencesTabToSelectName.get()))
+                                                                               .findFirst();
+            if (preferencesTabToSelect.isPresent()) {
+                preferenceTabList.getSelectionModel().select(preferencesTabToSelect.get());
+            }
         } else {
         preferenceTabList.getSelectionModel().selectFirst();
         }
