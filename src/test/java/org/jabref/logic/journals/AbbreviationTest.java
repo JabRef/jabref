@@ -108,7 +108,7 @@ class AbbreviationTest {
       Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
       Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
       assertEquals(abbreviation, otherAbbreviation);
-      assertNotEquals(abbreviation, "String");
+        assertNotEquals("String", abbreviation);
     }
 
     @Test
