@@ -21,7 +21,6 @@ By using JabRef as training object in exercises and labs, students can level-up 
    implementation effort, testing effort, and "issue understanding effort".
    The latter category is important, because some issues are "quick wins" and others need thorough thinking.
 
-
    In general, all issues of JabRef are free to take.
    Be aware that the difficulty of bugs and feature vary.
    For the brave, the [Bug Board](https://github.com/orgs/JabRef/projects/7) or the [Feature Board](https://github.com/JabRef/jabref/projects/6) provide other issue sources.
@@ -34,7 +33,7 @@ By using JabRef as training object in exercises and labs, students can level-up 
 6. Students address review feedback
 7. Students submit pull request
 8. Code reviews by JabRef maintainers
-9. Students address feedback and learn more about good coding practices by incoporating feedback
+9. Students address feedback and learn more about good coding practices by incorporating feedback
 10. Students update their pull request
 11. Pull request is merged
 
@@ -50,19 +49,19 @@ There is no special process for student contributions. We want to discuss it nev
 
 The process for accepting contributions is as below. The syntax is [BPMN](https://en.wikipedia.org/wiki/Business\_Process\_Model\_and\_Notation) modeled using [bpmn.io](https://bpmn.io).
 
-[![process](<images/contribution-process-reviews.svg>)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
+[![process](images/contribution-process-reviews.svg)](https://raw.githubusercontent.com/JabRef/jabref/main/docs/images/contribution-process-reviews.svg)
 
 In short, the contribution is **reviewed by two JabRef developers**. Typically, they have constructive feedback on their contribution. This means, that the contributors get comments on their contribution enabling them to level-up their coding skill. Incorporating improvements takes time, too. The benefit is two-fold: a) contributors improve their coding skills and b) JabRef's code quality improves. All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
 
 GitHub describes that in their page [Understanding the GitHub flow](https://guides.github.com/introduction/flow/):
 
-[![GitHub flow](<images/github-flow.png>)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/github-flow.png)
+[![GitHub flow](images/github-flow.png)](https://raw.githubusercontent.com/JabRef/jabref/main/docs/images/github-flow.png)
 
 ## Process for Java newcomers
 
 Newcomers contributing in the context of a university teaching experience are invited to follow the process described above. In case the capacity of the instructing university allows, we propose a three-step approach. First, the contributors prepare their contribution as usual. Then, they submit the pull request _to a separate repository_. There, the instructor reviews the pull request and provides feedback. This happens in a loop until the instructor shows the green light. Then, the pull request can be submitted to the main JabRef repository. This will help to reduce the load on the JabRef team and improve the quality of the initial pull request.
 
-[![process with instructor](<images/contribution-process-reviews-with-instructor.svg>)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
+[![process with instructor](images/contribution-process-reviews-with-instructor.svg)](https://raw.githubusercontent.com/JabRef/jabref/main/docs/images/contribution-process-reviews-with-instructor.svg)
 
 ## Past courses
 
@@ -129,7 +128,7 @@ Course "Programming and Software Development" as part of the [BSc Software Engin
 
 Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 
-* Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements specification to the final pull request.
+* Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements' specification to the final pull request.
 * Successfully run in 2020
 
 ### Portuguese

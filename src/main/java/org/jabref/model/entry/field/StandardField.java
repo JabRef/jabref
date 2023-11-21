@@ -66,7 +66,7 @@ public enum StandardField implements Field {
     INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
     ISBN("isbn", "ISBN", FieldProperty.ISBN, FieldProperty.VERBATIM),
     ISRN("isrn", "ISRN", FieldProperty.VERBATIM),
-    ISSN("issn", "ISSN", FieldProperty.VERBATIM),
+    ISSN("issn", "ISSN", FieldProperty.ISSN, FieldProperty.VERBATIM),
     ISSUE("issue"),
     ISSUETITLE("issuetitle"),
     ISSUESUBTITLE("issuesubtitle"),

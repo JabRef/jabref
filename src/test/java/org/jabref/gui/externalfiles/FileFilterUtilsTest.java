@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileFilterUtilsTest {
 
@@ -25,42 +27,42 @@ public class FileFilterUtilsTest {
 
     @Test
     public void isDuringLastDayNegativeTest() {
-        assertEquals(fileFilterUtils.isDuringLastDay(time.minusHours(24)), false);
+        assertFalse(fileFilterUtils.isDuringLastDay(time.minusHours(24)));
     }
 
     @Test
     public void isDuringLastDayPositiveTest() {
-        assertEquals(fileFilterUtils.isDuringLastDay(time.minusHours(23)), true);
+        assertTrue(fileFilterUtils.isDuringLastDay(time.minusHours(23)));
     }
 
     @Test
     public void isDuringLastWeekNegativeTest() {
-        assertEquals(fileFilterUtils.isDuringLastWeek(time.minusDays(7)), false);
+        assertFalse(fileFilterUtils.isDuringLastWeek(time.minusDays(7)));
     }
 
     @Test
     public void isDuringLastWeekPositiveTest() {
-        assertEquals(fileFilterUtils.isDuringLastWeek(time.minusDays(6).minusHours(23)), true);
+        assertTrue(fileFilterUtils.isDuringLastWeek(time.minusDays(6).minusHours(23)));
     }
 
     @Test
     public void isDuringLastMonthNegativeTest() {
-        assertEquals(fileFilterUtils.isDuringLastMonth(time.minusDays(30)), false);
+        assertFalse(fileFilterUtils.isDuringLastMonth(time.minusDays(30)));
     }
 
     @Test
     public void isDuringLastMonthPositiveTest() {
-        assertEquals(fileFilterUtils.isDuringLastMonth(time.minusDays(29).minusHours(23)), true);
+        assertTrue(fileFilterUtils.isDuringLastMonth(time.minusDays(29).minusHours(23)));
     }
 
     @Test
     public void isDuringLastYearNegativeTest() {
-        assertEquals(fileFilterUtils.isDuringLastYear(time.minusDays(365)), false);
+        assertFalse(fileFilterUtils.isDuringLastYear(time.minusDays(365)));
     }
 
     @Test
     public void isDuringLastYearPositiveTest() {
-        assertEquals(fileFilterUtils.isDuringLastYear(time.minusDays(364).minusHours(23)), true);
+        assertTrue(fileFilterUtils.isDuringLastYear(time.minusDays(364).minusHours(23)));
     }
 
     @Nested

@@ -22,10 +22,9 @@ public class ISSNChecker implements ValueChecker {
             return Optional.of(Localization.lang("incorrect format"));
         }
 
-        if (issn.isValidChecksum()) {
-            return Optional.empty();
-        } else {
+        if (!issn.isValidChecksum()) {
             return Optional.of(Localization.lang("incorrect control digit"));
         }
+        return Optional.empty();
     }
 }

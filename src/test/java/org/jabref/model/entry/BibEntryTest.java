@@ -364,17 +364,17 @@ class BibEntryTest {
     @Test
     void identicObjectsareEqual() throws Exception {
         BibEntry otherEntry = entry;
-        assertTrue(entry.equals(otherEntry));
+        assertEquals(entry, otherEntry);
     }
 
     @Test
     void compareToNullObjectIsFalse() throws Exception {
-        assertFalse(entry.equals(null));
+        assertNotEquals(null, entry);
     }
 
     @Test
     void compareToDifferentClassIsFalse() throws Exception {
-        assertFalse(entry.equals(new Object()));
+        assertNotEquals(entry, new Object());
     }
 
     @Test

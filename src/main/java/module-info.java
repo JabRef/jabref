@@ -88,7 +88,7 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
 
     // Apache Commons and other (similar) helper libraries
-    requires commons.cli;
+    requires org.apache.commons.cli;
     requires org.apache.commons.csv;
     requires org.apache.commons.lang3;
     requires com.google.common;
@@ -133,6 +133,7 @@ open module org.jabref {
     requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;
+    requires org.eclipse.jgit.ssh.apache;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
 
@@ -140,5 +141,5 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
-    requires org.eclipse.jgit.ssh.apache;
+    requires com.jthemedetector;
 }

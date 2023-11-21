@@ -273,6 +273,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabList.remove(RelatedArticlesTab.NAME);
         entryEditorTabList.remove(LatexCitationsTab.NAME);
         entryEditorTabList.remove(FulltextSearchResultsTab.NAME);
+        entryEditorTabList.remove(SciteTab.NAME);
         entryEditorTabList.remove("Comments");
         // Then show the remaining configured
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
@@ -301,6 +302,8 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
+
+        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
 
         return entryEditorTabs;
     }
