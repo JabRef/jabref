@@ -27,10 +27,10 @@ import org.jabref.logic.l10n.Localization;
 public class MainTableHeaderContextMenu extends ContextMenu {
 
     private static final int OUT_OF_BOUNDS = -1;
-    private final TaskExecutor taskExecutor;
-    private final JabRefFrame frame;
     MainTable mainTable;
     MainTableColumnFactory factory;
+    private final JabRefFrame frame;
+    private final TaskExecutor taskExecutor;
 
     /**
      * Constructor for the right click menu
