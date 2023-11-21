@@ -49,20 +49,6 @@ jobs:
           checkstyle_version: '10.3'
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              Your code currently does not meet JabRef's code guidelines.
-              We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-              The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
-              Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-              Afterwards, please run checkstyle locally and fix the issues.
-
-
-              More information on code quality in JabRef is available at <https://devdocs.jabref.org/getting-into-the-code/development-strategy.html>.
-          comment_tag: checkstyle
   openrewrite:
     name: OpenRewrite
     runs-on: ubuntu-latest
@@ -81,19 +67,6 @@ jobs:
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              Your code currently does not meet JabRef's code guidelines.
-              We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
-              The issues found can be **automatically fixed**.
-              Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
-
-
-              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
-          comment_tag: openrewrite
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
@@ -114,18 +87,6 @@ jobs:
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              Your code currently does not meet JabRef's code guidelines.
-              We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
-              Please fix the detected errors, commit, and push.
-
-
-              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
-          comment_tag: modernizer
   markdown:
     name: Markdown
     runs-on: ubuntu-latest
@@ -141,18 +102,7 @@ jobs:
           globs: |
             *.md
             docs/**/*.md
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: >
-              You modified Markdown (*.md) files.
-              To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
-              [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
-
-              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "Markdown".
-          comment_tag: markdown
-  changelog-non-frozen:
+  changelog:
     name: CHANGELOG.md
     runs-on: ubuntu-latest
     steps:
@@ -161,22 +111,16 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
-          fetch-depth: 0
       - name: Lint CHANGELOG.md
         run: |
           # Install jbang
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           export PATH=$PATH:$HOME/.jbang/bin
 
-          # ensure that refs are available
-          BRANCH=`git rev-parse HEAD`
-          git checkout main
-
           # run heylogs verification
-          jbang --repos jitpack,central -m nbbrd.heylogs.cli.HeylogsCommand com.github.koppor.heylogs:heylogs-cli:jitpack-SNAPSHOT check CHANGELOG.md --gitdiff main...$BRANCH > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.7.2:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
-          sed -i 's/consistent-separator/consistent-separator (ignored)/' heylogs.txt
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
 
           cat heylogs.txt
@@ -184,18 +128,26 @@ jobs:
           # exit 1 in case of error
           # We have 1 "valid" issue in CHANGELOG.md
           grep -q "1 problem" heylogs.txt || exit 1
-      - name: Add comment on pull request
-        if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@v2
+  changelog-unreleased-only:
+    name: CHANGELOG.md - only unreleased touched
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
         with:
-          message: >
-              While the PR was in progress, JabRef released a new version.
-              You have to merge `upstream/main` and move your entry in `CHANGELOG.md` to section `## [Unreleased]`.
-
-
-              It might also be that another CHANGELOG.md issue arose.
-              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "CHANGELOG.md".
-          comment_tag: changelog
+          submodules: 'false'
+          show-progress: 'false'
+          fetch-depth: 0
+      - name: Install clparse
+        run: |
+          curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          sudo mv clparse /usr/local/bin/clparse
+      - name: Check CHANGELOG.md diff
+        run: |
+          diff \
+            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
