@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class PredatoryJournalRepository {
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         if (predatoryJournals.containsKey(journal)) {
-            LOGGER.info("match: " + journal);
+            LOGGER.debug("Found predatory journal {}", journal);
             return true;
         }
 
@@ -56,16 +55,7 @@ public class PredatoryJournalRepository {
                                        .filter(key -> match.isSimilar(journal.toLowerCase(Locale.ROOT), key.toLowerCase(Locale.ROOT)))
                                        .collect(Collectors.toList());
 
-        LOGGER.info("matches: " + String.join(", ", matches));
+        LOGGER.info("Found multiple possible predatory journals {}", String.join(", ", matches));
         return !matches.isEmpty();
-    }
-
-    private String decode(String s) {
-        return Optional.ofNullable(s)
-                       .orElse("")
-                       .replace(",", "")
-                       .replace("&amp;", "&")
-                       .replace("&#8217;", "'")
-                       .replace("&#8211;", "-");
     }
 }

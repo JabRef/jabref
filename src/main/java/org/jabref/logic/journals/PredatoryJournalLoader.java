@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,10 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.OS;
 import org.jabref.model.strings.StringUtil;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -78,34 +75,29 @@ public class PredatoryJournalLoader {
     public static PredatoryJournalRepository loadRepository() {
         PredatoryJournalRepository repository = new PredatoryJournalRepository();
 
-        // Initialize with built-in list
         try (InputStream resourceAsStream = PredatoryJournalRepository.class.getResourceAsStream("/journals/predatoryJournal-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no predatoryJournalList.mv. We use a default predatory journal list");
             } else {
-                // Use user's app data directory for more permanent storage
-                Path appDataDir = Path.of(AppDirsFactory.getInstance()
-                                                        .getUserDataDir(
-                                                                OS.APP_DIR_APP_NAME,
-                                                                "predatoryJournals",
-                                                                OS.APP_DIR_APP_AUTHOR));
-                Files.createDirectories(appDataDir); // Ensure the directory exists
-                Path predatoryJournalListPath = appDataDir.resolve("predatoryJournal-list.mv");
-                Files.copy(resourceAsStream, predatoryJournalListPath, StandardCopyOption.REPLACE_EXISTING);
-                repository = new PredatoryJournalRepository(predatoryJournalListPath);
+                Path tempDir = Files.createTempDirectory("jabref-journal");
+                Path tempJournalList = tempDir.resolve("predatoryJournal-list.mv");
+                Files.copy(resourceAsStream, tempJournalList);
+                repository = new PredatoryJournalRepository(tempJournalList);
+                tempDir.toFile().deleteOnExit();
+                tempJournalList.toFile().deleteOnExit();
             }
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Error while copying predatory journal list", e);
             return repository;
         }
         return repository;
     }
 
+    /**
+     *  Loads predatory journal information from online resources
+     */
     public void loadFromOnlineSources() {
-        // populates linkElements (and predatoryJournals if CSV)
         PREDATORY_SOURCES.forEach(this::crawl);
-        // adds cleaned HTML to predatoryJournals
         LINK_ELEMENTS.forEach(this::clean);
 
         LOGGER.info("Updated predatory journal list");
@@ -116,7 +108,7 @@ public class PredatoryJournalLoader {
             URLDownload download = new URLDownload(source.url);
 
             if (!download.canBeReached()) {
-                LOGGER.warn("URL UNREACHABLE");
+                LOGGER.warn("Url {} is unreachable", source.url);
             } else if (source.url.getPath().contains(".csv")) {
                 handleCSV(new InputStreamReader(download.asInputStream()));
             } else {
@@ -124,9 +116,8 @@ public class PredatoryJournalLoader {
                     handleHTML(source.elementPattern.get(), download.asString());
                 }
             }
-        } catch (
-                IOException ex) {
-            LOGGER.error("Could not crawl source {}", source.url, ex);
+        } catch (IOException ex) {
+            LOGGER.error("Could not crawl source for predatory journals {}", source.url, ex);
         }
     }
 
@@ -147,7 +138,7 @@ public class PredatoryJournalLoader {
                 }
             }
             // changes column order from CSV (source: url, name, abbr)
-            predatoryJournalInformations.add(new PredatoryJournalInformation(name, abbr, url));
+            predatoryJournalInformations.add(new PredatoryJournalInformation(decode(name), decode(abbr), url));
         }
     }
 
@@ -180,10 +171,18 @@ public class PredatoryJournalLoader {
                     return;
                 }
             }
-            predatoryJournalInformations.add(new PredatoryJournalInformation(name, abbr, url));
+            predatoryJournalInformations.add(new PredatoryJournalInformation(decode(name), decode(abbr), url));
         }
     }
 
+    private String decode(String s) {
+        return Optional.ofNullable(s)
+                       .orElse("")
+                       .replace(",", "")
+                       .replace("&amp;", "&")
+                       .replace("&#8217;", "'")
+                       .replace("&#8211;", "-");
+    }
     public Set<PredatoryJournalInformation> getPredatoryJournalInformations() {
         return new HashSet<>(predatoryJournalInformations);
     }
