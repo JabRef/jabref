@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -44,10 +45,11 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
-
-    public PreferencesDialogView(JabRefFrame frame) {
+    private final Optional<String> preferencesTabToSelectName;
+    public PreferencesDialogView(JabRefFrame frame,Optional<String> preferencesTabToSelectName) {
         this.frame = frame;
         this.setTitle(Localization.lang("JabRef preferences"));
+        this.preferencesTabToSelectName = preferencesTabToSelectName;
 
         ViewLoader.view(this)
                   .load()
@@ -102,7 +104,17 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             }
         });
 
+        if (this.preferencesTabToSelectName.isPresent()){
+            preferenceTabList.getItems().forEach(preferencesTab -> {
+              if (preferencesTab.getTabName().equals(this.preferencesTabToSelectName.get())) {
+
+                  preferenceTabList.getSelectModel().select(preferencesTab);
+              }
+           });
+        } else {
         preferenceTabList.getSelectionModel().selectFirst();
+        }
+
         new ViewModelListCellFactory<PreferencesTab>()
                 .withText(PreferencesTab::getTabName)
                 .install(preferenceTabList);
