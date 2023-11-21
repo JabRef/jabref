@@ -163,7 +163,7 @@ recipeList:
   - org.openrewrite.staticanalysis.RemoveExtraSemicolons
   - org.openrewrite.staticanalysis.RemoveJavaDocAuthorTag
   - org.openrewrite.staticanalysis.RemoveHashCodeCallsFromArrayInstances
-  - org.openrewrite.staticanalysis.RemoveRedundantTypeCast
+#  - org.openrewrite.staticanalysis.RemoveRedundantTypeCast
   - org.openrewrite.staticanalysis.RemoveToStringCallsFromArrayInstances
   - org.openrewrite.staticanalysis.RemoveUnneededAssertion
   - org.openrewrite.staticanalysis.RemoveUnneededBlock
@@ -195,3 +195,6 @@ recipeList:
   - org.openrewrite.staticanalysis.UseSystemLineSeparator
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
+
+  - org.openrewrite.java.testing.junit5.CleanupAssertions
+#  - org.openrewrite.java.testing.junit5.JUnit5BestPractices

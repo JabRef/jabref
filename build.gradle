@@ -27,7 +27,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.4.0'
+    id 'org.openrewrite.rewrite' version '6.5.4'
 }
 
 // Enable following for debugging
@@ -144,7 +144,7 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.3'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.3'
 
     implementation 'com.fasterxml:aalto-xml:1.3.2'
@@ -180,7 +180,7 @@ dependencies {
     }
 
     implementation 'org.controlsfx:controlsfx:11.2.0'
-    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
+    implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.8'
 
     implementation 'org.jsoup:jsoup:1.16.2'
     implementation 'com.konghq:unirest-java:3.14.5'
@@ -248,12 +248,12 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.4'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.5'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.4.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
