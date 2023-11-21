@@ -95,7 +95,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         this.getItems().add(new SeparatorMenuItem());
         ActionFactory actionfactory = new ActionFactory(Globals.getKeyPrefs());
-        MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor,"Entry table"));
+        MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor, "Entry table"));
         this.getItems().add(showMoreItem);
     }
 

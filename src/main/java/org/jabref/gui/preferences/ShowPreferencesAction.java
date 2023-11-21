@@ -21,16 +21,14 @@ public class ShowPreferencesAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-
-    public ShowPreferencesAction(JabRefFrame jabRefFrame,TaskExecutor taskExecutor,String preferencesTabToSelectName){
-         this(jabRefFrame , taskExecutor);
+    public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor, String preferencesTabToSelectName) {
+        this(jabRefFrame, taskExecutor);
          this.preferencesTabToSelectName = Optional.of(preferencesTabToSelectName);
    }
-
 
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame,preferencesTabToSelectName));
+        dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, preferencesTabToSelectName));
     }
 }

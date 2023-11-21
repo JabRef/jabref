@@ -46,7 +46,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
     private final Optional<String> preferencesTabToSelectName;
-    public PreferencesDialogView(JabRefFrame frame,Optional<String> preferencesTabToSelectName) {
+
+    public PreferencesDialogView(JabRefFrame frame, Optional<String> preferencesTabToSelectName) {
         this.frame = frame;
         this.setTitle(Localization.lang("JabRef preferences"));
         this.preferencesTabToSelectName = preferencesTabToSelectName;
@@ -104,7 +105,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             }
         });
 
-        if (this.preferencesTabToSelectName.isPresent()){
+        if (this.preferencesTabToSelectName.isPresent()) {
             Optional<PreferencesTab> preferencesTabToSelect = preferenceTabList.getItems()
                                                                                .stream()
                                                                                .filter(prefTab -> prefTab.getTabName().equals(this.preferencesTabToSelectName.get()))
