@@ -33,6 +33,5 @@ public class ShowPreferencesAction extends SimpleCommand {
         } else {
             dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, preferencesTabToSelectName.get()));
         }
-
     }
 }
