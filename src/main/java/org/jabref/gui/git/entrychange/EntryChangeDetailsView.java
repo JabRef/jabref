@@ -1,11 +1,5 @@
 package org.jabref.gui.git.entrychange;
 
-import javafx.geometry.Orientation;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.VBox;
-
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -15,12 +9,13 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.git.BibGitContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.git.BibGitContext;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
+import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 
 public final class EntryChangeDetailsView extends GitChangeDetailsView {
     private final PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();
@@ -42,33 +37,33 @@ public final class EntryChangeDetailsView extends GitChangeDetailsView {
         onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        //PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
 
-        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
-        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
+        //TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
+        //TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
 
-        EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
-            newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
-        });
+        //EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
+        //    newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
+        //});
 
-        EasyBind.subscribe(newEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
-            if (oldEntryTabPane.getSelectionModel().getSelectedIndex() != selectedIndex.intValue()) {
-                oldEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
-            }
-        });
+        //EasyBind.subscribe(newEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
+        //    if (oldEntryTabPane.getSelectionModel().getSelectedIndex() != selectedIndex.intValue()) {
+        //        oldEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
+         //   }
+        //});
 
-        VBox containerOld = new VBox(inJabRef, oldEntryTabPane);
-        VBox containerNew = new VBox(onDisk, newEntryTabPane);
+        // VBox containerOld = new VBox(inJabRef, oldEntryTabPane);
+        // VBox containerNew = new VBox(onDisk, newEntryTabPane);
 
-        SplitPane split = new SplitPane(containerOld, containerNew);
-        split.setOrientation(Orientation.HORIZONTAL);
+        // SplitPane split = new SplitPane(containerOld, containerNew);
+        // split.setOrientation(Orientation.HORIZONTAL);
 
-        setLeftAnchor(split, 8d);
-        setTopAnchor(split, 8d);
-        setRightAnchor(split, 8d);
-        setBottomAnchor(split, 8d);
+        // setLeftAnchor(split, 8d);
+        // setTopAnchor(split, 8d);
+        // setRightAnchor(split, 8d);
+        // setBottomAnchor(split, 8d);
 
-        this.getChildren().add(split);
+        // this.getChildren().add(split);
     }
 
     private List<SplitPane> getChildren() {

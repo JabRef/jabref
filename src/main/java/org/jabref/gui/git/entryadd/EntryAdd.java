@@ -3,7 +3,6 @@ package org.jabref.gui.git.entryadd;
 import org.jabref.gui.git.GitChange;
 import org.jabref.gui.git.GitChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.git.BibGitContext;
@@ -24,7 +23,6 @@ public final class EntryAdd extends GitChange {
     @Override
     public void applyChange(NamedCompound undoEdit) {
         databaseContext.getDatabase().insertEntry(addedEntry);
-        undoEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), addedEntry));
     }
 
     public BibEntry getAddedEntry() {

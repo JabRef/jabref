@@ -6,15 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Worker;
-import javafx.print.PrinterJob;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.web.WebView;
-
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -30,9 +21,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.git.BibGitContext;
 import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -40,6 +29,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.html.HTMLAnchorElement;
+
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Worker;
+import javafx.print.PrinterJob;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.web.WebView;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -197,9 +195,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
 
         themeManager.installCss(previewView.getEngine());
-    }
-
-    public PreviewViewer(BibGitContext git, DialogService dialogService2, PreferencesService preferencesService2, StateManager stateManager, ThemeManager themeManager, TaskExecutor taskExecutor2) {
     }
 
     private void highlightSearchPattern() {

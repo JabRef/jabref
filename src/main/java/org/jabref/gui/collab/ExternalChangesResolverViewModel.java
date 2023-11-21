@@ -54,9 +54,6 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
     }
 
-    public ExternalChangesResolverViewModel(List<GitChange> changes2, UndoManager undoManager2) {
-    }
-
     public ObservableList<DatabaseChange> getVisibleChanges() {
         return visibleChanges;
     }

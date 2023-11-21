@@ -24,7 +24,7 @@ public final class EntryDelete extends GitChange {
     @Override
     public void applyChange(NamedCompound undoEdit) {
         this.databaseContext.getDatabase().removeEntry(deletedEntry);
-        undoEdit.addEdit(new UndoableRemoveEntries(this.databaseContext.getDatabase(), deletedEntry));
+        // undoEdit.addEdit(new UndoableRemoveEntries(this.databaseContext.getDatabase(), deletedEntry));
     }
 
     public BibEntry getDeletedEntry() {

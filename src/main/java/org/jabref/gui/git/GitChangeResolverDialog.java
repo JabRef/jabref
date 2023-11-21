@@ -6,30 +6,28 @@ package org.jabref.gui.git;
 
  import javax.swing.undo.UndoManager;
 
- import javafx.beans.property.SimpleStringProperty;
- import javafx.fxml.FXML;
- import javafx.scene.control.Button;
- import javafx.scene.control.SelectionMode;
- import javafx.scene.control.TableColumn;
- import javafx.scene.control.TableView;
- import javafx.scene.layout.BorderPane;
-
  import org.jabref.gui.DialogService;
  import org.jabref.gui.StateManager;
- import org.jabref.gui.git.ExternalChangesResolverViewModel;
- import org.jabref.gui.preview.PreviewViewer;
  import org.jabref.gui.theme.ThemeManager;
  import org.jabref.gui.util.BaseDialog;
  import org.jabref.gui.util.TaskExecutor;
  import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.git.BibGitContext;
-import org.jabref.preferences.PreferencesService;
+ import org.jabref.model.git.BibGitContext;
+ import org.jabref.preferences.PreferencesService;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
 
  import com.airhacks.afterburner.views.ViewLoader;
  import com.tobiasdiez.easybind.EasyBind;
+
  import jakarta.inject.Inject;
- import org.slf4j.Logger;
- import org.slf4j.LoggerFactory;
+ import javafx.beans.property.SimpleStringProperty;
+ import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.SelectionMode;
+ import javafx.scene.control.TableColumn;
+ import javafx.scene.control.TableView;
+ import javafx.scene.layout.BorderPane;
 
  public class GitChangeResolverDialog extends BaseDialog<Boolean> {
      private final static Logger LOGGER = LoggerFactory.getLogger(GitChangeResolverDialog.class);
@@ -91,8 +89,8 @@ import org.jabref.preferences.PreferencesService;
 
      @FXML
      private void initialize() {
-         PreviewViewer previewViewer = new PreviewViewer(git, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
-         GitChangeDetailsViewFactory gitChangeDetailsViewFactory = new GitChangeDetailsViewFactory(git, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
+         //PreviewViewer previewViewer = new PreviewViewer(git, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+         //GitChangeDetailsViewFactory gitChangeDetailsViewFactory = new GitChangeDetailsViewFactory(git, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
 
          viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 

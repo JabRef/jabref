@@ -6,7 +6,6 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.git.GitDatabase;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -36,9 +35,6 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
         this.database = database;
         this.entries = entries;
         this.paste = paste;
-    }
-
-    public UndoableInsertEntries(GitDatabase database2, BibEntry addedEntry) {
     }
 
     @Override

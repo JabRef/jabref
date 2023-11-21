@@ -5,8 +5,6 @@ import javax.swing.undo.CompoundEdit;
 import org.jabref.gui.git.GitChange;
 import org.jabref.gui.git.GitChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.git.BibGitContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,8 +40,7 @@ public final class EntryChange extends GitChange {
         this.gitContext.getDatabase().removeEntry(oldEntry);
         this.gitContext.getDatabase().insertEntry(newEntry);
         CompoundEdit changeEntryEdit = new CompoundEdit();
-        changeEntryEdit.addEdit(new UndoableRemoveEntries(gitContext.getDatabase(), oldEntry));
-        changeEntryEdit.addEdit(new UndoableInsertEntries(gitContext.getDatabase(), newEntry));
+
         changeEntryEdit.end();
 
         undoEdit.addEdit(changeEntryEdit);
