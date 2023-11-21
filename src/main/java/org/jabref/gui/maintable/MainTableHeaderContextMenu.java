@@ -27,8 +27,8 @@ import org.jabref.logic.l10n.Localization;
 public class MainTableHeaderContextMenu extends ContextMenu {
 
     private static final int OUT_OF_BOUNDS = -1;
-    private final JabRefFrame frame;
     private final TaskExecutor taskExecutor;
+    private final JabRefFrame frame;
     MainTable mainTable;
     MainTableColumnFactory factory;
 
@@ -90,7 +90,6 @@ public class MainTableHeaderContextMenu extends ContextMenu {
                 RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
                 this.getItems().add(itemToAdd);
             }
-
         }
 
         this.getItems().add(new SeparatorMenuItem());

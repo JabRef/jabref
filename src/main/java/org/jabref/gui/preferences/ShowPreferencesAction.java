@@ -15,7 +15,6 @@ public class ShowPreferencesAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private Optional<String> preferencesTabToSelectName = Optional.empty();
 
-
     public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor) {
         this.jabRefFrame = jabRefFrame;
         this.taskExecutor = taskExecutor;
