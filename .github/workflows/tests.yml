@@ -39,7 +39,6 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
       - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
@@ -47,6 +46,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
           checkstyle_version: '10.3'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
   openrewrite:
@@ -63,7 +64,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
@@ -81,7 +83,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -162,7 +165,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -197,7 +201,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -234,7 +239,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -278,7 +284,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
