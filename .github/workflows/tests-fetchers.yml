@@ -50,7 +50,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:
