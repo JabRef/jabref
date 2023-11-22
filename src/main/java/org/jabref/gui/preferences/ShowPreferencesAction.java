@@ -29,7 +29,7 @@ public class ShowPreferencesAction extends SimpleCommand {
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         if (preferencesTabToSelectName.isEmpty()) {
-            dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, ""));
+            dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, null));
         } else {
             dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, preferencesTabToSelectName.get()));
         }

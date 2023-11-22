@@ -105,7 +105,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             }
         });
 
-        if ((this.preferencesTabToSelectName != null) && !this.preferencesTabToSelectName.equals("")) {
+        if (this.preferencesTabToSelectName != null) {
             Optional<PreferencesTab> preferencesTabToSelect = preferenceTabList.getItems()
                                                                                .stream()
                                                                                .filter(prefTab -> prefTab.getTabName().equals(this.preferencesTabToSelectName))
