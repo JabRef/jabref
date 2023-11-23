@@ -59,8 +59,7 @@ public class PredatoryJournalLoader {
     private static final Pattern PATTERN_NAME = Pattern.compile("(?<=\">).*?(?=<)");
     private static final Pattern PATTERN_URL = Pattern.compile("http.*?(?=\")");
     private static final Pattern PATTERN_ABBR = Pattern.compile("(?<=\\()[^ ]*(?=\\))");
-    private final List<String> LINK_ELEMENTS = new ArrayList<>();
-    private static final List<PJSource> PREDATORY_SOURCES = List.of(
+    private final List<PJSource> predatorySources = List.of(
             new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv"),
             new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv"),
             new PJSource("https://beallslist.net/",
@@ -70,6 +69,8 @@ public class PredatoryJournalLoader {
             new PJSource("https://beallslist.net/hijacked-journals/",
                     "<tr>.*?</tr>")
     );
+    private final List<String> linkElements = new ArrayList<>();
+
     private final List<PredatoryJournalInformation> predatoryJournalInformation = new ArrayList<>();
 
     public static PredatoryJournalRepository loadRepository() {
@@ -98,8 +99,8 @@ public class PredatoryJournalLoader {
      * This method should be only called once when building JabRef
      */
     public void loadFromOnlineSources() {
-        PREDATORY_SOURCES.forEach(this::crawl);
-        LINK_ELEMENTS.forEach(this::clean);
+        predatorySources.forEach(this::crawl);
+        linkElements.forEach(this::clean);
 
         LOGGER.info("Updated predatory journal list");
     }
@@ -146,7 +147,7 @@ public class PredatoryJournalLoader {
     private void handleHTML(Pattern pattern, String body) {
         Matcher matcher = pattern.matcher(body);
         while (matcher.find()) {
-            LINK_ELEMENTS.add(matcher.group());
+            linkElements.add(matcher.group());
         }
     }
 
