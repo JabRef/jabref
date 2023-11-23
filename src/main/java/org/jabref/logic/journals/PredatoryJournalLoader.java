@@ -59,7 +59,7 @@ public class PredatoryJournalLoader {
     private static final Pattern PATTERN_NAME = Pattern.compile("(?<=\">).*?(?=<)");
     private static final Pattern PATTERN_URL = Pattern.compile("http.*?(?=\")");
     private static final Pattern PATTERN_ABBR = Pattern.compile("(?<=\\()[^ ]*(?=\\))");
-    private static final List<String> LINK_ELEMENTS = new ArrayList<>();
+    private final List<String> LINK_ELEMENTS = new ArrayList<>();
     private static final List<PJSource> PREDATORY_SOURCES = List.of(
             new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv"),
             new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv"),
@@ -70,7 +70,7 @@ public class PredatoryJournalLoader {
             new PJSource("https://beallslist.net/hijacked-journals/",
                     "<tr>.*?</tr>")
     );
-    private final List<PredatoryJournalInformation> predatoryJournalInformations = new ArrayList<>();
+    private final List<PredatoryJournalInformation> predatoryJournalInformation = new ArrayList<>();
 
     public static PredatoryJournalRepository loadRepository() {
         PredatoryJournalRepository repository = new PredatoryJournalRepository();
@@ -94,7 +94,8 @@ public class PredatoryJournalLoader {
     }
 
     /**
-     *  Loads predatory journal information from online resources
+     * Loads predatory journal information from online resources
+     * This method should be only called once when building JabRef
      */
     public void loadFromOnlineSources() {
         PREDATORY_SOURCES.forEach(this::crawl);
@@ -138,7 +139,7 @@ public class PredatoryJournalLoader {
                 }
             }
             // changes column order from CSV (source: url, name, abbr)
-            predatoryJournalInformations.add(new PredatoryJournalInformation(decode(name), decode(abbr), url));
+            predatoryJournalInformation.add(new PredatoryJournalInformation(decode(name), decode(abbr), url));
         }
     }
 
@@ -171,7 +172,7 @@ public class PredatoryJournalLoader {
                     return;
                 }
             }
-            predatoryJournalInformations.add(new PredatoryJournalInformation(decode(name), decode(abbr), url));
+            predatoryJournalInformation.add(new PredatoryJournalInformation(decode(name), decode(abbr), url));
         }
     }
 
@@ -183,7 +184,8 @@ public class PredatoryJournalLoader {
                        .replace("&#8217;", "'")
                        .replace("&#8211;", "-");
     }
+
     public Set<PredatoryJournalInformation> getPredatoryJournalInformations() {
-        return new HashSet<>(predatoryJournalInformations);
+        return new HashSet<>(predatoryJournalInformation);
     }
 }
