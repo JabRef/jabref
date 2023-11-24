@@ -6,12 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,8 +30,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.crypto.NoSuchPaddingException;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -126,7 +121,6 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
-import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
@@ -1636,7 +1630,7 @@ public class JabRefPreferences implements PreferencesService {
         } catch (Exception ex) {
             LOGGER.warn("JabRef could not open the git key store");
         }
-        return (String) defaults.get(PROXY_PASSWORD);
+        return (String) defaults.get(GIT_PASSWORD);
     }
 
     private void setProxyPassword(String password) {
