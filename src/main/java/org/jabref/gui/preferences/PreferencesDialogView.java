@@ -45,12 +45,12 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
-    private final String preferencesTabToSelectName;
+    private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
 
-    public PreferencesDialogView(JabRefFrame frame, String preferencesTabToSelectName) {
+    public PreferencesDialogView(JabRefFrame frame, Class<? extends PreferencesTab> preferencesTabToSelectClass) {
         this.frame = frame;
         this.setTitle(Localization.lang("JabRef preferences"));
-        this.preferencesTabToSelectName = preferencesTabToSelectName;
+        this.preferencesTabToSelectClass = preferencesTabToSelectClass;
 
         ViewLoader.view(this)
                   .load()
@@ -105,13 +105,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             }
         });
 
-        if (this.preferencesTabToSelectName != null) {
-            Optional<PreferencesTab> preferencesTabToSelect = preferenceTabList.getItems()
-                                                                               .stream()
-                                                                               .filter(prefTab -> prefTab.getTabName().equals(this.preferencesTabToSelectName))
-                                                                               .findFirst();
-            if (preferencesTabToSelect.isPresent()) {
-                preferenceTabList.getSelectionModel().select(preferencesTabToSelect.get());
+        if (this.preferencesTabToSelectClass != null) {
+            Optional<PreferencesTab> tabToSelectIfExist = preferenceTabList.getItems()
+                                                                           .stream()
+                                                                           .filter(prefTab -> prefTab.getClass() == preferencesTabToSelectClass)
+                                                                           .findFirst();
+            if (tabToSelectIfExist.isPresent()) {
+                preferenceTabList.getSelectionModel().select(tabToSelectIfExist.get());
             }
         } else {
             preferenceTabList.getSelectionModel().selectFirst();

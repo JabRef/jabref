@@ -13,25 +13,25 @@ public class ShowPreferencesAction extends SimpleCommand {
 
     private final JabRefFrame jabRefFrame;
     private final TaskExecutor taskExecutor;
-    private Optional<String> preferencesTabToSelectName = Optional.empty();
+    private Optional<Class<? extends PreferencesTab>> preferencesTabToSelectClass = Optional.empty();
 
     public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor) {
         this.jabRefFrame = jabRefFrame;
         this.taskExecutor = taskExecutor;
     }
 
-    public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor, String preferencesTabToSelectName) {
+    public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor, Class<? extends PreferencesTab> preferencesTabToSelectClass) {
         this(jabRefFrame, taskExecutor);
-         this.preferencesTabToSelectName = Optional.of(preferencesTabToSelectName);
+        this.preferencesTabToSelectClass = Optional.of(preferencesTabToSelectClass);
    }
 
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        if (preferencesTabToSelectName.isEmpty()) {
+        if (preferencesTabToSelectClass.isEmpty()) {
             dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, null));
         } else {
-            dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, preferencesTabToSelectName.get()));
+            dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, preferencesTabToSelectClass.get()));
         }
     }
 }

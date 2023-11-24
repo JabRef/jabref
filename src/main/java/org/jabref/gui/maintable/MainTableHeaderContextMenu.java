@@ -21,6 +21,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 
@@ -94,7 +95,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         this.getItems().add(new SeparatorMenuItem());
         ActionFactory actionfactory = new ActionFactory(Globals.getKeyPrefs());
-        MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor, "Entry table"));
+        MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor, TableTab.class));
         this.getItems().add(showMoreItem);
     }
 
