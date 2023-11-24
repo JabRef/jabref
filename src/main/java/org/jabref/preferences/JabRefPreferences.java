@@ -6,9 +6,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +33,8 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
@@ -121,6 +126,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
+import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
@@ -1612,8 +1618,23 @@ public class JabRefPreferences implements PreferencesService {
             } catch (PasswordAccessException ex) {
                 LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
             } catch (Exception ex) {
-                LOGGER.warn("JabRef could not open the key store");
+                LOGGER.warn("JabRef could not open the git key store");
             }
+        }
+        return (String) defaults.get(PROXY_PASSWORD);
+    }
+
+    private String getGitPassword() {
+        try {
+            final Keyring keyring = Keyring.create();
+            return new Password(
+                    keyring.getPassword("org.jabref", "git"),
+                    getInternalPreferences().getUserAndHost())
+                    .decrypt();
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("JabRef uses git password from key store but no password is stored");
+        } catch (Exception ex) {
+            LOGGER.warn("JabRef could not open the git key store");
         }
         return (String) defaults.get(PROXY_PASSWORD);
     }
@@ -1632,6 +1653,22 @@ public class JabRefPreferences implements PreferencesService {
             } catch (Exception ex) {
                 LOGGER.warn("Unable to open key store", ex);
             }
+        }
+    }
+
+    private void setGitPassword(String password) {
+        try {
+            final Keyring keyring = Keyring.create();
+            if (StringUtil.isBlank(password)) {
+                keyring.deletePassword("org.jabref", "git");
+            } else {
+                keyring.setPassword("org.jabref", "git", new Password(
+                        password.trim(),
+                        getInternalPreferences().getUserAndHost())
+                        .encrypt());
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to open key store", ex);
         }
     }
 
@@ -2830,13 +2867,13 @@ public class JabRefPreferences implements PreferencesService {
 
         gitPreferences = new GitPreferences(
             get(GIT_USERNAME),
-            get(GIT_PASSWORD),
+            getGitPassword(),
                 getBoolean(GIT_AUTOCOMMIT),
                 getBoolean(GIT_AUTOSYNC)
         );
 
         EasyBind.listen(gitPreferences.getUsernameProperty(), (obs, oldValue, newValue) -> put(GIT_USERNAME, newValue));
-        EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) -> put(GIT_PASSWORD, newValue));
+        EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) -> setGitPassword(newValue));
         EasyBind.listen(gitPreferences.getAutoCommitProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_AUTOCOMMIT, newValue));
         EasyBind.listen(gitPreferences.getAutoSyncProperty(), (obs, oldValue, newValue) -> putBoolean(GIT_AUTOSYNC, newValue));
 
