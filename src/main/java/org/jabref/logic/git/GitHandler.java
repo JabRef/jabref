@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.util.io.FileUtil;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -17,7 +19,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.jabref.logic.util.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,6 @@ public class GitHandler {
 
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-
 
         if (!isGitRepository()) {
             try {
@@ -271,9 +271,9 @@ public class GitHandler {
                 git.push()
                .setTransportConfigCallback(transportConfigCallback)
                .call();
-            }else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
+            } else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
                 throw new IOException("No git credentials");
-            }  else {
+            } else {
                 git.push()
                 .setCredentialsProvider(this.credentialsProvider)
                 .call();
@@ -332,8 +332,6 @@ public class GitHandler {
                 }
             }
         }
-
-
     }
 
     /**
