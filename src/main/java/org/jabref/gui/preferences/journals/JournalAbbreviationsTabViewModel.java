@@ -21,6 +21,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationManager;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -103,6 +104,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 }
             }
         });
+        JournalAbbreviationManager.registerRefreshAction(this::setValues);
     }
 
     @Override

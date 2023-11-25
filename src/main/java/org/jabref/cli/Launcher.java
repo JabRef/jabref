@@ -11,7 +11,9 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
+import org.jabref.logic.journals.JournalAbbreviationManager;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
@@ -79,6 +81,7 @@ public class Launcher {
             // Initialize rest of preferences
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
+            initJournalAbbreviations(preferences.getJournalAbbreviationPreferences());
             initGlobals(preferences);
             clearOldSearchIndices();
 
@@ -108,6 +111,10 @@ public class Launcher {
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
+    }
+
+    private static void initJournalAbbreviations(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+        JournalAbbreviationManager.init(journalAbbreviationPreferences);
     }
 
     private static void routeLoggingToSlf4J() {

@@ -79,6 +79,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.JournalAbbreviationDirectoryWatcher;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -389,6 +390,9 @@ public class JabRefPreferences implements PreferencesService {
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
 
+    // Journal Abbreviations
+    private static final String JOURNAL_ABBREVIATIONS_DIRECTORY_PATH = "journalAbbreviationsPath";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -487,6 +491,8 @@ public class JabRefPreferences implements PreferencesService {
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
+
+    private JournalAbbreviationDirectoryWatcher journalAbbreviationDirectoryWatcher;
     private FieldPreferences fieldPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
@@ -1195,7 +1201,8 @@ public class JabRefPreferences implements PreferencesService {
 
         journalAbbreviationPreferences = new JournalAbbreviationPreferences(
                 getStringList(EXTERNAL_JOURNAL_LISTS),
-                getBoolean(USE_AMS_FJOURNAL));
+                getBoolean(USE_AMS_FJOURNAL),
+                getPath(JOURNAL_ABBREVIATIONS_DIRECTORY_PATH, OS.getNativeDesktop().getJournalAbbreviationsDirectory()));
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));

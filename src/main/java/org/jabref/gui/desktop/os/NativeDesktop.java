@@ -107,6 +107,13 @@ public abstract class NativeDesktop {
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
+    public Path getJournalAbbreviationsDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "journal-abbreviations",
+                                             OS.APP_DIR_APP_AUTHOR));
+    }
+
     public String getHostName() {
         String hostName;
         // Following code inspired by https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/SystemUtils.html#getHostName--
