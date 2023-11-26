@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.stream.Collectors;
 
@@ -10,10 +11,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
@@ -22,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
+import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -39,6 +38,11 @@ public class CommentsTab extends FieldsEditorTab {
     public static final String NAME = "Comments";
 
     private final String defaultOwner;
+    private final UserSpecificCommentField userSpecificCommentField;
+
+    // TODO: Move this to the preferences
+    private boolean showUserComment = true;
+
     public CommentsTab(PreferencesService preferences,
                        BibDatabaseContext databaseContext,
                        SuggestionProviders suggestionProviders,
@@ -65,14 +69,20 @@ public class CommentsTab extends FieldsEditorTab {
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner();
         setText(Localization.lang("Comments"));
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
+
+        userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
     }
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
+
         SequencedSet<Field> comments = new LinkedHashSet<>();
+        if (showUserComment) {
+            comments.add(userSpecificCommentField);
+        }
         comments.add(StandardField.COMMENT);
         comments.addAll(entry.getFields().stream()
-                             .filter(field -> field instanceof UserSpecificCommentField ||
+                             .filter(field -> (field instanceof UserSpecificCommentField && showUserComment) ||
                                      field.getName().toLowerCase().contains("comment"))
                              .sorted(Comparator.comparing(Field::getName))
                              .collect(Collectors.toCollection(LinkedHashSet::new)));
@@ -112,6 +122,8 @@ public class CommentsTab extends FieldsEditorTab {
 
         boolean hasDefaultOwnerField = false;
 
+        Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
+
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
@@ -123,30 +135,20 @@ public class CommentsTab extends FieldsEditorTab {
             editor.getNode().setDisable(!shouldBeEnabled);
         }
 
-        if (!hasDefaultOwnerField) {
+        if (hasDefaultOwnerField) {
             BorderPane container = new BorderPane();
-            Button addDefaultOwnerCommentButton = new Button(Localization.lang("Add"));
-            addDefaultOwnerCommentButton.setOnAction(e -> {
-                ObservableList<Node> children = gridPane.getChildren();
-                int rows = gridPane.getRowCount();
+            Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user comments"));
+            hideDefaultOwnerCommentButton.setOnAction(e -> {
+                var labelForfield = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
+                labelForfield.ifPresent(label -> gridPane.getChildren().remove(label));
+                fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
+                editors.remove(userSpecificCommentField);
 
-                // remove button
-                children.removeLast();
-
-                // add comment field for current user
-                UserSpecificCommentField userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
-                Label label = createLabelAndEditor(entry, userSpecificCommentField);
-                Parent node = editors.get(userSpecificCommentField).getNode();
-                gridPane.addRow(rows - 1, label, node);
-                setCompressedRowLayout(gridPane, rows);
-                node.requestFocus();
+                showUserComment = false;
+                setupPanel(entry, false);
             });
-            // container.setCenter(addDefaultOwnerCommentButton);
-            gridPane.add(addDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
-            // setRegularRowLayout(gridPane);
+            gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
             setCompressedRowLayout();
-            // gridPane.getRowConstraints().add(new RowConstraints(addDefaultOwnerCommentButton.getMinHeight()));
-            // setCompressedRowLayout(gridPane, gridPane.getRowCount());
         }
     }
 }
