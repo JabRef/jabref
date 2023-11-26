@@ -12,13 +12,13 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preferences.table.TableTab;
@@ -32,17 +32,19 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     MainTableColumnFactory factory;
     private final JabRefFrame frame;
     private final TaskExecutor taskExecutor;
+    private final KeyBindingRepository keyBindingRepository;
 
     /**
      * Constructor for the right click menu
      *
      */
-    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory, JabRefFrame frame, TaskExecutor taskExecutor) {
+    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory, JabRefFrame frame, TaskExecutor taskExecutor, KeyBindingRepository keyBindingRepository) {
         super();
         this.frame = frame;
         this.taskExecutor = taskExecutor;
         this.mainTable = mainTable;
         this.factory = factory;
+        this.keyBindingRepository = keyBindingRepository;
         constructItems(mainTable);
     }
 
@@ -94,7 +96,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         }
 
         this.getItems().add(new SeparatorMenuItem());
-        ActionFactory actionfactory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
         MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor, TableTab.class));
         this.getItems().add(showMoreItem);
     }
@@ -269,7 +271,6 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         @Override
         public String getText() {
-            // TODO Auto-generated method stub
             return text;
         }
 
