@@ -162,7 +162,7 @@ class DatabaseMergerTest {
 
         // Assert that groups of other are children of root node of target
         assertEquals(targetRootGroup, target.getGroups().get());
-        assertEquals(target.getGroups().get().getChildren().size(), 1);
+        assertEquals(1, target.getGroups().get().getChildren().size());
         assertEquals(otherRootGroup, target.getGroups().get().getChildren().get(0));
     }
 
@@ -185,7 +185,7 @@ class DatabaseMergerTest {
 
         // Assert that groups of other are children of root node of target
         assertEquals(targetRootGroup, target.getGroups().get());
-        assertEquals(target.getGroups().get().getChildren().size(), 1);
+        assertEquals(1, target.getGroups().get().getChildren().size());
         assertEquals(expectedImportedGroupNode, target.getGroups().get().getChildren().get(0));
         assertEquals(expectedContentSelectors, target.getContentSelectorList());
     }

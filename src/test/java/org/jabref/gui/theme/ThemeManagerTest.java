@@ -145,7 +145,7 @@ class ThemeManagerTest {
         Files.move(largeCssTestFile, largeCssTestFile.resolveSibling("renamed.css"));
 
         // getAdditionalStylesheet() should no longer offer the deleted stylesheet as it is not been held in memory
-        assertEquals(themeManager.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet(), "",
+        assertEquals("", themeManager.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet(),
                 "didn't expect additional stylesheet after css was deleted");
 
         Files.move(largeCssTestFile.resolveSibling("renamed.css"), largeCssTestFile);
@@ -194,7 +194,7 @@ class ThemeManagerTest {
         });
 
         Assertions.assertDoesNotThrow(() -> {
-            assertEquals(webEngineStyleSheetLocation.get(), TEST_CSS_DATA);
+            assertEquals(TEST_CSS_DATA, webEngineStyleSheetLocation.get());
         });
     }
 
