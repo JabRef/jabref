@@ -218,6 +218,7 @@ public class EntryEditorPreferences {
     public boolean shouldShowUserCommentsFields() {
         return showUserCommentsFields.get();
     }
+
     public BooleanProperty showUserCommentsFieldsProperty() {
         return showUserCommentsFields;
     }
