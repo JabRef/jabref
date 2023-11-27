@@ -246,5 +246,4 @@ public class GuiPreferences {
     public BooleanProperty mergeShowChangedFieldOnlyProperty() {
         return mergeShowChangedFieldsOnly;
     }
-
 }
