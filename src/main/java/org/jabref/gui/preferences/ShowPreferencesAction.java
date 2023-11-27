@@ -23,6 +23,11 @@ public class ShowPreferencesAction extends SimpleCommand {
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame, preferencesTabToSelectClass));
+        dialogService.showCustomDialog(new PreferencesDialogView(preferencesTabToSelectClass));
+
+        // Refresh frame and tables
+        jabRefFrame.getGlobalSearchBar().updateHintVisibility();
+        jabRefFrame.setupAllTables();
+        jabRefFrame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 }

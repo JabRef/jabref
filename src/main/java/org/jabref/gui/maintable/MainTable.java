@@ -198,7 +198,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 taskExecutor);
 
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this, rightClickMenuFactory, this.libraryTab.frame(), taskExecutor, keyBindingRepository).show(true);
+        new MainTableHeaderContextMenu(this, rightClickMenuFactory, this.libraryTab.frame(), keyBindingRepository).show(true);
     }
 
     /**

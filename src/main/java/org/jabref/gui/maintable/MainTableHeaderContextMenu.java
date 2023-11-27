@@ -18,7 +18,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preferences.table.TableTab;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
@@ -27,17 +26,18 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     MainTable mainTable;
     MainTableColumnFactory factory;
     private final JabRefFrame frame;
-    private final TaskExecutor taskExecutor;
     private final KeyBindingRepository keyBindingRepository;
 
     /**
      * Constructor for the right click menu
      *
      */
-    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory, JabRefFrame frame, TaskExecutor taskExecutor, KeyBindingRepository keyBindingRepository) {
+    public MainTableHeaderContextMenu(MainTable mainTable,
+                                      MainTableColumnFactory factory,
+                                      JabRefFrame frame,
+                                      KeyBindingRepository keyBindingRepository) {
         super();
         this.frame = frame;
-        this.taskExecutor = taskExecutor;
         this.mainTable = mainTable;
         this.factory = factory;
         this.keyBindingRepository = keyBindingRepository;

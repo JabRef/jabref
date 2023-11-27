@@ -11,7 +11,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.theme.ThemeManager;
@@ -43,12 +42,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @Inject private PreferencesService preferencesService;
     @Inject private ThemeManager themeManager;
 
-    private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
 
-    public PreferencesDialogView(JabRefFrame frame, Class<? extends PreferencesTab> preferencesTabToSelectClass) {
-        this.frame = frame;
+    public PreferencesDialogView(Class<? extends PreferencesTab> preferencesTabToSelectClass) {
         this.setTitle(Localization.lang("JabRef preferences"));
         this.preferencesTabToSelectClass = preferencesTabToSelectClass;
 
@@ -74,7 +71,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, preferencesService, frame);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferencesService);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
