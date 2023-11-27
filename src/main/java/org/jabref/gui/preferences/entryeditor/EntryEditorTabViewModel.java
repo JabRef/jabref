@@ -32,6 +32,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
 
+    private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
+
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
@@ -61,6 +63,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
         enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
+        showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
     }
@@ -98,6 +101,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
         entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
+        entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -172,5 +176,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableSciteTabProperty() {
         return enableSciteTabProperty;
+    }
+
+    public BooleanProperty showUserCommentsProperty() {
+        return this.showUserCommentsProperty;
     }
 }

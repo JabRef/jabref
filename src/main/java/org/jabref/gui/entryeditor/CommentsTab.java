@@ -31,6 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.preferences.EntryEditorPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class CommentsTab extends FieldsEditorTab {
@@ -39,8 +40,7 @@ public class CommentsTab extends FieldsEditorTab {
     private final String defaultOwner;
     private final UserSpecificCommentField userSpecificCommentField;
 
-    // TODO: Move this to the preferences
-    private boolean showUserComment = true;
+    private final EntryEditorPreferences entryEditorPreferences;
 
     public CommentsTab(PreferencesService preferences,
                        BibDatabaseContext databaseContext,
@@ -70,17 +70,18 @@ public class CommentsTab extends FieldsEditorTab {
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
 
         userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
+        entryEditorPreferences = preferences.getEntryEditorPreferences();
     }
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         SequencedSet<Field> comments = new LinkedHashSet<>();
-        if (showUserComment) {
+        if (entryEditorPreferences.shouldShowUserCommentsFields()) {
             comments.add(userSpecificCommentField);
         }
         comments.add(StandardField.COMMENT);
         comments.addAll(entry.getFields().stream()
-                             .filter(field -> (field instanceof UserSpecificCommentField && showUserComment) ||
+                             .filter(field -> (field instanceof UserSpecificCommentField && entryEditorPreferences.shouldShowUserCommentsFields()) ||
                                      field.getName().toLowerCase().contains("comment"))
                              .sorted(Comparator.comparing(Field::getName))
                              .collect(Collectors.toCollection(LinkedHashSet::new)));
@@ -140,7 +141,7 @@ public class CommentsTab extends FieldsEditorTab {
                 fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
                 editors.remove(userSpecificCommentField);
 
-                showUserComment = false;
+                entryEditorPreferences.setShowUserCommentsFields(false);
                 setupPanel(entry, false);
             });
             gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
