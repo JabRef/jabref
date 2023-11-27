@@ -12,7 +12,6 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
@@ -75,7 +74,6 @@ public class CommentsTab extends FieldsEditorTab {
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
-
         SequencedSet<Field> comments = new LinkedHashSet<>();
         if (showUserComment) {
             comments.add(userSpecificCommentField);
@@ -123,7 +121,6 @@ public class CommentsTab extends FieldsEditorTab {
         boolean hasDefaultOwnerField = false;
 
         Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
-
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
@@ -136,11 +133,10 @@ public class CommentsTab extends FieldsEditorTab {
         }
 
         if (hasDefaultOwnerField) {
-            BorderPane container = new BorderPane();
             Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user comments"));
             hideDefaultOwnerCommentButton.setOnAction(e -> {
-                var labelForfield = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
-                labelForfield.ifPresent(label -> gridPane.getChildren().remove(label));
+                var labelForField = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
+                labelForField.ifPresent(label -> gridPane.getChildren().remove(label));
                 fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
                 editors.remove(userSpecificCommentField);
 

@@ -40,7 +40,6 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
@@ -256,6 +255,8 @@ public class JabRefPreferences implements PreferencesService {
 
 
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
+
+    public static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -638,6 +639,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
 
+        defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
+
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
@@ -891,7 +894,7 @@ public class JabRefPreferences implements PreferencesService {
                 escape = false;
             }
         }
-        if (res.length() > 0) {
+        if (!res.isEmpty()) {
             return Optional.of(res.toString());
         } else if (c == -1) {
             // end of stream
@@ -1452,7 +1455,8 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(ENTRY_EDITOR_HEIGHT),
                 getBoolean(AUTOLINK_FILES_ENABLED),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB));
+                getBoolean(SHOW_SCITE_TAB),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS));
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (obs, oldValue, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -1466,6 +1470,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (obs, oldValue, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
         EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
+        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
 
         return entryEditorPreferences;
     }
@@ -2612,7 +2617,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
-
         return guiPreferences;
     }
 

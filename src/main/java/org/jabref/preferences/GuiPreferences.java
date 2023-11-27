@@ -247,11 +247,4 @@ public class GuiPreferences {
         return mergeShowChangedFieldsOnly;
     }
 
-    public boolean isMergeShowChangedFieldsOnly() {
-        return mergeShowChangedFieldsOnly.getValue();
-    }
-
-    public void setIsMergedShowChangedFielsOnly(boolean showChangedFieldsOnly) {
-        mergeShowChangedFieldsOnly.setValue(showChangedFieldsOnly);
-    }
 }

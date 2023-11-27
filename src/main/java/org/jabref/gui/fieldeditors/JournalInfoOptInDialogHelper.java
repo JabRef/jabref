@@ -1,8 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.EntryEditorPreferences;
 
 public class JournalInfoOptInDialogHelper {
 

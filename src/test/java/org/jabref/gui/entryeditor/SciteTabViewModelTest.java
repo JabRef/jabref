@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
 
+import org.jabref.gui.preferences.EntryEditorPreferences;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;

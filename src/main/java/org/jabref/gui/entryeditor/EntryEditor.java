@@ -56,6 +56,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.EntryEditorPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
