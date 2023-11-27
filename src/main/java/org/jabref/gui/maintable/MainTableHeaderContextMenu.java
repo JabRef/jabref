@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
@@ -13,11 +12,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
@@ -97,7 +93,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         this.getItems().add(new SeparatorMenuItem());
         ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
-        MenuItem showMoreItem = actionfactory.createMenuItem(RightClickMenuActions.SHOW_PREFS_RIGHT_CLICK_MENU, new ShowPreferencesAction(frame, taskExecutor, TableTab.class));
+        MenuItem showMoreItem = actionfactory.createMenuItem(
+                StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
+                new ShowPreferencesAction(frame, taskExecutor, TableTab.class));
         this.getItems().add(showMoreItem);
     }
 
@@ -246,37 +244,6 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         public boolean isVisibleInTable() {
             return visibleInTable;
-        }
-    }
-
-    /**
-     * build appropriate actions for the right click menu (different from StandardActions)
-     *
-     */
-    private enum RightClickMenuActions implements Action {
-
-        SHOW_PREFS_RIGHT_CLICK_MENU(Localization.lang("More options..."), IconTheme.JabRefIcons.PREFERENCES);
-
-        private final String text;
-        private final String description;
-        private final Optional<JabRefIcon> icon;
-        private final Optional<KeyBinding> keyBinding;
-
-        RightClickMenuActions(String text, IconTheme.JabRefIcons icon) {
-            this.text = text;
-            this.description = "";
-            this.icon = Optional.of(icon);
-            this.keyBinding = Optional.empty();
-        }
-
-        @Override
-        public String getText() {
-            return text;
-        }
-
-        @Override
-        public Optional<JabRefIcon> getIcon() {
-            return icon;
         }
     }
 }
