@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.preferences.EntryEditorPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONObject;

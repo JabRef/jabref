@@ -4,7 +4,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.EntryEditorPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
 

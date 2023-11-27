@@ -30,7 +30,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.EntryEditorPreferences;
 import org.jabref.preferences.MrDlibPreferences;
 import org.jabref.preferences.PreferencesService;
 
