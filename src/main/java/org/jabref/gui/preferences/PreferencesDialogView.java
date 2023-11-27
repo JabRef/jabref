@@ -108,11 +108,9 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         if (this.preferencesTabToSelectClass != null) {
             Optional<PreferencesTab> tabToSelectIfExist = preferenceTabList.getItems()
                                                                            .stream()
-                                                                           .filter(prefTab -> prefTab.getClass() == preferencesTabToSelectClass)
+                                                                           .filter(prefTab -> prefTab.getClass().equals(preferencesTabToSelectClass))
                                                                            .findFirst();
-            if (tabToSelectIfExist.isPresent()) {
-                preferenceTabList.getSelectionModel().select(tabToSelectIfExist.get());
-            }
+            tabToSelectIfExist.ifPresent(preferencesTab -> preferenceTabList.getSelectionModel().select(preferencesTab));
         } else {
             preferenceTabList.getSelectionModel().selectFirst();
         }

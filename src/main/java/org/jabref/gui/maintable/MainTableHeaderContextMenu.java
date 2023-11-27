@@ -95,7 +95,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
         MenuItem showMoreItem = actionfactory.createMenuItem(
                 StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
-                new ShowPreferencesAction(frame, taskExecutor, TableTab.class));
+                new ShowPreferencesAction(frame, TableTab.class));
         this.getItems().add(showMoreItem);
     }
 
