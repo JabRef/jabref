@@ -1,5 +1,7 @@
 package org.jabref.logic.l10n;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -69,5 +71,10 @@ public enum Language {
 
     public String getId() {
         return id;
+    }
+
+    public static Language[] getSorted() {
+        return Arrays.stream(values()).sorted(Comparator.comparing(Language::getDisplayName))
+                                      .toArray(Language[]::new);
     }
 }

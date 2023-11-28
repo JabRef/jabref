@@ -57,7 +57,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
     private final ReadOnlyListProperty<Language> languagesListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.values()));
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.getSorted()));
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
 
     private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
