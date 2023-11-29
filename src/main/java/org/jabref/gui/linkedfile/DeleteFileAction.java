@@ -58,6 +58,11 @@ public class DeleteFileAction extends SimpleCommand {
             return;
         }
 
+        if (!preferences.getFilePreferences().confirmDeleteLinkedFile()) {
+            deleteFiles(linkedFiles, true);
+            return;
+        }
+
         String dialogTitle;
         String dialogContent;
 
