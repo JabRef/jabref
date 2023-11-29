@@ -32,7 +32,8 @@ jobs:
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Check whether journal-list.mv can be generated (the "real" generation is done inside JabRef's build process)
         run: |
           ./gradlew generateJournalListMV

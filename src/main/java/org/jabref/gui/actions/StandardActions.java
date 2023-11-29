@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
@@ -194,7 +195,7 @@ public enum StandardActions implements Action {
     GROUP_ENTRIES_ADD(Localization.lang("Add selected entries to this group")),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group"));
 
-    private final String text;
+    private String text;
     private final String description;
     private final Optional<JabRefIcon> icon;
     private final Optional<KeyBinding> keyBinding;
@@ -270,5 +271,10 @@ public enum StandardActions implements Action {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    public Action withText(String text) {
+        this.text = Objects.requireNonNull(text);
+        return this;
     }
 }
