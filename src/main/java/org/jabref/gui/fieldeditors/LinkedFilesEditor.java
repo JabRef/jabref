@@ -266,7 +266,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private void deleteEntry() {
         new DeleteFileAction(dialogService, preferencesService, databaseContext,
                 viewModel, listView.getSelectionModel().getSelectedItems()).execute();
-
     }
 
     public LinkedFilesEditorViewModel getViewModel() {
