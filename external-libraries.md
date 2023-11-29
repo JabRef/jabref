@@ -4,7 +4,7 @@ This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
 One can list all dependencies by using Gradle task `dependencyReport`.
-It generates the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
+It generates the file `build/reports/project/dependencies.txt`.
 Below, there is a howto to generate the content at "Sorted list of runtime dependencies output by gradle".
 
 ## Legend
@@ -152,6 +152,13 @@ License: Apache-2.0
 Id:      com.googlecode.javaewah:JavaEWAH
 Project: JavaEWAH
 URL:     https://github.com/lemire/javaewah
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.jthemedetecor.OsThemeDetector
+Project: jSystemThemeDetector
+URL:     https://github.com/Dansoftowner/jSystemThemeDetector
 License: Apache-2.0
 ```
 

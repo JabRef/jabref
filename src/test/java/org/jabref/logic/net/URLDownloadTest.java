@@ -73,10 +73,10 @@ public class URLDownloadTest {
 
     @Test
     public void downloadToTemporaryFileKeepsName() throws IOException {
-        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE.md"));
+        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
-        assertTrue(path.contains("LICENSE") && path.endsWith(".md"), path);
+        assertTrue(path.contains("LICENSE"), path);
     }
 
     @Test

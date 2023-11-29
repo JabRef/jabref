@@ -12,4 +12,4 @@ JabRef supports kinds of remote storage:
 The first one is the more modern approach allowing offline-work.
 The second approach makes use of the SQL features of databases and require direct online connections.
 
-More details in [JabDrive](remote-storeage-jabdrive.md) and [SQL Storage](remote-storage-sql.md) respectively.
+More details in [JabDrive](remote-storage-jabdrive.md) and [SQL Storage](remote-storage-sql.md) respectively.

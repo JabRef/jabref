@@ -63,6 +63,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
+
+    private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
+
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
@@ -178,6 +181,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());
             }
         }
+        themeSyncOsProperty.setValue(workspacePreferences.shouldThemeSyncOs());
 
         fontOverrideProperty.setValue(workspacePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(workspacePreferences.getMainFontSize()));
@@ -215,10 +219,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
         switch (selectedThemeProperty.get()) {
-            case LIGHT -> workspacePreferences.setTheme(Theme.light());
-            case DARK -> workspacePreferences.setTheme(Theme.dark());
+            case LIGHT ->
+                    workspacePreferences.setTheme(Theme.light());
+            case DARK ->
+                    workspacePreferences.setTheme(Theme.dark());
             case CUSTOM -> workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
+        workspacePreferences.setThemeSyncOs(themeSyncOsProperty.getValue());
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
@@ -320,6 +327,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<ThemeTypes> selectedThemeProperty() {
         return this.selectedThemeProperty;
+    }
+
+    public BooleanProperty themeSyncOsProperty() {
+        return this.themeSyncOsProperty;
     }
 
     public StringProperty customPathToThemeProperty() {

@@ -3,13 +3,11 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
-<?import org.jabref.gui.icon.JabRefIconView?>
-<?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.ISSNEditor">
     <EditorTextArea fx:id="textArea"/>
-    <VBox>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
                 styleClass="icon-button">
@@ -20,5 +18,11 @@
                 <Tooltip text="%View journal info"/>
             </tooltip>
         </Button>
-    </VBox>
+        <Button fx:id="fetchInformationByIdentifierButton"
+                onAction="#fetchInformationByIdentifier"
+                styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
+            </graphic>
+        </Button>
 </fx:root>
