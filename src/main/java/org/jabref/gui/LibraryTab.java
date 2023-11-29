@@ -451,8 +451,11 @@ public class LibraryTab extends Tab {
                                                      .toList();
 
             if (!linkedFileList.isEmpty() && showLinkedFileDeleteConfirmationDialog(linkedFileList)) {
-                List<LinkedFileViewModel> viewModels = linkedFileList.
-                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, linkedFileList);
+                List<LinkedFileViewModel> viewModels = linkedFileList.stream()
+                                                                     .map(linkedFile -> linkedFile.toModel(null, bibDatabaseContext, null, null, preferencesService))
+                                                                     .collect(Collectors.toList());
+
+                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, viewModels).execute();
             }
         }
 
@@ -753,8 +756,7 @@ public class LibraryTab extends Tab {
                 message,
                 okButton,
                 cancelButton,
-                Localization.lang("Show confirmation dialog when deleting files"),
-                // false => confirm delete
+                Localization.lang("Do not ask again"),
                 optOut -> preferencesService.getFilePreferences().confirmDeleteLinkedFile(!optOut));
     }
 

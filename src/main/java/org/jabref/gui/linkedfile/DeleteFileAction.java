@@ -41,7 +41,7 @@ public class DeleteFileAction extends SimpleCommand {
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.viewModel = viewModel;
-        this.linkedFiles = List.copyOf(linkedFiles)
+        this.linkedFiles = List.copyOf(linkedFiles);
     }
 
     public DeleteFileAction(DialogService dialogService,
