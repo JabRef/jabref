@@ -209,7 +209,8 @@ public class LinkedFile implements Serializable {
                                        TaskExecutor taskExecutor,
                                        DialogService dialogService,
                                        PreferencesService preferencesService) {
-        return new LinkedFileViewModel(this,
+        return new LinkedFileViewModel(
+                this,
                 entry,
                 databaseContext,
                 taskExecutor,
