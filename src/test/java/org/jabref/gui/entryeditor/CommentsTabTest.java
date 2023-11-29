@@ -72,12 +72,16 @@ class CommentsTabTest {
     @Mock
     private OwnerPreferences ownerPreferences;
 
+    @Mock
+    private EntryEditorPreferences entryEditorPreferences;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
+        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
         BibEntryType entryTypeMock = mock(BibEntryType.class);
         when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
