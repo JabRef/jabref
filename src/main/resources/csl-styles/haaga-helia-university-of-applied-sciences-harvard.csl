@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
+  <info>
+    <title>Haaga-Helia ammattikorkeakoulu - Harvard</title>
+    <id>http://www.zotero.org/styles/haaga-helia-university-of-applied-sciences-harvard</id>
+    <link href="http://www.zotero.org/styles/haaga-helia-university-of-applied-sciences-harvard" rel="self"/>
+    <link href="https://libguides.haaga-helia.fi/referencing" xml:lang="en-GB" rel="documentation"/>
+    <link href="https://libguides.haaga-helia.fi/lahdeviittaamisen-tueksi" xml:lang="fi-FI" rel="documentation"/>
+    <author>
+      <name>Mika Rautio</name>
+      <uri>https://github.com/mrautio</uri>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="generic-base"/>
+    <summary>Haaga-Helia University of Applied Sciences referencing style (Finnish and English)</summary>
+    <updated>2021-11-14T07:02:42+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="fi">
+    <date form="text">
+      <date-part name="day" suffix="."/>
+      <date-part name="month" suffix="." form="numeric"/>
+      <date-part name="year"/>
+    </date>
+    <terms>
+      <term name="no date">s.a.</term>
+      <term name="and">&amp;</term>
+      <term name="et-al">ym.</term>
+      <!-- In FI references, depending on reference material, the localization would be "Luettavissa" / "Nähtävissä" / "Kuunneltavissa". According to Thesis instructors, using "URL" in FI localization is allowed. -->
+      <term name="available at">URL</term>
+      <term name="accessed">Luettu</term>
+      <term name="page">s.</term>
+    </terms>
+  </locale>
+  <locale xml:lang="en">
+    <date form="text">
+      <date-part name="day" suffix=" "/>
+      <date-part name="month" suffix=" "/>
+      <date-part name="year"/>
+    </date>
+    <terms>
+      <term name="no date">s.a.</term>
+      <term name="and">&amp;</term>
+      <term name="et-al">&amp; al.</term>
+      <term name="available at">URL</term>
+      <term name="page">pp.</term>
+    </terms>
+  </locale>
+  <macro name="access">
+    <choose>
+      <if variable="DOI" match="all">
+        <group delimiter=": " suffix=".">
+          <text term="available at"/>
+          <!-- Haaga-Helia referencing guidelines do not recognize DOI. However, due to its persistency, it makes sense to use it when given. -->
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </group>
+      </if>
+      <else-if variable="URL" match="all">
+        <group delimiter=": " suffix=".">
+          <text term="available at"/>
+          <text variable="URL"/>
+        </group>
+      </else-if>
+    </choose>
+    <group>
+      <text term="accessed" text-case="capitalize-first" prefix=" " suffix=": "/>
+      <date variable="accessed" form="text"/>
+    </group>
+  </macro>
+  <macro name="author-bibliography">
+    <names variable="author">
+      <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with="." delimiter-precedes-last="never" delimiter=", "/>
+      <label form="short" prefix=" "/>
+      <substitute>
+        <text macro="author-substitute"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-citation">
+    <names variable="author">
+      <name form="short" and="text" sort-separator=", " initialize-with="." delimiter-precedes-last="never" delimiter=", "/>
+      <substitute>
+        <text macro="author-substitute"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-substitute">
+    <choose>
+      <if position="subsequent" variable="title-short" type="legislation">
+        <text variable="title-short"/>
+      </if>
+      <else-if type="legislation">
+        <text macro="title"/>
+      </else-if>
+      <else-if variable="publisher">
+        <text variable="publisher"/>
+      </else-if>
+      <else>
+        <!-- Haaga-Helia referencing guidelines do not specify how to cite/list reference, if author and publisher are not known. -->
+        <text macro="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container">
+    <choose>
+      <if type="article article-magazine article-newspaper article-journal" match="any">
+        <group delimiter=", " suffix="">
+          <text variable="container-title"/>
+          <text variable="volume"/>
+          <text variable="issue"/>
+          <group>
+            <text term="page" suffix=" "/>
+            <text variable="page"/>
+          </group>
+        </group>
+      </if>
+      <else-if type="legislation">
+        <text variable="container-title" suffix=". "/>
+        <group delimiter=", " suffix=". ">
+          <text variable="collection-title"/>
+          <date variable="issued" form="text"/>
+          <group>
+            <text term="page" suffix=" "/>
+            <text variable="page"/>
+          </group>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="event">
+    <choose>
+      <if type="personal_communication speech" match="any">
+        <text variable="event" suffix=". "/>
+        <text variable="event-place"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="genre">
+    <choose>
+      <if type="thesis">
+        <text variable="genre"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="issued">
+    <choose>
+      <if type="legislation"/>
+      <else-if variable="issued">
+        <choose>
+          <if type="personal_communication speech post" match="any">
+            <date variable="issued" form="text"/>
+          </if>
+          <else>
+            <date variable="issued" form="text" date-parts="year"/>
+            <text variable="year-suffix"/>
+          </else>
+        </choose>
+      </else-if>
+      <else>
+        <text term="no date"/>
+        <!-- no date cites need to be unique -->
+        <text variable="year-suffix"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="locator">
+    <choose>
+      <if type="legislation">
+        <group prefix=" ">
+          <label variable="locator"/>
+          <text variable="locator" prefix=" "/>
+        </group>
+      </if>
+      <else-if locator="page">
+        <text variable="locator" prefix=", "/>
+      </else-if>
+      <else>
+        <group prefix=", ">
+          <label variable="locator"/>
+          <text variable="locator" prefix=" "/>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="note">
+    <text variable="note"/>
+  </macro>
+  <macro name="publisher">
+    <choose>
+      <if type="article article-magazine article-newspaper article-journal" match="none">
+        <group delimiter=". " suffix="">
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="source">
+    <choose>
+      <if type="personal_communication speech post" match="any">
+        <text variable="source"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="title">
+    <text variable="title"/>
+  </macro>
+  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true">
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=" ">
+        <text macro="author-citation"/>
+        <text macro="issued"/>
+        <!-- note needed when cite must include Creative Commons license information in relevant graphic/figure -->
+        <text macro="note"/>
+      </group>
+      <text macro="locator"/>
+    </layout>
+  </citation>
+  <bibliography>
+    <sort>
+      <key macro="author-bibliography"/>
+    </sort>
+    <layout>
+      <choose>
+        <if type="legislation">
+          <text macro="author-bibliography" suffix=". "/>
+          <text macro="publisher"/>
+          <text macro="container"/>
+          <text macro="access"/>
+        </if>
+        <else>
+          <text macro="author-bibliography"/>
+          <text macro="issued" prefix=" " suffix="."/>
+          <group delimiter=". " prefix=" " suffix=".">
+            <!-- author's job title is needed in case of personal communication / presentation references. CSL does not support job titles, so work-around is to add job title to the actual title -->
+            <text macro="title"/>
+            <text macro="genre"/>
+            <text macro="publisher"/>
+            <text macro="container"/>
+            <text macro="source"/>
+            <text macro="event"/>
+            <text macro="access"/>
+          </group>
+        </else>
+      </choose>
+    </layout>
+  </bibliography>
+</style>

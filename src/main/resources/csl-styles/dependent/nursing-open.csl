@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Nursing Open</title>
+    <id>http://www.zotero.org/styles/nursing-open</id>
+    <link href="http://www.zotero.org/styles/nursing-open" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="independent-parent"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/20541058/homepage/forauthors.html#1-g" rel="documentation"/>
+    <category citation-format="author-date"/>
+    <eissn>2054-1058</eissn>
+    <updated>2023-02-08T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

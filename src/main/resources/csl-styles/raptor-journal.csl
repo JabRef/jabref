@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="symbol" initialize-with="" demote-non-dropping-particle="never" default-locale="en-US">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
+  <info>
+    <title>Raptor Journal</title>
+    <title-short>RJ</title-short>
+    <id>http://www.zotero.org/styles/raptor-journal</id>
+    <link href="http://www.zotero.org/styles/raptor-journal" rel="self"/>
+    <link href="http://www.zotero.org/styles/egretta" rel="template"/>
+    <link href="https://sciendo-parsed-data-feed.s3.eu-central-1.amazonaws.com/SRJ/Instructions_for_Authors.pdf" rel="documentation"/>
+    <author>
+      <name>Michal Ševčík</name>
+      <email>michal.t.sevcik@gmail.com</email>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="biology"/>
+    <category field="zoology"/>
+    <eissn>2644-5247</eissn>
+    <summary>Journal for science, research and conservation on birds of prey and owls. Raptor Journal (formerly known as Slovak Raptor Journal) is issued generally annually and publishes original papers, reviews, short notes and other articles focusing on birds of prey and owls. All articles are published in English.</summary>
+    <updated>2023-03-11T17:01:01+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="et-al">et al.</term>
+    </terms>
+  </locale>
+  <macro name="editor-translator">
+    <names variable="editor translator" suffix=",">
+      <name and="symbol" name-as-sort-order="first" sort-separator=" "/>
+      <label form="short" strip-periods="true" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" strip-periods="true" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book report" match="any">
+        <group delimiter=". ">
+          <group delimiter=", ">
+            <text variable="title"/>
+            <choose>
+              <if match="any" variable="volume">
+                <group delimiter=" ">
+                  <text term="volume" suffix=" "/>
+                  <text variable="volume"/>
+                </group>
+              </if>
+            </choose>
+          </group>
+          <text macro="edition"/>
+        </group>
+      </if>
+      <else>
+        <text variable="title"/>
+        <choose>
+          <if type="chapter paper-conference" match="any">
+            <group>
+              <text variable="page" prefix=", "/>
+            </group>
+          </if>
+        </choose>
+      </else>
+    </choose>
+  </macro>
+  <macro name="year-date">
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+        <text variable="year-suffix"/>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+        <text variable="year-suffix" prefix="-"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number suffix=". " variable="edition"/>
+          <text term="edition" form="short"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container">
+    <choose>
+      <if type="article-journal article-magazine" match="any">
+        <group delimiter=" ">
+          <text variable="container-title"/>
+          <group delimiter=": ">
+            <group>
+              <text variable="volume"/>
+              <text variable="issue" prefix="(" suffix=")"/>
+            </group>
+            <text variable="page"/>
+          </group>
+        </group>
+      </if>
+      <else-if type="chapter paper-conference" match="any">
+        <group delimiter=" ">
+          <text term="in" text-case="capitalize-first" font-style="normal" suffix=":"/>
+          <text macro="editor-translator"/>
+          <group delimiter=": ">
+            <text variable="container-title"/>
+          </group>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <choose>
+      <if type="thesis" match="any">
+        <group delimiter=" ">
+          <text variable="genre"/>
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </if>
+      <else-if type="report" match="any">
+        <text variable="genre" suffix=". "/>
+        <text variable="number" prefix="No. " suffix=". "/>
+        <text variable="publisher-place" suffix=", "/>
+        <text variable="publisher"/>
+      </else-if>
+      <else>
+        <group delimiter=", ">
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="internet-locator">
+    <choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI" prefix="DOI: "/>
+      </if>
+      <else-if match="any" variable="URL">
+        <group delimiter=", ">
+          <group delimiter=" ">
+            <text term="retrieved" text-case="capitalize-first"/>
+            <date form="text" variable="accessed" suffix=","/>
+            <text variable="URL" prefix="from "/>
+          </group>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="pages">
+    <choose>
+      <if type="book" match="any">
+        <text variable="number-of-pages"/>
+      </if>
+    </choose>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year-suffix" year-suffix-delimiter=",">
+    <sort>
+      <key macro="year-date"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=" ">
+        <text macro="author-short"/>
+        <text macro="year-date"/>
+      </group>
+      <group prefix=", " delimiter=" ">
+        <label variable="locator" form="short"/>
+        <text variable="locator"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography name-as-sort-order="first" sort-separator=" " entry-spacing="0">
+    <sort>
+      <key macro="author"/>
+      <key macro="year-date"/>
+      <key macro="title"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=": ">
+        <group delimiter=" ">
+          <text macro="author"/>
+          <text macro="year-date"/>
+        </group>
+        <group delimiter=". ">
+          <text macro="title"/>
+          <text macro="container"/>
+          <text macro="publisher"/>
+          <text macro="pages"/>
+          <text macro="internet-locator"/>
+        </group>
+      </group>
+    </layout>
+  </bibliography>
+</style>

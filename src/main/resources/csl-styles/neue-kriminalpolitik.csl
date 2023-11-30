@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" default-locale="de-DE">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
+  <info>
+    <title>Neue Kriminalpolitik (Deutsch)</title>
+    <title-short>NK</title-short>
+    <id>http://www.zotero.org/styles/neue-kriminalpolitik</id>
+    <link href="http://www.zotero.org/styles/neue-kriminalpolitik" rel="self"/>
+    <link href="https://www.nk.nomos.de/fileadmin/nk/doc/NK_Autorenhinweise_2015.pdf" rel="documentation"/>
+    <author>
+      <name>AlexVonB</name>
+      <uri>https://github.com/AlexVonB</uri>
+    </author>
+    <category citation-format="note"/>
+    <category field="law"/>
+    <issn>0934-9200</issn>
+    <updated>2021-12-20T16:35:47+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="authors-inline">
+    <names variable="author" font-style="italic">
+      <name form="short" font-style="normal" delimiter="/" name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title" form="short"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="authors-bib">
+    <names variable="author" font-style="italic">
+      <name form="short" font-style="normal" delimiter=" / " name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title" form="short"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="number-and-year">
+    <choose>
+      <if match="any" variable="volume">
+        <number variable="volume"/>
+        <date date-parts="year" form="text" variable="issued" prefix=" (" suffix=")"/>
+      </if>
+      <else>
+        <date date-parts="year" form="text" variable="issued"/>
+      </else>
+    </choose>
+  </macro>
+  <citation disambiguate-add-givenname="true">
+    <layout delimiter="; " suffix=".">
+      <choose>
+        <if type="article-journal" match="any">
+          <group delimiter=" ">
+            <text macro="authors-inline" font-style="normal"/>
+            <text variable="container-title-short" form="short"/>
+            <text macro="number-and-year"/>
+          </group>
+          <choose>
+            <if match="any" variable="locator">
+              <text variable="page-first" prefix=", "/>
+              <text variable="locator" prefix=", "/>
+            </if>
+          </choose>
+        </if>
+        <else-if type="legal_case" match="any">
+          <choose>
+            <if match="any" variable="container-title">
+              <group delimiter=" ">
+                <text variable="authority"/>
+                <text variable="container-title" form="short"/>
+                <text variable="volume" suffix=","/>
+                <text variable="page-first"/>
+                <text variable="locator" prefix="(" suffix=")"/>
+              </group>
+            </if>
+            <else>
+              <group delimiter=" ">
+                <text variable="authority" suffix=","/>
+                <text variable="genre" suffix=" v."/>
+                <date form="text" variable="issued" suffix=" &#8211;"/>
+                <text variable="number"/>
+              </group>
+            </else>
+          </choose>
+          <choose>
+            <if match="any" variable="title-short">
+              <text variable="title-short" prefix=" &#8211; "/>
+            </if>
+          </choose>
+        </else-if>
+        <else>
+          <group delimiter=" ">
+            <text macro="authors-inline"/>
+            <date date-parts="year" form="text" variable="issued"/>
+          </group>
+          <choose>
+            <if match="any" variable="locator">
+              <text variable="page-first" prefix=", "/>
+              <text variable="locator" prefix=", "/>
+            </if>
+          </choose>
+        </else>
+      </choose>
+    </layout>
+  </citation>
+  <bibliography>
+    <sort>
+      <key macro="authors-bib"/>
+      <key variable="issued"/>
+    </sort>
+    <layout>
+      <choose>
+        <if type="article-journal" match="any">
+          <group delimiter=" ">
+            <text macro="authors-bib"/>
+            <text variable="title" suffix=","/>
+            <text term="in" suffix=":"/>
+            <text variable="container-title" form="short"/>
+            <text macro="number-and-year" suffix=","/>
+            <text variable="page"/>
+          </group>
+        </if>
+        <else-if type="book" match="any">
+          <group delimiter=" ">
+            <text macro="authors-bib"/>
+            <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")"/>
+            <text variable="title"/>
+          </group>
+          <choose>
+            <if match="any" is-numeric="volume">
+              <text term="volume" prefix=", " suffix=" "/>
+              <number text-case="uppercase" variable="volume" form="roman"/>
+            </if>
+            <else-if match="any" variable="volume">
+              <text variable="volume" prefix=", "/>
+            </else-if>
+          </choose>
+          <choose>
+            <if match="any" is-numeric="edition">
+              <text variable="edition" prefix=", " suffix=". "/>
+              <text term="edition" form="short"/>
+            </if>
+          </choose>
+        </else-if>
+        <else-if type="legal_case" match="none">
+          <group delimiter=" ">
+            <text macro="authors-bib"/>
+            <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")"/>
+            <text variable="title"/>
+          </group>
+          <choose>
+            <if match="all" variable="container-title">
+              <group delimiter=" " prefix=". ">
+                <text term="in" suffix=":"/>
+                <choose>
+                  <if match="any" variable="editor">
+                    <names variable="editor">
+                      <name form="short" delimiter=" / " et-al-min="2" et-al-use-first="1"/>
+                      <label form="short" prefix=" (" suffix="),"/>
+                    </names>
+                  </if>
+                </choose>
+                <text variable="container-title"/>
+              </group>
+            </if>
+          </choose>
+          <text variable="page" prefix=", "/>
+        </else-if>
+      </choose>
+    </layout>
+  </bibliography>
+</style>

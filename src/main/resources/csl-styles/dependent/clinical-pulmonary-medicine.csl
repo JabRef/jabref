@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Clinical Pulmonary Medicine</title>
+    <id>http://www.zotero.org/styles/clinical-pulmonary-medicine</id>
+    <link href="http://www.zotero.org/styles/clinical-pulmonary-medicine" rel="self"/>
+    <link href="http://www.zotero.org/styles/journal-of-clinical-rheumatology" rel="independent-parent"/>
+    <link href="https://edmgr.ovid.com/cpm/accounts/ifauth.htm" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="medicine"/>
+    <issn>1068-0640</issn>
+    <eissn>1536-5956</eissn>
+    <updated>2021-08-09T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

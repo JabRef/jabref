@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never">
+  <!-- Polyglot - journal publishes in Polish and English -->
+  <info>
+    <title>Termedia Neuropsychiatria i Neuropsychologia/Neuropsychiatry and Neuropsychology</title>
+    <id>http://www.zotero.org/styles/termedia-neuropsychiatria-i-neuropsychologia-neuropsychiatry-and-neuropsychology</id>
+    <link href="http://www.zotero.org/styles/termedia-neuropsychiatria-i-neuropsychologia-neuropsychiatry-and-neuropsychology" rel="self"/>
+    <link href="http://www.zotero.org/styles/tropical-animal-health-and-production" rel="template"/>
+    <link href="https://www.termedia.pl/Czasopismo/Neuropsychiatria_i_Neuropsychologia-46/Dla_autorow" rel="documentation"/>
+    <author>
+      <name>Martyna Urbanek-Trzeciak</name>
+      <email>martyna.urbanek@gmail.com</email>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="medicine"/>
+    <issn>1896-6764</issn>
+    <eissn>2084-9885</eissn>
+    <updated>2020-12-17T09:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="page-range-delimiter">-</term>
+    </terms>
+  </locale>
+  <locale xml:lang="pl">
+    <terms>
+      <term name="page-range-delimiter">-</term>
+      <term name="et-al">i wsp.</term>
+    </terms>
+  </locale>
+  <macro name="author">
+    <names variable="author" suffix=".">
+      <name name-as-sort-order="all" sort-separator=" " initialize-with="" delimiter=", " delimiter-precedes-last="never" delimiter-precedes-et-al="never"/>
+      <label form="short" prefix=" (" suffix=")" strip-periods="true"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text macro="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text" delimiter=", " initialize-with=". "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text macro="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <group delimiter=", ">
+          <text variable="title" suffix=","/>
+        </group>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="year-date">
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+        <text variable="year-suffix"/>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="journal">
+    <choose>
+      <if type="article-journal article-magazine" match="any">
+        <group delimiter=", ">
+          <text variable="container-title" form="short"/>
+        </group>
+        <choose>
+          <if variable="page volume" match="none">
+            <text variable="DOI" prefix=", doi: "/>
+          </if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="journal-info">
+    <choose>
+      <if type="article-journal article-magazine" match="any">
+        <group delimiter=": ">
+          <text variable="volume"/>
+          <text variable="page"/>
+        </group>
+        <choose>
+          <if variable="page volume" match="none">
+            <text variable="DOI" prefix=", doi: "/>
+          </if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year-suffix">
+    <sort>
+      <key macro="year-date"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=" ">
+        <text macro="author-short"/>
+        <text macro="year-date"/>
+        <group>
+          <label variable="locator" form="short"/>
+          <text variable="locator" prefix=" "/>
+        </group>
+      </group>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="false" et-al-min="4" et-al-use-first="3" line-spacing="2" entry-spacing="1">
+    <sort>
+      <key macro="author"/>
+      <key macro="title"/>
+    </sort>
+    <layout>
+      <text variable="citation-number" suffix=". "/>
+      <group>
+        <text macro="author" suffix=" "/>
+        <text macro="title" suffix=". "/>
+        <text macro="journal" suffix=" "/>
+        <text macro="year-date" suffix="; "/>
+        <text macro="journal-info" suffix="."/>
+      </group>
+    </layout>
+  </bibliography>
+</style>

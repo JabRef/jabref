@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" default-locale="de-CH">
+  <info>
+    <title>Uni Fribourg Theologie (Deutsch)</title>
+    <id>http://www.zotero.org/styles/uni-fribourg-theologie</id>
+    <link href="http://www.zotero.org/styles/uni-fribourg-theologie" rel="self"/>
+    <link href="https://www.unifr.ch/theo/de/assets/public/Reglements/richtlinien.pdf" rel="documentation"/>
+    <author>
+      <name>Bernhard Knorn SJ</name>
+      <email>bksj AT gmx DOT net</email>
+    </author>
+    <category citation-format="note"/>
+    <category field="theology"/>
+    <summary>German full note style according to the guidelines of the University of Fribourg (Switzerland) for student papers in theology, 4th ed. 2010, following Albert Raffelt, Theologie studieren, 7. Aufl., Freiburg 2008.</summary>
+    <updated>2023-03-22T17:00:00+02:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="de">
+    <terms>
+      <term name="accessed">Heruntergeladen am</term>
+      <term name="editortranslator" form="verb-short">hg. und übers. von</term>
+      <term name="note" form="short">Anm.</term>
+      <term name="reviewed-author">Rez.</term>
+    </terms>
+  </locale>
+  <macro name="author-inv">
+    <names variable="author">
+      <name name-as-sort-order="all" sort-separator=", " delimiter="&#160;; ">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" delimiter="&#160;; " font-variant="small-caps"/>
+      <label form="short" prefix=" (" suffix=")"/>
+      <et-al font-variant="normal"/>
+      <substitute>
+        <names variable="editor"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="translator">
+    <names variable="translator">
+      <label form="verb-short" suffix=" "/>
+      <name delimiter-precedes-last="never" and="text">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
+    </names>
+  </macro>
+  <macro name="editor-transl">
+    <names variable="editor translator" delimiter="&#160;; ">
+      <label form="verb-short" suffix=" "/>
+      <name delimiter-precedes-last="never" and="text">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if variable="reviewed-author">
+        <text term="reviewed-author" suffix=" "/>
+        <names variable="reviewed-author" suffix=", ">
+          <name name-as-sort-order="all" sort-separator=", " delimiter="&#160;; ">
+            <name-part name="family" font-variant="small-caps"/>
+          </name>
+        </names>
+        <text variable="title"/>
+      </if>
+      <else-if type="book speech manuscript" match="any">
+        <text variable="title" font-style="italic"/>
+      </else-if>
+      <else-if type="entry-encyclopedia entry-dictionary" match="any">
+        <text variable="title" prefix="Art. "/>
+      </else-if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="date">
+    <choose>
+      <if variable="accessed">
+        <date variable="accessed" form="numeric"/>
+      </if>
+      <else>
+        <date variable="issued" form="numeric"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="year-date">
+    <choose>
+      <if is-uncertain-date="issued">
+        <text term="circa" form="short" suffix=" "/>
+      </if>
+    </choose>
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="volume">
+    <choose>
+      <if variable="volume" match="none">
+        <group delimiter=" ">
+          <number variable="number-of-volumes" form="numeric"/>
+          <text term="volume" form="long" plural="true"/>
+        </group>
+      </if>
+      <else-if is-numeric="volume">
+        <group>
+          <label variable="volume" form="long" suffix=" "/>
+          <text variable="volume"/>
+        </group>
+      </else-if>
+      <else>
+        <text variable="volume"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="point-locators-subsequent">
+    <choose>
+      <if variable="locator">
+        <group delimiter=" " prefix=" ">
+          <choose>
+            <if locator="page" match="none">
+              <label variable="locator" form="short"/>
+            </if>
+          </choose>
+          <text variable="locator"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <citation et-al-min="4" et-al-use-first="1" delimiter-precedes-et-al="never">
+    <layout suffix="." delimiter="&#160;; ">
+      <text macro="author-short" suffix=", "/>
+      <text variable="title" form="short" font-style="italic"/>
+      <choose>
+        <if type="webpage post-weblog" match="any">
+          <text variable="URL" prefix=", "/>
+          <text macro="date" prefix=" (" suffix=")"/>
+        </if>
+        <else>
+          <text macro="year-date" prefix=" (" suffix=")"/>
+        </else>
+      </choose>
+      <text macro="point-locators-subsequent"/>
+    </layout>
+  </citation>
+  <bibliography et-al-min="4" et-al-use-first="1" delimiter-precedes-et-al="never" entry-spacing="1">
+    <sort>
+      <key variable="annote"/>
+      <!--für unterteiltes Literaturverzeichnis im Extra-Feld z.B. "annote:A" für Quellen und "annote:B" für Sekundärliteratur eintragen-->
+      <key macro="author-inv"/>
+      <key variable="title"/>
+      <key variable="volume"/>
+      <key macro="date"/>
+    </sort>
+    <layout suffix=".">
+      <text macro="author-inv" suffix="&#160;: "/>
+      <text macro="title"/>
+      <choose>
+        <if type="webpage post-weblog speech manuscript article-newspaper article-magazine chapter" match="any">
+          <text macro="translator" prefix=", "/>
+        </if>
+        <else-if type="article-journal entry-dictionary entry-encyclopedia" match="any">
+          <text macro="editor-transl" prefix=", "/>
+        </else-if>
+      </choose>
+      <choose>
+        <if type="webpage post-weblog article-newspaper article-magazine article-journal entry-dictionary entry-encyclopedia" match="any">
+          <text value="In" prefix=". " suffix="&#160;: "/>
+          <text variable="container-title" form="short" font-style="italic"/>
+        </if>
+      </choose>
+      <choose>
+        <if type="webpage post-weblog" match="any">
+          <text variable="genre" prefix=". "/>
+          <text variable="URL" prefix=". Online im Internet&#160;: "/>
+          <group delimiter=" " prefix=" [" suffix="]">
+            <text term="accessed"/>
+            <text macro="date"/>
+          </group>
+        </if>
+        <else-if type="speech">
+          <group prefix=". " delimiter=", ">
+            <text variable="genre"/>
+            <text variable="publisher-place"/>
+            <text macro="date"/>
+            <text variable="URL" prefix=". Online im Internet&#160;: "/>
+          </group>
+        </else-if>
+        <else-if type="manuscript">
+          <text variable="genre" prefix=". "/>
+          <text variable="publisher-place" prefix=". "/>
+          <text macro="date" prefix=", "/>
+          <group delimiter=", " prefix=". ">
+            <text variable="archive"/>
+            <text variable="archive_location"/>
+          </group>
+        </else-if>
+        <else-if type="article-newspaper article-magazine" match="any">
+          <text variable="publisher-place" prefix=" (" suffix=")"/>
+          <group delimiter=" " prefix=", ">
+            <label variable="issue" form="short"/>
+            <text variable="issue"/>
+          </group>
+          <text macro="date" prefix=", "/>
+          <text variable="section" prefix=", "/>
+        </else-if>
+        <else-if type="article-journal entry-dictionary entry-encyclopedia" match="any">
+          <text variable="edition" vertical-align="sup"/>
+          <text variable="volume" prefix=" "/>
+          <text macro="year-date" prefix=" (" suffix=")"/>
+        </else-if>
+        <else-if type="chapter">
+          <text value="In" prefix=". " suffix="&#160;: "/>
+          <names variable="editor" suffix="&#160;: ">
+            <name name-as-sort-order="all" sort-separator=", " delimiter="&#160;; ">
+              <name-part name="family" font-variant="small-caps"/>
+            </name>
+            <label form="short" prefix=" (" suffix=")"/>
+          </names>
+          <text variable="container-title" font-style="italic"/>
+          <text macro="volume" prefix=", "/>
+          <group prefix=". ">
+            <text variable="publisher-place" suffix=" "/>
+            <text variable="edition" vertical-align="sup"/>
+            <text macro="year-date"/>
+          </group>
+          <group delimiter="&#160;; " prefix=" (" suffix=")">
+            <text variable="collection-title" form="short"/>
+            <text variable="collection-number"/>
+          </group>
+        </else-if>
+        <else>
+          <text macro="volume" prefix=", "/>
+          <text macro="editor-transl" prefix=", "/>
+          <group prefix=". ">
+            <text variable="publisher-place" suffix=" "/>
+            <text variable="edition" vertical-align="sup"/>
+            <text macro="year-date"/>
+          </group>
+          <group delimiter="&#160;; " prefix=" (" suffix=")">
+            <text variable="genre"/>
+            <text variable="collection-title" form="short"/>
+            <text variable="collection-number"/>
+          </group>
+        </else>
+      </choose>
+      <text variable="page" prefix=", "/>
+      <text variable="DOI" prefix=" (https://doi.org/" suffix=")"/>
+    </layout>
+  </bibliography>
+</style>

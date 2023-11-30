@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-GB">
+  <info>
+    <title>Journal of the American Philosophical Association</title>
+    <id>http://www.zotero.org/styles/journal-of-the-american-philosophical-association</id>
+    <link href="http://www.zotero.org/styles/journal-of-the-american-philosophical-association" rel="self"/>
+    <link href="http://www.zotero.org/styles/karstenia" rel="template"/>
+    <link href="https://www.cambridge.org/core/journals/journal-of-the-american-philosophical-association/information/author-instructions/preparing-your-materials" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="humanities"/>
+    <issn>2053-4477</issn>
+    <eissn>2053-4485</eissn>
+    <updated>2023-05-25T18:05:51+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="editor">
+    <names variable="editor">
+      <name and="symbol"/>
+      <label form="short" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="anon">
+    <text term="anonymous" form="short" text-case="capitalize-first"/>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name and="symbol" delimiter-precedes-last="never" name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <text macro="anon"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="symbol" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text macro="anon"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book thesis" match="any">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title" quotes="true"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
+  </macro>
+  <macro name="year-date">
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </if>
+      <else>
+        <text term="no date"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="pages">
+    <text variable="page"/>
+  </macro>
+  <macro name="cite-locator">
+    <group delimiter=" ">
+      <choose>
+        <if match="none" locator="page">
+          <label variable="locator" form="short"/>
+        </if>
+      </choose>
+      <text variable="locator"/>
+    </group>
+  </macro>
+  <macro name="secondary-contributors">
+    <names variable="editor translator" delimiter="; ">
+      <label form="verb" text-case="capitalize-first" suffix=" "/>
+      <name/>
+    </names>
+  </macro>
+  <macro name="volume">
+    <group delimiter=" ">
+      <label variable="volume" form="short"/>
+      <number variable="volume" form="numeric"/>
+    </group>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key macro="year-date"/>
+      <key macro="author"/>
+    </sort>
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=": ">
+        <group delimiter=" ">
+          <text macro="author-short"/>
+          <text macro="year-date"/>
+        </group>
+        <text macro="cite-locator"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="true">
+    <sort>
+      <key macro="author"/>
+      <key macro="year-date"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=" ">
+        <group delimiter=". ">
+          <text macro="author"/>
+          <date variable="issued" prefix="(" suffix=")">
+            <date-part name="year"/>
+          </date>
+        </group>
+        <choose>
+          <if type="book thesis" match="any">
+            <group delimiter=". ">
+              <text macro="title"/>
+              <text macro="edition"/>
+              <text macro="secondary-contributors"/>
+              <text macro="publisher"/>
+              <text macro="volume"/>
+            </group>
+          </if>
+          <else-if type="chapter">
+            <group delimiter=". ">
+              <text macro="title"/>
+              <group delimiter=" ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor" text-case="capitalize-all"/>
+              </group>
+              <group delimiter=" ">
+                <group delimiter=", ">
+                  <group delimiter=". ">
+                    <text variable="container-title" font-style="italic"/>
+                    <text variable="collection-title"/>
+                  </group>
+                  <text macro="volume"/>
+                </group>
+                <group delimiter=", ">
+                  <text macro="publisher" prefix="(" suffix=")"/>
+                  <text macro="pages"/>
+                </group>
+              </group>
+            </group>
+          </else-if>
+          <else>
+            <group delimiter=". ">
+              <text macro="title"/>
+              <group delimiter=", ">
+                <text variable="container-title" font-style="italic"/>
+                <text variable="volume"/>
+                <text macro="pages"/>
+              </group>
+            </group>
+          </else>
+        </choose>
+      </group>
+    </layout>
+  </bibliography>
+</style>

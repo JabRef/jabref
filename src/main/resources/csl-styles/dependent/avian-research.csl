@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Avian Research</title>
+    <id>http://www.zotero.org/styles/avian-research</id>
+    <link href="http://www.zotero.org/styles/avian-research" rel="self"/>
+    <link href="http://www.zotero.org/styles/elsevier-harvard2" rel="independent-parent"/>
+    <link href="https://www.keaipublishing.com/en/journals/avian-research/guide-for-authors/" rel="documentation"/>
+    <category citation-format="author-date"/>
+    <issn>2055-6187</issn>
+    <eissn>2053-7166</eissn>
+    <updated>2022-05-27T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

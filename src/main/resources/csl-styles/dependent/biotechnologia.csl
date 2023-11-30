@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-GB">
+  <info>
+    <title>BioTechnologia</title>
+    <id>http://www.zotero.org/styles/biotechnologia</id>
+    <link href="http://www.zotero.org/styles/biotechnologia" rel="self"/>
+    <link href="http://www.zotero.org/styles/council-of-science-editors-author-date" rel="independent-parent"/>
+    <link href="http://www.biotechnologia-journal.org/Journal/BioTechnologia-85/For-authors" rel="documentation"/>
+    <category citation-format="author-date"/>
+    <category field="biology"/>
+    <issn>0860-7796</issn>
+    <eissn>2353-9461</eissn>
+    <updated>2021-02-24T21:58:08+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+  <info>
+    <title>Gnosis: Journal of Gnostic Studies</title>
+    <title-short>GNOS</title-short>
+    <id>http://www.zotero.org/styles/gnosis-journal-of-gnostic-studies</id>
+    <link href="http://www.zotero.org/styles/gnosis-journal-of-gnostic-studies" rel="self"/>
+    <link href="http://www.zotero.org/styles/archiv-fur-geschichte-der-philosophie" rel="template"/>
+    <link href="https://brill.com/view/journals/gnos/gnos-overview.xml?contents=artsub" rel="documentation"/>
+    <link href="https://brill.com/fileasset/downloads_products/Author_Instructions/GNOS.pdf" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+    </author>
+    <category citation-format="note"/>
+    <category field="philosophy"/>
+    <issn>2451-8581</issn>
+    <eissn>2451-859X</eissn>
+    <updated>2022-09-24T15:59:53+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en"/>
+  <macro name="editor">
+    <names variable="editor translator" delimiter=". ">
+      <label form="verb" text-case="capitalize-first" suffix=" "/>
+      <name and="text"/>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name and="text" name-as-sort-order="all"/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text" delimiter=", " initialize-with="."/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="title" text-case="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book thesis" match="any">
+        <text variable="title" text-case="title" font-style="italic" prefix=" "/>
+      </if>
+      <else-if type="article-journal" match="any">
+        <text variable="title" quotes="true" prefix=" "/>
+      </else-if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher-place"/>
+    </group>
+  </macro>
+  <macro name="year-date">
+    <date date-parts="year" form="numeric" variable="issued"/>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition" strip-periods="true"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="locator">
+    <group delimiter=" ">
+      <choose>
+        <if match="none" locator="page"/>
+      </choose>
+    </group>
+    <text variable="locator"/>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" collapse="year">
+    <sort>
+      <key macro="author-short"/>
+      <key macro="year-date" sort="ascending"/>
+    </sort>
+    <layout delimiter="; ">
+      <group delimiter=", ">
+        <group delimiter=" ">
+          <text macro="author-short"/>
+          <text macro="year-date"/>
+        </group>
+        <text macro="locator"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="20">
+    <sort>
+      <key macro="author"/>
+      <key variable="title"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=". ">
+        <text macro="author"/>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+        <text macro="title" suffix="."/>
+        <choose>
+          <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
+            <group delimiter=". ">
+              <text macro="edition"/>
+              <text macro="editor"/>
+              <text macro="publisher"/>
+            </group>
+          </if>
+          <else-if type="chapter paper-conference" match="any">
+            <group delimiter=". ">
+              <group delimiter=" ">
+                <label variable="page" text-case="capitalize-first"/>
+                <text variable="page"/>
+                <text term="in"/>
+                <text variable="container-title" font-style="italic"/>
+              </group>
+              <text macro="editor" suffix="."/>
+              <text macro="edition"/>
+              <text variable="collection-title"/>
+              <text macro="publisher"/>
+            </group>
+          </else-if>
+          <else>
+            <group delimiter=" ">
+              <text variable="container-title" font-style="italic"/>
+              <group delimiter=":">
+                <text variable="volume"/>
+                <text variable="page"/>
+              </group>
+            </group>
+          </else>
+        </choose>
+      </group>
+    </layout>
+  </bibliography>
+</style>

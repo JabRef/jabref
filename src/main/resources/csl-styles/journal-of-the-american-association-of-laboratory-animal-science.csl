@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+  <info>
+    <title>Journal of the American Association of Laboratory Animal Science</title>
+    <title-short>JAALAS</title-short>
+    <id>http://www.zotero.org/styles/journal-of-the-american-association-of-laboratory-animal-science</id>
+    <link href="http://www.zotero.org/styles/journal-of-the-american-association-of-laboratory-animal-science" rel="self"/>
+    <link href="http://www.zotero.org/styles/council-of-science-editors" rel="template"/>
+    <link href="https://www.aalas.org/publications/information-for-authors/cm-and-jaalas/manuscript-preparation" rel="documentation"/>
+    <author>
+      <name>Charles Parnot</name>
+      <email>charles.parnot@gmail.com</email>
+      <uri>http://twitter.com/cparnot</uri>
+    </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
+    <category citation-format="numeric"/>
+    <category field="biology"/>
+    <issn>1559-6109</issn>
+    <updated>2021-07-21T07:37:42+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="editor-translator">
+    <names variable="editor translator" delimiter="; ">
+      <name name-as-sort-order="all" sort-separator=" " initialize-with="" delimiter=", " delimiter-precedes-last="always"/>
+      <label form="long" prefix=", "/>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name name-as-sort-order="all" sort-separator=" " initialize-with="" delimiter=", " delimiter-precedes-last="always"/>
+      <label form="long" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="title" form="short"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if type="article-journal" match="any">
+        <text variable="DOI" prefix="https://doi.org/"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="title">
+    <group delimiter=", ">
+      <text variable="title"/>
+      <choose>
+        <if type="thesis" match="any">
+          <text variable="genre"/>
+        </if>
+        <else-if type="chapter" match="any">
+          <text macro="pages"/>
+        </else-if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="publisher-place">
+    <choose>
+      <if variable="publisher-place" match="none">
+        <text value="[place unknown]"/>
+      </if>
+      <else>
+        <text variable="publisher-place"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=": ">
+      <text macro="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
+  </macro>
+  <macro name="pages">
+    <label plural="never" strip-periods="true" suffix=" " variable="page" form="short"/>
+    <text variable="page"/>
+  </macro>
+  <macro name="year-date">
+    <date variable="issued">
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <macro name="container">
+    <text variable="container-title" form="short" strip-periods="true"/>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition" form="short"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition" suffix="."/>
+      </else>
+    </choose>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout vertical-align="sup" delimiter=",">
+      <text variable="citation-number"/>
+    </layout>
+  </citation>
+  <bibliography et-al-min="12" et-al-use-first="10" second-field-align="flush">
+    <sort>
+      <key variable="author"/>
+      <key macro="year-date"/>
+    </sort>
+    <layout>
+      <text variable="citation-number" suffix="."/>
+      <group suffix="." delimiter=". ">
+        <text macro="author" font-weight="bold"/>
+        <text macro="year-date"/>
+        <text macro="title"/>
+        <choose>
+          <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
+            <group delimiter=". " prefix=" " suffix=".">
+              <text macro="edition"/>
+              <text macro="editor-translator"/>
+              <text prefix=" " macro="publisher"/>
+            </group>
+          </if>
+          <else-if type="chapter paper-conference" match="any">
+            <group prefix=" " delimiter=". ">
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor-translator"/>
+              </group>
+              <text macro="container"/>
+              <text variable="volume" prefix="Vol. "/>
+              <text macro="edition"/>
+              <group suffix="." delimiter="; ">
+                <text macro="publisher"/>
+              </group>
+            </group>
+          </else-if>
+          <else>
+            <text macro="editor-translator" suffix="."/>
+            <group delimiter=" " prefix=" ">
+              <text macro="container"/>
+              <group delimiter=":">
+                <text variable="volume" font-weight="bold" prefix=" "/>
+                <text variable="page" prefix=":"/>
+              </group>
+            </group>
+          </else>
+        </choose>
+      </group>
+      <text prefix=" " macro="access"/>
+    </layout>
+  </bibliography>
+</style>

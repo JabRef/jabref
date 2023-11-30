@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded" default-locale="en-GB">
+  <info>
+    <title>European Society of Cardiology</title>
+    <id>http://www.zotero.org/styles/european-society-of-cardiology</id>
+    <link href="http://www.zotero.org/styles/european-society-of-cardiology" rel="self"/>
+    <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
+    <link href="https://academic.oup.com/eurheartj/pages/general_instructions#2.4" rel="documentation"/>
+    <author>
+      <name>Sebastian Karcher</name>
+    </author>
+    <contributor>
+      <name>Matthieu Depuydt</name>
+    </contributor>
+    <category citation-format="numeric"/>
+    <category field="medicine"/>
+    <updated>2012-09-27T22:06:38+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en-GB">
+    <terms>
+      <term name="section" form="short">sect.</term>
+    </terms>
+  </locale>
+  <macro name="author">
+    <names variable="author">
+      <name delimiter-precedes-last="always" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="editor">
+    <group delimiter=": ">
+      <choose>
+        <if type="chapter" match="any">
+          <text term="in" text-case="capitalize-first" prefix=" "/>
+        </if>
+      </choose>
+      <names variable="editor" suffix=".">
+        <name delimiter-precedes-last="always" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
+        <label form="short" prefix=", "/>
+      </names>
+    </group>
+  </macro>
+  <macro name="publisher">
+    <group>
+      <choose>
+        <if type="book chapter paper-conference" match="any">
+          <group delimiter=". ">
+            <group delimiter="; ">
+              <group delimiter=": ">
+                <text variable="publisher-place"/>
+                <text variable="publisher"/>
+              </group>
+              <date variable="issued" form="numeric" date-parts="year"/>
+            </group>
+            <group>
+              <label variable="page" form="short" plural="never" strip-periods="true"/>
+              <text variable="page"/>
+            </group>
+          </group>
+        </if>
+      </choose>
+    </group>
+    <text value="" prefix=" " suffix=";"/>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if variable="URL" type="webpage" match="all">
+        <group delimiter=" ">
+          <text variable="URL"/>
+          <date variable="accessed" form="text" prefix="(" suffix=")"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="book article-newspaper" match="any">
+        <text variable="container-title" font-style="italic"/>
+        <text macro="edition" prefix=" "/>
+      </if>
+      <else-if type="article-journal">
+        <text variable="container-title" form="short" strip-periods="true" font-style="italic" prefix=" "/>
+      </else-if>
+      <else>
+        <text variable="container-title" font-style="italic"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition" form="long"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition" suffix="."/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="date">
+    <date variable="issued" form="numeric" date-parts="year"/>
+  </macro>
+  <macro name="journal-location">
+    <choose>
+      <if type="article-journal article-magazine" match="any">
+        <group delimiter=":">
+          <group delimiter=";">
+            <text macro="date"/>
+            <text variable="volume" font-weight="bold"/>
+          </group>
+          <text variable="page"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <citation collapse="citation-number">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout vertical-align="sup" delimiter=",">
+      <text variable="citation-number"/>
+    </layout>
+  </citation>
+  <bibliography second-field-align="flush">
+    <layout>
+      <text variable="citation-number" suffix=". "/>
+      <group delimiter=". ">
+        <group delimiter=". ">
+          <text macro="author"/>
+          <text macro="title"/>
+        </group>
+        <group delimiter=" " suffix=". ">
+          <text macro="editor"/>
+          <group delimiter=". ">
+            <text macro="container-title"/>
+            <text macro="publisher"/>
+          </group>
+          <text macro="journal-location"/>
+        </group>
+      </group>
+      <text macro="access"/>
+    </layout>
+  </bibliography>
+</style>
