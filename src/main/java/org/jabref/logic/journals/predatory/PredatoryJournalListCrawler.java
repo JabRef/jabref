@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 public class PredatoryJournalListCrawler {
 
     private record PJSource(URL url, Optional<Pattern> elementPattern) {
-
         PJSource(String url, String regex) {
             this(createURL(url), Optional.of(Pattern.compile(regex)));
         }
