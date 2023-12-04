@@ -60,7 +60,7 @@ import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -481,7 +481,7 @@ public class JabRefPreferences implements PreferencesService {
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
-    private CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private CitationKeyGenerationPreferences CitationKeyGenerationPreferences;
     private NameDisplayPreferences nameDisplayPreferences;
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferences mainTableColumnPreferences;
@@ -911,6 +911,7 @@ public class JabRefPreferences implements PreferencesService {
      * @param key The key to check.
      * @return true if the key is set, false otherwise.
      */
+
     public boolean hasKey(String key) {
         return prefs.get(key, null) != null;
     }
@@ -1637,7 +1638,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // CitationKeyPatternPreferences
+    // CitationKeyGenerationPreferences
     //*************************************************************************************************************
 
     private GlobalCitationKeyPattern getGlobalCitationKeyPattern() {
@@ -1687,16 +1688,16 @@ public class JabRefPreferences implements PreferencesService {
     private void clearCitationKeyPatterns() throws BackingStoreException {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        getCitationKeyPatternPreferences().setKeyPattern(getGlobalCitationKeyPattern());
+        getCitationKeyGenerationPreferences().setKeyPattern(getGlobalCitationKeyPattern());
     }
 
     @Override
-    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
-        if (Objects.nonNull(citationKeyPatternPreferences)) {
-            return citationKeyPatternPreferences;
+    public CitationKeyGenerationPreferences getCitationKeyGenerationPreferences() {
+        if (Objects.nonNull(CitationKeyGenerationPreferences)) {
+            return CitationKeyGenerationPreferences;
         }
 
-        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+        CitationKeyGenerationPreferences = new CitationKeyGenerationPreferences(
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
@@ -1708,35 +1709,35 @@ public class JabRefPreferences implements PreferencesService {
                 (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
                 getBibEntryPreferences().keywordSeparatorProperty());
 
-        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.shouldAvoidOverwriteCiteKeyProperty(),
                 (obs, oldValue, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
                 (obs, oldValue, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
                 (obs, oldValue, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
-            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
-            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
+        EasyBind.listen(CitationKeyGenerationPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.ALWAYS);
+            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A);
         });
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.keyPatternRegexProperty(),
                 (obs, oldValue, newValue) -> put(KEY_PATTERN_REGEX, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.keyPatternReplacementProperty(),
                 (obs, oldValue, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.unwantedCharactersProperty(),
                 (obs, oldValue, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternProperty(),
+        EasyBind.listen(CitationKeyGenerationPreferences.keyPatternProperty(),
                 (obs, oldValue, newValue) -> storeGlobalCitationKeyPattern(newValue));
 
-        return citationKeyPatternPreferences;
+        return CitationKeyGenerationPreferences;
     }
 
-    private CitationKeyPatternPreferences.KeySuffix getKeySuffix() {
-        CitationKeyPatternPreferences.KeySuffix keySuffix =
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+    private CitationKeyGenerationPreferences.KeySuffix getKeySuffix() {
+        CitationKeyGenerationPreferences.KeySuffix keySuffix =
+                org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_B;
         if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+            keySuffix = org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.ALWAYS;
         } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+            keySuffix = org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A;
         }
         return keySuffix;
     }
@@ -1828,7 +1829,6 @@ public class JabRefPreferences implements PreferencesService {
                 (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
         EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
                 (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
-
         return externalApplicationsPreferences;
     }
 
@@ -2986,7 +2986,7 @@ public class JabRefPreferences implements PreferencesService {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
                 getBibEntryPreferences(),
-                getCitationKeyPatternPreferences(),
+                getCitationKeyGenerationPreferences(),
                 getFieldPreferences(),
                 getXmpPreferences(),
                 getDOIPreferences(),

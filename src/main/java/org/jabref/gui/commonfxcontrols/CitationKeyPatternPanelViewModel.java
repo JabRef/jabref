@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
@@ -37,9 +37,9 @@ public class CitationKeyPatternPanelViewModel {
     private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    private final CitationKeyPatternPreferences keyPatternPreferences;
+    private final CitationKeyGenerationPreferences keyPatternPreferences;
 
-    public CitationKeyPatternPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
+    public CitationKeyPatternPanelViewModel(CitationKeyGenerationPreferences keyPatternPreferences) {
         this.keyPatternPreferences = keyPatternPreferences;
     }
 

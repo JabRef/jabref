@@ -40,20 +40,20 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     private final AbstractCitationKeyPattern citeKeyPattern;
     private final BibDatabase database;
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final CitationKeyGenerationPreferences CitationKeyGenerationPreferences;
     private final String unwantedCharacters;
 
-    public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
+    public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyGenerationPreferences CitationKeyGenerationPreferences) {
+        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(CitationKeyGenerationPreferences.getKeyPattern()),
                 bibDatabaseContext.getDatabase(),
-                citationKeyPatternPreferences);
+                CitationKeyGenerationPreferences);
     }
 
-    public CitationKeyGenerator(AbstractCitationKeyPattern citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public CitationKeyGenerator(AbstractCitationKeyPattern citeKeyPattern, BibDatabase database, CitationKeyGenerationPreferences CitationKeyGenerationPreferences) {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
-        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
-        this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
+        this.CitationKeyGenerationPreferences = Objects.requireNonNull(CitationKeyGenerationPreferences);
+        this.unwantedCharacters = CitationKeyGenerationPreferences.getUnwantedCharacters();
     }
 
     /**
@@ -122,13 +122,13 @@ public class CitationKeyGenerator extends BracketedPattern {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()
-                == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+        boolean alwaysAddLetter = CitationKeyGenerationPreferences.getKeySuffix()
+                == org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.ALWAYS;
 
         if (alwaysAddLetter || occurrences != 0) {
             // The key is already in use, so we must modify it.
-            boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
-                    == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+            boolean firstLetterA = CitationKeyGenerationPreferences.getKeySuffix()
+                    == org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A;
 
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
             String moddedKey;
@@ -157,9 +157,9 @@ public class CitationKeyGenerator extends BracketedPattern {
      */
     private String replaceWithRegex(String key) {
         // Remove Regular Expressions while generating Keys
-        String regex = citationKeyPatternPreferences.getKeyPatternRegex();
+        String regex = CitationKeyGenerationPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
+            String replacement = CitationKeyGenerationPreferences.getKeyPatternReplacement();
             try {
                 key = key.replaceAll(regex, replacement);
             } catch (PatternSyntaxException e) {
@@ -187,7 +187,7 @@ public class CitationKeyGenerator extends BracketedPattern {
      * @return a cleaned citation key for the given {@link BibEntry}
      */
     private Function<String, String> expandBracketContent(BibEntry entry) {
-        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordDelimiter();
+        Character keywordDelimiter = CitationKeyGenerationPreferences.getKeywordDelimiter();
 
         return (String bracket) -> {
             String expandedPattern;

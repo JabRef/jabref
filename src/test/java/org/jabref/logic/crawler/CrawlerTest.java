@@ -7,7 +7,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
@@ -56,11 +56,11 @@ class CrawlerTest {
     public void setUp() throws Exception {
         setUpRepository();
 
-        CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+        CitationKeyGenerationPreferences citationKeyGenerationPreferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -75,7 +75,7 @@ class CrawlerTest {
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferencesService.getCitationKeyGenerationPreferences()).thenReturn(citationKeyGenerationPreferences);
 
         entryTypesManager = new BibEntryTypesManager();
     }

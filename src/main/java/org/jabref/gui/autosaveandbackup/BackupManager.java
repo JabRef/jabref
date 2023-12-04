@@ -266,7 +266,7 @@ public class BackupManager {
                     bibWriter,
                     saveConfiguration,
                     preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
+                    preferences.getCitationKeyGenerationPreferences(),
                     entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
             backupFilesQueue.add(backupPath);

@@ -605,7 +605,7 @@ public class ArgumentProcessor {
                         bibWriter,
                         saveConfiguration,
                         preferencesService.getFieldPreferences(),
-                        preferencesService.getCitationKeyPatternPreferences(),
+                        preferencesService.getCitationKeyGenerationPreferences(),
                         entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
@@ -717,7 +717,7 @@ public class ArgumentProcessor {
 
             CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                     parserResult.getDatabaseContext(),
-                    preferencesService.getCitationKeyPatternPreferences());
+                    preferencesService.getCitationKeyGenerationPreferences());
             for (BibEntry entry : database.getEntries()) {
                 keyGenerator.generateAndSetKey(entry);
             }

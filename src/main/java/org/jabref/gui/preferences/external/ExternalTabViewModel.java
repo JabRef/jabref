@@ -97,7 +97,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                 PushToApplications.getApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences)
                                   .orElse(new PushToEmacs(dialogService, preferences)));
 
-        citeCommandProperty.setValue(initialExternalApplicationPreferences.getCiteCommand());
+        citeCommandProperty.setValue(initialExternalApplicationPreferences.getCiteCommand().toString());
         useCustomTerminalProperty.setValue(initialExternalApplicationPreferences.useCustomTerminal());
         customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());

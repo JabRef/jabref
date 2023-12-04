@@ -10,7 +10,7 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -38,11 +38,11 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     public BibtexDatabaseWriter(BibWriter bibWriter,
                                 SelfContainedSaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
-                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                CitationKeyGenerationPreferences CitationKeyGenerationPreferences,
                                 BibEntryTypesManager entryTypesManager) {
         super(bibWriter,
                 saveConfiguration,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
 
         this.fieldPreferences = fieldPreferences;
@@ -52,11 +52,11 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
                                 String newline,
                                 SelfContainedSaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
-                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                CitationKeyGenerationPreferences CitationKeyGenerationPreferences,
                                 BibEntryTypesManager entryTypesManager) {
         super(new BibWriter(writer, newline),
                 saveConfiguration,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
 
         this.fieldPreferences = fieldPreferences;

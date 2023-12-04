@@ -37,7 +37,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        DatabaseCitationKeyPattern newKeyPattern = new DatabaseCitationKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern());
+        DatabaseCitationKeyPattern newKeyPattern = new DatabaseCitationKeyPattern(preferencesService.getCitationKeyGenerationPreferences().getKeyPattern());
 
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();

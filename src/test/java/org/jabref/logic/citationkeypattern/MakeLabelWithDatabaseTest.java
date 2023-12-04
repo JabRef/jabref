@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MakeLabelWithDatabaseTest {
 
     private BibDatabase database;
-    private CitationKeyPatternPreferences preferences;
+    private CitationKeyGenerationPreferences preferences;
     private GlobalCitationKeyPattern pattern;
     private DatabaseCitationKeyPattern bibtexKeyPattern;
     private BibEntry entry;
@@ -34,11 +34,11 @@ class MakeLabelWithDatabaseTest {
         database.insertEntry(entry);
         pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
         bibtexKeyPattern = new DatabaseCitationKeyPattern(pattern);
-        preferences = new CitationKeyPatternPreferences(
+        preferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -66,11 +66,11 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKeyAlwaysLetter() {
-        preferences = new CitationKeyPatternPreferences(
+        preferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.ALWAYS,
+                CitationKeyGenerationPreferences.KeySuffix.ALWAYS,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -84,11 +84,11 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKeyAlwaysLetterAlreadyExistsDuplicatesStartAtB() {
-        preferences = new CitationKeyPatternPreferences(
+        preferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.ALWAYS,
+                CitationKeyGenerationPreferences.KeySuffix.ALWAYS,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -107,11 +107,11 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKeyStartDuplicatesAtB() {
-        preferences = new CitationKeyPatternPreferences(
+        preferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -125,11 +125,11 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKeyAlreadyExistsDuplicatesStartAtB() {
-        preferences = new CitationKeyPatternPreferences(
+        preferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -426,11 +426,11 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateKeyRegExReplace() {
-        preferences = new CitationKeyPatternPreferences(
+        preferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "2",
                 "3",
                 DEFAULT_UNWANTED_CHARACTERS,

@@ -51,7 +51,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         IntegrityCheck check = new IntegrityCheck(database,
                 preferencesService.getFilePreferences(),
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferencesService.getCitationKeyGenerationPreferences(),
                 abbreviationRepository,
                 preferencesService.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 

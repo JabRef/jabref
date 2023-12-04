@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -15,11 +15,11 @@ import org.jabref.model.entry.field.InternalField;
 public class CitationKeyDeviationChecker implements EntryChecker {
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final CitationKeyGenerationPreferences CitationKeyGenerationPreferences;
 
-    public CitationKeyDeviationChecker(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public CitationKeyDeviationChecker(BibDatabaseContext bibDatabaseContext, CitationKeyGenerationPreferences CitationKeyGenerationPreferences) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
+        this.CitationKeyGenerationPreferences = Objects.requireNonNull(CitationKeyGenerationPreferences);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
         String key = valuekey.get();
 
         // generate new key
-        String generatedKey = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences).generateKey(entry);
+        String generatedKey = new CitationKeyGenerator(bibDatabaseContext, CitationKeyGenerationPreferences).generateKey(entry);
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(

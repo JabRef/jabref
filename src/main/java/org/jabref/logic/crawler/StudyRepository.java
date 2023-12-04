@@ -421,7 +421,7 @@ public class StudyRepository {
 
     private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {
         CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries,
-                preferencesService.getCitationKeyPatternPreferences());
+                preferencesService.getCitationKeyGenerationPreferences());
         targetEntries.getEntries().stream().filter(bibEntry -> !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);
     }
 
@@ -435,7 +435,7 @@ public class StudyRepository {
                     bibWriter,
                     saveConfiguration,
                     preferencesService.getFieldPreferences(),
-                    preferencesService.getCitationKeyPatternPreferences(),
+                    preferencesService.getCitationKeyGenerationPreferences(),
                     bibEntryTypesManager);
             databaseWriter.saveDatabase(context);
         } catch (UnsupportedCharsetException ex) {

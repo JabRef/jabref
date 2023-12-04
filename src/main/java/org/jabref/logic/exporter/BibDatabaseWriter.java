@@ -23,7 +23,7 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -59,13 +59,13 @@ public abstract class BibDatabaseWriter {
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     protected final BibWriter bibWriter;
     protected final SelfContainedSaveConfiguration saveConfiguration;
-    protected final CitationKeyPatternPreferences keyPatternPreferences;
+    protected final CitationKeyGenerationPreferences keyPatternPreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
     public BibDatabaseWriter(BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
-                             CitationKeyPatternPreferences keyPatternPreferences,
+                             CitationKeyGenerationPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
         this.bibWriter = Objects.requireNonNull(bibWriter);
         this.saveConfiguration = saveConfiguration;

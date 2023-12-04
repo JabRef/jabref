@@ -10,8 +10,8 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
-    CitationKeyPatternPreferences citationKeyPatternPreferences;
+    CitationKeyGenerationPreferences CitationKeyGenerationPreferences;
     PreferencesService preferencesService;
     LibraryPreferences libraryPreferences;
     ImportFormatPreferences importFormatPreferences;
@@ -68,18 +68,18 @@ class StudyRepositoryTest {
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+        CitationKeyGenerationPreferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 "",
                 ',');
-        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferencesService.getCitationKeyGenerationPreferences()).thenReturn(CitationKeyGenerationPreferences);
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
@@ -259,7 +259,7 @@ class StudyRepositoryTest {
                 .withField(StandardField.TITLE, "Automatic Control, Robotics, and Information Processing");
         entry3.setType(StandardEntryType.Article);
 
-        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(new BibDatabaseContext(), citationKeyPatternPreferences);
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(new BibDatabaseContext(), CitationKeyGenerationPreferences);
         citationKeyGenerator.generateAndSetKey(entry3);
 
         return List.of(entry1, entry2, entry3);

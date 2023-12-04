@@ -41,7 +41,7 @@ class PushToEmacsTest {
         when(preferencesService.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getCiteCommand()).thenReturn("\\cite{key1,key2}");
+        when(externalApplicationsPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
         when(preferencesService.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
         pushToEmacs = new PushToEmacs(dialogService, preferencesService);

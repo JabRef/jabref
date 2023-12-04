@@ -266,7 +266,7 @@ public class SaveDatabaseAction {
                         bibWriter,
                         saveConfiguration,
                         preferences.getFieldPreferences(),
-                        preferences.getCitationKeyPatternPreferences(),
+                        preferences.getCitationKeyGenerationPreferences(),
                         entryTypesManager);
 
                 if (selectedOnly) {

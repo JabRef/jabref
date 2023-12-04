@@ -49,7 +49,8 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     private void dissectCiteCommand() {
-        String preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+        System.out.println(preferencesService.getExternalApplicationsPreferences().getCiteCommand());
+        String preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand().toString();
 
         if (preferencesCiteCommand != null && preferencesCiteCommand.equals(cachedCiteCommand)) {
             return;

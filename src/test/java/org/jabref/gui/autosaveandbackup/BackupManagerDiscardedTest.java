@@ -70,7 +70,7 @@ class BackupManagerDiscardedTest {
                     bibWriter,
                     saveConfiguration,
                     preferencesService.getFieldPreferences(),
-                    preferencesService.getCitationKeyPatternPreferences(),
+                    preferencesService.getCitationKeyGenerationPreferences(),
                     bibEntryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         }

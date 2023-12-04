@@ -14,7 +14,7 @@ import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -106,7 +106,7 @@ public interface PreferencesService {
 
     SSLPreferences getSSLPreferences();
 
-    CitationKeyPatternPreferences getCitationKeyPatternPreferences();
+    CitationKeyGenerationPreferences getCitationKeyGenerationPreferences();
 
     PushToApplicationPreferences getPushToApplicationPreferences();
 

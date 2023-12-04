@@ -13,7 +13,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
@@ -34,9 +34,9 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new CitationKeyPatternPanelItemModel(new CitationKeyPatternPanelViewModel.DefaultEntryType(), ""));
 
-    private final CitationKeyPatternPreferences keyPatternPreferences;
+    private final CitationKeyGenerationPreferences keyPatternPreferences;
 
-    public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
+    public CitationKeyPatternTabViewModel(CitationKeyGenerationPreferences keyPatternPreferences) {
         this.keyPatternPreferences = keyPatternPreferences;
     }
 
@@ -47,12 +47,12 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         generateOnSaveProperty.setValue(keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
 
         if (keyPatternPreferences.getKeySuffix()
-                == CitationKeyPatternPreferences.KeySuffix.ALWAYS) {
+                == CitationKeyGenerationPreferences.KeySuffix.ALWAYS) {
             letterAlwaysAddProperty.setValue(true);
             letterStartAProperty.setValue(false);
             letterStartBProperty.setValue(false);
         } else if (keyPatternPreferences.getKeySuffix()
-                == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A) {
+                == CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A) {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(true);
             letterStartBProperty.setValue(false);
@@ -86,12 +86,12 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
 
-        CitationKeyPatternPreferences.KeySuffix keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+        CitationKeyGenerationPreferences.KeySuffix keySuffix = CitationKeyGenerationPreferences.KeySuffix.ALWAYS;
 
         if (letterStartAProperty.getValue()) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+            keySuffix = CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A;
         } else if (letterStartBProperty.getValue()) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+            keySuffix = CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_B;
         }
 
         keyPatternPreferences.setAvoidOverwriteCiteKey(!overwriteAllowProperty.getValue());

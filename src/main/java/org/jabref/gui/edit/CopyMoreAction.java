@@ -171,7 +171,7 @@ public class CopyMoreAction extends SimpleCommand {
             return;
         }
 
-        String citeCommand = Optional.ofNullable(preferencesService.getExternalApplicationsPreferences().getCiteCommand())
+        String citeCommand = Optional.ofNullable(preferencesService.getExternalApplicationsPreferences().getCiteCommand().toString())
                                      .filter(cite -> cite.contains("\\")) // must contain \
                                      .orElse("\\cite");
 

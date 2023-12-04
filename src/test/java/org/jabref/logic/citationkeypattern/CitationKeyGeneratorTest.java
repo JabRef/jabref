@@ -93,11 +93,11 @@ class CitationKeyGeneratorTest {
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+        CitationKeyGenerationPreferences patternPreferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -1014,11 +1014,11 @@ class CitationKeyGeneratorTest {
     void generateKeyDoesNotModifyTheKeyWithIncorrectRegexReplacement() {
         String pattern = "[title]";
         GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+        CitationKeyGenerationPreferences patternPreferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "[", // Invalid regexp
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,

@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabase;
@@ -138,7 +138,7 @@ class IntegrityCheckTest {
 
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
-                createCitationKeyPatternPreferences(),
+                createCitationKeyGenerationPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
 
@@ -170,7 +170,7 @@ class IntegrityCheckTest {
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
-                createCitationKeyPatternPreferences(),
+                createCitationKeyGenerationPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
         assertNotEquals(Collections.emptyList(), messages);
@@ -181,18 +181,18 @@ class IntegrityCheckTest {
         when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
-                createCitationKeyPatternPreferences(),
+                createCitationKeyGenerationPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
         assertEquals(Collections.emptyList(), messages);
     }
 
-    private CitationKeyPatternPreferences createCitationKeyPatternPreferences() {
-        return new CitationKeyPatternPreferences(
+    private CitationKeyGenerationPreferences createCitationKeyGenerationPreferences() {
+        return new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,

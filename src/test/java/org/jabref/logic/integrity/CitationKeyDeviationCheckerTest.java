@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -28,14 +28,14 @@ public class CitationKeyDeviationCheckerTest {
     private final MetaData metaData = mock(MetaData.class);
     private final AbstractCitationKeyPattern abstractCitationKeyPattern = mock(AbstractCitationKeyPattern.class);
     private final GlobalCitationKeyPattern globalCitationKeyPattern = mock(GlobalCitationKeyPattern.class);
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
-    private final CitationKeyDeviationChecker checker = new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences);
+    private final CitationKeyGenerationPreferences CitationKeyGenerationPreferences = mock(CitationKeyGenerationPreferences.class);
+    private final CitationKeyDeviationChecker checker = new CitationKeyDeviationChecker(bibDatabaseContext, CitationKeyGenerationPreferences);
 
     @BeforeEach
     void setUp() {
         when(bibDatabaseContext.getMetaData()).thenReturn(metaData);
-        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(globalCitationKeyPattern);
-        when(metaData.getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern())).thenReturn(abstractCitationKeyPattern);
+        when(CitationKeyGenerationPreferences.getKeyPattern()).thenReturn(globalCitationKeyPattern);
+        when(metaData.getCiteKeyPattern(CitationKeyGenerationPreferences.getKeyPattern())).thenReturn(abstractCitationKeyPattern);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
     }
 

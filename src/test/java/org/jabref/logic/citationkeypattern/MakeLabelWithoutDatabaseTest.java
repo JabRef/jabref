@@ -24,11 +24,11 @@ class MakeLabelWithoutDatabaseTest {
     void setUp() {
         GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[auth]");
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+        CitationKeyGenerationPreferences patternPreferences = new CitationKeyGenerationPreferences(
                 false,
                 false,
                 false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyGenerationPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,

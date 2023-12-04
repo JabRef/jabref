@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,7 +20,7 @@ public class IntegrityCheck {
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
-                          CitationKeyPatternPreferences citationKeyPatternPreferences,
+                          CitationKeyGenerationPreferences CitationKeyGenerationPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -36,7 +36,7 @@ public class IntegrityCheck {
                 new BibStringChecker(),
                 new HTMLCharacterChecker(),
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
-                new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
+                new CitationKeyDeviationChecker(bibDatabaseContext, CitationKeyGenerationPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
                 new AmpersandChecker(),
                 new LatexIntegrityChecker(),

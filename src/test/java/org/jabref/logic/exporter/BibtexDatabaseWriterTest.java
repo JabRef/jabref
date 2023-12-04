@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerationPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -74,7 +74,7 @@ public class BibtexDatabaseWriterTest {
     private ImportFormatPreferences importFormatPreferences;
     private SelfContainedSaveConfiguration saveConfiguration;
     private FieldPreferences fieldPreferences;
-    private CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private CitationKeyGenerationPreferences CitationKeyGenerationPreferences;
     private BibEntryTypesManager entryTypesManager;
     private StringWriter stringWriter;
     private BibWriter bibWriter;
@@ -83,7 +83,7 @@ public class BibtexDatabaseWriterTest {
     void setUp() {
         fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        CitationKeyGenerationPreferences = mock(CitationKeyGenerationPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
@@ -100,7 +100,7 @@ public class BibtexDatabaseWriterTest {
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
     }
 
@@ -462,7 +462,7 @@ public class BibtexDatabaseWriterTest {
                     bibWriter,
                     saveConfiguration,
                     fieldPreferences,
-                    citationKeyPatternPreferences,
+                    CitationKeyGenerationPreferences,
                     entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
@@ -486,7 +486,7 @@ public class BibtexDatabaseWriterTest {
                     bibWriter,
                     saveConfiguration,
                     fieldPreferences,
-                    citationKeyPatternPreferences,
+                    CitationKeyGenerationPreferences,
                     entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
@@ -510,7 +510,7 @@ public class BibtexDatabaseWriterTest {
                     bibWriter,
                     saveConfiguration,
                     fieldPreferences,
-                    citationKeyPatternPreferences,
+                    CitationKeyGenerationPreferences,
                     entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
@@ -531,7 +531,7 @@ public class BibtexDatabaseWriterTest {
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
@@ -574,7 +574,7 @@ public class BibtexDatabaseWriterTest {
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(bibEntry, stringWriter.toString());
@@ -607,7 +607,7 @@ public class BibtexDatabaseWriterTest {
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(bibEntry, stringWriter.toString());
@@ -959,7 +959,7 @@ public class BibtexDatabaseWriterTest {
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
@@ -1039,7 +1039,7 @@ public class BibtexDatabaseWriterTest {
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
-                citationKeyPatternPreferences,
+                CitationKeyGenerationPreferences,
                 entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 

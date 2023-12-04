@@ -10,7 +10,7 @@ import javafx.beans.property.StringProperty;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class CitationKeyPatternPreferences {
+public class CitationKeyGenerationPreferences {
 
     public enum KeySuffix {
         ALWAYS,         // CiteKeyA, CiteKeyB, CiteKeyC ...
@@ -29,16 +29,16 @@ public class CitationKeyPatternPreferences {
     private final String defaultPattern;
     private final ReadOnlyObjectProperty<Character> keywordDelimiter;
 
-    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
-                                         boolean shouldWarnBeforeOverwriteCiteKey,
-                                         boolean shouldGenerateCiteKeysBeforeSaving,
-                                         KeySuffix keySuffix,
-                                         String keyPatternRegex,
-                                         String keyPatternReplacement,
-                                         String unwantedCharacters,
-                                         GlobalCitationKeyPattern keyPattern,
-                                         String defaultPattern,
-                                         ReadOnlyObjectProperty<Character> keywordDelimiter) {
+    public CitationKeyGenerationPreferences(boolean shouldAvoidOverwriteCiteKey,
+                                            boolean shouldWarnBeforeOverwriteCiteKey,
+                                            boolean shouldGenerateCiteKeysBeforeSaving,
+                                            KeySuffix keySuffix,
+                                            String keyPatternRegex,
+                                            String keyPatternReplacement,
+                                            String unwantedCharacters,
+                                            GlobalCitationKeyPattern keyPattern,
+                                            String defaultPattern,
+                                            ReadOnlyObjectProperty<Character> keywordDelimiter) {
 
         this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);
         this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);
@@ -54,16 +54,16 @@ public class CitationKeyPatternPreferences {
     }
 
     @VisibleForTesting
-    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
-                                         boolean shouldWarnBeforeOverwriteCiteKey,
-                                         boolean shouldGenerateCiteKeysBeforeSaving,
-                                         KeySuffix keySuffix,
-                                         String keyPatternRegex,
-                                         String keyPatternReplacement,
-                                         String unwantedCharacters,
-                                         GlobalCitationKeyPattern keyPattern,
-                                         String defaultPattern,
-                                         Character keywordDelimiter) {
+    public CitationKeyGenerationPreferences(boolean shouldAvoidOverwriteCiteKey,
+                                            boolean shouldWarnBeforeOverwriteCiteKey,
+                                            boolean shouldGenerateCiteKeysBeforeSaving,
+                                            KeySuffix keySuffix,
+                                            String keyPatternRegex,
+                                            String keyPatternReplacement,
+                                            String unwantedCharacters,
+                                            GlobalCitationKeyPattern keyPattern,
+                                            String defaultPattern,
+                                            Character keywordDelimiter) {
 
         this(shouldAvoidOverwriteCiteKey,
                 shouldWarnBeforeOverwriteCiteKey,

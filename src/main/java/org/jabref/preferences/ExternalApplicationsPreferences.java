@@ -64,8 +64,15 @@ public class ExternalApplicationsPreferences {
         this.shouldAutoOpenEmailAttachmentsFolder.set(shouldAutoOpenEmailAttachmentsFolder);
     }
 
-    public String getCiteCommand() {
-        return citeCommand.get();
+    public CitationCommandStringPreferences getCiteCommand() {
+        String citeCommandStr = this.citeCommand.get();
+
+        // prefix is "\cite{"，suffix is "}"，delimiter is ","
+        String prefix = "\\cite{"; // should watch out inverse slash
+        String delimiter = ",";
+        String suffix = "}";
+
+        return new CitationCommandStringPreferences(prefix, delimiter, suffix);
     }
 
     public StringProperty citeCommandProperty() {

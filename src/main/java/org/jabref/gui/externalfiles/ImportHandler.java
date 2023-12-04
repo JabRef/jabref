@@ -290,10 +290,10 @@ public class ImportHandler {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
+                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyGenerationPreferences()
                                                                                      .getKeyPattern()),
                 bibDatabaseContext.getDatabase(),
-                preferencesService.getCitationKeyPatternPreferences());
+                preferencesService.getCitationKeyGenerationPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
     }
 
