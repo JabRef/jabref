@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to use System Preference for Light/Dark Theme [#8729](https://github.com/JabRef/jabref/issues/8729).
 - We added [scholar.archive.org](https://scholar.archive.org/) as a new fetcher. [#10498](https://github.com/JabRef/jabref/issues/10498)
 - We integrated predatory journal checking as part of the Integrity Checker based on the [check-bib-for-predatory](https://github.com/CfKu/check-bib-for-predatory). [koppor#348](https://github.com/koppor/jabref/issues/348)
+- We added a 'More options' section in the main table right click menu opening the preferences dialog. [#9432](https://github.com/JabRef/jabref/issues/9432)
 
 ### Changed
 

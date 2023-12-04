@@ -157,7 +157,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, taskExecutor)),
+                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame)),
 
                 new SeparatorMenuItem(),
 
