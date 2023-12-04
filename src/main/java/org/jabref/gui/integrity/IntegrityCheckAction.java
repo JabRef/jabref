@@ -14,7 +14,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.PredatoryJournalRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

@@ -65,7 +65,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.PredatoryJournalRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryTypesManager;

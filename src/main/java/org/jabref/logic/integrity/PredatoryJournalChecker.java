@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.journals.PredatoryJournalRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;

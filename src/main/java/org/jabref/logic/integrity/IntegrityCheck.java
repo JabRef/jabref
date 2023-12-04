@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.PredatoryJournalRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

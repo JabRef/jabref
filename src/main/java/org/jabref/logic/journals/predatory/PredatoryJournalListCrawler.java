@@ -1,20 +1,16 @@
-package org.jabref.logic.journals;
+package org.jabref.logic.journals.predatory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,35 +23,31 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PredatoryJournalLoader {
-    private static class PJSource {
-        URL url;
-        Optional<Pattern> elementPattern;
+/**
+ * Converts (hard-coded) online resources to a set. {@link #loadFromOnlineSources} is the method containing the result.
+ */
+public class PredatoryJournalListCrawler {
+
+    private record PJSource(URL url, Optional<Pattern> elementPattern) {
 
         PJSource(String url, String regex) {
-            try {
-                this.url = new URI(url).toURL();
-            } catch (
-                    MalformedURLException |
-                    URISyntaxException ex) {
-                throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
-            }
-            this.elementPattern = Optional.of(Pattern.compile(regex));
+            this(createURL(url), Optional.of(Pattern.compile(regex)));
         }
 
         PJSource(String url) {
+            this(createURL(url), Optional.empty());
+        }
+
+        private static URL createURL(String urlString) {
             try {
-                this.url = new URI(url).toURL();
-            } catch (
-                    MalformedURLException |
-                    URISyntaxException ex) {
+                return new URI(urlString).toURL();
+            } catch (MalformedURLException | URISyntaxException ex) {
                 throw new IllegalArgumentException("Malformed URL has occurred in PJSource", ex);
             }
-            this.elementPattern = Optional.empty();
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalListCrawler.class);
     private static final Pattern PATTERN_NAME = Pattern.compile("(?<=\">).*?(?=<)");
     private static final Pattern PATTERN_URL = Pattern.compile("http.*?(?=\")");
     private static final Pattern PATTERN_ABBR = Pattern.compile("(?<=\\()[^ ]*(?=\\))");
@@ -69,40 +61,21 @@ public class PredatoryJournalLoader {
             new PJSource("https://beallslist.net/hijacked-journals/",
                     "<tr>.*?</tr>")
     );
+
     private final List<String> linkElements = new ArrayList<>();
 
     private final List<PredatoryJournalInformation> predatoryJournalInformation = new ArrayList<>();
 
-    public static PredatoryJournalRepository loadRepository() {
-        PredatoryJournalRepository repository = new PredatoryJournalRepository();
-
-        try (InputStream resourceAsStream = PredatoryJournalRepository.class.getResourceAsStream("/journals/predatoryJournal-list.mv")) {
-            if (resourceAsStream == null) {
-                LOGGER.warn("There is no predatoryJournalList.mv. We use a default predatory journal list");
-            } else {
-                Path tempDir = Files.createTempDirectory("jabref-journal");
-                Path tempJournalList = tempDir.resolve("predatoryJournal-list.mv");
-                Files.copy(resourceAsStream, tempJournalList);
-                repository = new PredatoryJournalRepository(tempJournalList);
-                tempDir.toFile().deleteOnExit();
-                tempJournalList.toFile().deleteOnExit();
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while copying predatory journal list", e);
-            return repository;
-        }
-        return repository;
-    }
-
     /**
      * Loads predatory journal information from online resources
      * This method should be only called once when building JabRef
+     *
+     * @return the set of journal information
      */
-    public void loadFromOnlineSources() {
+    public HashSet<PredatoryJournalInformation> loadFromOnlineSources() {
         predatorySources.forEach(this::crawl);
         linkElements.forEach(this::clean);
-
-        LOGGER.info("Updated predatory journal list");
+        return new HashSet<>(predatoryJournalInformation);
     }
 
     private void crawl(PJSource source) {
@@ -184,9 +157,5 @@ public class PredatoryJournalLoader {
                        .replace("&amp;", "&")
                        .replace("&#8217;", "'")
                        .replace("&#8211;", "-");
-    }
-
-    public Set<PredatoryJournalInformation> getPredatoryJournalInformations() {
-        return new HashSet<>(predatoryJournalInformation);
     }
 }

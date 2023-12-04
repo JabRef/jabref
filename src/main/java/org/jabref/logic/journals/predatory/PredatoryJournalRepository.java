@@ -1,4 +1,4 @@
-package org.jabref.logic.journals;
+package org.jabref.logic.journals.predatory;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -25,9 +25,9 @@ public class PredatoryJournalRepository {
     /**
      * Initializes the internal data based on the predatory journals found in the given MV file
      */
-    public PredatoryJournalRepository(Path pjlist) {
+    public PredatoryJournalRepository(Path mvStore) {
         MVMap<String, PredatoryJournalInformation> predatoryJournalsMap;
-        try (MVStore store = new MVStore.Builder().readOnly().fileName(pjlist.toAbsolutePath().toString()).open()) {
+        try (MVStore store = new MVStore.Builder().readOnly().fileName(mvStore.toAbsolutePath().toString()).open()) {
             predatoryJournalsMap = store.openMap("PredatoryJournals");
             predatoryJournals.putAll(predatoryJournalsMap);
         }

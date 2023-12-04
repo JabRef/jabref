@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.journals.PredatoryJournalLoader;
+import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -18,10 +18,10 @@ class PredatoryJournalCheckerTest {
 
     @BeforeAll
     static void initChecker() {
-        checker = new PredatoryJournalChecker(PredatoryJournalLoader.loadRepository(),
+        checker = new PredatoryJournalChecker(PredatoryJournalListLoader.loadRepository(),
                 List.of(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE));
     }
-    
+
     @Test
     void journalIsNotPredatory() {
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "IEEE Software");

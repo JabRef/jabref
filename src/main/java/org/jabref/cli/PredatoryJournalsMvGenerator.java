@@ -3,29 +3,25 @@ package org.jabref.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.HashSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.journals.PredatoryJournalInformation;
-import org.jabref.logic.journals.PredatoryJournalLoader;
+import org.jabref.logic.journals.predatory.PredatoryJournalInformation;
+import org.jabref.logic.journals.predatory.PredatoryJournalListCrawler;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
-public class PredatoryJournalListMvGenerator {
+public class PredatoryJournalsMvGenerator {
     public static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
-        PredatoryJournalLoader loader = new PredatoryJournalLoader();
-        loader.loadFromOnlineSources();
-
-        Path predatoryJournalMvFile = Path.of("build", "resources", "main", "journals", "predatoryJournal-list.mv");
-
-        Files.createDirectories(predatoryJournalMvFile.getParent());
+        Path predatoryJournalsMvFile = Path.of("build", "resources", "main", "journals", "predatory-journals.mv");
+        Files.createDirectories(predatoryJournalsMvFile.getParent());
 
         try (MVStore store = new MVStore.Builder()
-                .fileName(predatoryJournalMvFile.toString())
+                .fileName(predatoryJournalsMvFile.toString())
                 .compressHigh()
                 .backgroundExceptionHandler((t, e) -> {
                     System.err.println("Exception occurred in Thread " + t + "with exception " + e);
@@ -33,7 +29,9 @@ public class PredatoryJournalListMvGenerator {
                 })
                 .open()) {
             MVMap<String, PredatoryJournalInformation> predatoryJournalsMap = store.openMap("PredatoryJournals");
-            Set<PredatoryJournalInformation> predatoryJournals = loader.getPredatoryJournalInformations();
+
+            PredatoryJournalListCrawler loader = new PredatoryJournalListCrawler();
+            HashSet<PredatoryJournalInformation> predatoryJournals = loader.loadFromOnlineSources();
 
             var resultMap = predatoryJournals.stream().collect(Collectors.toMap(PredatoryJournalInformation::name, Function.identity(),
                     (predatoryJournalInformation, predatoryJournalInformation2) -> {

@@ -1,4 +1,4 @@
-package org.jabref.logic.journals;
+package org.jabref.logic.journals.predatory;
 
 import java.io.Serializable;
 
