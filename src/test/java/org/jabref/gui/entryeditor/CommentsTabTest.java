@@ -29,6 +29,8 @@ import org.jabref.testutils.category.GUITest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
@@ -82,6 +84,7 @@ class CommentsTabTest {
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
         when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
         BibEntryType entryTypeMock = mock(BibEntryType.class);
         when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
@@ -101,8 +104,35 @@ class CommentsTabTest {
     }
 
     @Test
-    void testDetermineFieldsToShowWorksForASingleUser() {
+    void emptyCommentShownIfGloballyEnabled() {
         final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.COMMENT, "Standard comment text");
+
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
+
+        assertEquals(Set.of(StandardField.COMMENT, ownerComment), fields);
+    }
+
+    @Test
+    void emptyCommentFieldNotShownIfGloballyDisabled() {
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(false);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.COMMENT, "Standard comment text");
+
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
+
+        assertEquals(Set.of(StandardField.COMMENT), fields);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void commentFieldShownIfContainsText(boolean shouldShowUserCommentsFields) {
+        final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(shouldShowUserCommentsFields);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.COMMENT, "Standard comment text")

@@ -75,20 +75,26 @@ public class CommentsTab extends FieldsEditorTab {
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         SequencedSet<Field> comments = new LinkedHashSet<>();
-        if (entryEditorPreferences.shouldShowUserCommentsFields()) {
+
+        // First comes the standard comment field
+        comments.add(StandardField.COMMENT);
+
+        // Also show comment field of the current user (if enabled in the preferences)
+        if (entry.hasField(userSpecificCommentField) || entryEditorPreferences.shouldShowUserCommentsFields()) {
             comments.add(userSpecificCommentField);
         }
-        comments.add(StandardField.COMMENT);
+
+        // Show all non-empty comment fields (otherwise, they are completely hidden)
         comments.addAll(entry.getFields().stream()
-                             .filter(field -> (field instanceof UserSpecificCommentField && entryEditorPreferences.shouldShowUserCommentsFields()) ||
-                                     field.getName().toLowerCase().contains("comment"))
-                             .sorted(Comparator.comparing(Field::getName))
-                             .collect(Collectors.toCollection(LinkedHashSet::new)));
+                .filter(field -> (field instanceof UserSpecificCommentField && !field.equals(userSpecificCommentField))
+                        || field.getName().toLowerCase().contains("comment"))
+                .sorted(Comparator.comparing(Field::getName))
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
         return comments;
     }
 
     /**
-     * Comment editors: thre times size of button
+     * Comment editors: three times size of button
      */
     private void setCompressedRowLayout() {
         int numberOfComments = gridPane.getRowCount() - 1;
@@ -118,21 +124,20 @@ public class CommentsTab extends FieldsEditorTab {
     protected void setupPanel(BibEntry entry, boolean compressed) {
         super.setupPanel(entry, compressed);
 
-        boolean hasDefaultOwnerField = false;
-
         Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
             boolean isStandardBibtexComment = field == StandardField.COMMENT;
-            boolean isDefaultOwnerComment = field.getName().contains(defaultOwner);
-            hasDefaultOwnerField = hasDefaultOwnerField || isDefaultOwnerComment;
+            boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
             boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
             editor.getNode().setDisable(!shouldBeEnabled);
         }
 
-        if (hasDefaultOwnerField) {
+        // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
+        // button would just disappear and no change **in the current** editor would be made
+        if (entryEditorPreferences.shouldShowUserCommentsFields() && !entry.hasField(userSpecificCommentField)) {
             Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user comments"));
             hideDefaultOwnerCommentButton.setOnAction(e -> {
                 var labelForField = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
