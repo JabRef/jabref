@@ -3,7 +3,7 @@ package org.jabref.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,7 @@ public class PredatoryJournalsMvGenerator {
             MVMap<String, PredatoryJournalInformation> predatoryJournalsMap = store.openMap("PredatoryJournals");
 
             PredatoryJournalListCrawler loader = new PredatoryJournalListCrawler();
-            HashSet<PredatoryJournalInformation> predatoryJournals = loader.loadFromOnlineSources();
+            Set<PredatoryJournalInformation> predatoryJournals = loader.loadFromOnlineSources();
 
             var resultMap = predatoryJournals.stream().collect(Collectors.toMap(PredatoryJournalInformation::name, Function.identity(),
                     (predatoryJournalInformation, predatoryJournalInformation2) -> {
