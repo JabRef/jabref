@@ -28,7 +28,7 @@ jobs:
           git checkout main
           git pull
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 21.0.1
           distribution: 'liberica'
