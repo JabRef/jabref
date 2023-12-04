@@ -9,7 +9,7 @@ import org.jabref.preferences.BibEntryPreferences;
 
 public record ImportFormatPreferences(
         BibEntryPreferences bibEntryPreferences,
-        CitationKeyGenerationPreferences CitationKeyGenerationPreferences,
+        CitationKeyGenerationPreferences citationKeyGenerationPreferences,
         FieldPreferences fieldPreferences,
         XmpPreferences xmpPreferences,
         DOIPreferences doiPreferences,
