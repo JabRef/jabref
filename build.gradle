@@ -592,6 +592,7 @@ jlink {
         requires 'com.google.gson'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
+        requires 'org.apache.commons.lang3'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
