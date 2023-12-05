@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.text.Normalizer;
 
 /**
  * Contains all supported languages.
@@ -74,7 +75,14 @@ public enum Language {
     }
 
     public static Language[] getSorted() {
-        return Arrays.stream(values()).sorted(Comparator.comparing(Language::getDisplayName))
-                                      .toArray(Language[]::new);
+        return Arrays.stream(values())
+                .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
+                .toArray(Language[]::new);
+    }
+
+    private static String removeNonLatinCharacters(String input) {
+        // Remove non-Latin characters
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        return normalized.replaceAll("[^\\p{IsLatin}]", "");
     }
 }
