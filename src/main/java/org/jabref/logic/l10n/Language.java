@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-
 /**
  * Contains all supported languages.
  */
