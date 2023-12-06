@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Contains all supported languages.
@@ -38,9 +39,9 @@ public enum Language {
     UKRAINIAN("украї́нська (Ukrainian)", "uk"),
     VIETNAMESE("Vietnamese", "vi");
 
+    private static final Pattern isNotLatin = Pattern.compile("[^\\p{IsLatin}]")
     private final String displayName;
     private final String id;
-
     /**
      * @param id Typically as 639-1 code
      */
@@ -81,6 +82,6 @@ public enum Language {
     }
 
     private static String removeNonLatinCharacters(String input) {
-        return input.replaceAll("[^\\p{IsLatin}]", "");
+       return isNotLatin.matcher(input).replaceAll("");
     }
 }
