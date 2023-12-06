@@ -39,7 +39,7 @@ public enum Language {
     UKRAINIAN("украї́нська (Ukrainian)", "uk"),
     VIETNAMESE("Vietnamese", "vi");
 
-    private static final Pattern isNotLatin = Pattern.compile("[^\\p{IsLatin}]");
+    private static final Pattern IS_NOT_LATIN = Pattern.compile("[^\\p{IsLatin}]");
     private final String displayName;
     private final String id;
     /**
@@ -82,6 +82,6 @@ public enum Language {
     }
 
     private static String removeNonLatinCharacters(String input) {
-       return isNotLatin.matcher(input).replaceAll("");
+       return IS_NOT_LATIN.matcher(input).replaceAll("");
     }
 }
