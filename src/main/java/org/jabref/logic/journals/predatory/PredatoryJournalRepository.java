@@ -1,7 +1,6 @@
 package org.jabref.logic.journals.predatory;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,27 +16,27 @@ import org.slf4j.LoggerFactory;
 /**
  * A repository for all predatory journals and publishers, including add and find methods.
  */
-public class PredatoryJournalRepository {
+public class PredatoryJournalRepository implements AutoCloseable {
     private final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalRepository.class);
-    private final Map<String, PredatoryJournalInformation> predatoryJournals = new HashMap<>();
+    private final Map<String, PredatoryJournalInformation> predatoryJournals;
     private final StringSimilarity match = new StringSimilarity();
+    private final MVStore store;
 
     /**
      * Initializes the internal data based on the predatory journals found in the given MV file
      */
     public PredatoryJournalRepository(Path mvStore) {
         MVMap<String, PredatoryJournalInformation> predatoryJournalsMap;
-        try (MVStore store = new MVStore.Builder().readOnly().fileName(mvStore.toAbsolutePath().toString()).open()) {
-            predatoryJournalsMap = store.openMap("PredatoryJournals");
-            predatoryJournals.putAll(predatoryJournalsMap);
-        }
+        store = new MVStore.Builder().readOnly().fileName(mvStore.toAbsolutePath().toString()).open();
+        predatoryJournals = store.openMap("PredatoryJournals");
     }
 
     /**
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public PredatoryJournalRepository() {
-        predatoryJournals.put("Demo", new PredatoryJournalInformation("Demo", "Demo", ""));
+        store = null;
+        predatoryJournals = Map.of("Demo", new PredatoryJournalInformation("Demo", "Demo", ""));
     }
 
     /**
@@ -57,5 +56,12 @@ public class PredatoryJournalRepository {
 
         LOGGER.info("Found multiple possible predatory journals {}", String.join(", ", matches));
         return !matches.isEmpty();
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (store != null) {
+            store.close();
+        }
     }
 }
