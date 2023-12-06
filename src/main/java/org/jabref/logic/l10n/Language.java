@@ -39,7 +39,7 @@ public enum Language {
     UKRAINIAN("украї́нська (Ukrainian)", "uk"),
     VIETNAMESE("Vietnamese", "vi");
 
-    private static final Pattern isNotLatin = Pattern.compile("[^\\p{IsLatin}]")
+    private static final Pattern isNotLatin = Pattern.compile("[^\\p{IsLatin}]");
     private final String displayName;
     private final String id;
     /**
