@@ -4,9 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -15,11 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PredatoryJournalCheckerTest {
 
     static PredatoryJournalChecker checker;
+    static PredatoryJournalRepository predatoryJournalRepository = PredatoryJournalListLoader.loadRepository();
 
     @BeforeAll
     static void initChecker() {
-        checker = new PredatoryJournalChecker(PredatoryJournalListLoader.loadRepository(),
+        checker = new PredatoryJournalChecker(predatoryJournalRepository,
                 List.of(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE));
+    }
+
+    @AfterAll
+    static void close() throws Exception {
+        predatoryJournalRepository.close();
     }
 
     @Test
