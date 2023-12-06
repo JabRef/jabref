@@ -1,7 +1,7 @@
 package org.jabref.logic.journals.predatory;
 
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -13,22 +13,23 @@ public class PredatoryJournalListLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalListLoader.class);
 
     public static PredatoryJournalRepository loadRepository() {
-        Path path;
-        try {
-            URL resource = PredatoryJournalRepository.class.getResource("/journals/predatory-journals.mv");
-            if (resource == null) {
-                LOGGER.error("predatoryJournal-list.mv not found. Using demo list.");
-                return new PredatoryJournalRepository();
+        PredatoryJournalRepository repository = new PredatoryJournalRepository();
+        // Initialize with built-in list
+        try (InputStream resourceAsStream = PredatoryJournalListLoader.class.getResourceAsStream("/journals/predatory-journals.mv")) {
+            if (resourceAsStream == null) {
+                LOGGER.warn("There is no predatory-journal.mv. We use a default predatory dummy list");
+                repository = new PredatoryJournalRepository();
+            } else {
+                Path tempDir = Files.createTempDirectory("jabref-journal");
+                Path tempJournalList = tempDir.resolve("predatory-journals.mv");
+                Files.copy(resourceAsStream, tempJournalList);
+                repository = new PredatoryJournalRepository(tempJournalList);
+                tempDir.toFile().deleteOnExit();
+                tempJournalList.toFile().deleteOnExit();
             }
-            path = Path.of(resource.toURI());
-            if (!Files.exists(path)) {
-                LOGGER.error("predatoryJournal-list.mv not found. Using demo list.");
-                return new PredatoryJournalRepository();
-            }
-        } catch (URISyntaxException e) {
-            LOGGER.error("Could not determine path to predatoryJournal-list.mv. Using demo list.");
-            return new PredatoryJournalRepository();
+        } catch (IOException e) {
+            LOGGER.error("Error while copying journal list", e);
         }
-        return new PredatoryJournalRepository(path);
+        return repository;
     }
 }
