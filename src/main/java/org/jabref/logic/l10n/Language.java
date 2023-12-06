@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.text.Normalizer;
+
 
 /**
  * Contains all supported languages.
@@ -82,7 +82,6 @@ public enum Language {
 
     private static String removeNonLatinCharacters(String input) {
         // Remove non-Latin characters
-        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
-        return normalized.replaceAll("[^\\p{IsLatin}]", "");
+        return input.replaceAll("[^\\p{IsLatin}]", "");
     }
 }
