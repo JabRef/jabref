@@ -15,11 +15,13 @@ public class PredatoryJournalListLoader {
     public static PredatoryJournalRepository loadRepository() {
         PredatoryJournalRepository repository = new PredatoryJournalRepository();
         // Initialize with built-in list
+        // We cannot use PredatoryJournalRepository.class.getResource, because this is null in JPackage, thus we need "getResourceAsStream"
         try (InputStream resourceAsStream = PredatoryJournalListLoader.class.getResourceAsStream("/journals/predatory-journals.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no predatory-journal.mv. We use a default predatory dummy list");
                 repository = new PredatoryJournalRepository();
             } else {
+                // MVStore does not support loading from stream. Thus, we need to have a file copy of the stream.
                 Path tempDir = Files.createTempDirectory("jabref-journal");
                 Path tempJournalList = tempDir.resolve("predatory-journals.mv");
                 Files.copy(resourceAsStream, tempJournalList);
