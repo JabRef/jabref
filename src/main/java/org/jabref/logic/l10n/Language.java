@@ -81,7 +81,6 @@ public enum Language {
     }
 
     private static String removeNonLatinCharacters(String input) {
-        // Remove non-Latin characters
         return input.replaceAll("[^\\p{IsLatin}]", "");
     }
 }
