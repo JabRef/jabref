@@ -2,6 +2,7 @@ package org.jabref.logic.l10n;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,10 +74,10 @@ public enum Language {
         return id;
     }
 
-    public static Language[] getSorted() {
-        return Arrays.stream(values())
+    public static List<Language> getSorted() {
+        return Arrays.stream(values()).sorted()
                 .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
-                .toArray(Language[]::new);
+                .toList();
     }
 
     private static String removeNonLatinCharacters(String input) {
