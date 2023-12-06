@@ -1,6 +1,8 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.Objects;
 import java.util.Optional;
@@ -257,13 +259,22 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
+        final BibEntry theEntry = entry.get();
         BackgroundTask
-                .wrap(() -> layout.generatePreview(entry.get(), database))
+                .wrap(() -> layout.generatePreview(theEntry, database))
                 .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
                     LOGGER.error("Error while generating citation style", exception);
-                    setPreviewText(Localization.lang("Error while generating citation style"));
+
+                    // Convert stack trace to a string
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    exception.printStackTrace(printWriter);
+                    String stackTraceString = stringWriter.toString();
+
+                    // Set the preview text with the localized error message and the stack trace
+                    setPreviewText(Localization.lang("Error while generating citation style") + "\n\n" + exception.getLocalizedMessage() + "\n\nBibTeX (internal):\n" + theEntry + "\n\nStack Trace:\n" + stackTraceString);
                 })
                 .executeWith(taskExecutor);
     }

@@ -21,7 +21,9 @@
 
     <CheckBox fx:id="openOnNewEntry" text="%Open editor when a new entry is created"/>
     <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
-    <CheckBox fx:id="autoLinkFilesEnabled" text="%Automatically search and show unlinked files in the entry editor"></CheckBox>
+    <CheckBox
+            fx:id="autoLinkFilesEnabled"
+            text="%Automatically search and show unlinked files in the entry editor"/>
 
     <CheckBox fx:id="enableRelatedArticlesTab" text="%Show 'Related Articles' tab"/>
     <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"
@@ -35,6 +37,7 @@
     <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
     <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
     <CheckBox fx:id="enableSciteTab" text="%Show 'Scite' tab"/>
+    <CheckBox fx:id="showUserCommentsField" text="%Show user comments field"/>
 
     <Label styleClass="sectionHeader" text="%Custom editor tabs"/>
     <HBox>

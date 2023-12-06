@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,25 +76,25 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return fields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getPrimaryOptionalFields() {
+    public SequencedSet<Field> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.IMPORTANT)
                                   .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getSecondaryOptionalFields() {
+    public SequencedSet<Field> getSecondaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.DETAIL)
                                   .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getDeprecatedFields(BibDatabaseMode mode) {
+    public SequencedSet<Field> getDeprecatedFields(BibDatabaseMode mode) {
         if (mode == BibDatabaseMode.BIBTEX) {
-            return Collections.emptySet();
+            return new LinkedHashSet<>();
         }
-        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
+        SequencedSet<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
 
         // Only the optional fields which are mapped to another BibLaTeX name should be shown as "deprecated"
         deprecatedFields.retainAll(getOptionalFieldsAndAliases());
@@ -106,8 +107,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    public Set<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
-        Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
+    public SequencedSet<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
+        SequencedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }
@@ -115,8 +116,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Get list of all optional fields of this entry and all fields being source for a BibTeX to BibLaTeX conversion.
      */
-    private Set<Field> getOptionalFieldsAndAliases() {
-        Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
+    private SequencedSet<Field> getOptionalFieldsAndAliases() {
+        SequencedSet<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
             optionalFieldsAndAliases.add(field.field());
             if (EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(field.field())) {
