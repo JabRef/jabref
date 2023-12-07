@@ -76,7 +76,7 @@ public enum Language {
     }
 
     public static List<Language> getSorted() {
-        return Arrays.stream(values()).sorted()
+        return Arrays.stream(values())
                 .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
                 .toList();
     }
