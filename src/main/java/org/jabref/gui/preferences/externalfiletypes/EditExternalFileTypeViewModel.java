@@ -6,15 +6,28 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
+
+import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+
 public class EditExternalFileTypeViewModel {
     private final ExternalFileTypeItemViewModel fileTypeViewModel;
-
     private final StringProperty nameProperty = new SimpleStringProperty("");
     private final StringProperty mimeTypeProperty = new SimpleStringProperty("");
     private final StringProperty extensionProperty = new SimpleStringProperty("");
     private final StringProperty selectedApplicationProperty = new SimpleStringProperty("");
     private final BooleanProperty defaultApplicationSelectedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty customApplicationSelectedProperty = new SimpleBooleanProperty(false);
+
+
+    private Validator extensionValidator;
+    private Validator sameExtensionValidator;
+    private CompositeValidator validator;
 
     public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel) {
         this.fileTypeViewModel = fileTypeViewModel;
@@ -29,6 +42,22 @@ public class EditExternalFileTypeViewModel {
             customApplicationSelectedProperty.setValue(true);
             selectedApplicationProperty.setValue(fileTypeViewModel.applicationProperty().getValue());
         }
+
+        setupValidation();
+    }
+
+    private void setupValidation() {
+        validator = new CompositeValidator();
+        extensionValidator = new FunctionBasedValidator<>(
+                extensionProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a name for the extension.")));
+
+        validator.addValidators(extensionValidator);
+    }
+
+    public ValidationStatus validationStatus() {
+        return validator.getValidationStatus();
     }
 
     public Node getIcon() {
@@ -57,6 +86,10 @@ public class EditExternalFileTypeViewModel {
 
     public BooleanProperty customApplicationSelectedProperty() {
         return customApplicationSelectedProperty;
+    }
+
+    public BooleanProperty validExtensionTypeProperty() {
+        return defaultApplicationSelectedProperty;
     }
 
     public void storeSettings() {

@@ -45,6 +45,11 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
+        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
+
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
