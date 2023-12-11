@@ -76,7 +76,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     protected void showEditDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
-        dialogService.showCustomDialogAndWait(new EditExternalFileTypeEntryDialog(item, dialogTitle));
+        dialogService.showCustomDialogAndWait(new EditExternalFileTypeEntryDialog(item, dialogTitle, fileTypes));
     }
 
     public boolean edit(ExternalFileTypeItemViewModel type) {
@@ -97,7 +97,6 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item) {
-        // Check that there are no empty strings.
         if (item.getName().isEmpty() || item.extensionProperty().get().isEmpty() || item.mimetypeProperty().get().isEmpty()) {
             LOGGER.info("One of the fields is empty or invalid!");
             return false;

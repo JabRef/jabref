@@ -4,6 +4,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 import org.jabref.logic.l10n.Localization;
@@ -23,15 +24,16 @@ public class EditExternalFileTypeViewModel {
     private final StringProperty selectedApplicationProperty = new SimpleStringProperty("");
     private final BooleanProperty defaultApplicationSelectedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty customApplicationSelectedProperty = new SimpleBooleanProperty(false);
-
-
+    private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
+    private final String originalExtension;
     private Validator extensionValidator;
     private Validator sameExtensionValidator;
     private CompositeValidator validator;
 
-    public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel) {
+    public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
         this.fileTypeViewModel = fileTypeViewModel;
-
+        this.fileTypes = fileTypes;
+        this.originalExtension = fileTypeViewModel.extensionProperty().getValue();
         extensionProperty.setValue(fileTypeViewModel.extensionProperty().getValue());
         nameProperty.setValue(fileTypeViewModel.nameProperty().getValue());
         mimeTypeProperty.setValue(fileTypeViewModel.mimetypeProperty().getValue());
@@ -51,9 +53,21 @@ public class EditExternalFileTypeViewModel {
         extensionValidator = new FunctionBasedValidator<>(
                 extensionProperty,
                 StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a name for the extension.")));
-
-        validator.addValidators(extensionValidator);
+                ValidationMessage.error(Localization.lang("Please enter a name for the extension."))
+        );
+        sameExtensionValidator = new FunctionBasedValidator<>(
+                extensionProperty,
+                extension -> {
+                    for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
+                        if (extension.equalsIgnoreCase(fileTypeItem.extensionProperty().get()) && !extension.equalsIgnoreCase(originalExtension)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                ValidationMessage.error(Localization.lang("There is already an exists extension with the same name."))
+        );
+        validator.addValidators(extensionValidator, sameExtensionValidator);
     }
 
     public ValidationStatus validationStatus() {

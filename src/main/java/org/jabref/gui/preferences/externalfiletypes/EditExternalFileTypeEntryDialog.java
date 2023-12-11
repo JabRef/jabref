@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,11 +35,15 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     private final NativeDesktop nativeDesktop = OS.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
     private final ExternalFileTypeItemViewModel item;
+
+    private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
     private EditExternalFileTypeViewModel viewModel;
 
-    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
-        this.item = item;
 
+
+    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
+        this.item = item;
+        this.fileTypes = fileTypes;
         this.setTitle(dialogTitle);
 
         ViewLoader.view(this)
@@ -49,7 +54,6 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
         confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
-
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
@@ -60,7 +64,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new EditExternalFileTypeViewModel(item);
+        viewModel = new EditExternalFileTypeViewModel(item, fileTypes);
 
         icon.setGraphic(viewModel.getIcon());
 
