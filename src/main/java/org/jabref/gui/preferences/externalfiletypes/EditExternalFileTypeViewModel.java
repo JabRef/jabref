@@ -27,6 +27,8 @@ public class EditExternalFileTypeViewModel {
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
     private final String originalExtension;
     private Validator extensionValidator;
+    private Validator nameValidator;
+    private Validator mimeTypeValidator;
     private Validator sameExtensionValidator;
     private CompositeValidator validator;
 
@@ -55,6 +57,19 @@ public class EditExternalFileTypeViewModel {
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("Please enter a name for the extension."))
         );
+
+        nameValidator = new FunctionBasedValidator<>(
+                nameProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a name for the name."))
+        );
+
+        mimeTypeValidator = new FunctionBasedValidator<>(
+                mimeTypeProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a name for the MIME type."))
+        );
+
         sameExtensionValidator = new FunctionBasedValidator<>(
                 extensionProperty,
                 extension -> {
@@ -67,7 +82,8 @@ public class EditExternalFileTypeViewModel {
                 },
                 ValidationMessage.error(Localization.lang("There is already an exists extension with the same name."))
         );
-        validator.addValidators(extensionValidator, sameExtensionValidator);
+
+        validator.addValidators(extensionValidator, sameExtensionValidator, nameValidator, mimeTypeValidator);
     }
 
     public ValidationStatus validationStatus() {
