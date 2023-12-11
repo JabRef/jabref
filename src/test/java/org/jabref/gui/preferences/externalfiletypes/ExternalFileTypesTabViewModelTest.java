@@ -76,7 +76,7 @@ public class ExternalFileTypesTabViewModelTest {
         externalFileTypesTabViewModel.addNewType();
 
         ObservableList<ExternalFileTypeItemViewModel> actualFileTypes = externalFileTypesTabViewModel.getFileTypes();
-        assertEquals(actualFileTypes.size(), 1);
+        assertEquals(1, actualFileTypes.size());
         assertTrue(viewModelIsSameValue(actualFileTypes.getFirst()));
     }
 
@@ -93,6 +93,6 @@ public class ExternalFileTypesTabViewModelTest {
         externalFileTypesTabViewModel.addNewType();
 
         ObservableList<ExternalFileTypeItemViewModel> emptyFileTypes = externalFileTypesTabViewModel.getFileTypes();
-        assertEquals(emptyFileTypes.size(), 0);
+        assertEquals(0, emptyFileTypes.size());
     }
 }
