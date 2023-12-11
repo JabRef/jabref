@@ -97,12 +97,12 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item) {
-        if (withEmptyValue(item)){
+        if (withEmptyValue(item)) {
             LOGGER.debug("One of the fields is empty or invalid.");
             return false;
         }
 
-        if(!isUniqueExtension(item)){
+        if (!isUniqueExtension(item)) {
             LOGGER.debug("File Extension exists already.");
             return false;
         }
@@ -110,11 +110,11 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         return true;
     }
 
-    private boolean withEmptyValue(ExternalFileTypeItemViewModel item){
+    private boolean withEmptyValue(ExternalFileTypeItemViewModel item) {
         return item.getName().isEmpty() || item.extensionProperty().get().isEmpty() || item.mimetypeProperty().get().isEmpty();
     }
 
-    private boolean isUniqueExtension(ExternalFileTypeItemViewModel item){
+    private boolean isUniqueExtension(ExternalFileTypeItemViewModel item) {
         // check extension need to be unique in the list
         String newExt = item.extensionProperty().get();
         for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {

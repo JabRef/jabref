@@ -39,8 +39,6 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
     private EditExternalFileTypeViewModel viewModel;
 
-
-
     public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
         this.item = item;
         this.fileTypes = fileTypes;
