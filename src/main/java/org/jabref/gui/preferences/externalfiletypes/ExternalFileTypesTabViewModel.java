@@ -98,7 +98,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
     public boolean isValidExternalFileType(ExternalFileTypeItemViewModel item) {
         if (item.getName().isEmpty() || item.extensionProperty().get().isEmpty() || item.mimetypeProperty().get().isEmpty()) {
-            LOGGER.info("One of the fields is empty or invalid!");
+            LOGGER.info("One of the fields is empty or invalid.");
             return false;
         }
 
@@ -106,7 +106,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
         String newExt = item.extensionProperty().get();
         for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
             if (newExt.equalsIgnoreCase(fileTypeItem.extensionProperty().get())) {
-                LOGGER.info("File Extension exists already!");
+                LOGGER.info("File Extension exists already.");
                 return false;
             }
         }
