@@ -38,7 +38,6 @@ public class TestArchitectureTest {
                  .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
                  .and().doNotHaveFullyQualifiedName("org.jabref.http.server.TestBibFile")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.autocompleter.AutoCompleterUtil")
-                 .and().doNotHaveFullyQualifiedName("org.jabref.gui.preferences.externalfiletypes.ExternalFileTypeItemViewModelTestData")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.search.TextFlowEqualityHelper")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.bibtex.BibEntryAssert")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.importer.fileformat.ImporterTestEngine")
