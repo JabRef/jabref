@@ -61,7 +61,7 @@ public class EditExternalFileTypeViewModel {
         nameValidator = new FunctionBasedValidator<>(
                 nameProperty,
                 StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a name for the name."))
+                ValidationMessage.error(Localization.lang("Please enter a name."))
         );
 
         mimeTypeValidator = new FunctionBasedValidator<>(
