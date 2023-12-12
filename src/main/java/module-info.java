@@ -61,7 +61,7 @@ open module org.jabref {
     // http server and client exchange
     requires java.net.http;
     requires jakarta.ws.rs;
-    requires grizzly.framework;
+    requires org.glassfish.grizzly;
 
     // data mapping
     requires jakarta.xml.bind;
