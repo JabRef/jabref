@@ -26,16 +26,22 @@ public class EditExternalFileTypeViewModel {
     private final BooleanProperty customApplicationSelectedProperty = new SimpleBooleanProperty(false);
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
     private final String originalExtension;
+    private final String originalName;
+    private final String originalMimeType;
     private Validator extensionValidator;
     private Validator nameValidator;
     private Validator mimeTypeValidator;
     private Validator sameExtensionValidator;
+    private Validator sameNameValidator;
+    private Validator sameMimeTypeValidator;
     private CompositeValidator validator;
 
     public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
         this.fileTypeViewModel = fileTypeViewModel;
         this.fileTypes = fileTypes;
         this.originalExtension = fileTypeViewModel.extensionProperty().getValue();
+        this.originalName = fileTypeViewModel.nameProperty().getValue();
+        this.originalMimeType = fileTypeViewModel.mimetypeProperty().getValue();
         extensionProperty.setValue(fileTypeViewModel.extensionProperty().getValue());
         nameProperty.setValue(fileTypeViewModel.nameProperty().getValue());
         mimeTypeProperty.setValue(fileTypeViewModel.mimetypeProperty().getValue());
@@ -80,10 +86,36 @@ public class EditExternalFileTypeViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There is already an exists extension with the same name."))
+                ValidationMessage.error(Localization.lang("There is already an same external file type with same extension exists"))
         );
 
-        validator.addValidators(extensionValidator, sameExtensionValidator, nameValidator, mimeTypeValidator);
+        sameNameValidator = new FunctionBasedValidator<>(
+                nameProperty,
+                name -> {
+                    for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
+                        if (name.equalsIgnoreCase(fileTypeItem.nameProperty().get()) && !name.equalsIgnoreCase(originalName)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                ValidationMessage.error(Localization.lang("There is already an same external file type with same name exists"))
+        );
+
+        sameMimeTypeValidator = new FunctionBasedValidator<>(
+                mimeTypeProperty,
+                mimeType -> {
+                    for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
+                        if (mimeType.equalsIgnoreCase(fileTypeItem.mimetypeProperty().get()) && !mimeType.equalsIgnoreCase(originalMimeType)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                ValidationMessage.error(Localization.lang("There is already an same external file type with same MIME type exists"))
+        );
+
+        validator.addValidators(extensionValidator, sameExtensionValidator, nameValidator, sameNameValidator, mimeTypeValidator, sameMimeTypeValidator);
     }
 
     public ValidationStatus validationStatus() {
