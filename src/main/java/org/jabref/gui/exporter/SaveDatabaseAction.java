@@ -370,14 +370,13 @@ public class SaveDatabaseAction {
         String automaticCommitMsg = "Automatic update via JabRef";
         if (preferences.getGitPreferences().getAutoCommit()) {
             try {
-                git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
+                return git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
             } catch (GitAPIException | IOException e) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Failed to open repository"));
                 LOGGER.info("Failed to open repository");
-                return false;
             }
         }
-        return true;
+        return false;
     }
 
     public void automaticGitPush(Path filePath) {
