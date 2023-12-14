@@ -335,7 +335,8 @@ public class SaveDatabaseAction {
     }
 
     /**
-     * Handle JabRef git integration action. This method is called when the user save the database.
+     * @param filePath of library
+     * @return true on successful git pull
      */
     public boolean automaticGitPull(Path filePath) {
         GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
@@ -365,6 +366,10 @@ public class SaveDatabaseAction {
         return true;
     }
 
+    /**
+     * @param filePath of library
+     * @return true on successful git commit
+     */
     public boolean automaticGitCommit(Path filePath) {
         GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
         String automaticCommitMsg = "Automatic update via JabRef";
@@ -379,6 +384,9 @@ public class SaveDatabaseAction {
         return false;
     }
 
+    /**
+     * @param filePath of library
+     */
     public void automaticGitPush(Path filePath) {
         GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
         try {

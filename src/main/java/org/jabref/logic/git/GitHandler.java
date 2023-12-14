@@ -325,6 +325,9 @@ public class GitHandler {
         }
     }
 
+    /**
+     * Force git pull and overwrite files.
+     */
     public void forceGitPull() {
         try {
             Git git = Git.open(this.repositoryPathAsFile);
@@ -340,7 +343,7 @@ public class GitHandler {
                 git.reset()
                    .setMode(ResetCommand.ResetType.HARD)
                    .call();
-                git.merge().include(git.getRepository().findRef("origin/" + "main")).call();
+                git.merge().include(git.getRepository().findRef("origin/" + getCurrentlyCheckedOutBranch())).call();
             } else {
                 git.verifySignature();
                 git.fetch()
@@ -350,7 +353,7 @@ public class GitHandler {
                 git.reset()
                    .setMode(ResetCommand.ResetType.HARD)
                    .call();
-                git.merge().include(git.getRepository().findRef("origin/" + "main")).call();
+                git.merge().include(git.getRepository().findRef("origin/" + getCurrentlyCheckedOutBranch())).call();
             }
         } catch (GitAPIException | IOException e) {
             LOGGER.error("Failed to force git pull", e);
