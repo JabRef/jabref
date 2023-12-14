@@ -10,10 +10,12 @@ import java.util.Optional;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
@@ -226,7 +228,6 @@ public class GitHandler {
                 .setMessage(commitMessage)
                 .call();
         }
-
         return commitCreated;
     }
 
@@ -292,45 +293,22 @@ public class GitHandler {
      * Pulls all commits made to the branch that is tracked by the currently checked out branch.
      * If pulling to remote fails, it fails silently.
      */
-    public void pullOnCurrentBranch() throws IOException {
+    public void pullOnCurrentBranch() throws IOException, GitAPIException {
         Git git = Git.open(this.repositoryPathAsFile);
-
         String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
         boolean isSshRemoteRepository = remoteURL != null && remoteURL.contains("git@");
-
         git.verifySignature();
-
         if (isSshRemoteRepository) {
-            try {
-                TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
-                git.pull()
-                .setTransportConfigCallback(transportConfigCallback)
-                .call();
-            } catch (GitAPIException e) {
-                if (e.getMessage().equals("origin: not found")) {
-                    LOGGER.info("No remote repository detected. Push skipped.");
-                } else {
-                    LOGGER.info("Failed to pull");
-                    throw new RuntimeException(e);
-                }
-            }
+            TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
+            git.pull()
+               .setTransportConfigCallback(transportConfigCallback)
+               .call();
         } else if (this.gitPassword.isEmpty() || this.gitUsername.isEmpty()) {
-            throw new IOException("No git credentials");
+            throw new TransportException("No git credentials");
         } else {
-            try {
-                git.pull()
-                .setCredentialsProvider(this.credentialsProvider).call();
-            } catch (GitAPIException e) {
-                if (e.getMessage().equals("origin: not found")) {
-                    LOGGER.info("No remote repository detected. Push skipped.");
-                } else if (e.getMessage().equals("HEAD is detached")) {
-                    throw new IOException("HEAD is detached");
-                } else {
-                    LOGGER.info("Failed to pull");
-                    System.out.println(e.getMessage());
-                    throw new RuntimeException(e);
-                }
-            }
+            git.pull()
+               .setCredentialsProvider(this.credentialsProvider)
+               .call();
         }
     }
 
@@ -347,9 +325,36 @@ public class GitHandler {
         }
     }
 
-    public void setCredentialsProvider(CredentialsProvider credentialsProvider) {
-        this.credentialsProvider = credentialsProvider;
-        this.gitUsername = "credentialsProvider";
-        this.gitPassword = "credentialsProvider";
+    public void forceGitPull() {
+        try {
+            Git git = Git.open(this.repositoryPathAsFile);
+            String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
+            boolean isSshRemoteRepository = remoteURL != null && remoteURL.contains("git@");
+            if (isSshRemoteRepository) {
+                TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
+                git.verifySignature();
+                git.fetch()
+                   .setTransportConfigCallback(transportConfigCallback)
+                   .setRemote("origin")
+                   .call();
+                git.reset()
+                   .setMode(ResetCommand.ResetType.HARD)
+                   .call();
+                git.merge().include(git.getRepository().findRef("origin/" + "main")).call();
+            } else {
+                git.verifySignature();
+                git.fetch()
+                   .setCredentialsProvider(this.credentialsProvider)
+                   .setRemote("origin")
+                   .call();
+                git.reset()
+                   .setMode(ResetCommand.ResetType.HARD)
+                   .call();
+                git.merge().include(git.getRepository().findRef("origin/" + "main")).call();
+            }
+        } catch (GitAPIException | IOException e) {
+            LOGGER.error("Failed to force git pull", e);
+            throw new RuntimeException(e);
+        }
     }
 }

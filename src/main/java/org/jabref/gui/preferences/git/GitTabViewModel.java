@@ -2,22 +2,18 @@ package org.jabref.gui.preferences.git;
 
 import java.util.List;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.git.GitPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.git.GitPreferences;
 
 public class GitTabViewModel implements PreferenceTabViewModel {
-
-    private StringProperty username = new SimpleStringProperty();
-    private StringProperty password = new SimpleStringProperty();
-    private BooleanProperty autoCommit = new SimpleBooleanProperty();
-
-    private BooleanProperty autoSync = new SimpleBooleanProperty();
-    private GitPreferences gitPreferences;
+    private final StringProperty username;
+    private final StringProperty password;
+    private final BooleanProperty autoCommit;
+    private final BooleanProperty autoSync;
+    private final GitPreferences gitPreferences;
 
     public GitTabViewModel(GitPreferences gitPreferences) {
         this.gitPreferences = gitPreferences;
@@ -31,8 +27,8 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         this.username.setValue(this.gitPreferences.getUsername());
         this.password.setValue(this.gitPreferences.getPassword());
-        this.autoCommit.setValue(this.gitPreferences.getAutoCommit());
-        this.autoCommit.setValue(this.gitPreferences.getAutoSync());
+        this.autoCommit.setValue(this.gitPreferences.getAutoCommit() || this.gitPreferences.getAutoSync());
+        this.autoSync.setValue(this.gitPreferences.getAutoSync());
     }
 
     @Override
@@ -65,16 +61,8 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         return this.password;
     }
 
-    public Boolean getAutoCommit() {
-        return this.autoCommit.get();
-    }
-
     public BooleanProperty getAutoCommitProperty() {
         return this.autoCommit;
-    }
-
-    public Boolean getAutoSync() {
-        return this.autoSync.get();
     }
 
     public BooleanProperty getAutoSyncProperty() {

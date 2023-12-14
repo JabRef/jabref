@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,16 +18,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
-
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
-import org.jabref.gui.git.GitCredentialsDialogView;
-import org.jabref.gui.git.GitChange;
-import org.jabref.gui.git.GitChangeResolverDialog;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
@@ -48,11 +41,15 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.git.BibGitContext;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
+import org.eclipse.jgit.api.errors.DetachedHeadException;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.errors.NoRemoteRepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -247,17 +244,25 @@ public class SaveDatabaseAction {
 
             boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder());
 
+            if (preferences.getGitPreferences().getAutoSync()) {
+                success = automaticGitPull(targetPath);
+            }
+
+            if (preferences.getGitPreferences().getAutoCommit()) {
+                boolean commited = automaticGitCommit(targetPath);
+                if (commited && preferences.getGitPreferences().getAutoSync()) {
+                    automaticGitPush(targetPath);
+                }
+            }
+
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
             }
             dialogService.notify(Localization.lang("Library saved"));
 
-            if (success) {
-                this.automaticGitUpdate(targetPath);
-            }
             return success;
-        } catch (SaveException | IOException | GitAPIException ex) {
+        } catch (SaveException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
@@ -332,47 +337,56 @@ public class SaveDatabaseAction {
     /**
      * Handle JabRef git integration action. This method is called when the user save the database.
      */
-    public void automaticGitUpdate(Path filePath) throws IOException, GitAPIException {
+    public boolean automaticGitPull(Path filePath) {
         GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
-        List<GitChange> changes = new ArrayList<GitChange>();
-        BibGitContext bibGitContext = new BibGitContext();
-        if (preferences.getGitPreferences().getAutoCommit()) {
-            String automaticCommitMsg = "Automatic update via JabRef";
-            git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
+        try {
+            git.pullOnCurrentBranch();
+        } catch (CheckoutConflictException e) {
+            git.forceGitPull();
+            dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Local repository is out of date, please review the library and save again"));
+            LOGGER.info("Failed to pull");
+            return false;
+        } catch (NoRemoteRepositoryException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("No remote repository detected"));
+            LOGGER.info("No remote repository detected");
+        } catch (DetachedHeadException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Git detached head"));
+            LOGGER.info("Git detached head");
+        } catch (TransportException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Git credentials error"));
+            LOGGER.info("Git credentials error");
+        } catch (GitAPIException e) {
+            LOGGER.info("Failed to pull");
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Failed to open repository"));
+            LOGGER.info("Failed to open repository");
         }
-        if (preferences.getGitPreferences().getAutoSync()) {
+        return true;
+    }
+
+    public boolean automaticGitCommit(Path filePath) {
+        GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
+        String automaticCommitMsg = "Automatic update via JabRef";
+        if (preferences.getGitPreferences().getAutoCommit()) {
             try {
-                git.pullOnCurrentBranch();
-            } catch (IOException ex1) {
-                if (ex1.getMessage().equals("No git credentials")) {
-                    GitCredentialsDialogView gitCredentialsDialogView = new GitCredentialsDialogView();
-
-                    gitCredentialsDialogView.showGitCredentialsDialog();
-
-                    UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(
-                            gitCredentialsDialogView.getGitUsername(),
-                            gitCredentialsDialogView.getGitPassword()
-                    );
-
-                    git.setCredentialsProvider(credentialsProvider);
-                    try {
-                        git.pullOnCurrentBranch();
-                    } catch (IOException ex2) {
-                        if (ex2.getMessage().equals("HEAD is detached")) {
-                            GitChangeResolverDialog GitChangeResolverDialog = new GitChangeResolverDialog(changes, bibGitContext, "Merge issues");
-                        } else {
-                            throw new RuntimeException(ex2.getMessage());
-                        }
-                    }
-                    
-                } else if (ex1.getMessage().equals("HEAD is detached")) {
-                    GitChangeResolverDialog GitChangeResolverDialog = new GitChangeResolverDialog(changes, bibGitContext, "Merge issues");
-                } 
-                else {
-                    throw new IOException(ex1.getMessage());
-                }
+                git.createCommitWithSingleFileOnCurrentBranch(filePath.getFileName().toString(), automaticCommitMsg);
+            } catch (GitAPIException | IOException e) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Failed to open repository"));
+                LOGGER.info("Failed to open repository");
+                return false;
             }
+        }
+        return true;
+    }
+
+    public void automaticGitPush(Path filePath) {
+        GitHandler git = new GitHandler(filePath.getParent(), preferences.getGitPreferences());
+        try {
             git.pushCommitsToRemoteRepository();
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Git"), Localization.lang("Failed to push file in remote repository"));
+            LOGGER.info("Failed to push file in remote repository");
         }
     }
 }

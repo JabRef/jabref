@@ -9,7 +9,6 @@ public class GitPreferences {
     private StringProperty username;
     private StringProperty password;
     private BooleanProperty autoCommit;
-
     private BooleanProperty autoSync;
 
     public GitPreferences(String username, String password, Boolean autoCommit, Boolean autoSync) {
@@ -44,22 +43,6 @@ public class GitPreferences {
 
     public BooleanProperty getAutoSyncProperty() {
         return this.autoSync;
-    }
-
-    public void setAutoCommit(Boolean autoCommit) {
-        this.autoCommit = new SimpleBooleanProperty(autoCommit);
-    }
-
-    public void setAutoCommitProperty(BooleanProperty autoCommit) {
-        this.autoCommit = autoCommit;
-    }
-
-    public void setAutoSync(Boolean autoSync) {
-        this.autoSync = new SimpleBooleanProperty(autoSync);
-    }
-
-    public void setAutoSyncProperty(BooleanProperty autoSync) {
-        this.autoSync = autoSync;
     }
 
     public String getUsername() {

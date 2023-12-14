@@ -14,7 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.git.GitChange;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 

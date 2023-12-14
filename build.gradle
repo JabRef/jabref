@@ -144,15 +144,6 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '6.7.0.202309050840-r'
-    testImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '6.7.0.202309050840-r'
-
-    testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.51.v20230217'
-    testImplementation group: 'org.eclipse.jetty', name: 'jetty-security', version: '9.4.51.v20230217'
-    
-    testCompileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
-    configurations.all {
-        exclude group: "commons-logging", module: "commons-logging"
-    }
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.3'
@@ -257,6 +248,12 @@ dependencies {
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
+
+    testImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '6.7.0.202309050840-r'
+    testImplementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.51.v20230217'
+    testImplementation group: 'org.eclipse.jetty', name: 'jetty-security', version: '9.4.51.v20230217'
+
+    testCompileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.12.5'
     // xjc needs the runtime as well for the ant task, otherwise it fails
@@ -726,4 +723,8 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+configurations.all {
+    exclude group: "commons-logging", module: "commons-logging"
 }

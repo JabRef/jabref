@@ -35,17 +35,7 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
 
         username.textProperty().bindBidirectional(viewModel.getUsernameProperty());
         password.textProperty().bindBidirectional(viewModel.getPasswordProperty());
-        autoCommit.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        autoCommit.selectedProperty().setValue(false);
-                    }
-                });
-        autoSync.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        autoSync.selectedProperty().setValue(false);
-                    }
-                });
+        autoCommit.selectedProperty().bindBidirectional(viewModel.getAutoCommitProperty());
+        autoSync.selectedProperty().bindBidirectional(viewModel.getAutoSyncProperty());
     }
 }
