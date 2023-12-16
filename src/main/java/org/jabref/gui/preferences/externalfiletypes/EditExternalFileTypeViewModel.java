@@ -28,12 +28,9 @@ public class EditExternalFileTypeViewModel {
     private final String originalExtension;
     private final String originalName;
     private final String originalMimeType;
-    private Validator extensionValidator;
-    private Validator nameValidator;
-    private Validator mimeTypeValidator;
-    private Validator sameExtensionValidator;
-    private Validator sameNameValidator;
-    private Validator sameMimeTypeValidator;
+    private CompositeValidator extensionValidator;
+    private CompositeValidator nameValidator;
+    private CompositeValidator mimeTypeValidator;
     private CompositeValidator validator;
 
     public EditExternalFileTypeViewModel(ExternalFileTypeItemViewModel fileTypeViewModel, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
@@ -58,25 +55,14 @@ public class EditExternalFileTypeViewModel {
 
     private void setupValidation() {
         validator = new CompositeValidator();
-        extensionValidator = new FunctionBasedValidator<>(
+        extensionValidator = new CompositeValidator();
+
+        Validator extensionisNotBlankValidator = new FunctionBasedValidator<>(
                 extensionProperty,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("Please enter a name for the extension."))
         );
-
-        nameValidator = new FunctionBasedValidator<>(
-                nameProperty,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a name."))
-        );
-
-        mimeTypeValidator = new FunctionBasedValidator<>(
-                mimeTypeProperty,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a name for the MIME type."))
-        );
-
-        sameExtensionValidator = new FunctionBasedValidator<>(
+        Validator sameExtensionValidator = new FunctionBasedValidator<>(
                 extensionProperty,
                 extension -> {
                     for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
@@ -86,10 +72,12 @@ public class EditExternalFileTypeViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There is already an same external file type with same extension exists"))
+                ValidationMessage.error(Localization.lang("There already exists an external file type with the same extension"))
         );
+        extensionValidator.addValidators(sameExtensionValidator, extensionisNotBlankValidator);
 
-        sameNameValidator = new FunctionBasedValidator<>(
+        nameValidator = new CompositeValidator();
+        Validator sameNameValidator = new FunctionBasedValidator<>(
                 nameProperty,
                 name -> {
                     for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
@@ -99,10 +87,24 @@ public class EditExternalFileTypeViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There is already an same external file type with same name exists"))
+                ValidationMessage.error(Localization.lang("There already exists an external file type with the same name"))
         );
 
-        sameMimeTypeValidator = new FunctionBasedValidator<>(
+        Validator nameIsNotBlankValidator = new FunctionBasedValidator<>(
+                nameProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a name."))
+        );
+        nameValidator.addValidators(sameNameValidator, nameIsNotBlankValidator);
+
+        mimeTypeValidator = new CompositeValidator();
+        Validator mimeTypeIsNotBlankValidator = new FunctionBasedValidator<>(
+                mimeTypeProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a name for the MIME type."))
+        );
+
+        Validator sameMimeTypeValidator = new FunctionBasedValidator<>(
                 mimeTypeProperty,
                 mimeType -> {
                     for (ExternalFileTypeItemViewModel fileTypeItem : fileTypes) {
@@ -112,14 +114,27 @@ public class EditExternalFileTypeViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There is already an same external file type with same MIME type exists"))
+                ValidationMessage.error(Localization.lang("There already exists an external file type with the same MIME type"))
         );
+        mimeTypeValidator.addValidators(sameMimeTypeValidator, mimeTypeIsNotBlankValidator);
 
         validator.addValidators(extensionValidator, sameExtensionValidator, nameValidator, sameNameValidator, mimeTypeValidator, sameMimeTypeValidator);
     }
 
     public ValidationStatus validationStatus() {
         return validator.getValidationStatus();
+    }
+
+    public ValidationStatus extensionValidation() {
+        return extensionValidator.getValidationStatus();
+    }
+
+    public ValidationStatus mimeTypeValidation() {
+        return mimeTypeValidator.getValidationStatus();
+    }
+
+    public ValidationStatus nameValidation() {
+        return nameValidator.getValidationStatus();
     }
 
     public Node getIcon() {
