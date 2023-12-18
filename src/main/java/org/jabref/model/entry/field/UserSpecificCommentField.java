@@ -32,10 +32,9 @@ public class UserSpecificCommentField implements Field {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Field)) {
+        if (!(o instanceof Field other)) {
             return false;
         }
-        Field other = (Field) o;
         return name.equals(other.getName());
     }
 

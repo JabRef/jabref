@@ -64,7 +64,7 @@ jobs:
         run: |
           mv gource/gource.mp4 gource-videos/jabref-complete.mp4
       - name: 'Upload gource video'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Gource
           path: gource-videos/
