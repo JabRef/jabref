@@ -391,7 +391,7 @@ public class GroupDialogViewModel {
 
         if (editedGroup == null) {
             // creating new group -> defaults!
-            colorProperty.setValue(GroupColorPicker.generateTopGroupColor());
+            colorProperty.setValue(GroupColorPicker.generateColor(List.of())); // TODO
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);

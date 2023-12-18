@@ -41,7 +41,8 @@ public class GroupColorPicker {
     }
 
     // Generate color for top groups
-    public static Color generateTopGroupColor() {
+    public static Color generateColor(List<Color> otherColors) {
+        // otherColors might be empty; then use default group color (IconTheme.getDefaultGroupColor())
         return useRandom ? getDistinctHue() : IconTheme.getDefaultGroupColor();
     }
 

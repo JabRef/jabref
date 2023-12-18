@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 import javafx.application.Platform;
@@ -36,6 +37,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -95,16 +97,21 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private final BibDatabaseContext currentDatabase;
+    private final GroupTreeNode parentNode;
     private final AbstractGroup editedGroup;
+
     private GroupDialogViewModel viewModel;
+
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
-                           AbstractGroup editedGroup,
+                           GroupTreeNode parentNode, // might be null
+                           AbstractGroup editedGroup, // might be null
                            GroupDialogHeader groupDialogHeader) {
         this.currentDatabase = currentDatabase;
+        this.parentNode = parentNode;
         this.editedGroup = editedGroup;
 
         ViewLoader.view(this)
@@ -212,8 +219,18 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoColorCheckbox.setSelected(GroupColorPicker.useRandom);
         autoColorCheckbox.setOnAction(event -> {
             GroupColorPicker.useRandom = autoColorCheckbox.isSelected();
-            if (autoColorCheckbox.isSelected()) {
-                viewModel.colorFieldProperty().setValue(GroupColorPicker.generateTopGroupColor());
+            if (autoColorCheckbox.isSelected() && (parentNode != null)) {
+                if (parentNode.getChildren().isEmpty()) {
+                    // case 1: We are creating the first sub group, we start with default
+                    viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
+                } else {
+                    // case 2: We are creating (n>1)th group
+                    // We use the colors of the sibling group as base and then use the most distant color
+                    viewModel.colorFieldProperty().setValue(GroupColorPicker.generateColor(
+                            parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+                                      .flatMap(Optional::stream)
+                                      .toList()));
+                }
             } else {
                 viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
             }
