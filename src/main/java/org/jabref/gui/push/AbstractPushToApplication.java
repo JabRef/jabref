@@ -10,6 +10,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,9 +27,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
-    private static final String CITE_KEY1 = "key1";
-    private static final String CITE_KEY2 = "key2";
-
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotPush; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
@@ -38,7 +36,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected final DialogService dialogService;
     protected final PreferencesService preferencesService;
 
-    private String cachedCiteCommand;
     private String cachedCitePrefix;
     private String cachedCiteSuffix;
     private String cachedCiteDelimiter;
@@ -49,23 +46,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     private void dissectCiteCommand() {
-        String preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+        CitationCommandString preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
 
-        if (preferencesCiteCommand != null && preferencesCiteCommand.equals(cachedCiteCommand)) {
-            return;
-        }
-
-        cachedCiteCommand = preferencesCiteCommand;
-
-        int indexKey1 = cachedCiteCommand.indexOf(CITE_KEY1);
-        int indexKey2 = cachedCiteCommand.indexOf(CITE_KEY2);
-        if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
-            return;
-        }
-
-        cachedCitePrefix = preferencesCiteCommand.substring(0, indexKey1);
-        cachedCiteDelimiter = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY1) + CITE_KEY1.length(), indexKey2);
-        cachedCiteSuffix = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY2) + CITE_KEY2.length());
+        cachedCitePrefix = preferencesCiteCommand.prefix();
+        cachedCiteDelimiter = preferencesCiteCommand.delimiter();
+        cachedCiteSuffix = preferencesCiteCommand.suffix();
     }
 
     @Override
