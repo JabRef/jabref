@@ -40,7 +40,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoOpenAttachedFoldersProperty = new SimpleBooleanProperty();
     private final ListProperty<PushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
-    private final StringProperty citeCommandProperty = new SimpleStringProperty();
+    private final StringProperty citeCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomTerminalProperty = new SimpleBooleanProperty();
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
