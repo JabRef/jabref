@@ -10,7 +10,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -36,21 +35,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected final DialogService dialogService;
     protected final PreferencesService preferencesService;
 
-    private String cachedCitePrefix;
-    private String cachedCiteSuffix;
-    private String cachedCiteDelimiter;
-
     public AbstractPushToApplication(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-    }
-
-    private void dissectCiteCommand() {
-        CitationCommandString preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
-
-        cachedCitePrefix = preferencesCiteCommand.prefix();
-        cachedCiteDelimiter = preferencesCiteCommand.delimiter();
-        cachedCiteSuffix = preferencesCiteCommand.suffix();
     }
 
     @Override
@@ -155,18 +142,15 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String getCitePrefix() {
-        dissectCiteCommand();
-        return cachedCitePrefix;
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().prefix();
     }
 
     public String getDelimiter() {
-        dissectCiteCommand();
-        return cachedCiteDelimiter;
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter();
     }
 
     protected String getCiteSuffix() {
-        dissectCiteCommand();
-        return cachedCiteSuffix;
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().suffix();
     }
 
     @Override
