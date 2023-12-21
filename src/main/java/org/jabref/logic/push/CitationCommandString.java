@@ -1,6 +1,10 @@
 package org.jabref.logic.push;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public record CitationCommandString(String prefix, String delimiter, String suffix) {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommandString.class);
     private static final String CITE_KEY1 = "key1";
     private static final String CITE_KEY2 = "key2";
 
@@ -13,7 +17,8 @@ public record CitationCommandString(String prefix, String delimiter, String suff
         int indexKey1 = completeCiteCommand.indexOf(CITE_KEY1);
         int indexKey2 = completeCiteCommand.indexOf(CITE_KEY2);
         if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
-            return new CitationCommandString("", "", "");
+            LOGGER.error("Wrong indexes {} {} for completeCiteCommand {}. Using default.", indexKey1, indexKey2, completeCiteCommand);
+            return new CitationCommandString("\\cite{", ",", "}");
         }
 
         String prefix = completeCiteCommand.substring(0, indexKey1);
