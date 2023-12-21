@@ -3,6 +3,7 @@ package org.jabref.gui.edit;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.ClipBoardManager;
@@ -102,33 +103,6 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    private void copyKey() {
-        List<BibEntry> entries = stateManager.getSelectedEntries();
-
-        // Collect all non-null keys.
-        List<String> keys = entries.stream()
-                                   .filter(entry -> entry.getCitationKey().isPresent())
-                                   .map(entry -> entry.getCitationKey().get())
-                                   .collect(Collectors.toList());
-
-        if (keys.isEmpty()) {
-            dialogService.notify(Localization.lang("None of the selected entries have citation keys."));
-            return;
-        }
-
-        final String copiedKeys = String.join(",", keys);
-        clipBoardManager.setContent(copiedKeys);
-
-        if (keys.size() == entries.size()) {
-            // All entries had keys.
-            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(copiedKeys)));
-        } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
-                    Integer.toString(entries.size() - keys.size()), Integer.toString(entries.size())));
-        }
-    }
-
     private void copyDoi() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
@@ -165,7 +139,7 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    private void copyCiteKey() {
+    private void doCopyKey(Function<List<String>, String> mapKeyList) {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // Collect all non-null keys.
@@ -179,19 +153,29 @@ public class CopyMoreAction extends SimpleCommand {
             return;
         }
 
-        CitationCommandString citeCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+        String clipBoardContent = mapKeyList.apply(keys);
 
-        final String copiedCiteCommand = citeCommand.prefix() + String.join(citeCommand.delimiter(), keys) + citeCommand.suffix();
-        clipBoardManager.setContent(copiedCiteCommand);
+        clipBoardManager.setContent(clipBoardContent);
 
         if (keys.size() == entries.size()) {
             // All entries had keys.
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(copiedCiteCommand)));
+                    JabRefDialogService.shortenDialogMessage(clipBoardContent)));
         } else {
             dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Integer.toString(entries.size() - keys.size()), Integer.toString(entries.size())));
         }
+    }
+
+    private void copyCiteKey() {
+        doCopyKey(keys -> {
+            CitationCommandString citeCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+            return citeCommand.prefix() + String.join(citeCommand.delimiter(), keys) + citeCommand.suffix();
+        });
+    }
+
+    private void copyKey() {
+        doCopyKey(keys -> String.join(preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter(), keys));
     }
 
     private void copyKeyAndTitle() {
