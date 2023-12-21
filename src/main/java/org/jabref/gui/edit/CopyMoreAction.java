@@ -259,6 +259,9 @@ public class CopyMoreAction extends SimpleCommand {
 
         for (BibEntry entry : entriesWithKey) {
             String key = entry.getCitationKey().orElse("");
+            if (LOGGER.isDebugEnabled() && key.isEmpty()) {
+                LOGGER.debug("entry {} had no citation key, but it should have had one", entry);
+            }
             String url = entry.getField(StandardField.URL).orElse("");
             keyAndLink.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
             keyAndLink.append(OS.NEWLINE);
