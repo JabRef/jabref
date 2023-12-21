@@ -17,8 +17,13 @@ public record CitationCommandString(String prefix, String delimiter, String suff
         int indexKey1 = completeCiteCommand.indexOf(CITE_KEY1);
         int indexKey2 = completeCiteCommand.indexOf(CITE_KEY2);
         if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
-            LOGGER.error("Wrong indexes {} {} for completeCiteCommand {}. Using default.", indexKey1, indexKey2, completeCiteCommand);
-            return new CitationCommandString("\\cite{", ",", "}");
+            LOGGER.info("Wrong indexes {} {} for completeCiteCommand {}. Using default delimiter and suffix.", indexKey1, indexKey2, completeCiteCommand);
+            if (completeCiteCommand.isEmpty()) {
+                completeCiteCommand = "\\cite{";
+            } else if (!completeCiteCommand.endsWith("{")) {
+                completeCiteCommand += "{";
+            }
+            return new CitationCommandString(completeCiteCommand, ",", "}");
         }
 
         String prefix = completeCiteCommand.substring(0, indexKey1);
