@@ -112,10 +112,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
         externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
         externalPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
-
-
         externalPreferences.setCiteCommand(CitationCommandString.from(citeCommandProperty.getValue()));
-
         externalPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
         externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());

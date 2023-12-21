@@ -1,9 +1,6 @@
 package org.jabref.logic.push;
 
-public record CitationCommandString(
-        String prefix,
-        String delimiter,
-        String suffix) {
+public record CitationCommandString(String prefix, String delimiter, String suffix) {
     private static final String CITE_KEY1 = "key1";
     private static final String CITE_KEY2 = "key2";
 
@@ -13,7 +10,6 @@ public record CitationCommandString(
     }
 
     public static CitationCommandString from(String completeCiteCommand) {
-
         int indexKey1 = completeCiteCommand.indexOf(CITE_KEY1);
         int indexKey2 = completeCiteCommand.indexOf(CITE_KEY2);
         if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
