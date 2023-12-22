@@ -29,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We upgraded to JavaFX 21.0.1. As a consequence JabRef requires now macOS 11 or later and GTK 3.8 or later on Linux [10627](https://github.com/JabRef/jabref/pull/10627).
 - A user-specific comment fields is not enabled by default, but can be enabled using the "Add" button. [#10424](https://github.com/JabRef/jabref/issues/10424)
 - We upgraded to Lucene 9.9 for the fulltext search. The search index will be rebuild. [#10686](https://github.com/JabRef/jabref/pull/10686)
+- When using "Copy..." -> "Copy citation key", the delimiter configured at "Push applications" is respected. [#10707](https://github.com/JabRef/jabref/pull/10707)
 
 ### Fixed
 
@@ -37,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed some small inconsistencies in the user interface. [#10507](https://github.com/JabRef/jabref/issues/10507) [#10458](https://github.com/JabRef/jabref/issues/10458) [#10660](https://github.com/JabRef/jabref/issues/10660)
 - We fixed the issue where the Hayagriva YAML exporter would not include a parent field for the publisher/series. [#10596](https://github.com/JabRef/jabref/issues/10596)
 - We fixed issues in the external file type dialog w.r.t. duplicate entries in the case of a language switch. [#10271](https://github.com/JabRef/jabref/issues/10271)
+- We fixed an issue where the right-click action "Copy cite..." did not respect the configured citation command under "External Programs" -> "[Push Applications](https://docs.jabref.org/cite/pushtoapplications)" [#10615](https://github.com/JabRef/jabref/issues/10615)
 
 ### Removed
 
