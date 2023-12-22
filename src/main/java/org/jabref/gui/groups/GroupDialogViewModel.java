@@ -28,6 +28,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -66,6 +67,7 @@ public class GroupDialogViewModel {
     private final StringProperty nameProperty = new SimpleStringProperty("");
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
     private final StringProperty iconProperty = new SimpleStringProperty("");
+    private final BooleanProperty colorUseProperty = new SimpleBooleanProperty();
     private final ObjectProperty<Color> colorProperty = new SimpleObjectProperty<>();
     private final ListProperty<GroupHierarchyType> groupHierarchyListProperty = new SimpleListProperty<>();
     private final ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty = new SimpleObjectProperty<>();
@@ -377,7 +379,7 @@ public class GroupDialogViewModel {
             if (resultingGroup != null) {
                 preferencesService.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
 
-                resultingGroup.setColor(colorProperty.getValue());
+                resultingGroup.setColor(colorUseProperty.getValue() ? colorProperty.getValue() : null);
                 resultingGroup.setDescription(descriptionProperty.getValue());
                 resultingGroup.setIconName(iconProperty.getValue());
                 return resultingGroup;
@@ -395,16 +397,23 @@ public class GroupDialogViewModel {
 
         if (editedGroup == null) {
             // creating new group -> defaults!
+            // TODO: Create default group (via org.jabref.logic.groups.DefaultGroupsFactory) and use values
 
+            colorUseProperty.setValue(false);
             colorProperty.setValue(determineColor());
             if (parentNode != null) {
-                parentNode.getGroup().getIconName().ifPresent(iconName -> iconProperty.setValue(iconName));
+                parentNode.getGroup()
+                          .getIconName()
+                          .filter(iconName -> !iconName.equals(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON))
+                          .ifPresent(iconProperty::setValue);
+                parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
             nameProperty.setValue(editedGroup.getName());
+            colorUseProperty.setValue(editedGroup.getColor().isPresent());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
@@ -466,11 +475,8 @@ public class GroupDialogViewModel {
                                                      .flatMap(Optional::stream)
                                                      .toList();
             Optional<Color> parentColor = parentNode.getGroup().getColor();
-            if (parentColor.isEmpty()) {
-                color = GroupColorPicker.generateColor(colorsOfSiblings);
-            } else {
-                color = GroupColorPicker.generateColor(colorsOfSiblings, parentColor.get());
-            }
+            color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value))
+                               .orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
         }
         return color;
     }
@@ -489,7 +495,7 @@ public class GroupDialogViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()).execute();
+
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
@@ -550,6 +556,10 @@ public class GroupDialogViewModel {
 
     public StringProperty iconProperty() {
         return iconProperty;
+    }
+
+    public BooleanProperty colorUseProperty() {
+        return colorUseProperty;
     }
 
     public ObjectProperty<Color> colorFieldProperty() {

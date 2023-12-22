@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -29,11 +30,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabrefIconProvider;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
@@ -65,6 +71,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
     @FXML private Button iconPickerButton;
+    @FXML private CheckBox colorUseCheckbox;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
     @FXML private CheckBox autoColorCheckbox;
@@ -132,9 +139,18 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             this.setTitle(Localization.lang("Edit group") + " " + editedGroup.getName());
         }
 
-        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        ButtonType helpButtonType = new ButtonType("", ButtonBar.ButtonData.HELP_2);
+        getDialogPane().getButtonTypes().setAll(helpButtonType, ButtonType.OK, ButtonType.CANCEL);
 
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
+
+        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        actionFactory.configureIconButton(
+                StandardActions.HELP_GROUPS,
+                new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()),
+                helpButton);
+
         confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
         // handle validation before closing dialog and calling resultConverter
         confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
@@ -164,6 +180,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         nameField.textProperty().bindBidirectional(viewModel.nameProperty());
         descriptionField.textProperty().bindBidirectional(viewModel.descriptionProperty());
         iconField.textProperty().bindBidirectional(viewModel.iconProperty());
+        colorUseCheckbox.selectedProperty().bindBidirectional(viewModel.colorUseProperty());
         colorField.valueProperty().bindBidirectional(viewModel.colorFieldProperty());
         hierarchicalContextCombo.itemsProperty().bind(viewModel.groupHierarchyListProperty());
         new ViewModelListCellFactory<GroupHierarchyType>()
