@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import com.google.gson.Gson;
 
 public class SemanticScholarFetcher implements CitationFetcher {
+    private static final SemanticScholarFetcher DEFAULT = new SemanticScholarFetcher();
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     @Override
@@ -71,11 +72,11 @@ public class SemanticScholarFetcher implements CitationFetcher {
     }
 
     public static RelatedEntriesFetcher buildCitationsFetcher() {
-        return entry -> new SemanticScholarFetcher().searchCitedBy(entry);
+        return DEFAULT::searchCitedBy;
     }
 
     public static RelatedEntriesFetcher buildReferencesFetcher() {
-        return entry -> new SemanticScholarFetcher().searchCiting(entry);
+        return DEFAULT::searchCiting;
     }
 
     @Override
