@@ -36,7 +36,7 @@ interface SearchBasedFetcherCapabilityTest {
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
@@ -53,7 +53,7 @@ interface SearchBasedFetcherCapabilityTest {
     @Test
     default void supportsYearSearch() throws Exception {
         List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -72,7 +72,7 @@ interface SearchBasedFetcherCapabilityTest {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
         List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -92,7 +92,7 @@ interface SearchBasedFetcherCapabilityTest {
     @Test
     default void supportsJournalSearch() throws Exception {
         List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
-        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {

@@ -61,7 +61,7 @@ class StudyCatalogToFetcherConverterTest {
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(ImporterPreferences.class));
+                mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS));
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(

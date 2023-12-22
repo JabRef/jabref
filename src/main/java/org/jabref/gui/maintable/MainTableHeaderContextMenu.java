@@ -5,27 +5,42 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.logic.l10n.Localization;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
     private static final int OUT_OF_BOUNDS = -1;
     MainTable mainTable;
     MainTableColumnFactory factory;
+    private final JabRefFrame frame;
+    private final KeyBindingRepository keyBindingRepository;
 
     /**
      * Constructor for the right click menu
      *
      */
-    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory) {
+    public MainTableHeaderContextMenu(MainTable mainTable,
+                                      MainTableColumnFactory factory,
+                                      JabRefFrame frame,
+                                      KeyBindingRepository keyBindingRepository) {
         super();
+        this.frame = frame;
         this.mainTable = mainTable;
         this.factory = factory;
+        this.keyBindingRepository = keyBindingRepository;
         constructItems(mainTable);
     }
 
@@ -66,15 +81,22 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             }
         }
 
-        SeparatorMenuItem separator = new SeparatorMenuItem();
-        this.getItems().add(separator);
+        if (!commonColumns.isEmpty()) {
+            this.getItems().add(new SeparatorMenuItem());
 
-        // Append to the menu the current remaining columns in the common columns.
-
-        for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
-            RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
-            this.getItems().add(itemToAdd);
+            // Append to the menu the current remaining columns in the common columns.
+            for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
+                RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
+                this.getItems().add(itemToAdd);
+            }
         }
+
+        this.getItems().add(new SeparatorMenuItem());
+        ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
+        MenuItem showMoreItem = actionfactory.createMenuItem(
+                StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
+                new ShowPreferencesAction(frame, TableTab.class));
+        this.getItems().add(showMoreItem);
     }
 
     /**
@@ -110,7 +132,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      */
     @SuppressWarnings("rawtypes")
     private void addColumn(MainTableColumn tableColumn, int index) {
-        if (index <= OUT_OF_BOUNDS || index >= mainTable.getColumns().size()) {
+        if ((index <= OUT_OF_BOUNDS) || (index >= mainTable.getColumns().size())) {
             mainTable.getColumns().add(tableColumn);
         } else {
             mainTable.getColumns().add(index, tableColumn);

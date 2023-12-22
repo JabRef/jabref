@@ -14,7 +14,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-          fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
       - name: Initialize git
@@ -22,28 +21,16 @@ jobs:
           git config --local core.editor /usr/bin/cat
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-      - name: Update buildres/csl/csl-styles
+      - name: Update src/main/resources/csl-styles
         run: |
-          cd buildres/csl/csl-styles
+          cd src/main/resources/csl-styles
           git checkout master
           git pull
-          cd ..
-          cd ..
-          cd ..
-          cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
-          cp buildres/csl/csl-styles/apa.csl src/main/resources/csl-styles/
-          cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
-          cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
-      - name: Update buildres/csl/csl-locales
+      - name: Update src/main/resources/csl-locales
         run: |
-          cd buildres/csl/csl-locales
+          cd src/main/resources/csl-locales
           git checkout master
           git pull
-          cd ..
-          cd ..
-          cd ..
-          cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
-          cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
       - uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}

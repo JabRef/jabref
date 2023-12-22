@@ -2,8 +2,8 @@
   path = buildres/abbrv.jabref.org
   url = https://github.com/JabRef/abbrv.jabref.org.git
 [submodule "buildres/csl-styles"]
-  path = buildres/csl/csl-styles
+  path = src/main/resources/csl-styles
   url = https://github.com/citation-style-language/styles.git
 [submodule "buildres/csl-locales"]
-  path = buildres/csl/csl-locales
+  path = src/main/resources/csl-locales
   url = https://github.com/citation-style-language/locales.git

@@ -30,6 +30,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
@@ -59,6 +62,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
+        enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
+        showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
     }
@@ -95,6 +100,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
+        entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
+        entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -165,5 +172,13 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty autoLinkFilesEnabledProperty() {
         return autoLinkEnabledProperty;
+    }
+
+    public BooleanProperty enableSciteTabProperty() {
+        return enableSciteTabProperty;
+    }
+
+    public BooleanProperty showUserCommentsProperty() {
+        return this.showUserCommentsProperty;
     }
 }

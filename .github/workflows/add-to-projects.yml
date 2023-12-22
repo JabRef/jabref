@@ -1,0 +1,42 @@
+name: Add to Project on Label
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "good first issue"
+        if: "${{ github.event.label.name == 'good first issue' }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 5 --owner jabref --url $ISSUE_URL
+      - name: needs-refinement
+        if: github.event.label.name == 'needs-refinement'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 15 --owner jabref --url $ISSUE_URL
+      - name: "status: freeze"
+        if: "${{ github.event.label.name == 'status: freeze' }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 9 --owner jabref --url $ISSUE_URL
+      - name: ui
+        if: "${{ github.event.label.name == 'ui' }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
+          gh project item-add 8 --owner jabref --url $ISSUE_URL

@@ -8,10 +8,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Articles in the medline format can be downloaded from http://www.ncbi.nlm.nih.gov/pubmed/. 1. Search for a term and
- * make sure you have selected the PubMed database 2. Select the results you want to export by checking their checkboxes
- * 3. Press on the 'Send to' drop down menu on top of the search results 4. Select 'File' as Destination and 'XML' as
- * Format 5. Press 'Create File' to download your search results in a medline xml file
+ * Articles in the medline format can be downloaded from http://www.ncbi.nlm.nih.gov/pubmed/.
+ * <ol>
+ *   <li>Search for a term and make sure you have selected the <strong>PubMed</strong> database.</li>
+ *   <li>Select the results you want to export by checking their checkboxes.</li>
+ *   <li>Press on the <strong>'Send to'</strong> drop down menu on top of the search results.</li>
+ *   <li>Select <strong>'File'</strong> as Destination and <strong>'XML'</strong> as Format.</li>
+ *   <li>Press <strong>'Create File'</strong> to download your search results in a medline xml file.</li>
+ * </ol>
  */
 public class MedlineImporterTest {
 

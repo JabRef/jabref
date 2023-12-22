@@ -20,6 +20,7 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
         itemMap.put("mathesis", Localization.lang("Master's thesis"));
         itemMap.put("phdthesis", Localization.lang("PhD thesis"));
         itemMap.put("candthesis", Localization.lang("Candidate thesis"));
+        itemMap.put("bathesis", Localization.lang("Bachelor's thesis"));
         itemMap.put("techreport", Localization.lang("Technical report"));
         itemMap.put("resreport", Localization.lang("Research report"));
         itemMap.put("software", Localization.lang("Software"));
