@@ -3,8 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -83,7 +83,7 @@ public class MedraTest {
 
     @Test
     public void testPerformNonExistent() throws FetcherException {
-        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1016/j.bjoms.2007.08.004"));
+        assertThrows(FetcherServerException.class, () -> fetcher.performSearchById("10.1016/j.bjoms.2007.08.004"));
     }
 
     @ParameterizedTest

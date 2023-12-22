@@ -341,7 +341,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.MONTH, "#oct#")
                 .withField(StandardField.ISSN, "1434-6052")
                 .withField(StandardField.ABSTRACT, "Multi-electron production is studied at high electron transverse momentum in positron- and electron-proton collisions using the H1 detector at HERA. The data correspond to an integrated luminosity of 115 pb-1. Di-electron and tri-electron event yields are measured. Cross sections are derived in a restricted phase space region dominated by photon-photon collisions. In general good agreement is found with the Standard Model predictions. However, for electron pair invariant masses above 100 GeV, three di-electron events and three tri-electron events are observed, compared to Standard Model expectations of 0.30 \\pm 0.04 and 0.23 \\pm 0.04, respectively.")
-                .withField(StandardField.PUBLISHER, "Springer Science and Business Media {LLC}")
+                .withField(StandardField.PUBLISHER, "Springer Science and Business Media LLC")
                 .withField(StandardField.EPRINT, "hep-ex/0307015")
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/hep-ex/0307015v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
