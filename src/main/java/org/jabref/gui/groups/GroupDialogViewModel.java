@@ -24,12 +24,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -492,10 +490,6 @@ public class GroupDialogViewModel {
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
                      ));
-    }
-
-    public void openHelpPage() {
-
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

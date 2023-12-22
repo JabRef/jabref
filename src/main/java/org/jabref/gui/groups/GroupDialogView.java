@@ -146,10 +146,17 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences());
         actionFactory.configureIconButton(
                 StandardActions.HELP_GROUPS,
-                new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()),
+                helpAction,
                 helpButton);
+
+        // Consume the dialog close event, but execute the help action
+        helpButton.addEventFilter(ActionEvent.ACTION, event -> {
+            helpAction.execute();
+            event.consume();
+        });
 
         confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
         // handle validation before closing dialog and calling resultConverter
@@ -272,11 +279,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML
     private void texGroupBrowse() {
         viewModel.texGroupBrowse();
-    }
-
-    @FXML
-    private void openHelp() {
-        viewModel.openHelpPage();
     }
 
     @FXML
