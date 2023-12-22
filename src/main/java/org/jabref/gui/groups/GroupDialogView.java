@@ -292,6 +292,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         // Necessary because of a bug in controlsfx GridView
         // https://github.com/controlsfx/controlsfx/issues/1400
+        // The issue is closed, but still appears here
         Platform.runLater(() -> {
             ikonGridView.setItems(filteredList);
         });

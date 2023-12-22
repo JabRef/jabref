@@ -395,21 +395,11 @@ public class GroupDialogViewModel {
 
         if (editedGroup == null) {
             // creating new group -> defaults!
-            Color color;
-            if (parentNode == null) {
-                color = GroupColorPicker.generateColor(List.of());
-            } else {
-                List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
-                                                         .flatMap(Optional::stream)
-                                                         .toList();
-                Optional<Color> parentColor = parentNode.getGroup().getColor();
-                if (parentColor.isEmpty()) {
-                    color = GroupColorPicker.generateColor(colorsOfSiblings);
-                } else {
-                    color = GroupColorPicker.generateColor(colorsOfSiblings, parentColor.get());
-                }
+
+            colorProperty.setValue(determineColor());
+            if (parentNode != null) {
+                parentNode.getGroup().getIconName().ifPresent(iconName -> iconProperty.setValue(iconName));
             }
-            colorProperty.setValue(color);
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
@@ -465,6 +455,24 @@ public class GroupDialogViewModel {
                 texGroupFilePathProperty.setValue(group.getFilePath().toString());
             }
         }
+    }
+
+    private Color determineColor() {
+        Color color;
+        if (parentNode == null) {
+            color = GroupColorPicker.generateColor(List.of());
+        } else {
+            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+                                                     .flatMap(Optional::stream)
+                                                     .toList();
+            Optional<Color> parentColor = parentNode.getGroup().getColor();
+            if (parentColor.isEmpty()) {
+                color = GroupColorPicker.generateColor(colorsOfSiblings);
+            } else {
+                color = GroupColorPicker.generateColor(colorsOfSiblings, parentColor.get());
+            }
+        }
+        return color;
     }
 
     public void texGroupBrowse() {
