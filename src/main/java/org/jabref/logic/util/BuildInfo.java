@@ -28,6 +28,7 @@ public final class BuildInfo {
     public final String minRequiredJavaVersion;
     public final boolean allowJava9;
     public final String biodiversityHeritageApiKey;
+    public final String semanticScholarApiKey;
 
     public BuildInfo() {
         this("/build.properties");
@@ -57,6 +58,7 @@ public final class BuildInfo {
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
         allowJava9 = "true".equals(properties.getProperty("allowJava9", "true"));
         biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
+        semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {
@@ -64,7 +66,7 @@ public final class BuildInfo {
                                 // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gradle
                                 .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
                                 .orElse("");
-        if (!"".equals(result)) {
+        if (!result.isEmpty()) {
             return result;
         }
         return defaultValue;

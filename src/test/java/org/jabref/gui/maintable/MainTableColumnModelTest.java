@@ -52,6 +52,6 @@ public class MainTableColumnModelTest {
     public void typeOnlyMainTableColumnModelParserRetrievesCorrectQualifier() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testTypeOnlyName);
 
-        assertEquals(testColumnModel.getQualifier(), "");
+        assertEquals("", testColumnModel.getQualifier());
     }
 }

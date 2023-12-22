@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 
@@ -17,22 +18,26 @@ import org.slf4j.LoggerFactory;
 
 public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
-    public static final String FETCHER_NAME = "SearchAll";
+    public static final String FETCHER_NAME = "Search Selected";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
-    private final Set<SearchBasedFetcher> fetchers;
+    private Set<SearchBasedFetcher> fetchers;
     private final int maximumNumberOfReturnedResults;
 
-    public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, int maximumNumberOfReturnedResults)
+    public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, ImporterPreferences importerPreferences, int maximumNumberOfReturnedResults)
             throws IllegalArgumentException {
         if (searchBasedFetchers == null) {
             throw new IllegalArgumentException("The set of searchBasedFetchers must not be null!");
         }
-        // Remove the Composite Fetcher instance from its own fetcher set to prevent a StackOverflow
-        this.fetchers = searchBasedFetchers.stream()
-                                           .filter(searchBasedFetcher -> searchBasedFetcher != this)
-                                           .collect(Collectors.toSet());
+
+        fetchers = searchBasedFetchers.stream()
+                                      // Remove the Composite Fetcher instance from its own fetcher set to prevent a StackOverflow
+                                      .filter(searchBasedFetcher -> searchBasedFetcher != this)
+                                      // Remove any unselected Fetcher instance
+                                      .filter(searchBasedFetcher -> importerPreferences.getCatalogs().stream()
+                                                                                       .anyMatch((name -> name.equals(searchBasedFetcher.getName()))))
+                                      .collect(Collectors.toSet());
         this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
     }
 

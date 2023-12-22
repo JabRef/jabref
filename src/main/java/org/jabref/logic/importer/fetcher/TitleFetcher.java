@@ -36,8 +36,7 @@ public class TitleFetcher implements IdBasedFetcher {
             return Optional.empty();
         }
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, identifier);
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, identifier);
 
         Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entry);
         if (doi.isEmpty()) {

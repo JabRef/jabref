@@ -5,6 +5,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -25,6 +27,25 @@
         <CheckBox fx:id="useCustomDOI" text="%Use custom DOI base URI for article access"/>
         <TextField fx:id="useCustomDOIName" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <Label styleClass="sectionHeader" text="%Catalogues used for 'Search Selected'"/>
+    <TableView
+            fx:id="catalogTable"
+            VBox.vgrow="ALWAYS"
+            editable="true">
+        <columns>
+            <TableColumn minWidth="90" prefWidth="70"
+                    fx:id="catalogEnabledColumn"
+                    text="%Enabled"
+                    />
+            <TableColumn
+                    fx:id="catalogColumn"
+                    text="%Catalog"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView
+                    fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
 
     <Label styleClass="sectionHeader" text="%Remote services"/>
     <CheckBox fx:id="grobidEnabled" text="%Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."/>
