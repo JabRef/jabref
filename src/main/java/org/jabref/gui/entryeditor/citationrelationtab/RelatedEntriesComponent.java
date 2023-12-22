@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -64,7 +63,7 @@ public class RelatedEntriesComponent extends VBox {
         if (canLoadEntries()) {
             viewModel.loadEntries();
         } else {
-            relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
+            relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("The selected entry does not have a DOI linked to it. Lookup a DOI and try again.")));
         }
 
         viewModel.relatedEntriesResultPropertyProperty().addListener((observable, oldValue, result) -> {
@@ -83,7 +82,7 @@ public class RelatedEntriesComponent extends VBox {
                 } else {
                     relatedEntriesListView.setItems(
                             FXCollections.observableArrayList(entries.stream().map(entry ->
-                                    new CitationRelationItem(entry, false)).collect(Collectors.toList()))
+                                    new CitationRelationItem(entry, false)).toList())
                     );
                 }
             } else if (result.isFailure()) {
