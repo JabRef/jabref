@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -50,11 +51,14 @@ import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
+import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
+
+    private static boolean useAutoColoring = false;
 
     // Basic Settings
     @FXML private TextField nameField;
@@ -97,8 +101,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private final BibDatabaseContext currentDatabase;
-    private final GroupTreeNode parentNode;
-    private final AbstractGroup editedGroup;
+    private final @Nullable GroupTreeNode parentNode;
+    private final @Nullable AbstractGroup editedGroup;
 
     private GroupDialogViewModel viewModel;
 
@@ -107,8 +111,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @Inject private PreferencesService preferencesService;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
-                           GroupTreeNode parentNode, // might be null
-                           AbstractGroup editedGroup, // might be null
+                           @Nullable GroupTreeNode parentNode,
+                           @Nullable AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader) {
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
@@ -136,9 +140,17 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
     }
 
+    private @Nullable AbstractGroup parentGroup() {
+        if (parentNode == null) {
+            return null;
+        } else {
+            return parentNode.getGroup();
+        }
+    }
+
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, fileUpdateMonitor);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -216,24 +228,27 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             nameField.requestFocus();
         });
 
-        autoColorCheckbox.setSelected(GroupColorPicker.useRandom);
+        autoColorCheckbox.setSelected(useAutoColoring);
         autoColorCheckbox.setOnAction(event -> {
-            GroupColorPicker.useRandom = autoColorCheckbox.isSelected();
-            if (autoColorCheckbox.isSelected() && (parentNode != null)) {
-                if (parentNode.getChildren().isEmpty()) {
-                    // case 1: We are creating the first sub group, we start with default
-                    viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
-                } else {
-                    // case 2: We are creating (n>1)th group
-                    // We use the colors of the sibling group as base and then use the most distant color
-                    viewModel.colorFieldProperty().setValue(GroupColorPicker.generateColor(
-                            parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
-                                      .flatMap(Optional::stream)
-                                      .toList()));
-                }
-            } else {
-                viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
+            useAutoColoring = autoColorCheckbox.isSelected();
+            if (!autoColorCheckbox.isSelected()) {
+                return;
             }
+            if (parentNode == null) {
+                viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
+                return;
+            }
+            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+                                                     .flatMap(Optional::stream)
+                                                     .toList();
+            Optional<Color> parentColor = parentGroup().getColor();
+            Color color;
+            if (parentColor.isEmpty()) {
+                color = GroupColorPicker.generateColor(colorsOfSiblings);
+            } else {
+                color = GroupColorPicker.generateColor(colorsOfSiblings, parentColor.get());
+            }
+            viewModel.colorFieldProperty().setValue(color);
         });
     }
 

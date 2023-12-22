@@ -59,6 +59,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.Nullable;
 
 public class GroupDialogViewModel {
     // Basic Settings
@@ -109,17 +110,20 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
+    private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
-                                AbstractGroup editedGroup,
+                                @Nullable AbstractGroup editedGroup,
+                                @Nullable GroupTreeNode parentNode,
                                 FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
+        this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
         setupValidation();
@@ -391,7 +395,21 @@ public class GroupDialogViewModel {
 
         if (editedGroup == null) {
             // creating new group -> defaults!
-            colorProperty.setValue(GroupColorPicker.generateColor(List.of())); // TODO
+            Color color;
+            if (parentNode == null) {
+                color = GroupColorPicker.generateColor(List.of());
+            } else {
+                List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+                                                         .flatMap(Optional::stream)
+                                                         .toList();
+                Optional<Color> parentColor = parentNode.getGroup().getColor();
+                if (parentColor.isEmpty()) {
+                    color = GroupColorPicker.generateColor(colorsOfSiblings);
+                } else {
+                    color = GroupColorPicker.generateColor(colorsOfSiblings, parentColor.get());
+                }
+            }
+            colorProperty.setValue(color);
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
