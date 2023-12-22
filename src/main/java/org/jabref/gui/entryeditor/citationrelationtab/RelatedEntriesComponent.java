@@ -67,36 +67,37 @@ public class RelatedEntriesComponent extends VBox {
         }
 
         viewModel.relatedEntriesResultPropertyProperty().addListener((observable, oldValue, result) -> {
-            if (result.isPending()) {
-                showNodes(progressIndicator, cancelButton);
-                hideNodes(refreshButton, importEntriesButton);
-                relatedEntriesListView.getItems().clear();
-                relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("Loading...")));
-            } else if (result.isSuccess()) {
-                hideNodes(progressIndicator, cancelButton);
-                showNodes(refreshButton, importEntriesButton);
-
-                List<BibEntry> entries = result.asSuccess().value();
-                if (entries.isEmpty()) {
-                    relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("No articles found")));
-                } else {
-                    relatedEntriesListView.setItems(
-                            FXCollections.observableArrayList(entries.stream().map(entry ->
-                                    new CitationRelationItem(entry, false)).toList())
-                    );
+            switch (result) {
+                case Result.Pending<List<BibEntry>> ignored -> {
+                    showNodes(progressIndicator, cancelButton);
+                    hideNodes(refreshButton, importEntriesButton);
+                    relatedEntriesListView.getItems().clear();
+                    relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("Loading...")));
                 }
-            } else if (result.isFailure()) {
-                hideNodes(progressIndicator, cancelButton);
-                showNodes(refreshButton, importEntriesButton);
+                case Result.Success<List<BibEntry>> success -> {
+                    hideNodes(progressIndicator, cancelButton);
+                    showNodes(refreshButton, importEntriesButton);
 
-                Exception exception = result.asFailure().exception();
+                    List<BibEntry> entries = success.value();
+                    if (entries.isEmpty()) {
+                        relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("No articles found")));
+                    } else {
+                        relatedEntriesListView.setItems(
+                                FXCollections.observableArrayList(entries.stream().map(entry ->
+                                        new CitationRelationItem(entry, false)).toList())
+                        );
+                    }
+                }
+                case Result.Failure<List<BibEntry>> failure -> {
+                    hideNodes(progressIndicator, cancelButton);
+                    showNodes(refreshButton, importEntriesButton);
 
-                relatedEntriesListView.setPlaceholder(buildLabel(
-                        Localization.lang("Error while fetching citing entries: %0", exception.getMessage())));
+                    relatedEntriesListView.setPlaceholder(buildLabel(
+                            Localization.lang("Error while fetching citing entries: %0", failure.exception().getMessage())));
 
-                LOGGER.error("Error while fetching entry's citation relations", exception);
-            } else {
-                throw new IllegalStateException("Result is can be in one of the three legal states: PENDING, SUCCESS or FAILURE");
+                    LOGGER.error("Error while fetching entry's citation relations", failure.exception());
+                }
+                default -> LOGGER.error("Unexpected value: " + result);
             }
         });
     }

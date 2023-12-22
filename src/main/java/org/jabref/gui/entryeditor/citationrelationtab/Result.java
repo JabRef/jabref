@@ -12,11 +12,11 @@ public sealed class Result<V> {
     }
 
     public static <V> Result<V> failure(Exception e) {
-        return (Result<V>) new Failure(e);
+        return new Failure<V>(e);
     }
 
     public static <V> Result<V> pending() {
-        return (Result<V>) new Pending();
+        return new Pending<V>();
     }
 
     public static <V> Result<V> of(Supplier<V> func) {
@@ -24,23 +24,6 @@ public sealed class Result<V> {
             return success(func.get());
         } catch (Exception e) {
             return failure(e);
-        }
-    }
-
-    public V getOrNull() {
-        if (isSuccess()) {
-            return ((Success<V>) this).v;
-        } else {
-            return null;
-        }
-    }
-
-    public V getOrElse(Supplier<V> fallback) {
-        V valueOrNull = getOrNull();
-        if (valueOrNull == null) {
-            return fallback.get();
-        } else {
-            return get();
         }
     }
 
@@ -52,8 +35,8 @@ public sealed class Result<V> {
         }
     }
 
-    public Failure asFailure() {
-        return (Failure) this;
+    public Failure<V> asFailure() {
+        return (Failure<V>) this;
     }
 
     public Success<V> asSuccess() {
@@ -83,7 +66,7 @@ public sealed class Result<V> {
         }
     }
 
-    public static final class Failure extends Result<Object> {
+    public static final class Failure<V> extends Result<V> {
         private final Exception e;
         Failure(Exception e) {
             this.e = e;
@@ -94,5 +77,5 @@ public sealed class Result<V> {
         }
     }
 
-    public static final class Pending extends Result<Object> { }
+    public static final class Pending<V> extends Result<V> { }
 }
