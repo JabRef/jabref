@@ -36,6 +36,10 @@ import org.controlsfx.control.CheckListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A base UI component for viewing entries that are related to a specific entry. It was mainly created
+ * to track entry references and citations in the {@link CitationRelationsTab}.
+ * */
 public class RelatedEntriesComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedEntriesComponent.class);
     private final LibraryTab libraryTab;
@@ -66,6 +70,10 @@ public class RelatedEntriesComponent extends VBox {
             relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("The selected entry does not have a DOI linked to it. Lookup a DOI and try again.")));
         }
 
+        listenForRelatedEntriesUpdates();
+    }
+
+    private void listenForRelatedEntriesUpdates() {
         viewModel.relatedEntriesResultPropertyProperty().addListener((observable, oldValue, result) -> {
             switch (result) {
                 case Result.Pending<List<BibEntry>> ignored -> {

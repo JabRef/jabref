@@ -14,24 +14,23 @@ public class RelatedEntriesRepository {
         this.cache = cache;
     }
 
-    public RelatedEntriesRepository(RelatedEntriesFetcher fetcher) {
-        this(fetcher, new RelatedEntriesCache());
-    }
-
     public List<BibEntry> lookupRelatedEntries(BibEntry entry) {
-        if (needToRefreshCache(entry)) {
+        if (isRelatedEntriesNotCached(entry)) {
             refreshCache(entry);
         }
 
         return cache.lookupRelatedEntries(entry);
     }
 
-    public boolean needToRefreshCache(BibEntry entry) {
+    public boolean isRelatedEntriesNotCached(BibEntry entry) {
         return !cache.isRelatedEntriesCached(entry);
     }
 
+    /**
+     * Fetches entries related to the given {@code entry} and cache the result for faster access.
+     * */
     public void refreshCache(BibEntry entry) {
         List<BibEntry> relatedEntries = fetcher.fetch(entry);
-        cache.cacheOrMerge(entry, relatedEntries);
+        cache.updateCache(entry, relatedEntries);
     }
 }
