@@ -1,8 +1,10 @@
 package org.jabref.gui.importer;
 
+import java.util.List;
+
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
@@ -23,7 +25,7 @@ public class NewEntryActionTest {
 
     private NewEntryAction newEntryAction;
     private final LibraryTab libraryTab = mock(LibraryTab.class);
-    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
+    private final LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     private final DialogService dialogService = spy(DialogService.class);
     private final PreferencesService preferencesService = mock(PreferencesService.class);
     private final StateManager stateManager = mock(StateManager.class);
@@ -38,7 +40,7 @@ public class NewEntryActionTest {
     public void testExecuteOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
         newEntryAction = new NewEntryAction(() -> libraryTab, type, dialogService, preferencesService, stateManager);
-        when(jabRefFrame.getBasePanelCount()).thenReturn(1);
+        when(tabContainer.getLibraryTabs()).thenReturn(List.of(libraryTab));
 
         newEntryAction.execute();
         verify(libraryTab, times(1)).insertEntry(new BibEntry(type));

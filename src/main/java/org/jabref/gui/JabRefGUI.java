@@ -273,7 +273,7 @@ public class JabRefGUI {
         // This is because importToOpen might have been used, which adds to
         // loadedDatabases, but not to getBasePanelCount()
 
-        for (int i = 0; (i < parserResults.size()) && (i < mainFrame.getBasePanelCount()); i++) {
+        for (int i = 0; (i < parserResults.size()) && (i < mainFrame.getLibraryTabs().size()); i++) {
             ParserResult pr = parserResults.get(i);
             LibraryTab libraryTab = mainFrame.getLibraryTabAt(i);
 

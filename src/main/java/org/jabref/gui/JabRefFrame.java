@@ -672,21 +672,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * @return the BasePanel count.
-     */
-    public int getBasePanelCount() {
-        return tabbedPane.getTabs().size();
-    }
-
-    /**
-     * @deprecated do not operate on tabs but on BibDatabaseContexts
-     */
-    @Deprecated
-    public TabPane getTabbedPane() {
-        return tabbedPane;
-    }
-
-    /**
      * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
      * this updates to the new settings. We need to notify all tabs about the changes to avoid problems when changing
      * the column set.
