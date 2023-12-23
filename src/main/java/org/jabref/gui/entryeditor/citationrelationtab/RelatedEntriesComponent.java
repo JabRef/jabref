@@ -149,7 +149,7 @@ public class RelatedEntriesComponent extends VBox {
 
         // Create import buttons for both sides
         importEntriesButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
-        importEntriesButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
+        importEntriesButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to library")));
         styleTopBarNode(importEntriesButton, 50.0);
         importEntriesButton.setOnAction(e ->
                 viewModel.importEntriesIntoCurrentLibrary(relatedEntriesListView.getCheckModel().getCheckedItems()));
