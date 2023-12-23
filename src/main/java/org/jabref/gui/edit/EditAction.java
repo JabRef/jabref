@@ -1,11 +1,13 @@
 package org.jabref.gui.edit;
 
+import java.util.function.Supplier;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -23,14 +25,14 @@ public class EditAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
-    private final LibraryTabContainer tabContainer;
+    private final Supplier<LibraryTab> libraryTab;
     private final StandardActions action;
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public EditAction(StandardActions action, LibraryTabContainer tabContainer, StateManager stateManager, UndoManager undoManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> libraryTab, StateManager stateManager, UndoManager undoManager) {
         this.action = action;
-        this.tabContainer = tabContainer;
+        this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
 
@@ -76,10 +78,10 @@ public class EditAction extends SimpleCommand {
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 switch (action) {
-                    case COPY -> tabContainer.getCurrentLibraryTab().copy();
-                    case CUT -> tabContainer.getCurrentLibraryTab().cut();
-                    case PASTE -> tabContainer.getCurrentLibraryTab().paste();
-                    case DELETE_ENTRY -> tabContainer.getCurrentLibraryTab().delete(false);
+                    case COPY -> libraryTab.get().copy();
+                    case CUT -> libraryTab.get().cut();
+                    case PASTE -> libraryTab.get().paste();
+                    case DELETE_ENTRY -> libraryTab.get().delete(false);
                     case UNDO -> {
                         if (undoManager.canUndo()) {
                             undoManager.undo();

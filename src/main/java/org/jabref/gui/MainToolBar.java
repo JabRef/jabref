@@ -110,16 +110,16 @@ public class MainToolBar extends ToolBar {
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame, dialogService, preferencesService, stateManager)),
                         createNewEntryFromIdButton(),
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, preferencesService, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame, stateManager, undoManager))),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
                         factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)),
                         factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager, undoManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager, undoManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager, undoManager))),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 

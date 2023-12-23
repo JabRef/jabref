@@ -28,12 +28,12 @@ public class SearchFieldRightClickMenu {
         ContextMenu contextMenu = new ContextMenu();
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new EditAction(StandardActions.UNDO, frame, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.REDO, new EditAction(StandardActions.REDO, frame, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.DELETE, new EditAction(StandardActions.DELETE, frame, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.UNDO, new EditAction(StandardActions.UNDO, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.REDO, new EditAction(StandardActions.REDO, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.DELETE, new EditAction(StandardActions.DELETE, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
