@@ -413,10 +413,6 @@ public class LibraryTab extends Tab {
         this.mode = mode;
     }
 
-    public JabRefFrame frame() {
-        return frame;
-    }
-
     /**
      * Removes the selected entries from the database
      *
