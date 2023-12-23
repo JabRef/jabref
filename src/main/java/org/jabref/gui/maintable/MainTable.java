@@ -28,6 +28,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
@@ -77,6 +78,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
+                     JabRefFrame jabRefFrame,
                      BibDatabaseContext database,
                      PreferencesService preferencesService,
                      DialogService dialogService,
@@ -198,7 +200,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 taskExecutor);
 
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this, rightClickMenuFactory, this.libraryTab.frame(), keyBindingRepository).show(true);
+        new MainTableHeaderContextMenu(this, rightClickMenuFactory, jabRefFrame, keyBindingRepository).show(true);
     }
 
     /**

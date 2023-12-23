@@ -93,7 +93,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 action.performAction(libraryTab, result, dialogService);
-                libraryTab.frame().showLibraryTab(libraryTab);
             }
         }
     }

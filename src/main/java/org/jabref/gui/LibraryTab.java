@@ -508,6 +508,7 @@ public class LibraryTab extends Tab {
     private void createMainTable() {
         mainTable = new MainTable(tableModel,
                 this,
+                frame,
                 bibDatabaseContext,
                 preferencesService,
                 dialogService,
