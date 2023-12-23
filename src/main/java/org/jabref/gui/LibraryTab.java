@@ -227,7 +227,7 @@ public class LibraryTab extends Tab {
 
     public void onDatabaseLoadingSucceed(ParserResult result) {
         BibDatabaseContext context = result.getDatabaseContext();
-        OpenDatabaseAction.performPostOpenActions(this, result);
+        OpenDatabaseAction.performPostOpenActions(this, result, dialogService);
 
         feedData(context);
 

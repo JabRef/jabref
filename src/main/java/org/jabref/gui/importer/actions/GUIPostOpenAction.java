@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.actions;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.importer.ParserResult;
 
@@ -34,5 +35,5 @@ public interface GUIPostOpenAction {
      * @param panel The BasePanel where the database is shown.
      * @param pr    The result of the BIB parse operation.
      */
-    void performAction(LibraryTab panel, ParserResult pr);
+    void performAction(LibraryTab panel, ParserResult pr, DialogService dialogService);
 }

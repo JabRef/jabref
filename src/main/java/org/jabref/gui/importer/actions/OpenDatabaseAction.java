@@ -89,10 +89,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param libraryTab The BasePanel where the database is shown.
      * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
+    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result, DialogService dialogService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
-                action.performAction(libraryTab, result);
+                action.performAction(libraryTab, result, dialogService);
                 libraryTab.frame().showLibraryTab(libraryTab);
             }
         }
