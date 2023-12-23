@@ -200,12 +200,12 @@ public class MainMenu extends MenuBar {
                 specialFieldsSeparator,
                 // ToDo: SpecialField needs the active BasePanel to mark it as changed.
                 //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame, dialogService, preferencesService, undoManager, stateManager));
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager));
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.

@@ -62,12 +62,12 @@ public class RightClickMenu {
 
                 createSendSubMenu(factory, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor),
 
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
 
                 new SeparatorMenuItem(),
 

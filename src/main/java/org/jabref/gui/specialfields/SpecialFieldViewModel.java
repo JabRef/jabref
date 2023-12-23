@@ -3,12 +3,13 @@ package org.jabref.gui.specialfields;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
@@ -38,11 +39,11 @@ public class SpecialFieldViewModel {
     }
 
     public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value,
-                                                    JabRefFrame frame,
+                                                    Supplier<LibraryTab> libraryTab,
                                                     DialogService dialogService,
                                                     StateManager stateManager) {
         return new SpecialFieldAction(
-                frame,
+                libraryTab,
                 field,
                 value.getFieldValue().orElse(null),
                 // if field contains only one value, it has to be nulled, as another setting does not empty the field
