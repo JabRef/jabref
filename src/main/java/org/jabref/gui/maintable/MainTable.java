@@ -265,10 +265,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager, libraryTab.getUndoManager());
+        EditAction copyAction = new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager, libraryTab.getUndoManager());
+        EditAction cutAction = new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager, libraryTab.getUndoManager());
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager, libraryTab.getUndoManager());
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {

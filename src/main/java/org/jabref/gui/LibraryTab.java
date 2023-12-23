@@ -27,6 +27,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
@@ -62,6 +63,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
@@ -571,8 +573,8 @@ public class LibraryTab extends Tab {
         searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
 
-    public void updateSearchManager() {
-        frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
+    public SuggestionProvider<Author> getAutoCompleter() {
+        return searchAutoCompleter;
     }
 
     public EntryEditor getEntryEditor() {

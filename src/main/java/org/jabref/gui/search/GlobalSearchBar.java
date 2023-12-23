@@ -144,7 +144,8 @@ public class GlobalSearchBar extends HBox {
                 keyBindingRepository,
                 stateManager,
                 searchField,
-                frame));
+                frame,
+                undoManager));
 
         ObservableList<String> search = stateManager.getWholeSearchHistory();
         search.addListener((ListChangeListener.Change<? extends String> change) -> {
@@ -152,7 +153,8 @@ public class GlobalSearchBar extends HBox {
                     keyBindingRepository,
                     stateManager,
                     searchField,
-                    frame));
+                    frame,
+                    undoManager));
         });
 
         ClipBoardManager.addX11Support(searchField);

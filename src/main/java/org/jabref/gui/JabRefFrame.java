@@ -647,7 +647,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             }
 
             // Update search autocompleter with information for the correct database:
-            libraryTab.updateSearchManager();
+            globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
             libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
