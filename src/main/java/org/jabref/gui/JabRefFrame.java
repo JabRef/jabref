@@ -267,31 +267,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         getGlobalSearchBar().focus();
                         break;
                     case NEW_ARTICLE:
-                        new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_BOOK:
-                        new NewEntryAction(this, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_INBOOK:
-                        new NewEntryAction(this, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_MASTERSTHESIS:
-                        new NewEntryAction(this, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_PHDTHESIS:
-                        new NewEntryAction(this, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_PROCEEDINGS:
-                        new NewEntryAction(this, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_TECHREPORT:
-                        new NewEntryAction(this, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_UNPUBLISHED:
-                        new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_INPROCEEDINGS:
-                        new NewEntryAction(this, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
                         break;
                     case PASTE:
                         if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
