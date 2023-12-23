@@ -88,7 +88,7 @@ public class RelatedEntriesComponent extends VBox {
 
                     List<BibEntry> entries = success.value();
                     if (entries.isEmpty()) {
-                        relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("No articles found")));
+                        relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("No publications found")));
                     } else {
                         relatedEntriesListView.setItems(
                                 FXCollections.observableArrayList(entries.stream().map(entry ->
