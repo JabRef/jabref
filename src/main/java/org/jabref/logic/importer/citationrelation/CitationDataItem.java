@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.logic.importer.citationrelation;
 
 public class CitationDataItem {
     private PaperDetails citingPaper;

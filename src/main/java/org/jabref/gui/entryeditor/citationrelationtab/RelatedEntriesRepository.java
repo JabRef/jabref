@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
 
-import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.RelatedEntriesFetcher;
 import org.jabref.model.entry.BibEntry;
 
 public class RelatedEntriesRepository {
@@ -27,7 +26,8 @@ public class RelatedEntriesRepository {
     }
 
     /**
-     * Fetches entries related to the given {@code entry} and cache the result for faster access.
+     * Fetches entries related to the given {@code entry} from the remote server and cache the result locally
+     * for faster access.
      * */
     public void refreshCache(BibEntry entry) {
         List<BibEntry> relatedEntries = fetcher.fetch(entry);

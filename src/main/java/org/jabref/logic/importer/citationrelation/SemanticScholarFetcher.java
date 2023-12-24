@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.logic.importer.citationrelation;
 
 import java.io.IOException;
 import java.net.URI;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.entryeditor.citationrelationtab.RelatedEntriesComponent;
+import org.jabref.gui.entryeditor.citationrelationtab.RelatedEntriesFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.net.URLDownload;
