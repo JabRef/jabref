@@ -449,13 +449,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apiguardian:apiguardian-api
-Project: @API Guardian
-URL:     https://github.com/apiguardian-team/apiguardian
-License: Apache-2.0
-```
-
-```yaml
 Id:      org.bouncycastle:bcprov-jdk15on
 Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
@@ -771,7 +764,6 @@ org.apache.pdfbox:fontbox:3.0.0
 org.apache.pdfbox:pdfbox-io:3.0.0
 org.apache.pdfbox:pdfbox:3.0.0
 org.apache.pdfbox:xmpbox:3.0.1
-org.apiguardian:apiguardian-api:1.1.2
 org.bouncycastle:bcprov-jdk18on:1.77
 org.checkerframework:checker-qual:3.37.0
 org.codehaus.woodstox:stax2-api:4.2
@@ -804,11 +796,6 @@ org.jetbrains:annotations:24.0.1
 org.jooq:jool:0.9.15
 org.jsoup:jsoup:1.16.2
 org.jspecify:jspecify:0.3.0
-org.junit.jupiter:junit-jupiter-api:5.10.1
-org.junit.jupiter:junit-jupiter-params:5.10.1
-org.junit.jupiter:junit-jupiter:5.10.1
-org.junit.platform:junit-platform-commons:1.10.1
-org.junit:junit-bom:5.10.1
 org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.3.1
 org.kordamp.ikonli:ikonli-core:12.3.1
 org.kordamp.ikonli:ikonli-javafx:12.3.1
@@ -825,7 +812,6 @@ org.openjfx:javafx-graphics:21.0.1
 org.openjfx:javafx-media:21.0.1
 org.openjfx:javafx-swing:21.0.1
 org.openjfx:javafx-web:21.0.1
-org.opentest4j:opentest4j:1.3.0
 org.postgresql:postgresql:42.6.0
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.13.8
