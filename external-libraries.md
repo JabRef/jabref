@@ -529,6 +529,13 @@ License: MIT
 ```
 
 ```yaml
+Id:      org.jspecify:jspecify
+Project: jspecify
+URL:     https://jspecify.dev/
+License: Apache-2.0
+```
+
+```yaml
 Id:      org.kordamp.ikonli
 Project: Ikonli
 URL:     https://kordamp.org/ikonli/
