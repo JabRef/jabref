@@ -21,7 +21,7 @@ public class RelatedEntriesRepository {
         return cache.lookupRelatedEntries(entry);
     }
 
-    public boolean isRelatedEntriesNotCached(BibEntry entry) {
+    private boolean isRelatedEntriesNotCached(BibEntry entry) {
         return !cache.isRelatedEntriesCached(entry);
     }
 
