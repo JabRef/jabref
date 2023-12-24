@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A base UI component for viewing entries that are related to a specific entry. It was mainly created
+ * A base UI component to display a list of entries that are related to a specific pivot entry. It was mainly created
  * to track entry references and citations in the {@link CitationRelationsTab}.
  * */
 public class RelatedEntriesComponent extends VBox {
