@@ -86,7 +86,7 @@ import org.slf4j.LoggerFactory;
 public class LibraryTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -127,7 +127,7 @@ public class LibraryTab extends Tab {
     private final TaskExecutor taskExecutor;
 
     public LibraryTab(BibDatabaseContext bibDatabaseContext,
-                      JabRefFrame frame,
+                      LibraryTabContainer tabContainer,
                       DialogService dialogService,
                       PreferencesService preferencesService,
                       StateManager stateManager,
@@ -135,7 +135,7 @@ public class LibraryTab extends Tab {
                       BibEntryTypesManager entryTypesManager,
                       CountingUndoManager undoManager,
                       TaskExecutor taskExecutor) {
-        this.frame = Objects.requireNonNull(frame);
+        this.tabContainer = Objects.requireNonNull(tabContainer);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = undoManager;
         this.dialogService = dialogService;
@@ -222,7 +222,7 @@ public class LibraryTab extends Tab {
     public void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        frame.addTab(this, true);
+        tabContainer.addTab(this, true);
     }
 
     public void onDatabaseLoadingSucceed(ParserResult result) {
@@ -486,9 +486,9 @@ public class LibraryTab extends Tab {
 
             this.changedProperty.setValue(true); // The database just changed.
             if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-                showAndEdit(entries.get(0));
+                showAndEdit(entries.getFirst());
             }
-            clearAndSelect(entries.get(0));
+            clearAndSelect(entries.getFirst());
         }
     }
 
@@ -504,7 +504,7 @@ public class LibraryTab extends Tab {
     private void createMainTable() {
         mainTable = new MainTable(tableModel,
                 this,
-                frame,
+                tabContainer,
                 bibDatabaseContext,
                 preferencesService,
                 dialogService,
@@ -557,14 +557,14 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Set up auto completion for this database
+     * Set up auto-completion for this database
      */
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository, autoCompletePreferences);
         } else {
-            // Create empty suggestion providers if auto completion is deactivated
+            // Create empty suggestion providers if auto-completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
         searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
@@ -836,7 +836,7 @@ public class LibraryTab extends Tab {
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
-                                              JabRefFrame frame,
+                                              LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               CountingUndoManager undoManager,
@@ -846,7 +846,7 @@ public class LibraryTab extends Tab {
 
         LibraryTab newTab = new LibraryTab(
                 context,
-                frame,
+                tabContainer,
                 dialogService,
                 preferencesService,
                 stateManager,
@@ -865,7 +865,7 @@ public class LibraryTab extends Tab {
     }
 
     public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
-                                              JabRefFrame frame,
+                                              LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
@@ -875,9 +875,9 @@ public class LibraryTab extends Tab {
                                               TaskExecutor taskExecutor) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(
+        return new LibraryTab(
                 databaseContext,
-                frame,
+                tabContainer,
                 dialogService,
                 preferencesService,
                 stateManager,
@@ -885,8 +885,6 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
                 taskExecutor);
-
-        return libraryTab;
     }
 
     private class GroupTreeListener {

@@ -11,7 +11,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -25,18 +26,21 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     private static final int OUT_OF_BOUNDS = -1;
     MainTable mainTable;
     MainTableColumnFactory factory;
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final KeyBindingRepository keyBindingRepository;
+    private final DialogService dialogService;
 
     public MainTableHeaderContextMenu(MainTable mainTable,
                                       MainTableColumnFactory factory,
-                                      JabRefFrame frame,
-                                      KeyBindingRepository keyBindingRepository) {
+                                      LibraryTabContainer tabContainer,
+                                      KeyBindingRepository keyBindingRepository,
+                                      DialogService dialogService) {
         super();
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.mainTable = mainTable;
         this.factory = factory;
         this.keyBindingRepository = keyBindingRepository;
+        this.dialogService = dialogService;
 
         constructItems();
     }
@@ -92,7 +96,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
         MenuItem showMoreItem = actionfactory.createMenuItem(
                 StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
-                new ShowPreferencesAction(frame, TableTab.class));
+                new ShowPreferencesAction(tabContainer, TableTab.class, dialogService));
         this.getItems().add(showMoreItem);
     }
 

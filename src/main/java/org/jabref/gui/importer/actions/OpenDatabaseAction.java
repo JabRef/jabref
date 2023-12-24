@@ -14,8 +14,8 @@ import java.util.Optional;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.Telemetry;
 import org.jabref.gui.actions.SimpleCommand;
@@ -56,7 +56,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction());
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -65,7 +65,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final CountingUndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
-    public OpenDatabaseAction(JabRefFrame frame,
+    public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               StateManager stateManager,
@@ -73,7 +73,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               BibEntryTypesManager entryTypesManager,
                               CountingUndoManager undoManager,
                               TaskExecutor taskExecutor) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -113,10 +113,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @return Path of current panel database directory or the working directory
      */
     private Path getInitialDirectory() {
-        if (frame.getLibraryTabs().isEmpty()) {
+        if (tabContainer.getLibraryTabs().isEmpty()) {
             return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
-            Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
+            Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
             return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
@@ -145,8 +145,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
-            for (int i = 0; i < frame.getLibraryTabs().size(); i++) {
-                LibraryTab libraryTab = frame.getLibraryTabAt(i);
+            for (int i = 0; i < tabContainer.getLibraryTabs().size(); i++) {
+                LibraryTab libraryTab = tabContainer.getLibraryTabAt(i);
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     iterator.remove();
@@ -174,7 +174,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         } else if (toRaise != null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
-            frame.showLibraryTab(toRaise);
+            tabContainer.showLibraryTab(toRaise);
         }
     }
 
@@ -197,7 +197,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 dialogService,
                 preferencesService,
                 stateManager,
-                frame,
+                tabContainer,
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
@@ -243,7 +243,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (parserResult.getDatabase().isShared()) {
                          openSharedDatabase(
                                  parserResult,
-                                 frame,
+                                 tabContainer,
                                  dialogService,
                                  preferencesService,
                                  stateManager,
@@ -263,7 +263,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     public static void openSharedDatabase(ParserResult parserResult,
-                                          JabRefFrame frame,
+                                          LibraryTabContainer tabContainer,
                                           DialogService dialogService,
                                           PreferencesService preferencesService,
                                           StateManager stateManager,
@@ -274,7 +274,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
-                    frame,
+                    tabContainer,
                     dialogService,
                     preferencesService,
                     stateManager,

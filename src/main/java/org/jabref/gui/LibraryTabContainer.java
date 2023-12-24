@@ -20,4 +20,6 @@ public interface LibraryTabContainer {
     void closeTab(LibraryTab libraryTab);
 
     void closeCurrentTab();
+
+    void refresh();
 }

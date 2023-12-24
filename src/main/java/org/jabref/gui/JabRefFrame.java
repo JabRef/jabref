@@ -946,6 +946,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return mainStage;
     }
 
+    public void refresh() {
+        globalSearchBar.updateHintVisibility();
+        setupAllTables();
+        getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
+    }
+
     /**
      * The action concerned with closing the window.
      */
