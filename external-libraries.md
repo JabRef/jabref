@@ -85,6 +85,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      com.github.Dansoftowner:jSystemThemeDetector
+Project: jSystemThemeDetector
+URL:     https://github.com/Dansoftowner/jSystemThemeDetector
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.github.hypfvieh.dbus-java
 Project: dbus-java
 URL:     https://github.com/hypfvieh/dbus-java
@@ -117,6 +124,13 @@ Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
 License: Apache-2.0
+```
+
+```yaml
+Id:      com.github.weisj:jsvg
+Project: JSVG - A Java SVG implementation
+URL:     https://github.com/weisJ/jsvg
+License: MIT
 ```
 
 ```yaml
@@ -515,6 +529,13 @@ License: MIT
 ```
 
 ```yaml
+Id:      org.jspecify:jspecify
+Project: jspecify
+URL:     https://jspecify.dev/
+License: Apache-2.0
+```
+
+```yaml
 Id:      org.kordamp.ikonli
 Project: Ikonli
 URL:     https://kordamp.org/ikonli/
@@ -647,22 +668,26 @@ License: BSD-3-Clause
 3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
+
 at.favre.lib:hkdf:1.1.0
-com.dlsc.gemsfx:gemsfx:1.82.0
+com.dlsc.gemsfx:gemsfx:1.90.0
 com.dlsc.pickerfx:pickerfx:1.2.0
 com.dlsc.unitfx:unitfx:1.0.10
-com.fasterxml.jackson.core:jackson-annotations:2.15.3
-com.fasterxml.jackson.core:jackson-core:2.15.3
-com.fasterxml.jackson.core:jackson-databind:2.15.3
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3
+com.fasterxml.jackson.core:jackson-annotations:2.16.0
+com.fasterxml.jackson.core:jackson-core:2.16.0
+com.fasterxml.jackson.core:jackson-databind:2.16.0
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.0
 com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3
-com.fasterxml.jackson:jackson-bom:2.15.3
-com.fasterxml:aalto-xml:1.3.1
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0
+com.fasterxml.jackson:jackson-bom:2.16.0
+com.fasterxml:aalto-xml:1.3.2
+com.github.Dansoftowner:jSystemThemeDetector:3.8
 com.github.hypfvieh:dbus-java-core:4.2.1
 com.github.hypfvieh:dbus-java-transport-native-unixsocket:4.2.1
 com.github.javakeyring:java-keyring:1.0.4
 com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9
 com.github.tomtung:latex2unicode_2.13:0.3.2
+com.github.weisj:jsvg:1.2.0
 com.google.code.gson:gson:2.10
 com.google.errorprone:error_prone_annotations:2.21.1
 com.google.guava:failureaccess:1.0.1
@@ -695,7 +720,7 @@ com.vladsch.flexmark:flexmark-util-sequence:0.64.8
 com.vladsch.flexmark:flexmark-util-visitor:0.64.8
 com.vladsch.flexmark:flexmark:0.64.8
 commons-beanutils:commons-beanutils:1.9.4
-commons-cli:commons-cli:1.5.0
+commons-cli:commons-cli:1.6.0
 commons-codec:commons-codec:1.16.0
 commons-collections:commons-collections:3.2.2
 commons-digester:commons-digester:2.1
@@ -726,71 +751,74 @@ net.jodah:typetools:0.6.1
 one.jpro.jproutils:tree-showing:0.2.2
 org.antlr:antlr4-runtime:4.13.1
 org.apache.commons:commons-csv:1.10.0
-org.apache.commons:commons-lang3:3.13.0
+org.apache.commons:commons-lang3:3.14.0
 org.apache.httpcomponents:httpasyncclient:4.1.5
 org.apache.httpcomponents:httpclient:4.5.13
 org.apache.httpcomponents:httpcore-nio:4.4.13
 org.apache.httpcomponents:httpcore:4.4.13
 org.apache.httpcomponents:httpmime:4.5.13
-org.apache.logging.log4j:log4j-api:2.20.0
-org.apache.logging.log4j:log4j-to-slf4j:2.20.0
-org.apache.lucene:lucene-analysis-common:9.8.0
-org.apache.lucene:lucene-core:9.8.0
-org.apache.lucene:lucene-highlighter:9.8.0
-org.apache.lucene:lucene-queries:9.8.0
-org.apache.lucene:lucene-queryparser:9.8.0
-org.apache.lucene:lucene-sandbox:9.8.0
+org.apache.logging.log4j:log4j-api:2.21.1
+org.apache.logging.log4j:log4j-to-slf4j:2.21.1
+org.apache.lucene:lucene-analysis-common:9.9.1
+org.apache.lucene:lucene-core:9.9.0
+org.apache.lucene:lucene-core:9.9.1
+org.apache.lucene:lucene-highlighter:9.9.0
+org.apache.lucene:lucene-queries:9.9.0
+org.apache.lucene:lucene-queries:9.9.1
+org.apache.lucene:lucene-queryparser:9.9.1
+org.apache.lucene:lucene-sandbox:9.9.1
 org.apache.pdfbox:fontbox:3.0.0
 org.apache.pdfbox:pdfbox-io:3.0.0
 org.apache.pdfbox:pdfbox:3.0.0
-org.apache.pdfbox:xmpbox:3.0.0
-org.bouncycastle:bcprov-jdk18on:1.76
+org.apache.pdfbox:xmpbox:3.0.1
+org.bouncycastle:bcprov-jdk18on:1.77
 org.checkerframework:checker-qual:3.37.0
 org.codehaus.woodstox:stax2-api:4.2
-org.controlsfx:controlsfx:11.1.2
+org.controlsfx:controlsfx:11.2.0
 org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r
-org.fxmisc.flowless:flowless:0.7.1
-org.fxmisc.richtext:richtextfx:0.11.1
+org.fxmisc.flowless:flowless:0.7.2
+org.fxmisc.richtext:richtextfx:0.11.2
 org.fxmisc.undo:undofx:2.1.1
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
-org.glassfish.grizzly:grizzly-framework:4.0.0
-org.glassfish.grizzly:grizzly-http-server:4.0.0
-org.glassfish.grizzly:grizzly-http:4.0.0
-org.glassfish.hk2.external:aopalliance-repackaged:3.0.4
-org.glassfish.hk2:hk2-api:3.0.4
-org.glassfish.hk2:hk2-locator:3.0.4
-org.glassfish.hk2:hk2-utils:3.0.4
+org.glassfish.grizzly:grizzly-framework:4.0.1
+org.glassfish.grizzly:grizzly-http-server:4.0.1
+org.glassfish.grizzly:grizzly-http:4.0.1
+org.glassfish.hk2.external:aopalliance-repackaged:3.0.5
+org.glassfish.hk2:hk2-api:3.0.5
+org.glassfish.hk2:hk2-locator:3.0.5
+org.glassfish.hk2:hk2-utils:3.0.5
 org.glassfish.hk2:osgi-resource-locator:1.0.3
 org.glassfish.jaxb:jaxb-core:4.0.3
 org.glassfish.jaxb:jaxb-runtime:4.0.3
 org.glassfish.jaxb:txw2:4.0.3
-org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.3
-org.glassfish.jersey.core:jersey-client:3.1.3
-org.glassfish.jersey.core:jersey-common:3.1.3
-org.glassfish.jersey.core:jersey-server:3.1.3
-org.glassfish.jersey.inject:jersey-hk2:3.1.3
+org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.4
+org.glassfish.jersey.core:jersey-client:3.1.4
+org.glassfish.jersey.core:jersey-common:3.1.5
+org.glassfish.jersey.core:jersey-server:3.1.4
+org.glassfish.jersey.inject:jersey-hk2:3.1.5
 org.jabref:afterburner.fx:2.0.0
 org.javassist:javassist:3.29.2-GA
 org.jbibtex:jbibtex:1.0.20
 org.jetbrains:annotations:24.0.1
 org.jooq:jool:0.9.15
-org.jsoup:jsoup:1.16.1
+org.jsoup:jsoup:1.16.2
+org.jspecify:jspecify:0.3.0
 org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.3.1
 org.kordamp.ikonli:ikonli-core:12.3.1
 org.kordamp.ikonli:ikonli-javafx:12.3.1
 org.kordamp.ikonli:ikonli-material-pack:12.3.1
 org.kordamp.ikonli:ikonli-materialdesign-pack:12.3.1
 org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1
-org.libreoffice:libreoffice:7.6.1
-org.libreoffice:unoloader:7.6.1
+org.libreoffice:libreoffice:7.6.4
+org.libreoffice:unoloader:7.6.4
 org.mariadb.jdbc:mariadb-java-client:2.7.9
-org.openjfx:javafx-base:20.0.2
-org.openjfx:javafx-controls:20.0.2
-org.openjfx:javafx-fxml:20.0.2
-org.openjfx:javafx-graphics:20.0.2
-org.openjfx:javafx-media:20.0.2
-org.openjfx:javafx-swing:20.0.2
-org.openjfx:javafx-web:20.0.2
+org.openjfx:javafx-base:21.0.1
+org.openjfx:javafx-controls:21.0.1
+org.openjfx:javafx-fxml:21.0.1
+org.openjfx:javafx-graphics:21.0.1
+org.openjfx:javafx-media:21.0.1
+org.openjfx:javafx-swing:21.0.1
+org.openjfx:javafx-web:21.0.1
 org.postgresql:postgresql:42.6.0
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.13.8
@@ -799,7 +827,7 @@ org.slf4j:slf4j-api:2.0.9
 org.tinylog:slf4j-tinylog:2.6.2
 org.tinylog:tinylog-api:2.6.2
 org.tinylog:tinylog-impl:2.6.2
-org.yaml:snakeyaml:2.1
+org.yaml:snakeyaml:2.2
 pt.davidafsilva.apple:jkeychain:1.1.0
 tech.units:indriya:2.1.2
 tech.uom.lib:uom-lib-common:2.1
