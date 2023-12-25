@@ -51,11 +51,11 @@ public class JabRefGUI {
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
     public JabRefGUI(Stage mainStage,
-                     List<ParserResult> databases,
+                     List<ParserResult> parserResults,
                      boolean isBlank,
                      PreferencesService preferencesService,
                      FileUpdateMonitor fileUpdateMonitor) {
-        this.parserResults = databases;
+        this.parserResults = parserResults;
         this.isBlank = isBlank;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -259,9 +259,12 @@ public class JabRefGUI {
         }
 
         // Display warnings, if any
-        int tabNumber = 0;
-        for (ParserResult pr : parserResults) {
-            ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame, tabNumber++);
+        for (int tabNumber = 0; tabNumber < parserResults.size(); tabNumber++) {
+            ParserResult pr = parserResults.get(tabNumber);
+            if (pr.hasWarnings()) {
+                ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame.getDialogService());
+                mainFrame.showLibraryTabAt(tabNumber);
+            }
         }
 
         // After adding the databases, go through each and see if
