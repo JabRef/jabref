@@ -238,11 +238,11 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
