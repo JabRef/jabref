@@ -467,12 +467,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    /**
-     * This method is called from JabRefFrame when the user wants to create a new entry or entries. It is necessary when the user would expect the added entry or one of the added entries to be selected in the entry editor
-     *
-     * @param entries The new entries.
-     */
-
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
             bibDatabaseContext.getDatabase().insertEntries(entries);
