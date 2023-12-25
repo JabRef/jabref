@@ -5,6 +5,7 @@ import java.util.List;
 import org.jabref.model.database.BibDatabaseContext;
 
 public interface LibraryTabContainer {
+    @Deprecated
     LibraryTab getLibraryTabAt(int i);
 
     List<LibraryTab> getLibraryTabs();

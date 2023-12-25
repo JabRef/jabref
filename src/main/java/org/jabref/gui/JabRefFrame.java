@@ -545,6 +545,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      *
      * @param i Index of base
      */
+    @Deprecated
     public LibraryTab getLibraryTabAt(int i) {
         return (LibraryTab) tabbedPane.getTabs().get(i);
     }
@@ -559,6 +560,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                          .collect(Collectors.toList());
     }
 
+    @Deprecated
     public void showLibraryTabAt(int i) {
         tabbedPane.getSelectionModel().select(i);
     }
