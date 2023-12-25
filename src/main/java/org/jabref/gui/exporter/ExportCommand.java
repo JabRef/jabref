@@ -11,8 +11,8 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -46,7 +46,7 @@ public class ExportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
 
     private final ExportMethod exportMethod;
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final StateManager stateManager;
     private final PreferencesService preferences;
     private final DialogService dialogService;
@@ -55,7 +55,7 @@ public class ExportCommand extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public ExportCommand(ExportMethod exportMethod,
-                         JabRefFrame frame,
+                         LibraryTabContainer tabContainer,
                          StateManager stateManager,
                          DialogService dialogService,
                          PreferencesService preferences,
@@ -63,7 +63,7 @@ public class ExportCommand extends SimpleCommand {
                          JournalAbbreviationRepository abbreviationRepository,
                          TaskExecutor taskExecutor) {
         this.exportMethod = exportMethod;
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -135,7 +135,7 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
-                    LibraryTab.DatabaseNotification notificationPane = frame.getCurrentLibraryTab().getNotificationPane();
+                    LibraryTab.DatabaseNotification notificationPane = tabContainer.getCurrentLibraryTab().getNotificationPane();
                     notificationPane.notify(
                             IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
                             Localization.lang("Export operation finished successfully."),
