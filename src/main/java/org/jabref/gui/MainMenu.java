@@ -135,7 +135,7 @@ public class MainMenu extends MenuBar {
                 frame.getFileHistory(),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame, dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame, preferencesService)),
+                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame, preferencesService, dialogService)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame)),
 
                 new SeparatorMenuItem(),
