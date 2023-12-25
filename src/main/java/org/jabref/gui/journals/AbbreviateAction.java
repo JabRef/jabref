@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -12,7 +13,7 @@ import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
-import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -38,7 +39,7 @@ public class AbbreviateAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
 
     private final StandardActions action;
-    private final LibraryTabContainer tabContainer;
+    private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
@@ -49,7 +50,7 @@ public class AbbreviateAction extends SimpleCommand {
     private AbbreviationType abbreviationType;
 
     public AbbreviateAction(StandardActions action,
-                            LibraryTabContainer tabContainer,
+                            Supplier<LibraryTab> tabSupplier,
                             DialogService dialogService,
                             StateManager stateManager,
                             JournalAbbreviationPreferences abbreviationPreferences,
@@ -57,7 +58,7 @@ public class AbbreviateAction extends SimpleCommand {
                             TaskExecutor taskExecutor,
                             UndoManager undoManager) {
         this.action = action;
-        this.tabContainer = tabContainer;
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.journalAbbreviationPreferences = abbreviationPreferences;
@@ -129,7 +130,7 @@ public class AbbreviateAction extends SimpleCommand {
 
         ce.end();
         undoManager.addEdit(ce);
-        tabContainer.getCurrentLibraryTab().markBaseChanged();
+        tabSupplier.get().markBaseChanged();
         return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
     }
 
@@ -146,7 +147,7 @@ public class AbbreviateAction extends SimpleCommand {
 
         ce.end();
         undoManager.addEdit(ce);
-        tabContainer.getCurrentLibraryTab().markBaseChanged();
+        tabSupplier.get().markBaseChanged();
         return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
     }
 }

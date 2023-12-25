@@ -1,6 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import org.jabref.gui.LibraryTabContainer;
+import java.util.function.Supplier;
+
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 
@@ -10,11 +12,11 @@ public class PreviewSwitchAction extends SimpleCommand {
 
     public enum Direction { PREVIOUS, NEXT }
 
-    private final LibraryTabContainer tabContainer;
+    private final Supplier<LibraryTab> tabSupplier;
     private final Direction direction;
 
-    public PreviewSwitchAction(Direction direction, LibraryTabContainer tabContainer, StateManager stateManager) {
-        this.tabContainer = tabContainer;
+    public PreviewSwitchAction(Direction direction, Supplier<LibraryTab> tabSupplier, StateManager stateManager) {
+        this.tabSupplier = tabSupplier;
         this.direction = direction;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -23,9 +25,9 @@ public class PreviewSwitchAction extends SimpleCommand {
     @Override
     public void execute() {
         if (direction == Direction.NEXT) {
-            tabContainer.getCurrentLibraryTab().getEntryEditor().nextPreviewStyle();
+            tabSupplier.get().getEntryEditor().nextPreviewStyle();
         } else {
-            tabContainer.getCurrentLibraryTab().getEntryEditor().previousPreviewStyle();
+            tabSupplier.get().getEntryEditor().previousPreviewStyle();
         }
     }
 }

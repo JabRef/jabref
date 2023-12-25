@@ -109,7 +109,11 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    public GlobalSearchBar(LibraryTabContainer tabContainer, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
+    public GlobalSearchBar(LibraryTabContainer tabContainer,
+                           StateManager stateManager,
+                           PreferencesService preferencesService,
+                           CountingUndoManager undoManager,
+                           DialogService dialogService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;

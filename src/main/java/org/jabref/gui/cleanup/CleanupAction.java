@@ -2,11 +2,12 @@ package org.jabref.gui.cleanup;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -24,7 +25,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class CleanupAction extends SimpleCommand {
 
-    private final LibraryTabContainer tabContainer;
+    private final Supplier<LibraryTab> tabSupplier;
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -34,13 +35,13 @@ public class CleanupAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupAction(LibraryTabContainer tabContainer,
+    public CleanupAction(Supplier<LibraryTab> tabSupplier,
                          PreferencesService preferences,
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,
                          UndoManager undoManager) {
-        this.tabContainer = tabContainer;
+        this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -123,8 +124,8 @@ public class CleanupAction extends SimpleCommand {
         }
 
         if (modifiedEntriesCount > 0) {
-            tabContainer.getCurrentLibraryTab().updateEntryEditorIfShowing();
-            tabContainer.getCurrentLibraryTab().markBaseChanged();
+            tabSupplier.get().updateEntryEditorIfShowing();
+            tabSupplier.get().markBaseChanged();
         }
 
         if (modifiedEntriesCount == 0) {

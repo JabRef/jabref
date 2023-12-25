@@ -2,11 +2,12 @@ package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -22,7 +23,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
-    private final LibraryTabContainer tabContainer;
+    private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
@@ -33,13 +34,13 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private final PreferencesService preferencesService;
     private final UndoManager undoManager;
 
-    public GenerateCitationKeyAction(LibraryTabContainer tabContainer,
+    public GenerateCitationKeyAction(Supplier<LibraryTab> tabSupplier,
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      TaskExecutor taskExecutor,
                                      PreferencesService preferencesService,
                                      UndoManager undoManager) {
-        this.tabContainer = tabContainer;
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
@@ -143,7 +144,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     undoManager.addEdit(compound);
                 }
 
-                tabContainer.getCurrentLibraryTab().markBaseChanged();
+                tabSupplier.get().markBaseChanged();
                 dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
                 return super.onSuccess(onSuccess);
             }

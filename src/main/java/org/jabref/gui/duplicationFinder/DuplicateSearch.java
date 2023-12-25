@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -18,7 +19,6 @@ import javafx.beans.property.SimpleStringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
@@ -41,7 +41,7 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class DuplicateSearch extends SimpleCommand {
 
-    private final LibraryTabContainer tabContainer;
+    private final Supplier<LibraryTab> tabSupplier;
     private final BlockingQueue<List<BibEntry>> duplicates = new LinkedBlockingQueue<>();
 
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
@@ -57,13 +57,13 @@ public class DuplicateSearch extends SimpleCommand {
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
 
-    public DuplicateSearch(LibraryTabContainer tabContainer,
+    public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
                            StateManager stateManager,
                            PreferencesService prefs,
                            BibEntryTypesManager entryTypesManager,
                            TaskExecutor taskExecutor) {
-        this.tabContainer = tabContainer;
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.prefs = prefs;
@@ -156,7 +156,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, tabContainer.getCurrentLibraryTab().getBibDatabaseContext(), stateManager, dialogService, prefs);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, tabSupplier.get().getBibDatabaseContext(), stateManager, dialogService, prefs);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 
@@ -189,7 +189,7 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        LibraryTab libraryTab = tabSupplier.get();
         final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
