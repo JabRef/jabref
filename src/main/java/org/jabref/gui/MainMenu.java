@@ -186,7 +186,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame, stateManager)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame, dialogService, stateManager, taskExecutor, preferencesService, undoManager)),
 
                 new SeparatorMenuItem(),
