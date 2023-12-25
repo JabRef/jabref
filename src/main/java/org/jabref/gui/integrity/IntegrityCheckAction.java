@@ -7,7 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
@@ -26,20 +26,20 @@ public class IntegrityCheckAction extends SimpleCommand {
 
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final PredatoryJournalRepository predatoryJournalRepository;
 
-    public IntegrityCheckAction(JabRefFrame frame,
+    public IntegrityCheckAction(LibraryTabContainer tabContainer,
                                 PreferencesService preferencesService,
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository abbreviationRepository,
                                 PredatoryJournalRepository predatoryJournalRepository) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
@@ -83,7 +83,7 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab()));
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabContainer.getCurrentLibraryTab()));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
