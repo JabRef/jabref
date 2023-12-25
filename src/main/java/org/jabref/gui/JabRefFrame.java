@@ -542,16 +542,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * Returns the indexed LibraryTab.
-     *
-     * @param i Index of base
-     */
-    @Deprecated
-    public LibraryTab getLibraryTabAt(int i) {
-        return (LibraryTab) tabbedPane.getTabs().get(i);
-    }
-
-    /**
      * Returns a list of all LibraryTabs in this frame.
      */
     public List<LibraryTab> getLibraryTabs() {
