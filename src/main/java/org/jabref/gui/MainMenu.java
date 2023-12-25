@@ -281,7 +281,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, fileUpdateMonitor, taskExecutor, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, frame::getOpenDatabaseAction, fileUpdateMonitor, taskExecutor, preferencesService, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, frame.getOpenDatabaseAction(), dialogService, fileUpdateMonitor, taskExecutor, preferencesService, stateManager)),
 
