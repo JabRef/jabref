@@ -86,13 +86,12 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * Go through the list of post open actions, and perform those that need to be performed.
      *
-     * @param libraryTab The BasePanel where the database is shown.
      * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result, DialogService dialogService) {
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
-                action.performAction(libraryTab, result, dialogService);
+                action.performAction(result, dialogService);
             }
         }
     }
@@ -145,8 +144,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
-            for (int i = 0; i < tabContainer.getLibraryTabs().size(); i++) {
-                LibraryTab libraryTab = tabContainer.getLibraryTabAt(i);
+            for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     iterator.remove();

@@ -278,9 +278,7 @@ public class JabRefGUI {
 
         for (int i = 0; (i < parserResults.size()) && (i < mainFrame.getLibraryTabs().size()); i++) {
             ParserResult pr = parserResults.get(i);
-            LibraryTab libraryTab = mainFrame.getLibraryTabAt(i);
-
-            OpenDatabaseAction.performPostOpenActions(libraryTab, pr, mainFrame.getDialogService());
+            OpenDatabaseAction.performPostOpenActions(pr, mainFrame.getDialogService());
         }
 
         LOGGER.debug("Finished adding panels");

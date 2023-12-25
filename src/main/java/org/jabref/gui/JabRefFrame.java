@@ -406,11 +406,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
-        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            LibraryTab libraryTab = getLibraryTabAt(i);
+        for (LibraryTab libraryTab : getLibraryTabs()) {
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
+
             if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
-                tabbedPane.getSelectionModel().select(i);
+                showLibraryTab(libraryTab);
                 if (!confirmClose(libraryTab)) {
                     return false;
                 }
@@ -419,6 +419,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
             }
+
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);

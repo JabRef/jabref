@@ -3,7 +3,6 @@ package org.jabref.gui.importer.actions;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.migrations.MergeReviewIntoCommentMigration;
 import org.jabref.model.entry.BibEntry;
@@ -16,7 +15,7 @@ public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
     }
 
     @Override
-    public void performAction(LibraryTab libraryTab, ParserResult parserResult, DialogService dialogService) {
+    public void performAction(ParserResult parserResult, DialogService dialogService) {
         MergeReviewIntoCommentMigration migration = new MergeReviewIntoCommentMigration();
 
         migration.performMigration(parserResult);
