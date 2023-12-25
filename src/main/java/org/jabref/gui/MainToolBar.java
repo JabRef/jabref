@@ -126,7 +126,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         pushToApplicationButton,
                         factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame, dialogService, stateManager, taskExecutor, preferencesService, undoManager)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor))),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 

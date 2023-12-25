@@ -229,7 +229,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository, predatoryJournalRepository)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
 
