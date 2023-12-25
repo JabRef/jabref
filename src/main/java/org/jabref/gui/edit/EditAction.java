@@ -25,14 +25,14 @@ public class EditAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
-    private final Supplier<LibraryTab> libraryTab;
+    private final Supplier<LibraryTab> tabSupplier;
     private final StandardActions action;
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public EditAction(StandardActions action, Supplier<LibraryTab> libraryTab, StateManager stateManager, UndoManager undoManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager, UndoManager undoManager) {
         this.action = action;
-        this.libraryTab = libraryTab;
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
 
@@ -78,10 +78,10 @@ public class EditAction extends SimpleCommand {
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 switch (action) {
-                    case COPY -> libraryTab.get().copy();
-                    case CUT -> libraryTab.get().cut();
-                    case PASTE -> libraryTab.get().paste();
-                    case DELETE_ENTRY -> libraryTab.get().delete(false);
+                    case COPY -> tabSupplier.get().copy();
+                    case CUT -> tabSupplier.get().cut();
+                    case PASTE -> tabSupplier.get().paste();
+                    case DELETE_ENTRY -> tabSupplier.get().delete(false);
                     case UNDO -> {
                         if (undoManager.canUndo()) {
                             undoManager.undo();

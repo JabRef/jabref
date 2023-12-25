@@ -21,12 +21,12 @@ public class UndoRedoAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoRedoAction.class);
 
     private final StandardActions action;
-    private final Supplier<LibraryTab> libraryTab;
+    private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
 
-    public UndoRedoAction(StandardActions action, Supplier<LibraryTab> libraryTab, DialogService dialogService, StateManager stateManager) {
+    public UndoRedoAction(StandardActions action, Supplier<LibraryTab> tabSupplier, DialogService dialogService, StateManager stateManager) {
         this.action = action;
-        this.libraryTab = libraryTab;
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
 
         // ToDo: Rework the UndoManager to something like the following, if it had a property.
@@ -36,7 +36,7 @@ public class UndoRedoAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        LibraryTab libraryTab = this.libraryTab.get();
+        LibraryTab libraryTab = this.tabSupplier.get();
         if (action == StandardActions.UNDO) {
             try {
                 libraryTab.getUndoManager().undo();
@@ -45,7 +45,7 @@ public class UndoRedoAction extends SimpleCommand {
             } catch (CannotUndoException ex) {
                 dialogService.notify(Localization.lang("Nothing to undo") + '.');
             }
-            this.libraryTab.get().markChangedOrUnChanged();
+            this.tabSupplier.get().markChangedOrUnChanged();
         } else if (action == StandardActions.REDO) {
             try {
                 libraryTab.getUndoManager().redo();

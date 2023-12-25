@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class SpecialFieldAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
-    private final Supplier<LibraryTab> libraryTab;
+    private final Supplier<LibraryTab> tabSupplier;
     private final SpecialField specialField;
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
@@ -41,7 +41,7 @@ public class SpecialFieldAction extends SimpleCommand {
     /**
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
      */
-    public SpecialFieldAction(Supplier<LibraryTab> libraryTab,
+    public SpecialFieldAction(Supplier<LibraryTab> tabSupplier,
                               SpecialField specialField,
                               String value,
                               boolean nullFieldIfValueIsTheSame,
@@ -50,7 +50,7 @@ public class SpecialFieldAction extends SimpleCommand {
                               PreferencesService preferencesService,
                               UndoManager undoManager,
                               StateManager stateManager) {
-        this.libraryTab = libraryTab;
+        this.tabSupplier = tabSupplier;
         this.specialField = specialField;
         this.value = value;
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
@@ -81,8 +81,8 @@ public class SpecialFieldAction extends SimpleCommand {
             ce.end();
             if (ce.hasEdits()) {
                 undoManager.addEdit(ce);
-                libraryTab.get().markBaseChanged();
-                libraryTab.get().updateEntryEditorIfShowing();
+                tabSupplier.get().markBaseChanged();
+                tabSupplier.get().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));

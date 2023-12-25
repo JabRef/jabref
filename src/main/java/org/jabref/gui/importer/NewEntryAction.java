@@ -23,7 +23,7 @@ public class NewEntryAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
-    private final Supplier<LibraryTab> libraryTab;
+    private final Supplier<LibraryTab> tabSupplier;
 
     /**
      * The type of the entry to create.
@@ -34,8 +34,8 @@ public class NewEntryAction extends SimpleCommand {
 
     private final PreferencesService preferences;
 
-    public NewEntryAction(Supplier<LibraryTab> libraryTab, DialogService dialogService, PreferencesService preferences, StateManager stateManager) {
-        this.libraryTab = libraryTab;
+    public NewEntryAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, PreferencesService preferences, StateManager stateManager) {
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
 
@@ -44,29 +44,29 @@ public class NewEntryAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
-    public NewEntryAction(Supplier<LibraryTab> libraryTab, EntryType type, DialogService dialogService, PreferencesService preferences, StateManager stateManager) {
-        this(libraryTab, dialogService, preferences, stateManager);
+    public NewEntryAction(Supplier<LibraryTab> tabSupplier, EntryType type, DialogService dialogService, PreferencesService preferences, StateManager stateManager) {
+        this(tabSupplier, dialogService, preferences, stateManager);
         this.type = Optional.of(type);
     }
 
     @Override
     public void execute() {
-        if (libraryTab.get() == null) {
+        if (tabSupplier.get() == null) {
             LOGGER.error("Action 'New entry' must be disabled when no database is open.");
             return;
         }
 
         if (type.isPresent()) {
-            libraryTab.get().insertEntry(new BibEntry(type.get()));
+            tabSupplier.get().insertEntry(new BibEntry(type.get()));
         } else {
-            EntryTypeView typeChoiceDialog = new EntryTypeView(libraryTab.get(), dialogService, preferences);
+            EntryTypeView typeChoiceDialog = new EntryTypeView(tabSupplier.get(), dialogService, preferences);
             EntryType selectedType = dialogService.showCustomDialogAndWait(typeChoiceDialog).orElse(null);
             if (selectedType == null) {
                 return;
             }
 
             trackNewEntry(selectedType);
-            libraryTab.get().insertEntry(new BibEntry(selectedType));
+            tabSupplier.get().insertEntry(new BibEntry(selectedType));
         }
     }
 

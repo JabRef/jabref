@@ -39,11 +39,11 @@ public class SpecialFieldViewModel {
     }
 
     public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value,
-                                                    Supplier<LibraryTab> libraryTab,
+                                                    Supplier<LibraryTab> tabSupplier,
                                                     DialogService dialogService,
                                                     StateManager stateManager) {
         return new SpecialFieldAction(
-                libraryTab,
+                tabSupplier,
                 field,
                 value.getFieldValue().orElse(null),
                 // if field contains only one value, it has to be nulled, as another setting does not empty the field

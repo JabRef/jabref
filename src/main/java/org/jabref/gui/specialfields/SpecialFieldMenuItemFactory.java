@@ -21,7 +21,7 @@ import de.saxsys.mvvmfx.utils.commands.Command;
 public class SpecialFieldMenuItemFactory {
     public static MenuItem getSpecialFieldSingleItem(SpecialField field,
                                                      ActionFactory factory,
-                                                     Supplier<LibraryTab> libraryTab,
+                                                     Supplier<LibraryTab> tabSupplier,
                                                      DialogService dialogService,
                                                      PreferencesService preferencesService,
                                                      UndoManager undoManager,
@@ -29,14 +29,14 @@ public class SpecialFieldMenuItemFactory {
         SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(field.getValues().getFirst());
         MenuItem menuItem = factory.createMenuItem(specialField.getAction(),
                 new SpecialFieldViewModel(field, preferencesService, undoManager)
-                        .getSpecialFieldAction(field.getValues().getFirst(), libraryTab, dialogService, stateManager));
+                        .getSpecialFieldAction(field.getValues().getFirst(), tabSupplier, dialogService, stateManager));
         menuItem.visibleProperty().bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
         return menuItem;
     }
 
     public static Menu createSpecialFieldMenu(SpecialField field,
                                               ActionFactory factory,
-                                              Supplier<LibraryTab> libraryTab,
+                                              Supplier<LibraryTab> tabSupplier,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               UndoManager undoManager,
@@ -44,7 +44,7 @@ public class SpecialFieldMenuItemFactory {
 
         return createSpecialFieldMenu(field, factory, preferencesService, undoManager, specialField ->
                 new SpecialFieldViewModel(field, preferencesService, undoManager)
-                        .getSpecialFieldAction(specialField.getValue(), libraryTab, dialogService, stateManager));
+                        .getSpecialFieldAction(specialField.getValue(), tabSupplier, dialogService, stateManager));
     }
 
     public static Menu createSpecialFieldMenu(SpecialField field,

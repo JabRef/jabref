@@ -44,7 +44,7 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
-    private final JabRefFrame frame;
+    private final LibraryTabContainer frame;
     private final PushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
@@ -58,7 +58,7 @@ public class MainToolBar extends ToolBar {
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
 
-    public MainToolBar(JabRefFrame frame,
+    public MainToolBar(LibraryTabContainer tabContainer,
                        PushToApplicationCommand pushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
@@ -68,7 +68,7 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager) {
-        this.frame = frame;
+        this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
         this.dialogService = dialogService;
