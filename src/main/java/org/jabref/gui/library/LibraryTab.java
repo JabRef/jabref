@@ -25,7 +25,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
-import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -89,6 +88,11 @@ import org.slf4j.LoggerFactory;
 
 public class LibraryTab extends Tab {
 
+    /**
+     * Defines the different modes that the BasePanel can operate in
+     */
+    private enum PanelMode { TABLE, TABLE_EDITOR }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final JabRefFrame frame;
     private final CountingUndoManager undoManager;
@@ -106,7 +110,7 @@ public class LibraryTab extends Tab {
     private FileAnnotationCache annotationCache;
     private EntryEditor entryEditor;
     private MainTable mainTable;
-    private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
+    private PanelMode mode = PanelMode.TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
     private boolean saving;
@@ -409,14 +413,6 @@ public class LibraryTab extends Tab {
         return suggestionProviders;
     }
 
-    public BasePanelMode getMode() {
-        return mode;
-    }
-
-    public void setMode(BasePanelMode mode) {
-        this.mode = mode;
-    }
-
     public JabRefFrame frame() {
         return frame;
     }
@@ -591,37 +587,22 @@ public class LibraryTab extends Tab {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        showBottomPane(BasePanelMode.SHOWING_EDITOR);
+        mode = PanelMode.TABLE_EDITOR;
+        splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
 
         // We use != instead of equals because of performance reasons
-        if (entry != getShowing()) {
+        if (entry != showing) {
             entryEditor.setEntry(entry);
             showing = entry;
         }
         entryEditor.requestFocus();
     }
 
-    private void showBottomPane(BasePanelMode newMode) {
-        if (newMode != BasePanelMode.SHOWING_EDITOR) {
-            throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
-        }
-        Node pane = entryEditor;
-
-        if (splitPane.getItems().size() == 2) {
-            splitPane.getItems().set(1, pane);
-        } else {
-            splitPane.getItems().add(1, pane);
-        }
-        mode = newMode;
-
-        splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
-    }
-
     /**
      * Removes the bottom component.
      */
     public void closeBottomPane() {
-        mode = BasePanelMode.SHOWING_NOTHING;
+        mode = PanelMode.TABLE;
         splitPane.getItems().remove(entryEditor);
     }
 
@@ -654,13 +635,13 @@ public class LibraryTab extends Tab {
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
         // This method is not able to close the bottom pane currently
 
-        if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
+        if ((mode == PanelMode.TABLE_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
             closeBottomPane();
         }
     }
 
     public void updateEntryEditorIfShowing() {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
+        if (mode == PanelMode.TABLE_EDITOR) {
             BibEntry currentEntry = entryEditor.getEntry();
             showAndEdit(currentEntry);
         }
@@ -710,7 +691,7 @@ public class LibraryTab extends Tab {
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
     private void saveDividerLocation(Number position) {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
+        if (mode == PanelMode.TABLE_EDITOR) {
             preferencesService.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
@@ -743,10 +724,6 @@ public class LibraryTab extends Tab {
 
     public void setSaving(boolean saving) {
         this.saving = saving;
-    }
-
-    private BibEntry getShowing() {
-        return showing;
     }
 
     public String formatOutputMessage(String start, int count) {
