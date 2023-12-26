@@ -160,7 +160,7 @@ public class GroupDialogViewModel {
                     return true;
                 },
                 ValidationMessage.warning(
-                        Localization.lang("There already exists a group with the same name. \nIf you use it, it will inherit all entries from this other group.")
+                        Localization.lang("There already exists a group with the same name.\nIf you use it, it will inherit all entries from this other group.")
                 )
         );
 
