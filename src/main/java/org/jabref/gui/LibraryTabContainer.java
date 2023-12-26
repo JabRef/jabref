@@ -19,5 +19,8 @@ public interface LibraryTabContainer {
 
     void closeCurrentTab();
 
+    /**
+     * Refreshes the ui after changes to the preferences
+     */
     void refresh();
 }

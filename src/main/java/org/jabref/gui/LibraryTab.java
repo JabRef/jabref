@@ -551,7 +551,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Set up auto-completion for this database
+     * Set up autocompletion for this database
      */
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();

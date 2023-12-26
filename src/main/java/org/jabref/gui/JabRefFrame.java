@@ -939,7 +939,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return mainStage;
     }
 
-    public void refresh() {
+    /**
+     * Refreshes the ui after preferences changes
+     */
+        public void refresh() {
         globalSearchBar.updateHintVisibility();
         setupAllTables();
         getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());

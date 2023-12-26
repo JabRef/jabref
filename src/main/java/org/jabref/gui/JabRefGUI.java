@@ -260,6 +260,9 @@ public class JabRefGUI {
 
         // Display warnings, if any
         for (int tabNumber = 0; tabNumber < parserResults.size(); tabNumber++) {
+            // ToDo: Method needs to be rewritten, because the index of the parser result and of the libraryTab may not
+            //  be identical, if there are also other tabs opened, that are not libraryTabs. Currently there are none,
+            //  therefor for now this ok.
             ParserResult pr = parserResults.get(tabNumber);
             if (pr.hasWarnings()) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame.getDialogService());
@@ -272,14 +275,7 @@ public class JabRefGUI {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        // Note that we have to check whether i does not go over getBasePanelCount().
-        // This is because importToOpen might have been used, which adds to
-        // loadedDatabases, but not to getBasePanelCount()
-
-        for (int i = 0; (i < parserResults.size()) && (i < mainFrame.getLibraryTabs().size()); i++) {
-            ParserResult pr = parserResults.get(i);
-            OpenDatabaseAction.performPostOpenActions(pr, mainFrame.getDialogService());
-        }
+        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, mainFrame.getDialogService()));
 
         LOGGER.debug("Finished adding panels");
     }
