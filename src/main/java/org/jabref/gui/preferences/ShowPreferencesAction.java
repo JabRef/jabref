@@ -28,6 +28,6 @@ public class ShowPreferencesAction extends SimpleCommand {
         // Refresh frame and tables
         jabRefFrame.getGlobalSearchBar().updateHintVisibility();
         jabRefFrame.setupAllTables();
-        jabRefFrame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
+        jabRefFrame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().resetFieldFormatter());
     }
 }
