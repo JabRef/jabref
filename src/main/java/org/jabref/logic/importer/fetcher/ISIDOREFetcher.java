@@ -1,9 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +60,21 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     public Parser getParser() {
         return xmlData -> {
             try {
+                PushbackInputStream pushbackInputStream = new PushbackInputStream(xmlData);
+                int data = pushbackInputStream.read();
+                if (data == -1) {
+                    return List.of();
+                }
+                if (pushbackInputStream.available() < 5) {
+                    // We guess, it's an error if less than 5
+                    pushbackInputStream.unread(data);
+                    String error = new String(pushbackInputStream.readAllBytes(), StandardCharsets.UTF_8);
+                    throw new FetcherException(error);
+                }
+
+                pushbackInputStream.unread(data);
                 DocumentBuilder builder = this.factory.newDocumentBuilder();
-                Document document = builder.parse(xmlData);
+                Document document = builder.parse(pushbackInputStream);
 
                 // Assuming the root element represents an entry
                 Element entryElement = document.getDocumentElement();
@@ -69,10 +84,11 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 }
 
                 return parseXMl(entryElement);
-            } catch (
-                    ParserConfigurationException |
-                    IOException |
-                    SAXException e) {
+            } catch (FetcherException e) {
+                Unchecked.throwChecked(e);
+            } catch (ParserConfigurationException |
+                     IOException |
+                     SAXException e) {
                 Unchecked.throwChecked(new FetcherException("Issue with parsing link", e));
             }
             return null;
@@ -97,9 +113,9 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         //uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
 
-        LOGGER.debug("URl for query {}", uriBuilder.build().toURL());
-
-        return uriBuilder.build().toURL();
+        URL url = uriBuilder.build().toURL();
+        LOGGER.debug("URl for query {}", url);
+        return url;
     }
 
     private List<BibEntry> parseXMl(Element element) {

@@ -24,11 +24,9 @@ public final class Word {
 
     static {
         Set<String> smallerWords = new HashSet<>();
-        Set<Character> dashes = new HashSet<>();
-        Set<String> conjunctions = new HashSet<>();
 
         // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
-        conjunctions.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
+        Set<String> conjunctions = new HashSet<>(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
         // Prepositions
@@ -36,14 +34,13 @@ public final class Word {
         // Conjunctions used as part of all case capitalisation to check if it is a small word or not
         smallerWords.addAll(conjunctions);
         // Dashes
-        dashes.addAll(Arrays.asList(
+
+        // unmodifiable for thread safety
+        DASHES = new HashSet<>(Arrays.asList(
                 '-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
                 '–', '—', '―', '⁓', '⁻', '₋', '−', '⸺', '⸻',
                 '〜', '゠', '︱', '︲', '﹘', '﹣', '－'
         ));
-
-        // unmodifiable for thread safety
-        DASHES = dashes;
 
         // unmodifiable for thread safety
         CONJUNCTIONS = conjunctions;

@@ -97,4 +97,10 @@ public class ISIDOREFetcherTest {
 
         assertEquals(List.of(expected), actual);
     }
+
+    @Test
+    public void noResults() throws FetcherException {
+        List<BibEntry> actual = fetcher.performSearch("nothing notthingham jojoyolo");
+        assertEquals(List.of(), actual);
+    }
 }

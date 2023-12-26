@@ -31,7 +31,7 @@ public abstract class AbstractQueryTransformer {
      * Transforms a and b and c to (a AND b AND c), where
      * a, b, and c can be complex expressions.
      */
-    private Optional<String> transform(BooleanQueryNode query) {
+    protected Optional<String> transform(BooleanQueryNode query) {
         String delimiter;
         if (query instanceof OrQueryNode) {
             delimiter = getLogicalOrOperator();
@@ -49,6 +49,7 @@ public abstract class AbstractQueryTransformer {
         }
         return Optional.of(result);
     }
+
 
     /**
      * Returns the logical AND operator used by the library
@@ -181,7 +182,7 @@ public abstract class AbstractQueryTransformer {
 
     /**
      * Return a string representation of the un-fielded (default fielded) term
-     *
+     * <p>
      * Default implementation: just return the term (in quotes if a space is contained)
      */
     protected Optional<String> handleUnFieldedTerm(String term) {
@@ -204,7 +205,7 @@ public abstract class AbstractQueryTransformer {
         return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
-    private Optional<String> transform(QueryNode query) {
+    protected Optional<String> transform(QueryNode query) {
         switch (query) {
             case BooleanQueryNode booleanQueryNode -> {
                 return transform(booleanQueryNode);
