@@ -50,7 +50,6 @@ public abstract class AbstractQueryTransformer {
         return Optional.of(result);
     }
 
-
     /**
      * Returns the logical AND operator used by the library
      * Note: whitespaces have to be included around the operator
