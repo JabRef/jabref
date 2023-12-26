@@ -182,6 +182,8 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
+
+        setOnClosed(event -> cleanUp());
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -252,8 +254,6 @@ public class LibraryTab extends Tab {
     }
 
     public void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
-        cleanUp();
-
         if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
             // If you open an existing library, a library tab with a loading animation is added immediately.
             // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
@@ -718,7 +718,7 @@ public class LibraryTab extends Tab {
     /**
      * Perform necessary cleanup when this BasePanel is closed.
      */
-    public void cleanUp() {
+    private void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         AutosaveManager.shutdown(bibDatabaseContext);
         BackupManager.shutdown(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory(), preferencesService.getFilePreferences().shouldCreateBackup());

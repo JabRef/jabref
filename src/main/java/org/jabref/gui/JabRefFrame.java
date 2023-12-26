@@ -889,7 +889,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     private void removeTab(LibraryTab libraryTab) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            libraryTab.cleanUp();
             tabbedPane.getTabs().remove(libraryTab);
         });
     }
