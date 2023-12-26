@@ -103,4 +103,15 @@ public class ISIDOREFetcherTest {
         List<BibEntry> actual = fetcher.performSearch("nothing notthingham jojoyolo");
         assertEquals(List.of(), actual);
     }
+
+    @Test
+    public void author() throws FetcherException {
+        List<BibEntry> actual = fetcher.performSearch("author:\"Adam Strange\"");
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Howard Green and Karen Boyland and Adam Strange")
+                .withField(StandardField.DOI, "doi:10.3406/htn.1990.2970")
+                .withField(StandardField.TITLE, "Le rôle des pépinières dans le développement des entreprises accueillies : essai d'évaluation. L'exemple du Yorkshire -Humberside (R.U.)")
+                .withField(StandardField.YEAR, "1990")
+        ), actual);
+    }
 }

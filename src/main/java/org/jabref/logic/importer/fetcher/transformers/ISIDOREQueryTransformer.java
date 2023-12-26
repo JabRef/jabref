@@ -1,9 +1,12 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.casechanger.Word;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.AuthorList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +18,9 @@ public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransforme
 
     private int handleCountTitle = 0;
     private int handleCountAuthor = 0;
-
     private int handleUnfieldedTermCount = 0;
+
+    private Map<String, String> parameterMap = new HashMap<>();
 
     @Override
     protected String getLogicalAndOperator() {
@@ -39,7 +43,10 @@ public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransforme
         if (handleCountAuthor > 3) {
             return "";
         }
-        return createKeyValuePair("author", author.replace(" ", "_"), "=");
+        String lastFirst = AuthorList.fixAuthorLastNameFirstCommas(author, false, true);
+        lastFirst = lastFirst.replace(", ", "_").toLowerCase(Locale.ENGLISH);
+        parameterMap.put("author", lastFirst);
+        return "";
     }
 
     @Override
@@ -48,18 +55,19 @@ public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransforme
         if (handleCountTitle > 3) {
             return "";
         }
-        return createKeyValuePair("title", StringUtil.quoteStringIfSpaceIsContained(title));
+        return handleUnFieldedTerm(title).orElse("");
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
         LOGGER.warn("ISIDORE does not support searching by journal");
-        return handleTitle(journalTitle);
+        return handleUnFieldedTerm(journalTitle).orElse("");
     }
 
     @Override
     protected String handleYear(String year) {
-        return createKeyValuePair("date", year, "=");
+        parameterMap.put("date", year);
+        return "";
     }
 
     @Override
@@ -72,5 +80,9 @@ public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransforme
             return Optional.empty();
         }
         return super.handleUnFieldedTerm(term);
+    }
+
+    public Map<String, String> getParameterMap() {
+        return this.parameterMap;
     }
 }

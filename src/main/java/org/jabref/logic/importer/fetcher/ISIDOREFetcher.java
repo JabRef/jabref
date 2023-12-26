@@ -108,10 +108,15 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("q", transformedQuery);
-        // uriBuilder.addParameter("page", String.valueOf(pageNumber));
+        if (pageNumber > 1) {
+            uriBuilder.addParameter("page", String.valueOf(pageNumber));
+        }
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
-        // uriBuilder.addParameter("lang", "en");
+        uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
+        queryTransformer.getParameterMap().forEach((k, v) -> {
+            uriBuilder.addParameter(k, v);
+        });
 
         URL url = uriBuilder.build().toURL();
         LOGGER.debug("URl for query {}", url);
@@ -153,8 +158,10 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return "";
     }
 
-    // Get the type of the document, ISIDORE only seems to have select types, also their types are different to
-    // those used by JabRef.
+    /**
+     * Get the type of the document, ISIDORE only seems to have select types, also their types are different to
+     * those used by JabRef.
+     */
     private EntryType getType(NodeList list) {
         for (int i = 0; i < list.getLength(); i++) {
             String type = list.item(i).getTextContent();
@@ -171,9 +178,9 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return StandardEntryType.Misc;
     }
 
-    // Gets all the authors, separated with the word "and"
-    // For some reason the author field sometimes has extra numbers and letters.
     private String getAuthor(Node itemElement) {
+        // Gets all the authors, separated with the word "and"
+        // For some reason the author field sometimes has extra numbers and letters.
         StringJoiner stringJoiner = new StringJoiner(" and ");
         for (int i = 1; i < itemElement.getChildNodes().getLength(); i += 2) {
             String next = removeNumbers(itemElement.getChildNodes().item(i).getTextContent()).replaceAll("\\s+", " ");
@@ -186,7 +193,9 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return (stringJoiner.toString().substring(0, stringJoiner.length())).trim().replaceAll("\\s+", " ");
     }
 
-    // Remove numbers from a string and everything after the number, (helps with the author field).
+    /**
+     * Remove numbers from a string and everything after the number, (helps with the author field).
+     */
     private String removeNumbers(String string) {
         for (int i = 0; i < string.length(); i++) {
             if (Character.isDigit(string.charAt(i))) {
@@ -196,11 +205,11 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return string;
     }
 
-    // In the XML file the publishers node often lists multiple publisher e.g.
-    // <publisher origin="HAL CCSD">HAL CCSD</publisher>
-    // <publisher origin="Elsevier">Elsevier</publisher>
-    // Therefore this function simply gets all of them.
     private String getPublishers(Node itemElement) {
+        // In the XML file the publishers node often lists multiple publisher e.g.
+        // <publisher origin="HAL CCSD">HAL CCSD</publisher>
+        // <publisher origin="Elsevier">Elsevier</publisher>
+        // Therefore this function simply gets all of them.
         if (itemElement == null) {
             return "";
         }
@@ -215,7 +224,6 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     }
 
     private String getJournal(NodeList list) {
-        // If there is no journal, return an empty string.
         if (list.getLength() == 0) {
             return "";
         }
