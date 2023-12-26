@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.util.List;
 
+import org.jabref.gui.library.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 
 public interface LibraryTabContainer {

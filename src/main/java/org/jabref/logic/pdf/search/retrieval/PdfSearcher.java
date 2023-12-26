@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.library.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.PdfSearchResults;

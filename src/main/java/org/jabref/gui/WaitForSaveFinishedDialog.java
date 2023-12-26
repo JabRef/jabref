@@ -4,6 +4,7 @@ import java.util.List;
 
 import javafx.concurrent.Task;
 
+import org.jabref.gui.library.LibraryTab;
 import org.jabref.logic.l10n.Localization;
 
 /**

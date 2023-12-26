@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.TableColumn;
 
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.library.LibraryTab;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.logic.bibtex.InvalidFieldValueException;

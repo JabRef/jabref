@@ -8,7 +8,6 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.SendAsKindleEmailAction;
 import org.jabref.gui.SendAsStandardEmailAction;
 import org.jabref.gui.StateManager;
@@ -18,6 +17,7 @@ import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.library.LibraryTab;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;

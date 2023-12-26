@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
+import org.jabref.gui.library.LibraryTab;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;

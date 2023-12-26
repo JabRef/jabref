@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.library;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +25,12 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
+import org.jabref.gui.BasePanelMode;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.UpdateTimestampListener;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -124,7 +130,7 @@ public class LibraryTab extends Tab {
     private final IndexingTaskManager indexingTaskManager;
     private final TaskExecutor taskExecutor;
 
-    public LibraryTab(BibDatabaseContext bibDatabaseContext,
+    private LibraryTab(BibDatabaseContext bibDatabaseContext,
                       JabRefFrame frame,
                       DialogService dialogService,
                       PreferencesService preferencesService,
@@ -253,7 +259,7 @@ public class LibraryTab extends Tab {
             // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
             // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
             // it doesn't handle the case when a library is loaded asynchronously.
-            // See org.jabref.gui.LibraryTab.createLibraryTab for the asynchronous loading.
+            // See org.jabref.gui.library.LibraryTab.createLibraryTab for the asynchronous loading.
             stateManager.setActiveDatabase(bibDatabaseContextFromParserResult);
         }
 

@@ -5,8 +5,8 @@ import java.util.Collections;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.library.LibraryTab;
 
 public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
 
