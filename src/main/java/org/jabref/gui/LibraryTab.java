@@ -66,7 +66,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
-import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -156,7 +155,6 @@ public class LibraryTab extends Tab {
         setupMainPanel();
         setupAutoCompletion();
 
-        this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new IndexUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
@@ -277,7 +275,6 @@ public class LibraryTab extends Tab {
         setupMainPanel();
         setupAutoCompletion();
 
-        this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -915,28 +912,6 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
             ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
-        }
-    }
-
-    /**
-     * Ensures that the results of the current search are updated when a new entry is inserted into the database Actual methods for performing search must run in javafx thread
-     */
-    private class SearchListener {
-
-        @Subscribe
-        public void listen(EntriesAddedEvent addedEntryEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
-        }
-
-        @Subscribe
-        public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            // IMO only used to update the status (found X entries)
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
     }
 

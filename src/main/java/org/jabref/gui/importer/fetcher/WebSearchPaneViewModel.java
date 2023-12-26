@@ -1,7 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
@@ -57,10 +56,9 @@ public class WebSearchPaneViewModel {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(
+        fetchers.setAll(WebFetchers.getSearchBasedFetchers(
                 preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences());
-        fetchers.setAll(allFetchers);
+                preferencesService.getImporterPreferences()));
 
         // Choose last-selected fetcher as default
         SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
