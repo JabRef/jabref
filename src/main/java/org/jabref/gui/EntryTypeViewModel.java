@@ -211,4 +211,8 @@ public class EntryTypeViewModel {
         });
         taskExecutor.execute(fetcherWorker);
     }
+
+    public void cancelFetcherWorker() {
+        fetcherWorker.cancel();
+    }
 }
