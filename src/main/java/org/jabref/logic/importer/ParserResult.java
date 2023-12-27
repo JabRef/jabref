@@ -132,7 +132,7 @@ public class ParserResult {
     }
 
     public String getErrorMessage() {
-        return String.join(" ", warnings());
+        return String.join("\n", warnings());
     }
 
     public BibDatabaseContext getDatabaseContext() {

@@ -9,6 +9,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -51,6 +52,7 @@ public class Globals {
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static JournalAbbreviationRepository journalAbbreviationRepository;
+    public static PredatoryJournalRepository predatoryJournalRepository;
 
     /**
      * This field is initialized upon startup.

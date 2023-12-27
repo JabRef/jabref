@@ -22,7 +22,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 jobs:
@@ -59,11 +59,10 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
       - name: Setup JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 21.0.1
           distribution: 'liberica'
-          cache: 'gradle'
       - name: Clean up keychain
         run: |
          security delete-keychain signing_temp.keychain ${{runner.temp}}/keychain/notarization.keychain || true
@@ -85,6 +84,8 @@ jobs:
           mkdir ${{runner.temp}}/keychain
           security create-keychain -p jabref ${{runner.temp}}/keychain/notarization.keychain
           security set-keychain-settings ${{runner.temp}}/keychain/notarization.keychain
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       - name: Prepare merged jars and modules dir (macOS)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build dmg (macOS)
@@ -161,7 +162,7 @@ jobs:
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
         if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
