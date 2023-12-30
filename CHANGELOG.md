@@ -11,6 +11,19 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+### Changed
+
+### Fixed
+
+- We fixed an issue where attempting to cancel the importing/generation of an entry from id is ignored. [#10508](https://github.com/JabRef/jabref/issues/10508)
+- We fixed an issue where the preview panel showing the wrong entry (an entry that is not selected in the entry table). [#9172](https://github.com/JabRef/jabref/issues/9172)
+
+### Removed
+
+## [5.12] – 2023-12-24
+
+### Added
+
 - We added a scite.ai tab in the entry editor that retrieves 'Smart Citation' tallies for citations that have a DOI. [koppor#375](https://github.com/koppor/jabref/issues/375)  
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
 - We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
@@ -44,9 +57,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - We removed duplicate filtering and sorting operations in the MainTable when editing BibEntries. [#10619](https://github.com/JabRef/jabref/pull/10619)
-
-
-
 
 ## [5.11] – 2023-10-22
 
@@ -1202,7 +1212,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.11...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.12...HEAD
+[5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
 [5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10
 [5.9]: https://github.com/JabRef/jabref/compare/v5.8...v5.9
