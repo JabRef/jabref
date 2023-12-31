@@ -156,8 +156,8 @@ public class PreviewPanel extends VBox {
 
     public void setEntry(BibEntry entry) {
         this.entry = entry;
-        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setEntry(entry);
+        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
     }
 
     public void print() {
