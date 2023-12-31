@@ -17,8 +17,7 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
+import javafx.event.Event;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
@@ -37,10 +36,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.autosaveandbackup.AutosaveManager;
-import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewEntryAction;
@@ -62,7 +58,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -352,15 +347,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
     }
 
-    /**
-     * Tears down all things started by JabRef
-     * <p>
-     * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
-     *
-     * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is
-     *                  set to true
-     */
-    private void tearDownJabRef(List<String> filenames) {
+    private void storeLastOpenedFiles(List<String> filenames) {
         if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
@@ -374,8 +361,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
-
-        prefs.flush();
     }
 
     /**
@@ -385,7 +370,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * <p>
      * Non-OSX JabRef calls this when choosing "Quit" from the menu
      * <p>
-     * SIDE EFFECT: tears down JabRef
      *
      * @return true if the user chose to quit; false otherwise
      */
@@ -407,22 +391,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
-        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
+        for (int i = 0; i < getLibraryTabs().size(); i++) {
             LibraryTab libraryTab = getLibraryTabAt(i);
-            final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-            if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
-                tabbedPane.getSelectionModel().select(i);
-                if (!confirmClose(libraryTab)) {
-                    return false;
-                }
-            } else if (context.getLocation() == DatabaseLocation.SHARED) {
-                context.convertToLocalDatabase();
-                context.getDBMSSynchronizer().closeSharedDatabase();
-                context.clearDBMSSynchronizer();
-            }
-            AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
-            context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
+            closeTab(libraryTab);
+
+            libraryTab.getBibDatabaseContext()
+                      .getDatabasePath()
+                      .map(Path::toAbsolutePath)
+                      .map(Path::toString)
+                      .ifPresent(filenames::add);
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
@@ -430,8 +407,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
         saveWindowState();
-        // Good bye!
-        tearDownJabRef(filenames);
+        storeLastOpenedFiles(filenames);
+        prefs.flush();
+
+        // Goodbye!
         Platform.exit();
         return true;
     }
@@ -528,7 +507,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             splitPane.getItems().remove(sidePane);
         } else {
             if (!splitPane.getItems().contains(sidePane)) {
-                splitPane.getItems().add(0, sidePane);
+                splitPane.getItems().addFirst(sidePane);
                 setDividerPosition();
             }
         }
@@ -547,7 +526,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * @param i Index of base
      */
     public LibraryTab getLibraryTabAt(int i) {
-        return (LibraryTab) tabbedPane.getTabs().get(i);
+        return getLibraryTabs().get(i);
     }
 
     /**
@@ -723,12 +702,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             tabbedPane.requestFocus();
         }
 
-        libraryTab.setOnCloseRequest(event -> {
-            libraryTab.cancelLoading();
-            closeTab(libraryTab);
-            event.consume();
-        });
-
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
 
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
@@ -736,7 +709,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     /**
      * Opens a new tab with existing data.
-     * Asynchronous loading is done at  {@link LibraryTab#createLibraryTab(BackgroundTask, Path, DialogService, PreferencesService, StateManager, JabRefFrame, FileUpdateMonitor, BibEntryTypesManager, CountingUndoManager)}.
+     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
      */
     public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -805,96 +778,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return fileHistory;
     }
 
-    /**
-     * Ask if the user really wants to close the given database.
-     * Offers to save or discard the changes -- or return to the library
-     *
-     * @return <code>true</code> if the user choose to close the database
-     */
-    private boolean confirmClose(LibraryTab libraryTab) {
-        String filename = libraryTab.getBibDatabaseContext()
-                                    .getDatabasePath()
-                                    .map(Path::toAbsolutePath)
-                                    .map(Path::toString)
-                                    .orElse(Localization.lang("untitled"));
-
-        ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
-        ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
-        ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Save before closing"),
-                Localization.lang("Library '%0' has changed.", filename),
-                saveChanges, discardChanges, returnToLibrary);
-
-        if (response.isEmpty()) {
-            return true;
-        }
-
-        ButtonType buttonType = response.get();
-
-        if (buttonType.equals(returnToLibrary)) {
-            return false;
-        }
-
-        if (buttonType.equals(saveChanges)) {
-            try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, dialogService, prefs, Globals.entryTypesManager);
-                if (saveAction.save()) {
-                    return true;
-                }
-                // The action was either canceled or unsuccessful.
-                dialogService.notify(Localization.lang("Unable to save library"));
-            } catch (Throwable ex) {
-                LOGGER.error("A problem occurred when trying to save the file", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
-            }
-            // Save was cancelled or an error occurred.
-            return false;
-        }
-
-        if (buttonType.equals(discardChanges)) {
-            BackupManager.discardBackup(libraryTab.getBibDatabaseContext(), prefs.getFilePreferences().getBackupDirectory());
-            return true;
-        }
-
-        return false;
-    }
-
     public void closeTab(LibraryTab libraryTab) {
-        // empty tab without database
-        if (libraryTab == null) {
-            libraryTab = getCurrentLibraryTab();
-        }
-
-        final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-
-        if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
-            if (confirmClose(libraryTab)) {
-                removeTab(libraryTab);
-            } else {
-                return;
-            }
-        } else if (context.getLocation() == DatabaseLocation.SHARED) {
-            context.convertToLocalDatabase();
-            context.getDBMSSynchronizer().closeSharedDatabase();
-            context.clearDBMSSynchronizer();
-            removeTab(libraryTab);
-        } else {
-            removeTab(libraryTab);
-        }
-        AutosaveManager.shutdown(context);
-        BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
-    }
-
-    private void removeTab(LibraryTab libraryTab) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Event requestCloseEvent = new Event(this, libraryTab, Tab.TAB_CLOSE_REQUEST_EVENT);
+            Event.fireEvent(libraryTab, requestCloseEvent);
+            if (!requestCloseEvent.isConsumed()) {
+                Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
+            }
             tabbedPane.getTabs().remove(libraryTab);
         });
     }
 
     public void closeCurrentTab() {
-        removeTab(getCurrentLibraryTab());
+        closeTab(getCurrentLibraryTab());
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
@@ -941,7 +837,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     private void copyRootNode(LibraryTab destinationLibraryTab) {
-        if (!destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().isEmpty()) {
+        if (destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().isPresent()) {
             return;
         }
         // a root (all entries) GroupTreeNode

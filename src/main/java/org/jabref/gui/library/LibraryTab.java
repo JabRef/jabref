@@ -16,8 +16,12 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -38,6 +42,7 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
@@ -187,7 +192,8 @@ public class LibraryTab extends Tab {
                     updateTabTitle(changedProperty.getValue()));
         });
 
-        setOnClosed(event -> cleanUp());
+        setOnCloseRequest(this::onCloseRequest);
+        setOnClosed(this::onClosed);
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -208,14 +214,8 @@ public class LibraryTab extends Tab {
         text.append("]");
     }
 
-    public void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+    private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
         this.dataLoadingTask = dataLoadingTask;
-    }
-
-    public void cancelLoading() {
-        if (dataLoadingTask != null) {
-            dataLoadingTask.cancel();
-        }
     }
 
     /**
@@ -696,13 +696,89 @@ public class LibraryTab extends Tab {
         }
     }
 
+    private void onCloseRequest(Event event) {
+        if (isModified() && (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL)) {
+            if (!confirmClose()) {
+                event.consume();
+            }
+        } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+            bibDatabaseContext.convertToLocalDatabase();
+            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+            bibDatabaseContext.clearDBMSSynchronizer();
+        }
+    }
+
     /**
-     * Perform necessary cleanup when this BasePanel is closed.
+     * Ask if the user really wants to close the given database.
+     * Offers to save or discard the changes -- or return to the library
+     *
+     * @return <code>true</code> if the user choose to close the database
      */
-    private void cleanUp() {
+    private boolean confirmClose() {
+        // Database could not have been changed, since it is still loading
+        if (dataLoadingTask != null) {
+            dataLoadingTask.cancel();
+            return true;
+        }
+
+        String filename = getBibDatabaseContext()
+                .getDatabasePath()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .orElse(Localization.lang("untitled"));
+
+        ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
+        ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
+        ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                Localization.lang("Save before closing"),
+                Localization.lang("Library '%0' has changed.", filename),
+                saveChanges, discardChanges, returnToLibrary);
+
+        if (response.isEmpty()) {
+            return true;
+        }
+
+        ButtonType buttonType = response.get();
+
+        if (buttonType.equals(returnToLibrary)) {
+            return false;
+        }
+
+        if (buttonType.equals(saveChanges)) {
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferencesService, Globals.entryTypesManager);
+                if (saveAction.save()) {
+                    return true;
+                }
+                // The action was either canceled or unsuccessful.
+                dialogService.notify(Localization.lang("Unable to save library"));
+            } catch (Throwable ex) {
+                LOGGER.error("A problem occurred when trying to save the file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
+            // Save was cancelled or an error occurred.
+            return false;
+        }
+
+        if (buttonType.equals(discardChanges)) {
+            BackupManager.discardBackup(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory());
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Perform necessary cleanup when this Library is closed.
+     */
+    private void onClosed(Event event) {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory(), preferencesService.getFilePreferences().shouldCreateBackup());
+        BackupManager.shutdown(bibDatabaseContext,
+                preferencesService.getFilePreferences().getBackupDirectory(),
+                preferencesService.getFilePreferences().shouldCreateBackup());
     }
 
     /**
