@@ -16,12 +16,7 @@ public class HTMLChars implements LayoutFormatter {
 
     @Override
     public String format(String inField) {
-        int i;
-        String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
-                              .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
-                              .replace("\n", "<br>") // Replace single line breaks with <br>
-                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+        String field = normalizedFiled(inField);
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -30,7 +25,7 @@ public class HTMLChars implements LayoutFormatter {
         boolean escaped = false;
         boolean incommand = false;
 
-        for (i = 0; i < field.length(); i++) {
+        for (int i = 0; i < field.length(); i++) {
             c = field.charAt(i);
             if (escaped && (c == '\\')) {
                 sb.append('\\');
@@ -157,6 +152,18 @@ public class HTMLChars implements LayoutFormatter {
         }
 
         return sb.toString().replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
+    }
+
+    private String normalizedFiled(String inField) {
+        // When we encounter a '&' we check if it starts an HTML entity then we skip it, otherwise
+        // we should replace it with '&amp;' to be rendered correctly.
+        String htmlEntityWithoutAmpersandRegex = "([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});";
+        return inField.replaceAll("&(?!" + htmlEntityWithoutAmpersandRegex + ")", "&amp;") // Replace & with &amp; if it does not begin an HTML entity
+                      .replaceAll("\\\\&", "&amp;") // Replace \& with &amp;
+                      .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                      .replace("\n", "<br>") // Replace single line breaks with <br>
+                      .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                      .replaceAll("\\$([^$]*)\\$", "\\{$1\\}");
     }
 
     private String getHTMLTag(String latexCommand) {
