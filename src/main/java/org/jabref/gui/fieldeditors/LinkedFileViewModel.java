@@ -499,30 +499,30 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         public boolean checkSSLHandshake(URLDownload urlDownload) {
             try {
-            urlDownload.canBeReached();
-        } catch (kong.unirest.UnirestException ex) {
-            if (ex.getCause() instanceof SSLHandshakeException) {
-                if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
-                        Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
-                                          urlDownload.getSource().toString()))) {
-                    return true;
+                urlDownload.canBeReached();
+            } catch (kong.unirest.UnirestException ex) {
+                if (ex.getCause() instanceof SSLHandshakeException) {
+                    if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
+                            Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
+                                    urlDownload.getSource().toString()))) {
+                        return true;
+                    } else {
+                        dialogService.notify(Localization.lang("Download operation canceled."));
+                        return false;
+                    }
                 } else {
-                    dialogService.notify(Localization.lang("Download operation canceled."));
+                    LOGGER.error("Error while checking if the file can be downloaded", ex);
+                    dialogService.notify(Localization.lang("Error downloading"));
                     return false;
                 }
-            } else {
-                LOGGER.error("Error while checking if the file can be downloaded", ex);
-                dialogService.notify(Localization.lang("Error downloading"));
-                return false;
             }
+            return true;
         }
-        return true;
-    }
 
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
         SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
         HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-        BackgroundTask<Path> downloadTask = BackgroundTask
+        return BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
@@ -533,8 +533,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .onFailure(ex -> LOGGER.error("Error in download", ex))
                 .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier));
-        return downloadTask;
     }
 
     private Optional<ExternalFileType> inferFileType(URLDownload urlDownload) {
@@ -582,7 +582,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferencesService.getImportFormatPreferences()), filePath));
             }
             dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferencesService.getXmpPreferences()), filePath));
-            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferencesService.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
             dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
                 databaseContext.getDatabase().insertEntry(newEntry);

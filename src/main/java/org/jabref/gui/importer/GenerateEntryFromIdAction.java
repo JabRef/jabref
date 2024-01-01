@@ -58,7 +58,10 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         BackgroundTask<Optional<BibEntry>> backgroundTask = searchAndImportEntryInBackground();
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
-        backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
+        backgroundTask.onRunning(() -> {
+            entryFromIdPopOver.hide();
+            dialogService.notify("%s".formatted(backgroundTask.messageProperty().get()));
+        });
         backgroundTask.onFailure(exception -> {
             String fetcherExceptionMessage = exception.getMessage();
 
@@ -95,8 +98,6 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             } else {
                 dialogService.notify("No entry found or import canceled");
             }
-
-            entryFromIdPopOver.hide();
         });
         backgroundTask.executeWith(taskExecutor);
     }

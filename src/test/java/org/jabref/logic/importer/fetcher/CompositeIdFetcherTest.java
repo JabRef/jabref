@@ -42,7 +42,8 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.TITLE, "Reading the CARDs: the Imprint of Accretion History in the Chemical Abundances of the Milky Way's Stellar Halo")
                                 .withField(StandardField.DATE, "2021-10-06")
                                 .withField(StandardField.YEAR, "2021")
-                                .withField(StandardField.MONTH, "aug")
+                                .withField(StandardField.MONTH, "#aug#")
+                                .withField(StandardField.ISSN, "1538-4357")
                                 .withField(StandardField.NUMBER, "2")
                                 .withField(StandardField.VOLUME, "934")
                                 .withField(StandardField.PUBLISHER, "American Astronomical Society")
@@ -94,11 +95,12 @@ class CompositeIdFetcherTest {
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForDoiId",
                         new BibEntry(StandardEntryType.Book)
-                                .withField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}")
+                                .withField(StandardField.TITLE, "Java® For Dummies®")
                                 .withField(StandardField.PUBLISHER, "Wiley")
                                 .withField(StandardField.YEAR, "2011")
-                                .withField(StandardField.AUTHOR, "Barry Burd")
-                                .withField(StandardField.MONTH, "jul")
+                                .withField(StandardField.AUTHOR, "Burd, Barry")
+                                .withField(StandardField.MONTH, "#jul#")
+                                .withField(StandardField.ISBN, "9781118257517")
                                 .withField(StandardField.DOI, "10.1002/9781118257517")
                                 .withCitationKey("Burd_2011"),
                         "10.1002/9781118257517"

@@ -34,7 +34,7 @@ class ACMPortalFetcherTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry(StandardEntryType.Conference)
-                        .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
+                        .withField(StandardField.AUTHOR, "Olsson, Tobias and Ericsson, Morgan and Wingkvist, Anna")
                         .withField(StandardField.YEAR, "2017")
                         .withField(StandardField.MONTH, "9")
                         .withField(StandardField.DAY, "11")

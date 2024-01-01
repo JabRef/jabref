@@ -137,6 +137,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
                             .map(year -> Integer.toString(year)).orElse("")
             );
             entry.setField(StandardField.DOI, item.getString("DOI"));
+            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
+            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
+            entry.setField(StandardField.NUMBER, item.optString("issue"));
+            entry.setField(StandardField.KEYWORDS, Optional.ofNullable(item.optJSONArray("subject")).map(this::getKeywords).orElse(""));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
@@ -195,5 +199,17 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public String getIdentifierName() {
         return "DOI";
+    }
+
+    private String getKeywords(JSONArray jsonArray) {
+        StringBuilder keywords = new StringBuilder();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+        keywords.append(jsonArray.getString(i));
+            if (i != jsonArray.length() - 1) {
+                keywords.append(", ");
+            }
+        }
+        return keywords.toString();
     }
 }

@@ -6,10 +6,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -337,7 +339,7 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        return ((database == null) || result.isEmpty()) ?
+        return (database == null) || result.isEmpty() ?
                 result :
                 Optional.of(database.resolveForStrings(result.get()));
     }
@@ -434,12 +436,10 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns an {@link Collections#unmodifiableSet(Set)} containing the names of all fields that are set for this particular entry.
-     *
-     * @return a set of existing field names
+     * Returns an unmodifiable sequence containing the names of all fields that are set for this particular entry.
      */
-    public Set<Field> getFields() {
-        return Collections.unmodifiableSet(fields.keySet());
+    public SequencedSet<Field> getFields() {
+        return new LinkedHashSet<>(fields.keySet());
     }
 
     /**

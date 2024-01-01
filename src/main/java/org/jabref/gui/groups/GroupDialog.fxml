@@ -37,7 +37,7 @@
                 <TextField fx:id="descriptionField"/>
             </VBox>
             <HBox spacing="10.0">
-                <VBox HBox.hgrow="ALWAYS">
+                <VBox HBox.hgrow="SOMETIMES">
                     <Label text="%Icon"/>
                     <HBox>
                         <TextField fx:id="iconField"/>
@@ -48,27 +48,25 @@
                         </Button>
                     </HBox>
                 </VBox>
-                <VBox layoutX="10.0" layoutY="10.0" minWidth="130.0" maxWidth="130.0" prefWidth="130.0">
-                    <Label text="%Color"/>
-                    <ColorPicker fx:id="colorField"/>
-                </VBox>
-                <VBox>
+                <VBox HBox.hgrow="SOMETIMES">
                     <Label text="%Hierarchical context"/>
                     <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="130.0" prefWidth="130.0"/>
                 </VBox>
+                <VBox HBox.hgrow="SOMETIMES"
+                      layoutX="10.0" layoutY="10.0"
+                      minWidth="130.0" maxWidth="130.0"
+                      prefWidth="130.0" spacing="10.0">
+                    <CheckBox fx:id="colorUseCheckbox" text="%Color"/>
+                    <VBox disable="${!colorUseCheckbox.selected}">
+                        <ColorPicker fx:id="colorField" minHeight="25.0"/>
+                        <CheckBox fx:id="autoColorCheckbox" text="Auto Color"/>
+                        <padding>
+                            <Insets left="20.0"/>
+                        </padding>
+                    </VBox>
+                </VBox>
             </HBox>
-            <HBox alignment="BOTTOM_LEFT">
-                <Label text="%Collect by" styleClass="sectionHeader"/>
-                <HBox HBox.hgrow="ALWAYS"/>
-                <Button styleClass="icon-button,narrow" onAction="#openHelp">
-                    <graphic>
-                        <JabRefIconView glyph="HELP"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%Open Help page"/>
-                    </tooltip>
-                </Button>
-            </HBox>
+            <Label text="%Collect by" styleClass="sectionHeader" style="-fx-padding: 0 10 0 0;"/>
             <HBox>
                 <VBox spacing="10.0">
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
@@ -181,4 +179,7 @@
             </HBox>
         </VBox>
     </content>
+    <padding>
+        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
+    </padding>
 </DialogPane>

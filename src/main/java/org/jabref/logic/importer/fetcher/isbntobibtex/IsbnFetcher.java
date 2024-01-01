@@ -34,13 +34,12 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
     private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile("\\n|\\r\\n|\\s");
     protected final ImportFormatPreferences importFormatPreferences;
-    private final OpenLibraryIsbnFetcher openLibraryIsbnFetcher;
     private final List<AbstractIsbnFetcher> retryIsbnFetcher;
     private final GvkFetcher gvkIbsnFetcher;
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        this.openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
+        OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIbsnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
         this.addRetryFetcher(openLibraryIsbnFetcher);

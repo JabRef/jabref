@@ -26,4 +26,9 @@ class ShortenDOIFormatterTest {
     public void invalidDoiIsKept() {
         assertEquals("invalid-doi", formatter.format("invalid-doi"));
     }
+
+    @Test
+    public void shortDoi() {
+        assertEquals("10/adc", formatter.format("10/adc"));
+    }
 }

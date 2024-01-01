@@ -298,9 +298,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                             // Extra workaround for CodeArea, which does not inherit from TextInputControl
                             if (!(stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof CodeArea))) {
                                 event.consume();
+                                break;
                             }
                             break;
                         }
+                        break;
                     default:
                 }
             }
@@ -486,6 +488,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 taskExecutor,
                 dialogService,
                 Globals.journalAbbreviationRepository,
+                Globals.predatoryJournalRepository,
                 entryTypesManager,
                 undoManager,
                 Globals.getClipboardManager());
@@ -716,6 +719,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         tabbedPane.getTabs().add(libraryTab);
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
+            tabbedPane.requestFocus();
         }
 
         libraryTab.setOnCloseRequest(event -> {
@@ -789,7 +793,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      */
     private void addImportedEntries(final LibraryTab panel, final ParserResult parserResult) {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
-        ImportCleanup cleanup = new ImportCleanup(panel.getBibDatabaseContext().getMode());
+        ImportCleanup cleanup = ImportCleanup.targeting(panel.getBibDatabaseContext().getMode());
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));

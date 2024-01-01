@@ -10,9 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,17 +52,17 @@ public class BibStringDiffTest {
     @Test
     void identicalObjectsAreEqual() {
         BibStringDiff other = diff;
-        assertTrue(other.equals(diff));
+        assertEquals(other, diff);
     }
 
     @Test
     void compareToNullObjectIsFalse() {
-        assertFalse(diff.equals(null));
+        assertNotEquals(null, diff);
     }
 
     @Test
     void compareToDifferentClassIsFalse() {
-        assertFalse(diff.equals(new Object()));
+        assertNotEquals(diff, new Object());
     }
 
     @Test

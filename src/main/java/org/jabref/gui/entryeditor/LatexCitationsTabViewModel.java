@@ -3,14 +3,10 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -140,31 +136,28 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 throw new IOException(String.format("Current search directory does not exist: %s", newDirectory));
             }
 
-            List<Path> texFiles = searchDirectory(newDirectory, new ArrayList<>());
+            List<Path> texFiles = searchDirectory(newDirectory);
+            LOGGER.debug("Found tex files: {}", texFiles);
             latexParserResult = new DefaultLatexParser().parse(texFiles);
         }
 
         return latexParserResult.getCitationsByKey(citeKey);
     }
 
-    private List<Path> searchDirectory(Path directory, List<Path> texFiles) {
-        Map<Boolean, List<Path>> fileListPartition;
-        try (Stream<Path> filesStream = Files.list(directory)) {
-            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
+    /**
+     * @param directory the directory to search for. It is recursively searched.
+     */
+    private List<Path> searchDirectory(Path directory) {
+        LOGGER.debug("Searching directory {}", directory);
+        try {
+            return Files.walk(directory)
+                        .filter(Files::isRegularFile)
+                        .filter(path -> path.toString().endsWith(TEX_EXT))
+                        .toList();
         } catch (IOException e) {
-            LOGGER.error(String.format("%s while searching files: %s", e.getClass().getName(), e.getMessage()));
-            return texFiles;
+            LOGGER.error("Error while searching files", e);
+            return List.of();
         }
-
-        List<Path> subDirectories = fileListPartition.get(true);
-        List<Path> files = fileListPartition.get(false)
-                                            .stream()
-                                            .filter(path -> path.toString().endsWith(TEX_EXT))
-                                            .collect(Collectors.toList());
-        texFiles.addAll(files);
-        subDirectories.forEach(subDirectory -> searchDirectory(subDirectory, texFiles));
-
-        return texFiles;
     }
 
     public void setLatexDirectory() {

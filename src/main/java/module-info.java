@@ -42,16 +42,17 @@ open module org.jabref {
     // Logging
     requires org.slf4j;
     requires jul.to.slf4j;
+    requires org.apache.logging.log4j.to.slf4j;
     requires org.tinylog.api;
     requires org.tinylog.api.slf4j;
     requires org.tinylog.impl;
 
     provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiWriter,
-         org.jabref.gui.logging.ApplicationInsightsWriter;
+    with org.jabref.gui.logging.GuiWriter;
 
     // Preferences and XML
     requires java.prefs;
+    requires com.fasterxml.aalto;
 
     // Annotations (@PostConstruct)
     requires jakarta.annotation;
@@ -60,7 +61,7 @@ open module org.jabref {
     // http server and client exchange
     requires java.net.http;
     requires jakarta.ws.rs;
-    requires grizzly.framework;
+    requires org.glassfish.grizzly;
 
     // data mapping
     requires jakarta.xml.bind;
@@ -75,10 +76,6 @@ open module org.jabref {
     // dependency injection using HK2
     requires org.glassfish.hk2.api;
 
-    // Microsoft application insights
-    requires applicationinsights.core;
-    requires applicationinsights.logging.log4j2;
-
     // http clients
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
@@ -91,7 +88,7 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
 
     // Apache Commons and other (similar) helper libraries
-    requires commons.cli;
+    requires org.apache.commons.cli;
     requires org.apache.commons.csv;
     requires org.apache.commons.lang3;
     requires com.google.common;
@@ -124,7 +121,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene95.Lucene95Codec;
+    uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -139,8 +136,11 @@ open module org.jabref {
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
 
+    requires transitive org.jspecify;
+
     // other libraries
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
+    requires com.jthemedetector;
 }

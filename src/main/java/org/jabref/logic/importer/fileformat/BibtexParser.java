@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * <code>ParserResult result = parser.parse();</code>
  * <p>
  * or
- * <p>
+ * <p>we
  * <code>ParserResult result = BibtexParser.parse(reader);</code>
  * <p>
  * Can be used stand-alone.

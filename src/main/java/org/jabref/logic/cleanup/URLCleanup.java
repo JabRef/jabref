@@ -37,14 +37,13 @@ public class URLCleanup implements CleanupJob {
     final Pattern urlPattern = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
     final Pattern dateTermsPattern = Pattern.compile(DATE_TERMS_REGEX, Pattern.CASE_INSENSITIVE);
     final Pattern datePattern = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);
-
-    private NormalizeDateFormatter formatter = new NormalizeDateFormatter();
+    private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
-        String noteFieldValue = entry.getField(NOTE_FIELD).orElse(null);
+        String noteFieldValue = entry.getField(NOTE_FIELD).orElse("");
 
         final Matcher urlMatcher = urlPattern.matcher(noteFieldValue);
         final Matcher dateTermsMatcher = dateTermsPattern.matcher(noteFieldValue);
@@ -74,7 +73,7 @@ public class URLCleanup implements CleanupJob {
              * remove it from the note field, and no other action is performed.
              */
             if (entry.hasField(URL_FIELD)) {
-                String urlFieldValue = entry.getField(URL_FIELD).orElse(null);
+                String urlFieldValue = entry.getField(URL_FIELD).orElse("");
                 if (urlFieldValue.equals(url)) {
                     entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                 }
@@ -96,7 +95,7 @@ public class URLCleanup implements CleanupJob {
 
                     // Same approach with the URL cleanup.
                     if (entry.hasField(URLDATE_FIELD)) {
-                        String urlDateFieldValue = entry.getField(URLDATE_FIELD).orElse(null);
+                        String urlDateFieldValue = entry.getField(URLDATE_FIELD).orElse("");
                         if (urlDateFieldValue.equals(formattedDate)) {
                             entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                         }

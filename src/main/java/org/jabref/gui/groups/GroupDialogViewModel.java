@@ -24,11 +24,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
-import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -59,12 +58,14 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.Nullable;
 
 public class GroupDialogViewModel {
     // Basic Settings
     private final StringProperty nameProperty = new SimpleStringProperty("");
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
     private final StringProperty iconProperty = new SimpleStringProperty("");
+    private final BooleanProperty colorUseProperty = new SimpleBooleanProperty();
     private final ObjectProperty<Color> colorProperty = new SimpleObjectProperty<>();
     private final ListProperty<GroupHierarchyType> groupHierarchyListProperty = new SimpleListProperty<>();
     private final ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty = new SimpleObjectProperty<>();
@@ -109,17 +110,20 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
+    private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
-                                AbstractGroup editedGroup,
+                                @Nullable AbstractGroup editedGroup,
+                                @Nullable GroupTreeNode parentNode,
                                 FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
+        this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
         setupValidation();
@@ -160,8 +164,7 @@ public class GroupDialogViewModel {
                     return true;
                 },
                 ValidationMessage.warning(
-                    Localization.lang("There exists already a group with the same name.") + "\n" +
-                    Localization.lang("If you use it, it will inherit all entries from this other group.")
+                        Localization.lang("There already exists a group with the same name.\nIf you use it, it will inherit all entries from this other group.")
                 )
         );
 
@@ -373,7 +376,7 @@ public class GroupDialogViewModel {
             if (resultingGroup != null) {
                 preferencesService.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
 
-                resultingGroup.setColor(colorProperty.getValue());
+                resultingGroup.setColor(colorUseProperty.getValue() ? colorProperty.getValue() : null);
                 resultingGroup.setDescription(descriptionProperty.getValue());
                 resultingGroup.setIconName(iconProperty.getValue());
                 return resultingGroup;
@@ -391,12 +394,23 @@ public class GroupDialogViewModel {
 
         if (editedGroup == null) {
             // creating new group -> defaults!
-            colorProperty.setValue(IconTheme.getDefaultGroupColor());
+            // TODO: Create default group (via org.jabref.logic.groups.DefaultGroupsFactory) and use values
+
+            colorUseProperty.setValue(false);
+            colorProperty.setValue(determineColor());
+            if (parentNode != null) {
+                parentNode.getGroup()
+                          .getIconName()
+                          .filter(iconName -> !iconName.equals(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON))
+                          .ifPresent(iconProperty::setValue);
+                parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
+            }
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
             nameProperty.setValue(editedGroup.getName());
+            colorUseProperty.setValue(editedGroup.getColor().isPresent());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
@@ -449,6 +463,21 @@ public class GroupDialogViewModel {
         }
     }
 
+    private Color determineColor() {
+        Color color;
+        if (parentNode == null) {
+            color = GroupColorPicker.generateColor(List.of());
+        } else {
+            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+                                                     .flatMap(Optional::stream)
+                                                     .toList();
+            Optional<Color> parentColor = parentNode.getGroup().getColor();
+            color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value))
+                               .orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
+        }
+        return color;
+    }
+
     public void texGroupBrowse() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
@@ -460,10 +489,6 @@ public class GroupDialogViewModel {
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
                      ));
-    }
-
-    public void openHelpPage() {
-        new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()).execute();
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
@@ -524,6 +549,10 @@ public class GroupDialogViewModel {
 
     public StringProperty iconProperty() {
         return iconProperty;
+    }
+
+    public BooleanProperty colorUseProperty() {
+        return colorUseProperty;
     }
 
     public ObjectProperty<Color> colorFieldProperty() {
