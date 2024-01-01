@@ -244,6 +244,10 @@ public class ImportHandler {
         // TODO: show dialog only for first entry?
         if (preferencesService.getGuiPreferences().isMergeApplyToAllEntriesProperty()) {
             decision = preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision();
+            if (decision == DuplicateResolverDialog.DuplicateResolverResult.BREAK) {
+                decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+                preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
+            }
         } else {
             decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
             preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
