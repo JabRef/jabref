@@ -51,11 +51,15 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private CheckBox onlyShowChangedFieldsCheck;
 
+    @FXML
+    private CheckBox applyToAllEntriesCheck;
+
     @Inject
     private PreferencesService preferencesService;
 
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
+    private final BooleanProperty applyToAllEntries = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -109,6 +113,9 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
+
+        applyToAllEntriesCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeApplyToAllEntriesProperty());
+        applyToAllEntries.bind(applyToAllEntriesCheck.selectedProperty());
 
         loadSavedConfiguration();
     }

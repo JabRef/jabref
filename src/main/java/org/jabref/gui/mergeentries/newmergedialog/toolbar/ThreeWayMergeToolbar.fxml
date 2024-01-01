@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-
 <fx:root prefWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar">
    <children>
       <ToolBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="800.0" styleClass="merge-toolbox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -43,7 +42,11 @@
                </toggleGroup>
             </RadioButton>
             <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
-            <CheckBox fx:id="onlyShowChangedFieldsCheck" text="%Only show changed fields"></CheckBox>
+             <CheckBox
+                     fx:id="onlyShowChangedFieldsCheck"
+                     text="%Only show changed fields"/>
+            <CheckBox fx:id="applyToAllEntriesCheck" text="%Apply to all entries"></CheckBox>
+
          </items>
       </ToolBar>
    </children>
