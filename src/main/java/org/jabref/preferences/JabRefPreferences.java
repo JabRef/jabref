@@ -40,6 +40,7 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -261,6 +262,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
 
     public static final String MERGE_APPLY_TO_ALL_ENTRIES = "mergeApplyToAllEntries";
+
+    public static final String DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES = "duplicateResolverDecisionResult";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -2594,7 +2597,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
                 getDouble(SIDE_PANE_WIDTH),
                 getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS),
-                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES));
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES),
+                DuplicateResolverDialog.DuplicateResolverResult.parse(get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES)));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
@@ -2625,6 +2629,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
         EasyBind.listen(guiPreferences.mergeApplyToAllEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_APPLY_TO_ALL_ENTRIES, newValue));
+        EasyBind.listen(guiPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
 
         return guiPreferences;
     }

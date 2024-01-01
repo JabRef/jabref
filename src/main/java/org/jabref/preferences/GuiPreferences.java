@@ -14,6 +14,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.logic.util.io.FileHistory;
 
@@ -39,6 +40,9 @@ public class GuiPreferences {
     private final BooleanProperty mergeHighlightWords;
     private final BooleanProperty mergeShowChangedFieldsOnly;
     private final BooleanProperty mergeApplyToAllEntries;
+
+    private final ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> allEntriesDuplicateResolverDecision;
+
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -57,7 +61,8 @@ public class GuiPreferences {
                           boolean mergeHighlightWords,
                           double sidePaneWidth,
                           boolean mergeShowChangedFieldsOnly,
-                          boolean mergeApplyToAllEntries) {
+                          boolean mergeApplyToAllEntries,
+                          DuplicateResolverDialog.DuplicateResolverResult allEntriesDuplicateResolverDecision) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
@@ -76,6 +81,7 @@ public class GuiPreferences {
         this.fileHistory = fileHistory;
         this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
         this.mergeApplyToAllEntries = new SimpleBooleanProperty(mergeApplyToAllEntries);
+        this.allEntriesDuplicateResolverDecision = new SimpleObjectProperty<>(allEntriesDuplicateResolverDecision);
     }
 
     public double getPositionX() {
@@ -260,5 +266,20 @@ public class GuiPreferences {
 
     public BooleanProperty mergeApplyToAllEntriesProperty() {
         return mergeApplyToAllEntries;
+    }
+
+    public Boolean isMergeApplyToAllEntriesProperty() {
+        return mergeApplyToAllEntries.get();
+    }
+
+    public void setAllEntriesDuplicateResolverDecision(DuplicateResolverDialog.DuplicateResolverResult allEntriesDuplicateResolverDecision) {
+        this.allEntriesDuplicateResolverDecision.setValue(allEntriesDuplicateResolverDecision);
+    }
+    public DuplicateResolverDialog.DuplicateResolverResult getAllEntriesDuplicateResolverDecision() {
+        return allEntriesDuplicateResolverDecision.get();
+    }
+
+    public ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> allEntriesDuplicateResolverDecisionProperty() {
+        return allEntriesDuplicateResolverDecision;
     }
 }

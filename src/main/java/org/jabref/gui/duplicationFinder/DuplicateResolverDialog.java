@@ -38,7 +38,15 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         KEEP_RIGHT,
         AUTOREMOVE_EXACT,
         KEEP_MERGE,
-        BREAK
+        BREAK;
+
+        public static DuplicateResolverResult parse(String name) {
+            try {
+                return DuplicateResolverResult.valueOf(name);
+            } catch (IllegalArgumentException e) {
+                return BREAK; // default
+            }
+        }
     }
 
     private ThreeWayMergeView threeWayMerge;

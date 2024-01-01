@@ -237,8 +237,18 @@ public class ImportHandler {
     }
 
     public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-        DuplicateResolverDialog.DuplicateResolverResult decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+
+        DuplicateResolverDialog.DuplicateResolverResult decision;
+        // TODO: show dialog only for first entry?
+        if (preferencesService.getGuiPreferences().isMergeApplyToAllEntriesProperty()) {
+            decision = preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision();
+        } else {
+            decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+            preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
+        }
+
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
@@ -253,17 +263,17 @@ public class ImportHandler {
     public void downloadLinkedFiles(BibEntry entry) {
         if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry.getFiles().stream()
-                    .filter(LinkedFile::isOnlineLink)
-                    .forEach(linkedFile ->
-                            new LinkedFileViewModel(
-                                    linkedFile,
-                                    entry,
-                                    bibDatabaseContext,
-                                    taskExecutor,
-                                    dialogService,
-                                    preferencesService
-                            ).download()
-                    );
+                 .filter(LinkedFile::isOnlineLink)
+                 .forEach(linkedFile ->
+                         new LinkedFileViewModel(
+                                 linkedFile,
+                                 entry,
+                                 bibDatabaseContext,
+                                 taskExecutor,
+                                 dialogService,
+                                 preferencesService
+                         ).download()
+                 );
         }
     }
 
