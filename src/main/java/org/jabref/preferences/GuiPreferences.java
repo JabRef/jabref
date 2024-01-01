@@ -275,6 +275,7 @@ public class GuiPreferences {
     public void setAllEntriesDuplicateResolverDecision(DuplicateResolverDialog.DuplicateResolverResult allEntriesDuplicateResolverDecision) {
         this.allEntriesDuplicateResolverDecision.setValue(allEntriesDuplicateResolverDecision);
     }
+
     public DuplicateResolverDialog.DuplicateResolverResult getAllEntriesDuplicateResolverDecision() {
         return allEntriesDuplicateResolverDecision.get();
     }

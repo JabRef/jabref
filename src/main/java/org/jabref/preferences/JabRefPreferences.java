@@ -646,7 +646,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
         defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
-        defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES,  DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
+        defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
 
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
 
