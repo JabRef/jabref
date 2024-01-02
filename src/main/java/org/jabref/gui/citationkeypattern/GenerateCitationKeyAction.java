@@ -2,9 +2,12 @@ package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -20,7 +23,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
@@ -29,13 +32,20 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
+    private final UndoManager undoManager;
 
-    public GenerateCitationKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager, TaskExecutor taskExecutor, PreferencesService preferencesService) {
-        this.frame = frame;
+    public GenerateCitationKeyAction(Supplier<LibraryTab> tabSupplier,
+                                     DialogService dialogService,
+                                     StateManager stateManager,
+                                     TaskExecutor taskExecutor,
+                                     PreferencesService preferencesService,
+                                     UndoManager undoManager) {
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
+        this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -131,10 +141,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
                 // register the undo event only if new citation keys were generated
                 if (compound.hasEdits()) {
-                    frame.getUndoManager().addEdit(compound);
+                    undoManager.addEdit(compound);
                 }
 
-                frame.getCurrentLibraryTab().markBaseChanged();
+                tabSupplier.get().markBaseChanged();
                 dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
                 return super.onSuccess(onSuccess);
             }
