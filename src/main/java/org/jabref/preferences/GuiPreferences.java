@@ -260,7 +260,7 @@ public class GuiPreferences {
         return mergeShowChangedFieldsOnly.getValue();
     }
 
-    public void setIsMergedShowChangedFielsOnly(boolean showChangedFieldsOnly) {
+    public void setIsMergedShowChangedFieldsOnly(boolean showChangedFieldsOnly) {
         mergeShowChangedFieldsOnly.setValue(showChangedFieldsOnly);
     }
 
@@ -270,6 +270,10 @@ public class GuiPreferences {
 
     public Boolean isMergeApplyToAllEntriesProperty() {
         return mergeApplyToAllEntries.get();
+    }
+
+    public void setIsMergeApplyToAllEntries(boolean applyToAllEntries) {
+        this.mergeApplyToAllEntries.setValue(applyToAllEntries);
     }
 
     public void setAllEntriesDuplicateResolverDecision(DuplicateResolverDialog.DuplicateResolverResult allEntriesDuplicateResolverDecision) {

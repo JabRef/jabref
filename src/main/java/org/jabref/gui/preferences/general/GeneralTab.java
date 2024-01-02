@@ -45,6 +45,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox showAdvancedHints;
     @FXML private CheckBox inspectionWarningDuplicate;
+    @FXML private CheckBox treatAlDuplicateEntriesTheSame;
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox collectTelemetry;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
@@ -117,6 +118,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
+        treatAlDuplicateEntriesTheSame.selectedProperty().bindBidirectional(viewModel.treatAllDuplicateEntriesTheSameProperty());
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
 

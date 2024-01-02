@@ -74,6 +74,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty treatAllDuplicateEntriesTheSameProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
@@ -106,7 +108,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private TrustStoreManager trustStoreManager;
+    private final TrustStoreManager trustStoreManager;
 
     public GeneralTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
@@ -119,7 +121,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.internalPreferences = preferences.getInternalPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.trustStoreManager = trustStoreManager;
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -189,6 +190,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
+        treatAllDuplicateEntriesTheSameProperty.setValue(preferences.getGuiPreferences().isMergeApplyToAllEntriesProperty());
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
@@ -230,6 +232,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
         workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+        preferences.getGuiPreferences().setIsMergeApplyToAllEntries(treatAllDuplicateEntriesTheSameProperty.getValue());
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
@@ -429,5 +432,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
+    }
+
+    public BooleanProperty treatAllDuplicateEntriesTheSameProperty() {
+        return this.treatAllDuplicateEntriesTheSameProperty;
     }
 }
