@@ -95,10 +95,10 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 threeWayMerge = new ThreeWayMergeView(one, two, preferencesService);
             }
             case IMPORT_CHECK -> {
-                first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                first = new ButtonType(Localization.lang("Keep existing entry"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
+                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Existing entry"),
                         Localization.lang("From import"), preferencesService);
             }
             default -> throw new IllegalStateException("Switch expression should be exhaustive");
@@ -142,6 +142,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 return DuplicateResolverResult.KEEP_MERGE;
             } else if (button.equals(removeExact)) {
                 return DuplicateResolverResult.AUTOREMOVE_EXACT;
+            } else if (button.equals(cancel)) {
+                return DuplicateResolverResult.KEEP_LEFT;
             }
             return null;
         });
