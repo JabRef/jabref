@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class UserSpecificCommentField implements Field {
-    private static final Set<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT);
+    private static final Set<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM);
     private final String name;
 
     public UserSpecificCommentField(String username) {
@@ -32,10 +32,9 @@ public class UserSpecificCommentField implements Field {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Field)) {
+        if (!(o instanceof Field other)) {
             return false;
         }
-        Field other = (Field) o;
         return name.equals(other.getName());
     }
 

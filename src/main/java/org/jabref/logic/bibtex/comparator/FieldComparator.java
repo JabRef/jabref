@@ -73,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private String getFieldValue(BibEntry entry) {
-        for (Field aField : fields) {
+        for (Field aField : fields.getFields()) {
             Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();
@@ -92,8 +92,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
         } else {
-            // If the field is author or editor, we rearrange names so they are
-            // sorted according to last name.
             f1 = getFieldValue(e1);
             f2 = getFieldValue(e2);
         }
@@ -102,9 +100,9 @@ public class FieldComparator implements Comparator<BibEntry> {
         if ((f1 == null) && (f2 == null)) {
             return 0;
         } else if (f1 == null) {
-            return multiplier;
-        } else if (f2 == null) {
             return -multiplier;
+        } else if (f2 == null) {
+            return +multiplier;
         }
 
         // Now we know that both f1 and f2 are != null

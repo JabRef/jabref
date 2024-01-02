@@ -57,7 +57,7 @@ class FieldChangeTest {
 
     @Test
     void fieldChangeDoesNotEqualString() {
-        assertNotEquals(fc, "foo");
+        assertNotEquals("foo", fc);
     }
 
     @Test

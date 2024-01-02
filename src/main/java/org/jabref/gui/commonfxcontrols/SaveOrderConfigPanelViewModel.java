@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.metadata.SaveOrder;
 
 public class SaveOrderConfigPanelViewModel {
 
@@ -24,7 +23,7 @@ public class SaveOrderConfigPanelViewModel {
     }
 
     public void addCriterion() {
-        selectedSortCriteriaProperty.add(new SortCriterionViewModel(new SaveOrder.SortCriterion()));
+        selectedSortCriteriaProperty.add(new SortCriterionViewModel());
     }
 
     public void removeCriterion(SortCriterionViewModel sortCriterionViewModel) {

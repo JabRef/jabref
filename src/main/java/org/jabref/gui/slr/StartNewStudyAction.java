@@ -3,9 +3,12 @@ package org.jabref.gui.slr;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Supplier;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
@@ -35,14 +38,16 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
 
     Study newStudy;
 
-    public StartNewStudyAction(JabRefFrame frame,
+    public StartNewStudyAction(LibraryTabContainer tabContainer,
+                               Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                                FileUpdateMonitor fileUpdateMonitor,
                                TaskExecutor taskExecutor,
                                PreferencesService preferencesService,
-                               StateManager stateManager) {
-        super(frame,
-                frame.getOpenDatabaseAction(),
-                frame.getDialogService(),
+                               StateManager stateManager,
+                               DialogService dialogService) {
+        super(tabContainer,
+                openDatabaseActionSupplier.get(),
+                dialogService,
                 fileUpdateMonitor,
                 taskExecutor,
                 preferencesService,

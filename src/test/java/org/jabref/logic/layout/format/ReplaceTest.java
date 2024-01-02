@@ -5,6 +5,7 @@ import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ReplaceTest {
 
@@ -26,7 +27,7 @@ public class ReplaceTest {
     public void testFormatNull() {
         ParamLayoutFormatter a = new Replace();
         a.setArgument("Eds.,Ed.");
-        assertEquals(null, a.format(null));
+        assertNull(a.format(null));
     }
 
     @Test

@@ -42,7 +42,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
     @Override
     public void onOperationCompleted() {
-        if (couldNotConnect) {
+        if (couldNotPush) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Verify that LyX is running and that the lyxpipe is valid.")
                             + "[" + commandPath + "]");
@@ -60,7 +60,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, final List<BibEntry> entries, final String keyString) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
@@ -79,7 +79,7 @@ public class PushToLyx extends AbstractPushToApplication {
             // See if it helps to append ".in":
             lp = new File(commandPath + ".in");
             if (!lp.exists() || !lp.canWrite()) {
-                couldNotConnect = true;
+                couldNotPush = true;
                 return;
             }
         }

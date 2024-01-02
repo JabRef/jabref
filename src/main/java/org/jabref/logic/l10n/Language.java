@@ -1,8 +1,12 @@
 package org.jabref.logic.l10n;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Contains all supported languages.
@@ -14,6 +18,7 @@ public enum Language {
     DANISH("Dansk", "da"),
     DUTCH("Nederlands", "nl"),
     ENGLISH("English", "en"),
+    FINNISH("Suomi", "fi"),
     FRENCH("Français", "fr"),
     GERMAN("Deutsch", "de"),
     GREEK("ελληνικά (Greek)", "el"),
@@ -34,9 +39,9 @@ public enum Language {
     UKRAINIAN("украї́нська (Ukrainian)", "uk"),
     VIETNAMESE("Vietnamese", "vi");
 
+    private static final Pattern IS_NOT_LATIN = Pattern.compile("[^\\p{IsLatin}]");
     private final String displayName;
     private final String id;
-
     /**
      * @param id Typically as 639-1 code
      */
@@ -68,5 +73,15 @@ public enum Language {
 
     public String getId() {
         return id;
+    }
+
+    public static List<Language> getSorted() {
+        return Arrays.stream(values())
+                .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
+                .toList();
+    }
+
+    private static String removeNonLatinCharacters(String input) {
+       return IS_NOT_LATIN.matcher(input).replaceAll("");
     }
 }

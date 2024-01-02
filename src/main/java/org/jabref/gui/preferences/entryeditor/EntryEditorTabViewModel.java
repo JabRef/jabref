@@ -16,6 +16,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.preferences.MrDlibPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
@@ -27,18 +28,24 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
+    private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final MrDlibPreferences mrDlibPreferences;
 
     public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.mrDlibPreferences = preferencesService.getMrDlibPreferences();
     }
 
     @Override
@@ -49,11 +56,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
         enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.shouldShowRecommendationsTab());
-        acceptRecommendationsProperty.setValue(entryEditorPreferences.isMrdlibAccepted());
+        acceptRecommendationsProperty.setValue(mrDlibPreferences.shouldAcceptRecommendations());
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
+        journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
+        enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
+        showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
     }
@@ -80,13 +90,18 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
         entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
-        entryEditorPreferences.setIsMrdlibAccepted(acceptRecommendationsProperty.getValue());
+        mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
         entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
+        entryEditorPreferences.setEnableJournalPopup(journalPopupProperty.getValue()
+                ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
+        entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
+        entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -147,11 +162,23 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return this.allowIntegerEditionProperty;
     }
 
+    public BooleanProperty journalPopupProperty() {
+        return journalPopupProperty;
+    }
+
     public StringProperty fieldsProperty() {
         return fieldsProperty;
     }
 
     public BooleanProperty autoLinkFilesEnabledProperty() {
         return autoLinkEnabledProperty;
+    }
+
+    public BooleanProperty enableSciteTabProperty() {
+        return enableSciteTabProperty;
+    }
+
+    public BooleanProperty showUserCommentsProperty() {
+        return this.showUserCommentsProperty;
     }
 }

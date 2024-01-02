@@ -8,6 +8,11 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 
+import com.github.javakeyring.BackendNotSupportedException;
+import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
+import org.slf4j.LoggerFactory;
+
 /**
  * Operating system (OS) detection
  *
@@ -41,5 +46,25 @@ public class OS {
             return new Linux();
         }
         return new DefaultDesktop();
+    }
+
+    public static boolean isKeyringAvailable() {
+        try (Keyring keyring = Keyring.create()) {
+            keyring.setPassword("JabRef", "keyringTest", "keyringTest");
+            if (!"keyringTest".equals(keyring.getPassword("JabRef", "keyringTest"))) {
+                return false;
+            }
+            keyring.deletePassword("JabRef", "keyringTest");
+        } catch (BackendNotSupportedException ex) {
+            LoggerFactory.getLogger(OS.class).warn("Credential store not supported.");
+            return false;
+        } catch (PasswordAccessException ex) {
+            LoggerFactory.getLogger(OS.class).warn("Password storage in credential store failed.");
+            return false;
+        } catch (Exception ex) {
+            LoggerFactory.getLogger(OS.class).warn("Connection to credential store failed");
+            return false;
+        }
+        return true;
     }
 }

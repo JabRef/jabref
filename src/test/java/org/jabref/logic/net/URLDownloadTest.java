@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,10 +73,10 @@ public class URLDownloadTest {
 
     @Test
     public void downloadToTemporaryFileKeepsName() throws IOException {
-        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE.md"));
+        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
-        assertTrue(path.contains("LICENSE") && path.endsWith(".md"), path);
+        assertTrue(path.contains("LICENSE"), path);
     }
 
     @Test
@@ -131,7 +132,7 @@ public class URLDownloadTest {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
 
         Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertTrue(exception.getCause() instanceof FetcherServerException);
+        assertInstanceOf(FetcherServerException.class, exception.getCause());
     }
 
     @Test
@@ -139,6 +140,6 @@ public class URLDownloadTest {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
 
         Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertTrue(exception.getCause() instanceof FetcherClientException);
+        assertInstanceOf(FetcherClientException.class, exception.getCause());
     }
 }

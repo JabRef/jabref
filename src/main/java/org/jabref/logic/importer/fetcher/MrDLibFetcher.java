@@ -53,7 +53,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Optional<String> title = entry.getLatexFreeField(StandardField.TITLE);
+        Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
         if (title.isPresent()) {
             String response = makeServerRequest(title.get());
             MrDLibImporter importer = new MrDLibImporter();
@@ -101,8 +101,8 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             String response = urlDownload.asString();
 
             // Conversion of < and >
-            response = response.replaceAll("&gt;", ">");
-            response = response.replaceAll("&lt;", "<");
+            response = response.replace("&gt;", ">");
+            response = response.replace("&lt;", "<");
             return response;
         } catch (IOException e) {
             throw new FetcherException("Problem downloading", e);
@@ -117,7 +117,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      */
     private String constructQuery(String queryWithTitle) {
         // The encoding does not work for / so we convert them by our own
-        queryWithTitle = queryWithTitle.replaceAll("/", " ");
+        queryWithTitle = queryWithTitle.replace("/", " ");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
         builder.setHost(MDL_URL);

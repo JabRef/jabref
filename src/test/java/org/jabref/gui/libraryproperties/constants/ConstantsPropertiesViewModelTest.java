@@ -8,7 +8,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.preferences.FilePreferences;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 class ConstantsPropertiesViewModelTest {
+
+    private DialogService service;
+    private FilePreferences filePreferences;
+
+    @BeforeEach
+    void setUp() {
+        service = mock(DialogService.class);
+        filePreferences = mock(FilePreferences.class);
+    }
 
     @DisplayName("Check that the list of strings is sorted according to their keys")
     @Test
@@ -25,10 +36,9 @@ class ConstantsPropertiesViewModelTest {
         BibDatabase db = new BibDatabase();
         db.setStrings(List.of(string1, string2));
         BibDatabaseContext context = new BibDatabaseContext(db);
-        DialogService service = mock(DialogService.class);
         List<String> expected = List.of(string2.getName(), string1.getName()); // ICSE before TSE
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
         model.setValues();
 
         List<String> actual = model.stringsListProperty().stream()
@@ -44,10 +54,9 @@ class ConstantsPropertiesViewModelTest {
     void testStringsListPropertyResorting() {
         BibDatabase db = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(db);
-        DialogService service = mock(DialogService.class);
         List<String> expected = List.of("ICSE", "TSE");
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
         var stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
         stringsList.add(new ConstantsItemModel("ICSE", "International Conference on Software Engineering"));

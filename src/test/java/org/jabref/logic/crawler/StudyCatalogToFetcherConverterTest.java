@@ -40,7 +40,6 @@ class StudyCatalogToFetcherConverterTest {
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 
@@ -62,7 +61,7 @@ class StudyCatalogToFetcherConverterTest {
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(ImporterPreferences.class));
+                mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS));
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(

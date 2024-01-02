@@ -12,15 +12,16 @@ on:
 concurrency:
   group: gource
   cancel-in-progress: true
-  
+
 jobs:
   action:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          show-progress: 'false'
       - name: 'Development history of current build'
         uses: BoundfoxStudios/action-gource@v2
         with:
@@ -63,7 +64,7 @@ jobs:
         run: |
           mv gource/gource.mp4 gource-videos/jabref-complete.mp4
       - name: 'Upload gource video'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Gource
           path: gource-videos/

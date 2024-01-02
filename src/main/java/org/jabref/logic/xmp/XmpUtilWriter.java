@@ -310,7 +310,7 @@ public class XmpUtilWriter {
             }
 
             // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-            if (resolvedEntries.size() > 0) {
+            if (!resolvedEntries.isEmpty()) {
                 writeDocumentInformation(document, resolvedEntries.get(0), null);
                 writeDublinCore(document, resolvedEntries, null);
             }

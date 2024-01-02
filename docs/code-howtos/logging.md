@@ -43,6 +43,5 @@ In the `.properties` file, this is done for `org.jabref.model.entry.BibEntry`.
 
 ## Further reading
 
-SLF4J also support parameterized logging, e.g. if you want to print out multiple arguments in a log statement use a pair of curly braces (`{}`). 
+SLF4J also support parameterized logging, e.g. if you want to print out multiple arguments in a log statement use a pair of curly braces (`{}`).
 Head to <https://www.slf4j.org/faq.html#logging_performance> for examples.
-

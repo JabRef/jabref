@@ -20,6 +20,7 @@ import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -35,10 +36,12 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
 
     private final DialogService dialogService;
+    private final FilePreferences filePreferences;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
+        this.filePreferences = filePreferences;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
                 EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
@@ -101,7 +104,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.STRING_EDITOR, dialogService).execute();
+        new HelpAction(HelpFile.STRING_EDITOR, dialogService, filePreferences).execute();
     }
 
     public ListProperty<ConstantsItemModel> stringsListProperty() {

@@ -29,15 +29,15 @@ Why
     * `OOListUtil`: some utilities working on List
   * `uno` : helpers for various tasks via UNO.\
     These are conceptually independent of JabRef code and logic.
-  * `ootext` : to separate decisions on the format of references and citation marks from the actual insertion into the document, the earlier method [OOUtil.insertOOFormattedTextAtCurrentLocation](https://github.com/JabRef/jabref/blob/475b2989ffa8ec61c3327c62ed8f694149f83220/src/main/java/org/jabref/logic/openoffice/OOUtil.java#L112) was extended to handle new tags that describe actions earlier done in code.
-    * This became [OOTextIntoOO.write](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/model/openoffice/ootext/OOTextIntoOO.java#L149)
+  * `ootext` : to separate decisions on the format of references and citation marks from the actual insertion into the document, the earlier method `OOUtil.insertOOFormattedTextAtCurrentLocation` was extended to handle new tags that describe actions earlier done in code.
+    * This became `OOTextIntoOO.write`
       * `(change)` Now all output to the document goes through this, not only those from Layout. This allows the citation markers and `jstyle:Title` to use these tags.
         * This allows some backward-compatible extensions to jstyle.\
-          `(change)` [Added](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/style/OOBibStyle.java#L92) some extra keywords, in `{prefix}_MARKUP_BEFORE`, `{prefix}_MARKUP_AFTER` pairs to allow bracketing some parts of citation marks with text and/or open/close tag pairs.
-    * [OOFormat](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/model/openoffice/ootext/OOFormat.java) contains helpers to create the appropriate tags
-    * [OOText](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/model/openoffice/ootext/OOText.java) formalizes the distinction from `String`. I did not change `String` to `OOText` in old code, (in particular in OOStyle).
+          `(change)` Added some extra keywords, in `{prefix}_MARKUP_BEFORE`, `{prefix}_MARKUP_AFTER` pairs to allow bracketing some parts of citation marks with text and/or open/close tag pairs.
+    * `OOFormat` contains helpers to create the appropriate tags
+    * `OOText` formalizes the distinction from `String`. I did not change `String` to `OOText` in old code, (in particular in OOStyle).
   * `rangesort` : ordering objects that have an `XTextRange`, optionally with an extra integer to break ties.
-    * `RangeSort.partitionAndSortRanges` : since `XTextRangeCompare` can only compare `XTextRange` values in the same `XText`, we partition them accordingly and only sort within each partiion.
+    * `RangeSort.partitionAndSortRanges` : since `XTextRangeCompare` can only compare `XTextRange` values in the same `XText`, we partition them accordingly and only sort within each partition.
     * `RangeSortable` (interface), `RangeSortEntry` (implements) :\
       When we replace `XTextRange` of citation marks in footnotes with the range of the footnote mark, multiple citation marks may be mapped to the same location. To preserve the order between these, `RangeSortable` allows this order to be indicated by returning appropriate indices from `getIndexInPosition`
     * `RangeSortVisual` : sort in top-to-bottom left-to-right order.\
@@ -61,12 +61,12 @@ At the core,
   * a list of citations (`citationsInStorageOrder`)
   * an identifier `CitationGroupId cgid`
     * this allows to refer to the group
-    * also used to associate the group to its citation markers location (outside the style part, in [Backend](https://github.com/antalk2/jabref/blob/fed0952cbdaf7a76bcb09b3db5ac48f34f5ca388/src/main/java/org/jabref/logic/openoffice/backend/Backend52.java#L46))
+    * also used to associate the group to its citation markers location (outside the style part, in `Backend52`)
   * `OODataModel dataModel` is here, in order to handle old (Jabref5.2) structure where pageInfo belonged to CitationGroup not Citation
   * `referenceMarkNameForLinking` is optional: can be used to crosslink to the citation marker from the bibliography.
 * `CitationGroups` represents the collection of citation groups.\
   Processing starts with creating a `CitationGroups` instance from the data stored in the document.
-* `CitedKey` represents a cited source, with ordered backreferences (using `CitationPath`) to the correponding citations.
+* `CitedKey` represents a cited source, with ordered back references (using `CitationPath`) to the corresponding citations.
 * `CitedKeys` is just an order-preserving collection of `CitedKeys` that also supports lookup by `citationKey`. While producing citation markers, we also create a corresponding `CitedKeys` instance, and store it in `CitationGroups.bibliography`. This is already sorted, its entries have `uniqueLetter` or `number` assigned, but not converted to markup yet.
 
 Common processing steps:
@@ -79,10 +79,11 @@ Common processing steps:
   We can create a `CitedKeys` instance (`bibliography`) according to this order.
 * For citations numbered in order of first appearance we number the sources and distribute the numbers to the corresponding citations.
 * For citations numbered in order of bibliography, we sort the bibliography, number, distribute.
-* For author-year citations we have to decide on the letters `uniqueLetter` used to distinguish sources. This needs order of first appearance of the sources and recognizing clashing citation markers. This is done in logic, in [`OOProcessAuthorYearMarkers.createUniqueLetters()`](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/style/OOProcessAuthorYearMarkers.java#L49)
-* We also mark first appearance of each source ([`setIsFirstAppearanceOfSourceInCitations`](https://github.com/antalk2/jabref/blob/fed0952cbdaf7a76bcb09b3db5ac48f34f5ca388/src/main/java/org/jabref/logic/openoffice/style/OOProcessAuthorYearMarkers.java#L146))
+* For author-year citations we have to decide on the letters `uniqueLetter` used to distinguish sources. This needs order of first appearance of the sources and recognizing clashing citation markers. This is done in logic, in `OOProcessAuthorYearMarkers.createUniqueLetters()`
+* We also mark first appearance of each source (`setIsFirstAppearanceOfSourceInCitations`)
 
-The entry point for this processing is: [`OOProcess.produceCitationMarkers`](https://github.com/antalk2/jabref/blob/fed0952cbdaf7a76bcb09b3db5ac48f34f5ca388/src/main/java/org/jabref/logic/openoffice/style/OOProcess.java#L69).\
+The entry point for this processing is: `OOProcess.produceCitationMarkers`.
+
 It fills
 
 * each `CitationGroup.citationMarker`
@@ -94,7 +95,7 @@ It fills
 * `StyleLoader` : not changed (knows about default styles) Used by GUI
 * `OOPreFormatter` : LaTeX code to unicode and OOText tags. (not changed)
 * `OOBibStyle` : is mostly concerned by loading/parsing jstyle files and presenting its pieces to the rest. Originally it also contains code to format numeric and author-year citation markers.
-  * Details of their new implementations are in [`OOBibStyleGetNumCitationMarker`](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/logic/openoffice/style/OOBibStyleGetNumCitationMarker.java) and [`OOBibStyleGetCitationMarker`](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/logic/openoffice/style/OOBibStyleGetCitationMarker.java)
+  * Details of their new implementations are in `OOBibStyleGetNumCitationMarker` and `OOBibStyleGetCitationMarker`
   * The new implementations
     * support pageInfo for each citation
     * support unresolved citations
@@ -106,7 +107,7 @@ It fills
       * `CitationMarkerNumericBibEntry`
       * `CitationMarkerNormEntry`\
         describe their expected input entries.
-* [`OOProcess.produceCitationMarkers`](https://github.com/antalk2/jabref/blob/fed0952cbdaf7a76bcb09b3db5ac48f34f5ca388/src/main/java/org/jabref/logic/openoffice/style/OOProcess.java#L69) is the main entry point for style application. Calls to specific implementations in `OOProcessCitationKeyMarkers`, `OOProcessNumericMarkers` and `OOProcessAuthorYearMarkers` according to jstyle flags.
+* `OOProcess.produceCitationMarkers` is the main entry point for style application. Calls to specific implementations in `OOProcessCitationKeyMarkers`, `OOProcessNumericMarkers` and `OOProcessAuthorYearMarkers` according to jstyle flags.
 
 ## logic/backend
 

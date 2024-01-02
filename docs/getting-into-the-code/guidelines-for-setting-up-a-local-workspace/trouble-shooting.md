@@ -64,7 +64,7 @@ In older IntelliJ setups, more things were necessary:
 
 Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-![Ignore the Gradle project "buildSrc"](../../images/intellij-gradle-config-ignore-buildSrc.png)
+![Ignore the Gradle project "buildSrc"](intellij-gradle-config-ignore-buildSrc.png)
 
 Add `src-gen` as root:
 

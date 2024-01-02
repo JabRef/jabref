@@ -30,8 +30,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 public class RisImporter extends Importer {
 
-    private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+    private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY {2}- .*");
+    private static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
     @Override
     public String getName() {
@@ -62,7 +62,7 @@ public class RisImporter extends Importer {
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                                        .split("ER  -.*(\\n)*");
+                                        .split("ER {2}-.*(\\n)*");
 
         // stores all the date tags from highest to lowest priority
         List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
@@ -89,7 +89,7 @@ public class RisImporter extends Importer {
                 boolean done = false;
                 while (!done && (j < (lines.length - 1))) {
                     if ((lines[j + 1].length() >= 6) && !"  - ".equals(lines[j + 1].substring(2, 6))) {
-                        if ((current.length() > 0) && !Character.isWhitespace(current.charAt(current.length() - 1))
+                        if ((!current.isEmpty()) && !Character.isWhitespace(current.charAt(current.length() - 1))
                                 && !Character.isWhitespace(lines[j + 1].charAt(0))) {
                             current.append(' ');
                         }
@@ -208,7 +208,7 @@ public class RisImporter extends Importer {
                             String year = value.substring(0, 4);
 
                             try {
-                                Year.parse(year, formatter);
+                                Year.parse(year, YEAR_FORMATTER);
                                 // if the year is parsebale we have found a higher priority date
                                 dateTag = tag;
                                 dateValue = value;
@@ -281,7 +281,7 @@ public class RisImporter extends Importer {
             }
 
             // if we found a date
-            if (dateTag.length() > 0) {
+            if (!dateTag.isEmpty()) {
                 fields.put(StandardField.YEAR, dateValue.substring(0, 4));
 
                 String[] parts = dateValue.split("/");

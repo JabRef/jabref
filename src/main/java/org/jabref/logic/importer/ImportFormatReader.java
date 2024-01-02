@@ -62,7 +62,7 @@ public class ImportFormatReader {
 
     public void reset() {
         formats.add(new CopacImporter());
-        formats.add(new EndnoteImporter(importFormatPreferences));
+        formats.add(new EndnoteImporter());
         formats.add(new EndnoteXmlImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
@@ -73,7 +73,7 @@ public class ImportFormatReader {
         formats.add(new OvidImporter());
         formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
         formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
-        formats.add(new PdfContentImporter(importFormatPreferences));
+        formats.add(new PdfContentImporter());
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             formats.add(new PdfGrobidImporter(importFormatPreferences));

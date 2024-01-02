@@ -48,7 +48,7 @@ class CitationEntryTest {
         assertEquals(citationEntry1, citationEntry1);
         assertEquals(citationEntry1, citationEntry3);
         assertNotEquals(citationEntry1, citationEntry2);
-        assertNotEquals(citationEntry1, "Random String");
+        assertNotEquals("Random String", citationEntry1);
     }
 
     @Test

@@ -129,7 +129,7 @@ public class AuthorListParser {
             // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
             // If not, we check if spaces separate pre- and lastname
             if (spaceInAllParts) {
-                listOfNames = listOfNames.replaceAll(",", " and");
+                listOfNames = listOfNames.replace(",", " and");
             } else {
                 // Looking for name affixes to avoid
                 // arrayNameList needs to reduce by the count off avoiding terms

@@ -6,7 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedCollection;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.integrity.PagesChecker;
@@ -148,8 +149,13 @@ public class JabRefItemDataProvider implements ItemDataProvider {
             }
         }
 
-        Set<Field> fields = new LinkedHashSet<>(entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields()));
-        fields.addAll(bibEntry.getFields());
+        SequencedCollection<Field> fields;
+        if (entryType.isPresent()) {
+            fields = entryType.map(BibEntryType::getAllFields).map(LinkedHashSet::new).get();
+            fields.addAll(bibEntry.getFields());
+        } else {
+            fields = bibEntry.getFields();
+        }
         for (Field key : fields) {
             bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                     .map(removeNewlinesFormatter::format)
@@ -198,5 +204,15 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         return data.stream()
                    .map(entry -> entry.getCitationKey().orElse(""))
                    .toList();
+    }
+
+    public String toJson() {
+        List<BibEntry> entries = bibDatabaseContext.getEntries();
+        this.setData(entries, bibDatabaseContext, entryTypesManager);
+        return entries.stream()
+                      .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
+                      .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
+                      .map(String.class::cast)
+                      .collect(Collectors.joining(",", "[", "]"));
     }
 }

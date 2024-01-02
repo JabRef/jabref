@@ -38,7 +38,7 @@ public class DiVATest {
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("Gustafsson260746");
         entry.setField(StandardField.AUTHOR, "Gustafsson, Oscar");
-        entry.setField(StandardField.INSTITUTION, "Linköping University, The Institute of Technology");
+        entry.setField(StandardField.INSTITUTION, "The Institute of Technology");
         entry.setField(StandardField.JOURNAL,
                 "IEEE transactions on circuits and systems. 2, Analog and digital signal processing (Print)");
         entry.setField(StandardField.NUMBER, "11");

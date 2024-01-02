@@ -13,27 +13,31 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
-    @FXML private ComboBox<GeneralTabViewModel.ThemeTypes> theme;
+    @FXML private ComboBox<ThemeTypes> theme;
+    @FXML private CheckBox themeSyncOs;
     @FXML private TextField customThemePath;
     @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
@@ -49,6 +53,11 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button autosaveLocalLibrariesHelp;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
+    @FXML private CheckBox remoteServer;
+    @FXML private TextField remotePort;
+    @FXML private Button remoteHelp;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -74,7 +83,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -91,14 +100,15 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        new ViewModelListCellFactory<GeneralTabViewModel.ThemeTypes>()
-                .withText(GeneralTabViewModel.ThemeTypes::getDisplayName)
+        new ViewModelListCellFactory<ThemeTypes>()
+                .withText(ThemeTypes::getDisplayName)
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
+        themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
         EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
-            boolean isCustomTheme = theme == GeneralTabViewModel.ThemeTypes.CUSTOM;
+            boolean isCustomTheme = theme == ThemeTypes.CUSTOM;
             customThemePath.disableProperty().set(!isCustomTheme);
             customThemeBrowse.disableProperty().set(!isCustomTheme);
         });
@@ -120,17 +130,23 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
+        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferencesService.getFilePreferences()), autosaveLocalLibrariesHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
 
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
         backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
 
         Platform.runLater(() -> {
+            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
         });
+
+        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
+        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
+        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
     }
 
     @FXML
@@ -140,5 +156,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
     public void backupFileDirBrowse() {
         viewModel.backupFileDirBrowse();
+    }
+
+    @FXML
+    public void openBrowser() {
+        viewModel.openBrowser();
     }
 }

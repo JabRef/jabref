@@ -14,9 +14,10 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.util.OptionalUtil;
 
 import org.slf4j.Logger;
@@ -33,13 +34,15 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
     private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile("\\n|\\r\\n|\\s");
     protected final ImportFormatPreferences importFormatPreferences;
-    private final OpenLibraryIsbnFetcher openLibraryIsbnFetcher;
     private final List<AbstractIsbnFetcher> retryIsbnFetcher;
+    private final GvkFetcher gvkIbsnFetcher;
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        this.openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
+        OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
+        this.gvkIbsnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(openLibraryIsbnFetcher);
     }
 
     @Override
@@ -54,25 +57,25 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        if (StringUtil.isBlank(identifier)) {
-            return Optional.empty();
-        }
-
         Optional<BibEntry> bibEntry = Optional.empty();
 
         try {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
-            bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
+            Optional<ISBN> isbn = ISBN.parse(identifier);
+            if (isbn.isPresent()) {
+                bibEntry = gvkIbsnFetcher.performSearchById(isbn.get().getNormalized());
+            }
         } catch (FetcherException ex) {
             LOGGER.debug("Got a fetcher exception for IBSN search", ex);
             if (retryIsbnFetcher.isEmpty()) {
                 throw ex;
             }
         } finally {
-            LOGGER.debug("Trying using the alternate ISBN fetchers to find an entry.");
             // do not move the iterator in the loop as this would always return a new one and thus create and endless loop
             Iterator<AbstractIsbnFetcher> iterator = retryIsbnFetcher.iterator();
             while (bibEntry.isEmpty() && iterator.hasNext()) {
+                LOGGER.debug("Trying using the alternate ISBN fetchers to find an entry.");
+
                 AbstractIsbnFetcher fetcher = iterator.next();
                 LOGGER.debug("No entry found for ISBN {}; trying {} next.", identifier, fetcher.getName());
                 bibEntry = fetcher.performSearchById(identifier);

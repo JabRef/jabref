@@ -18,6 +18,7 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
@@ -63,6 +64,7 @@ class SourceTabTest {
                 new DummyFileUpdateMonitor(),
                 mock(DialogService.class),
                 stateManager,
+                mock(BibEntryTypesManager.class),
                 keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),

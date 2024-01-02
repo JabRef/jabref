@@ -154,7 +154,7 @@ public final class DocumentReader {
         }
         PDPage page = pdfDocument.getPage(pageNumber);
         List<String> annotations = page.getAnnotations().stream().filter(annotation -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
-        if (annotations.size() > 0) {
+        if (!annotations.isEmpty()) {
             newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
         }
     }

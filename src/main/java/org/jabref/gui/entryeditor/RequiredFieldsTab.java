@@ -2,7 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedSet;
 
 import javax.swing.undo.UndoManager;
 
@@ -51,12 +51,12 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
-        Set<Field> fields = new LinkedHashSet<>();
+        SequencedSet<Field> fields = new LinkedHashSet<>();
         if (entryType.isPresent()) {
             for (OrFields orFields : entryType.get().getRequiredFields()) {
-                fields.addAll(orFields);
+                fields.addAll(orFields.getFields());
             }
             // Add the edit field for Bibtex-key.
             fields.add(InternalField.KEY_FIELD);

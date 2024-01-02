@@ -117,7 +117,7 @@ public class Layout {
 
     /**
      * Returns the processed text. If the database argument is
-     * null, no string references will be resolved. Otherwise all valid
+     * null, no string references will be resolved. Otherwise, all valid
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */

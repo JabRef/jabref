@@ -191,7 +191,7 @@ class OOBibBase {
             String msg =
                     Localization.lang("Please move the cursor"
                             + " to the location for the new citation.") + "\n"
-                            + Localization.lang("I cannot insert to the cursors current location.");
+                            + Localization.lang("I cannot insert to the cursor's current location.");
             return OOResult.error(new OOError(errorTitle, msg, ex));
         }
         return OOResult.ok(cursor);

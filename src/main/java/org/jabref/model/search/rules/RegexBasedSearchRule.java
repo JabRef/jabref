@@ -50,7 +50,7 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
         for (Field field : bibEntry.getFields()) {
             Optional<String> fieldOptional = bibEntry.getField(field);
             if (fieldOptional.isPresent()) {
-                String fieldContentNoBrackets = StringUtil.stripAccents(bibEntry.getLatexFreeField(field).get());
+                String fieldContentNoBrackets = StringUtil.stripAccents(bibEntry.getFieldLatexFree(field).get());
                 Matcher m = pattern.matcher(fieldContentNoBrackets);
                 if (m.find()) {
                     return true;

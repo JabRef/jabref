@@ -48,7 +48,7 @@ public class PdfMergeMetadataImporter extends Importer {
             this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
         this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
-        this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
+        this.metadataImporters.add(new PdfContentImporter());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
         for (Importer metadataImporter : metadataImporters) {
             List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath).getDatabase().getEntries();
-            if (extractedEntries.size() == 0) {
+            if (extractedEntries.isEmpty()) {
                 continue;
             }
             candidates.add(extractedEntries.get(0));

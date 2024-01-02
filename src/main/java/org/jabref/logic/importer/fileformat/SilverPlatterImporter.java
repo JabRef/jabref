@@ -89,80 +89,87 @@ public class SilverPlatterImporter extends Importer {
                 }
                 String f3 = field.substring(0, 2);
                 String frest = field.substring(5);
-                if ("TI".equals(f3)) {
-                    h.put(StandardField.TITLE, frest);
-                } else if ("AU".equals(f3)) {
-                    if (frest.trim().endsWith("(ed)")) {
-                        String ed = frest.trim();
-                        ed = ed.substring(0, ed.length() - 4);
-                        h.put(StandardField.EDITOR,
-                                AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
-                    } else {
-                        h.put(StandardField.AUTHOR,
-                                AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                switch (f3) {
+                    case "TI" ->
+                            h.put(StandardField.TITLE, frest);
+                    case "AU" -> {
+                        if (frest.trim().endsWith("(ed)")) {
+                            String ed = frest.trim();
+                            ed = ed.substring(0, ed.length() - 4);
+                            h.put(StandardField.EDITOR,
+                                    AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
+                        } else {
+                            h.put(StandardField.AUTHOR,
+                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                        }
                     }
-                } else if ("AB".equals(f3)) {
-                    h.put(StandardField.ABSTRACT, frest);
-                } else if ("DE".equals(f3)) {
-                    String kw = frest.replace("-;", ",").toLowerCase(Locale.ROOT);
-                    h.put(StandardField.KEYWORDS, kw.substring(0, kw.length() - 1));
-                } else if ("SO".equals(f3)) {
-                    int m = frest.indexOf('.');
-                    if (m >= 0) {
-                        String jr = frest.substring(0, m);
-                        h.put(StandardField.JOURNAL, jr.replace("-", " "));
-                        frest = frest.substring(m);
-                        m = frest.indexOf(';');
-                        if (m >= 5) {
-                            String yr = frest.substring(m - 5, m).trim();
-                            h.put(StandardField.YEAR, yr);
+                    case "AB" ->
+                            h.put(StandardField.ABSTRACT, frest);
+                    case "DE" -> {
+                        String kw = frest.replace("-;", ",").toLowerCase(Locale.ROOT);
+                        h.put(StandardField.KEYWORDS, kw.substring(0, kw.length() - 1));
+                    }
+                    case "SO" -> {
+                        int m = frest.indexOf('.');
+                        if (m >= 0) {
+                            String jr = frest.substring(0, m);
+                            h.put(StandardField.JOURNAL, jr.replace("-", " "));
                             frest = frest.substring(m);
-                            m = frest.indexOf(':');
-                            int issueIndex = frest.indexOf('(');
-                            int endIssueIndex = frest.indexOf(')');
-                            if (m >= 0) {
-                                String pg = frest.substring(m + 1).trim();
-                                h.put(StandardField.PAGES, pg);
-                                h.put(StandardField.VOLUME, frest.substring(1, issueIndex).trim());
-                                h.put(StandardField.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
-                            }
-                        }
-                    }
-                } else if ("PB".equals(f3)) {
-                    int m = frest.indexOf(':');
-                    if (m >= 0) {
-                        String jr = frest.substring(0, m);
-                        h.put(StandardField.PUBLISHER, jr.replace("-", " ").trim());
-                        frest = frest.substring(m);
-                        m = frest.indexOf(", ");
-                        if ((m + 2) < frest.length()) {
-                            String yr = frest.substring(m + 2).trim();
-                            try {
-                                Integer.parseInt(yr);
+                            m = frest.indexOf(';');
+                            if (m >= 5) {
+                                String yr = frest.substring(m - 5, m).trim();
                                 h.put(StandardField.YEAR, yr);
-                            } catch (NumberFormatException ex) {
-                                // Let's assume that this wasn't a number, since it
-                                // couldn't be parsed as an integer.
+                                frest = frest.substring(m);
+                                m = frest.indexOf(':');
+                                int issueIndex = frest.indexOf('(');
+                                int endIssueIndex = frest.indexOf(')');
+                                if (m >= 0) {
+                                    String pg = frest.substring(m + 1).trim();
+                                    h.put(StandardField.PAGES, pg);
+                                    h.put(StandardField.VOLUME, frest.substring(1, issueIndex).trim());
+                                    h.put(StandardField.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
+                                }
                             }
                         }
                     }
-                } else if ("AF".equals(f3)) {
-                    h.put(StandardField.SCHOOL, frest.trim());
-                } else if ("DT".equals(f3)) {
-                    frest = frest.trim();
-                    if ("Monograph".equals(frest)) {
-                        type = StandardEntryType.Book;
-                    } else if (frest.startsWith("Dissertation")) {
-                        type = StandardEntryType.PhdThesis;
-                    } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
-                        type = StandardEntryType.Article;
-                    } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
-                        type = StandardEntryType.InCollection;
-                        // This entry type contains page numbers and booktitle in the
-                        // title field.
-                        isChapter = true;
-                    } else {
-                        type = EntryTypeFactory.parse(frest.replace(" ", ""));
+                    case "PB" -> {
+                        int m = frest.indexOf(':');
+                        if (m >= 0) {
+                            String jr = frest.substring(0, m);
+                            h.put(StandardField.PUBLISHER, jr.replace("-", " ").trim());
+                            frest = frest.substring(m);
+                            m = frest.indexOf(", ");
+                            if ((m + 2) < frest.length()) {
+                                String yr = frest.substring(m + 2).trim();
+                                try {
+                                    Integer.parseInt(yr);
+                                    h.put(StandardField.YEAR, yr);
+                                } catch (
+                                        NumberFormatException ex) {
+                                    // Let's assume that this wasn't a number, since it
+                                    // couldn't be parsed as an integer.
+                                }
+                            }
+                        }
+                    }
+                    case "AF" ->
+                            h.put(StandardField.SCHOOL, frest.trim());
+                    case "DT" -> {
+                        frest = frest.trim();
+                        if ("Monograph".equals(frest)) {
+                            type = StandardEntryType.Book;
+                        } else if (frest.startsWith("Dissertation")) {
+                            type = StandardEntryType.PhdThesis;
+                        } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
+                            type = StandardEntryType.Article;
+                        } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
+                            type = StandardEntryType.InCollection;
+                            // This entry type contains page numbers and booktitle in the
+                            // title field.
+                            isChapter = true;
+                        } else {
+                            type = EntryTypeFactory.parse(frest.replace(" ", ""));
+                        }
                     }
                 }
             }

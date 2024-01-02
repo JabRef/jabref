@@ -22,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -45,8 +46,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final TaskExecutor taskExecutor;
 
-    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, PreferencesService preferencesService, DialogService dialogService) {
+    public RelatedArticlesTab(EntryEditorPreferences preferences,
+                              PreferencesService preferencesService,
+                              DialogService dialogService,
+                              TaskExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
         this.preferences = preferences;
@@ -72,7 +78,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                    ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
                     root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
@@ -82,7 +88,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                     progress.setVisible(false);
                     root.getChildren().add(getErrorInfo());
                 })
-                .executeWith(Globals.TASK_EXECUTOR);
+                .executeWith(taskExecutor);
 
         root.getChildren().add(progress);
 
@@ -128,7 +134,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             titleLink.setOnAction(event -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get());
+                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getFilePreferences());
                     } catch (IOException e) {
                         LOGGER.error("Error opening the browser to: " + entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
@@ -192,7 +198,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
         mdlLink.setOnAction(event -> {
             try {
-                JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
+                JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferencesService.getFilePreferences());
             } catch (IOException e) {
                 LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
                 dialogService.showErrorDialogAndWait(e);
@@ -212,9 +218,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
-            preferences.setIsMrdlibAccepted(true);
-
             MrDlibPreferences mrDlibPreferences = preferencesService.getMrDlibPreferences();
+            mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
             mrDlibPreferences.setSendOs(cbOS.isSelected());
             mrDlibPreferences.setSendTimezone(cbTimezone.isSelected());
@@ -237,7 +242,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         // Ask for consent to send data to Mr. DLib on first time to tab
-        if (preferences.isMrdlibAccepted()) {
+        if (preferencesService.getMrDlibPreferences().shouldAcceptRecommendations()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
             setContent(getPrivacyDialog(entry));

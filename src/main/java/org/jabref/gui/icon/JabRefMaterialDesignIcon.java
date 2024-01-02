@@ -30,7 +30,8 @@ public enum JabRefMaterialDesignIcon implements Ikon {
     SET_ALL("jab-setall", '\ue90c'),
     VSCODE("jab-vsvode", '\ue90d'),
     CANCEL("jab-cancel", '\ue90e'),
-    SUBLIME_TEXT("jab-sublime-text", '\ue90f');
+    SUBLIME_TEXT("jab-sublime-text", '\ue90f'),
+    TEXSHOP("jab-texshop", '\ue910');
 
     private String description;
     private int code;

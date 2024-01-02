@@ -13,7 +13,7 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -82,7 +82,7 @@ public class Benchmarks {
         BibWriter bibWriter = new BibWriter(outputWriter, OS.NEWLINE);
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                mock(SaveConfiguration.class),
+                mock(SelfContainedSaveConfiguration.class),
                 mock(FieldPreferences.class),
                 mock(CitationKeyPatternPreferences.class),
                 new BibEntryTypesManager());

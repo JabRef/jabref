@@ -5,18 +5,29 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.FetcherApiKey;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox enableWebSearch;
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
@@ -32,6 +43,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox useCustomApiKey;
     @FXML private Button testCustomApiKey;
 
+    @FXML private CheckBox persistApiKeys;
+    @FXML private SplitPane persistentTooltipWrapper; // The disabled persistApiKeys control does not show tooltips
+    @FXML private TableView<StudyCatalogItem> catalogTable;
+    @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+
     public WebSearchTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -46,6 +63,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
 
+        enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
@@ -57,6 +75,26 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
+
+        new ViewModelTableRowFactory<StudyCatalogItem>()
+                .withOnMouseClickedEvent((entry, event) -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        entry.setEnabled(!entry.isEnabled());
+                    }
+                })
+                .install(catalogTable);
+
+        catalogColumn.setReorderable(false);
+        catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        catalogEnabledColumn.setResizable(false);
+        catalogEnabledColumn.setReorderable(false);
+        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
+        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
+
+        catalogColumn.setEditable(false);
+        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
+        catalogTable.setItems(viewModel.getCatalogs());
 
         new ViewModelListCellFactory<FetcherApiKey>()
                 .withText(FetcherApiKey::getName)
@@ -74,6 +112,16 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
         testCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
+
+        persistApiKeys.selectedProperty().bindBidirectional(viewModel.getApikeyPersistProperty());
+        persistApiKeys.disableProperty().bind(viewModel.apiKeyPersistAvailable().not());
+        EasyBind.subscribe(viewModel.apiKeyPersistAvailable(), available -> {
+            if (!available) {
+                persistentTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
+            } else {
+                persistentTooltipWrapper.setTooltip(null);
+            }
+        });
 
         apiKeySelector.setItems(viewModel.fetcherApiKeys());
         viewModel.selectedApiKeyProperty().bind(apiKeySelector.valueProperty());

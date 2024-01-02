@@ -36,6 +36,7 @@ public class TestArchitectureTest {
     public void testNaming(JavaClasses classes) {
         classes().that().areTopLevelClasses()
                  .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
+                 .and().doNotHaveFullyQualifiedName("org.jabref.http.server.TestBibFile")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.autocompleter.AutoCompleterUtil")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.search.TextFlowEqualityHelper")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.bibtex.BibEntryAssert")

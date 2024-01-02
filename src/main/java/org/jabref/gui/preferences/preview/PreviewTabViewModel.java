@@ -241,7 +241,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         for (int oldIndex : selected) {
             boolean alreadyTaken = newIndices.contains(oldIndex - 1);
-            int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
+            int newIndex = (oldIndex > 0) && !alreadyTaken ? oldIndex - 1 : oldIndex;
             chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
             newIndices.add(newIndex);
         }
@@ -263,7 +263,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (int i = selected.size() - 1; i >= 0; i--) {
             int oldIndex = selected.get(i);
             boolean alreadyTaken = newIndices.contains(oldIndex + 1);
-            int newIndex = ((oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+            int newIndex = (oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken ? oldIndex + 1 : oldIndex;
             chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
             newIndices.add(newIndex);
         }

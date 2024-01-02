@@ -43,7 +43,7 @@ class MathSciNetTest {
         ratiuEntry.setField(StandardField.YEAR, "2016");
         ratiuEntry.setField(StandardField.NUMBER, "3");
         ratiuEntry.setField(StandardField.PAGES, "571--589");
-        ratiuEntry.setField(StandardField.ISSN, "1422-6928");
+        ratiuEntry.setField(StandardField.ISSN, "1422-6928,1422-6952");
         ratiuEntry.setField(StandardField.KEYWORDS, "76A15 (35A01 35A02 35K61 82D30)");
         ratiuEntry.setField(StandardField.MR_NUMBER, "3537908");
         ratiuEntry.setField(StandardField.DOI, "10.1007/s00021-016-0250-0");
