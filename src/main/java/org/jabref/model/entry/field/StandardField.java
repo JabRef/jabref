@@ -31,7 +31,7 @@ public enum StandardField implements Field {
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
-    // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
+    // Comments of users are handled at {@link org.jabref.model.entry.field.UserSficCommentField}
     COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),

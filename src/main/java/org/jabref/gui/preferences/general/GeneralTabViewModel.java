@@ -22,6 +22,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.Theme;
@@ -39,6 +40,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -76,6 +78,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty treatAllDuplicateEntriesTheSameProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> duplicatedResolveDecisionProperty = new SimpleObjectProperty<>();
+
+    private final ListProperty<DuplicateResolverDialog.DuplicateResolverResult> duplicateResolverResults = new SimpleListProperty<>();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
@@ -96,6 +101,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
+    private final GuiPreferences guiPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -119,6 +125,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.internalPreferences = preferences.getInternalPreferences();
+        this.guiPreferences = preferences.getGuiPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
 
@@ -190,7 +197,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
-        treatAllDuplicateEntriesTheSameProperty.setValue(preferences.getGuiPreferences().isMergeApplyToAllEntriesProperty());
+        treatAllDuplicateEntriesTheSameProperty.setValue(guiPreferences.isMergeApplyToAllEntriesProperty());
+        duplicatedResolveDecisionProperty.setValue(guiPreferences.getAllEntriesDuplicateResolverDecision());
+        duplicateResolverResults.setValue(FXCollections.observableArrayList(DuplicateResolverDialog.DuplicateResolverResult.values()));
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
@@ -232,7 +241,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
         workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
-        preferences.getGuiPreferences().setIsMergeApplyToAllEntries(treatAllDuplicateEntriesTheSameProperty.getValue());
+        guiPreferences.setIsMergeApplyToAllEntries(treatAllDuplicateEntriesTheSameProperty.getValue());
+        guiPreferences.setAllEntriesDuplicateResolverDecision(duplicatedResolveDecisionProperty.getValue());
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
@@ -436,5 +446,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty treatAllDuplicateEntriesTheSameProperty() {
         return this.treatAllDuplicateEntriesTheSameProperty;
+    }
+
+    public ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> duplicatedResolveDecisionProperty() {
+        return this.duplicatedResolveDecisionProperty;
+    }
+
+    public ListProperty<DuplicateResolverDialog.DuplicateResolverResult> duplicateResolverResults() {
+        return this.duplicateResolverResults;
     }
 }

@@ -102,7 +102,7 @@
                             text="%Only show changed fields"/>
                     <CheckMenuItem
                             fx:id="applyToAllEntriesCheck"
-                            text="%Apply to all entries"/>
+                            text="%Treat all duplicates entries the same way"/>
                 </items>
 
             </MenuButton>
