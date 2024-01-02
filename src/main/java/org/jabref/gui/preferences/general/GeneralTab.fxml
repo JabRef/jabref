@@ -72,7 +72,7 @@
               text="%Warn about unresolved duplicates when closing inspection window"/>
     <CheckBox fx:id="treatAlDuplicateEntriesTheSame" text="%Treat all duplicates entries the same way" >
         <tooltip>
-            <Tooltip text="%Applies the last chosen duplicate resolving strategy to all entries without showing a dialog. Uncheck this option to show the dialog again "/>
+            <Tooltip text="%Applies the last chosen duplicate resolving strategy to all entries without showing a dialog. Uncheck this option to show the dialog again"/>
         </tooltip>
     </CheckBox>
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
