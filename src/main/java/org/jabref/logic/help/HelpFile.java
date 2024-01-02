@@ -44,7 +44,8 @@ public enum HelpFile {
     FETCHER_SCIENCEDIRECT(""),
     DATABASE_PROPERTIES("setup/databaseproperties"),
     FIND_DUPLICATES("finding-sorting-and-cleaning-entries/findduplicates"),
-    SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration");
+    SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration"),
+    PUSH_TO_APPLICATION("cite/pushtoapplications");
 
     private final String pageName;
 

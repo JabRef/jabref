@@ -39,13 +39,13 @@ public class UnoNamed {
             throw new CreationException(e.getMessage());
         }
 
-        XNamed xNamed = (UnoCast.cast(XNamed.class, xObject)
-                                .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed")));
+        XNamed xNamed = UnoCast.cast(XNamed.class, xObject)
+                                .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed"));
         xNamed.setName(name);
 
         // get XTextContent interface
-        XTextContent xTextContent = (UnoCast.cast(XTextContent.class, xObject)
-                                            .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent")));
+        XTextContent xTextContent = UnoCast.cast(XTextContent.class, xObject)
+                                            .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent"));
         range.getText().insertTextContent(range, xTextContent, absorb);
         return xNamed;
     }

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
  *
- * @implSpec API is documented at http://unpaywall.org/api/v2
+ * API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetcher.class);

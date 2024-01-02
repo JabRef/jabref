@@ -2,10 +2,11 @@ package org.jabref.logic.citationstyle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedCollection;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
@@ -148,14 +149,19 @@ public class JabRefItemDataProvider implements ItemDataProvider {
             }
         }
 
-        Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
-        fields.addAll(bibEntry.getFields());
+        SequencedCollection<Field> fields;
+        if (entryType.isPresent()) {
+            fields = entryType.map(BibEntryType::getAllFields).map(LinkedHashSet::new).get();
+            fields.addAll(bibEntry.getFields());
+        } else {
+            fields = bibEntry.getFields();
+        }
         for (Field key : fields) {
             bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                     .map(removeNewlinesFormatter::format)
                     .map(LatexToUnicodeAdapter::format)
                     .ifPresent(value -> {
-                        if (StandardField.MONTH.equals(key)) {
+                        if (StandardField.MONTH == key) {
                             // Change month from #mon# to mon because CSL does not support the former format
                             value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                         }
@@ -185,16 +191,6 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         this.pagesChecker = new PagesChecker(ctx);
     }
 
-    public String toJson() {
-        List<BibEntry> entries = bibDatabaseContext.getEntries();
-        this.setData(entries, bibDatabaseContext, entryTypesManager);
-        return entries.stream()
-                .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
-                .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
-                .map(item -> (String) item)
-                .collect(Collectors.joining(",", "[", "]"));
-    }
-
     @Override
     public CSLItemData retrieveItem(String id) {
         return data.stream()
@@ -208,5 +204,15 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         return data.stream()
                    .map(entry -> entry.getCitationKey().orElse(""))
                    .toList();
+    }
+
+    public String toJson() {
+        List<BibEntry> entries = bibDatabaseContext.getEntries();
+        this.setData(entries, bibDatabaseContext, entryTypesManager);
+        return entries.stream()
+                      .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
+                      .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
+                      .map(String.class::cast)
+                      .collect(Collectors.joining(",", "[", "]"));
     }
 }

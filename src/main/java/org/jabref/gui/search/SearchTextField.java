@@ -12,6 +12,7 @@ public class SearchTextField {
         CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
         textField.setPromptText(Localization.lang("Search") + "...");
         textField.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+        textField.setId("searchField");
         return textField;
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -22,6 +23,7 @@ public class IntegrityCheck {
                           FilePreferences filePreferences,
                           CitationKeyPatternPreferences citationKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
+                          PredatoryJournalRepository predatoryJournalRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -38,16 +40,16 @@ public class IntegrityCheck {
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
-                new AmpersandChecker()
+                new AmpersandChecker(),
+                new LatexIntegrityChecker(),
+                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
+                new PredatoryJournalChecker(predatoryJournalRepository,
+                        List.of(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE))
                 ));
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.addAll(List.of(
-                    new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
-                    new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))
-            ));
+            entryCheckers.add(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8)));
         } else {
             entryCheckers.addAll(List.of(
-                    new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())

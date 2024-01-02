@@ -61,7 +61,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      */
     private final Path temporaryFile;
 
-    private final FileLock temporaryFileLock;
+    private FileLock temporaryFileLock;
 
     /**
      * A backup of the target file (if it exists), created when the stream is closed
@@ -105,8 +105,14 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
-            if (out instanceof FileOutputStream) {
-                temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
+            if (out instanceof FileOutputStream stream) {
+                try {
+                    temporaryFileLock = stream.getChannel().tryLock();
+                } catch (IOException ex) {
+                    // workaround for https://bugs.openjdk.org/browse/JDK-8167023
+                    LOGGER.warn("Could not acquire file lock. Maybe we are on a network drive?", ex);
+                    temporaryFileLock = null;
+                }
             } else {
                 temporaryFileLock = null;
             }
@@ -184,8 +190,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             try {
                 // Make sure we have written everything to the temporary file
                 flush();
-                if (out instanceof FileOutputStream) {
-                    ((FileOutputStream) out).getFD().sync();
+                if (out instanceof FileOutputStream stream) {
+                    stream.getFD().sync();
                 }
             } catch (IOException exception) {
                 // Try to close nonetheless

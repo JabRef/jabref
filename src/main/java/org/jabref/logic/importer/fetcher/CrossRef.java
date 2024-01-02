@@ -40,7 +40,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 /**
  * A class for fetching DOIs from CrossRef
  * <p>
- * See https://github.com/CrossRef/rest-api-doc
+ * See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
  */
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
@@ -56,9 +56,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        entry.getLatexFreeField(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
-        entry.getLatexFreeField(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
-        entry.getLatexFreeField(StandardField.YEAR).ifPresent(year ->
+        entry.getFieldLatexFree(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
+        entry.getFieldLatexFree(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
+        entry.getFieldLatexFree(StandardField.YEAR).ifPresent(year ->
                 uriBuilder.addParameter("filter", "from-pub-date:" + year)
         );
         uriBuilder.addParameter("rows", "20"); // = API default
@@ -137,6 +137,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
                             .map(year -> Integer.toString(year)).orElse("")
             );
             entry.setField(StandardField.DOI, item.getString("DOI"));
+            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
+            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
+            entry.setField(StandardField.NUMBER, item.optString("issue"));
+            entry.setField(StandardField.KEYWORDS, Optional.ofNullable(item.optJSONArray("subject")).map(this::getKeywords).orElse(""));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
@@ -154,7 +158,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         // input: list of {"given":"A.","family":"Riel","affiliation":[]}
         return IntStream.range(0, authors.length())
                         .mapToObj(authors::getJSONObject)
-                        .map((author) -> new Author(
+                        .map(author -> new Author(
                                 author.optString("given", ""), "", "",
                                 author.optString("family", ""), ""))
                         .collect(AuthorList.collect())
@@ -162,13 +166,13 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     private EntryType convertType(String type) {
-        return type.equals("journal-article") ? StandardEntryType.Article : StandardEntryType.Misc;
+        return "journal-article".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     @Override
     public Optional<DOI> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException {
 
-        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getLatexFreeField(StandardField.TITLE).orElse(""));
+        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getFieldLatexFree(StandardField.TITLE).orElse(""));
         final StringSimilarity stringSimilarity = new StringSimilarity();
 
         for (BibEntry fetchedEntry : fetchedEntries) {
@@ -195,5 +199,17 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public String getIdentifierName() {
         return "DOI";
+    }
+
+    private String getKeywords(JSONArray jsonArray) {
+        StringBuilder keywords = new StringBuilder();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+        keywords.append(jsonArray.getString(i));
+            if (i != jsonArray.length() - 1) {
+                keywords.append(", ");
+            }
+        }
+        return keywords.toString();
     }
 }

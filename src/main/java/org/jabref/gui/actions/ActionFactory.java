@@ -80,9 +80,9 @@ public class ActionFactory {
         setGraphic(menuItem, action);
 
         // Show tooltips
-        if (command instanceof SimpleCommand) {
+        if (command instanceof SimpleCommand simpleCommand) {
             EasyBind.subscribe(
-                    ((SimpleCommand) command).statusMessageProperty(),
+                    simpleCommand.statusMessageProperty(),
                     message -> {
                         Label label = getAssociatedNode(menuItem);
                         if (label != null) {

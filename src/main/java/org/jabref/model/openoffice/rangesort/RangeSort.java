@@ -30,8 +30,8 @@ public class RangeSort {
         private final XTextRangeCompare cmp;
 
         HolderComparatorWithinPartition(XText text) {
-            cmp = (UnoCast.cast(XTextRangeCompare.class, text)
-                          .orElseThrow(java.lang.IllegalArgumentException::new));
+            cmp = UnoCast.cast(XTextRangeCompare.class, text)
+                          .orElseThrow(java.lang.IllegalArgumentException::new);
         }
 
         /**

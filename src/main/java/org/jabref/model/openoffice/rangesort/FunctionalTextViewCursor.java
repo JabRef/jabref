@@ -87,7 +87,7 @@ public class FunctionalTextViewCursor {
         }
 
         if (initialSelection == null) {
-            String errorMessage = ("Selection is not available: cannot provide a functional view cursor");
+            String errorMessage = "Selection is not available: cannot provide a functional view cursor";
             return OOResult.error(errorMessage);
         } else if (Arrays.stream(initialSelection.getSupportedServiceNames())
                          .noneMatch("com.sun.star.text.TextRanges"::equals)) {

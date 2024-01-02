@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -95,27 +96,34 @@ public class MarcXmlParser implements Parser {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: " + tag);
 
-            if (tag.equals("020")) {
+            if ("020".equals(tag)) {
                 putIsbn(bibEntry, datafield);
-            } else if (tag.equals("100") || tag.equals("700") || tag.equals("710")) {
+            } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
-            } else if (tag.equals("245")) {
+            } else if ("111".equals(tag)) {
+                // FixMe: Conference Information also in Subtitle (245) & Author (710)
+                putConferenceDetail(bibEntry, datafield);
+            } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
-            } else if (tag.equals("250")) {
+            } else if ("250".equals(tag)) {
                 putEdition(bibEntry, datafield);
-            } else if (tag.equals("264")) {
+            } else if ("264".equals(tag)) {
                 putPublication(bibEntry, datafield);
-            } else if (tag.equals("300")) {
+            } else if ("300".equals(tag)) {
                 putPhysicalDescription(bibEntry, datafield);
-            } else if (tag.equals("490") || tag.equals("830")) {
+            } else if ("490".equals(tag) || "830".equals(tag)) {
                 putSeries(bibEntry, datafield);
-            } else if (tag.equals("520")) {
+            } else if ("502".equals(tag)) {
+                putThesisDescription(bibEntry, datafield); // Master's thesis, PhD thesis, Thesis
+            } else if ("520".equals(tag)) {
                 putSummary(bibEntry, datafield);
-            } else if (tag.equals("653")) {
+            } else if ("653".equals(tag)) {
                 putKeywords(bibEntry, datafield);
-            } else if (tag.equals("856")) {
+            } else if ("773".equals(tag)) {
+                putIssue(bibEntry, datafield);
+            } else if ("856".equals(tag)) {
                 putElectronicLocation(bibEntry, datafield);
-            } else if (tag.equals("966")) {
+            } else if ("966".equals(tag)) {
                 putDoi(bibEntry, datafield);
             } else if (Integer.parseInt(tag) >= 546 && Integer.parseInt(tag) <= 599) {
                 // Notes
@@ -125,16 +133,6 @@ public class MarcXmlParser implements Parser {
                 LOGGER.debug("Unparsed tag: {}", tag);
             }
         }
-
-        /*
-         * ToDo:
-         *  pages
-         *  volume and number correct
-         *  series and journals stored in different tags
-         *  thesis
-         *  proceedings
-         */
-
         return bibEntry;
     }
 
@@ -184,7 +182,7 @@ public class MarcXmlParser implements Parser {
             if (field.isPresent()) {
                 String ind1 = datafield.getAttribute("ind1");
                 String brackedName;
-                if (field.get() == StandardField.PUBLISHER && StringUtil.isNotBlank(ind1) && ind1.equals("2")) {
+                if (field.get() == StandardField.PUBLISHER && StringUtil.isNotBlank(ind1) && "2".equals(ind1)) {
                     // ind == 2 -> Corporate publisher
                     brackedName = "{" + name.getAsFirstLastNamesWithAnd() + "}";
                 } else {
@@ -197,6 +195,15 @@ public class MarcXmlParser implements Parser {
                     bibEntry.setField(field.get(), brackedName);
                 }
             }
+        }
+    }
+
+    private void putConferenceDetail(BibEntry bibEntry, Element datafield) {
+        String conference = getSubfield("a", datafield);
+        bibEntry.setType(StandardEntryType.Proceedings);
+
+        if (StringUtil.isNotBlank(conference)) {
+            bibEntry.setField(StandardField.EVENTTITLE, conference);
         }
     }
 
@@ -245,13 +252,13 @@ public class MarcXmlParser implements Parser {
 
     private void putPublication(BibEntry bibEntry, Element datafield) {
         String ind2 = datafield.getAttribute("ind2");
-        if (StringUtil.isNotBlank(ind2) && ind2.equals("1")) { // Publisher
+        if (StringUtil.isNotBlank(ind2) && "1".equals(ind2)) { // Publisher
             String place = getSubfield("a", datafield);
             String name = getSubfield("b", datafield);
             String date = getSubfield("c", datafield);
 
             if (StringUtil.isNotBlank(place)) {
-                bibEntry.setField(StandardField.LOCATION, place);
+                bibEntry.setField(StandardField.ADDRESS, place);
             }
 
             if (StringUtil.isNotBlank(name)) {
@@ -274,8 +281,8 @@ public class MarcXmlParser implements Parser {
     private void putPhysicalDescription(BibEntry bibEntry, Element datafield) {
         String pagetotal = getSubfield("a", datafield);
 
-        if (StringUtil.isNotBlank(pagetotal) && (pagetotal.contains("pages") || pagetotal.contains("p."))) {
-            pagetotal = pagetotal.replaceAll(" p\\.?$", "");
+        if (StringUtil.isNotBlank(pagetotal) && (pagetotal.contains("pages") || pagetotal.contains("p.") || pagetotal.contains("S") || pagetotal.contains("Seiten"))) {
+            pagetotal = pagetotal.replaceAll(".*?(\\d+)(?:\\s*Seiten|\\s*S|\\s*pages|\\s*p).*", "$1");
             bibEntry.setField(StandardField.PAGETOTAL, pagetotal);
         }
     }
@@ -301,11 +308,25 @@ public class MarcXmlParser implements Parser {
         }
     }
 
+    private void putThesisDescription(BibEntry bibEntry, Element datafield) {
+        String thesisDegree = getSubfield("b", datafield);
+        String school = getSubfield("c", datafield);
+        bibEntry.setType(StandardEntryType.MastersThesis);
+
+        if (StringUtil.isNotBlank(school)) {
+            bibEntry.setField(StandardField.SCHOOL, school);
+        }
+
+        if ("Dissertation".equals(thesisDegree)) {
+            bibEntry.setType(StandardEntryType.PhdThesis);
+        }
+    }
+
     private void putSummary(BibEntry bibEntry, Element datafield) {
         String summary = getSubfield("a", datafield);
 
         String ind1 = datafield.getAttribute("ind1");
-        if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && ind1.equals("3")) { // Abstract
+        if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && "3".equals(ind1)) { // Abstract
             if (bibEntry.getField(StandardField.ABSTRACT).isPresent()) {
                 bibEntry.setField(StandardField.ABSTRACT, bibEntry.getField(StandardField.ABSTRACT).get().concat(summary));
             } else {
@@ -323,6 +344,31 @@ public class MarcXmlParser implements Parser {
                 bibEntry.setField(StandardField.KEYWORDS, keywords.get() + ", " + keyword);
             } else {
                 bibEntry.setField(StandardField.KEYWORDS, keyword);
+            }
+        }
+    }
+
+    private void putIssue(BibEntry bibEntry, Element datafield) {
+        bibEntry.setType(StandardEntryType.Article);
+
+        List<String> issues = getSubfields("g", datafield);
+
+        for (String issue : issues) {
+            String[] parts = issue.split(":");
+            if (parts.length == 2) {
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+
+                if (StringUtil.isNotBlank(value)) {
+                    switch (key) {
+                        case "number" -> bibEntry.setField(StandardField.NUMBER, value);
+                        case "year" -> bibEntry.setField(StandardField.YEAR, value);
+                        case "pages" -> bibEntry.setField(StandardField.PAGES, value);
+                        case "volume" -> bibEntry.setField(StandardField.VOLUME, value);
+                        case "day" -> bibEntry.setField(StandardField.DAY, value);
+                        case "month" -> bibEntry.setField(StandardField.MONTH, value);
+                    }
+                }
             }
         }
     }
@@ -403,10 +449,17 @@ public class MarcXmlParser implements Parser {
 
         for (Element subfield : subfields) {
             if (subfield.getAttribute("code").equals(a)) {
-                return (subfield.getTextContent());
+                return subfield.getTextContent();
             }
         }
+
         return null;
+    }
+
+    private List<String> getSubfields(String a, Element datafield) {
+        List<Element> subfields = getChildren("subfield", datafield);
+
+        return subfields.stream().filter(field -> field.getAttribute("code").equals(a)).map(Node::getTextContent).toList();
     }
 
     private Element getChild(String name, Element e) {

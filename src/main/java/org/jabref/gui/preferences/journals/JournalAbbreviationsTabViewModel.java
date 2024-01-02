@@ -341,7 +341,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess((success) -> Globals.journalAbbreviationRepository =
+                .onSuccess(success -> Globals.journalAbbreviationRepository =
                         JournalAbbreviationLoader.loadRepository(abbreviationsPreferences))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);

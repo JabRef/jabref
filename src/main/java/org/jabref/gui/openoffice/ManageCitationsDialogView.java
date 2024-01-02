@@ -84,9 +84,6 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     }
 
     public boolean isOkToShowThisDialog() {
-        if (viewModel == null || viewModel.failedToGetCitationEntries) {
-            return false;
-        }
-        return true;
+        return viewModel != null && !viewModel.failedToGetCitationEntries;
     }
 }

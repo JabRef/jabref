@@ -1,0 +1,91 @@
+<zs:searchRetrieveResponse>
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <record>
+                    <leader>00921nam a2200289 c 4500</leader>
+                    <controlfield tag="001">BV048992225</controlfield>
+                    <controlfield tag="003">DE-604</controlfield>
+                    <controlfield tag="005">00000000000000.0</controlfield>
+                    <controlfield tag="007">t</controlfield>
+                    <controlfield tag="008">230607s1991 gl|| m||| 00||| eng d</controlfield>
+                    <datafield tag="040" ind1=" " ind2=" ">
+                        <subfield code="a">DE-604</subfield>
+                        <subfield code="b">ger</subfield>
+                        <subfield code="e">rda</subfield>
+                    </datafield>
+                    <datafield tag="100" ind1="1" ind2=" ">
+                        <subfield code="a">Blake, Carl LeRoy</subfield>
+                        <subfield code="d">1951-</subfield>
+                        <subfield code="e">Verfasser</subfield>
+                        <subfield code="0">(DE-588)1173216472</subfield>
+                        <subfield code="4">aut</subfield>
+                    </datafield>
+                    <datafield tag="245" ind1="1" ind2="0">
+                        <subfield code="a">Tempo rubato in the eigteenth century</subfield>
+                        <subfield code="b">a thesis</subfield>
+                        <subfield code="c">by Carl LeRoy Blake</subfield>
+                    </datafield>
+                    <datafield tag="246" ind1="1" ind2="3">
+                        <subfield code="a">Tempo rubato in the 18th century</subfield>
+                    </datafield>
+                    <datafield tag="250" ind1=" " ind2=" ">
+                        <subfield code="a">Faksimile</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="a">Ann Arbor, Mich.</subfield>
+                        <subfield code="b">UMI Dissertation Services</subfield>
+                        <subfield code="c">[1991]</subfield>
+                    </datafield>
+                    <datafield tag="300" ind1=" " ind2=" ">
+                        <subfield code="a">xii, 127 Seiten</subfield>
+                        <subfield code="b">Notenbeispiele</subfield>
+                        <subfield code="c">21 cm</subfield>
+                    </datafield>
+                    <datafield tag="502" ind1=" " ind2=" ">
+                        <subfield code="b">Dissertation</subfield>
+                        <subfield code="c">Cornell University</subfield>
+                        <subfield code="d">1988</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="4">
+                        <subfield code="a">Geschichte 1700-1800</subfield>
+                    </datafield>
+                    <datafield tag="655" ind1=" " ind2="7">
+                        <subfield code="0">(DE-588)4113937-9</subfield>
+                        <subfield code="a">Hochschulschrift</subfield>
+                        <subfield code="2">gnd-content</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(OCoLC)1385298558</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(DE-599)BVBBV048992225</subfield>
+                    </datafield>
+                    <datafield tag="041" ind1="0" ind2=" ">
+                        <subfield code="a">eng</subfield>
+                    </datafield>
+                    <datafield tag="049" ind1=" " ind2=" ">
+                        <subfield code="a">DE-83</subfield>
+                    </datafield>
+                    <datafield tag="336" ind1=" " ind2=" ">
+                        <subfield code="b">txt</subfield>
+                        <subfield code="2">rdacontent</subfield>
+                    </datafield>
+                    <datafield tag="337" ind1=" " ind2=" ">
+                        <subfield code="b">n</subfield>
+                        <subfield code="2">rdamedia</subfield>
+                    </datafield>
+                    <datafield tag="338" ind1=" " ind2=" ">
+                        <subfield code="b">nc</subfield>
+                        <subfield code="2">rdacarrier</subfield>
+                    </datafield>
+                </record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

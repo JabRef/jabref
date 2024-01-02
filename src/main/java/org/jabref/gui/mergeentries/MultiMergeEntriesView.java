@@ -233,9 +233,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             if (newValue) {
                 optionsGrid.getChildrenUnmodifiable().stream()
                            .filter(node -> GridPane.getColumnIndex(node) == column)
-                           .filter(node -> node instanceof HBox)
+                           .filter(HBox.class::isInstance)
                            .forEach(hbox -> ((HBox) hbox).getChildrenUnmodifiable().stream()
-                                                         .filter(node -> node instanceof ToggleButton)
+                                                         .filter(ToggleButton.class::isInstance)
                                                          .forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
                 sourceButton.setSelected(true);
             }

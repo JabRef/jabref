@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
@@ -19,8 +21,8 @@ public class PersonsEditorViewModel extends AbstractEditorViewModel {
 
     private final AutoCompletePreferences preferences;
 
-    public PersonsEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, AutoCompletePreferences preferences, FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+    public PersonsEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, AutoCompletePreferences preferences, FieldCheckers fieldCheckers, UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.preferences = preferences;
     }
 

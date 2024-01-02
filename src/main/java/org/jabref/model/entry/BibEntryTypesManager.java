@@ -100,7 +100,7 @@ public class BibEntryTypesManager {
             return true;
         } else {
             // different customization
-            return !EntryTypeFactory.isEqualNameAndFieldBased(type, currentlyStoredType.get());
+            return !EntryTypeFactory.nameAndFieldsAreEqual(type, currentlyStoredType.get());
         }
     }
 

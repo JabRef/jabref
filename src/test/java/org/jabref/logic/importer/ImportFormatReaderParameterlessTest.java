@@ -22,12 +22,10 @@ class ImportFormatReaderParameterlessTest {
 
     @BeforeEach
     void setUp() {
-        reader = new ImportFormatReader();
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
-
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        reader.resetImportFormats(importerPreferences, importFormatPreferences, fileMonitor);
+        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, fileMonitor);
     }
 
     @Test

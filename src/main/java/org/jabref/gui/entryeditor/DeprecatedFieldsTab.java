@@ -1,8 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -30,6 +30,7 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class DeprecatedFieldsTab extends FieldsEditorTab {
 
+    public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;
 
     public DeprecatedFieldsTab(BibDatabaseContext databaseContext,
@@ -47,7 +48,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
         this.entryTypesManager = entryTypesManager;
 
         setText(Localization.lang("Deprecated fields"));
-        EasyBind.subscribe(preferences.getGeneralPreferences().showAdvancedHintsProperty(), advancedHints -> {
+        EasyBind.subscribe(preferences.getWorkspacePreferences().showAdvancedHintsProperty(), advancedHints -> {
             if (advancedHints) {
                 setTooltip(new Tooltip(Localization.lang("Shows fields having a successor in biblatex.\nFor instance, the publication month should be part of the date field.\nUse the Cleanup Entries functionality to convert the entry to biblatex.")));
             } else {
@@ -58,14 +59,14 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toSet());
+            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
-            // Entry type unknown -> treat all fields as required
-            return Collections.emptySet();
+            // Entry type unknown -> treat all fields as required (thus no optional fields)
+            return new LinkedHashSet<>();
         }
     }
 }

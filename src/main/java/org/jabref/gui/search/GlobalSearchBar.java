@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,8 +43,7 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
@@ -109,7 +109,11 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
+    public GlobalSearchBar(LibraryTabContainer tabContainer,
+                           StateManager stateManager,
+                           PreferencesService preferencesService,
+                           CountingUndoManager undoManager,
+                           DialogService dialogService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -119,7 +123,7 @@ public class GlobalSearchBar extends HBox {
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
-        // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
+        // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
         currentResults.setPrefWidth(150);
 
         searchField.setTooltip(searchFieldTooltip);
@@ -127,14 +131,14 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
-                if (keyBinding.get().equals(KeyBinding.CLOSE)) {
+                if (keyBinding.get() == KeyBinding.CLOSE) {
                     // Clear search and select first entry, if available
                     searchField.setText("");
-                    frame.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
+                    tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
                     event.consume();
                 }
             }
@@ -143,14 +147,18 @@ public class GlobalSearchBar extends HBox {
         searchField.setContextMenu(SearchFieldRightClickMenu.create(
                 keyBindingRepository,
                 stateManager,
-                searchField));
+                searchField,
+                tabContainer,
+                undoManager));
 
         ObservableList<String> search = stateManager.getWholeSearchHistory();
         search.addListener((ListChangeListener.Change<? extends String> change) -> {
             searchField.setContextMenu(SearchFieldRightClickMenu.create(
                     keyBindingRepository,
                     stateManager,
-                    searchField));
+                    searchField,
+                    tabContainer,
+                    undoManager));
         });
 
         ClipBoardManager.addX11Support(searchField);
@@ -199,7 +207,7 @@ public class GlobalSearchBar extends HBox {
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::updateSearchQuery);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),
@@ -211,6 +219,18 @@ public class GlobalSearchBar extends HBox {
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+        /*
+         * The listener tracks a change on the focus property value.
+         * This happens, from active (user types a query) to inactive / focus
+         * lost (e.g., user selects an entry or triggers the search).
+         * The search history should only be filled, if focus is lost.
+         */
+        searchField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+            // Focus lost can be derived by checking that there is no newValue (or the text is empty)
+            if (oldValue && !(newValue || searchField.getText().isBlank())) {
+                this.stateManager.addSearchHistory(searchField.textProperty().get());
+            }
+        });
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
@@ -224,7 +244,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.REGULAR_EXPRESSION, regularExpressionButton.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
@@ -232,7 +252,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         fulltextButton.setSelected(searchPreferences.isFulltext());
@@ -240,7 +260,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(fulltextButton);
         fulltextButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.FULLTEXT, fulltextButton.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
@@ -248,7 +268,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(keepSearchString);
         keepSearchString.setOnAction(evt -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.KEEP_SEARCH_STRING, keepSearchString.isSelected());
-            performSearch();
+            updateSearchQuery();
         });
 
         openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
@@ -257,7 +277,7 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton.setOnAction(evt -> {
             globalSearchActive.setValue(true);
             globalSearchResultDialog = new GlobalSearchResultDialog(undoManager);
-            performSearch();
+            updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
         });
@@ -284,9 +304,9 @@ public class GlobalSearchBar extends HBox {
         searchField.selectAll();
     }
 
-    public void performSearch() {
+    public void updateSearchQuery() {
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
-        LOGGER.debug("Run search " + searchField.getText());
+        LOGGER.debug("Updated search query: {}", searchField.getText());
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
@@ -307,7 +327,6 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        this.stateManager.addSearchHistory(searchField.textProperty().get());
         stateManager.setSearchQuery(searchQuery);
     }
 
@@ -377,7 +396,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void setSearchFieldHintTooltip(TextFlow description) {
-        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
+        if (preferencesService.getWorkspacePreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
@@ -429,12 +448,12 @@ public class GlobalSearchBar extends HBox {
         }
 
         private void registerEventListener() {
-            this.suggestionList.setOnMouseClicked((me) -> {
+            this.suggestionList.setOnMouseClicked(me -> {
                 if (me.getButton() == MouseButton.PRIMARY) {
                     this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
                 }
             });
-            this.suggestionList.setOnKeyPressed((ke) -> {
+            this.suggestionList.setOnKeyPressed(ke -> {
                 switch (ke.getCode()) {
                     case TAB:
                     case ENTER:

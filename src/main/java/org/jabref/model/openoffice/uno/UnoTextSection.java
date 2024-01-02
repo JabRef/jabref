@@ -58,7 +58,7 @@ public class UnoTextSection {
             NoDocumentException {
 
         XNameAccess nameAccess = getNameAccess(doc);
-        return (UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor));
+        return UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
     }
 
     /**

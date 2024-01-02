@@ -103,8 +103,9 @@ class XjcTask extends DefaultTask {
     }
 
     private void updateOutput() {
-        if (outputDirectory != null && javaPackage != null)
-        outputs.dir(new File(getOutputDirectory(), packageAsPath(javaPackage)))
+        if (outputDirectory != null && javaPackage != null) {
+            outputs.dir(new File(getOutputDirectory(), packageAsPath(javaPackage)))
+        }
     }
 
     private static String packageAsPath(String pkg) {

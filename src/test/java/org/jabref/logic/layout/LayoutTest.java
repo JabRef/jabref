@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -25,16 +26,18 @@ import static org.mockito.Mockito.when;
 class LayoutTest {
 
     private LayoutFormatterPreferences layoutFormatterPreferences;
+    private JournalAbbreviationRepository abbreviationRepository;
 
     @BeforeEach
     void setUp() {
         layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        abbreviationRepository = mock(JournalAbbreviationRepository.class);
     }
 
     private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry) throws IOException {
         StringReader layoutStringReader = new StringReader(layout.replace("__NEWLINE__", "\n"));
 
-        return new LayoutHelper(layoutStringReader, fileDirForDatabase, layoutFormatterPreferences)
+        return new LayoutHelper(layoutStringReader, fileDirForDatabase, layoutFormatterPreferences, abbreviationRepository)
                 .getLayoutFromText()
                 .doLayout(entry, null);
     }

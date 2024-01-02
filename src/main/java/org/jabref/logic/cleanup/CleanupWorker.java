@@ -57,6 +57,8 @@ public class CleanupWorker {
                     new DoiCleanup();
             case CLEANUP_EPRINT ->
                     new EprintCleanup();
+            case CLEAN_UP_URL ->
+                    new URLCleanup();
             case MAKE_PATHS_RELATIVE ->
                     new RelativePathsCleanup(databaseContext, filePreferences);
             case RENAME_PDF ->

@@ -86,7 +86,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void createIndex(PdfIndexer indexer) {
-        enqueueTask(() -> indexer.createIndex());
+        enqueueTask(indexer::createIndex);
     }
 
     public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
@@ -103,7 +103,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
-        enqueueTask(() -> addToIndex(indexer, entry, entry.getFiles(), databaseContext));
+        addToIndex(indexer, entry, entry.getFiles(), databaseContext);
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {

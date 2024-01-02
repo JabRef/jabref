@@ -131,18 +131,18 @@ public class Backend52 {
 
         Codec52.ParsedMarkName parsed = Codec52.parseMarkName(markName).orElseThrow(IllegalArgumentException::new);
 
-        List<Citation> citations = (parsed.citationKeys.stream()
+        List<Citation> citations = parsed.citationKeys.stream()
                                                        .map(Citation::new)
-                                                       .collect(Collectors.toList()));
+                                                       .collect(Collectors.toList());
 
-        Optional<OOText> pageInfo = (UnoUserDefinedProperty.getStringValue(doc, markName)
-                                                           .map(OOText::fromString));
+        Optional<OOText> pageInfo = UnoUserDefinedProperty.getStringValue(doc, markName)
+                                                           .map(OOText::fromString);
         pageInfo = PageInfo.normalizePageInfo(pageInfo);
 
         setPageInfoInDataInitial(citations, pageInfo);
 
-        NamedRange namedRange = (citationStorageManager.getNamedRangeFromDocument(doc, markName)
-                                                       .orElseThrow(IllegalArgumentException::new));
+        NamedRange namedRange = citationStorageManager.getNamedRangeFromDocument(doc, markName)
+                                                       .orElseThrow(IllegalArgumentException::new);
 
         CitationGroupId groupId = new CitationGroupId(markName);
         CitationGroup group = new CitationGroup(OODataModel.JabRef52,
@@ -226,7 +226,7 @@ public class Backend52 {
         /*
          * Apply to document
          */
-        boolean withoutBrackets = (citationType == CitationType.INVISIBLE_CIT);
+        boolean withoutBrackets = citationType == CitationType.INVISIBLE_CIT;
         NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
                 markName,
                 position,
@@ -271,25 +271,25 @@ public class Backend52 {
                         Backend52::getPageInfoFromData);
 
                 // Try to do something of the pageInfos.
-                String singlePageInfo = (pageInfos.stream()
+                String singlePageInfo = pageInfos.stream()
                                                   .filter(Optional::isPresent)
                                                   .map(pi -> OOText.toString(pi.get()))
                                                   .distinct()
-                                                  .collect(Collectors.joining("; ")));
+                                                  .collect(Collectors.joining("; "));
 
-                int totalCitations = (joinableGroup.stream()
+                int totalCitations = joinableGroup.stream()
                                                    .map(CitationGroup::numberOfCitations)
-                                                   .mapToInt(Integer::intValue).sum());
+                                                   .mapToInt(Integer::intValue).sum();
                 if ("".equals(singlePageInfo)) {
                     singlePageInfo = null;
                 }
                 return OODataModel.fakePageInfos(singlePageInfo, totalCitations);
 
             case JabRef60:
-                return (joinableGroup.stream()
+                return joinableGroup.stream()
                                      .flatMap(group -> (group.citationsInStorageOrder.stream()
                                                                                      .map(Citation::getPageInfo)))
-                                     .collect(Collectors.toList()));
+                                     .collect(Collectors.toList());
             default:
                 throw new IllegalArgumentException("unhandled dataModel here");
         }
@@ -378,14 +378,14 @@ public class Backend52 {
                 List<CitationEntry> citations = new ArrayList<>(citationGroups.numberOfCitationGroups());
                 for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
                     String name = group.groupId.citationGroupIdAsString();
-                    XTextCursor cursor = (this
+                    XTextCursor cursor = this
                             .getRawCursorForCitationGroup(group, doc)
-                            .orElseThrow(IllegalStateException::new));
+                            .orElseThrow(IllegalStateException::new);
                     String context = GetContext.getCursorStringWithContext(cursor, 30, 30, true);
-                    Optional<String> pageInfo = (group.numberOfCitations() > 0
+                    Optional<String> pageInfo = group.numberOfCitations() > 0
                             ? (getPageInfoFromData(group)
                             .map(e -> OOText.toString(e)))
-                            : Optional.empty());
+                            : Optional.empty();
                     CitationEntry entry = new CitationEntry(name, context, pageInfo);
                     citations.add(entry);
                 }

@@ -1,10 +1,15 @@
 package org.jabref.model.entry.identifier;
 
+import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ISSN {
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+
+public class ISSN implements Identifier {
 
     private static final Pattern ISSN_PATTERN = Pattern.compile("^\\d{4}-\\d{3}[\\dxX]$");
     private static final Pattern ISSN_PATTERN_NODASH = Pattern.compile("^(\\d{4})(\\d{3}[\\dxX])$");
@@ -17,12 +22,12 @@ public class ISSN {
 
     public boolean isValidFormat() {
         Matcher issnMatcher = ISSN_PATTERN.matcher(issnString);
-        return (issnMatcher.matches());
+        return issnMatcher.matches();
     }
 
     public boolean isCanBeCleaned() {
         Matcher issnNoDashMatcher = ISSN_PATTERN_NODASH.matcher(issnString);
-        return (issnNoDashMatcher.matches());
+        return issnNoDashMatcher.matches();
     }
 
     public String getCleanedISSN() {
@@ -46,6 +51,21 @@ public class ISSN {
         if ((control == 'x') || (control == 'X')) {
             control = '9' + 1;
         }
-        return (((((sum % 11) + control) - '0') == 11) || ((sum % 11) == 0));
+        return ((((sum % 11) + control) - '0') == 11) || ((sum % 11) == 0);
+    }
+
+    @Override
+    public String getNormalized() {
+        return issnString;
+    }
+
+    @Override
+    public Field getDefaultField() {
+        return StandardField.ISSN;
+    }
+
+    @Override
+    public Optional<URI> getExternalURI() {
+        return Optional.empty();
     }
 }

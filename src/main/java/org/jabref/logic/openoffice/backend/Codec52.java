@@ -114,14 +114,14 @@ class Codec52 {
         String index = citeMatcher.group(1);
         int citTypeCode = Integer.parseInt(citeMatcher.group(2));
         CitationType citationType = citationTypeFromInt(citTypeCode);
-        return (Optional.of(new Codec52.ParsedMarkName(index, citationType, keys)));
+        return Optional.of(new Codec52.ParsedMarkName(index, citationType, keys));
     }
 
     /**
      * @return true if name matches the pattern used for JabRef reference mark names.
      */
     public static boolean isJabRefReferenceMarkName(String name) {
-        return (CITE_PATTERN.matcher(name).find());
+        return CITE_PATTERN.matcher(name).find();
     }
 
     /**
@@ -130,8 +130,8 @@ class Codec52 {
      * @param names The list to be filtered.
      */
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
-        return (names.stream()
+        return names.stream()
                      .filter(Codec52::isJabRefReferenceMarkName)
-                     .collect(Collectors.toList()));
+                     .collect(Collectors.toList());
     }
 }

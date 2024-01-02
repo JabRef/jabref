@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,12 +12,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.logic.util.OS;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
@@ -31,22 +35,28 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     @FXML private Label icon;
     @Inject private DialogService dialogService;
 
-    private final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
+    private final NativeDesktop nativeDesktop = OS.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
-
     private final ExternalFileTypeItemViewModel item;
 
+    private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
     private EditExternalFileTypeViewModel viewModel;
 
-    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
-        this.item = item;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
+    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle, ObservableList<ExternalFileTypeItemViewModel> fileTypes) {
+        this.item = item;
+        this.fileTypes = fileTypes;
         this.setTitle(dialogTitle);
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
+        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
@@ -57,7 +67,9 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new EditExternalFileTypeViewModel(item);
+        visualizer.setDecoration(new IconValidationDecorator());
+
+        viewModel = new EditExternalFileTypeViewModel(item, fileTypes);
 
         icon.setGraphic(viewModel.getIcon());
 
@@ -65,11 +77,16 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         customApplication.selectedProperty().bindBidirectional(viewModel.customApplicationSelectedProperty());
         selectedApplication.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
         btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
-
         extension.textProperty().bindBidirectional(viewModel.extensionProperty());
         name.textProperty().bindBidirectional(viewModel.nameProperty());
         mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());
         selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());
+
+        Platform.runLater(() -> {
+            visualizer.initVisualization(viewModel.extensionValidation(), extension, true);
+            visualizer.initVisualization(viewModel.nameValidation(), name, true);
+            visualizer.initVisualization(viewModel.mimeTypeValidation(), mimeType, true);
+        });
     }
 
     @FXML

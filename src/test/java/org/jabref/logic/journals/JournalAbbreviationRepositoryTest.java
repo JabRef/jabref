@@ -26,7 +26,7 @@ class JournalAbbreviationRepositoryTest {
 
     private JournalAbbreviationRepository repository;
 
-    private BibDatabase bibDatabase = new BibDatabase();
+    private final BibDatabase bibDatabase = new BibDatabase();
     private UndoableUnabbreviator undoableUnabbreviator;
 
     @BeforeEach
@@ -168,8 +168,8 @@ class JournalAbbreviationRepositoryTest {
     void testAbbreviationsWithEscapedAmpersand() {
         assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials & Interfaces").get());
         assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials \\& Interfaces").get());
-        assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling"), repository.get("Antioxidants & Redox Signaling").get());
-        assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling"), repository.get("Antioxidants \\& Redox Signaling").get());
+        assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Sign."), repository.get("Antioxidants & Redox Signaling").get());
+        assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Sign."), repository.get("Antioxidants \\& Redox Signaling").get());
 
         repository.addCustomAbbreviation(new Abbreviation("Long & Name", "L. N.", "LN"));
         assertEquals(new Abbreviation("Long & Name", "L. N.", "LN"), repository.get("Long & Name").get());

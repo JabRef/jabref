@@ -83,7 +83,7 @@ public final class DocumentReader {
      */
     public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext) {
         return entry.getFiles().stream()
-                    .map((pdf) -> readLinkedPdf(databaseContext, pdf))
+                    .map(pdf -> readLinkedPdf(databaseContext, pdf))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .flatMap(List::stream)
@@ -153,8 +153,8 @@ public final class DocumentReader {
             newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
         }
         PDPage page = pdfDocument.getPage(pageNumber);
-        List<String> annotations = page.getAnnotations().stream().filter((annotation) -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
-        if (annotations.size() > 0) {
+        List<String> annotations = page.getAnnotations().stream().filter(annotation -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
+        if (!annotations.isEmpty()) {
             newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
         }
     }

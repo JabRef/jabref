@@ -6,17 +6,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
@@ -33,7 +30,6 @@ import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class DocBook5ExporterTest {
 
@@ -46,31 +42,26 @@ public class DocBook5ExporterTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
-        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                new ArrayList<>(),
+        exporter = new TemplateExporter(
+                "DocBook 5.1",
+                "docbook5",
+                "docbook5",
+                null,
+                StandardFileType.XML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration,
-                mock(XmpPreferences.class),
-                mock(FieldPreferences.class),
-                BibDatabaseMode.BIBTEX,
-                mock(BibEntryTypesManager.class));
-
-        exporter = exporterFactory.getExporterByName("docbook5").get();
+                SaveOrder.getDefaultSaveOrder());
 
         LocalDate myDate = LocalDate.of(2018, 1, 1);
 
+        xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        BibEntry entry = new BibEntry(StandardEntryType.Book);
-        entry.setField(StandardField.TITLE, "my paper title");
-        entry.setField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez");
-        entry.setField(StandardField.ISBN, "1-2-34");
-        entry.setCitationKey("mykey");
-        entry.setDate(new org.jabref.model.entry.Date(myDate));
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "my paper title")
+                .withField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez")
+                .withField(StandardField.ISBN, "1-2-34")
+                .withCitationKey("mykey")
+                .withDate(new Date(myDate));
         entries = Collections.singletonList(entry);
     }
 

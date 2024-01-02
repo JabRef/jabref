@@ -18,7 +18,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary;
@@ -35,12 +34,10 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachme
  */
 public class PdfEmbeddedBibFileImporter extends Importer {
 
-    private final ImportFormatPreferences importFormatPreferences;
     private final BibtexParser bibtexParser;
 
     public PdfEmbeddedBibFileImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
-        bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        bibtexParser = new BibtexParser(importFormatPreferences);
     }
 
     @Override
@@ -75,7 +72,7 @@ public class PdfEmbeddedBibFileImporter extends Importer {
 
     /**
      * Extraction of embedded files in pdfs adapted from:
-     * Adapted from https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj
+     * Adapted from <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
      */
 
     private List<BibEntry> getEmbeddedBibFileEntries(PDDocument document) throws IOException, ParseException {
@@ -101,8 +98,7 @@ public class PdfEmbeddedBibFileImporter extends Importer {
         // extract files from annotations
         for (PDPage page : document.getPages()) {
             for (PDAnnotation annotation : page.getAnnotations()) {
-                if (annotation instanceof PDAnnotationFileAttachment) {
-                    PDAnnotationFileAttachment annotationFileAttachment = (PDAnnotationFileAttachment) annotation;
+                if (annotation instanceof PDAnnotationFileAttachment annotationFileAttachment) {
                     PDComplexFileSpecification fileSpec = (PDComplexFileSpecification) annotationFileAttachment.getFile();
                     allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));
                 }

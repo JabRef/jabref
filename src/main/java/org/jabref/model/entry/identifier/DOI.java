@@ -37,7 +37,7 @@ public class DOI implements Identifier {
             + "("                               // begin group \1
             + "10"                              // directory indicator
             + "(?:\\.[0-9]+)+"                  // registrant codes
-            + "[/:%]" // divider
+            + "[/:%]"                           // divider
             + "(?:.+)"                          // suffix alphanumeric string
             + ")";                              // end group \1
     private static final String FIND_DOI_EXP = ""
@@ -171,6 +171,9 @@ public class DOI implements Identifier {
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
             if (cleanedDOI.startsWith("_") && cleanedDOI.endsWith("_")) {
+                if (cleanedDOI.length() == 1) {
+                    return Optional.empty();
+                }
                 cleanedDOI = cleanedDOI.substring(1, cleanedDOI.length() - 1);
             }
 

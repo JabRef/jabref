@@ -33,7 +33,7 @@ class DefaultAutoCompleterTest {
 
     @Test
     void completeWithoutAddingAnythingReturnsNothing() {
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
         assertEquals(Collections.emptyList(), result);
     }
 
@@ -42,7 +42,7 @@ class DefaultAutoCompleterTest {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
         assertEquals(Collections.emptyList(), result);
     }
 
@@ -52,7 +52,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.AUTHOR, "testAuthor");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
         assertEquals(Collections.emptyList(), result);
     }
 
@@ -62,7 +62,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "testValue");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("testValue"));
         assertEquals(Arrays.asList("testValue"), result);
     }
 
@@ -72,7 +72,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "testValue");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
         assertEquals(Arrays.asList("testValue"), result);
     }
 
@@ -82,7 +82,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "testValue");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testvalue")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("testvalue"));
         assertEquals(Arrays.asList("testValue"), result);
     }
 
@@ -92,7 +92,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "testKey");
         database.insertEntry(entry);
 
-        assertThrows(NullPointerException.class, () -> autoCompleter.provideSuggestions(getRequest((null))));
+        assertThrows(NullPointerException.class, () -> autoCompleter.provideSuggestions(getRequest(null)));
     }
 
     @Test
@@ -101,7 +101,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "testKey");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(""));
         assertEquals(Collections.emptyList(), result);
     }
 
@@ -114,7 +114,7 @@ class DefaultAutoCompleterTest {
         entryTwo.setField(StandardField.TITLE, "testValueTwo");
         database.insertEntry(entryTwo);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("testValue"));
         assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
     }
 
@@ -124,7 +124,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "val");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("va")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("va"));
         assertEquals(Collections.singletonList("val"), result);
     }
 
@@ -134,7 +134,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "test value");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("val")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("val"));
         assertEquals(Collections.singletonList("value"), result);
     }
 
@@ -144,7 +144,7 @@ class DefaultAutoCompleterTest {
         entry.setField(StandardField.TITLE, "test value");
         database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("lue")));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest("lue"));
         assertEquals(Collections.singletonList("value"), result);
     }
 }

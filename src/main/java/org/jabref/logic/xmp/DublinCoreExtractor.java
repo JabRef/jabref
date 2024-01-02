@@ -152,7 +152,7 @@ public class DublinCoreExtractor {
                 // only for month field - override value
                 // workaround, because the date value of the xmp component of pdf box is corrupted
                 // see also DublinCoreExtractor#extractYearAndMonth
-                if (StandardField.MONTH.equals(key)) {
+                if (StandardField.MONTH == key) {
                     Optional<Month> parsedMonth = Month.parse(value);
                     parsedMonth.ifPresent(bibEntry::setMonth);
                 }
@@ -423,7 +423,7 @@ public class DublinCoreExtractor {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
-        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(field -> field.getName()));
+        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         fields.addAll(bibEntry.getFields());
         for (Field field : fields) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {

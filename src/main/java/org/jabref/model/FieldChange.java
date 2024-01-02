@@ -48,8 +48,7 @@ public class FieldChange {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof FieldChange) {
-            FieldChange other = (FieldChange) obj;
+        if (obj instanceof FieldChange other) {
             if (entry == null) {
                 if (other.entry != null) {
                     return false;

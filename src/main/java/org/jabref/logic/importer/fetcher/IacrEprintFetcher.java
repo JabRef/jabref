@@ -18,7 +18,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
 
@@ -63,7 +62,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         String actualEntry = getRequiredValueBetween("<pre id=\"bibtex\">", "</pre>", bibtexCitationHtml);
 
         try {
-            return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());
+            return BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }

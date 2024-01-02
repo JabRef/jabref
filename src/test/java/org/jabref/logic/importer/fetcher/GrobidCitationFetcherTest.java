@@ -57,18 +57,21 @@ public class GrobidCitationFetcherTest {
                                                                             .withField(StandardField.AUTHOR, "Thomas, H")
                                                                             .withField(StandardField.TITLE, "Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)")
                                                                             .withField(StandardField.DATE, "2004")
+                                                                            .withField(StandardField.PUBLISHER, "University of Colorado")
                                                                             .withField(StandardField.YEAR, "2004")
                                                                             .withField(StandardField.ADDRESS, "Boulder");
 
     static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
-    static BibEntry example3AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCitationKey("-1")
+    static BibEntry example3AsBibEntry = new BibEntry(StandardEntryType.InBook).withCitationKey("-1")
                                                                             .withField(StandardField.AUTHOR, "Turk, Jeremy and Graham, Philip and Verhulst, Frank")
-                                                                            .withField(StandardField.TITLE, "Child and Adolescent Psychiatry")
+                                                                            .withField(StandardField.TITLE, "Developmental psychopathology")
+                                                                            .withField(StandardField.BOOKTITLE, "Child and Adolescent Psychiatry")
                                                                             .withField(StandardField.PUBLISHER, "Oxford University Press")
                                                                             .withField(StandardField.DATE, "2007-02")
                                                                             .withField(StandardField.YEAR, "2007")
                                                                             .withField(StandardField.MONTH, "2")
-                                                                            .withField(StandardField.DOI, "10.1093/med/9780199216697.001.0001")
+                                                                            .withField(StandardField.PAGES, "191-264")
+                                                                            .withField(StandardField.DOI, "10.1093/med/9780199216697.003.0004")
                                                                             .withField(StandardField.ADDRESS, "Oxford, England");
 
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
@@ -78,6 +81,7 @@ public class GrobidCitationFetcherTest {
                                                                                .withField(StandardField.PUBLISHER, "Cavendish")
                                                                                .withField(StandardField.DATE, "2003")
                                                                                .withField(StandardField.YEAR, "2003")
+                                                                               .withField(StandardField.NUMBER, "4")
                                                                                .withField(StandardField.ADDRESS, "London, England");
 
     public static Stream<Arguments> provideExamplesForCorrectResultTest() {
@@ -91,7 +95,7 @@ public class GrobidCitationFetcherTest {
 
     public static Stream<Arguments> provideInvalidInput() {
         return Stream.of(
-                Arguments.of("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________"),
+                Arguments.of("😋😋😋"),
                 Arguments.of("¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°")
         );
     }

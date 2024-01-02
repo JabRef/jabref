@@ -208,6 +208,10 @@ public class UnicodeToReadableCharMap extends HashMap<String, String> {
         put("\u01EB", "o");
         put("\u1E0C", "D");
         put("\u1E0D", "d");
+        put("\u1E1A", "E"); // "~" subscript
+        put("\u1E1B", "e");
+        put("\u1E2C", "I");
+        put("\u1E2D", "i");
         put("\u1E24", "H");
         put("\u1E25", "h");
         put("\u1E36", "L");
@@ -226,6 +230,21 @@ public class UnicodeToReadableCharMap extends HashMap<String, String> {
         put("\u1E63", "s");
         put("\u1E6C", "T");
         put("\u1E6D", "t");
+        put("\u1E74", "U");
+        put("\u1E75", "u");
+        put("\u1EA2", "A"); // hook
+        put("\u1EA3", "a");
+        put("\u1EBA", "E");
+        put("\u1EBB", "e");
+        put("\u1EC8", "I");
+        put("\u1EC9", "i");
+        put("\u1ECE", "O");
+        put("\u1ECF", "o");
+        put("\u1EE6", "U");
+        put("\u1EE7", "u");
+        put("\u1EF6", "Y");
+        put("\u1EF7", "y");
+
         put("\u00CF", "I");
 
         put("\u008C", "AE"); // doesn't work?

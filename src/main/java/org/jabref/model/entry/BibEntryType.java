@@ -4,9 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -24,25 +27,22 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
      *
+     * A builder is available at {@link BibEntryTypeBuilder}
+     *
      * @param type              The EntryType this BibEntryType is wrapped around.
      * @param fields            A BibFields list of all fields, including the required fields
      * @param requiredFields    A OrFields list of just the required fields
      */
     public BibEntryType(EntryType type, Collection<BibField> fields, Collection<OrFields> requiredFields) {
         this.type = Objects.requireNonNull(type);
-        this.requiredFields = new LinkedHashSet<>(requiredFields);
         this.fields = new LinkedHashSet<>(fields);
+        this.requiredFields = new LinkedHashSet<>(requiredFields);
     }
 
     public EntryType getType() {
         return type;
     }
 
-    /**
-     * Returns all supported optional field names.
-     *
-     * @return a Set of optional field name Strings
-     */
     public Set<BibField> getOptionalFields() {
         return getAllBibFields().stream()
                              .filter(field -> !isRequired(field.field()))
@@ -76,25 +76,25 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return fields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getPrimaryOptionalFields() {
+    public SequencedSet<Field> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.IMPORTANT)
                                   .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getSecondaryOptionalFields() {
+    public SequencedSet<Field> getSecondaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.DETAIL)
                                   .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getDeprecatedFields(BibDatabaseMode mode) {
+    public SequencedSet<Field> getDeprecatedFields(BibDatabaseMode mode) {
         if (mode == BibDatabaseMode.BIBTEX) {
-            return Collections.emptySet();
+            return new LinkedHashSet<>();
         }
-        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
+        SequencedSet<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
 
         // Only the optional fields which are mapped to another BibLaTeX name should be shown as "deprecated"
         deprecatedFields.retainAll(getOptionalFieldsAndAliases());
@@ -107,8 +107,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    public Set<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
-        Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
+    public SequencedSet<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
+        SequencedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }
@@ -116,8 +116,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Get list of all optional fields of this entry and all fields being source for a BibTeX to BibLaTeX conversion.
      */
-    private Set<Field> getOptionalFieldsAndAliases() {
-        Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
+    private SequencedSet<Field> getOptionalFieldsAndAliases() {
+        SequencedSet<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
             optionalFieldsAndAliases.add(field.field());
             if (EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(field.field())) {
@@ -146,13 +146,21 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return Objects.hash(type, requiredFields, fields);
     }
 
+    /**
+     * Generates a **single line** string containing the information. This is used for debugging purposes.
+     *
+     * See "<a href="https://biratkirat.medium.com/learning-effective-java-item-10-84cc3ab553bc">Effective Java, Item 10</a>" for a discussion on contracts.
+     *
+     * We are sure, we are using this method in a) logs (which should use single lines for output) and b) in the UI. For the UI, we use {@link BibEntryTypePrefsAndFileViewModel},
+     * which in turn uses {@link MetaDataSerializer#serializeCustomEntryTypes(BibEntryType)}
+     */
     @Override
     public String toString() {
         return "BibEntryType{" +
-               "type=" + type +
-               ", requiredFields=" + requiredFields +
-               ", fields=" + fields +
-               '}';
+                "type=" + type +
+                ", allFields=" + fields +
+                ", requiredFields=" + requiredFields +
+                '}';
     }
 
     @Override

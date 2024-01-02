@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,10 +68,33 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     @Override
     public void storeSettings() {
         List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
+
+        if (isDefaultMap(fieldKeywordsMap)) {
+            Iterator<ContentSelector> iterator = metaData.getContentSelectors().getContentSelectors().iterator();
+            while (iterator.hasNext()) {
+                metaData.clearContentSelectors(iterator.next().getField());
+            }
+        }
+
         fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
 
         List<Field> fieldNamesToRemove = filterFieldsToRemove();
         fieldNamesToRemove.forEach(metaData::clearContentSelectors);
+    }
+
+    private boolean isDefaultMap(Map<Field, List<String>> fieldKeywordsMap) {
+        if (fieldKeywordsMap.size() != DEFAULT_FIELD_NAMES.size()) {
+            return false;
+        }
+        for (Field field : DEFAULT_FIELD_NAMES) {
+            if (!fieldKeywordsMap.containsKey(field)) {
+                return false;
+            }
+            if (!fieldKeywordsMap.get(field).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public ListProperty<Field> getFieldNamesBackingList() {
@@ -102,7 +126,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     }
 
     void showInputFieldNameDialog() {
-        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name:"))
+        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name"))
                      .map(FieldFactory::parseField)
                      .ifPresent(this::addFieldIfUnique);
     }

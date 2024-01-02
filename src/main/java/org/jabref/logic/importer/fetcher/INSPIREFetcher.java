@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -83,7 +83,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override
@@ -94,21 +94,21 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
         String url;
 
-        if (archiveprefix.get() == "arXiv" && !eprint.isEmpty()) {
+        if (archiveprefix.filter("arxiv"::equals).isPresent() && eprint.isPresent()) {
             url = INSPIRE_ARXIV_HOST + eprint.get();
-        } else if (!doi.isEmpty()) {
+        } else if (doi.isPresent()) {
             url = INSPIRE_DOI_HOST + doi.get();
         } else {
             return results;
         }
 
         try {
-            URLDownload download = getUrlDownload(new URL(url));
+            URLDownload download = getUrlDownload(new URI(url).toURL());
             results = getParser().parseEntries(download.asInputStream());
             results.forEach(this::doPostCleanup);
             return results;
-        } catch (IOException | ParseException e) {
-            throw new FetcherException("Error occured during fetching", e);
+        } catch (IOException | ParseException | URISyntaxException e) {
+            throw new FetcherException("Error occurred during fetching", e);
         }
     }
 }

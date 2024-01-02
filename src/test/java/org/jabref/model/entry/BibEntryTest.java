@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -25,6 +26,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -361,17 +364,17 @@ class BibEntryTest {
     @Test
     void identicObjectsareEqual() throws Exception {
         BibEntry otherEntry = entry;
-        assertTrue(entry.equals(otherEntry));
+        assertEquals(entry, otherEntry);
     }
 
     @Test
     void compareToNullObjectIsFalse() throws Exception {
-        assertFalse(entry.equals(null));
+        assertNotEquals(null, entry);
     }
 
     @Test
     void compareToDifferentClassIsFalse() throws Exception {
-        assertFalse(entry.equals(new Object()));
+        assertNotEquals(entry, new Object());
     }
 
     @Test
@@ -808,5 +811,39 @@ class BibEntryTest {
 
         copyEntry.mergeWith(otherEntry, otherPrioritizedFields);
         assertEquals(expected.getFields(), copyEntry.getFields());
+    }
+
+    public static Stream<BibEntry> isEmpty() {
+        return Stream.of(
+                new BibEntry(),
+                new BibEntry(StandardEntryType.Book),
+                new BibEntry().withField(StandardField.OWNER, "test"),
+                new BibEntry().withField(StandardField.CREATIONDATE, "test"),
+                new BibEntry()
+                        .withField(StandardField.OWNER, "test")
+                        .withField(StandardField.CREATIONDATE, "test"),
+                // source: https://github.com/JabRef/jabref/issues/8645
+                new BibEntry()
+                        .withField(StandardField.OWNER, "mlep")
+                        .withField(StandardField.CREATIONDATE, "2022-04-05T10:41:54"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void isEmpty(BibEntry entry) {
+        assertTrue(entry.isEmpty());
+    }
+
+    public static Stream<BibEntry> isNotEmpty() {
+        return Stream.of(
+                new BibEntry().withCitationKey("test"),
+                new BibEntry().withField(StandardField.AUTHOR, "test")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void isNotEmpty(BibEntry entry) {
+        assertFalse(entry.isEmpty());
     }
 }

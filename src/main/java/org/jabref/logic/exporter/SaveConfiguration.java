@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.model.metadata.SaveOrder;
 
 public class SaveConfiguration {
@@ -11,35 +12,22 @@ public class SaveConfiguration {
     private SaveOrder saveOrder;
     private boolean makeBackup;
     private BibDatabaseWriter.SaveType saveType;
-    private boolean useMetadataSaveOrder;
 
     public SaveConfiguration(SaveOrder saveOrder,
                              Boolean makeBackup,
                              BibDatabaseWriter.SaveType saveType,
-                             Boolean useMetadataSaveOrder,
                              Boolean reformatFile) {
         this.saveOrder = saveOrder;
         this.makeBackup = makeBackup;
         this.saveType = saveType;
-        this.useMetadataSaveOrder = useMetadataSaveOrder;
         this.reformatFile = reformatFile;
     }
 
     public SaveConfiguration() {
         this(SaveOrder.getDefaultSaveOrder(),
                 false,
-                BibDatabaseWriter.SaveType.ALL,
-                true,
+                BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA,
                 false);
-    }
-
-    public boolean useMetadataSaveOrder() {
-        return useMetadataSaveOrder;
-    }
-
-    public SaveConfiguration withMetadataSaveOrder(boolean newTakeMetadataSaveOrderInAccount) {
-        this.useMetadataSaveOrder = newTakeMetadataSaveOrderInAccount;
-        return this;
     }
 
     public SaveOrder getSaveOrder() {
@@ -56,7 +44,7 @@ public class SaveConfiguration {
     }
 
     /**
-     * Required by {@link org.jabref.logic.autosaveandbackup.BackupManager}. Should not be used in other settings
+     * Required by {@link BackupManager}. Should not be used in other settings
      *
      * @param newMakeBackup whether a backup (.bak file) should be made
      */

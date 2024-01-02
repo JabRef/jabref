@@ -3,6 +3,8 @@ package org.jabref.cli;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.util.Pair;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -142,5 +144,23 @@ class JabRefCLITest {
                 oocalc, ods, MSBib, mods, xmp, pdf, bib""";
 
         assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
+    }
+
+    @Test
+    void alignStringTable() {
+        List<Pair<String, String>> given = List.of(
+                new Pair<>("Apple", "Slice"),
+                new Pair<>("Bread", "Loaf"),
+                new Pair<>("Paper", "Sheet"),
+                new Pair<>("Country", "County"));
+
+        String expected = """
+                Apple   : Slice
+                Bread   : Loaf
+                Paper   : Sheet
+                Country : County
+                """;
+
+        assertEquals(expected, JabRefCLI.alignStringTable(given));
     }
 }

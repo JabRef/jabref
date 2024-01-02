@@ -1,7 +1,7 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
-import java.util.SortedSet;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -13,15 +13,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.Telemetry;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SidePanePreferences;
 
@@ -43,6 +45,7 @@ public class WebSearchPaneViewModel {
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
@@ -51,11 +54,11 @@ public class WebSearchPaneViewModel {
     public WebSearchPaneViewModel(PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
 
-        SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(
+        fetchers.setAll(WebFetchers.getSearchBasedFetchers(
                 preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences());
-        fetchers.setAll(allFetchers);
+                preferencesService.getImporterPreferences()));
 
         // Choose last-selected fetcher as default
         SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
@@ -77,6 +80,12 @@ public class WebSearchPaneViewModel {
                         // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
                         return null;
                     }
+
+                    if (CompositeIdFetcher.containsValidId(queryText)) {
+                        // in case the query contains any ID, it is treated as valid
+                        return null;
+                    }
+
                     try {
                         parser.parse(queryText, NO_EXPLICIT_FIELD);
                         return null;
@@ -119,6 +128,13 @@ public class WebSearchPaneViewModel {
     }
 
     public void search() {
+        if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
+            if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
+                dialogService.notify(Localization.lang("Web search disabled"));
+                return;
+            }
+        }
+
         String query = getQuery().trim();
         if (StringUtil.isBlank(query)) {
             dialogService.notify(Localization.lang("Please enter a search string"));
@@ -130,16 +146,25 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        Globals.getTelemetryClient().ifPresent(client ->
-                client.trackEvent("search", Map.of("fetcher", activeFetcher.getName()), Map.of()));
+        Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
+        String fetcherName = activeFetcher.getName();
 
-        BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(query)))
+        if (CompositeIdFetcher.containsValidId(query)) {
+            CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
+            parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
+            fetcherName = Localization.lang("Identifier-based Web Search");
+        }
+
+        final String finalFetcherName = fetcherName;
+        Telemetry.getTelemetryClient().ifPresent(client ->
+                client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
+
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
                              .withInitialMessage(Localization.lang("Processing %0", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
-        dialog.setTitle(activeFetcher.getName());
+        dialog.setTitle(finalFetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
 

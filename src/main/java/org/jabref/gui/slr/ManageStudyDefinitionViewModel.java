@@ -53,7 +53,7 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
-    private final ObservableList<StudyDatabaseItem> databases = FXCollections.observableArrayList();
+    private final ObservableList<StudyCatalogItem> databases = FXCollections.observableArrayList();
 
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
@@ -74,7 +74,7 @@ public class ManageStudyDefinitionViewModel {
                                     .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
                                     .map(name -> {
                                         boolean enabled = DEFAULT_SELECTION.contains(name);
-                                        return new StudyDatabaseItem(name, enabled);
+                                        return new StudyCatalogItem(name, enabled);
                                     })
                                     .toList());
         this.dialogService = Objects.requireNonNull(dialogService);
@@ -105,7 +105,7 @@ public class ManageStudyDefinitionViewModel {
                                     .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
                                     .map(name -> {
                                         boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
-                                        return new StudyDatabaseItem(name, enabled);
+                                        return new StudyCatalogItem(name, enabled);
                                     })
                                     .toList());
 
@@ -133,7 +133,7 @@ public class ManageStudyDefinitionViewModel {
         return queries;
     }
 
-    public ObservableList<StudyDatabaseItem> getDatabases() {
+    public ObservableList<StudyCatalogItem> getCatalogs() {
         return databases;
     }
 

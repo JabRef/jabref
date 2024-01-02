@@ -18,10 +18,15 @@ public class FileFieldParser {
     private final String value;
 
     private StringBuilder charactersOfCurrentElement;
+
     private boolean windowsPath;
 
     public FileFieldParser(String value) {
-        this.value = value;
+        if (value == null) {
+            this.value = null;
+        } else {
+            this.value = value.replace("$\\backslash$", "\\");
+        }
     }
 
     /**

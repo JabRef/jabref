@@ -31,14 +31,12 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -83,16 +81,6 @@ public class AstrophysicsDataSystem
     @Override
     public String getName() {
         return "SAO/NASA ADS";
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
     }
 
     /**
@@ -156,7 +144,7 @@ public class AstrophysicsDataSystem
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferences);
     }
 
     @Override
@@ -172,7 +160,7 @@ public class AstrophysicsDataSystem
         // Move adsurl to url field
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         entry.getField(StandardField.ABSTRACT)
-             .filter(abstractText -> abstractText.equals("Not Available <P />"))
+             .filter("Not Available <P />"::equals)
              .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
         entry.getField(StandardField.ABSTRACT)
@@ -260,7 +248,7 @@ public class AstrophysicsDataSystem
         try {
             String postData = buildPostData(ids);
             URLDownload download = new URLDownload(getURLforExport());
-            download.addHeader("Authorization", "Bearer " + this.getApiKey());
+            download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
             String content = download.asString();
@@ -298,8 +286,7 @@ public class AstrophysicsDataSystem
             throw new FetcherException("A network error occurred", e);
         }
         List<String> bibCodes = fetchBibcodes(urlForQuery);
-        List<BibEntry> results = performSearchByIds(bibCodes);
-        return results;
+        return performSearchByIds(bibCodes);
     }
 
     @Override
@@ -321,7 +308,7 @@ public class AstrophysicsDataSystem
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload urlDownload = new URLDownload(url);
-        urlDownload.addHeader("Authorization", "Bearer " + this.getApiKey());
+        urlDownload.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
         return urlDownload;
     }
 }

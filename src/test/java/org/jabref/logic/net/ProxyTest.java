@@ -3,6 +3,7 @@ package org.jabref.logic.net;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProxyTest {
    /**
@@ -12,12 +13,14 @@ public class ProxyTest {
    @Test
    public void testProxyPreferencesStorePassword() {
        // mock data
-       Boolean useProxy = true;
+       boolean useProxy = true;
        String hostname = "testName";
        String port = "8080";
-       Boolean useAuthentication = true;
+       boolean useAuthentication = true;
        String username = "testUserName";
        String password = "testPassword";
+       boolean persist = false;
+
        // Creates proxy preference
        ProxyPreferences proxyPref = new ProxyPreferences(
                useProxy,
@@ -25,13 +28,16 @@ public class ProxyTest {
                port,
                useAuthentication,
                username,
-               password);
+               password,
+               persist);
+
        // Check if mock data is stored in object memory and can be extracted
-       assertEquals(proxyPref.shouldUseProxy(), true);
+       assertTrue(proxyPref.shouldUseProxy());
        assertEquals(proxyPref.getHostname(), hostname);
        assertEquals(proxyPref.getPort(), port);
-       assertEquals(proxyPref.shouldUseAuthentication(), true);
+       assertTrue(proxyPref.shouldUseAuthentication());
        assertEquals(proxyPref.getUsername(), username);
        assertEquals(proxyPref.getPassword(), password);
+       assertEquals(proxyPref.shouldPersistPassword(), persist);
    }
 }

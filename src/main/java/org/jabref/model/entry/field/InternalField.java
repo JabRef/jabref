@@ -65,7 +65,7 @@ public enum InternalField implements Field {
     }
 
     public static Optional<InternalField> fromName(String name) {
-        if (name.equalsIgnoreCase("bibtexkey")) {
+        if ("bibtexkey".equalsIgnoreCase(name)) {
             // For backwards compatibility
             return Optional.of(InternalField.KEY_FIELD);
         }

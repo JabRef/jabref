@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: weekly
     labels:
-      - "type: dependencies"
+      - "dependencies"
     ignore:
       - dependency-name: com.microsoft.azure:applicationinsights-core
         versions:
@@ -18,10 +18,10 @@ updates:
     schedule:
       interval: weekly
     labels:
-      - "type: dependencies"
+      - "dependencies"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: weekly
     labels:
-      - "type: dependencies"
+      - "dependencies"

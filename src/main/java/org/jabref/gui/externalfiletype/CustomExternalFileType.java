@@ -178,8 +178,7 @@ public class CustomExternalFileType implements ExternalFileType {
             return true;
         }
 
-        if (object instanceof CustomExternalFileType) {
-            CustomExternalFileType other = (CustomExternalFileType) object;
+        if (object instanceof CustomExternalFileType other) {
             return Objects.equals(name, other.name) && Objects.equals(extension, other.extension) &&
                     Objects.equals(mimeType, other.mimeType) && Objects.equals(openWith, other.openWith) && Objects.equals(iconName, other.iconName);
         }

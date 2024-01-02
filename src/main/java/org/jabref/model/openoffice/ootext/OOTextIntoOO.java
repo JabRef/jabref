@@ -1,14 +1,15 @@
 package org.jabref.model.openoffice.ootext;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -145,7 +146,7 @@ public class OOTextIntoOO {
         cursor.collapseToEnd();
 
         MyPropertyStack formatStack = new MyPropertyStack(cursor);
-        Stack<String> expectEnd = new Stack<>();
+        Deque<String> expectEnd = new ArrayDeque<>();
 
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
@@ -302,7 +303,7 @@ public class OOTextIntoOO {
         formatStack.apply(cursor);
         cursor.collapseToEnd();
 
-        if (!expectEnd.empty()) {
+        if (!expectEnd.isEmpty()) {
             StringBuilder rest = new StringBuilder();
             for (String s : expectEnd) {
                 rest.insert(0, String.format("<%s>", s));
@@ -438,7 +439,7 @@ public class OOTextIntoOO {
         /**
          * Maintain a stack of layers, each containing a description of the desired state of properties. Each description is an ArrayList of property values, Optional.empty() encoding "not directly set".
          */
-        final Stack<ArrayList<Optional<Object>>> layers;
+        final Deque<ArrayList<Optional<Object>>> layers;
 
         MyPropertyStack(XTextCursor cursor) {
             XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
@@ -493,7 +494,7 @@ public class OOTextIntoOO {
                 }
             }
 
-            this.layers = new Stack<>();
+            this.layers = new ArrayDeque<>();
             this.layers.push(initialValuesOpt);
         }
 
@@ -671,9 +672,9 @@ public class OOTextIntoOO {
             throw new java.lang.IllegalArgumentException("setCharLocale \"\" or null");
         }
         String[] parts = value.split("-");
-        String language = (parts.length > 0) ? parts[0] : "";
-        String country = (parts.length > 1) ? parts[1] : "";
-        String variant = (parts.length > 2) ? parts[2] : "";
+        String language = parts.length > 0 ? parts[0] : "";
+        String country = parts.length > 1 ? parts[1] : "";
+        String variant = parts.length > 2 ? parts[2] : "";
         return setCharLocale(new Locale(language, country, variant));
     }
 
@@ -688,13 +689,13 @@ public class OOTextIntoOO {
                                                                   boolean relative,
                                                                   MyPropertyStack formatStack) {
         List<OOPair<String, Object>> settings = new ArrayList<>();
-        Optional<Short> oldValue = (formatStack
+        Optional<Short> oldValue = formatStack
                 .getPropertyValue(CHAR_ESCAPEMENT)
-                .map(e -> (short) e));
+                .map(e -> (short) e);
 
-        Optional<Byte> oldHeight = (formatStack
+        Optional<Byte> oldHeight = formatStack
                 .getPropertyValue(CHAR_ESCAPEMENT_HEIGHT)
-                .map(e -> (byte) e));
+                .map(e -> (byte) e);
 
         if (relative && (value.isPresent() || height.isPresent())) {
             double oldHeightFloat = oldHeight.orElse(CHAR_ESCAPEMENT_HEIGHT_DEFAULT) * 0.01;

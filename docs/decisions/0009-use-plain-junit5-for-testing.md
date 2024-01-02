@@ -34,7 +34,7 @@ Chosen option: "Plain JUnit5", because comes out best \(see below\).
 ### Plain JUnit5
 
 Homepage: <https://junit.org/junit5/docs/current/user-guide/>
-JabRef testing guidelines: <https://devdocs.jabref.org/getting-into-the-code/code-howtos#test-cases>
+JabRef testing guidelines: <../testing.md>
 
 Example:
 

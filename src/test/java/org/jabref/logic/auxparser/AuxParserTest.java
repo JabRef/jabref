@@ -14,7 +14,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +43,7 @@ class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -71,7 +70,7 @@ class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         Path auxFile = Path.of(AuxParserTest.class.getResource("papertwoargmacro.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -96,7 +95,7 @@ class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         Path auxFile = Path.of(AuxParserTest.class.getResource("badpaper.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -118,7 +117,7 @@ class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib");
         Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -134,7 +133,7 @@ class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         Path auxFile = Path.of(AuxParserTest.class.getResource("nested.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
@@ -156,7 +155,7 @@ class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         Path auxFile = Path.of(AuxParserTest.class.getResource("crossref.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
             AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);

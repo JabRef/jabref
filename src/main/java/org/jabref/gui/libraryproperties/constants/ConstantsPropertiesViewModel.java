@@ -1,5 +1,7 @@
 package org.jabref.gui.libraryproperties.constants;
 
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,7 @@ import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -33,10 +36,12 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
 
     private final DialogService dialogService;
+    private final FilePreferences filePreferences;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
+        this.filePreferences = filePreferences;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
                 EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
@@ -48,7 +53,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
         stringsListProperty.addAll(databaseContext.getDatabase().getStringValues().stream()
                                                   .sorted(new BibtexStringComparator(false))
                                                   .map(this::convertFromBibTexString)
-                                                  .collect(Collectors.toSet()));
+                                                  .toList());
     }
 
     public void addNewString() {
@@ -68,6 +73,11 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
 
     public void removeString(ConstantsItemModel item) {
         stringsListProperty.remove(item);
+    }
+
+    public void resortStrings() {
+        // Resort the strings list in the same order as setValues() does
+        stringsListProperty.sort(Comparator.comparing(c -> c.labelProperty().get().toLowerCase(Locale.ROOT)));
     }
 
     private ConstantsItemModel convertFromBibTexString(BibtexString bibtexString) {
@@ -94,7 +104,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.STRING_EDITOR, dialogService).execute();
+        new HelpAction(HelpFile.STRING_EDITOR, dialogService, filePreferences).execute();
     }
 
     public ListProperty<ConstantsItemModel> stringsListProperty() {

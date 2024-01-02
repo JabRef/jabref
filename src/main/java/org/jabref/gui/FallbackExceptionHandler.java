@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import org.jabref.gui.util.DefaultTaskExecutor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +20,9 @@ public class FallbackExceptionHandler implements Thread.UncaughtExceptionHandler
     @Override
     public void uncaughtException(Thread thread, Throwable exception) {
         LOGGER.error("Uncaught exception occurred in " + thread, exception);
-
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                JabRefGUI.getMainFrame()
-                         .getDialogService()
-                         .showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception)
-        );
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+                    dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
+        });
     }
 }

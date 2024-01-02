@@ -421,7 +421,7 @@ public class BracketedPattern {
                     String[] nums = pattern.substring(4).split("_");
                     return authNofMth(editorList,
                             Integer.parseInt(nums[0]),
-                            Integer.parseInt(nums[1]) - 1);
+                            Integer.parseInt(nums[1]));
                 } else if (pattern.matches("edtr\\d+")) {
                     String fa = firstAuthor(editorList);
                     int num = Integer.parseInt(pattern.substring(4));
@@ -521,7 +521,7 @@ public class BracketedPattern {
      */
     private static AuthorList createAuthorList(String unparsedAuthors) {
         return AuthorList.parse(unparsedAuthors).getAuthors().stream()
-                         .map((author) -> {
+                         .map(author -> {
                              // If the author is an institution, use an institution key instead of the full name
                              String lastName = author.getLast()
                                                      .map(lastPart -> isInstitution(author) ?
@@ -756,7 +756,7 @@ public class BracketedPattern {
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
-                authorList.getAuthor(0).getLastOnly().replaceAll(" ", "");
+                authorList.getAuthor(0).getLastOnly().replace(" ", "");
     }
 
     /**
@@ -1264,7 +1264,7 @@ public class BracketedPattern {
                     // If there are more than 3 parts, only keep the first character of each word
                     final int[] codePoints = tokenParts.stream()
                                                        .filter(Predicate.not(String::isBlank))
-                                                       .mapToInt((s) -> s.codePointAt(0))
+                                                       .mapToInt(s -> s.codePointAt(0))
                                                        .toArray();
                     rest = new String(codePoints, 0, codePoints.length);
                 } else {

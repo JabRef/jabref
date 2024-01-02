@@ -13,7 +13,7 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -34,7 +34,6 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;
@@ -83,7 +82,7 @@ public class Benchmarks {
         BibWriter bibWriter = new BibWriter(outputWriter, OS.NEWLINE);
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                mock(SaveConfiguration.class),
+                mock(SelfContainedSaveConfiguration.class),
                 mock(FieldPreferences.class),
                 mock(CitationKeyPatternPreferences.class),
                 new BibEntryTypesManager());
@@ -93,7 +92,7 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         return parser.parse(new StringReader(bibtexString));
     }
 

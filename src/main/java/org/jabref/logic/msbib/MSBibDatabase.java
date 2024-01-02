@@ -66,7 +66,6 @@ public class MSBibDatabase {
     /**
      * Imports entries from an office xml file
      *
-     * @param reader
      * @return List of {@link BibEntry}
      */
     public List<BibEntry> importEntriesFromXml(BufferedReader reader) {

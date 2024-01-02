@@ -24,7 +24,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 /**
  * Importer for the MEDLINE Plain format.
  * <p>
- * check here for details on the format http://www.nlm.nih.gov/bsd/mms/medlineelements.html
+ * check here for details on the format <a href="http://www.nlm.nih.gov/bsd/mms/medlineelements.html">...</a>
  */
 public class MedlinePlainImporter extends Importer {
 
@@ -340,7 +340,7 @@ public class MedlinePlainImporter extends Importer {
             if (value.contains("Copyright")) {
                 int copyrightIndex = value.lastIndexOf("Copyright");
                 // remove the copyright from the field since the name of the field is copyright
-                String copyrightInfo = value.substring(copyrightIndex).replaceAll("Copyright ", "");
+                String copyrightInfo = value.substring(copyrightIndex).replace("Copyright ", "");
                 hm.put(new UnknownField("copyright"), copyrightInfo);
                 abstractValue = value.substring(0, copyrightIndex);
             } else {

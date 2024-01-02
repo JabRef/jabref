@@ -115,7 +115,7 @@ public class TooltipTextUtil {
             textList.remove(index);
             String[] textParts = original.split(replacement.toReplace);
             if (textParts.length == 2) {
-                if (textParts[0].equals("")) {
+                if ("".equals(textParts[0])) {
                     textList.add(index, TooltipTextUtil.createText(replacement.replacement, replacement.textType));
                     textList.add(index + 1, TooltipTextUtil.createText(textParts[1], TooltipTextUtil.TextType.NORMAL));
                 } else {

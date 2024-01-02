@@ -53,7 +53,7 @@ public class ProtectTermsFormatterTest {
     public void test() {
         assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
         assertEquals("{BPEL}", formatter.format("{BPEL}"));
-        assertEquals("{Testing BPEL Engine Performance: A Survey}",
+        assertEquals("{Testing {BPEL} Engine Performance: A Survey}",
                 formatter.format("{Testing BPEL Engine Performance: A Survey}"));
     }
 }

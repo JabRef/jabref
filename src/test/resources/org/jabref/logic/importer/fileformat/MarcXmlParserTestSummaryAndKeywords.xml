@@ -1,0 +1,156 @@
+<zs:searchRetrieveResponse>
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <record>
+                    <leader>03645nam a2200541 c 4500</leader>
+                    <controlfield tag="001">BV049039638</controlfield>
+                    <controlfield tag="003">DE-604</controlfield>
+                    <controlfield tag="005">00000000000000.0</controlfield>
+                    <controlfield tag="007">t</controlfield>
+                    <controlfield tag="008">230706s2023 a||| |||| 00||| eng d</controlfield>
+                    <datafield tag="020" ind1=" " ind2=" ">
+                        <subfield code="a">9781476691497</subfield>
+                        <subfield code="c">pbk</subfield>
+                        <subfield code="9">978-1-4766-9149-7</subfield>
+                    </datafield>
+                    <datafield tag="040" ind1=" " ind2=" ">
+                        <subfield code="a">DE-604</subfield>
+                        <subfield code="b">ger</subfield>
+                        <subfield code="e">rda</subfield>
+                    </datafield>
+                    <datafield tag="100" ind1="1" ind2=" ">
+                        <subfield code="a">Cottrell, Robert C.</subfield>
+                        <subfield code="d">1950-</subfield>
+                        <subfield code="e">Verfasser</subfield>
+                        <subfield code="0">(DE-588)131931563</subfield>
+                        <subfield code="4">aut</subfield>
+                    </datafield>
+                    <datafield tag="245" ind1="1" ind2="0">
+                        <subfield code="a">Martyrs of the early American Left</subfield>
+                        <subfield code="b">Inez Milholland, Randolph Bourne and John Reed</subfield>
+                        <subfield code="c">Robert C. Cottrell</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="a">Jefferson, North Carolina</subfield>
+                        <subfield code="b">McFarland & Company, Inc., Publishers</subfield>
+                        <subfield code="c">[2023]</subfield>
+                    </datafield>
+                    <datafield tag="300" ind1=" " ind2=" ">
+                        <subfield code="a">vii, 301 Seiten</subfield>
+                        <subfield code="b">Illustrationen</subfield>
+                        <subfield code="c">26 cm</subfield>
+                    </datafield>
+                    <datafield tag="505" ind1="8" ind2=" ">
+                        <subfield code="a">Vassar girl suffragist -- A man of letters -- A poet singing nothing but joy -- An American renaissance -- The unanticipated marriage -- Thirteen months in Europe -- Riding with the revolution -- Keeping faith with the cause -- The lyrical left's response to World War I -- Joining the new republic -- The peace crusade -- The Eastern Front -- The death of a feminist martyr -- Frustrated love and transnationalism -- The love of his life -- The war to make the world safe for democracy -- The Bolshevik Revolution -- "America in 1918" -- War's end -- An American in communist Russia -- Three American martyrs</subfield>
+                    </datafield>
+                    <datafield tag="520" ind1="3" ind2=" ">
+                        <subfield code="a">"Uniquely intertwining the stories of three leading early twentieth century radical Americans, this book presents the enthralling tale of the too-short lives of Inez Milholland, Randolph Bourne and John Reed. This collective biography highlights the movements, causes and personal experiences that drew such privileged individuals to the American left, willing to sacrifice comfortable circumstances and opportunities. Operating as writers and activists, the trio became leading spokespersons for feminism, sexual liberation, unions, civil liberties, pacifism, internationalism, socialism, anarchism and, in Reed's case, communism. Determinedly challenging capitalism, patriarchy and the nation-state, the independently-minded Milholland, Bourne and Reed possessed a twofold commitment to personal liberation and community-interclass and transnational. With their early deaths, they left behind personal models for acting, living, thinking afresh and standing as cultural and political radicals in early twentieth century America. In the process, they became martyrs to the very movements they championed."-Provided by publisher"</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Political activists / United States / Biography</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Radicals / United States / Biography</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="1">
+                        <subfield code="a">Milholland, Inez</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="1">
+                        <subfield code="a">Bourne, Randolph Silliman / 1886-1918</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="1">
+                        <subfield code="a">Reed, John / 1887-1920</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Right and left (Political science) / United States / History / 20th century</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Radicalism / United States / History / 20th century</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="2">
+                        <subfield code="a">United States / Social conditions / 1865-1918</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="2">
+                        <subfield code="a">United States / Politics and government / 1865-1933</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="1">
+                        <subfield code="a">Bourne, Randolph Silliman / 1886-1918</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="1">
+                        <subfield code="a">Milholland, Inez</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="1">
+                        <subfield code="a">Reed, John / 1887-1920</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Political activists</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Politics and government</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Radicalism</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Radicals</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Right and left (Political science)</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="0">
+                        <subfield code="a">Social conditions</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="2">
+                        <subfield code="a">United States</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="4">
+                        <subfield code="a">1865-1999</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="6">
+                        <subfield code="a">Biographies</subfield>
+                    </datafield>
+                    <datafield tag="653" ind1=" " ind2="6">
+                        <subfield code="a">History</subfield>
+                    </datafield>
+                    <datafield tag="655" ind1=" " ind2="7">
+                        <subfield code="0">(DE-588)4006804-3</subfield>
+                        <subfield code="a">Biografie</subfield>
+                        <subfield code="2">gnd-content</subfield>
+                    </datafield>
+                    <datafield tag="776" ind1="0" ind2="8">
+                        <subfield code="i">Erscheint auch als</subfield>
+                        <subfield code="n">Online-Ausgabe</subfield>
+                        <subfield code="z">978-1-4766-4922-1</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(DE-599)BVBBV049039638</subfield>
+                    </datafield>
+                    <datafield tag="041" ind1="0" ind2=" ">
+                        <subfield code="a">eng</subfield>
+                    </datafield>
+                    <datafield tag="049" ind1=" " ind2=" ">
+                        <subfield code="a">DE-12</subfield>
+                    </datafield>
+                    <datafield tag="336" ind1=" " ind2=" ">
+                        <subfield code="b">txt</subfield>
+                        <subfield code="2">rdacontent</subfield>
+                    </datafield>
+                    <datafield tag="337" ind1=" " ind2=" ">
+                        <subfield code="b">n</subfield>
+                        <subfield code="2">rdamedia</subfield>
+                    </datafield>
+                    <datafield tag="338" ind1=" " ind2=" ">
+                        <subfield code="b">nc</subfield>
+                        <subfield code="2">rdacarrier</subfield>
+                    </datafield>
+                </record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

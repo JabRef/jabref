@@ -39,6 +39,23 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
+
+        BibEntry articleTagThatIssue = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Santos, Fabio and Vargovich, Joseph and Trinkenreich, Bianca and Santos, Italo and Penney, Jacob and Britto, Ricardo and Pimentel, João Felipe and Wiese, Igor and Steinmacher, Igor and Sarma, Anita and Gerosa, Marco A.")
+                .withField(StandardField.DATE, "2023-08-31")
+                .withField(StandardField.DOI, "10.1007/s10664-023-10329-4")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10664-023-10329-4:PDF")
+                .withField(StandardField.ISSN, "1382-3256")
+                .withField(StandardField.JOURNAL, "Empirical Software Engineering")
+                .withField(StandardField.MONTH, "#aug#")
+                .withField(StandardField.NUMBER, "5")
+                .withField(StandardField.PAGES, "1--52")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Tag that issue: applying API-domain labels in issue tracking systems")
+                .withField(StandardField.VOLUME, "28")
+                .withField(StandardField.YEAR, "2023")
+                .withField(StandardField.ABSTRACT, "Labeling issues with the skills required to complete them can help contributors to choose tasks in Open Source Software projects. However, manually labeling issues is time-consuming and error-prone, and current automated approaches are mostly limited to classifying issues as bugs/non-bugs. We investigate the feasibility and relevance of automatically labeling issues with what we call “API-domains,” which are high-level categories of APIs. Therefore, we posit that the APIs used in the source code affected by an issue can be a proxy for the type of skills (e.g., DB, security, UI) needed to work on the issue. We ran a user study (n=74) to assess API-domain labels’ relevancy to potential contributors, leveraged the issues’ descriptions and the project history to build prediction models, and validated the predictions with contributors (n=20) of the projects. Our results show that (i) newcomers to the project consider API-domain labels useful in choosing tasks, (ii) labels can be predicted with a precision of 84% and a recall of 78.6% on average, (iii) the results of the predictions reached up to 71.3% in precision and 52.5% in recall when training with a project and testing in another (transfer learning), and (iv) project contributors consider most of the predictions helpful in identifying needed skills. These findings suggest our approach can be applied in practice to automatically label issues, assisting developers in finding tasks that better match their skills.");
+
         BibEntry firstArticle = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Steinmacher, Igor and Balali, Sogol and Trinkenreich, Bianca and Guizani, Mariam and Izquierdo-Cortazar, Daniel and Cuevas Zambrano, Griselda G. and Gerosa, Marco Aurelio and Sarma, Anita")
             .withField(StandardField.DATE, "2021-09-09")
@@ -101,7 +118,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
             .withField(StandardField.ABSTRACT, "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment.");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
-        assertEquals(List.of(fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
+        assertEquals(List.of(articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
     }
 
     @Test
@@ -182,9 +199,9 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
-                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL)
-                                                                              .orElse("")
-                                                                              .equals("Computer Supported Cooperative Work (CSCW)"))
+                                                  .filter(bibEntry -> "Computer Supported Cooperative Work (CSCW)"
+                                                                              .equals(bibEntry.getField(StandardField.JOURNAL)
+                                                                                              .orElse("")))
                                                   .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))

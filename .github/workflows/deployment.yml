@@ -1,7 +1,6 @@
 name: Deployment
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -13,10 +12,13 @@ on:
     tags:
        - '*'
   pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'src/test/**'
-      - 'README.md'
+  merge_group:
+  workflow_dispatch:
+    inputs:
+      notarization:
+        type: boolean
+        required: false
+        default: false
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -26,9 +28,10 @@ env:
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
+  JDK21: ""
 
 concurrency:
-  group: ${{ github.ref }}
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 jobs:
@@ -41,14 +44,20 @@ jobs:
           - os: ubuntu-latest
             displayName: linux
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+            eaJdk: https://files.jabref.org/jdks/jdk-linux-x64.tar.gz
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
+            eaJDK: https://files.jabref.org/jdks/jdk-windows-x64.zip
           - os: macos-latest
             displayName: macOS
-            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
+            eaJDK: https://files.jabref.org/jdks/jdk-macos-x64.tar.gz
     runs-on: ${{ matrix.os }}
-    name: Create installer and portable version for ${{ matrix.displayName }}
+    outputs:
+      major: ${{ steps.gitversion.outputs.Major }}
+      minor: ${{ steps.gitversion.outputs.Minor }}
+      branchname: ${{ steps.gitversion.outputs.branchName }}
+    name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -62,9 +71,17 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Install pigz and cache (linux)
+        if: (matrix.os == 'ubuntu-latest')
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pigz
+          version: 1.0
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
@@ -72,20 +89,24 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: 20
-          distribution: 'temurin'
-          cache: 'gradle'
-      - name: Setup OSX key chain on OSX
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Prepare merged jars and modules dir (macOS)
+        if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
+      - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
-      - name: Setup OSX key chain on OSX for app id cert
+      - name: Setup macOS key chain for app id cert
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
@@ -93,36 +114,72 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build runtime image
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
-      - name: Build installer
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
-        shell: bash
-      - name: Resign app image for OSX and build dmg
+      - name: Build dmg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
-          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.app/Contents/MacOS/JabRef
-          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.app
-          jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type dmg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
-          codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" --options runtime --entitlements buildres/mac/jabref.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          jpackage --type pkg --dest build/distribution --name JabRef --mac-package-identifier JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
-          productsign --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
-      - name: Package application image
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
+          jpackage \
+          --module org.jabref/org.jabref.cli.Launcher \
+          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
+          --add-modules org.jabref,org.jabref.merged.module  \
+          --dest build/distribution \
+          --app-content buildres/mac/jabrefHost.py \
+          --app-content buildres/mac/native-messaging-host \
+          --name JabRef \
+          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
+          --verbose \
+          --mac-sign \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
+          --mac-package-name JabRef \
+          --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
+          --mac-entitlements buildres/mac/jabref.entitlements \
+          --icon src/main/resources/icons/jabref.icns \
+          --resource-dir buildres/mac \
+          --file-associations buildres/mac/bibtexAssociations.properties \
+          --jlink-options --bind-services
+      - name: Build pkg (macOS)
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          jpackage \
+          --module org.jabref/org.jabref.cli.Launcher \
+          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
+          --add-modules org.jabref,org.jabref.merged.module  \
+          --dest build/distribution \
+          --app-content buildres/mac/jabrefHost.py \
+          --app-content buildres/mac/native-messaging-host \
+          --name JabRef \
+          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
+          --verbose \
+          --mac-sign \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
+          --mac-package-name JabRef \
+          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
+          --mac-entitlements buildres/mac/jabref.entitlements \
+          --icon src/main/resources/icons/jabref.icns \
+          --resource-dir buildres/mac \
+          --file-associations buildres/mac/bibtexAssociations.properties \
+          --jlink-options --bind-services
+      - name: Build runtime image and installer (linux, Windows)
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
+      - name: Package application image (linux, Windows)
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
-      - name: Repack deb file for Debian (compression)
-        if: (matrix.os == 'ubuntu-latest')
+      - name: Repack deb file for Debian
+        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd build/distribution
@@ -131,97 +188,55 @@ jobs:
           zstd -d < data.tar.zst | xz > data.tar.xz
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
-      - name: Upload to GitHub workflow artifacts store (non-Mac)
-        if: (matrix.os != 'macos-latest')
-        uses: actions/upload-artifact@v3
+          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+      - name: Setup rsync (macOS)
+        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        run: brew install rsync
+      - name: Setup rsync (Windows)
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
+        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
+        # We cannot use "setup-rsync", because that does not work on Windows
+        # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
+        run: choco install --no-progress rsync
+      - name: Setup SSH key
+        if: ${{ (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && ((matrix.os != 'macos-latest') || !((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Upload to builds.jabref.org (Windows)
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        shell: cmd
+        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Upload to builds.jabref.org (linux, macOS)
+        # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
+        #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
+        # needs to be on one line; multi line does not work
+        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Upload to GitHub workflow artifacts store (macOS)
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
+        uses: actions/upload-artifact@v4
         with:
-          name: JabRef-${{ matrix.displayName }}
+          # tbn = to-be-notarized
+          name: JabRef-macOS-tbn
           path: build/distribution
-      - name: Upload to GitHub workflow artifacts store (Mac)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: actions/upload-artifact@v3
-        with:
-          name: JabRef-macOS-signed
-          path: build/distribution
-  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    if: ${{ false }}  # disable for v5.9 since apple notarization fails
-    name: Notarize and package Mac OS binaries
-    runs-on: macos-latest
-    needs: [build]
-    steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Fetch all history for all tags and branches
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Run GitVersion
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        id: gitversion
-        shell: bash
-        run: |
-          echo "AssemblySemVer=5.9.60000" >> $GITHUB_OUTPUT
-          echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
-          echo "Major=5" >> $GITHUB_OUTPUT
-          echo "Minor=9" >> $GITHUB_OUTPUT
-      - name: Get macOS binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-macOS-signed
-          path: build/distribution/
-      - name: Notarize dmg and pkg installer
-        if: startsWith(github.ref, 'refs/tags/') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          REQUEST_UUID_DMG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
-          while xcrun altool --notarization-info "$REQUEST_UUID_DMG" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
-            echo "Verification in progress..."
-            sleep 30
-          done
-          codesign -vvv --deep --strict "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          codesign -dvv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          REQUEST_UUID_PKG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" | grep RequestUUID | awk '{print $3}')
-          while xcrun altool --notarization-info "$REQUEST_UUID_PKG" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
-            echo "Verification in progress..."
-            sleep 30
-          done
-          xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
-          rm "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
-          mv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
-      - name: Package application image
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: ${{ matrix.archivePortable }}
-      - name: Rename files
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: pwsh
-        run: |
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Upload to GitHub workflow artifacts store
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: actions/upload-artifact@v3
+        if: (steps.checksecrets.outputs.secretspresent != 'YES')
+        uses: actions/upload-artifact@v4
         with:
-          name: JabRef-macOS
+          # tbn = to-be-notarized
+          name: JabRef-${{ matrix.os }}
           path: build/distribution
-  deploy:
-    strategy:
-      fail-fast: false
-    name: Deploy binaries on builds.jabref.org
+  announce:
+    name: Comment on pull request
     runs-on: ubuntu-latest
     needs: [build]
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -234,49 +249,55 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Checkout source
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/checkout@v3
-      - name: Fetch all history for all tags and branches
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        run: git fetch --prune --unshallow
-      - name: Install GitVersion
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: gittools/actions/gitversion/setup@v0.10.2
+      - name: Comment PR
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        uses: thollander/actions-comment-pull-request@v2
         with:
-          versionSpec: '5.x'
-      - name: Run GitVersion
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Get linux binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-linux
-          path: build/distribution
-      - name: Get windows binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-windows
-          path: build/distribution
-      - name: Get macOS binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-macOS-signed
-          path: build/distribution/
-      - name: Deploy to builds.jabref.org
-        id: deploy
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: Pendect/action-rsyncer@v2.0.0
+          message: |
+            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
+          comment_tag: download-link
+          mode: recreate
+  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
+    name: macOS notarization
+    runs-on: macos-latest
+    needs: [build]
+    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
+    steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+          fi
         env:
-          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
-          BRANCH: ${{ steps.gitversion.outputs.branchName }}
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Download from GitHub workflow artifacts store (macOS)
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        uses: actions/download-artifact@master
         with:
-          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
-          options: ''
-          ssh_options: '-p 9922'
-          src: 'build/distribution/'
-          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          name: JabRef-macOS-tbn
+          path: build/distribution/
+      - name: Notarize dmg
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
+          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.dmg
+      - name: Notarize pkg
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
+          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg
+      - name: Upload to builds.jabref.org
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/

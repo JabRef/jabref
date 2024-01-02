@@ -15,6 +15,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
 public class OptionalFields2Tab extends OptionalFieldsTabBase {
+
+    public static final String NAME = "Optional fields 2";
+
     public OptionalFields2Tab(BibDatabaseContext databaseContext,
                               SuggestionProviders suggestionProviders,
                               UndoManager undoManager,

@@ -13,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -25,9 +26,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
-
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
-    protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
+    protected boolean couldNotPush; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
     protected String commandPath;
@@ -57,14 +57,14 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
         commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
             return;
         }
@@ -107,7 +107,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not call executable") + " '" + commandPath + "'.");
-        } else if (couldNotConnect) {
+        } else if (couldNotPush) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to %0", getDisplayName()) + ".");
@@ -141,10 +141,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return null;
     }
 
-    protected String getCiteCommand() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+    protected String getCitePrefix() {
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().prefix();
     }
 
+    public String getDelimiter() {
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter();
+    }
+
+    protected String getCiteSuffix() {
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().suffix();
+    }
+
+    @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }

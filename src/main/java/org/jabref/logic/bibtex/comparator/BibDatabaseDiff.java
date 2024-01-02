@@ -21,7 +21,7 @@ public class BibDatabaseDiff {
     private final List<BibStringDiff> bibStringDiffs;
     private final List<BibEntryDiff> entryDiffs;
 
-    private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
+    private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase, boolean includeEmptyEntries) {
         metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData()).orElse(null);
         preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase).orElse(null);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
@@ -30,6 +30,11 @@ public class BibDatabaseDiff {
         EntryComparator comparator = getEntryComparator();
         List<BibEntry> originalEntriesSorted = originalDatabase.getDatabase().getEntriesSorted(comparator);
         List<BibEntry> newEntriesSorted = newDatabase.getDatabase().getEntriesSorted(comparator);
+
+        if (!includeEmptyEntries) {
+            originalEntriesSorted.removeIf(BibEntry::isEmpty);
+            newEntriesSorted.removeIf(BibEntry::isEmpty);
+        }
 
         entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode());
     }
@@ -110,7 +115,7 @@ public class BibDatabaseDiff {
     }
 
     public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
-        return new BibDatabaseDiff(base, changed);
+        return new BibDatabaseDiff(base, changed, false);
     }
 
     public Optional<MetaDataDiff> getMetaDataDifferences() {

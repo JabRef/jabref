@@ -17,8 +17,9 @@ import javafx.scene.web.WebEngine;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.AppearancePreferences;
+import org.jabref.preferences.WorkspacePreferences;
 
+import com.jthemedetecor.OsThemeDetector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class ThemeManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
-    private final AppearancePreferences appearancePreferences;
+    private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
 
@@ -49,29 +50,40 @@ public class ThemeManager {
 
     private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
+    private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
-    public ThemeManager(AppearancePreferences appearancePreferences,
+    public ThemeManager(WorkspacePreferences workspacePreferences,
                         FileUpdateMonitor fileUpdateMonitor,
                         Consumer<Runnable> updateRunner) {
-        this.appearancePreferences = Objects.requireNonNull(appearancePreferences);
+        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
-        this.theme = appearancePreferences.getTheme();
+        this.theme = workspacePreferences.getTheme();
 
         // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
         // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css)
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        EasyBind.subscribe(appearancePreferences.themeProperty(), theme -> updateThemeSettings());
-        EasyBind.subscribe(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
-        EasyBind.subscribe(appearancePreferences.mainFontSizeProperty(), size -> updateFontSettings());
+        EasyBind.subscribe(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
+        EasyBind.subscribe(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
+        EasyBind.subscribe(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
+        EasyBind.subscribe(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
+        detector.registerListener(isDark -> updateThemeSettings());
     }
 
     private void updateThemeSettings() {
-        Theme newTheme = Objects.requireNonNull(appearancePreferences.getTheme());
+        Theme newTheme = Objects.requireNonNull(workspacePreferences.getTheme());
+
+        if (workspacePreferences.themeSyncOsProperty().getValue()) {
+            if (detector.isDark()) {
+                newTheme = Theme.dark();
+            } else {
+                newTheme = Theme.light();
+            }
+        }
 
         if (newTheme.equals(theme)) {
             LOGGER.info("Not updating theme because it hasn't changed");
@@ -160,16 +172,15 @@ public class ThemeManager {
     private void updateAdditionalCss() {
         getMainWindowScene().ifPresent(scene -> scene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
-                appearancePreferences.getTheme()
-                                     .getAdditionalStylesheet().map(styleSheet -> {
-                                         URL stylesheetUrl = styleSheet.getSceneStylesheet();
-                                         if (stylesheetUrl != null) {
-                                             return stylesheetUrl.toExternalForm();
-                                         } else {
-                                             return "";
-                                         }
-                                     })
-                                     .orElse("")
+                theme.getAdditionalStylesheet().map(styleSheet -> {
+                         URL stylesheetUrl = styleSheet.getSceneStylesheet();
+                         if (stylesheetUrl != null) {
+                             return stylesheetUrl.toExternalForm();
+                         } else {
+                             return "";
+                         }
+                     })
+                     .orElse("")
         )));
     }
 
@@ -210,10 +221,10 @@ public class ThemeManager {
      * @param scene is the scene, the font size should be applied to
      */
     public void updateFontStyle(Scene scene) {
-        if (appearancePreferences.shouldOverrideDefaultFontSize()) {
-            scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
+        if (workspacePreferences.shouldOverrideDefaultFontSize()) {
+            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
-            scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getDefaultFontSize() + "pt;");
+            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getDefaultFontSize() + "pt;");
         }
     }
 

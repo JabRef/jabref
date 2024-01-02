@@ -23,7 +23,6 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
@@ -36,6 +35,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -48,9 +48,9 @@ import jakarta.inject.Inject;
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
 
-    @Inject StateManager stateManager;
-    @Inject ImportFormatReader importFormatReader;
-    @Inject TaskExecutor taskExecutor;
+    @Inject private StateManager stateManager;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
@@ -81,6 +81,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
+        setOnCloseRequest(e -> viewModel.cancelFetcherWorker());
 
         setResultConverter(button -> {
             // The buttonType will always be "cancel", even if we pressed one of the entry type buttons
@@ -88,19 +89,20 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         });
 
         Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
+        btnGenerate.getStyleClass().add("customGenerateButton");
 
-        btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> (searching) ? Localization.lang("Searching...") : Localization.lang("Generate")));
+        btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> searching ? Localization.lang("Searching...") : Localization.lang("Generate")));
         btnGenerate.disableProperty().bind(viewModel.idFieldValidationStatus().validProperty().not().or(viewModel.searchingProperty()));
 
-        EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {
-            if (value) {
+        EasyBind.subscribe(viewModel.searchSuccesfulProperty(), isSuccessful -> {
+            if (isSuccessful) {
                 setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
     }
 
-    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
-        for (BibEntryType entryType : entries) {
+    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entryTypes) {
+        for (BibEntryType entryType : entryTypes) {
             Button entryButton = new Button(entryType.getType().getDisplayName());
             entryButton.setUserData(entryType);
             entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));
@@ -122,7 +124,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new EntryTypeViewModel(preferencesService, libraryTab, dialogService, stateManager, importFormatReader, taskExecutor);
+        viewModel = new EntryTypeViewModel(
+                preferencesService,
+                libraryTab,
+                dialogService,
+                stateManager,
+                taskExecutor,
+                fileUpdateMonitor);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
@@ -213,8 +221,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
      * The description is originating from biblatex manual chapter 2 Biblatex documentation is favored over the bibtex, since bibtex is a subset of biblatex and biblatex is better documented.
      */
     public static String getDescription(EntryType selectedType) {
-        if (selectedType instanceof StandardEntryType) {
-            switch ((StandardEntryType) selectedType) {
+        if (selectedType instanceof StandardEntryType entryType) {
+            switch (entryType) {
                 case Article -> {
                     return Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
                 }

@@ -58,7 +58,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
                 return null;
             }
             String lowerCaseSearchText = searchText.toLowerCase(Locale.ROOT);
-            return (option) -> option.getKey().toLowerCase(Locale.ROOT).contains(lowerCaseSearchText);
+            return option -> option.getKey().toLowerCase(Locale.ROOT).contains(lowerCaseSearchText);
         }));
         columnType.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getType()));
         columnKey.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getKey()));

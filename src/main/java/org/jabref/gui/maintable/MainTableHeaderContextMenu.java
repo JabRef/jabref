@@ -5,28 +5,44 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.logic.l10n.Localization;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
     private static final int OUT_OF_BOUNDS = -1;
     MainTable mainTable;
     MainTableColumnFactory factory;
+    private final LibraryTabContainer tabContainer;
+    private final KeyBindingRepository keyBindingRepository;
+    private final DialogService dialogService;
 
-    /**
-     * Constructor for the right click menu
-     *
-     */
-    public MainTableHeaderContextMenu(MainTable mainTable, MainTableColumnFactory factory) {
+    public MainTableHeaderContextMenu(MainTable mainTable,
+                                      MainTableColumnFactory factory,
+                                      LibraryTabContainer tabContainer,
+                                      KeyBindingRepository keyBindingRepository,
+                                      DialogService dialogService) {
         super();
+        this.tabContainer = tabContainer;
         this.mainTable = mainTable;
         this.factory = factory;
-        constructItems(mainTable);
+        this.keyBindingRepository = keyBindingRepository;
+        this.dialogService = dialogService;
+
+        constructItems();
     }
 
     /**
@@ -48,7 +64,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     /**
      * Constructs the items for the list and places them in the menu.
      */
-    private void constructItems(MainTable mainTable) {
+    private void constructItems() {
         // Reset the right-click menu
         this.getItems().clear();
         List<TableColumn<BibEntryTableViewModel, ?>> commonColumns = commonColumns();
@@ -60,44 +76,48 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             this.getItems().add(itemToAdd);
 
             // Remove from remaining common columns pool
-            MainTableColumn searchCol = (MainTableColumn<?>) column;
+            MainTableColumn<?> searchCol = (MainTableColumn<?>) column;
             if (isACommonColumn(searchCol)) {
-                commonColumns.removeIf(tableCol -> ((MainTableColumn) tableCol).getModel().equals(searchCol.getModel()));
+                commonColumns.removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(searchCol.getModel()));
             }
         }
 
-        SeparatorMenuItem separator = new SeparatorMenuItem();
-        this.getItems().add(separator);
+        if (!commonColumns.isEmpty()) {
+            this.getItems().add(new SeparatorMenuItem());
 
-        // Append to the menu the current remaining columns in the common columns.
-
-        for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
-            RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
-            this.getItems().add(itemToAdd);
+            // Append to the menu the current remaining columns in the common columns.
+            for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
+                RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
+                this.getItems().add(itemToAdd);
+            }
         }
+
+        this.getItems().add(new SeparatorMenuItem());
+        ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
+        MenuItem showMoreItem = actionfactory.createMenuItem(
+                StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
+                new ShowPreferencesAction(tabContainer, TableTab.class, dialogService));
+        this.getItems().add(showMoreItem);
     }
 
     /**
      * Creates an item for the menu constructed with the name/visibility of the table column.
-     *
      */
-    @SuppressWarnings("rawtypes")
     private RightClickMenuItem createMenuItem(TableColumn<BibEntryTableViewModel, ?> column, boolean isDisplaying) {
         // Gets display name and constructs Radio Menu Item.
-        MainTableColumn tableColumn = (MainTableColumn) column;
+        MainTableColumn<?> tableColumn = (MainTableColumn<?>) column;
         String displayName = tableColumn.getDisplayName();
         return new RightClickMenuItem(displayName, tableColumn, isDisplaying);
     }
 
     /**
      * Returns the current position of the inputted column in the table (index).
-     *
      */
-    private int obtainIndexOfColumn(MainTableColumn searchColumn) {
+    private int obtainIndexOfColumn(MainTableColumn<?> searchColumn) {
         ObservableList<TableColumn<BibEntryTableViewModel, ?>> columns = mainTable.getColumns();
         for (int i = 0; i < columns.size(); i++) {
             TableColumn<BibEntryTableViewModel, ?> column = columns.get(i);
-            MainTableColumnModel model = ((MainTableColumn) column).getModel();
+            MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
             if (model.equals(searchColumn.getModel())) {
                 return i;
             }
@@ -108,9 +128,8 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     /**
      * Adds the column into the MainTable for display.
      */
-    @SuppressWarnings("rawtypes")
-    private void addColumn(MainTableColumn tableColumn, int index) {
-        if (index <= OUT_OF_BOUNDS || index >= mainTable.getColumns().size()) {
+    private void addColumn(MainTableColumn<?> tableColumn, int index) {
+        if ((index <= OUT_OF_BOUNDS) || (index >= mainTable.getColumns().size())) {
             mainTable.getColumns().add(tableColumn);
         } else {
             mainTable.getColumns().add(index, tableColumn);
@@ -120,25 +139,24 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     /**
      * Removes the column from the MainTable to remove visibility.
      */
-    @SuppressWarnings("rawtypes")
-    private void removeColumn(MainTableColumn tableColumn) {
-        mainTable.getColumns().removeIf(tableCol -> ((MainTableColumn) tableCol).getModel().equals(tableColumn.getModel()));
+    private void removeColumn(MainTableColumn<?> tableColumn) {
+        mainTable.getColumns().removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(tableColumn.getModel()));
     }
 
     /**
      * Checks if a column is one of the commonly used columns.
      */
-    private boolean isACommonColumn(MainTableColumn tableColumn) {
+    private boolean isACommonColumn(MainTableColumn<?> tableColumn) {
         return isColumnInList(tableColumn, commonColumns());
     }
 
     /**
      * Determines if a list of TableColumns contains the searched column.
      */
-    private boolean isColumnInList(MainTableColumn searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
+    private boolean isColumnInList(MainTableColumn<?> searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
         for (TableColumn<BibEntryTableViewModel, ?> column:
         tableColumns) {
-            MainTableColumnModel model = ((MainTableColumn) column).getModel();
+            MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
             if (model.equals(searchColumn.getModel())) {
                 return true;
             }
@@ -185,13 +203,12 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
     /**
      * RightClickMenuItem: RadioMenuItem holding position in MainTable and its visibility.
-     *
      */
     private class RightClickMenuItem extends RadioMenuItem {
         private int index;
         private boolean visibleInTable;
 
-        RightClickMenuItem(String displayName, MainTableColumn column, boolean isVisible) {
+        RightClickMenuItem(String displayName, MainTableColumn<?> column, boolean isVisible) {
             super(displayName);
             setVisibleInTable(isVisible);
             // Flag item as selected if the item is already in the main table.

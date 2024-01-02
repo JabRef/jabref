@@ -109,8 +109,7 @@ public class LinkedFile implements Serializable {
         if (this == o) {
             return true;
         }
-        if (o instanceof LinkedFile) {
-            LinkedFile that = (LinkedFile) o;
+        if (o instanceof LinkedFile that) {
             return Objects.equals(description.get(), that.description.get())
                     && Objects.equals(link.get(), that.link.get())
                     && Objects.equals(fileType.get(), that.fileType.get());

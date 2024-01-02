@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
@@ -11,7 +12,6 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -47,21 +47,18 @@ public class RfcFetcher implements IdBasedParserFetcher {
      */
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-
-        String prefixedIdentifier = identifier;
+        String prefixedIdentifier = identifier.toLowerCase(Locale.ENGLISH);
         // if not a "draft" version
-        if (!identifier.toLowerCase().startsWith(DRAFT_PREFIX)) {
+        if ((!prefixedIdentifier.startsWith(DRAFT_PREFIX)) && (!prefixedIdentifier.startsWith("rfc"))) {
             // Add "rfc" prefix if user's search entry was numerical
-            prefixedIdentifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + prefixedIdentifier : prefixedIdentifier;
+            prefixedIdentifier = "rfc" + prefixedIdentifier;
         }
-
         URIBuilder uriBuilder = new URIBuilder("https://datatracker.ietf.org/doc/" + prefixedIdentifier + "/bibtex/");
-
         return uriBuilder.build().toURL();
     }
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 }
