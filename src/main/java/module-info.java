@@ -61,7 +61,7 @@ open module org.jabref {
     // http server and client exchange
     requires java.net.http;
     requires jakarta.ws.rs;
-    requires grizzly.framework;
+    requires org.glassfish.grizzly;
 
     // data mapping
     requires jakarta.xml.bind;
@@ -121,7 +121,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene95.Lucene95Codec;
+    uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -135,6 +135,8 @@ open module org.jabref {
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
+
+    requires transitive org.jspecify;
 
     // other libraries
     requires org.antlr.antlr4.runtime;

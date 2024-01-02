@@ -267,31 +267,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         getGlobalSearchBar().focus();
                         break;
                     case NEW_ARTICLE:
-                        new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_BOOK:
-                        new NewEntryAction(this, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_INBOOK:
-                        new NewEntryAction(this, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_MASTERSTHESIS:
-                        new NewEntryAction(this, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_PHDTHESIS:
-                        new NewEntryAction(this, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_PROCEEDINGS:
-                        new NewEntryAction(this, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_TECHREPORT:
-                        new NewEntryAction(this, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_UNPUBLISHED:
-                        new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
                     case NEW_INPROCEEDINGS:
-                        new NewEntryAction(this, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
+                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
                         break;
                     case PASTE:
                         if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
@@ -406,11 +406,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
-        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            LibraryTab libraryTab = getLibraryTabAt(i);
+        for (LibraryTab libraryTab : getLibraryTabs()) {
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
+
             if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
-                tabbedPane.getSelectionModel().select(i);
+                showLibraryTab(libraryTab);
                 if (!confirmClose(libraryTab)) {
                     return false;
                 }
@@ -419,6 +419,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
             }
+
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
@@ -488,6 +489,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 taskExecutor,
                 dialogService,
                 Globals.journalAbbreviationRepository,
+                Globals.predatoryJournalRepository,
                 entryTypesManager,
                 undoManager,
                 Globals.getClipboardManager());
@@ -540,15 +542,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * Returns the indexed LibraryTab.
-     *
-     * @param i Index of base
-     */
-    public LibraryTab getLibraryTabAt(int i) {
-        return (LibraryTab) tabbedPane.getTabs().get(i);
-    }
-
-    /**
      * Returns a list of all LibraryTabs in this frame.
      */
     public List<LibraryTab> getLibraryTabs() {
@@ -558,6 +551,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                          .collect(Collectors.toList());
     }
 
+    @Deprecated
     public void showLibraryTabAt(int i) {
         tabbedPane.getSelectionModel().select(i);
     }
@@ -646,7 +640,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             }
 
             // Update search autocompleter with information for the correct database:
-            libraryTab.updateSearchManager();
+            globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
             libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
@@ -668,21 +662,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             return null;
         }
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
-    }
-
-    /**
-     * @return the BasePanel count.
-     */
-    public int getBasePanelCount() {
-        return tabbedPane.getTabs().size();
-    }
-
-    /**
-     * @deprecated do not operate on tabs but on BibDatabaseContexts
-     */
-    @Deprecated
-    public TabPane getTabbedPane() {
-        return tabbedPane;
     }
 
     /**
@@ -958,6 +937,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     public Stage getMainStage() {
         return mainStage;
+    }
+
+    /**
+     * Refreshes the ui after preferences changes
+     */
+        public void refresh() {
+        globalSearchBar.updateHintVisibility();
+        setupAllTables();
+        getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
     /**

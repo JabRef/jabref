@@ -132,7 +132,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 URLConnection openConnection;
                 try {
                     openConnection = download.openConnection();
-                    bibtexString = URLDownload.asString(openConnection);
+                    bibtexString = URLDownload.asString(openConnection).trim();
                 } catch (IOException e) {
                     // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
                     if (e.getCause() instanceof FetcherException fe) {

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -22,6 +23,7 @@ public class IntegrityCheck {
                           FilePreferences filePreferences,
                           CitationKeyPatternPreferences citationKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
+                          PredatoryJournalRepository predatoryJournalRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -40,7 +42,9 @@ public class IntegrityCheck {
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
                 new AmpersandChecker(),
                 new LatexIntegrityChecker(),
-                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)
+                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
+                new PredatoryJournalChecker(predatoryJournalRepository,
+                        List.of(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE))
                 ));
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.add(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8)));
