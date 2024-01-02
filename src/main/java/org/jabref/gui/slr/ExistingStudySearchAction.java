@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -35,22 +35,22 @@ public class ExistingStudySearchAction extends SimpleCommand {
 
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final OpenDatabaseAction openDatabaseAction;
 
     /**
-     * @param frame Required to close the tab before the study is updated
+     * @param tabContainer Required to close the tab before the study is updated
      * @param openDatabaseAction Required to open the tab after the study is exectued
      */
     public ExistingStudySearchAction(
-            JabRefFrame frame,
+            LibraryTabContainer tabContainer,
             OpenDatabaseAction openDatabaseAction,
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
             PreferencesService preferencesService,
             StateManager stateManager) {
-        this(frame,
+        this(tabContainer,
                 openDatabaseAction,
                 dialogService,
                 fileUpdateMonitor,
@@ -61,7 +61,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     }
 
     protected ExistingStudySearchAction(
-            JabRefFrame frame,
+            LibraryTabContainer tabContainer,
             OpenDatabaseAction openDatabaseAction,
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
@@ -69,7 +69,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             PreferencesService preferencesService,
             StateManager stateManager,
             boolean isNew) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.openDatabaseAction = openDatabaseAction;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -146,6 +146,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
         // The user focused an SLR
         // We hard close the tab
         // Future work: Properly close the tab (with saving, ...)
-        frame.closeCurrentTab();
+        tabContainer.closeCurrentTab();
     }
 }

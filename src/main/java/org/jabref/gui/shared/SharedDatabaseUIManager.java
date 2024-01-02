@@ -12,8 +12,8 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -44,7 +44,7 @@ import com.google.common.eventbus.Subscribe;
 
 public class SharedDatabaseUIManager {
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -54,7 +54,7 @@ public class SharedDatabaseUIManager {
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
-    public SharedDatabaseUIManager(JabRefFrame frame,
+    public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
                                    PreferencesService preferencesService,
                                    StateManager stateManager,
@@ -62,7 +62,7 @@ public class SharedDatabaseUIManager {
                                    FileUpdateMonitor fileUpdateMonitor,
                                    UndoManager undoManager,
                                    TaskExecutor taskExecutor) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
@@ -87,15 +87,15 @@ public class SharedDatabaseUIManager {
 
         if (answer.isPresent()) {
             if (answer.get().equals(reconnect)) {
-                frame.closeCurrentTab();
-                dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(frame));
+                tabContainer.closeCurrentTab();
+                dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
-                frame.getLibraryTabs().forEach(tab -> tab.updateTabTitle(tab.isModified()));
+                tabContainer.getLibraryTabs().forEach(tab -> tab.updateTabTitle(tab.isModified()));
                 dialogService.notify(Localization.lang("Working offline."));
             }
         } else {
-            frame.closeCurrentTab();
+            tabContainer.closeCurrentTab();
         }
     }
 
@@ -134,7 +134,7 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(SharedEntriesNotPresentEvent event) {
-        LibraryTab libraryTab = frame.getCurrentLibraryTab();
+        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         EntryEditor entryEditor = libraryTab.getEntryEditor();
 
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
@@ -173,7 +173,7 @@ public class SharedDatabaseUIManager {
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 bibDatabaseContext,
-                frame,
+                tabContainer,
                 dialogService,
                 preferencesService,
                 stateManager,
@@ -181,7 +181,7 @@ public class SharedDatabaseUIManager {
                 entryTypesManager,
                 undoManager,
                 taskExecutor);
-        frame.addTab(libraryTab, true);
+        tabContainer.addTab(libraryTab, true);
         return libraryTab;
     }
 

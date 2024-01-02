@@ -24,8 +24,8 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
@@ -77,7 +77,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
@@ -95,7 +95,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
-    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame,
+    public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
@@ -103,7 +103,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               FileUpdateMonitor fileUpdateMonitor,
                                               UndoManager undoManager,
                                               TaskExecutor taskExecutor) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
@@ -181,7 +181,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         try {
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
-                    frame,
+                    tabContainer,
                     dialogService,
                     preferencesService,
                     stateManager,
@@ -290,7 +290,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> libraryTabs = frame.getLibraryTabs();
+        List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
         return libraryTabs.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 
