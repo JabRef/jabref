@@ -156,8 +156,7 @@ public class SearchFunctionalityTest {
         assertEquals(expected, matches);
     }
 
-    ;
-/*
+    /*
     @Test
     public void testSimplePDFFulltextSearch() throws Exception {
         initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-C.bib");
