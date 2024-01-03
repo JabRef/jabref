@@ -38,7 +38,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         KEEP_RIGHT(Localization.lang("Keep from import")),
         AUTOREMOVE_EXACT(Localization.lang("Automatically remove exact duplicates")),
         KEEP_MERGE(Localization.lang("Keep merged")),
-        BREAK("Break");
+        BREAK(Localization.lang("Ask every time"));
 
         final String defaultTranslationForImport;
 
