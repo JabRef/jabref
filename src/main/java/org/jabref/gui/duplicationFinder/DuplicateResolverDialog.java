@@ -33,12 +33,22 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public enum DuplicateResolverResult {
-        KEEP_BOTH,
-        KEEP_LEFT,
-        KEEP_RIGHT,
-        AUTOREMOVE_EXACT,
-        KEEP_MERGE,
-        BREAK;
+        KEEP_BOTH(Localization.lang("Keep both")),
+        KEEP_LEFT(Localization.lang("Keep existing entry")),
+        KEEP_RIGHT(Localization.lang("Keep from import")),
+        AUTOREMOVE_EXACT(Localization.lang("Automatically remove exact duplicates")),
+        KEEP_MERGE(Localization.lang("Keep merged")),
+        BREAK("Break");
+
+        final String defaultTranslationForImport;
+
+        DuplicateResolverResult(String defaultTranslationForImport) {
+            this.defaultTranslationForImport = defaultTranslationForImport;
+        }
+
+        public String getDefaultTranslationForImport() {
+            return defaultTranslationForImport;
+        }
 
         public static DuplicateResolverResult parse(String name) {
             try {

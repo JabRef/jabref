@@ -121,6 +121,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
         treatAllDuplicateEntriesTheSame.selectedProperty().bindBidirectional(viewModel.treatAllDuplicateEntriesTheSameProperty());
+
+        new ViewModelListCellFactory<DuplicateResolverDialog.DuplicateResolverResult>()
+                .withText(DuplicateResolverDialog.DuplicateResolverResult::getDefaultTranslationForImport)
+                .install(duplicatedResolveDecision);
         duplicatedResolveDecision.itemsProperty().setValue(viewModel.duplicateResolverResults());
         duplicatedResolveDecision.valueProperty().bindBidirectional(viewModel.duplicatedResolveDecisionProperty());
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());

@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.general;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +53,8 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+
+import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
@@ -199,7 +202,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
         treatAllDuplicateEntriesTheSameProperty.setValue(guiPreferences.isMergeApplyToAllEntriesProperty());
         duplicatedResolveDecisionProperty.setValue(guiPreferences.getAllEntriesDuplicateResolverDecision());
-        duplicateResolverResults.setValue(FXCollections.observableArrayList(DuplicateResolverDialog.DuplicateResolverResult.values()));
+
+        var availableDuplicateDecisionsForImport = EnumSet.of(KEEP_LEFT,
+                DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT,
+                DuplicateResolverDialog.DuplicateResolverResult.KEEP_MERGE,
+                DuplicateResolverDialog.DuplicateResolverResult.KEEP_BOTH,
+                DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+
+        duplicateResolverResults.setValue(FXCollections.observableArrayList(availableDuplicateDecisionsForImport));
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
