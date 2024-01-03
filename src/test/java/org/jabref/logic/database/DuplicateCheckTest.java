@@ -77,6 +77,14 @@ public class DuplicateCheckTest {
 
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
+    @Test
+    public void testDuplicateDetectionWithSameAuthorAndUmlauts() {
+        BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bobä");
+        BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Bill{\\\"{a}} Bob{\\\"{a}}");
+
+        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+    }
+
 
     @Test
     public void testDuplicateDetectionWithDifferentAuthors() {
