@@ -56,7 +56,7 @@ public class SpecialFieldViewModel {
     }
 
     public JabRefIcon getIcon() {
-        return getAction().getIcon().orElse(null);
+        return getAction().getIcon().get();
     }
 
     public String getLocalization() {
