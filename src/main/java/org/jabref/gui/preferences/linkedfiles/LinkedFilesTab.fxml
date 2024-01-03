@@ -78,6 +78,6 @@
     </GridPane>
 
     <Label styleClass="sectionHeader" text="%Attached files"/>
-    <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting files"/>
+    <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
 
 </fx:root>
