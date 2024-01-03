@@ -338,9 +338,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (entriesToAdd.isEmpty()) {
             return;
         }
-        for (BibEntry entry : entriesToAdd) {
-            importHandler.importEntryWithDuplicateCheck(database, entry);
-        }
+        importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -424,7 +422,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(taskExecutor);
+                case TOP, BOTTOM ->
+                        importHandler.importFilesInBackground(files).executeWith(taskExecutor);
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {

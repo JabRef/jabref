@@ -56,6 +56,8 @@ import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
+
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
@@ -193,10 +195,14 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK);
+    }
+
+    private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
         Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
         if (existingDuplicateInLibrary.isPresent()) {
-            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get());
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
             if (duplicateHandledEntry.isEmpty()) {
                 return;
             }
@@ -216,8 +222,8 @@ public class ImportHandler {
         return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
     }
 
-    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
-        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
+    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext, decision);
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
@@ -236,22 +242,11 @@ public class ImportHandler {
         return Optional.of(originalEntry);
     }
 
-    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult decision) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-
-        DuplicateResolverDialog.DuplicateResolverResult decision;
-        // TODO: show dialog only for first entry?
-        if (preferencesService.getGuiPreferences().isMergeApplyToAllEntriesProperty()) {
-            decision = preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision();
-            if (decision == DuplicateResolverDialog.DuplicateResolverResult.BREAK) {
-                decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
-                preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
-            }
-        } else {
-            decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
-            preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
+        if (decision == BREAK) {
+            decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
         }
-
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
@@ -373,5 +368,21 @@ public class ImportHandler {
         LOGGER.info("Found ISBN identifier in clipboard");
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
+    }
+
+    public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
+        boolean firstEntry = true;
+        for (BibEntry entry : entriesToAdd) {
+            if (firstEntry) {
+                importEntryWithDuplicateCheck(database, entry, BREAK);
+                firstEntry = false;
+                continue;
+            }
+            if (preferencesService.getGuiPreferences().isMergeApplyToAllEntriesProperty()) {
+                importEntryWithDuplicateCheck(database, entry, preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision());
+            } else {
+                importEntryWithDuplicateCheck(database, entry);
+            }
+        }
     }
 }
