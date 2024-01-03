@@ -186,7 +186,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             if (this.getSortOrder().isEmpty()) {
                 return;
             }
-            this.jumpToSearchKey(getSortOrder().get(0), key);
+            this.jumpToSearchKey(getSortOrder().getFirst(), key);
         });
 
         database.getDatabase().registerListener(this);
