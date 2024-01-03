@@ -32,4 +32,4 @@ jobs:
         uses: lycheeverse/lychee-action@v1.8.0
         with:
           fail: true
-          args: --accept '200..=204, 429, 500' --max-concurrency 1 --cache --no-progress --exclude-all-private './**/*.md'
+          args: --accept '200,201,202,203,204,429,500' --max-concurrency 1 --cache --no-progress --exclude-all-private './**/*.md'
