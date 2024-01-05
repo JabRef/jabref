@@ -90,7 +90,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
-        autoOpenAttachedFoldersProperty.setValue(!initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
+        autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
                 FXCollections.observableArrayList(PushToApplications.getAllApplications(dialogService, preferences)));
