@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class DoiResolution implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
-    private DOIPreferences doiPreferences;
+    private final DOIPreferences doiPreferences;
 
     public DoiResolution(DOIPreferences doiPreferences) {
         super();

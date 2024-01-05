@@ -22,6 +22,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -97,7 +98,8 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                 PushToApplications.getApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences)
                                   .orElse(new PushToEmacs(dialogService, preferences)));
 
-        citeCommandProperty.setValue(initialExternalApplicationPreferences.getCiteCommand());
+        citeCommandProperty.setValue(initialExternalApplicationPreferences.getCiteCommand().toString());
+
         useCustomTerminalProperty.setValue(initialExternalApplicationPreferences.useCustomTerminal());
         customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
@@ -110,7 +112,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
         externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
         externalPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
-        externalPreferences.setCiteCommand(citeCommandProperty.getValue());
+        externalPreferences.setCiteCommand(CitationCommandString.from(citeCommandProperty.getValue()));
         externalPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
         externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
@@ -229,6 +231,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetCiteCommandToDefault() {
-        this.citeCommandProperty.setValue(preferences.getExternalApplicationsPreferences().getDefaultCiteCommand());
+        this.citeCommandProperty.setValue(preferences.getExternalApplicationsPreferences().getDefaultCiteCommand().toString());
     }
 }

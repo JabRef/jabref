@@ -162,7 +162,7 @@ jobs:
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
         if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
