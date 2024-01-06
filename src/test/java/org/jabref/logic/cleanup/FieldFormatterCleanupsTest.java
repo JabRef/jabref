@@ -18,6 +18,7 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -305,6 +306,24 @@ public class FieldFormatterCleanupsTest {
                         new FieldFormatterCleanup(StandardField.TITLE, new LatexCleanupFormatter()),
                         new FieldFormatterCleanup(StandardField.BOOKTITLE, new EscapeAmpersandsFormatter()),
                         new FieldFormatterCleanup(StandardField.BOOKTITLE, new LatexCleanupFormatter())
+                ),
+                fieldFormatterCleanups);
+    }
+
+    @Test
+    void identityCanBeParsed() {
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanups.parse("""
+                all-text-fields[identity]
+                date[normalize_date]
+                month[normalize_month]
+                pages[normalize_page_numbers]
+                """);
+        assertEquals(
+                List.of(
+                        new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new IdentityFormatter()),
+                        new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter())
                 ),
                 fieldFormatterCleanups);
     }

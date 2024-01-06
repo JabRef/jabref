@@ -204,13 +204,16 @@ public class FieldFormatterCleanups {
     }
 
     static Formatter getFormatterFromString(String formatterName) {
-        for (Formatter formatter : Formatters.getAll()) {
-            if (formatterName.equals(formatter.getKey())) {
-                return formatter;
-            }
-        }
-        LOGGER.info("Formatter {} not found.", formatterName);
-        return new IdentityFormatter();
+        return Formatters
+                .getFormatterForName(formatterName)
+                .orElseGet(() -> {
+                    if (!formatterName.equals("identity")) {
+                        // The identity formatter is not listed in the formatters list, but is still valid
+                        // Therefor, we log errors in other cases only
+                        LOGGER.info("Formatter {} not found.", formatterName);
+                    }
+                    return new IdentityFormatter();
+                });
     }
 
     @Override
