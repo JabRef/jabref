@@ -3,6 +3,7 @@ package org.jabref.gui.importer;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.library.LibraryTab;
 import org.jabref.gui.util.OptionalObjectProperty;
