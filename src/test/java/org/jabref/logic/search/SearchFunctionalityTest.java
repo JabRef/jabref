@@ -144,7 +144,13 @@ public class SearchFunctionalityTest {
                 Arguments.of(List.of(entry4B), "test-library-B.bib", "[/9]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
 
                 Arguments.of(List.of(), "test-library-B.bib", "\\bCas\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(entry1B), "test-library-B.bib", "\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE))
+                Arguments.of(List.of(entry1B), "test-library-B.bib", "\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
+
+                Arguments.of(List.of(), "test-library-C.bib", "This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimal1, minimalNote1), "test-library-C.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+
+                Arguments.of(List.of(), "test-library-C.bib", "User Test", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE))
         );
     }
 
@@ -157,21 +163,11 @@ public class SearchFunctionalityTest {
     }
 
     /*
-    @Test
-    public void testSimplePDFFulltextSearch() throws Exception {
-        initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-C.bib");
-
-        //@Test uses PDFReader
-
-        //Positive search test
-        PdfSearchResults resultsPositive = search.search("This is a short sentence, comma included.", 10);
-        assertEquals(3, resultsPositive.numSearchResults());
-        //Negative search test
-        PdfSearchResults resultsNegative = search.search("This is a test.", 10);
-        assertEquals(0, resultsNegative.numSearchResults());
+    private static Stream<Arguments> testSimplePDFFulltextSearch() {
+        return Stream.of()
     }
 
-    @Test
+            /*    @Test
     public void testSimplePDFNoteFulltextSearch() throws Exception {
         initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-C.bib");
 
@@ -185,32 +181,18 @@ public class SearchFunctionalityTest {
         assertEquals(0, resultsNegative.numSearchResults());
     }
 
-    @Test
-    public void testSensitivePDFFulltextSearch() throws Exception {
-        initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-C.bib");
 
-        //@Test uses DatabaseSearcher
-
-        //Positive search test
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
-        assertEquals(List.of(minimal1, minimalNote1), matches);
-        //Negative search test
-        matches = new DatabaseSearcher(new SearchQuery("This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
-        assertEquals(List.of(), matches);
-    }
-
-    @Test
-    public void testSensitivePDFNoteFulltextSearch() throws Exception {
-        initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-C.bib");
-
-        //@Test uses DatabaseSearcher
+    @ParameterizedTest
+    @MethodSource
+    public void testSimplePDFFulltextSearch(List<BibEntry> expected, String query, EnumSet<SearchRules.SearchFlags> searchFlags) throws Exception {
+        BibDatabase bibDatabase = initializeDatabaseFromPath("test-library-C.bib");
 
         //Positive search test
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
-        assertEquals(List.of(minimalNote1), matches);
+        PdfSearchResults resultsPositive = search.search("This is a short sentence, comma included.", 10);
+        assertEquals(3, resultsPositive.numSearchResults());
         //Negative search test
-        matches = new DatabaseSearcher(new SearchQuery("User Test", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
-        assertEquals(List.of(), matches);
+        PdfSearchResults resultsNegative = search.search("This is a test.", 10);
+        assertEquals(0, resultsNegative.numSearchResults());
     }
 */
 }
