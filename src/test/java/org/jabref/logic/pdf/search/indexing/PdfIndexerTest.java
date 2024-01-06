@@ -133,30 +133,6 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void testFlushIndex() throws IOException {
-        // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setCitationKey("Example2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
-        database.insertEntry(entry);
-
-        indexer.createIndex();
-        indexer.addToIndex(context);
-        // index actually exists
-        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
-        }
-
-        // when
-        indexer.flushIndex();
-
-        // then
-        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(0, reader.numDocs());
-        }
-    }
-
-    @Test
     public void exampleThesisIndexAppendMetaData() throws IOException {
         // given
         BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);

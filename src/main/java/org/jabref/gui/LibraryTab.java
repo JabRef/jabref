@@ -926,6 +926,7 @@ public class LibraryTab extends Tab {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
+                    // TODO: Instantiated too much. We need Dependency Injection here.
                     PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
                         indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);

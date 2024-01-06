@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -41,10 +40,12 @@ import org.slf4j.LoggerFactory;
  */
 public class PdfIndexer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexer.class);
 
     private final Directory directoryToIndex;
     private BibDatabaseContext databaseContext;
+
+    private IndexWriter indexWriter;
 
     private final FilePreferences filePreferences;
 
@@ -58,15 +59,36 @@ public class PdfIndexer {
     }
 
     /**
-     * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
-     * Lucene search index will be deleted!
+     * Creates (and thus resets) the PDF index. No re-indexing will be done.
+     * Any previous state of the Lucene search is deleted.
      */
     public void createIndex() {
-        // Create new index by creating IndexWriter but not writing anything.
-        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
-            // empty comment for checkstyle
+        try {
+            indexWriter = new IndexWriter(
+                    directoryToIndex,
+                    new IndexWriterConfig(
+                            new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
+            LOGGER.debug("Created new index for directory {}.", directoryToIndex);
         } catch (IOException e) {
-            LOGGER.warn("Could not create new Index!", e);
+            LOGGER.warn("Could not create new index", e);
+        }
+    }
+
+    private IndexWriter getIndexWriter() {
+        if (indexWriter == null) {
+            initializeIndexWriter();
+        }
+        return indexWriter;
+    }
+
+    private void initializeIndexWriter() {
+        try {
+            indexWriter = new IndexWriter(
+                    directoryToIndex,
+                    new IndexWriterConfig(
+                            new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
+        } catch (IOException e) {
+            LOGGER.error("Could not initialize the IndexWriter", e);
         }
     }
 
@@ -77,7 +99,7 @@ public class PdfIndexer {
     }
 
     /**
-     * Adds all the pdf files linked to one entry in the database to an existing (or new) Lucene search index
+     * Adds all PDF files linked to one entry in the database to an existing (or new) Lucene search index
      *
      * @param entry a bibtex entry to link the pdf files to
      * @param databaseContext the associated BibDatabaseContext
@@ -106,10 +128,14 @@ public class PdfIndexer {
      */
     public void addToIndex(BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
         if (databaseContext != null) {
+            // TODO: This needs to be commented. The databaseContext should exist?! Maybe when an unsaved database is saved?
             this.databaseContext = databaseContext;
         }
         if (!entry.getFiles().isEmpty()) {
             addToIndex(entry, linkedFile);
+        } else {
+            // TODO: Can this happen?
+            LOGGER.debug("Tried to index {}, which is not attached to BibEntry {}", linkedFile, entry);
         }
     }
 
@@ -119,14 +145,11 @@ public class PdfIndexer {
      * @param linkedFilePath the path to the file to be removed
      */
     public void removeFromIndex(String linkedFilePath) {
-        try (IndexWriter indexWriter = new IndexWriter(
-                directoryToIndex,
-                new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-            indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
-            indexWriter.commit();
+        try {
+            getIndexWriter().deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
+            getIndexWriter().commit();
         } catch (IOException e) {
-            LOGGER.warn("Could not initialize the IndexWriter!", e);
+            LOGGER.debug("Could not remove document {} from the index.", linkedFilePath, e);
         }
     }
 
@@ -147,19 +170,6 @@ public class PdfIndexer {
     public void removeFromIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
         for (LinkedFile linkedFile : linkedFiles) {
             removeFromIndex(linkedFile.getLink());
-        }
-    }
-
-    /**
-     * Deletes all entries from the Lucene search index.
-     */
-    public void flushIndex() {
-        IndexWriterConfig config = new IndexWriterConfig();
-        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-        try (IndexWriter deleter = new IndexWriter(directoryToIndex, config)) {
-            // Do nothing. Index is deleted.
-        } catch (IOException e) {
-            LOGGER.warn("The IndexWriter could not be initialized", e);
         }
     }
 
@@ -190,28 +200,23 @@ public class PdfIndexer {
                 if (topDocs.scoreDocs.length > 0) {
                     Document doc = reader.document(topDocs.scoreDocs[0].doc);
                     long indexModificationTime = Long.parseLong(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
-
                     BasicFileAttributes attributes = Files.readAttributes(resolvedPath.get(), BasicFileAttributes.class);
-
                     if (indexModificationTime >= attributes.lastModifiedTime().to(TimeUnit.SECONDS)) {
+                        LOGGER.debug("File {} is already indexed", linkedFile.getLink());
                         return;
                     }
                 }
             } catch (IndexNotFoundException e) {
-                // if there is no index yet, don't need to check anything!
+                LOGGER.debug("Index not found. Continuing.", e);
             }
             // If no document was found, add the new one
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
-                try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                                                               new IndexWriterConfig(
-                                                                                     new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-                    indexWriter.addDocuments(pages.get());
-                    indexWriter.commit();
-                }
+                getIndexWriter().addDocuments(pages.get());
+                getIndexWriter().commit();
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
+            LOGGER.warn("Could not add document {} to the index.", linkedFile.getLink(), e);
         }
     }
 
@@ -231,6 +236,7 @@ public class PdfIndexer {
                 paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
             }
         } catch (IOException e) {
+            LOGGER.debug("Could not read from index. Returning intermediate result.", e);
             return paths;
         }
         return paths;

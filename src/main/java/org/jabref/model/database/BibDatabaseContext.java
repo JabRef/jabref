@@ -161,7 +161,7 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. BIB file directory or Main file directory
+        // 3. BIB file directory or main file directory
         // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
         // (in the metadata of the bib file)
         if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -237,6 +237,9 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    /**
+     * @return The "global" path to store all lucene index files. This is independent of the concrete JabRef library.
+     */
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
