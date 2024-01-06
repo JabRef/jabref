@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The "Automatically open folders of attached files" preference default status has been changed to enabled.[#56](https://github.com/koppor/jabref/issues/56)
 - The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
 
 ### Fixed
