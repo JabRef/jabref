@@ -1,9 +1,7 @@
-# Folder `src\test\search`
+# Libraries and PDFs for testing search functionality
 
-This folder contains manual use-cases for testing the search functionality. 
-It contains the folder `src\test\search\resources` with material used in the use-cases.
+This folder contains manual use-cases for testing the search functionality.
 
-## Related Issues and Pull Requests
+It is used at the test code `org.jabref.logic.search.SearchFunctionalityTest`.
 
-[Pull Request #8963](https://github.com/JabRef/jabref/pull/8963): This PR is about Lucene which
-is used for the search functionality. 
+The `.pdf` files are generated from the `.tex` files using `pdflatex`.
