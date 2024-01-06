@@ -11,8 +11,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 
-import com.airhacks.afterburner.injection.Injector;
-
 /**
  * This action checks whether any new custom entry types were loaded from this
  * BIB file. If so, an offer to remember these entry types is given.
@@ -25,9 +23,8 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
     }
 
     @Override
-    public void performAction(LibraryTab libraryTab, ParserResult parserResult) {
+    public void performAction(ParserResult parserResult, DialogService dialogService) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         dialogService.showCustomDialogAndWait(new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult)));
     }
 

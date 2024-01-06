@@ -2,9 +2,12 @@ package org.jabref.gui.cleanup;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+
+import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -22,25 +25,28 @@ import org.jabref.preferences.PreferencesService;
 
 public class CleanupAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupAction(JabRefFrame frame,
+    public CleanupAction(Supplier<LibraryTab> tabSupplier,
                          PreferencesService preferences,
                          DialogService dialogService,
                          StateManager stateManager,
-                         TaskExecutor taskExecutor) {
-        this.frame = frame;
+                         TaskExecutor taskExecutor,
+                         UndoManager undoManager) {
+        this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -118,8 +124,8 @@ public class CleanupAction extends SimpleCommand {
         }
 
         if (modifiedEntriesCount > 0) {
-            frame.getCurrentLibraryTab().updateEntryEditorIfShowing();
-            frame.getCurrentLibraryTab().markBaseChanged();
+            tabSupplier.get().updateEntryEditorIfShowing();
+            tabSupplier.get().markBaseChanged();
         }
 
         if (modifiedEntriesCount == 0) {
@@ -141,7 +147,7 @@ public class CleanupAction extends SimpleCommand {
             ce.end();
             if (ce.hasEdits()) {
                 modifiedEntriesCount++;
-                frame.getUndoManager().addEdit(ce);
+                undoManager.addEdit(ce);
             }
         }
     }

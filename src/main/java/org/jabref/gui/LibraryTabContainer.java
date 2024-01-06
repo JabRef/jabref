@@ -6,8 +6,6 @@ import org.jabref.gui.library.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 
 public interface LibraryTabContainer {
-    LibraryTab getLibraryTabAt(int i);
-
     List<LibraryTab> getLibraryTabs();
 
     LibraryTab getCurrentLibraryTab();
@@ -21,4 +19,9 @@ public interface LibraryTabContainer {
     void closeTab(LibraryTab libraryTab);
 
     void closeCurrentTab();
+
+    /**
+     * Refreshes the ui after changes to the preferences
+     */
+    void refresh();
 }

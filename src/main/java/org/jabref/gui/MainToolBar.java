@@ -44,7 +44,7 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
-    private final JabRefFrame frame;
+    private final LibraryTabContainer frame;
     private final PushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
@@ -58,7 +58,7 @@ public class MainToolBar extends ToolBar {
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
 
-    public MainToolBar(JabRefFrame frame,
+    public MainToolBar(LibraryTabContainer tabContainer,
                        PushToApplicationCommand pushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
@@ -68,7 +68,7 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager) {
-        this.frame = frame;
+        this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
         this.dialogService = dialogService;
@@ -97,7 +97,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, taskExecutor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, dialogService, preferencesService, stateManager))),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager))),
 
                 leftSpacer,
 
@@ -106,27 +106,27 @@ public class MainToolBar extends ToolBar {
                 rightSpacer,
 
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame, StandardEntryType.Article, dialogService, preferencesService, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame, dialogService, preferencesService, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferencesService, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                         createNewEntryFromIdButton(),
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, preferencesService, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame, stateManager))),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager))),
+                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
                         pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame, dialogService, stateManager, taskExecutor, preferencesService)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor))),
+                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferencesService, undoManager)),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
 

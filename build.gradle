@@ -123,7 +123,7 @@ dependencies {
     implementation 'org.apache.lucene:lucene-queryparser:9.9.1'
     implementation 'org.apache.lucene:lucene-queries:9.9.0'
     implementation 'org.apache.lucene:lucene-analysis-common:9.9.1'
-    implementation 'org.apache.lucene:lucene-highlighter:9.9.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.9.1'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
@@ -144,10 +144,10 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.1'
     implementation 'org.antlr:antlr4-runtime:4.13.1'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.8.0.202311291450-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.3'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.16.1'
 
     implementation 'com.fasterxml:aalto-xml:1.3.2'
 
@@ -258,7 +258,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.5.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.5.4"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")

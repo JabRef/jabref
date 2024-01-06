@@ -262,7 +262,7 @@ public class DOI implements Identifier {
         return getExternalURIFromBase(URI.create(customBase));
     }
 
-    private Optional<URI> getExternalURIFromBase(URI base) {
+    public Optional<URI> getExternalURIFromBase(URI base) {
         try {
             URI uri = new URI(base.getScheme(), base.getHost(), "/" + doi, null);
             return Optional.of(uri);

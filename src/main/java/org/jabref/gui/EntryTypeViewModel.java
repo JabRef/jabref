@@ -197,7 +197,7 @@ public class EntryTypeViewModel {
                         Localization.lang("Return to dialog"));
                 if (addEntryFlag) {
                     new NewEntryAction(
-                            libraryTab.frame(),
+                            () -> libraryTab,
                             StandardEntryType.Article,
                             dialogService,
                             preferencesService,
