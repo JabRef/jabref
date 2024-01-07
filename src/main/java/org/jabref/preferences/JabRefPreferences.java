@@ -1178,6 +1178,7 @@ public class JabRefPreferences implements PreferencesService {
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
         return new LayoutFormatterPreferences(
                 getNameFormatterPreferences(),
+                getDOIPreferences(),
                 getFilePreferences().mainFileDirectoryProperty());
     }
 
