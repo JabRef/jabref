@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -142,7 +143,7 @@ class StringUtilTest {
         assertEquals("]", StringUtil.stripBrackets("]"));
         assertEquals("", StringUtil.stripBrackets("[]"));
         assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
-        assertEquals(null, StringUtil.stripBrackets(null));
+        assertNull(StringUtil.stripBrackets(null));
     }
 
     @Test

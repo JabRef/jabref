@@ -29,6 +29,12 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         fetcher = new LOBIDFetcher(importerPreferences);
     }
 
+    @Override
+    public String queryForUniqueResultsPerPage() {
+        // LOBID does not have unique entries per page for "Software";
+        return "Discussion";
+    }
+
     @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry firstArticle = new BibEntry(StandardEntryType.Book)

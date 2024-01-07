@@ -76,30 +76,30 @@ class SidePaneViewModelTest {
     void moveUp() {
         sidePaneViewModel.moveUp(SidePaneType.WEB_SEARCH);
 
-        assertEquals(sidePaneComponents.get(0), SidePaneType.WEB_SEARCH);
-        assertEquals(sidePaneComponents.get(1), SidePaneType.GROUPS);
+        assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.get(0));
+        assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(1));
     }
 
     @Test
     void moveUpFromFirstPosition() {
         sidePaneViewModel.moveUp(SidePaneType.GROUPS);
 
-        assertEquals(sidePaneComponents.get(0), SidePaneType.GROUPS);
+        assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(0));
     }
 
     @Test
     void moveDown() {
         sidePaneViewModel.moveDown(SidePaneType.WEB_SEARCH);
 
-        assertEquals(sidePaneComponents.get(1), SidePaneType.OPEN_OFFICE);
-        assertEquals(sidePaneComponents.get(2), SidePaneType.WEB_SEARCH);
+        assertEquals(SidePaneType.OPEN_OFFICE, sidePaneComponents.get(1));
+        assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.get(2));
     }
 
     @Test
     void moveDownFromLastPosition() {
         sidePaneViewModel.moveDown(SidePaneType.OPEN_OFFICE);
 
-        assertEquals(sidePaneComponents.get(2), SidePaneType.OPEN_OFFICE);
+        assertEquals(SidePaneType.OPEN_OFFICE, sidePaneComponents.get(2));
     }
 
     @Test

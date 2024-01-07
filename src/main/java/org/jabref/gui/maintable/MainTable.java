@@ -29,6 +29,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
@@ -72,11 +73,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ClipBoardManager clipBoardManager;
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
+                     LibraryTabContainer tabContainer,
                      BibDatabaseContext database,
                      PreferencesService preferencesService,
                      DialogService dialogService,
@@ -96,7 +99,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.clipBoardManager = clipBoardManager;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
-        UndoManager undoManager = libraryTab.getUndoManager();
+        this.undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
@@ -118,7 +121,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         database,
                         preferencesService,
                         preferencesService.getMainTableColumnPreferences(),
-                        libraryTab.getUndoManager(),
+                        undoManager,
                         dialogService,
                         stateManager,
                         taskExecutor).createColumns());
@@ -192,13 +195,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 database,
                 preferencesService,
                 preferencesService.getMainTableColumnPreferences(),
-                libraryTab.getUndoManager(),
+                undoManager,
                 dialogService,
                 stateManager,
                 taskExecutor);
 
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
+        new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, keyBindingRepository, dialogService).show(true);
     }
 
     /**
@@ -265,10 +268,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
@@ -169,6 +170,8 @@ public class Launcher {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
+        Globals.predatoryJournalRepository = PredatoryJournalListLoader
+                .loadRepository();
 
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());

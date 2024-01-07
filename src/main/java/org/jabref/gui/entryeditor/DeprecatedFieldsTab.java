@@ -1,8 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -59,14 +59,14 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toSet());
+            return entryType.get().getDeprecatedFields(mode).stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
-            // Entry type unknown -> treat all fields as required
-            return Collections.emptySet();
+            // Entry type unknown -> treat all fields as required (thus no optional fields)
+            return new LinkedHashSet<>();
         }
     }
 }

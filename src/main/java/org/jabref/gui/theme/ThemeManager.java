@@ -19,6 +19,7 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
 
+import com.jthemedetecor.OsThemeDetector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class ThemeManager {
 
     private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
+    private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
     public ThemeManager(WorkspacePreferences workspacePreferences,
                         FileUpdateMonitor fileUpdateMonitor,
@@ -66,12 +68,22 @@ public class ThemeManager {
         baseCssLiveUpdate();
 
         EasyBind.subscribe(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
+        EasyBind.subscribe(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
         EasyBind.subscribe(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
         EasyBind.subscribe(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
+        detector.registerListener(isDark -> updateThemeSettings());
     }
 
     private void updateThemeSettings() {
         Theme newTheme = Objects.requireNonNull(workspacePreferences.getTheme());
+
+        if (workspacePreferences.themeSyncOsProperty().getValue()) {
+            if (detector.isDark()) {
+                newTheme = Theme.dark();
+            } else {
+                newTheme = Theme.light();
+            }
+        }
 
         if (newTheme.equals(theme)) {
             LOGGER.info("Not updating theme because it hasn't changed");
@@ -160,16 +172,15 @@ public class ThemeManager {
     private void updateAdditionalCss() {
         getMainWindowScene().ifPresent(scene -> scene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
-                workspacePreferences.getTheme()
-                                    .getAdditionalStylesheet().map(styleSheet -> {
-                                         URL stylesheetUrl = styleSheet.getSceneStylesheet();
-                                         if (stylesheetUrl != null) {
-                                             return stylesheetUrl.toExternalForm();
-                                         } else {
-                                             return "";
-                                         }
-                                     })
-                                    .orElse("")
+                theme.getAdditionalStylesheet().map(styleSheet -> {
+                         URL stylesheetUrl = styleSheet.getSceneStylesheet();
+                         if (stylesheetUrl != null) {
+                             return stylesheetUrl.toExternalForm();
+                         } else {
+                             return "";
+                         }
+                     })
+                     .orElse("")
         )));
     }
 

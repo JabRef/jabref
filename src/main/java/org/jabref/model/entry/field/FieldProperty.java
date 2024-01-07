@@ -10,6 +10,7 @@ public enum FieldProperty {
     FILE_EDITOR,
     GENDER,
     ISBN,
+    ISSN,
     JOURNAL_NAME,
     LANGUAGE,
     MONTH,
