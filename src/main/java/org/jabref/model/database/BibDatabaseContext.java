@@ -16,6 +16,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
@@ -238,20 +239,23 @@ public class BibDatabaseContext {
     }
 
     /**
-     * @return The "global" path to store all lucene index files. This is independent of the concrete JabRef library.
+     * @return The path to store the lucene index files. One directory for each library.
      */
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
 
-        if (getDatabasePath().isPresent()) {
-            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
-            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
-            return indexPath;
-        }
-
-        indexPath = appData.resolve("unsaved");
-        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        indexPath = getDatabasePath().map(databasePath -> {
+            Path databaseFileName = databasePath.getFileName();
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
+            Path result = appData.resolve(fileName);
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), result);
+            return result;
+        }).orElseGet(() -> {
+            Path result = appData.resolve("unsaved");
+            LOGGER.debug("Using index for unsaved database: {}", result);
+            return result;
+        });
         return indexPath;
     }
 
