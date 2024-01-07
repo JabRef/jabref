@@ -37,26 +37,15 @@ import static org.mockito.Mockito.when;
 
 public class DatabaseSearcherWithBibFilesTest {
 
-    private static BibEntry entry1A = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry1")
-            .withField(StandardField.AUTHOR, "Test")
-            .withField(StandardField.TITLE, "cASe");
-    private static BibEntry entry2A = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry2")
-            .withField(StandardField.AUTHOR, "test")
-            .withField(StandardField.TITLE, "casE");
-    private static BibEntry entry3A = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry3")
-            .withField(StandardField.AUTHOR, "tESt")
-            .withField(StandardField.TITLE, "Case");
-    private static BibEntry entry4A = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry4")
-            .withField(StandardField.AUTHOR, "tesT")
-            .withField(StandardField.TITLE, "CASE");
-    private static BibEntry entry5A = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry5")
-            .withField(StandardField.AUTHOR, "TEST")
-            .withField(StandardField.TITLE, "case");
+    private static BibEntry titleSentenceCased = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("title-sentence-cased")
+            .withField(StandardField.TITLE, "Title Sentence Cased");
+    private static BibEntry titleMixedCased = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("title-mixed-cased")
+            .withField(StandardField.TITLE, "TiTle MiXed CaSed");
+    private static BibEntry titleUpperCased = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("title-upper-cased")
+            .withField(StandardField.TITLE, "TITLE UPPER CASED");
 
     private static BibEntry entry1B = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
@@ -127,22 +116,22 @@ public class DatabaseSearcherWithBibFilesTest {
                 // empty library
                 Arguments.of(List.of(), "empty.bib", "Test", EnumSet.noneOf(SearchRules.SearchFlags.class)),
 
-                // test-library-A
+                // test-library-title-casing
 
-                Arguments.of(List.of(), "test-library-A.bib", "Best", EnumSet.noneOf(SearchRules.SearchFlags.class)),
-                Arguments.of(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), "test-library-A.bib", "Test", EnumSet.noneOf(SearchRules.SearchFlags.class)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "NotExisting", EnumSet.noneOf(SearchRules.SearchFlags.class)),
+                Arguments.of(List.of(titleSentenceCased, titleMixedCased, titleUpperCased), "test-library-title-casing.bib", "Title", EnumSet.noneOf(SearchRules.SearchFlags.class)),
 
-                Arguments.of(List.of(), "test-library-A.bib", "author=Case", EnumSet.noneOf(SearchRules.SearchFlags.class)),
-                Arguments.of(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), "test-library-A.bib", "author=Test", EnumSet.noneOf(SearchRules.SearchFlags.class)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title=NotExisting", EnumSet.noneOf(SearchRules.SearchFlags.class)),
+                Arguments.of(List.of(titleSentenceCased, titleMixedCased, titleUpperCased), "test-library-title-casing.bib", "title=Title", EnumSet.noneOf(SearchRules.SearchFlags.class)),
 
-                Arguments.of(List.of(), "test-library-A.bib", "author=Test and title=Test", EnumSet.noneOf(SearchRules.SearchFlags.class)),
-                Arguments.of(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), "test-library-A.bib", "author=Test and title=Case", EnumSet.noneOf(SearchRules.SearchFlags.class)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title=TiTLE", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(titleSentenceCased), "test-library-title-casing.bib", "title=Title", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                Arguments.of(List.of(), "test-library-A.bib", "TesT", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(entry1A), "test-library-A.bib", "Test", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "TiTLE", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(titleMixedCased), "test-library-title-casing.bib", "TiTle", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                Arguments.of(List.of(), "test-library-A.bib", "author=Test and title=case", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(entry1A), "test-library-A.bib", "author=Test and title=cASe", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title=NotExisting", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(titleMixedCased), "test-library-title-casing.bib", "title=TiTle", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
 
                 // test-library-B
 
