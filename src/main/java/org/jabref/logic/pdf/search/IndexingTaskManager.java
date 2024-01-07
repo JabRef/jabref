@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -85,8 +87,8 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         };
     }
 
-    public void createIndex(PdfIndexer indexer) {
-        enqueueTask(indexer::createIndex);
+    public void rebuildIndex(PdfIndexer indexer) {
+        enqueueTask(indexer::rebuildIndex);
     }
 
     public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
@@ -102,8 +104,17 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
+    public void addToIndex(PdfIndexer indexer, List<BibEntry> entries) {
+        AtomicInteger counter = new AtomicInteger();
+        // To enable seeing progress in the UI, we group the entries in chunks of 50
+        // Solution inspired by https://stackoverflow.com/a/27595803/873282
+        entries.stream().collect(Collectors.groupingBy(x -> counter.getAndIncrement() / 50))
+               .values()
+               .forEach(list -> enqueueTask(() -> indexer.addToIndex(list)));
+    }
+
     public void addToIndex(PdfIndexer indexer, BibEntry entry) {
-        addToIndex(indexer, entry, entry.getFiles());
+        enqueueTask(() -> indexer.addToIndex(entry));
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {

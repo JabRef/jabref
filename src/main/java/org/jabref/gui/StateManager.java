@@ -77,9 +77,6 @@ public class StateManager {
 
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
-    // TODO: Related code should go into a IndexManager class
-    private Map<BibDatabaseContext, PdfIndexer> indexerMap = new HashMap<>();
-
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
     }
@@ -140,29 +137,6 @@ public class StateManager {
 
     public Optional<BibDatabaseContext> getActiveDatabase() {
         return activeDatabase.get();
-    }
-
-    public @Nullable PdfIndexer getIndexerOfActiveDatabase() {
-        return this.indexerMap.get(activeDatabase.getValue().orElse(null));
-    }
-
-    public void shutdownIndexer(BibDatabaseContext context) {
-        PdfIndexer indexer = this.indexerMap.get(context);
-        if (indexer != null) {
-            try {
-                indexer.close();
-            } catch (IOException e) {
-                LOGGER.debug("Could not close indexer", e);
-            }
-        }
-    }
-
-    public Collection<PdfIndexer> getAllIndexers() {
-        return this.indexerMap.values();
-    }
-
-    public void setIndexer(BibDatabaseContext databaseContext, PdfIndexer pdfIndexer) {
-        this.indexerMap.put(databaseContext, pdfIndexer);
     }
 
     public void setActiveDatabase(BibDatabaseContext database) {

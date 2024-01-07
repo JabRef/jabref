@@ -22,6 +22,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -88,6 +89,9 @@ public class DatabaseSearcherWithBibFilesTest {
 
         // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule
         Globals.stateManager.setActiveDatabase(context);
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
+        Globals.prefs = preferencesService;
 
         pdfIndexer = PdfIndexer.of(context, filePreferences);
         // Alternative - For debugging with Luke (part of the Apache Lucene distribution)

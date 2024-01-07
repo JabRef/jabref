@@ -19,7 +19,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +55,9 @@ public final class PdfSearcher {
         }
 
         List<SearchResult> resultDocs = new ArrayList<>();
-
-        Directory directory = indexer.indexWriter.getDirectory();
-
-        indexer.indexWriter.commit();
-
-        try (IndexReader reader = DirectoryReader.open(directory)) {
+        // We need to point the DirectoryReader to the indexer, because we get errors otherwise
+        // Hint from https://stackoverflow.com/a/63673753/873282.
+        try (IndexReader reader = DirectoryReader.open(indexer.getIndexWriter())) {
             Query query = new MultiFieldQueryParser(PDF_FIELDS, englishStemAnalyzer).parse(searchString);
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs results = searcher.search(query, maxHits);

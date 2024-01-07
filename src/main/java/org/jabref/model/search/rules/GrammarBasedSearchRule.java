@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.pdf.search.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
@@ -104,11 +106,12 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
         try {
             LOGGER.trace("Calling PDFIndexer");
-            PdfIndexer indexerOfActiveDatabase = Globals.stateManager.getIndexerOfActiveDatabase();
-            if (indexerOfActiveDatabase == null) {
-                LOGGER.warn("No indexer found");
+            BibDatabaseContext context = Globals.stateManager.getActiveDatabase().orElse(null);
+            if (context == null) {
+                LOGGER.warn("No active library");
                 return;
             }
+            PdfIndexer indexerOfActiveDatabase = PdfIndexerManager.get(context, Globals.prefs.getFilePreferences());
             PdfSearcher searcher = PdfSearcher.of(indexerOfActiveDatabase);
             PdfSearchResults results = searcher.search(query, 5);
             searchResults = results.getSortedByScore();

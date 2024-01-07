@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -45,9 +44,6 @@ public class PdfIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexer.class);
 
     @VisibleForTesting
-    // Also needs to be accessed by {@link PdfSearcher}
-    // We need to point the DirectoryReader to the indexer, because we get errors otherwise
-    // Hint from https://stackoverflow.com/a/63673753/873282.
     IndexWriter indexWriter;
 
     private final BibDatabaseContext databaseContext;
@@ -59,14 +55,20 @@ public class PdfIndexer {
         this.databaseContext = databaseContext;
         this.indexDirectory = indexDirectory;
         this.filePreferences = filePreferences;
-        Globals.stateManager.setIndexer(databaseContext, this);
     }
 
+    /**
+     * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
+     */
     @VisibleForTesting
     public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences) throws IOException {
         return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences);
     }
 
+    /**
+     * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
+     */
+    @VisibleForTesting
     public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
     }
@@ -80,7 +82,10 @@ public class PdfIndexer {
         initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE);
     }
 
-    private IndexWriter getIndexWriter() {
+    /**
+     * Needs to be accessed by {@link PdfSearcher}
+     */
+    IndexWriter getIndexWriter() {
         if (indexWriter == null) {
             initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         }
@@ -109,8 +114,12 @@ public class PdfIndexer {
     public void rebuildIndex() {
         LOGGER.debug("Rebuilding index.");
         createIndex();
+        addToIndex(databaseContext.getEntries());
+    }
+
+    public void addToIndex(List<BibEntry> entries) {
         int count = 0;
-        for (BibEntry entry : databaseContext.getEntries()) {
+        for (BibEntry entry : entries) {
             addToIndex(entry, false);
             count++;
             if (count % 100 == 0) {

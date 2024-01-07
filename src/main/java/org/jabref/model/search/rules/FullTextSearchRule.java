@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.pdf.search.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -32,13 +32,10 @@ public abstract class FullTextSearchRule implements SearchRule {
     protected String lastQuery;
     protected List<SearchResult> lastSearchResults;
 
-    private final PdfIndexer pdfIndexer;
-
     public FullTextSearchRule(EnumSet<SearchRules.SearchFlags> searchFlags) {
         this.searchFlags = searchFlags;
         this.lastQuery = "";
         lastSearchResults = Collections.emptyList();
-        pdfIndexer = Globals.stateManager.getIndexerOfActiveDatabase();
     }
 
     public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
@@ -51,25 +48,31 @@ public abstract class FullTextSearchRule implements SearchRule {
             LOGGER.debug("Fulltext search results called even though fulltext search flag is missing.");
             return new PdfSearchResults();
         }
-        if (pdfIndexer == null) {
-            LOGGER.debug("No known PDFIndexer for library.");
+
+        if (query.equals(this.lastQuery)) {
+            LOGGER.debug("Reusing fulltext search results.");
+            return new PdfSearchResults(lastSearchResults.stream()
+                                                         .filter(searchResult -> searchResult.isResultFor(bibEntry))
+                                                         .toList());
+        }
+
+        PdfIndexer pdfIndexer;
+        try {
+            pdfIndexer = PdfIndexerManager.get(Globals.stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences());
+        } catch (IOException e) {
+            LOGGER.error("Could not access full text index.", e);
             return new PdfSearchResults();
         }
-
-        if (!query.equals(this.lastQuery)) {
-            this.lastQuery = query;
-            lastSearchResults = Collections.emptyList();
-            try {
-                PdfSearcher searcher = PdfSearcher.of(pdfIndexer);
-                PdfSearchResults results = searcher.search(query, 5);
-                lastSearchResults = results.getSortedByScore();
-            } catch (IOException e) {
-                LOGGER.error("Could not retrieve search results.", e);
-            }
+        this.lastQuery = query;
+        lastSearchResults = Collections.emptyList();
+        try {
+            PdfSearcher searcher = PdfSearcher.of(pdfIndexer);
+            PdfSearchResults results = searcher.search(query, 5);
+            lastSearchResults = results.getSortedByScore();
+            return results;
+        } catch (IOException e) {
+            LOGGER.error("Could not retrieve search results.", e);
+            return new PdfSearchResults();
         }
-
-        return new PdfSearchResults(lastSearchResults.stream()
-                                                     .filter(searchResult -> searchResult.isResultFor(bibEntry))
-                                                     .collect(Collectors.toList()));
     }
 }
