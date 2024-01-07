@@ -443,7 +443,7 @@ class LayoutEntry {
             case "CreateDocBook5Editors" -> new CreateDocBook5Editors();
             case "CurrentDate" -> new CurrentDate();
             case "DateFormatter" -> new DateFormatter();
-            case "DOICheck" -> new DOICheck();
+            case "DOICheck" -> new DOICheck(preferences.getDoiPreferences());
             case "DOIStrip" -> new DOIStrip();
             case "EntryTypeFormatter" -> new EntryTypeFormatter();
             case "FirstPage" -> new FirstPage();
