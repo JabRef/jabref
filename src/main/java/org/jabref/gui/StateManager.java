@@ -77,6 +77,7 @@ public class StateManager {
 
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
+    // TODO: Related code should go into a IndexManager class
     private Map<BibDatabaseContext, PdfIndexer> indexerMap = new HashMap<>();
 
     public StateManager() {
