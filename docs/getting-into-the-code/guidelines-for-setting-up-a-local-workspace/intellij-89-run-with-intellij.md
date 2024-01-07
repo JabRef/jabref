@@ -18,10 +18,10 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
 6. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd> , on mac <kbd>cmd><kbd>+<kbd>1</kbd>)
 7. Copy all build resources to the folder of the build classes
    1. Navigate to the folder `build/resoruces/main`
-   1. Right click -> "Open In" -> "Explorer"
+   1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
    1. Navigate into directory "main"
    1. Select the folder `out/production/classes`
-   1. Right click -> "Open In" -> "Explorer"
+   1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
    1. Navigate into directory "classes"
    1. Now you have two Explorer windows opened. Copy all files and directories from the first one to the second one.
 8. Locate the class `Launcher` (e.g., by <kbd>ctrl</kbd>+<kbd>N</kbd> and then typing `Launcher`). Press <kbd>Enter</kbd> to jump to that class.
