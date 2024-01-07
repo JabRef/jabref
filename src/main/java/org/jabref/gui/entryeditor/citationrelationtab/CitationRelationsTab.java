@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,9 +38,11 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -107,7 +110,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByHBox.setPrefHeight(40);
 
         // Create Heading Lab
-        Label citingLabel = new Label(Localization.lang("Citing"));
+        Label citingLabel = new Label(Localization.lang("Cites"));
         styleLabel(citingLabel);
         Label citedByLabel = new Label(Localization.lang("Cited By"));
         styleLabel(citedByLabel);
@@ -160,20 +163,19 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         refreshCitingButton.setOnMouseClicked(event -> {
             searchForRelations(entry, citingListView, abortCitingButton,
-                    refreshCitingButton, CitationFetcher.SearchType.CITING, importCitingButton, citingProgress, true);
+                    refreshCitingButton, CitationFetcher.SearchType.CITES, importCitingButton, citingProgress, true);
         });
 
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton,
                 refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, true));
 
         // Create SplitPane to hold all nodes above
-        SplitPane container = new SplitPane(citedByVBox, citingVBox);
-
-        styleFetchedListView(citingListView);
+        SplitPane container = new SplitPane(citingVBox, citedByVBox);
         styleFetchedListView(citedByListView);
+        styleFetchedListView(citingListView);
 
         searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton,
-                CitationFetcher.SearchType.CITING, importCitingButton, citingProgress, false);
+                CitationFetcher.SearchType.CITES, importCitingButton, citingProgress, false);
 
         searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton,
                 CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, false);
@@ -193,7 +195,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = BibEntryView.getEntryNode(entry.getEntry());
+                    Node entryNode = BibEntryView.getEntryNode(entry.entry());
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
@@ -203,8 +205,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in database")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(entry.getEntry());
-                            libraryTab.clearAndSelect(entry.getEntry());
+                            libraryTab.showAndEdit(entry.entry());
+                            libraryTab.clearAndSelect(entry.entry());
                             citingTask.cancel();
                             citedByTask.cancel();
                         });
@@ -285,7 +287,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param entry         BibEntry currently selected in Jabref Database
      * @param listView      ListView to use
-     * @param abortButton         Button to stop the search
+     * @param abortButton   Button to stop the search
      * @param refreshButton refresh Button to use
      * @param searchType    type of search (CITING / CITEDBY)
      */
@@ -305,7 +307,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         listView.setItems(observableList);
 
-        if (citingTask != null && !citingTask.isCanceled() && searchType == CitationFetcher.SearchType.CITING) {
+        if (citingTask != null && !citingTask.isCanceled() && searchType == CitationFetcher.SearchType.CITES) {
             citingTask.cancel();
         } else if (citedByTask != null && !citedByTask.isCanceled() && searchType == CitationFetcher.SearchType.CITED_BY) {
             citedByTask.cancel();
@@ -313,7 +315,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         BackgroundTask<List<BibEntry>> task;
 
-        if (searchType == CitationFetcher.SearchType.CITING) {
+        if (searchType == CitationFetcher.SearchType.CITES) {
             task = BackgroundTask.wrap(() -> {
                 if (shouldRefresh) {
                     bibEntryRelationsRepository.forceRefreshReferences(entry);
@@ -332,18 +334,18 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         task.onRunning(() -> prepareToSearchForRelations(abortButton, refreshButton, importButton, progress, task))
-                .onSuccess(fetchedList -> onSearchForRelationsSucceed(entry, listView, abortButton, refreshButton,
-                        searchType, importButton, progress, fetchedList, observableList))
-                .onFailure(exception -> {
-                    LOGGER.error("Error while fetching citing Articles", exception);
-                    hideNodes(abortButton, progress, importButton);
-                    listView.setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
-                            exception.getMessage())));
+            .onSuccess(fetchedList -> onSearchForRelationsSucceed(entry, listView, abortButton, refreshButton,
+                    searchType, importButton, progress, fetchedList, observableList))
+            .onFailure(exception -> {
+                LOGGER.error("Error while fetching citing Articles", exception);
+                hideNodes(abortButton, progress, importButton);
+                listView.setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
+                        exception.getMessage())));
 
-                    refreshButton.setVisible(true);
-                    dialogService.notify(exception.getMessage());
-                })
-                .executeWith(Globals.TASK_EXECUTOR);
+                refreshButton.setVisible(true);
+                dialogService.notify(exception.getMessage());
+            })
+            .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private void onSearchForRelationsSucceed(BibEntry entry, CheckListView<CitationRelationItem> listView,
@@ -354,7 +356,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(abortButton, progress);
 
         observableList.setAll(fetchedList.stream().map(entr -> new CitationRelationItem(entr, false))
-                .collect(Collectors.toList()));
+                                         .collect(Collectors.toList()));
 
         if (!observableList.isEmpty()) {
             listView.refresh();
@@ -396,10 +398,14 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param entriesToImport entries to import
      */
-    private void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry entry) {
+    private void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
         citingTask.cancel();
         citedByTask.cancel();
-        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::getEntry).collect(Collectors.toList());
+
+        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::entry).collect(Collectors.toList());
+
+        // papers that our existingEntry cites
+
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
                 preferencesService,
@@ -408,7 +414,31 @@ public class CitationRelationsTab extends EntryEditorTab {
                 stateManager,
                 dialogService,
                 Globals.TASK_EXECUTOR);
-        importHandler.importEntries(entries);
+
+        if (searchType == CitationFetcher.SearchType.CITES) {
+            CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, preferencesService.getCitationKeyPatternPreferences());
+
+            List<String> citeKeys = new ArrayList<>();
+            for (BibEntry entryToCite : entries) {
+                if (entryToCite.getCitationKey().isEmpty()) {
+                    String key = generator.generateKey(entryToCite);
+                    entryToCite.setCitationKey(key);
+                    citeKeys.add(key);
+                }
+            }
+            existingEntry.setField(StandardField.CITES, citeKeys.stream().collect(Collectors.joining(",")));
+            importHandler.importEntries(entries);
+        }
+        if (searchType == CitationFetcher.SearchType.CITED_BY) {
+            for (BibEntry entryThatCitesOurExistingEntry : entries) {
+                List<String> existingCites = Arrays.stream(entryThatCitesOurExistingEntry.getField(StandardField.CITES).orElse("").split(",")).collect(Collectors.toList());
+                existingCites.removeIf(String::isEmpty);
+                existingCites.add(existingEntry.getCitationKey().orElse(""));
+                entryThatCitesOurExistingEntry.setField(StandardField.CITES, existingCites.stream().collect(Collectors.joining(",")));
+            }
+
+            importHandler.importEntries(entries);
+        }
 
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }

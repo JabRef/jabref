@@ -73,6 +73,37 @@ public class PaperDetails {
         return bibEntry;
     }
 
+    public BibEntry toBibEntryWithCited(BibEntry searchedEntry) {
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.TITLE, getTitle());
+        if (getYear() != null) {
+            bibEntry.setField(StandardField.YEAR, getYear());
+        }
+
+        String authors = getAuthors().stream()
+                                     .map(AuthorResponse::getName)
+                                     .collect(Collectors.joining(" and "));
+        bibEntry.setField(StandardField.AUTHOR, authors);
+
+        return bibEntry;
+    }
+
+    public BibEntry toBibEntryWithCiting() {
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.TITLE, getTitle());
+        if (getYear() != null) {
+            bibEntry.setField(StandardField.YEAR, getYear());
+        }
+
+        String authors = getAuthors().stream()
+                                     .map(AuthorResponse::getName)
+                                     .collect(Collectors.joining(" and "));
+        bibEntry.setField(StandardField.AUTHOR, authors);
+
+        return bibEntry;
+    }
+
+
     @Override
     public String toString() {
         return "PaperDetails{" +
