@@ -47,15 +47,6 @@ public class DatabaseSearcherWithBibFilesTest {
             .withCitationKey("title-upper-cased")
             .withField(StandardField.TITLE, "TITLE UPPER CASED");
 
-    private static BibEntry entry1B = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry1")
-            .withField(StandardField.AUTHOR, "Test")
-            .withField(StandardField.TITLE, "Case");
-    private static BibEntry entry4B = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("entry4")
-            .withField(StandardField.AUTHOR, "Special")
-            .withField(StandardField.TITLE, "192? title.");
-
     private static BibEntry mininimalSentenceCase = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-sentence-case")
             .withFiles(Collections.singletonList(new LinkedFile("", "minimal-sentence-case.pdf", StandardFileType.PDF.getName())));
@@ -133,13 +124,12 @@ public class DatabaseSearcherWithBibFilesTest {
                 Arguments.of(List.of(), "test-library-title-casing.bib", "title=NotExisting", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
                 Arguments.of(List.of(titleMixedCased), "test-library-title-casing.bib", "title=TiTle", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                // test-library-B
+                Arguments.of(List.of(), "test-library-title-casing.bib", "[Y]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
+                Arguments.of(List.of(titleUpperCased), "test-library-title-casing.bib", "[U]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
 
-                Arguments.of(List.of(), "test-library-B.bib", "[/8]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
-                Arguments.of(List.of(entry4B), "test-library-B.bib", "[/9]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
-
-                Arguments.of(List.of(), "test-library-B.bib", "\\bCas\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(entry1B), "test-library-B.bib", "\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                // Word boundaries
+                Arguments.of(List.of(), "test-library-title-casing.bib", "\\bTit\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(titleSentenceCased), "test-library-title-casing.bib", "\\bTitle\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
                 // test-library-with-attached-files
 
