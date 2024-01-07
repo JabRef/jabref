@@ -862,6 +862,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         }
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
+        Globals.stateManager.shutdownIndexer(context);
     }
 
     private void removeTab(LibraryTab libraryTab) {

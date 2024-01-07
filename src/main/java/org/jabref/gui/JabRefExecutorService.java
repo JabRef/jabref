@@ -146,7 +146,19 @@ public class JabRefExecutorService {
         gracefullyShutdown(this.executorService);
         gracefullyShutdown(this.lowPriorityExecutorService);
 
+        closePdfIndexers();
+
         timer.cancel();
+    }
+
+    private void closePdfIndexers() {
+        Globals.stateManager.getAllIndexers().forEach(indexer -> {
+            try {
+                indexer.close();
+            } catch (Exception e) {
+                LOGGER.debug("Problem closing PDF indexer", e);
+            }
+        });
     }
 
     private static class NamedRunnable implements Runnable {

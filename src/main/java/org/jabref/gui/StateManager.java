@@ -1,6 +1,8 @@
 package org.jabref.gui;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +143,21 @@ public class StateManager {
 
     public @Nullable PdfIndexer getIndexerOfActiveDatabase() {
         return this.indexerMap.get(activeDatabase.getValue().orElse(null));
+    }
+
+    public void shutdownIndexer(BibDatabaseContext context) {
+        PdfIndexer indexer = this.indexerMap.get(context);
+        if (indexer != null) {
+            try {
+                indexer.close();
+            } catch (IOException e) {
+                LOGGER.debug("Could not close indexer", e);
+            }
+        }
+    }
+
+    public Collection<PdfIndexer> getAllIndexers() {
+        return this.indexerMap.values();
     }
 
     public void setIndexer(BibDatabaseContext databaseContext, PdfIndexer pdfIndexer) {

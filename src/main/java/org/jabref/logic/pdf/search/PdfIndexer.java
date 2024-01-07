@@ -53,12 +53,18 @@ public class PdfIndexer {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final Directory indexDirectory;
+    private IndexReader reader;
 
     private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         this.indexDirectory = indexDirectory;
         this.filePreferences = filePreferences;
         Globals.stateManager.setIndexer(databaseContext, this);
+    }
+
+    @VisibleForTesting
+    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences);
     }
 
     public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
@@ -70,32 +76,30 @@ public class PdfIndexer {
      * Any previous state of the Lucene search is deleted.
      */
     public void createIndex() {
-        try {
-            indexWriter = new IndexWriter(
-                    indexDirectory,
-                    new IndexWriterConfig(
-                            new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
-            LOGGER.debug("Created new index for directory {}.", indexDirectory);
-        } catch (IOException e) {
-            LOGGER.warn("Could not create new index", e);
-        }
+        LOGGER.debug("Creating new index for directory {}.", indexDirectory);
+        initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE);
     }
 
     private IndexWriter getIndexWriter() {
         if (indexWriter == null) {
-            initializeIndexWriter();
+            initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         }
         return indexWriter;
     }
 
-    private void initializeIndexWriter() {
+    private void initializeIndexWriterAndReader(IndexWriterConfig.OpenMode mode) {
         try {
             indexWriter = new IndexWriter(
                     indexDirectory,
                     new IndexWriterConfig(
-                            new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
+                            new EnglishStemAnalyzer()).setOpenMode(mode));
         } catch (IOException e) {
             LOGGER.error("Could not initialize the IndexWriter", e);
+        }
+        try {
+            reader = DirectoryReader.open(indexWriter);
+        } catch (IOException e) {
+            LOGGER.error("Could not initialize the IndexReader", e);
         }
     }
 
@@ -103,10 +107,18 @@ public class PdfIndexer {
      * Rebuilds the PDF index. All PDF files linked to entries in the database will be re-indexed.
      */
     public void rebuildIndex() {
+        LOGGER.debug("Rebuilding index.");
         createIndex();
+        int count = 0;
         for (BibEntry entry : databaseContext.getEntries()) {
-            addToIndex(entry);
+            addToIndex(entry, false);
+            count++;
+            if (count % 100 == 0) {
+                doCommit();
+            }
         }
+        doCommit();
+        LOGGER.debug("Added {} documents to the index.", count);
     }
 
     /**
@@ -115,7 +127,14 @@ public class PdfIndexer {
      * @param entry a bibtex entry to link the pdf files to
      */
     public void addToIndex(BibEntry entry) {
-        addToIndex(entry, entry.getFiles());
+        addToIndex(entry, entry.getFiles(), true);
+    }
+
+    private void addToIndex(BibEntry entry, boolean shouldCommit) {
+        addToIndex(entry, entry.getFiles(), false);
+        if (shouldCommit) {
+            doCommit();
+        }
     }
 
     /**
@@ -124,8 +143,23 @@ public class PdfIndexer {
      * @param entry a bibtex entry to link the pdf files to
      */
     public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
+        addToIndex(entry, linkedFiles, true);
+    }
+
+    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles, boolean shouldCommit) {
         for (LinkedFile linkedFile : linkedFiles) {
-            addToIndex(entry, linkedFile);
+            addToIndex(entry, linkedFile, false);
+        }
+        if (shouldCommit) {
+            doCommit();
+        }
+    }
+
+    private void doCommit() {
+        try {
+            getIndexWriter().commit();
+        } catch (IOException e) {
+            LOGGER.warn("Could not commit changes to the index.", e);
         }
     }
 
@@ -171,6 +205,10 @@ public class PdfIndexer {
      * @param linkedFile the file to write to the index
      */
     public void addToIndex(BibEntry entry, LinkedFile linkedFile) {
+        this.addToIndex(entry, linkedFile, true);
+    }
+
+    private void addToIndex(BibEntry entry, LinkedFile linkedFile, boolean shouldCommit) {
         if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
             return;
         }
@@ -182,7 +220,7 @@ public class PdfIndexer {
         LOGGER.debug("Adding {} to index", linkedFile.getLink());
         try {
             // Check if a document with this path is already in the index
-            try (IndexReader reader = DirectoryReader.open(indexWriter)) {
+            try {
                 IndexSearcher searcher = new IndexSearcher(reader);
                 TermQuery query = new TermQuery(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
                 TopDocs topDocs = searcher.search(query, 1);
@@ -203,7 +241,11 @@ public class PdfIndexer {
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
                 getIndexWriter().addDocuments(pages.get());
-                getIndexWriter().commit();
+                if (shouldCommit) {
+                    getIndexWriter().commit();
+                }
+            } else {
+                LOGGER.debug("No content found in file {}", linkedFile.getLink());
             }
         } catch (IOException e) {
             LOGGER.warn("Could not add document {} to the index.", linkedFile.getLink(), e);
@@ -230,5 +272,9 @@ public class PdfIndexer {
             return paths;
         }
         return paths;
+    }
+
+    public void close() throws IOException {
+        indexWriter.close();
     }
 }
