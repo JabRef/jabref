@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.retrieval;
+package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.gui.LibraryTab;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
@@ -21,7 +20,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.NIOFSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,15 +29,15 @@ public final class PdfSearcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
-    private final Directory indexDirectory;
+    private final PdfIndexer indexer;
     private EnglishStemAnalyzer englishStemAnalyzer = new EnglishStemAnalyzer();
 
-    private PdfSearcher(Directory indexDirectory) {
-        this.indexDirectory = indexDirectory;
+    private PdfSearcher(PdfIndexer indexer) {
+        this.indexer = indexer;
     }
 
-    public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
-        return new PdfSearcher(new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
+    public static PdfSearcher of(PdfIndexer indexer) throws IOException {
+        return new PdfSearcher(indexer);
     }
 
     /**
@@ -59,7 +57,11 @@ public final class PdfSearcher {
 
         List<SearchResult> resultDocs = new ArrayList<>();
 
-        try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
+        Directory directory = indexer.indexWriter.getDirectory();
+
+        indexer.indexWriter.commit();
+
+        try (IndexReader reader = DirectoryReader.open(indexer.indexWriter)) {
             Query query = new MultiFieldQueryParser(PDF_FIELDS, englishStemAnalyzer).parse(searchString);
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs results = searcher.search(query, maxHits);

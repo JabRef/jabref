@@ -1,10 +1,9 @@
-package org.jabref.logic.pdf.search.retrieval;
+package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -54,7 +53,7 @@ public class PdfSearcherTest {
         database.insertEntry(exampleThesis);
 
         PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
-        search = PdfSearcher.of(context);
+        search = PdfSearcher.of(indexer);
 
         indexer.rebuildIndex();
     }

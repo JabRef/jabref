@@ -1,7 +1,9 @@
 package org.jabref.gui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.pdf.search.PdfIndexer;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -33,6 +36,7 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +74,8 @@ public class StateManager {
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
+
+    private Map<BibDatabaseContext, PdfIndexer> indexerMap = new HashMap<>();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -131,6 +137,14 @@ public class StateManager {
 
     public Optional<BibDatabaseContext> getActiveDatabase() {
         return activeDatabase.get();
+    }
+
+    public @Nullable PdfIndexer getIndexerOfActiveDatabase() {
+        return this.indexerMap.get(activeDatabase.getValue().orElse(null));
+    }
+
+    public void setIndexer(BibDatabaseContext databaseContext, PdfIndexer pdfIndexer) {
+        this.indexerMap.put(databaseContext, pdfIndexer);
     }
 
     public void setActiveDatabase(BibDatabaseContext database) {

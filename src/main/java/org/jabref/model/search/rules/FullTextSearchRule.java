@@ -8,14 +8,12 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.pdf.search.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +23,6 @@ import org.slf4j.LoggerFactory;
  * Some kind of caching of the full text search results is implemented.
  */
 @AllowedToUseLogic("Because access to the lucene index is needed")
-@NullMarked
 public abstract class FullTextSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FullTextSearchRule.class);
@@ -35,14 +32,13 @@ public abstract class FullTextSearchRule implements SearchRule {
     protected String lastQuery;
     protected List<SearchResult> lastSearchResults;
 
-    private final @Nullable BibDatabaseContext databaseContext;
+    private final PdfIndexer pdfIndexer;
 
     public FullTextSearchRule(EnumSet<SearchRules.SearchFlags> searchFlags) {
         this.searchFlags = searchFlags;
         this.lastQuery = "";
         lastSearchResults = Collections.emptyList();
-
-        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
+        pdfIndexer = Globals.stateManager.getIndexerOfActiveDatabase();
     }
 
     public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
@@ -55,8 +51,8 @@ public abstract class FullTextSearchRule implements SearchRule {
             LOGGER.debug("Fulltext search results called even though fulltext search flag is missing.");
             return new PdfSearchResults();
         }
-        if (databaseContext == null) {
-            LOGGER.debug("No known database context.");
+        if (pdfIndexer == null) {
+            LOGGER.debug("No known PDFIndexer for library.");
             return new PdfSearchResults();
         }
 
@@ -64,7 +60,7 @@ public abstract class FullTextSearchRule implements SearchRule {
             this.lastQuery = query;
             lastSearchResults = Collections.emptyList();
             try {
-                PdfSearcher searcher = PdfSearcher.of(databaseContext);
+                PdfSearcher searcher = PdfSearcher.of(pdfIndexer);
                 PdfSearchResults results = searcher.search(query, 5);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {

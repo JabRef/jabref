@@ -11,7 +11,7 @@ import org.jabref.gui.Globals;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfIndexer;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DatabaseSearcherWithBibFilesTest {
+public class SearchFunctionalityTest {
 
     private static BibEntry entry1A = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
@@ -91,7 +91,7 @@ public class DatabaseSearcherWithBibFilesTest {
     private Path indexDir;
 
     private BibDatabase initializeDatabaseFromPath(String testFile) throws Exception {
-        return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(DatabaseSearcherWithBibFilesTest.class.getResource(testFile)).toURI()));
+        return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource(testFile)).toURI()));
     }
 
     private BibDatabase initializeDatabaseFromPath(Path testFile) throws Exception {

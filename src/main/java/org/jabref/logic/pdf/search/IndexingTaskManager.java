@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.indexing;
+package org.jabref.logic.pdf.search;
 
 import java.util.List;
 import java.util.Queue;
@@ -9,7 +9,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;

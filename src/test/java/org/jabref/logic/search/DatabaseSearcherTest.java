@@ -66,7 +66,9 @@ public class DatabaseSearcherTest {
     @Test
     public void testNoMatchesFromEmptyDatabaseWithInvalidQuery() {
         SearchQuery query = new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
+
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
     }
 
