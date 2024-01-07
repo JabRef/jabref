@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.PdfSearcher;
+import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
@@ -54,6 +55,8 @@ public class GrammarBasedSearchRule implements SearchRule {
     private String query;
     private List<SearchResult> searchResults = new ArrayList<>();
 
+    private final BibDatabaseContext databaseContext;
+
     public static class ThrowingErrorListener extends BaseErrorListener {
 
         public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
@@ -68,6 +71,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags) throws RecognitionException {
         this.searchFlags = searchFlags;
+        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
     public static boolean isValid(EnumSet<SearchFlags> searchFlags, String query) {
@@ -100,8 +104,12 @@ public class GrammarBasedSearchRule implements SearchRule {
         if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
             return;
         }
+        if (databaseContext == null) {
+            LOGGER.debug("No known database context.");
+            return;
+        }
         try {
-            PdfSearcher searcher = PdfSearcher.of(Globals.stateManager.getIndexerOfActiveDatabase());
+            PdfSearcher searcher = PdfSearcher.of(databaseContext);
             PdfSearchResults results = searcher.search(query, 5);
             searchResults = results.getSortedByScore();
         } catch (IOException e) {

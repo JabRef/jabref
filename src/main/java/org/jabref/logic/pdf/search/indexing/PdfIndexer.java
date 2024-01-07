@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -45,7 +44,6 @@ public class PdfIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexer.class);
 
     @VisibleForTesting
-    // Also needs to be accessed by {@link PdfSearcher}
     // We need to point the DirectoryReader to the indexer, because we get errors otherwise
     // Hint from https://stackoverflow.com/a/63673753/873282.
     IndexWriter indexWriter;
@@ -58,7 +56,6 @@ public class PdfIndexer {
         this.databaseContext = databaseContext;
         this.indexDirectory = indexDirectory;
         this.filePreferences = filePreferences;
-        Globals.stateManager.setIndexer(databaseContext, this);
     }
 
     public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {

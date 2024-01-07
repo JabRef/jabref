@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.pdf.search.indexing;
 
 import java.nio.file.Path;
 import java.util.Collections;
