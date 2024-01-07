@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.indexing;
+package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
 import java.nio.file.Files;

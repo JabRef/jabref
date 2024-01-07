@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.indexing;
+package org.jabref.logic.pdf.search;
 
 import java.util.List;
 import java.util.Queue;
@@ -93,7 +93,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
         for (BibEntry entry : databaseContext.getEntries()) {
             for (LinkedFile file : entry.getFiles()) {
-                enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
+                enqueueTask(() -> indexer.addToIndex(entry, file));
                 pathsToRemove.remove(file.getLink());
             }
         }
@@ -108,7 +108,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
         for (LinkedFile file : linkedFiles) {
-            enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
+            enqueueTask(() -> indexer.addToIndex(entry, file));
         }
     }
 

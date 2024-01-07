@@ -1,6 +1,5 @@
 package org.jabref.logic.search;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -8,11 +7,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.logic.pdf.search.PdfIndexer;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,7 +23,6 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,43 +68,27 @@ public class SearchFunctionalityTest {
 
     private static BibEntry minimal1 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal1")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName())));
+            .withFiles(Collections.singletonList(new LinkedFile("Minimal 1", "minimal-1.pdf", StandardFileType.PDF.getName())));
     private static BibEntry minimal2 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal2")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName())));
+            .withFiles(Collections.singletonList(new LinkedFile("Minimal 2", "minimal-2.pdf", StandardFileType.PDF.getName())));
     private static BibEntry minimal3 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal3")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName())));
+            .withFiles(Collections.singletonList(new LinkedFile("Minimal 3", "minimal-3.pdf", StandardFileType.PDF.getName())));
     private static BibEntry minimalNote1 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note1")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote", "minimal-note.pdf", StandardFileType.PDF.getName())));
+            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 1", "minimal-note-1.pdf", StandardFileType.PDF.getName())));
     private static BibEntry minimalNote2 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note2")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 1", "minimal-note1.pdf", StandardFileType.PDF.getName())));
+            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 2", "minimal-note-2.pdf", StandardFileType.PDF.getName())));
     private static BibEntry minimalNote3 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note3")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 2", "minimal-note2.pdf", StandardFileType.PDF.getName())));
+            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 3", "minimal-note-3.pdf", StandardFileType.PDF.getName())));
 
-    private PdfSearcher search;
-    private PdfIndexer indexer;
+    FilePreferences filePreferences = mock(FilePreferences.class);
 
-    @BeforeEach
-    public void setUp(@TempDir Path indexDir) throws IOException {
-        FilePreferences filePreferences = mock(FilePreferences.class);
-        BibDatabase database = new BibDatabase();
-        BibDatabaseContext context = mock(BibDatabaseContext.class);
-
-        when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/search")));
-        when(context.getFulltextIndexPath()).thenReturn(indexDir);
-        when(context.getDatabase()).thenReturn(database);
-        when(context.getEntries()).thenReturn(database.getEntries());
-
-        indexer = PdfIndexer.of(context, filePreferences);
-        search = PdfSearcher.of(context);
-
-        indexer.createIndex();
-        indexer.addToIndex(context);
-    }
+    @TempDir
+    private Path indexDir;
 
     private BibDatabase initializeDatabaseFromPath(String testFile) throws Exception {
         return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource(testFile)).toURI()));
@@ -114,10 +96,19 @@ public class SearchFunctionalityTest {
 
     private BibDatabase initializeDatabaseFromPath(Path testFile) throws Exception {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
-        BibDatabase database = context.getDatabase();
-        search = PdfSearcher.of(context);
-        indexer.addToIndex(context);
+        BibDatabase database = result.getDatabase();
+
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(context.getFileDirectories(Mockito.any())).thenReturn(List.of(testFile.getParent()));
+        when(context.getFulltextIndexPath()).thenReturn(indexDir);
+        when(context.getDatabase()).thenReturn(database);
+        when(context.getEntries()).thenReturn(database.getEntries());
+
+        // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule
+        Globals.stateManager.setActiveDatabase(context);
+
+        PdfIndexer pdfIndexer = PdfIndexer.of(context, filePreferences);
+        pdfIndexer.rebuildIndex();
         return database;
     }
 
@@ -147,10 +138,24 @@ public class SearchFunctionalityTest {
                 Arguments.of(List.of(entry1B), "test-library-B.bib", "\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
                 Arguments.of(List.of(), "test-library-C.bib", "This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(minimal1, minimalNote1), "test-library-C.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+
+                // minimal1.pdf contains "THIS is a short sentence, comma included"
+                // minimalNote1.pdf contains "THIS IS A SHORT SENTENCE, COMMA INCLUDED."
+                Arguments.of(List.of(minimal1, minimalNote1), "test-library-C.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimal1, minimalNote1), "test-library-C.bib", "THIS", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimal1), "test-library-C.bib", "THIS is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimal1), "test-library-C.bib", "comma", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimal1), "test-library-C.bib", "comma", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "THIS IS A SHORT SENTENCE, COMMA INCLUDED.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-C.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
                 Arguments.of(List.of(), "test-library-C.bib", "User Test", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE))
+
+                // minimal-note1.pdf contains "HELLO WORLD" as pdf comment, which should be found
+                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "world", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "HELLO WORLD", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-C.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE))
         );
     }
 

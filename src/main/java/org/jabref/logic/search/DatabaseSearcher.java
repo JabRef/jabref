@@ -25,7 +25,7 @@ public class DatabaseSearcher {
     }
 
     public List<BibEntry> getMatches() {
-        LOGGER.debug("Search term: " + query);
+        LOGGER.debug("Search term: {}", query);
 
         if (!query.isValid()) {
             LOGGER.warn("Search failed: illegal search expression");

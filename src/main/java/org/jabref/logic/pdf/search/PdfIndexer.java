@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.indexing;
+package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -18,6 +19,7 @@ import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -42,20 +44,25 @@ public class PdfIndexer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexer.class);
 
-    private final Directory directoryToIndex;
-    private BibDatabaseContext databaseContext;
+    @VisibleForTesting
+    // Also needs to be accessed by {@link PdfSearcher}
+    // We need to point the DirectoryReader to the indexer, because we get errors otherwise
+    // Hint from https://stackoverflow.com/a/63673753/873282.
+    IndexWriter indexWriter;
 
-    private IndexWriter indexWriter;
-
+    private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
+    private final Directory indexDirectory;
 
-    public PdfIndexer(Directory indexDirectory, FilePreferences filePreferences) {
-        this.directoryToIndex = indexDirectory;
+    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
+        this.databaseContext = databaseContext;
+        this.indexDirectory = indexDirectory;
         this.filePreferences = filePreferences;
+        Globals.stateManager.setIndexer(databaseContext, this);
     }
 
     public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
     }
 
     /**
@@ -65,10 +72,10 @@ public class PdfIndexer {
     public void createIndex() {
         try {
             indexWriter = new IndexWriter(
-                    directoryToIndex,
+                    indexDirectory,
                     new IndexWriterConfig(
                             new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
-            LOGGER.debug("Created new index for directory {}.", directoryToIndex);
+            LOGGER.debug("Created new index for directory {}.", indexDirectory);
         } catch (IOException e) {
             LOGGER.warn("Could not create new index", e);
         }
@@ -84,7 +91,7 @@ public class PdfIndexer {
     private void initializeIndexWriter() {
         try {
             indexWriter = new IndexWriter(
-                    directoryToIndex,
+                    indexDirectory,
                     new IndexWriterConfig(
                             new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
         } catch (IOException e) {
@@ -92,9 +99,13 @@ public class PdfIndexer {
         }
     }
 
-    public void addToIndex(BibDatabaseContext databaseContext) {
+    /**
+     * Rebuilds the PDF index. All PDF files linked to entries in the database will be re-indexed.
+     */
+    public void rebuildIndex() {
+        createIndex();
         for (BibEntry entry : databaseContext.getEntries()) {
-            addToIndex(entry, databaseContext);
+            addToIndex(entry);
         }
     }
 
@@ -102,40 +113,19 @@ public class PdfIndexer {
      * Adds all PDF files linked to one entry in the database to an existing (or new) Lucene search index
      *
      * @param entry a bibtex entry to link the pdf files to
-     * @param databaseContext the associated BibDatabaseContext
      */
-    public void addToIndex(BibEntry entry, BibDatabaseContext databaseContext) {
-        addToIndex(entry, entry.getFiles(), databaseContext);
+    public void addToIndex(BibEntry entry) {
+        addToIndex(entry, entry.getFiles());
     }
 
     /**
      * Adds a list of pdf files linked to one entry in the database to an existing (or new) Lucene search index
      *
      * @param entry a bibtex entry to link the pdf files to
-     * @param databaseContext the associated BibDatabaseContext
      */
-    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
+    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
         for (LinkedFile linkedFile : linkedFiles) {
-            addToIndex(entry, linkedFile, databaseContext);
-        }
-    }
-
-    /**
-     * Adds a pdf file linked to one entry in the database to an existing (or new) Lucene search index
-     *
-     * @param entry a bibtex entry
-     * @param linkedFile the link to the pdf files
-     */
-    public void addToIndex(BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
-        if (databaseContext != null) {
-            // TODO: This needs to be commented. The databaseContext should exist?! Maybe when an unsaved database is saved?
-            this.databaseContext = databaseContext;
-        }
-        if (!entry.getFiles().isEmpty()) {
             addToIndex(entry, linkedFile);
-        } else {
-            // TODO: Can this happen?
-            LOGGER.debug("Tried to index {}, which is not attached to BibEntry {}", linkedFile, entry);
         }
     }
 
@@ -180,7 +170,7 @@ public class PdfIndexer {
      * @param entry the entry associated with the file
      * @param linkedFile the file to write to the index
      */
-    private void addToIndex(BibEntry entry, LinkedFile linkedFile) {
+    public void addToIndex(BibEntry entry, LinkedFile linkedFile) {
         if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
             return;
         }
@@ -192,7 +182,7 @@ public class PdfIndexer {
         LOGGER.debug("Adding {} to index", linkedFile.getLink());
         try {
             // Check if a document with this path is already in the index
-            try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
+            try (IndexReader reader = DirectoryReader.open(indexWriter)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
                 TermQuery query = new TermQuery(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
                 TopDocs topDocs = searcher.search(query, 1);
@@ -227,7 +217,7 @@ public class PdfIndexer {
      */
     public Set<String> getListOfFilePaths() {
         Set<String> paths = new HashSet<>();
-        try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
+        try (IndexReader reader = DirectoryReader.open(indexWriter)) {
             IndexSearcher searcher = new IndexSearcher(reader);
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);

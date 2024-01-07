@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.pdf.search.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
@@ -32,14 +32,13 @@ public abstract class FullTextSearchRule implements SearchRule {
     protected String lastQuery;
     protected List<SearchResult> lastSearchResults;
 
-    private final BibDatabaseContext databaseContext;
+    private final PdfIndexer pdfIndexer;
 
     public FullTextSearchRule(EnumSet<SearchRules.SearchFlags> searchFlags) {
         this.searchFlags = searchFlags;
         this.lastQuery = "";
         lastSearchResults = Collections.emptyList();
-
-        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
+        pdfIndexer = Globals.stateManager.getIndexerOfActiveDatabase();
     }
 
     public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
@@ -48,7 +47,12 @@ public abstract class FullTextSearchRule implements SearchRule {
 
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
+            LOGGER.debug("Fulltext search results called even though fulltext search flag is missing.");
+            return new PdfSearchResults();
+        }
+        if (pdfIndexer == null) {
+            LOGGER.debug("No known PDFIndexer for library.");
             return new PdfSearchResults();
         }
 
@@ -56,11 +60,11 @@ public abstract class FullTextSearchRule implements SearchRule {
             this.lastQuery = query;
             lastSearchResults = Collections.emptyList();
             try {
-                PdfSearcher searcher = PdfSearcher.of(databaseContext);
+                PdfSearcher searcher = PdfSearcher.of(pdfIndexer);
                 PdfSearchResults results = searcher.search(query, 5);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {
-                LOGGER.error("Could not retrieve search results!", e);
+                LOGGER.error("Could not retrieve search results.", e);
             }
         }
 
