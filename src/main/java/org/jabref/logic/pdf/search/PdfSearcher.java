@@ -61,7 +61,7 @@ public final class PdfSearcher {
 
         indexer.indexWriter.commit();
 
-        try (IndexReader reader = DirectoryReader.open(indexer.indexWriter)) {
+        try (IndexReader reader = DirectoryReader.open(directory)) {
             Query query = new MultiFieldQueryParser(PDF_FIELDS, englishStemAnalyzer).parse(searchString);
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs results = searcher.search(query, maxHits);

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchFunctionalityTest {
+public class DatabaseSearcherWithBibFilesTest {
 
     private static BibEntry entry1A = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
@@ -91,7 +91,7 @@ public class SearchFunctionalityTest {
     private Path indexDir;
 
     private BibDatabase initializeDatabaseFromPath(String testFile) throws Exception {
-        return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource(testFile)).toURI()));
+        return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(DatabaseSearcherWithBibFilesTest.class.getResource(testFile)).toURI()));
     }
 
     private BibDatabase initializeDatabaseFromPath(Path testFile) throws Exception {
