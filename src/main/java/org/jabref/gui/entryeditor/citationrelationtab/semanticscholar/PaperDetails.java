@@ -72,7 +72,7 @@ public class PaperDetails {
 
         return bibEntry;
     }
-    
+
     @Override
     public String toString() {
         return "PaperDetails{" +
