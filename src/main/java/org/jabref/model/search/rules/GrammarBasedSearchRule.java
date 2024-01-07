@@ -99,9 +99,11 @@ public class GrammarBasedSearchRule implements SearchRule {
         this.query = query;
 
         if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
+            LOGGER.debug("Fulltext search flag absent.");
             return;
         }
         try {
+            LOGGER.trace("Calling PDFIndexer");
             PdfIndexer indexerOfActiveDatabase = Globals.stateManager.getIndexerOfActiveDatabase();
             if (indexerOfActiveDatabase == null) {
                 LOGGER.warn("No indexer found");
