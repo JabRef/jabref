@@ -109,7 +109,7 @@ public class DatabaseSearcherWithBibFilesTest {
         // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule
         Globals.stateManager.setActiveDatabase(context);
 
-        PdfIndexer pdfIndexer = PdfIndexer.of(context, filePreferences);
+        pdfIndexer = PdfIndexer.of(context, filePreferences);
         // Alternative - For debugging with Luke (part of the Apache Lucene distribution)
         // pdfIndexer = PdfIndexer.of(context, Path.of("C:\\temp\\index"), filePreferences);
 
