@@ -102,24 +102,20 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
-        addToIndex(indexer, entry, entry.getFiles(), databaseContext);
+    public void addToIndex(PdfIndexer indexer, BibEntry entry) {
+        addToIndex(indexer, entry, entry.getFiles());
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
-        for (LinkedFile file : linkedFiles) {
-            enqueueTask(() -> indexer.addToIndex(entry, file));
-        }
-    }
-
-    public void removeFromIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
-        for (LinkedFile file : linkedFiles) {
-            enqueueTask(() -> indexer.removeFromIndex(file.getLink()));
-        }
+    public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
+        enqueueTask(() -> indexer.addToIndex(entry, linkedFiles));
     }
 
     public void removeFromIndex(PdfIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> removeFromIndex(indexer, entry, entry.getFiles()));
+        enqueueTask(() -> indexer.removeFromIndex(entry));
+    }
+
+    public void removeFromIndex(PdfIndexer indexer, List<LinkedFile> linkedFiles) {
+        enqueueTask(() -> indexer.removeFromIndex(linkedFiles));
     }
 
     public void updateDatabaseName(String name) {

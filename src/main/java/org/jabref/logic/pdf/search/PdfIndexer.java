@@ -183,15 +183,13 @@ public class PdfIndexer {
      * @param entry the entry documents are linked to
      */
     public void removeFromIndex(BibEntry entry) {
-        removeFromIndex(entry, entry.getFiles());
+        removeFromIndex(entry.getFiles());
     }
 
     /**
      * Removes a list of files linked to a bib-entry from the index
-     *
-     * @param entry the entry documents are linked to
      */
-    public void removeFromIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
+    public void removeFromIndex(List<LinkedFile> linkedFiles) {
         for (LinkedFile linkedFile : linkedFiles) {
             removeFromIndex(linkedFile.getLink());
         }

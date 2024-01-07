@@ -914,7 +914,7 @@ public class LibraryTab extends Tab {
                 try {
                     PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
-                        indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+                        indexingTaskManager.addToIndex(pdfIndexer, addedEntry);
                     }
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
@@ -950,8 +950,8 @@ public class LibraryTab extends Tab {
                     removedFiles.remove(newFileList);
 
                     try {
-                        indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
-                        indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
+                        indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles);
+                        indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), removedFiles);
                     } catch (IOException e) {
                         LOGGER.warn("I/O error when writing lucene index", e);
                     }
