@@ -66,24 +66,24 @@ public class DatabaseSearcherWithBibFilesTest {
             .withField(StandardField.AUTHOR, "Special")
             .withField(StandardField.TITLE, "192? title.");
 
-    private static BibEntry minimal1 = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal1")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimal 1", "minimal-1.pdf", StandardFileType.PDF.getName())));
-    private static BibEntry minimal2 = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal2")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimal 2", "minimal-2.pdf", StandardFileType.PDF.getName())));
-    private static BibEntry minimal3 = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal3")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimal 3", "minimal-3.pdf", StandardFileType.PDF.getName())));
-    private static BibEntry minimalNote1 = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-note1")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 1", "minimal-note-1.pdf", StandardFileType.PDF.getName())));
-    private static BibEntry minimalNote2 = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-note2")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 2", "minimal-note-2.pdf", StandardFileType.PDF.getName())));
-    private static BibEntry minimalNote3 = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-note3")
-            .withFiles(Collections.singletonList(new LinkedFile("Minimalnote 3", "minimal-note-3.pdf", StandardFileType.PDF.getName())));
+    private static BibEntry mininimalSentenceCase = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("minimal-sentence-case")
+            .withFiles(Collections.singletonList(new LinkedFile("", "minimal-sentence-case.pdf", StandardFileType.PDF.getName())));
+    private static BibEntry minimalAllUpperCase = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("minimal-all-upper-case")
+            .withFiles(Collections.singletonList(new LinkedFile("", "minimal-all-upper-case.pdf", StandardFileType.PDF.getName())));
+    private static BibEntry minimalMixedCase = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("minimal-mixed-case")
+            .withFiles(Collections.singletonList(new LinkedFile("", "minimal-mixed-case.pdf", StandardFileType.PDF.getName())));
+    private static BibEntry minimalNoteSentenceCase = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("minimal-note-sentence-case")
+            .withFiles(Collections.singletonList(new LinkedFile("", "minimal-note-sentence-case.pdf", StandardFileType.PDF.getName())));
+    private static BibEntry minimalNoteAllUpperCase = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("minimal-note-all-upper-case")
+            .withFiles(Collections.singletonList(new LinkedFile("", "minimal-note-all-upper-case.pdf", StandardFileType.PDF.getName())));
+    private static BibEntry minimalNoteMixedCase = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("minimal-note-mixed-case")
+            .withFiles(Collections.singletonList(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
 
     FilePreferences filePreferences = mock(FilePreferences.class);
 
@@ -137,25 +137,22 @@ public class DatabaseSearcherWithBibFilesTest {
                 Arguments.of(List.of(), "test-library-B.bib", "\\bCas\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
                 Arguments.of(List.of(entry1B), "test-library-B.bib", "\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                Arguments.of(List.of(), "test-library-C.bib", "This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-with-attached-files.bib", "This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                // minimal1.pdf contains "THIS is a short sentence, comma included"
-                // minimalNote1.pdf contains "THIS IS A SHORT SENTENCE, COMMA INCLUDED."
-                Arguments.of(List.of(minimal1, minimalNote1), "test-library-C.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(minimal1, minimalNote1), "test-library-C.bib", "THIS", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(minimal1), "test-library-C.bib", "THIS is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(minimal1), "test-library-C.bib", "comma", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(minimal1), "test-library-C.bib", "comma", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "THIS IS A SHORT SENTENCE, COMMA INCLUDED.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(), "test-library-C.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(mininimalSentenceCase, minimalAllUpperCase, minimalMixedCase, minimalNoteSentenceCase, minimalNoteAllUpperCase, minimalNoteMixedCase), "test-library-with-attached-files.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimalAllUpperCase, minimalMixedCase, minimalNoteAllUpperCase, minimalNoteMixedCase), "test-library-with-attached-files.bib", "THIS", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimalAllUpperCase), "test-library-with-attached-files.bib", "THIS is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(mininimalSentenceCase, minimalAllUpperCase, minimalMixedCase, minimalNoteSentenceCase, minimalNoteAllUpperCase, minimalNoteMixedCase), "test-library-with-attached-files.bib", "comma", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(mininimalSentenceCase, minimalAllUpperCase, minimalMixedCase, minimalNoteSentenceCase, minimalNoteAllUpperCase, minimalNoteMixedCase), "test-library-with-attached-files.bib", "comma", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(minimalNoteAllUpperCase), "test-library-with-attached-files.bib", "THIS IS A SHORT SENTENCE, COMMA INCLUDED.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-with-attached-files.bib", "This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                Arguments.of(List.of(), "test-library-C.bib", "User Test", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-with-attached-files.bib", "User Test", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
-                // minimal-note1.pdf contains "HELLO WORLD" as pdf comment, which should be found
-                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "world", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
-                Arguments.of(List.of(minimalNote1), "test-library-C.bib", "HELLO WORLD", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
-                Arguments.of(List.of(), "test-library-C.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE))
+                Arguments.of(List.of(minimalNoteSentenceCase), "test-library-with-attached-files.bib", "world", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimalNoteSentenceCase), "test-library-with-attached-files.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT)),
+                Arguments.of(List.of(minimalNoteSentenceCase), "test-library-with-attached-files.bib", "HELLO WORLD", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
+                Arguments.of(List.of(), "test-library-with-attached-files.bib", "Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE))
         );
     }
 
@@ -174,7 +171,7 @@ public class DatabaseSearcherWithBibFilesTest {
 
             /*    @Test
     public void testSimplePDFNoteFulltextSearch() throws Exception {
-        initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-C.bib");
+        initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-with-attached-files.bib");
 
         //@Test uses PDFReader
 
@@ -190,7 +187,7 @@ public class DatabaseSearcherWithBibFilesTest {
     @ParameterizedTest
     @MethodSource
     public void testSimplePDFFulltextSearch(List<BibEntry> expected, String query, EnumSet<SearchRules.SearchFlags> searchFlags) throws Exception {
-        BibDatabase bibDatabase = initializeDatabaseFromPath("test-library-C.bib");
+        BibDatabase bibDatabase = initializeDatabaseFromPath("test-library-with-attached-files.bib");
 
         //Positive search test
         PdfSearchResults resultsPositive = search.search("This is a short sentence, comma included.", 10);
