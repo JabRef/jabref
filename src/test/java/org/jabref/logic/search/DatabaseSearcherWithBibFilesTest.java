@@ -109,9 +109,10 @@ public class DatabaseSearcherWithBibFilesTest {
         // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule
         Globals.stateManager.setActiveDatabase(context);
 
-        // PdfIndexer pdfIndexer = PdfIndexer.of(context, filePreferences);
-        // For debugging with Luke (part of the Apache Lucene distribution)
-        pdfIndexer = PdfIndexer.of(context, Path.of("C:\\temp\\index"), filePreferences);
+        PdfIndexer pdfIndexer = PdfIndexer.of(context, filePreferences);
+        // Alternative - For debugging with Luke (part of the Apache Lucene distribution)
+        // pdfIndexer = PdfIndexer.of(context, Path.of("C:\\temp\\index"), filePreferences);
+
         pdfIndexer.rebuildIndex();
         return database;
     }
@@ -123,7 +124,10 @@ public class DatabaseSearcherWithBibFilesTest {
 
     private static Stream<Arguments> searchLibrary() {
         return Stream.of(
+                // empty library
                 Arguments.of(List.of(), "empty.bib", "Test", EnumSet.noneOf(SearchRules.SearchFlags.class)),
+
+                // test-library-A
 
                 Arguments.of(List.of(), "test-library-A.bib", "Best", EnumSet.noneOf(SearchRules.SearchFlags.class)),
                 Arguments.of(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), "test-library-A.bib", "Test", EnumSet.noneOf(SearchRules.SearchFlags.class)),
@@ -140,11 +144,15 @@ public class DatabaseSearcherWithBibFilesTest {
                 Arguments.of(List.of(), "test-library-A.bib", "author=Test and title=case", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
                 Arguments.of(List.of(entry1A), "test-library-A.bib", "author=Test and title=cASe", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)),
 
+                // test-library-B
+
                 Arguments.of(List.of(), "test-library-B.bib", "[/8]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
                 Arguments.of(List.of(entry4B), "test-library-B.bib", "[/9]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)),
 
                 Arguments.of(List.of(), "test-library-B.bib", "\\bCas\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
                 Arguments.of(List.of(entry1B), "test-library-B.bib", "\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)),
+
+                // test-library-with-attached-files
 
                 Arguments.of(List.of(), "test-library-with-attached-files.bib", "This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)),
 
@@ -173,40 +181,6 @@ public class DatabaseSearcherWithBibFilesTest {
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), database).getMatches();
         assertEquals(expected, matches);
     }
-
-    /*
-    private static Stream<Arguments> testSimplePDFFulltextSearch() {
-        return Stream.of()
-    }
-
-            /*    @Test
-    public void testSimplePDFNoteFulltextSearch() throws Exception {
-        initializeDatabaseFromPath(Path.of(Objects.requireNonNull(SearchFunctionalityTest.class.getResource("test-library-with-attached-files.bib");
-
-        //@Test uses PDFReader
-
-        //Positive search test
-        PdfSearchResults resultsPositive = search.search("Hello World", 10);
-        assertEquals(3, resultsPositive.numSearchResults());
-        //Negative search test
-        PdfSearchResults resultsNegative = search.search("User Test", 10);
-        assertEquals(0, resultsNegative.numSearchResults());
-    }
-
-
-    @ParameterizedTest
-    @MethodSource
-    public void testSimplePDFFulltextSearch(List<BibEntry> expected, String query, EnumSet<SearchRules.SearchFlags> searchFlags) throws Exception {
-        BibDatabase bibDatabase = initializeDatabaseFromPath("test-library-with-attached-files.bib");
-
-        //Positive search test
-        PdfSearchResults resultsPositive = search.search("This is a short sentence, comma included.", 10);
-        assertEquals(3, resultsPositive.numSearchResults());
-        //Negative search test
-        PdfSearchResults resultsNegative = search.search("This is a test.", 10);
-        assertEquals(0, resultsNegative.numSearchResults());
-    }
-*/
 }
 
 
