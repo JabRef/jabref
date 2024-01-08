@@ -57,7 +57,7 @@ public final class DocumentReader {
     public DocumentReader(BibEntry bibEntry, FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
         if (bibEntry.getFiles().isEmpty()) {
-            throw new IllegalStateException("There are no linked PDF files to this BibEntry");
+            throw new IllegalStateException("There are no linked PDF files to this BibEntry.");
         }
 
         this.entry = bibEntry;
