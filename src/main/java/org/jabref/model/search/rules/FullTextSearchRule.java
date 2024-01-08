@@ -30,12 +30,12 @@ public abstract class FullTextSearchRule implements SearchRule {
     protected final EnumSet<SearchRules.SearchFlags> searchFlags;
 
     protected String lastQuery;
-    protected List<SearchResult> lastSearchResults;
+    protected List<SearchResult> lastPdfSearchResults;
 
     public FullTextSearchRule(EnumSet<SearchRules.SearchFlags> searchFlags) {
         this.searchFlags = searchFlags;
         this.lastQuery = "";
-        lastSearchResults = Collections.emptyList();
+        lastPdfSearchResults = Collections.emptyList();
     }
 
     public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
@@ -50,29 +50,31 @@ public abstract class FullTextSearchRule implements SearchRule {
         }
 
         if (query.equals(this.lastQuery)) {
-            LOGGER.debug("Reusing fulltext search results.");
-            return new PdfSearchResults(lastSearchResults.stream()
-                                                         .filter(searchResult -> searchResult.isResultFor(bibEntry))
-                                                         .toList());
+            LOGGER.trace("Reusing fulltext search results (query={}, lastQuery={}).", query, this.lastQuery);
+        } else {
+            LOGGER.trace("Performing full query {}.", query);
+            PdfIndexer pdfIndexer;
+            try {
+                pdfIndexer = PdfIndexerManager.getIndexer(Globals.stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences());
+            } catch (IOException e) {
+                LOGGER.error("Could not access full text index.", e);
+                return new PdfSearchResults();
+            }
+            this.lastQuery = query;
+            lastPdfSearchResults = Collections.emptyList();
+            try {
+                PdfSearcher searcher = PdfSearcher.of(pdfIndexer);
+                PdfSearchResults results = searcher.search(query, 5);
+                lastPdfSearchResults = results.getSortedByScore();
+            } catch (IOException e) {
+                LOGGER.error("Could not retrieve search results.", e);
+                return new PdfSearchResults();
+            }
         }
 
-        PdfIndexer pdfIndexer;
-        try {
-            pdfIndexer = PdfIndexerManager.getIndexer(Globals.stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences());
-        } catch (IOException e) {
-            LOGGER.error("Could not access full text index.", e);
-            return new PdfSearchResults();
-        }
-        this.lastQuery = query;
-        lastSearchResults = Collections.emptyList();
-        try {
-            PdfSearcher searcher = PdfSearcher.of(pdfIndexer);
-            PdfSearchResults results = searcher.search(query, 5);
-            lastSearchResults = results.getSortedByScore();
-            return results;
-        } catch (IOException e) {
-            LOGGER.error("Could not retrieve search results.", e);
-            return new PdfSearchResults();
-        }
+        // We found a number of PDF files, now we need to relate it to the current BibEntry
+        return new PdfSearchResults(lastPdfSearchResults.stream()
+                                                        .filter(searchResult -> searchResult.isResultFor(bibEntry))
+                                                        .toList());
     }
 }
