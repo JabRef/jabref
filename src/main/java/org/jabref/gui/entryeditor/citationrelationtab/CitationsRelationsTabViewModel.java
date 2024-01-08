@@ -12,6 +12,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFe
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -39,7 +40,7 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
-        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::entry).collect(Collectors.toList());
+        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::entry).toList();
 
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
@@ -50,32 +51,57 @@ public class CitationsRelationsTabViewModel {
                 dialogService,
                 taskExecutor);
 
-        if (searchType == CitationFetcher.SearchType.CITES) {
-            CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, preferencesService.getCitationKeyPatternPreferences());
-
-            List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
-            citeKeys.removeIf(String::isEmpty);
-            for (BibEntry entryToCite : entries) {
-                if (entryToCite.getCitationKey().isEmpty()) {
-                    String key = generator.generateKey(entryToCite);
-                    entryToCite.setCitationKey(key);
-                    citeKeys.add(key);
-                } else {
-                    citeKeys.add(entryToCite.getCitationKey().get());
-                }
-            }
-            existingEntry.setField(StandardField.CITES, toCommaSeparatedString(citeKeys));
-            importHandler.importEntries(entries);
+        switch (searchType) {
+            case CITES -> importCites(entries, existingEntry, importHandler);
+            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler);
         }
-        if (searchType == CitationFetcher.SearchType.CITED_BY) {
-            for (BibEntry entryThatCitesOurExistingEntry : entries) {
-                List<String> existingCites = getExistingEntriesFromCiteField(entryThatCitesOurExistingEntry);
-                existingCites.removeIf(String::isEmpty);
-                existingCites.add(existingEntry.getCitationKey().orElse(""));
-                entryThatCitesOurExistingEntry.setField(StandardField.CITES, toCommaSeparatedString(existingCites));
-            }
+    }
 
-            importHandler.importEntries(entries);
+    private void importCites(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
+        CitationKeyPatternPreferences citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
+        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
+        boolean generateNewKeyOnImport = preferencesService.getImporterPreferences().generateNewKeyOnImportProperty().get();
+
+        List<String> citeKeys = getExistingEntriesFromCiteField(existingEntry);
+        citeKeys.removeIf(String::isEmpty);
+        for (BibEntry entryToCite : entries) {
+            if (generateNewKeyOnImport || entryToCite.getCitationKey().isEmpty()) {
+                String key = generator.generateKey(entryToCite);
+                entryToCite.setCitationKey(key);
+                addToKeyToList(citeKeys, key);
+            } else {
+                addToKeyToList(citeKeys, entryToCite.getCitationKey().get());
+            }
+        }
+        existingEntry.setField(StandardField.CITES, toCommaSeparatedString(citeKeys));
+        importHandler.importEntries(entries);
+    }
+
+    private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler) {
+        CitationKeyPatternPreferences citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
+        CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences);
+        boolean generateNewKeyOnImport = preferencesService.getImporterPreferences().generateNewKeyOnImportProperty().get();
+
+        for (BibEntry entryThatCitesOurExistingEntry : entries) {
+            List<String> existingCites = getExistingEntriesFromCiteField(entryThatCitesOurExistingEntry);
+            existingCites.removeIf(String::isEmpty);
+            String key;
+            if (generateNewKeyOnImport || entryThatCitesOurExistingEntry.getCitationKey().isEmpty()) {
+                key = generator.generateKey(entryThatCitesOurExistingEntry);
+                entryThatCitesOurExistingEntry.setCitationKey(key);
+            } else {
+                key = existingEntry.getCitationKey().get();
+            }
+            addToKeyToList(existingCites, key);
+            entryThatCitesOurExistingEntry.setField(StandardField.CITES, toCommaSeparatedString(existingCites));
+        }
+
+        importHandler.importEntries(entries);
+    }
+
+    private void addToKeyToList(List<String> list, String key) {
+        if (!list.contains(key)) {
+            list.add(key);
         }
     }
 
