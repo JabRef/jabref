@@ -3000,4 +3000,9 @@ public class JabRefPreferences implements PreferencesService {
                 getDOIPreferences(),
                 getGrobidPreferences());
     }
+
+    @Override
+    public JabRefOnlinePreferences getJabRefOnlinePreferences() {
+        return new JabRefOnlinePreferences();
+    }
 }

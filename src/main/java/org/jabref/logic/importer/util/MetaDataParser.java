@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.online.RemoteSettings;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -27,6 +28,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +123,8 @@ public class MetaDataParser {
                 }
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
+            } else if (entry.getKey().equals(MetaData.REMOTE_SETTINGS)) {
+                metaData.setRemoteSettings(new Gson().fromJson(getSingleItem(values), RemoteSettings.class));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {

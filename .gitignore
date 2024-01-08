@@ -36,7 +36,6 @@ __pycache__/
 parts/
 stage/
 prime/
-*.snap
 jabref_source.tar.bz2
 snap/.snapcraft/
 

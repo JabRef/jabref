@@ -22,6 +22,8 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
+import kong.unirest.json.JSONObject;
+
 /**
  * Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
  */
@@ -60,6 +62,9 @@ public class MetaDataSerializer {
                 .put(MetaData.FILE_DIRECTORY_LATEX + '-' + user, Collections.singletonList(path.toString().trim())));
         metaData.getVersionDBStructure().ifPresent(
                 versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, Collections.singletonList(versionDBStructure.trim())));
+        metaData.getRemoteSettings().ifPresent(
+            settings -> stringyMetaData.put(MetaData.REMOTE_SETTINGS, Collections.singletonList(new JSONObject(settings).toString()))
+        );
 
         for (ContentSelector selector : metaData.getContentSelectorList()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());

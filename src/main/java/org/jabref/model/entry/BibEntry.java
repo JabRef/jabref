@@ -27,6 +27,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.online.LocalRevision;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -138,6 +139,11 @@ public class BibEntry implements Cloneable {
      * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
+
+    /**
+     * Revision data for the entry, when synced with a remote database.
+     */
+    private Optional<LocalRevision> revision;
 
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
@@ -594,10 +600,9 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value must not be null");
         Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
-        if (value.isEmpty()) {
+        if (value == null || value.isEmpty()) {
             return clearField(field);
         }
 
@@ -1128,6 +1133,14 @@ public class BibEntry implements Cloneable {
         }
 
         this.setFiles(linkedFiles);
+    }
+
+    public Optional<LocalRevision> getRevision() {
+        return revision;
+    }
+
+    public void setRevision(LocalRevision localRevision) {
+        this.revision = Optional.ofNullable(localRevision);
     }
 
     /**

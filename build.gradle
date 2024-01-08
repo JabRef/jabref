@@ -27,6 +27,9 @@ plugins {
 
     id 'idea'
 
+    // JabRef Online GraphQL client integration
+    id 'com.apollographql.apollo3' version '3.8.2'
+    
     id 'org.openrewrite.rewrite' version '6.5.4'
 }
 
@@ -236,6 +239,8 @@ dependencies {
     testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.5'
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
+    implementation group: 'com.apollographql.apollo3', name: 'apollo-runtime-jvm', version: '3.8.2'
+    implementation group: 'com.apollographql.apollo3', name: 'apollo-rx3-support', version: '3.8.2'
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation 'org.jspecify:jspecify:0.3.0'
@@ -252,6 +257,12 @@ dependencies {
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
+
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-junit5:3.4.0'
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-plugin-jackson:3.4.0'
+
+    testImplementation 'com.fasterxml.jackson.core:jackson-core:2.15.3'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.12.5'
     // xjc needs the runtime as well for the ant task, otherwise it fails
@@ -296,9 +307,14 @@ processResources {
 tasks.register('generateSource') {
     dependsOn("generateBstGrammarSource",
             "generateSearchGrammarSource",
-            "generateCitaviSource")
+            "generateCitaviSource",
+            "generateApolloSources",
+            "generateServiceApolloSchema",
+            "generateServiceApolloUsedCoordinates"
+
+    )
     group = 'JabRef'
-    description 'Generates all necessary (Java) source files.'
+    description 'Generates all necessasry (Java) source files.'
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
@@ -358,6 +374,24 @@ tasks.register('generateCitaviSource', XjcTask) {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+apollo {
+    packageName = "org.jabref.jabrefonline"
+    schemaFile = file("src-gen/main/java/org/jabref/jabrefonline/graphql/schema.json")
+    mapScalar("DateTime", "java.time.ZonedDateTime", "org.jabref.logic.online.JavaZonedDateTimeAdapter.INSTANCE")
+    generateModelBuilder = true
+    introspection {
+        endpointUrl = "https://dev.www.jabref.org/api"
+    }
+}
+
+tasks.configureEach { task ->
+    // Download schema before trying to generate apollo sources
+    if (task.name.contains("generateServiceApolloSources")) {
+        task.dependsOn 'downloadServiceApolloSchemaFromIntrospection'
+    }
+}
+
 
 compileJava {
     options.compilerArgs << "-Xlint:none"
@@ -491,7 +525,7 @@ tasks.register('copyTestResources', Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
@@ -735,3 +769,5 @@ jmh {
     iterations = 10
     fork = 2
 }
+
+

@@ -17,6 +17,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.online.RemoteSettings;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
@@ -48,6 +49,7 @@ public class MetaData {
     public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
+    public static final String REMOTE_SETTINGS = "remote";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
@@ -73,6 +75,7 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     private String versionDBStructure;
+    private RemoteSettings remoteSettings;
 
     /**
      * Constructs an empty metadata.
@@ -360,6 +363,15 @@ public class MetaData {
         Objects.requireNonNull(value);
 
         unknownMetaData.put(key, value);
+    }
+
+    public Optional<RemoteSettings> getRemoteSettings() {
+        return Optional.ofNullable(remoteSettings);
+    }
+
+    public void setRemoteSettings(RemoteSettings remoteSettings) {
+        this.remoteSettings = remoteSettings;
+        postChange();
     }
 
     @Override

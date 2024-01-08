@@ -49,7 +49,7 @@ class XjcTask extends DefaultTask {
         if (outputDirectory == null) {
             return null
         }
-        return project.file(outputDirectory)
+        return project.file(outputDirectory + "/" + javaPackage.replace(".", "/"))
     }
 
     void setOutputDirectory(Object outputDirectory) {

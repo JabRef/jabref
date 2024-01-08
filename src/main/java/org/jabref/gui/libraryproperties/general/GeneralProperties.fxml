@@ -27,6 +27,8 @@
             <RowConstraints/>
             <RowConstraints/>
             <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints/>
         </rowConstraints>
 
         <Label styleClass="sectionHeader" text="%Override default file directories"
@@ -86,6 +88,10 @@
                GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <ComboBox fx:id="encoding" prefWidth="150.0"
                   GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6"/>
+
+        <Label styleClass="sectionHeader" text="%JabRef Account"
+               GridPane.columnSpan="3" GridPane.rowIndex="7"/>
+        <Button onAction="#connectJabRefAccount" text="%Connect" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
     </GridPane>
 </fx:root>

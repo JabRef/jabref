@@ -132,6 +132,13 @@ open module org.jabref {
     requires com.sun.jna;
     requires com.sun.jna.platform;
 
+    requires com.apollographql.apollo3.api;
+    requires com.apollographql.apollo3.runtime;
+    requires com.apollographql.apollo3.rx3;
+    // TOOD: Remove this dependency once apollo is fully migrated
+    requires kotlin.stdlib;
+    requires io.reactivex.rxjava3;
+
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
