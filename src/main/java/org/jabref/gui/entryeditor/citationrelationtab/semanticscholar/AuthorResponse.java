@@ -1,5 +1,8 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
+/**
+ * Used for GSON
+ */
 public class AuthorResponse {
     private String authorId;
     private String name;
