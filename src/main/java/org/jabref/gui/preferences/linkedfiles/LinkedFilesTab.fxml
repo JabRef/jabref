@@ -57,6 +57,7 @@
 
     <Label styleClass="sectionHeader" text="%Fulltext Index"/>
     <CheckBox fx:id="fulltextIndex" text="%Automatically index all linked files for fulltext search"/>
+    <CheckBox fx:id="fulltextIndexLinkedFilesShouldCheckForModifications" text="%Indexed files should be checked for modifications on startup"/>
 
     <Label styleClass="sectionHeader" text="%Linked file name conventions"/>
     <GridPane hgap="4.0" vgap="4.0">

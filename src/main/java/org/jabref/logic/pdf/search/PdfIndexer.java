@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -151,11 +152,11 @@ public class PdfIndexer {
      *
      * @param entry a bibtex entry to link the pdf files to
      */
-    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
+    public void addToIndex(BibEntry entry, Collection<LinkedFile> linkedFiles) {
         addToIndex(entry, linkedFiles, true);
     }
 
-    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles, boolean shouldCommit) {
+    public void addToIndex(BibEntry entry, Collection<LinkedFile> linkedFiles, boolean shouldCommit) {
         for (LinkedFile linkedFile : linkedFiles) {
             addToIndex(entry, linkedFile, false);
         }
@@ -198,9 +199,15 @@ public class PdfIndexer {
     /**
      * Removes a list of files linked to a bib-entry from the index
      */
-    public void removeFromIndex(List<LinkedFile> linkedFiles) {
+    public void removeFromIndex(Collection<LinkedFile> linkedFiles) {
         for (LinkedFile linkedFile : linkedFiles) {
             removeFromIndex(linkedFile.getLink());
+        }
+    }
+
+    public void removePathsFromIndex(Collection<String> linkedFiles) {
+        for (String linkedFile : linkedFiles) {
+            removeFromIndex(linkedFile);
         }
     }
 
@@ -216,7 +223,10 @@ public class PdfIndexer {
     }
 
     private void addToIndex(BibEntry entry, LinkedFile linkedFile, boolean shouldCommit) {
-        if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
+        if (linkedFile.isOnlineLink() ||
+                (!StandardFileType.PDF.getName().equals(linkedFile.getFileType()) &&
+                        // We do not require the file type to be set
+                        (!linkedFile.getLink().endsWith(".pdf") && !linkedFile.getLink().endsWith(".PDF")))) {
             return;
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);

@@ -32,6 +32,7 @@ public class FilePreferences {
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
+    private final BooleanProperty fulltextIndexLinkedFilesShouldCheckForModifications = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
     private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
@@ -44,6 +45,7 @@ public class FilePreferences {
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
+                           boolean fulltextIndexLinkedFilesShouldCheckForModifications,
                            Path workingDirectory,
                            Set<ExternalFileType> externalFileTypes,
                            boolean createBackup,
@@ -55,6 +57,7 @@ public class FilePreferences {
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
+        this.fulltextIndexLinkedFilesShouldCheckForModifications.setValue(fulltextIndexLinkedFilesShouldCheckForModifications);
         this.workingDirectory.setValue(workingDirectory);
         this.externalFileTypes.addAll(externalFileTypes);
         this.createBackup.setValue(createBackup);
@@ -139,6 +142,18 @@ public class FilePreferences {
 
     public void setFulltextIndexLinkedFiles(boolean shouldFulltextIndexLinkedFiles) {
         this.fulltextIndexLinkedFiles.set(shouldFulltextIndexLinkedFiles);
+    }
+
+    public boolean shouldFulltextIndexLinkedFilesShouldCheckForModifications() {
+        return fulltextIndexLinkedFilesShouldCheckForModifications.get();
+    }
+
+    public BooleanProperty fulltextIndexLinkedFilesShouldCheckForModifications() {
+        return fulltextIndexLinkedFilesShouldCheckForModifications;
+    }
+
+    public void setFulltextIndexLinkedFilesShouldCheckForModifications(boolean shouldFulltextIndexLinkedFilesShouldCheckForModifications) {
+        this.fulltextIndexLinkedFilesShouldCheckForModifications.set(shouldFulltextIndexLinkedFilesShouldCheckForModifications);
     }
 
     public Path getWorkingDirectory() {

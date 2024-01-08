@@ -91,17 +91,17 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(indexer::rebuildIndex);
     }
 
+    /**
+     * Updates the index by performing a delta analysis of the files already existing in the index and the files in the library.
+     */
     public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
-        for (BibEntry entry : databaseContext.getEntries()) {
-            for (LinkedFile file : entry.getFiles()) {
-                enqueueTask(() -> indexer.addToIndex(entry, file));
-                pathsToRemove.remove(file.getLink());
-            }
-        }
-        for (String pathToRemove : pathsToRemove) {
-            enqueueTask(() -> indexer.removeFromIndex(pathToRemove));
-        }
+        databaseContext.getEntries().stream()
+                       .flatMap(entry -> entry.getFiles().stream())
+                       .map(LinkedFile::getLink)
+                       .forEach(pathsToRemove::remove);
+        enqueueTask(() -> indexer.addToIndex(databaseContext.getEntries()));
+        enqueueTask(() -> indexer.removePathsFromIndex(pathsToRemove));
     }
 
     public void addToIndex(PdfIndexer indexer, List<BibEntry> entries) {
