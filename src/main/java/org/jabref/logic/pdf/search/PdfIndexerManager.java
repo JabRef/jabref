@@ -12,6 +12,14 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A PdfIndexer takes a long time to build. Caching it speeds up.
+ * <p>
+ * The PdfIndexer is related to the BibDatabaseContext and the FilePreferences. If the user changes the path of the library
+ * or the file preferences, we need to create a new PdfIndexer. Otherwise, we can reuse the existing one.
+ * <p>
+ * This manager implements a <a href="https://www.neatcode.org/object-pool/">Object Pool pattern</a> for {@link PdfIndexer}.
+ */
 public class PdfIndexerManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexerManager.class);
