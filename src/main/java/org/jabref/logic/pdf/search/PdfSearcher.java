@@ -66,7 +66,7 @@ public final class PdfSearcher {
             }
             return new PdfSearchResults(resultDocs);
         } catch (ParseException e) {
-            LOGGER.warn("Could not parse query: '{}'", searchString, e.getMessage());
+            LOGGER.warn("Could not parse query: '{}'", searchString, e);
             return new PdfSearchResults();
         }
     }
