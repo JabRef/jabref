@@ -51,7 +51,7 @@ public final class PdfSearcher {
             return new PdfSearchResults();
         }
         if (maxHits <= 0) {
-            throw new IllegalArgumentException("Must be called with at least 1 maxHits, was" + maxHits);
+            throw new IllegalArgumentException("Must be called with at least 1 maxHits, was " + maxHits);
         }
 
         List<SearchResult> resultDocs = new ArrayList<>();

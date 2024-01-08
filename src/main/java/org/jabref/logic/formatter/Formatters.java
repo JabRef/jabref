@@ -42,10 +42,10 @@ import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
 
-    private static Map<String, Formatter> nameToFormatterMap;
+    private static Map<String, Formatter> keyToFormatterMap;
 
     static {
-        nameToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getName, f -> f));
+        keyToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getKey, f -> f));
     }
 
     private Formatters() {
@@ -102,7 +102,7 @@ public class Formatters {
 
     public static Optional<Formatter> getFormatterForName(String name) {
         Objects.requireNonNull(name);
-        return nameToFormatterMap.containsKey(name) ? Optional.of(nameToFormatterMap.get(name)) : Optional.empty();
+        return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
 
     public static Optional<Formatter> getFormatterForModifier(String modifier) {

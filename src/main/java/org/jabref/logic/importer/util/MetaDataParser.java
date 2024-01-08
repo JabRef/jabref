@@ -78,6 +78,8 @@ public class MetaDataParser {
 
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
+     *
+     * @return the given metaData instance (which is modified, too)
      */
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
