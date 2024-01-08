@@ -205,7 +205,7 @@ public class FieldFormatterCleanups {
 
     static Formatter getFormatterFromString(String formatterName) {
         return Formatters
-                .getFormatterForName(formatterName)
+                .getFormatterForKey(formatterName)
                 .orElseGet(() -> {
                     if (!"identity".equals(formatterName)) {
                         // The identity formatter is not listed in the formatters list, but is still valid

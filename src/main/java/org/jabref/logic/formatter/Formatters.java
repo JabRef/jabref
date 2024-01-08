@@ -100,7 +100,7 @@ public class Formatters {
         return all;
     }
 
-    public static Optional<Formatter> getFormatterForName(String name) {
+    public static Optional<Formatter> getFormatterForKey(String name) {
         Objects.requireNonNull(name);
         return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
@@ -128,7 +128,7 @@ public class Formatters {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
-            return getFormatterForName(modifier);
+            return getFormatterForKey(modifier);
         }
     }
 }
