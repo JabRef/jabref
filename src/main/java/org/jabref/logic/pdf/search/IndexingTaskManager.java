@@ -100,6 +100,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
                        .flatMap(entry -> entry.getFiles().stream())
                        .map(LinkedFile::getLink)
                        .forEach(pathsToRemove::remove);
+        // The indexer checks the attached PDFs for modifications (based on the timestamp of the PDF) and reindexes the PDF if it is newer than the index. Therefore, we need to pass the whole library to the indexer for re-indexing.
         enqueueTask(() -> indexer.addToIndex(databaseContext.getEntries()));
         enqueueTask(() -> indexer.removePathsFromIndex(pathsToRemove));
     }
