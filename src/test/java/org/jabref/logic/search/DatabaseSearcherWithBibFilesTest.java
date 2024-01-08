@@ -90,7 +90,7 @@ public class DatabaseSearcherWithBibFilesTest {
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
 
-        // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule
+        // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule}
         Globals.stateManager.setActiveDatabase(context);
         PreferencesService preferencesService = mock(PreferencesService.class);
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
