@@ -27,6 +27,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
@@ -50,8 +51,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.pdf.search.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
@@ -62,6 +64,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
@@ -84,7 +87,7 @@ import org.slf4j.LoggerFactory;
 public class LibraryTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -125,7 +128,7 @@ public class LibraryTab extends Tab {
     private final TaskExecutor taskExecutor;
 
     public LibraryTab(BibDatabaseContext bibDatabaseContext,
-                      JabRefFrame frame,
+                      LibraryTabContainer tabContainer,
                       DialogService dialogService,
                       PreferencesService preferencesService,
                       StateManager stateManager,
@@ -133,7 +136,7 @@ public class LibraryTab extends Tab {
                       BibEntryTypesManager entryTypesManager,
                       CountingUndoManager undoManager,
                       TaskExecutor taskExecutor) {
-        this.frame = Objects.requireNonNull(frame);
+        this.tabContainer = Objects.requireNonNull(tabContainer);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = undoManager;
         this.dialogService = dialogService;
@@ -220,18 +223,18 @@ public class LibraryTab extends Tab {
     public void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        frame.addTab(this, true);
+        tabContainer.addTab(this, true);
     }
 
     public void onDatabaseLoadingSucceed(ParserResult result) {
         BibDatabaseContext context = result.getDatabaseContext();
-        OpenDatabaseAction.performPostOpenActions(this, result);
+        OpenDatabaseAction.performPostOpenActions(result, dialogService);
 
         feedData(context);
 
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             try {
-                indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+                indexingTaskManager.updateIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
             } catch (IOException e) {
                 LOGGER.error("Cannot access lucene index", e);
             }
@@ -411,10 +414,6 @@ public class LibraryTab extends Tab {
         this.mode = mode;
     }
 
-    public JabRefFrame frame() {
-        return frame;
-    }
-
     /**
      * Removes the selected entries from the database
      *
@@ -469,12 +468,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    /**
-     * This method is called from JabRefFrame when the user wants to create a new entry or entries. It is necessary when the user would expect the added entry or one of the added entries to be selected in the entry editor
-     *
-     * @param entries The new entries.
-     */
-
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
             bibDatabaseContext.getDatabase().insertEntries(entries);
@@ -488,9 +481,9 @@ public class LibraryTab extends Tab {
 
             this.changedProperty.setValue(true); // The database just changed.
             if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-                showAndEdit(entries.get(0));
+                showAndEdit(entries.getFirst());
             }
-            clearAndSelect(entries.get(0));
+            clearAndSelect(entries.getFirst());
         }
     }
 
@@ -506,6 +499,7 @@ public class LibraryTab extends Tab {
     private void createMainTable() {
         mainTable = new MainTable(tableModel,
                 this,
+                tabContainer,
                 bibDatabaseContext,
                 preferencesService,
                 dialogService,
@@ -558,21 +552,21 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Set up auto completion for this database
+     * Set up autocompletion for this database
      */
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository, autoCompletePreferences);
         } else {
-            // Create empty suggestion providers if auto completion is deactivated
+            // Create empty suggestion providers if auto-completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
         searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
 
-    public void updateSearchManager() {
-        frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
+    public SuggestionProvider<Author> getAutoCompleter() {
+        return searchAutoCompleter;
     }
 
     public EntryEditor getEntryEditor() {
@@ -837,7 +831,7 @@ public class LibraryTab extends Tab {
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
-                                              JabRefFrame frame,
+                                              LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               CountingUndoManager undoManager,
@@ -847,7 +841,7 @@ public class LibraryTab extends Tab {
 
         LibraryTab newTab = new LibraryTab(
                 context,
-                frame,
+                tabContainer,
                 dialogService,
                 preferencesService,
                 stateManager,
@@ -866,7 +860,7 @@ public class LibraryTab extends Tab {
     }
 
     public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
-                                              JabRefFrame frame,
+                                              LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
@@ -876,9 +870,9 @@ public class LibraryTab extends Tab {
                                               TaskExecutor taskExecutor) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(
+        return new LibraryTab(
                 databaseContext,
-                frame,
+                tabContainer,
                 dialogService,
                 preferencesService,
                 stateManager,
@@ -886,8 +880,6 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
                 taskExecutor);
-
-        return libraryTab;
     }
 
     private class GroupTreeListener {
@@ -921,10 +913,8 @@ public class LibraryTab extends Tab {
         public void listen(EntriesAddedEvent addedEntryEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
-                    for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
-                        indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
-                    }
+                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
+                    indexingTaskManager.addToIndex(pdfIndexer, addedEntryEvent.getBibEntries());
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
                 }
@@ -935,7 +925,7 @@ public class LibraryTab extends Tab {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
                         indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
                     }
@@ -958,8 +948,9 @@ public class LibraryTab extends Tab {
                     removedFiles.remove(newFileList);
 
                     try {
-                        indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
-                        indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
+                        PdfIndexer indexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
+                        indexingTaskManager.addToIndex(indexer, fieldChangedEvent.getBibEntry(), addedFiles);
+                        indexingTaskManager.removeFromIndex(indexer, removedFiles);
                     } catch (IOException e) {
                         LOGGER.warn("I/O error when writing lucene index", e);
                     }

@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.indexing;
+package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,8 +53,7 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex();
-        indexer.addToIndex(context);
+        indexer.rebuildIndex();
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -63,18 +62,17 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void dontIndexNonPdf() throws IOException {
+    public void doNotIndexNonPdf() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.aux", StandardFileType.AUX.getName())));
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex();
-        indexer.addToIndex(context);
+        indexer.rebuildIndex();
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(indexer.indexWriter)) {
             assertEquals(0, reader.numDocs());
         }
     }
@@ -87,11 +85,10 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex();
-        indexer.addToIndex(context);
+        indexer.rebuildIndex();
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(indexer.indexWriter)) {
             assertEquals(0, reader.numDocs());
         }
     }
@@ -105,8 +102,7 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex();
-        indexer.addToIndex(context);
+        indexer.rebuildIndex();
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -123,36 +119,11 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex();
-        indexer.addToIndex(context);
+        indexer.rebuildIndex();
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
-        }
-    }
-
-    @Test
-    public void testFlushIndex() throws IOException {
-        // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setCitationKey("Example2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
-        database.insertEntry(entry);
-
-        indexer.createIndex();
-        indexer.addToIndex(context);
-        // index actually exists
-        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
-        }
-
-        // when
-        indexer.flushIndex();
-
-        // then
-        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(0, reader.numDocs());
         }
     }
 
@@ -163,8 +134,8 @@ public class PdfIndexerTest {
         exampleThesis.setCitationKey("ExampleThesis2017");
         exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
-        indexer.createIndex();
-        indexer.addToIndex(context);
+
+        indexer.rebuildIndex();
 
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -176,7 +147,7 @@ public class PdfIndexerTest {
         metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
-        indexer.addToIndex(metadata, null);
+        indexer.addToIndex(metadata);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -184,4 +155,3 @@ public class PdfIndexerTest {
         }
     }
 }
-

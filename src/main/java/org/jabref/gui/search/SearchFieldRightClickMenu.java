@@ -1,11 +1,13 @@
 package org.jabref.gui.search;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -20,21 +22,22 @@ public class SearchFieldRightClickMenu {
     public static ContextMenu create(KeyBindingRepository keyBindingRepository,
                                      StateManager stateManager,
                                      CustomTextField searchField,
-                                     JabRefFrame frame) {
+                                     LibraryTabContainer tabContainer,
+                                     UndoManager undoManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new EditAction(StandardActions.UNDO, frame, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new EditAction(StandardActions.REDO, frame, stateManager)),
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager)),
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager)),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager)),
-                factory.createMenuItem(StandardActions.DELETE, new EditAction(StandardActions.DELETE, frame, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new EditAction(StandardActions.UNDO, tabContainer::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.REDO, new EditAction(StandardActions.REDO, tabContainer::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, tabContainer::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, tabContainer::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, tabContainer::getCurrentLibraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.DELETE, new EditAction(StandardActions.DELETE, tabContainer::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL, null, stateManager)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL, null, stateManager, undoManager)),
                 createSearchFromHistorySubMenu(factory, stateManager, searchField)
         );
 

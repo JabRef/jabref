@@ -1,9 +1,13 @@
 package org.jabref.gui.edit;
 
+import java.util.function.Supplier;
+
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -21,14 +25,16 @@ public class EditAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final StandardActions action;
     private final StateManager stateManager;
+    private final UndoManager undoManager;
 
-    public EditAction(StandardActions action, JabRefFrame frame, StateManager stateManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager, UndoManager undoManager) {
         this.action = action;
-        this.frame = frame;
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
+        this.undoManager = undoManager;
 
         if (action == StandardActions.PASTE) {
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -72,18 +78,18 @@ public class EditAction extends SimpleCommand {
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 switch (action) {
-                    case COPY -> frame.getCurrentLibraryTab().copy();
-                    case CUT -> frame.getCurrentLibraryTab().cut();
-                    case PASTE -> frame.getCurrentLibraryTab().paste();
-                    case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
+                    case COPY -> tabSupplier.get().copy();
+                    case CUT -> tabSupplier.get().cut();
+                    case PASTE -> tabSupplier.get().paste();
+                    case DELETE_ENTRY -> tabSupplier.get().delete(false);
                     case UNDO -> {
-                        if (frame.getUndoManager().canUndo()) {
-                            frame.getUndoManager().undo();
+                        if (undoManager.canUndo()) {
+                            undoManager.undo();
                         }
                     }
                     case REDO -> {
-                        if (frame.getUndoManager().canRedo()) {
-                            frame.getUndoManager().redo();
+                        if (undoManager.canRedo()) {
+                            undoManager.redo();
                         }
                     }
                     default -> LOGGER.debug("Only cut/copy/paste/deleteEntry supported but got: {} and focus owner {}", action, focusOwner);
