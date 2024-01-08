@@ -64,8 +64,8 @@ public class PdfIndexerTest {
     @Test
     public void doNotIndexNonPdf() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.aux", StandardFileType.AUX.getName())));
         database.insertEntry(entry);
 
         // when
