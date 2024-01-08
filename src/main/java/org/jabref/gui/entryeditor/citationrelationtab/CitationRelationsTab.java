@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,16 +32,14 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
-import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -69,12 +66,14 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final PreferencesService preferencesService;
     private final LibraryTab libraryTab;
+    private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
+    private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
 
     public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
                                 BibDatabaseContext databaseContext, UndoManager undoManager,
                                 StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
-                                PreferencesService preferencesService, LibraryTab lTab) {
+                                PreferencesService preferencesService, LibraryTab lTab, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
@@ -83,11 +82,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferencesService = preferencesService;
         this.libraryTab = lTab;
+        this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService,fileUpdateMonitor, Globals.TASK_EXECUTOR);
     }
 
     /**
@@ -345,7 +346,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 refreshButton.setVisible(true);
                 dialogService.notify(exception.getMessage());
             })
-            .executeWith(Globals.TASK_EXECUTOR);
+            .executeWith(taskExecutor);
     }
 
     private void onSearchForRelationsSucceed(BibEntry entry, CheckListView<CitationRelationItem> listView,
@@ -402,43 +403,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingTask.cancel();
         citedByTask.cancel();
 
-        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::entry).collect(Collectors.toList());
-
-        // papers that our existingEntry cites
-
-        ImportHandler importHandler = new ImportHandler(
-                databaseContext,
-                preferencesService,
-                fileUpdateMonitor,
-                undoManager,
-                stateManager,
-                dialogService,
-                Globals.TASK_EXECUTOR);
-
-        if (searchType == CitationFetcher.SearchType.CITES) {
-            CitationKeyGenerator generator = new CitationKeyGenerator(databaseContext, preferencesService.getCitationKeyPatternPreferences());
-
-            List<String> citeKeys = new ArrayList<>();
-            for (BibEntry entryToCite : entries) {
-                if (entryToCite.getCitationKey().isEmpty()) {
-                    String key = generator.generateKey(entryToCite);
-                    entryToCite.setCitationKey(key);
-                    citeKeys.add(key);
-                }
-            }
-            existingEntry.setField(StandardField.CITES, citeKeys.stream().collect(Collectors.joining(",")));
-            importHandler.importEntries(entries);
-        }
-        if (searchType == CitationFetcher.SearchType.CITED_BY) {
-            for (BibEntry entryThatCitesOurExistingEntry : entries) {
-                List<String> existingCites = Arrays.stream(entryThatCitesOurExistingEntry.getField(StandardField.CITES).orElse("").split(",")).collect(Collectors.toList());
-                existingCites.removeIf(String::isEmpty);
-                existingCites.add(existingEntry.getCitationKey().orElse(""));
-                entryThatCitesOurExistingEntry.setField(StandardField.CITES, existingCites.stream().collect(Collectors.joining(",")));
-            }
-
-            importHandler.importEntries(entries);
-        }
+        citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
 
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }

@@ -285,7 +285,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         entryEditorTabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
         entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext,
-                undoManager, stateManager, fileMonitor, preferencesService, libraryTab));
+                undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
 
         sourceTab = new SourceTab(
                 databaseContext,
