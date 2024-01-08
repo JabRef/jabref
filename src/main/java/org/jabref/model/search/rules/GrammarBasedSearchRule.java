@@ -1,6 +1,5 @@
 package org.jabref.model.search.rules;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -13,16 +12,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.PdfIndexer;
-import org.jabref.logic.pdf.search.PdfIndexerManager;
-import org.jabref.logic.pdf.search.PdfSearcher;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
@@ -47,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * This class implements the "Advanced Search Mode" described in the help
  */
 @AllowedToUseLogic("Because access to the lucene index is needed")
-public class GrammarBasedSearchRule implements SearchRule {
+public class GrammarBasedSearchRule extends FullTextSearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
@@ -70,6 +63,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags) throws RecognitionException {
+        super(searchFlags);
         this.searchFlags = searchFlags;
     }
 
@@ -99,25 +93,6 @@ public class GrammarBasedSearchRule implements SearchRule {
         parser.setErrorHandler(new BailErrorStrategy()); // ParseCancellationException on parse errors
         tree = parser.start();
         this.query = query;
-
-        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
-            LOGGER.debug("Fulltext search flag absent.");
-            return;
-        }
-        try {
-            LOGGER.trace("Calling PDFIndexer");
-            BibDatabaseContext context = Globals.stateManager.getActiveDatabase().orElse(null);
-            if (context == null) {
-                LOGGER.warn("No active library");
-                return;
-            }
-            PdfIndexer indexerOfActiveDatabase = PdfIndexerManager.getIndexer(context, Globals.prefs.getFilePreferences());
-            PdfSearcher searcher = PdfSearcher.of(indexerOfActiveDatabase);
-            PdfSearchResults results = searcher.search(query, 5);
-            searchResults = results.getSortedByScore();
-        } catch (IOException e) {
-            LOGGER.error("Could not retrieve search results", e);
-        }
     }
 
     @Override
@@ -128,11 +103,6 @@ public class GrammarBasedSearchRule implements SearchRule {
             LOGGER.info("Search failed", e);
             return false;
         }
-    }
-
-    @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-        return new PdfSearchResults(searchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
     }
 
     @Override
