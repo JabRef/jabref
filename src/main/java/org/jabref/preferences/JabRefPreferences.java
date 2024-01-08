@@ -421,9 +421,7 @@ public class JabRefPreferences implements PreferencesService {
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
-
     private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
-    private static final String FULLTEXT_INDEX_LINKED_FILES_SHOULD_CHECK_FOR_MODIFICATIONS = "fulltextIndexLinkedFilesShouldCheckForModifications";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -760,8 +758,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DOWNLOAD_LINKED_FILES, true);
         // Create Fulltext-Index by default
         defaults.put(FULLTEXT_INDEX_LINKED_FILES, true);
-        // On JabRef startup, do not check for modifications by default
-        defaults.put(FULLTEXT_INDEX_LINKED_FILES_SHOULD_CHECK_FOR_MODIFICATIONS, false);
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -2184,7 +2180,6 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
-                getBoolean(FULLTEXT_INDEX_LINKED_FILES_SHOULD_CHECK_FOR_MODIFICATIONS),
                 Path.of(get(WORKING_DIRECTORY)),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 getBoolean(CREATE_BACKUP),
@@ -2197,7 +2192,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
-        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesShouldCheckForModifications(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES_SHOULD_CHECK_FOR_MODIFICATIONS, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
         filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));

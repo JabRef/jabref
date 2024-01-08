@@ -11,8 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- Added a configuration option to enable fulltext search not checking all attached files upon start for modifications (disabled as default). [#10193](https://github.com/JabRef/jabref/issues/10193) 
-
 ### Changed
 
 - The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
