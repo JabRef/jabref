@@ -125,8 +125,8 @@ public class GrammarBasedSearchRule implements SearchRule {
         try {
             return new BibtexSearchVisitor(searchFlags, bibEntry).visit(tree);
         } catch (Exception e) {
-            LOGGER.debug("Search failed", e);
-            return getFulltextResults(query, bibEntry).numSearchResults() > 0;
+            LOGGER.info("Search failed", e);
+            return false;
         }
     }
 
