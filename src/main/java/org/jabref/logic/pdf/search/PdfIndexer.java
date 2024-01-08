@@ -87,8 +87,12 @@ public class PdfIndexer {
      * Needs to be accessed by {@link PdfSearcher}
      */
     IndexWriter getIndexWriter() {
+        LOGGER.trace("Getting the index writer");
         if (indexWriter == null) {
+            LOGGER.trace("Initializing the index writer");
             initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        } else {
+            LOGGER.trace("Using existing index writer");
         }
         return indexWriter;
     }

@@ -87,7 +87,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.get(bibDatabaseContext, filePreferences), entry);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
@@ -105,7 +105,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.get(bibDatabaseContext, filePreferences), entry);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access fulltext index", e);
         }

@@ -58,7 +58,7 @@ public abstract class FullTextSearchRule implements SearchRule {
 
         PdfIndexer pdfIndexer;
         try {
-            pdfIndexer = PdfIndexerManager.get(Globals.stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences());
+            pdfIndexer = PdfIndexerManager.getIndexer(Globals.stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences());
         } catch (IOException e) {
             LOGGER.error("Could not access full text index.", e);
             return new PdfSearchResults();

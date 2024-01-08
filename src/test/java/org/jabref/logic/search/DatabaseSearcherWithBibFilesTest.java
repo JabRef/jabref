@@ -12,6 +12,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.pdf.search.PdfIndexer;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -93,7 +94,7 @@ public class DatabaseSearcherWithBibFilesTest {
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         Globals.prefs = preferencesService;
 
-        pdfIndexer = PdfIndexer.of(context, filePreferences);
+        pdfIndexer = PdfIndexerManager.getIndexer(context, filePreferences);
         // Alternative - For debugging with Luke (part of the Apache Lucene distribution)
         // pdfIndexer = PdfIndexer.of(context, Path.of("C:\\temp\\index"), filePreferences);
 

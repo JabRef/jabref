@@ -75,7 +75,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            PdfIndexer indexer = PdfIndexerManager.get(databaseContext, filePreferences);
+            PdfIndexer indexer = PdfIndexerManager.getIndexer(databaseContext, filePreferences);
             currentLibraryTab.get().getIndexingTaskManager().rebuildIndex(indexer);
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));

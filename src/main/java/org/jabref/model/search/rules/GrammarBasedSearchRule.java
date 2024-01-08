@@ -111,7 +111,7 @@ public class GrammarBasedSearchRule implements SearchRule {
                 LOGGER.warn("No active library");
                 return;
             }
-            PdfIndexer indexerOfActiveDatabase = PdfIndexerManager.get(context, Globals.prefs.getFilePreferences());
+            PdfIndexer indexerOfActiveDatabase = PdfIndexerManager.getIndexer(context, Globals.prefs.getFilePreferences());
             PdfSearcher searcher = PdfSearcher.of(indexerOfActiveDatabase);
             PdfSearchResults results = searcher.search(query, 5);
             searchResults = results.getSortedByScore();
