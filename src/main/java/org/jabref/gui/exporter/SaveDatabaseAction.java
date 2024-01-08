@@ -138,10 +138,9 @@ public class SaveDatabaseAction {
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
-        // Close AutosaveManager and BackupManager for original library
         Optional<Path> databasePath = context.getDatabasePath();
         if (databasePath.isPresent()) {
-            final Path oldFile = databasePath.get();
+            // Close AutosaveManager, BackupManager, and PdfIndexer for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
             PdfIndexerManager.shutdownIndexer(context);
