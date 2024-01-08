@@ -207,7 +207,7 @@ public class FieldFormatterCleanups {
         return Formatters
                 .getFormatterForName(formatterName)
                 .orElseGet(() -> {
-                    if (!formatterName.equals("identity")) {
+                    if (!"identity".equals(formatterName)) {
                         // The identity formatter is not listed in the formatters list, but is still valid
                         // Therefor, we log errors in other cases only
                         LOGGER.info("Formatter {} not found.", formatterName);
