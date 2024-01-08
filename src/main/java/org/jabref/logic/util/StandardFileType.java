@@ -47,9 +47,6 @@ public enum StandardFileType implements FileType {
     CITAVI("Citavi", "ctv6bak", "ctv5bak"),
     MARKDOWN("Markdown", "md");
 
-
-
-
     private final List<String> extensions;
     private final String name;
 

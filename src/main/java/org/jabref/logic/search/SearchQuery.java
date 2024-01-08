@@ -69,7 +69,7 @@ public class SearchQuery implements SearchMatcher {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s)", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription());
+        return String.format("\"%s\" (%s, %s) %s", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription(), searchFlags);
     }
 
     @Override
