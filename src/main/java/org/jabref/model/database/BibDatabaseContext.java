@@ -245,17 +245,16 @@ public class BibDatabaseContext {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
 
-        indexPath = getDatabasePath().map(databasePath -> {
-            Path databaseFileName = databasePath.getFileName();
+        if (getDatabasePath().isPresent()) {
+            Path databaseFileName = getDatabasePath().get().getFileName();
             String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
-            Path result = appData.resolve(fileName);
-            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), result);
-            return result;
-        }).orElseGet(() -> {
-            Path result = appData.resolve("unsaved");
-            LOGGER.debug("Using index for unsaved database: {}", result);
-            return result;
-        });
+            indexPath = appData.resolve(fileName);
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
+        }
+
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
     }
 
