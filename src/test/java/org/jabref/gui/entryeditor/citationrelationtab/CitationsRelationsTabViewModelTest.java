@@ -38,7 +38,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CitationsRelationsTabViewModelTest {
-
     private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
     private BibEntry testEntry;
@@ -105,7 +104,7 @@ class CitationsRelationsTabViewModelTest {
                 new CitationRelationItem(secondEntryToImport, false));
 
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
-        assertEquals(Optional.of("FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"),existingEntry.getField(StandardField.CITES));
+        assertEquals(Optional.of("FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
         assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
     }
 

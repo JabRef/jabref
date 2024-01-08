@@ -39,10 +39,7 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
-
         List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::entry).collect(Collectors.toList());
-
-        // papers that our existingEntry cites
 
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
