@@ -738,9 +738,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(KINDLE_EMAIL, "");
 
-        if (OS.WINDOWS){
+        if (OS.WINDOWS) {
             defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.TRUE);
-        }else {
+        } else {
             defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         }
 
