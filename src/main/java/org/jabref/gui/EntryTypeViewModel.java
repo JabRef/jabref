@@ -16,7 +16,6 @@ import javafx.concurrent.Worker;
 
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.gui.library.LibraryTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;

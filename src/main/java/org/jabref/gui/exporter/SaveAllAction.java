@@ -5,8 +5,8 @@ import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.library.LibraryTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 

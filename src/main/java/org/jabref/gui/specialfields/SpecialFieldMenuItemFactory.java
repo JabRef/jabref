@@ -9,9 +9,9 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.library.LibraryTab;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.preferences.PreferencesService;
