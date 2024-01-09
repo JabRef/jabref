@@ -10,10 +10,10 @@ import com.google.common.eventbus.Subscribe;
 /**
  * Updates the timestamp of changed entries if the feature is enabled
  */
-public class UpdateTimestampListener {
+class UpdateTimestampListener {
     private final PreferencesService preferencesService;
 
-    public UpdateTimestampListener(PreferencesService preferencesService) {
+    UpdateTimestampListener(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
     }
 
