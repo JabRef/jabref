@@ -582,8 +582,11 @@ public class LibraryTab extends Tab {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        mode = PanelMode.TABLE_EDITOR;
-        splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
+        if (!splitPane.getItems().contains(entryEditor)) {
+            splitPane.getItems().addLast(entryEditor);
+            mode = PanelMode.TABLE_EDITOR;
+            splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
+        }
 
         // We use != instead of equals because of performance reasons
         if (entry != showing) {
