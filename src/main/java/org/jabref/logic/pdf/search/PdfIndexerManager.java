@@ -62,16 +62,20 @@ public class PdfIndexerManager {
                 LOGGER.debug("Problem closing PDF indexer", e);
             }
         });
+        indexerMap.clear();
+        pathFilePreferencesMap.clear();
     }
 
     public static void shutdownIndexer(BibDatabaseContext context) {
-        PdfIndexer indexer = indexerMap.get(context.getFulltextIndexPath());
+        Path fulltextIndexPath = context.getFulltextIndexPath();
+        PdfIndexer indexer = indexerMap.remove(fulltextIndexPath);
         if (indexer != null) {
             try {
                 indexer.close();
             } catch (IOException e) {
                 LOGGER.debug("Could not close indexer", e);
             }
+            pathFilePreferencesMap.remove(fulltextIndexPath);
         } else {
             LOGGER.debug("No indexer found for context {}", context);
         }
