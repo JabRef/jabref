@@ -250,6 +250,8 @@ public class LibraryTab extends Tab {
                 LOGGER.error("Cannot access lucene index", e);
             }
         }
+
+        dataLoadingTask = null;
     }
 
     public void onDatabaseLoadingFailed(Exception ex) {
@@ -689,16 +691,16 @@ public class LibraryTab extends Tab {
         }
     }
 
-    private void onCloseRequest(Event event) {
+    public boolean requestClose() {
         if (isModified() && (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL)) {
-            if (!confirmClose()) {
-                event.consume();
-            }
+            return confirmClose();
         } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
             bibDatabaseContext.convertToLocalDatabase();
             bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
             bibDatabaseContext.clearDBMSSynchronizer();
         }
+
+        return true;
     }
 
     /**
@@ -761,6 +763,12 @@ public class LibraryTab extends Tab {
         }
 
         return false;
+    }
+
+    private void onCloseRequest(Event event) {
+        if (!requestClose()) {
+            event.consume();
+        }
     }
 
     /**

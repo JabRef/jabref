@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -396,16 +395,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             }
         }
 
-        // Then ask if the user really wants to close, if the library has not been saved since last save.
-        List<String> filenames = new ArrayList<>();
-        for (LibraryTab libraryTab : getLibraryTabs()) {
-            closeTab(libraryTab);
+        List<String> filenames = getLibraryTabs().stream()
+                                                 .map(LibraryTab::getBibDatabaseContext)
+                                                 .map(BibDatabaseContext::getDatabasePath)
+                                                 .flatMap(Optional::stream)
+                                                 .map(Path::toAbsolutePath)
+                                                 .map(Path::toString)
+                                                 .collect(Collectors.toList());
 
-            libraryTab.getBibDatabaseContext()
-                      .getDatabasePath()
-                      .map(Path::toAbsolutePath)
-                      .map(Path::toString)
-                      .ifPresent(filenames::add);
+        // Then ask if the user really wants to close, if the library has not been saved since last save.
+        if (!closeTabs()) {
+            return false;
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
@@ -761,15 +761,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return fileHistory;
     }
 
-    public void closeTab(LibraryTab libraryTab) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            Event requestCloseEvent = new Event(this, libraryTab, Tab.TAB_CLOSE_REQUEST_EVENT);
-            Event.fireEvent(libraryTab, requestCloseEvent);
-            if (!requestCloseEvent.isConsumed()) {
-                Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
-            }
+    public boolean closeTab(LibraryTab libraryTab) {
+        Event requestCloseEvent = new Event(this, libraryTab, Tab.TAB_CLOSE_REQUEST_EVENT);
+        Event.fireEvent(libraryTab, requestCloseEvent);
+        if (!requestCloseEvent.isConsumed()) {
+            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
             tabbedPane.getTabs().remove(libraryTab);
-        });
+            return true;
+        }
+        return false;
+    }
+
+    private boolean closeTabs() {
+        // Ask before closing any tab, if any tab has changes
+        for (LibraryTab libraryTab : getLibraryTabs()) {
+            if (!libraryTab.requestClose()) {
+                return false;
+            }
+        }
+
+        // Close after checking for changes and saving all databases
+        for (LibraryTab libraryTab : getLibraryTabs()) {
+            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
+//            tabbedPane.getTabs().remove(libraryTab);
+        }
+        return true;
     }
 
     public void closeCurrentTab() {
