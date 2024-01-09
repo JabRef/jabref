@@ -648,19 +648,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
     }
 
-    /**
-     * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
-     * this updates to the new settings. We need to notify all tabs about the changes to avoid problems when changing
-     * the column set.
-     */
-    public void setupAllTables() {
-        tabbedPane.getTabs().forEach(tab -> {
-            if (tab instanceof LibraryTab libraryTab && (libraryTab.getDatabase() != null)) {
-                DefaultTaskExecutor.runInJavaFXThread(libraryTab::setupMainPanel);
-            }
-        });
-    }
-
     private ContextMenu createTabContextMenuFor(LibraryTab tab, KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
@@ -856,10 +843,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     /**
      * Refreshes the ui after preferences changes
      */
-        public void refresh() {
+    public void refresh() {
         globalSearchBar.updateHintVisibility();
-        setupAllTables();
-        getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().resetFieldFormatter());
+        getLibraryTabs().forEach(LibraryTab::setupMainPanel);
+        getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
     }
 
     /**

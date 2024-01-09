@@ -218,7 +218,7 @@ public class LibraryTab extends Tab {
     /**
      * The layout to display in the tab when it's loading
      */
-    public Node createLoadingAnimationLayout() {
+    private Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
         pane.setCenter(progressIndicator);
@@ -226,13 +226,13 @@ public class LibraryTab extends Tab {
         return pane;
     }
 
-    public void onDatabaseLoadingStarted() {
+    private void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
         tabContainer.addTab(this, true);
     }
 
-    public void onDatabaseLoadingSucceed(ParserResult result) {
+    private void onDatabaseLoadingSucceed(ParserResult result) {
         BibDatabaseContext context = result.getDatabaseContext();
         OpenDatabaseAction.performPostOpenActions(result, dialogService);
 
@@ -249,14 +249,14 @@ public class LibraryTab extends Tab {
         dataLoadingTask = null;
     }
 
-    public void onDatabaseLoadingFailed(Exception ex) {
+    private void onDatabaseLoadingFailed(Exception ex) {
         String title = Localization.lang("Connection error");
         String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
 
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    public void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
+    private void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
         if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
             // If you open an existing library, a library tab with a loading animation is added immediately.
             // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
@@ -858,20 +858,12 @@ public class LibraryTab extends Tab {
         mainTable.cut();
     }
 
-    public BooleanProperty changedProperty() {
-        return changedProperty;
-    }
-
     public boolean isModified() {
         return changedProperty.getValue();
     }
 
     public void markBaseChanged() {
         this.changedProperty.setValue(true);
-    }
-
-    public BooleanProperty nonUndoableChangeProperty() {
-        return nonUndoableChangeProperty;
     }
 
     public void markNonUndoableBaseChanged() {
