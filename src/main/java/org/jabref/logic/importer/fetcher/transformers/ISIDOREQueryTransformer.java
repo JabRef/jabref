@@ -75,6 +75,12 @@ public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransforme
         if (Word.SMALLER_WORDS.contains(term)) {
             return Optional.empty();
         }
+
+        // if not letter or digit, ignore
+        if (!term.matches("\\w+")) {
+            return Optional.empty();
+        }
+
         handleUnfieldedTermCount++;
         if (handleUnfieldedTermCount > MAX_TERMS) {
             return Optional.empty();
@@ -84,5 +90,21 @@ public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransforme
 
     public Map<String, String> getParameterMap() {
         return this.parameterMap;
+    }
+
+    @Override
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
+        Optional<String> first = handleUnFieldedTerm(fieldAsString);
+        Optional<String> second = handleUnFieldedTerm(term);
+        if (first.isEmpty() && second.isEmpty()) {
+            return Optional.empty();
+        }
+        if (first.isEmpty()) {
+            return second;
+        }
+        if (second.isEmpty()) {
+            return first;
+        }
+        return Optional.of(fieldAsString + " " + term);
     }
 }
