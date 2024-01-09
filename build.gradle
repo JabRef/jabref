@@ -357,6 +357,9 @@ tasks.register('generateCitaviSource', XjcTask) {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+
+    // hint by https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
+    options.fork = true
 }
 
 compileJava {
@@ -443,9 +446,15 @@ test {
 }
 
 testlogger {
-    theme 'standard-parallel'
+    // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
+
+    theme 'standard'
+
     showPassed false
     showSkipped false
+
+    showCauses false
+    showStackTraces false
 }
 
 tasks.register('databaseTest', Test) {
