@@ -301,6 +301,8 @@ public class BibtexParser implements Parser {
             return;
         }
 
+        // We remove all line breaks in the metadata
+        // These have been inserted to prevent too long lines when the file was saved, and are not part of the data.
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
             if (comment.startsWith(MetaData.META_FLAG)) {
@@ -309,10 +311,6 @@ public class BibtexParser implements Parser {
                 int pos = rest.indexOf(':');
 
                 if (pos > 0) {
-                    // We remove all line breaks in the metadata - these
-                    // will have been inserted
-                    // to prevent too long lines when the file was
-                    // saved, and are not part of the data.
                     meta.put(rest.substring(0, pos), rest.substring(pos + 1));
 
                     // meta comments are always re-written by JabRef and not stored in the file

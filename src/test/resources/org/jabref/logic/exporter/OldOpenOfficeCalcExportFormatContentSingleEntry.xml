@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<office:document-content xmlns:office="http://openoffice.org/2000/office" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:class="spreadsheet" xmlns:version="1.0" xmlns:style="http://openoffice.org/2000/style" xmlns:table="http://openoffice.org/2000/table" xmlns:text="http://openoffice.org/2000/text">
-    <office:script/>
+<office:document-content xmlns:office="http://openoffice.org/2000/office"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:class="spreadsheet" xmlns:version="1.0"
+    xmlns:style="http://openoffice.org/2000/style" xmlns:table="http://openoffice.org/2000/table"
+    xmlns:text="http://openoffice.org/2000/text">
+    <office:script />
     <office:automatic-styles>
         <style:style style:family="table-row" style:name="ro1">
-            <style.properties fo:break-before="auto" style:row-height="0.1681inch" style:use-optimal-row-height="true"/>
+            <style.properties fo:break-before="auto" style:row-height="0.1681inch"
+                style:use-optimal-row-height="true" />
         </style:style>
         <style:style style:family="table" style:master-page-name="Default" style:name="ta1">
-            <style:properties table:display="true"/>
+            <style:properties table:display="true" />
         </style:style>
     </office:automatic-styles>
     <office:body>
@@ -74,6 +78,9 @@
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Crossref</text:p>
+                </table:table-cell>
+                <table:table-cell>
+                    <text:p>Cites</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Date</text:p>
@@ -387,370 +394,374 @@
                     <text:p>7</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>New York, NY, USA</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Tony Clear</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
+                </table:table-cell>
+                <table:table-cell>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>http://doi.acm.org/10.1145/820127.820136</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>0097-8418</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>SIGCSE Bull.</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>4</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>13--14</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>ACM</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>Design and usability in security systems: daily life as a context of use?</text:p>
+                    <text:p>Design and usability in security systems: daily life as a context of
+                        use?</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>34</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>2002</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
+                    <text:p />
                 </table:table-cell>
             </table:table-row>
         </table:table>

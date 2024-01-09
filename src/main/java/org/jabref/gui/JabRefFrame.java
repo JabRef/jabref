@@ -61,6 +61,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
@@ -862,6 +863,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         }
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
+        PdfIndexerManager.shutdownAllIndexers();
     }
 
     private void removeTab(LibraryTab libraryTab) {

@@ -16,6 +16,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
@@ -161,7 +162,7 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. BIB file directory or Main file directory
+        // 3. BIB file directory or main file directory
         // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
         // (in the metadata of the bib file)
         if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -237,12 +238,17 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    /**
+     * @return The path to store the lucene index files. One directory for each library.
+     */
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            Path databaseFileName = getDatabasePath().get().getFileName();
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
+            indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
         }
