@@ -461,23 +461,11 @@ tasks.register('databaseTest', Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
     }
-
-    testLogging {
-        // set options for log level LIFECYCLE
-        events = ["FAILED"]
-        exceptionFormat "full"
-    }
 }
 
 tasks.register('fetcherTest', Test) {
     useJUnitPlatform {
         includeTags 'FetcherTest'
-    }
-
-    testLogging {
-        // set options for log level LIFECYCLE
-        events = ["FAILED"]
-        exceptionFormat "full"
     }
 }
 
