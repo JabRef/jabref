@@ -27,7 +27,7 @@ public class GuiPreferences {
     private final BooleanProperty windowFullScreen;
 
     // the last libraries that were open when jabref closes and should be reopened on startup
-    private final ObservableList<String> lastFilesOpened;
+    private final ObservableList<Path> lastFilesOpened;
     private final ObjectProperty<Path> lastFocusedFile;
     // observable list last files opened in the file menu
     private final FileHistory fileHistory;
@@ -46,7 +46,7 @@ public class GuiPreferences {
                           double sizeY,
                           boolean windowMaximised,
                           boolean windowFullScreen,
-                          List<String> lastFilesOpened,
+                          List<Path> lastFilesOpened,
                           Path lastFocusedFile,
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
@@ -147,11 +147,11 @@ public class GuiPreferences {
         return windowFullScreen.get();
     }
 
-    public ObservableList<String> getLastFilesOpened() {
+    public ObservableList<Path> getLastFilesOpened() {
         return lastFilesOpened;
     }
 
-    public void setLastFilesOpened(List<String> files) {
+    public void setLastFilesOpened(List<Path> files) {
         lastFilesOpened.setAll(files);
     }
 

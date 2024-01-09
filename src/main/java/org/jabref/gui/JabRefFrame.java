@@ -352,16 +352,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
     }
 
-    private void storeLastOpenedFiles(List<String> filenames) {
+    private void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
         if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
                 prefs.getGuiPreferences().getLastFilesOpened().clear();
             } else {
-                Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
-                                                             .getDatabasePath()
-                                                             .orElse(null);
                 prefs.getGuiPreferences().setLastFilesOpened(filenames);
                 prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
@@ -394,13 +391,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             }
         }
 
-        List<String> filenames = getLibraryTabs().stream()
-                                                 .map(LibraryTab::getBibDatabaseContext)
-                                                 .map(BibDatabaseContext::getDatabasePath)
-                                                 .flatMap(Optional::stream)
-                                                 .map(Path::toAbsolutePath)
-                                                 .map(Path::toString)
-                                                 .collect(Collectors.toList());
+        // Read the opened and focused databases before closing them
+        List<Path> openedLibraries = getLibraryTabs().stream()
+                                                     .map(LibraryTab::getBibDatabaseContext)
+                                                     .map(BibDatabaseContext::getDatabasePath)
+                                                     .flatMap(Optional::stream)
+                                                     .collect(Collectors.toList());
+        Path focusedLibraries = getCurrentLibraryTab().getBibDatabaseContext()
+                                                      .getDatabasePath()
+                                                      .orElse(null);
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         if (!closeTabs()) {
@@ -412,7 +411,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
         saveWindowState();
-        storeLastOpenedFiles(filenames);
+        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
+
         prefs.flush();
 
         // Goodbye!
@@ -761,9 +761,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public boolean closeTab(LibraryTab libraryTab) {
-        Event requestCloseEvent = new Event(this, libraryTab, Tab.TAB_CLOSE_REQUEST_EVENT);
-        Event.fireEvent(libraryTab, requestCloseEvent);
-        if (!requestCloseEvent.isConsumed()) {
+        if (libraryTab.requestClose()) {
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
             tabbedPane.getTabs().remove(libraryTab);
             return true;
@@ -782,7 +780,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         // Close after checking for changes and saving all databases
         for (LibraryTab libraryTab : getLibraryTabs()) {
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
-//            tabbedPane.getTabs().remove(libraryTab);
+            tabbedPane.getTabs().remove(libraryTab);
         }
         return true;
     }
@@ -900,7 +898,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         @Override
         public void execute() {
-            tabContainer.closeTab(libraryTab);
+            if (libraryTab == null) {
+                tabContainer.closeCurrentTab();
+            } else {
+                tabContainer.closeTab(libraryTab);
+            }
         }
     }
 

@@ -2582,7 +2582,9 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(SIZE_Y),
                 getBoolean(WINDOW_MAXIMISED),
                 getBoolean(WINDOW_FULLSCREEN),
-                getStringList(LAST_EDITED),
+                getStringList(LAST_EDITED).stream()
+                                          .map(Path::of)
+                                          .collect(Collectors.toList()),
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
@@ -2599,11 +2601,14 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
         EasyBind.listen(guiPreferences.windowFullScreenProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_FULLSCREEN, newValue));
-        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<String>) change -> {
+        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
                 prefs.remove(LAST_EDITED);
             } else {
-                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened());
+                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened().stream()
+                                                         .map(Path::toAbsolutePath)
+                                                         .map(Path::toString)
+                                                         .collect(Collectors.toList()));
             }
         });
         EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
