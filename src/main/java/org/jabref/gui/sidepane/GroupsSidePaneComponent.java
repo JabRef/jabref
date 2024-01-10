@@ -1,6 +1,7 @@
 package org.jabref.gui.sidepane;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
@@ -16,6 +17,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
+    private final Button addButton = IconTheme.JabRefIcons.ADD.asButton();
 
     public GroupsSidePaneComponent(SimpleCommand closeCommand,
                                    SimpleCommand moveUpCommand,
@@ -27,6 +29,9 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
         setupIntersectionUnionToggle();
+        addButton.setTooltip(new Tooltip(Localization.lang("Add group")));
+        addButton.setOnAction(e -> );
+        addExtraButtonToHeader(addButton, 0);
 
         EasyBind.subscribe(groupsPreferences.groupViewModeProperty(), mode -> {
             GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
