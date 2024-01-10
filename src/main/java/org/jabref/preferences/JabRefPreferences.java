@@ -744,7 +744,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(KINDLE_EMAIL, "");
-        defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+
+        if (OS.WINDOWS) {
+            defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.TRUE);
+        } else {
+            defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+        }
+
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
@@ -1185,6 +1191,7 @@ public class JabRefPreferences implements PreferencesService {
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
         return new LayoutFormatterPreferences(
                 getNameFormatterPreferences(),
+                getDOIPreferences(),
                 getFilePreferences().mainFileDirectoryProperty());
     }
 
