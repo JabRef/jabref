@@ -396,10 +396,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                                                      .map(LibraryTab::getBibDatabaseContext)
                                                      .map(BibDatabaseContext::getDatabasePath)
                                                      .flatMap(Optional::stream)
-                                                     .collect(Collectors.toList());
-        Path focusedLibraries = getCurrentLibraryTab().getBibDatabaseContext()
-                                                      .getDatabasePath()
-                                                      .orElse(null);
+                                                     .toList();
+        Path focusedLibraries = Optional.ofNullable(getCurrentLibraryTab())
+                                        .map(LibraryTab::getBibDatabaseContext)
+                                        .flatMap(BibDatabaseContext::getDatabasePath)
+                                        .orElse(null);
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         if (!closeTabs()) {
@@ -749,8 +750,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     public boolean closeTab(LibraryTab libraryTab) {
         if (libraryTab.requestClose()) {
-            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
             tabbedPane.getTabs().remove(libraryTab);
+            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
             return true;
         }
         return false;
@@ -766,8 +767,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         // Close after checking for changes and saving all databases
         for (LibraryTab libraryTab : getLibraryTabs()) {
-            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
             tabbedPane.getTabs().remove(libraryTab);
+            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
         return true;
     }
@@ -885,11 +886,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         @Override
         public void execute() {
-            if (libraryTab == null) {
-                tabContainer.closeCurrentTab();
-            } else {
-                tabContainer.closeTab(libraryTab);
-            }
+            Platform.runLater(() -> {
+                if (libraryTab == null) {
+                    tabContainer.closeCurrentTab();
+                } else {
+                    tabContainer.closeTab(libraryTab);
+                }
+            });
         }
     }
 
@@ -908,7 +911,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             for (Tab tab : tabbedPane.getTabs()) {
                 LibraryTab libraryTab = (LibraryTab) tab;
                 if (libraryTab != toKeepLibraryTab) {
-                    closeTab(libraryTab);
+                    Platform.runLater(() -> closeTab(libraryTab));
                 }
             }
         }
@@ -919,7 +922,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         @Override
         public void execute() {
             for (Tab tab : tabbedPane.getTabs()) {
-                closeTab((LibraryTab) tab);
+                Platform.runLater(() -> closeTab((LibraryTab) tab));
             }
         }
     }
