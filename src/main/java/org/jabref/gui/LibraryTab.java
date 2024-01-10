@@ -29,6 +29,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -415,38 +416,43 @@ public class LibraryTab extends Tab {
     /**
      * Removes the selected entries from the database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
-    public void delete(boolean cut) {
-        delete(cut, mainTable.getSelectedEntries());
+    public void delete(StandardActions mode) {
+        delete(mode, mainTable.getSelectedEntries());
     }
 
     /**
      * Removes the selected entries from the database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
-    private void delete(boolean cut, List<BibEntry> entries) {
+    private void delete(StandardActions mode, List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
         }
-        if (!cut && !showDeleteConfirmationDialog(entries.size())) {
+        if (mode == StandardActions.DELETE_ENTRY && !showDeleteConfirmationDialog(entries.size())) {
             return;
         }
 
-        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
+        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
         bibDatabaseContext.getDatabase().removeEntries(entries);
         ensureNotShowingBottomPanel(entries);
 
         this.changedProperty.setValue(true);
-        dialogService.notify(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        switch (mode) {
+            case StandardActions.CUT ->
+                    dialogService.notify(Localization.lang("Cut %0 entry(ies)", entries.size()));
+            case StandardActions.DELETE_ENTRY ->
+                    dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entries.size()));
+        }
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
     }
 
     public void delete(BibEntry entry) {
-        delete(false, Collections.singletonList(entry));
+        delete(StandardActions.DELETE_ENTRY, Collections.singletonList(entry));
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
@@ -799,10 +805,6 @@ public class LibraryTab extends Tab {
 
     public void setSaving(boolean saving) {
         this.saving = saving;
-    }
-
-    public String formatOutputMessage(String start, int count) {
-        return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
     }
 
     public CountingUndoManager getUndoManager() {
