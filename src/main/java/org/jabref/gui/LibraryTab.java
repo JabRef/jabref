@@ -781,6 +781,7 @@ public class LibraryTab extends Tab {
      */
     private void onClosed(Event event) {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
         AutosaveManager.shutdown(bibDatabaseContext);
         BackupManager.shutdown(bibDatabaseContext,
                 preferencesService.getFilePreferences().getBackupDirectory(),
