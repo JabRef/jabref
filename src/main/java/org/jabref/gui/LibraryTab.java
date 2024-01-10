@@ -90,12 +90,15 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
+ */
 public class LibraryTab extends Tab {
 
     /**
-     * Defines the different modes that the BasePanel can operate in
+     * Defines the different modes that the tab can operate in
      */
-    private enum PanelMode { TABLE, TABLE_EDITOR }
+    private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
@@ -114,7 +117,7 @@ public class LibraryTab extends Tab {
     private FileAnnotationCache annotationCache;
     private EntryEditor entryEditor;
     private MainTable mainTable;
-    private PanelMode mode = PanelMode.TABLE;
+    private PanelMode mode = PanelMode.MAIN_TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
     private boolean saving;
@@ -586,7 +589,7 @@ public class LibraryTab extends Tab {
     public void showAndEdit(BibEntry entry) {
         if (!splitPane.getItems().contains(entryEditor)) {
             splitPane.getItems().addLast(entryEditor);
-            mode = PanelMode.TABLE_EDITOR;
+            mode = PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR;
             splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
         }
 
@@ -602,7 +605,7 @@ public class LibraryTab extends Tab {
      * Removes the bottom component.
      */
     public void closeBottomPane() {
-        mode = PanelMode.TABLE;
+        mode = PanelMode.MAIN_TABLE;
         splitPane.getItems().remove(entryEditor);
     }
 
@@ -635,13 +638,13 @@ public class LibraryTab extends Tab {
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
         // This method is not able to close the bottom pane currently
 
-        if ((mode == PanelMode.TABLE_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
+        if ((mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
             closeBottomPane();
         }
     }
 
     public void updateEntryEditorIfShowing() {
-        if (mode == PanelMode.TABLE_EDITOR) {
+        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
             BibEntry currentEntry = entryEditor.getEntry();
             showAndEdit(currentEntry);
         }
@@ -691,7 +694,7 @@ public class LibraryTab extends Tab {
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
     private void saveDividerLocation(Number position) {
-        if (mode == PanelMode.TABLE_EDITOR) {
+        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
             preferencesService.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
