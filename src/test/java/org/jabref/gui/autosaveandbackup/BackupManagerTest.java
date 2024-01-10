@@ -150,7 +150,7 @@ public class BackupManagerTest {
                 preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
-        BackupManager.shutdown(database, filePreferences);
+        BackupManager.shutdown(database, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
 
         List<Path> files = Files.list(backupDir).toList();
         assertEquals(Collections.emptyList(), files);
