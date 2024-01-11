@@ -31,6 +31,11 @@ jobs:
           cd src/main/resources/csl-locales
           git checkout master
           git pull
+      - name: Persist changes
+        run: |
+          git add -f src/main/resources/csl-styles
+          git add -f src/main/resources/csl-locales
+          git diff-index --quiet HEAD || git commit -m 'Update CSL styles'
       - uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}

@@ -15,8 +15,8 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -87,7 +87,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
@@ -105,9 +105,9 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
         } catch (IOException e) {
-            LOGGER.error("Could not access Fulltext-Index", e);
+            LOGGER.error("Could not access fulltext index", e);
         }
     }
 

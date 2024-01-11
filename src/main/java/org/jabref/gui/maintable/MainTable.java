@@ -255,16 +255,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (!selectedEntries.isEmpty()) {
             try {
                 clipBoardManager.setContent(selectedEntries, entryTypesManager);
-                dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
+                dialogService.notify(Localization.lang("Copied %0 entry(ies)", selectedEntries.size()));
             } catch (IOException e) {
-                LOGGER.error("Error while copying selected entries to clipboard", e);
+                LOGGER.error("Error while copying selected entries to clipboard.", e);
             }
         }
     }
 
     public void cut() {
         copy();
-        libraryTab.delete(true);
+        libraryTab.delete(StandardActions.CUT);
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {

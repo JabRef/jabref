@@ -15,9 +15,20 @@ public interface LibraryTabContainer {
 
     void addTab(BibDatabaseContext bibDatabaseContext, boolean raisePanel);
 
-    void closeTab(LibraryTab libraryTab);
+    /**
+     * Closes a designated libraryTab
+     *
+     * @param libraryTab to be closed.
+     * @return true if closing the tab was successful
+     */
+    boolean closeTab(LibraryTab libraryTab);
 
-    void closeCurrentTab();
+    /**
+     * Closes the currently viewed libraryTab
+     *
+     * @return true if closing the tab was successful
+     */
+    boolean closeCurrentTab();
 
     /**
      * Refreshes the ui after changes to the preferences
