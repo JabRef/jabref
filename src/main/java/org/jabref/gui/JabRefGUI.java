@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -320,13 +319,12 @@ public class JabRefGUI {
     }
 
     private void openLastEditedDatabases() {
-        List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
+        List<Path> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
         }
 
-        List<Path> filesToOpen = lastFiles.stream().map(Path::of).collect(Collectors.toList());
-        getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
+        getMainFrame().getOpenDatabaseAction().openFiles(lastFiles);
     }
 
     public static JabRefFrame getMainFrame() {
