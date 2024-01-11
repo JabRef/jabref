@@ -6,15 +6,22 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.scene.control.Alert;
+import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
@@ -70,12 +77,12 @@ public class DeleteFileAction extends SimpleCommand {
         }
 
         String dialogTitle;
-        String dialogContent;
+        String dialogDescription;
 
         int numberOfLinkedFiles = filesToDelete.size();
         if (numberOfLinkedFiles != 1) {
             dialogTitle = Localization.lang("Delete %0 files", numberOfLinkedFiles);
-            dialogContent = Localization.lang("Delete %0 files permanently from disk, or just remove the files from the entry? " +
+            dialogDescription = Localization.lang("Delete %0 files permanently from disk, or just remove the files from the entry?\n" +
                     "Pressing Delete will delete the files permanently from disk.", numberOfLinkedFiles);
         } else {
             LinkedFile linkedFile = filesToDelete.getFirst().getFile();
@@ -83,7 +90,7 @@ public class DeleteFileAction extends SimpleCommand {
             if (file.isPresent()) {
                 Path path = file.get();
                 dialogTitle = Localization.lang("Delete '%0'", path.getFileName().toString());
-                dialogContent = Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? " +
+                dialogDescription = Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry?\n" +
                         "Pressing Delete will delete the file permanently from disk.", path.toString());
             } else {
                 dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
@@ -91,11 +98,13 @@ public class DeleteFileAction extends SimpleCommand {
             }
         }
 
+        DialogPane dialogPane = createDeleteFilesDialog(dialogDescription);
+
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonBar.ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
 
-        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION,
-                dialogTitle, dialogContent, removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+        Optional<ButtonType> buttonType = dialogService.showCustomDialogAndWait(
+                dialogTitle, dialogPane, removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
             ButtonType theButtonType = buttonType.get();
@@ -105,6 +114,27 @@ public class DeleteFileAction extends SimpleCommand {
                 deleteFiles(true);
             }
         }
+    }
+
+    private DialogPane createDeleteFilesDialog(String description) {
+        JabRefIconView warning = new JabRefIconView(IconTheme.JabRefIcons.WARNING);
+        warning.setGlyphSize(24.0);
+        Label header = new Label(description, warning);
+        header.setWrapText(true);
+        header.setStyle("""
+                -fx-padding: 10px;
+                -fx-background-color: -fx-background;""");
+
+        ListView<LinkedFileViewModel> filesToDeleteList = new ListView<>(FXCollections.observableArrayList(filesToDelete));
+        new ViewModelListCellFactory<LinkedFileViewModel>()
+                .withText((item) -> item.getFile().getLink())
+                .install(filesToDeleteList);
+
+        VBox content = new VBox(header, filesToDeleteList);
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setHeader(header);
+        dialogPane.setContent(content);
+        return dialogPane;
     }
 
     /**
