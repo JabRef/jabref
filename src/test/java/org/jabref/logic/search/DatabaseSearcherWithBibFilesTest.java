@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.Globals;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
@@ -38,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@AllowedToUseSwing("Makes use of Globals because of FullTextSearchRule")
 public class DatabaseSearcherWithBibFilesTest {
 
     private static BibEntry titleSentenceCased = new BibEntry(StandardEntryType.Misc)
