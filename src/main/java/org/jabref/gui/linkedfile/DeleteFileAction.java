@@ -80,18 +80,15 @@ public class DeleteFileAction extends SimpleCommand {
         String dialogDescription;
 
         int numberOfLinkedFiles = filesToDelete.size();
+        dialogDescription = Localization.lang("Delete %0 file(s) permanently from disk - or remove the file(s) from the entry?", numberOfLinkedFiles);
         if (numberOfLinkedFiles != 1) {
             dialogTitle = Localization.lang("Delete %0 files", numberOfLinkedFiles);
-            dialogDescription = Localization.lang("Delete %0 files permanently from disk, or just remove the files from the entry?\n" +
-                    "Pressing Delete will delete the files permanently from disk.", numberOfLinkedFiles);
         } else {
             LinkedFile linkedFile = filesToDelete.getFirst().getFile();
             Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
             if (file.isPresent()) {
                 Path path = file.get();
                 dialogTitle = Localization.lang("Delete '%0'", path.getFileName().toString());
-                dialogDescription = Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry?\n" +
-                        "Pressing Delete will delete the file permanently from disk.", path.toString());
             } else {
                 dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
                 return;
