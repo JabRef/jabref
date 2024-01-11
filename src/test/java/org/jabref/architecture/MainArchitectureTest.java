@@ -137,10 +137,16 @@ class MainArchitectureTest {
 
     @ArchTest
     public static void nativeDesktopIsRestricted(JavaClasses classes) {
-        noClasses().that().areAssignableFrom("org.jabref.gui.desktop.JabRefDesktop")
-                   .and().areAssignableFrom("org.jabref.cli.Launcher")
-                   .should().dependOnClassesThat().areAssignableFrom("org.jabref.gui.desktop.os.NativeDesktop")
-                   .because("JabRefDesktop is the bridge to NativeDesktop")
+        noClasses().that().doNotHaveSimpleName("JabRefDesktop")
+                   .and().doNotHaveSimpleName("Launcher")
+                   .and().doNotHaveSimpleName("DefaultDesktop")
+                   .and().doNotHaveSimpleName("OS")
+                   .and().doNotHaveSimpleName("Linux")
+                   .and().doNotHaveSimpleName("OSX")
+                   .and().doNotHaveSimpleName("Windows")
+                   .and().doNotHaveSimpleName("JabRefPreferences")
+                   .and().haveNameNotMatching(".*Test")
+                   .should().dependOnClassesThat().haveSimpleName("NativeDesktop")
                    .check(classes);
     }
 }
