@@ -124,7 +124,7 @@ public class DeleteFileAction extends SimpleCommand {
 
         ListView<LinkedFileViewModel> filesToDeleteList = new ListView<>(FXCollections.observableArrayList(filesToDelete));
         new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withText((item) -> item.getFile().getLink())
+                .withText(item -> item.getFile().getLink())
                 .install(filesToDeleteList);
 
         VBox content = new VBox(header, filesToDeleteList);
