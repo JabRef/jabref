@@ -433,13 +433,6 @@ test {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
-
-    testLogging {
-        // set options for log level LIFECYCLE
-        // for debugging tests: add "STANDARD_OUT", "STANDARD_ERROR"
-        events = ["FAILED"]
-        exceptionFormat "full"
-    }
 }
 
 testlogger {
