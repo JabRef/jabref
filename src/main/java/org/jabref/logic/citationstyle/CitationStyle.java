@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  */
 public class CitationStyle {
 
-    public static final String DEFAULT = "/ieee-with-url.csl";
+    public static final String DEFAULT = "/ieee.csl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
     private static final String STYLES_ROOT = "/csl-styles";
