@@ -134,4 +134,13 @@ class MainArchitectureTest {
                    .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
                    .check(classes);
     }
+
+    @ArchTest
+    public static void nativeDesktopIsRestricted(JavaClasses classes) {
+        noClasses().that().areAssignableFrom("org.jabref.gui.desktop.JabRefDesktop")
+                   .and().areAssignableFrom("org.jabref.cli.Launcher")
+                   .should().dependOnClassesThat().areAssignableFrom("org.jabref.gui.desktop.os.NativeDesktop")
+                   .because("JabRefDesktop is the bridge to NativeDesktop")
+                   .check(classes);
+    }
 }

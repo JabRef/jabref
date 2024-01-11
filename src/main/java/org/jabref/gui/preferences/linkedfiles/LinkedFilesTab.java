@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -38,6 +39,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
     @FXML private CheckBox confirmLinkedFileDelete;
+    @FXML private CheckBox moveToTrash;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -60,6 +62,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
         useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
+
+        moveToTrash.setDisable(!JabRefDesktop.moveToTrashSupported());
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());

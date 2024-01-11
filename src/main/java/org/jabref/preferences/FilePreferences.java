@@ -36,7 +36,8 @@ public class FilePreferences {
     private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
-    private final BooleanProperty confirmDeleteLinkedFile;
+    private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
+    private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -49,7 +50,8 @@ public class FilePreferences {
                            Set<ExternalFileType> externalFileTypes,
                            boolean createBackup,
                            Path backupDirectory,
-                           boolean confirmDeleteLinkedFile) {
+                           boolean confirmDeleteLinkedFile,
+                           boolean moveToTrash) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -61,7 +63,8 @@ public class FilePreferences {
         this.externalFileTypes.addAll(externalFileTypes);
         this.createBackup.setValue(createBackup);
         this.backupDirectory.setValue(backupDirectory);
-        this.confirmDeleteLinkedFile = new SimpleBooleanProperty(confirmDeleteLinkedFile);
+        this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
+        this.moveToTrash.setValue(moveToTrash);
     }
 
     public String getUserAndHost() {
@@ -194,5 +197,17 @@ public class FilePreferences {
 
     public void confirmDeleteLinkedFile(boolean confirmLinkedFileDelete) {
         this.confirmDeleteLinkedFile.set(confirmLinkedFileDelete);
+    }
+
+    public boolean moveToTrash() {
+        return moveToTrash.get();
+    }
+
+    public BooleanProperty moveToTrashProperty() {
+        return moveToTrash;
+    }
+
+    public void moveToTrash(boolean moveToTrash) {
+        this.moveToTrash.set(moveToTrash);
     }
 }

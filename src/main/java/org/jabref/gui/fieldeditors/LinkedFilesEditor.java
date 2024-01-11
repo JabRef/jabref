@@ -251,9 +251,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        // Delete multiple selected files in currently opened entry
-                        // als
-                        deleteEntry();
+                        deleteAttachedFilesWithConfirmation();
                         event.consume();
                         break;
                     default:
@@ -263,8 +261,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         });
     }
 
-    private void deleteEntry() {
-        new DeleteFileAction(dialogService, preferencesService, databaseContext,
+    private void deleteAttachedFilesWithConfirmation() {
+        new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), databaseContext,
                 viewModel, listView.getSelectionModel().getSelectedItems()).execute();
     }
 

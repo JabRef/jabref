@@ -457,7 +457,7 @@ public class LibraryTab extends Tab {
                                                                      .map(linkedFile -> linkedFile.toModel(null, bibDatabaseContext, null, null, preferencesService))
                                                                      .collect(Collectors.toList());
 
-                new DeleteFileAction(dialogService, preferencesService, bibDatabaseContext, viewModels).execute();
+                new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), bibDatabaseContext, viewModels).execute();
             }
         }
 
