@@ -454,6 +454,8 @@ public class BracketedPattern {
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
+            } else if ("camelShort".equals(pattern)) { 
+                return getCamelizedTitleShort(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("camel".equals(pattern)) {
                 return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("shortyear".equals(pattern)) {
@@ -662,6 +664,37 @@ public class BracketedPattern {
         return stringBuilder.toString();
     }
 
+    /**
+     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry, to a maximum of 7 words.
+     */
+    public static String getCamelizedTitleShort(String title) {
+        return keepLettersAndDigitsOnly(camelizeTitleShort(title));
+    }
+
+    public static String camelizeTitleShort(String title) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String formattedTitle = formatTitle(title);
+        int count = 0;
+        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+            while (titleScanner.hasNext()) {
+                if (count >= 7) {break}
+                
+                String word = titleScanner.next();
+
+                // Camelize the word
+                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
+
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(' ');
+                }
+                stringBuilder.append(word);
+                count += 1;
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+    
     /**
      * Capitalises the significant words of the "title" field in the given BibTeX entry
      */
