@@ -454,7 +454,7 @@ public class BracketedPattern {
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
-            } else if ("camelShort".equals(pattern)) { 
+            } else if ("shortcamel".equals(pattern)) { 
                 return getCamelizedTitleShort(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("camel".equals(pattern)) {
                 return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
