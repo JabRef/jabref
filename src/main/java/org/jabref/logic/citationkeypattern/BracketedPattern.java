@@ -677,7 +677,7 @@ public class BracketedPattern {
         int count = 0;
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
             while (titleScanner.hasNext()) {
-                if (count >= 7) {break}
+                if (count >= 7) { break; }
                 
                 String word = titleScanner.next();
 
