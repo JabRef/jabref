@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -262,7 +261,7 @@ public class JabRefGUI {
         for (int tabNumber = 0; tabNumber < parserResults.size(); tabNumber++) {
             // ToDo: Method needs to be rewritten, because the index of the parser result and of the libraryTab may not
             //  be identical, if there are also other tabs opened, that are not libraryTabs. Currently there are none,
-            //  therefor for now this ok.
+            //  therefore for now this ok.
             ParserResult pr = parserResults.get(tabNumber);
             if (pr.hasWarnings()) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame.getDialogService());
@@ -320,13 +319,12 @@ public class JabRefGUI {
     }
 
     private void openLastEditedDatabases() {
-        List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
+        List<Path> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
         }
 
-        List<Path> filesToOpen = lastFiles.stream().map(Path::of).collect(Collectors.toList());
-        getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
+        getMainFrame().getOpenDatabaseAction().openFiles(lastFiles);
     }
 
     public static JabRefFrame getMainFrame() {

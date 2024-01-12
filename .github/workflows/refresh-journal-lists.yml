@@ -37,6 +37,10 @@ jobs:
       - name: Check whether journal-list.mv can be generated (the "real" generation is done inside JabRef's build process)
         run: |
           ./gradlew generateJournalListMV
+      - name: Persist changes
+        run: |
+          git add -f buildres/abbrv.jabref.org
+          git diff-index --quiet HEAD || git commit -m 'Update journal abbreviation lists'
       - uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}

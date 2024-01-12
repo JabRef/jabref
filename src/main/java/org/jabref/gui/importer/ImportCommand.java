@@ -12,7 +12,6 @@ import java.util.SortedSet;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -116,9 +115,7 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            final LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
-
-            ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tabContainer.getCurrentLibraryTab().getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }

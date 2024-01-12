@@ -744,7 +744,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(KINDLE_EMAIL, "");
-        defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+
+        if (OS.WINDOWS) {
+            defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.TRUE);
+        } else {
+            defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+        }
+
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
@@ -1185,6 +1191,7 @@ public class JabRefPreferences implements PreferencesService {
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
         return new LayoutFormatterPreferences(
                 getNameFormatterPreferences(),
+                getDOIPreferences(),
                 getFilePreferences().mainFileDirectoryProperty());
     }
 
@@ -2588,7 +2595,9 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(SIZE_Y),
                 getBoolean(WINDOW_MAXIMISED),
                 getBoolean(WINDOW_FULLSCREEN),
-                getStringList(LAST_EDITED),
+                getStringList(LAST_EDITED).stream()
+                                          .map(Path::of)
+                                          .collect(Collectors.toList()),
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
@@ -2607,11 +2616,14 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
         EasyBind.listen(guiPreferences.windowFullScreenProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_FULLSCREEN, newValue));
-        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<String>) change -> {
+        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
                 prefs.remove(LAST_EDITED);
             } else {
-                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened());
+                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened().stream()
+                                                         .map(Path::toAbsolutePath)
+                                                         .map(Path::toString)
+                                                         .collect(Collectors.toList()));
             }
         });
         EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
