@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -49,10 +49,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private Button selectRightEntryValuesButton;
 
     @FXML
-    private CheckMenuItem onlyShowChangedFieldsCheck;
+    private CheckBox onlyShowChangedFieldsCheck;
 
     @FXML
-    private CheckMenuItem applyToAllEntriesCheck;
+    private CheckBox applyToAllEntriesCheck;
 
     @Inject
     private PreferencesService preferencesService;

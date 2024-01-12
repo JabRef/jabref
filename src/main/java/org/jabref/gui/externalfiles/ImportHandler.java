@@ -378,7 +378,7 @@ public class ImportHandler {
                 firstEntry = false;
                 continue;
             }
-            if (preferencesService.getGuiPreferences().isMergeApplyToAllEntriesProperty()) {
+            if (preferencesService.getGuiPreferences().shouldMergeApplyToAllEntries()) {
                 importEntryWithDuplicateCheck(database, entry, preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision());
             } else {
                 importEntryWithDuplicateCheck(database, entry);

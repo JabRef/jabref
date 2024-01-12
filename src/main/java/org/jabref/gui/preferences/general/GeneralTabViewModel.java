@@ -200,7 +200,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
-        treatAllDuplicateEntriesTheSameProperty.setValue(guiPreferences.isMergeApplyToAllEntriesProperty());
+        treatAllDuplicateEntriesTheSameProperty.setValue(guiPreferences.shouldMergeApplyToAllEntries());
         duplicatedResolveDecisionProperty.setValue(guiPreferences.getAllEntriesDuplicateResolverDecision());
 
         var availableDuplicateDecisionsForImport = EnumSet.of(KEEP_LEFT,

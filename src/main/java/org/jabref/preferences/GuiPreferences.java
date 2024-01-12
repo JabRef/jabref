@@ -256,11 +256,11 @@ public class GuiPreferences {
         return mergeShowChangedFieldsOnly;
     }
 
-    public boolean isMergeShowChangedFieldsOnly() {
+    public boolean shouldMergeShowChangedFieldsOnly() {
         return mergeShowChangedFieldsOnly.getValue();
     }
 
-    public void setIsMergedShowChangedFieldsOnly(boolean showChangedFieldsOnly) {
+    public void setMergeShowChangedFieldsOnly(boolean showChangedFieldsOnly) {
         mergeShowChangedFieldsOnly.setValue(showChangedFieldsOnly);
     }
 
@@ -268,7 +268,7 @@ public class GuiPreferences {
         return mergeApplyToAllEntries;
     }
 
-    public Boolean isMergeApplyToAllEntriesProperty() {
+    public Boolean shouldMergeApplyToAllEntries() {
         return mergeApplyToAllEntries.get();
     }
 
