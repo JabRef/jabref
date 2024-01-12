@@ -342,6 +342,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (entriesToAdd.isEmpty()) {
             return;
         }
+
         importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
     }
 
@@ -361,9 +362,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
-        for (BibEntry entry : entriesToAdd) {
-            importHandler.importEntryWithDuplicateCheck(database, (BibEntry) entry.clone());
-        }
+        importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

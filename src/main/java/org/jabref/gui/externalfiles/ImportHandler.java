@@ -247,6 +247,9 @@ public class ImportHandler {
         if (decision == BREAK) {
             decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
         }
+        if (preferencesService.getGuiPreferences().shouldMergeApplyToAllEntries()) {
+            preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
+        }
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
@@ -374,13 +377,17 @@ public class ImportHandler {
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
+                LOGGER.debug("First entry to import, we use BREAK");
                 importEntryWithDuplicateCheck(database, entry, BREAK);
                 firstEntry = false;
                 continue;
             }
             if (preferencesService.getGuiPreferences().shouldMergeApplyToAllEntries()) {
-                importEntryWithDuplicateCheck(database, entry, preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision());
+                var decision = preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision();
+                LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
+                importEntryWithDuplicateCheck(database, entry, decision);
             } else {
+                LOGGER.debug("not first entry, not pref flag, break will  be used");
                 importEntryWithDuplicateCheck(database, entry);
             }
         }
