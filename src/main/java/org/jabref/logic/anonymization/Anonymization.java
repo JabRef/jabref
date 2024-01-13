@@ -3,6 +3,7 @@ package org.jabref.logic.anonymization;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jabref.model.database.BibDatabase;
@@ -14,6 +15,8 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * This class is used to anonymize a library. It is required to make private libraries available for public use.
+ * <p>
+ * For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
  */
 @NullMarked
 public class Anonymization {
@@ -34,28 +37,17 @@ public class Anonymization {
         List<BibEntry> entries = bibDatabaseContext.getEntries();
         List<BibEntry> newEntries = new ArrayList<>(entries.size());
 
-        Map<Field, Map<String, Integer>> fieldToValueToCountMap = new HashMap<>();
-        int currentCount = 0;
+        Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
         for (BibEntry entry : entries) {
             BibEntry newEntry = new BibEntry(entry.getType());
             newEntries.add(newEntry);
             for (Field field : entry.getFields()) {
-                if (!fieldToValueToCountMap.containsKey(field)) {
-                    fieldToValueToCountMap.put(field, new HashMap<>());
-                }
-
-                String value = entry.getField(field).get();
-                if (!fieldToValueToCountMap.get(field).containsKey(value)) {
-                    // Current anonymization is using a simple counter.
-                    // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
-                    //       See {@link org.jabref.model.entry.field.StandardField} for usages.
-                    fieldToValueToCountMap.get(field).put(value, currentCount++);
-                }
-
-                Integer count = fieldToValueToCountMap.get(field).get(value);
-                fieldToValueToCountMap.get(field).put(value, count);
-
-                newEntry.setField(field, count.toString());
+                Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
+                // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
+                //       See {@link org.jabref.model.entry.field.StandardField} for usages.
+                String fieldContent = entry.getField(field).get();
+                Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
+                newEntry.setField(field, field.getName().toLowerCase(Locale.ROOT) + "-" + id);
             }
         }
         return newEntries;
