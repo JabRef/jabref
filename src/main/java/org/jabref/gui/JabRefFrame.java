@@ -40,7 +40,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.ParserResultWarningDialog;
@@ -57,7 +56,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -343,21 +341,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         telemetryPreferences.setAskToCollectTelemetry(false);
     }
 
-    /**
-     * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
-     */
-    public void openAction(String filePath) {
-        Path file = Path.of(filePath);
-        getOpenDatabaseAction().openFile(file);
-    }
-
-    /**
-     * The MacAdapter calls this method when "About" is selected from the application menu.
-     */
-    public void about() {
-        new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
-    }
-
     private void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
         if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
@@ -372,12 +355,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * General info dialog.  The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q
-     * is pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or
-     * not.
-     * <p>
-     * Non-OSX JabRef calls this when choosing "Quit" from the menu
-     * <p>
+     * Quit JabRef
      *
      * @return true if the user chose to quit; false otherwise
      */
