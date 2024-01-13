@@ -72,7 +72,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -133,6 +132,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 }
             }
         });
+
+        init();
     }
 
     private void initDragAndDrop() {
@@ -359,12 +360,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      *
      * @return true if the user chose to quit; false otherwise
      */
-    public boolean quit() {
-        // First ask if the user really wants to close, if there are still background tasks running
-        /*
-        It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
-        the background tasks may make changes themselves that need saving.
-         */
+    public boolean close() {
+        // Ask if the user really wants to close, if there are still background tasks running
+        // The background tasks may make changes themselves that need saving.
         if (stateManager.getAnyTasksThatWillNotBeRecoveredRunning().getValue()) {
             Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
                     Localization.lang("Please wait..."),
@@ -391,29 +389,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             return false;
         }
 
+        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
+
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
         waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
-        // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
-        saveWindowState();
-        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
-
-        prefs.flush();
-
-        // Goodbye!
-        Platform.exit();
         return true;
-    }
-
-    public void saveWindowState() {
-        GuiPreferences preferences = prefs.getGuiPreferences();
-        preferences.setPositionX(mainStage.getX());
-        preferences.setPositionY(mainStage.getY());
-        preferences.setSizeX(mainStage.getWidth());
-        preferences.setSizeY(mainStage.getHeight());
-        preferences.setWindowMaximised(mainStage.isMaximized());
-        preferences.setWindowFullScreen(mainStage.isFullScreen());
-        debugLogWindowState(mainStage);
     }
 
     /**
@@ -961,7 +942,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         @Override
         public void execute() {
-            frame.quit();
+            if (frame.close()) {
+                frame.mainStage.close();
+            }
         }
     }
 

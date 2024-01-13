@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -36,6 +37,7 @@ public class JabRefGUI {
     private final FileUpdateMonitor fileUpdateMonitor;
 
     private final List<ParserResult> parserResults;
+    private final Stage mainStage;
     private final boolean isBlank;
     private boolean correctedWindowPos;
 
@@ -50,11 +52,12 @@ public class JabRefGUI {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.correctedWindowPos = false;
 
+        this.mainStage = mainStage;
+
         WebViewStore.init();
 
-        mainFrame = new JabRefFrame(mainStage);
-
-        openWindow(mainStage);
+        JabRefGUI.mainFrame = new JabRefFrame(mainStage);
+        openWindow();
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
@@ -95,23 +98,15 @@ public class JabRefGUI {
         }
     }
 
-    private void openWindow(Stage mainStage) {
+    private void openWindow() {
         LOGGER.debug("Initializing frame");
-        mainFrame.init();
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
-        // Set the min-width and min-height for the main window
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
-
-        if (guiPreferences.isWindowFullscreen()) {
-            mainStage.setFullScreen(true);
-        }
-        // Restore window location and/or maximised state
-        if (guiPreferences.isWindowMaximised()) {
-            mainStage.setMaximized(true);
-        }
+        mainStage.setFullScreen(guiPreferences.isWindowFullscreen());
+        mainStage.setMaximized(guiPreferences.isWindowMaximised());
         if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
             LOGGER.debug("The Jabref window is outside the main screen");
@@ -144,17 +139,9 @@ public class JabRefGUI {
         mainStage.setScene(scene);
         mainStage.show();
 
-        mainStage.setOnCloseRequest(event -> {
-            if (!correctedWindowPos) {
-                // saves the window position only if its not  corrected -> the window will rest at the old Position,
-                // if the external Screen is connected again.
-                getMainFrame().saveWindowState();
-            }
-            boolean reallyQuit = mainFrame.quit();
-            if (!reallyQuit) {
-                event.consume();
-            }
-        });
+        mainStage.setOnCloseRequest(this::onCloseRequest);
+        mainStage.setOnHiding(this::onHiding);
+
         Platform.runLater(() -> mainFrame.openDatabases(parserResults, isBlank));
 
         if (!(fileUpdateMonitor.isActive())) {
@@ -165,7 +152,26 @@ public class JabRefGUI {
         }
     }
 
-    private void saveWindowState(Stage mainStage) {
+    public void onCloseRequest(WindowEvent event) {
+        if (!mainFrame.close()) {
+            event.consume();
+        }
+    }
+
+    public void onHiding(WindowEvent event) {
+        if (!correctedWindowPos) {
+            // saves the window position only if its not corrected -> the window will rest at the old Position,
+            // if the external Screen is connected again.
+            saveWindowState();
+        }
+
+        preferencesService.flush();
+
+        // Goodbye!
+        Platform.exit();
+    }
+
+    private void saveWindowState() {
         GuiPreferences preferences = preferencesService.getGuiPreferences();
         preferences.setPositionX(mainStage.getX());
         preferences.setPositionY(mainStage.getY());
