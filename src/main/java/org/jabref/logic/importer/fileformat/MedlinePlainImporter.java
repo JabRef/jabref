@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -350,7 +349,7 @@ public class MedlinePlainImporter extends Importer {
             if (oldAb == null) {
                 hm.put(StandardField.ABSTRACT, abstractValue);
             } else {
-                hm.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + abstractValue);
+                hm.put(StandardField.ABSTRACT, oldAb + '\n' + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put(new UnknownField("other-abstract"), value);
