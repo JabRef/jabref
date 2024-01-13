@@ -29,7 +29,6 @@ public class GitCredentialsDialogView extends BaseDialog<Void> {
     private TextField inputGitUsername;
     private PasswordField inputGitPassword;
 
-
     public GitCredentialsDialogView() {
         this.setTitle(Localization.lang("Git credentials"));
         this.dialogService = Injector.instantiateModelOrService(DialogService.class);
@@ -47,7 +46,6 @@ public class GitCredentialsDialogView extends BaseDialog<Void> {
         vBox.getChildren().add(this.inputGitPassword);
 
         this.pane.setContent(vBox);
-
     }
 
     public void showGitCredentialsDialog() {

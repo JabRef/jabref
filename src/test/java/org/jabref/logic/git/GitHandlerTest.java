@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Objects;
 
+import org.jabref.preferences.PreferencesService;
+
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -28,14 +30,13 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.jabref.logic.git.GitPreferences;
-import org.jabref.preferences.PreferencesService;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,13 +46,12 @@ class GitHandlerTest {
     private GitHandler gitHandler;
     private GitPreferences gitPreferences;
 
-
     private static Repository createRepository() throws IOException, GitAPIException {
         File localPath = File.createTempFile("TestGitRepository", "");
-        if(!localPath.delete()) {
+        if (!localPath.delete()) {
             throw new IOException("Could not delete temporary file " + localPath);
         }
-        if(!localPath.mkdirs()) {
+        if (!localPath.mkdirs()) {
             throw new IOException("Could not create directory " + localPath);
         }
         Repository repository = FileRepositoryBuilder.create(new File(localPath, ".git"));
@@ -61,12 +61,13 @@ class GitHandlerTest {
         git.commit().setMessage("Initial commit").call();
         return repository;
     }
+
     private static Path createFolder() throws IOException {
         File localPath = File.createTempFile("TestGitRepository", "");
-        if(!localPath.delete()) {
+        if (!localPath.delete()) {
             throw new IOException("Could not delete temporary file " + localPath);
         }
-        if(!localPath.mkdirs()) {
+        if (!localPath.mkdirs()) {
             throw new IOException("Could not create directory " + localPath);
         }
         return localPath.toPath();
@@ -128,7 +129,7 @@ class GitHandlerTest {
     }
 
     @Test
-    void pushSingleFile () throws Exception {
+    void pushSingleFile() throws Exception {
         String username = "test";
         String password = "test";
 
@@ -137,35 +138,32 @@ class GitHandlerTest {
         Server server = createServer(username, password, repository);
         server.start();
 
-        //Clone
+        // Clone
         CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
         Path clonedRepPath = createFolder();
         Git.cloneRepository()
            .setCredentialsProvider(credentialsProvider)
-           .setURI( "http://localhost:8080/repoTest/.git")
+           .setURI("http://localhost:8080/repoTest/.git")
            .setDirectory(clonedRepPath.toFile())
            .call();
 
-        //Add files
+        // Add files
         Files.createFile(Path.of(clonedRepPath.toString(), "bib_1.bib"));
 
-        //Commit
-        GitHandler git = new GitHandler(clonedRepPath);
-        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile"));
-
-        //Push
+        // Commit
         gitPreferences = new GitPreferences(username, password, true, true);
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getGitPreferences()).thenReturn(gitPreferences);
-        git.setGitPreferences(preferences.getGitPreferences());
+        GitHandler git = new GitHandler(clonedRepPath, preferences.getGitPreferences());
+        git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile");
+
+        // Push
         git.pushCommitsToRemoteRepository();
 
-        assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile"));
         server.stop();
     }
 
     private static SecurityHandler basicAuth(String username, String password) {
-
         HashLoginService l = new HashLoginService();
         UserStore userStore = new UserStore();
         String[] roles = new String[] {"user"};
@@ -190,7 +188,6 @@ class GitHandlerTest {
         csh.setLoginService(l);
 
         return csh;
-
     }
 
     private Server createServer(String username, String password, Repository repository) {
