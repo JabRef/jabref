@@ -144,6 +144,11 @@ public class BibEntry implements Cloneable {
         this(DEFAULT_TYPE);
     }
 
+    public BibEntry(String citationKey) {
+        this();
+        this.setCitationKey(citationKey);
+    }
+
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -151,6 +156,11 @@ public class BibEntry implements Cloneable {
         this.id = IdGenerator.next();
         setType(type);
         this.sharedBibEntryData = new SharedBibEntryData();
+    }
+
+    public BibEntry(EntryType type, String citationKey) {
+        this(type);
+        this.setCitationKey(citationKey);
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {

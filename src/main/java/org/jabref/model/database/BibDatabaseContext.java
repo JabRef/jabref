@@ -268,4 +268,20 @@ public class BibDatabaseContext {
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabaseContext that)) {
+            return false;
+        }
+        return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(database, metaData, path, location);
+    }
 }
