@@ -115,7 +115,7 @@ class PseudonymizationTest {
         Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
         // modify target to the files to be created
         Path target = tempDir.resolve("pseudo.bib");
-        Path mappingInfoTarget = target.resolveSibling(("pseudo.bib.mapping.csv"));
+        Path mappingInfoTarget = target.resolveSibling("pseudo.bib.mapping.csv");
 
         BibDatabaseContext databaseContext = importer.importDatabase(path).getDatabaseContext();
 
