@@ -84,7 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The main window of the application.
+ * Represents the inner frame of the JabRef window
  */
 public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
@@ -93,7 +93,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final SplitPane splitPane = new SplitPane();
-    private final PreferencesService prefs = Globals.prefs;
+    private final PreferencesService prefs;
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
@@ -114,17 +114,24 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     private final TaskExecutor taskExecutor;
 
-    public JabRefFrame(Stage mainStage, DialogService dialogService) {
+    public JabRefFrame(Stage mainStage,
+                       DialogService dialogService,
+                       FileUpdateMonitor fileUpdateMonitor,
+                       PreferencesService preferencesService) {
         this.mainStage = mainStage;
-        this.stateManager = Globals.stateManager;
         this.dialogService = dialogService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.prefs = preferencesService;
+
+        this.stateManager = Globals.stateManager;
         this.undoManager = Globals.undoManager;
-        this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
         this.entryTypesManager = Globals.entryTypesManager;
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.taskExecutor = Globals.TASK_EXECUTOR;
+
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs, taskExecutor);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
+
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -270,7 +277,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         event.consume();
                         break;
                     case SEARCH:
-                        getGlobalSearchBar().focus();
+                        globalSearchBar.focus();
                         break;
                     case NEW_ARTICLE:
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
@@ -709,10 +716,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         dialogService.showCustomDialogAndWait(dialog);
     }
 
-    public FileHistoryMenu getFileHistory() {
-        return fileHistory;
-    }
-
     public boolean closeTab(LibraryTab libraryTab) {
         if (libraryTab.requestClose()) {
             tabbedPane.getTabs().remove(libraryTab);
@@ -754,14 +757,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 taskExecutor);
     }
 
-    public GlobalSearchBar getGlobalSearchBar() {
-        return globalSearchBar;
-    }
-
-    public CountingUndoManager getUndoManager() {
-        return undoManager;
-    }
-
     private void copyGroupTreeNode(LibraryTab destinationLibraryTab, GroupTreeNode parent, GroupTreeNode groupTreeNodeToCopy) {
         List<BibEntry> allEntries = getCurrentLibraryTab()
                 .getBibDatabaseContext()
@@ -796,10 +791,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         destinationLibraryTab.getBibDatabaseContext()
                              .getMetaData()
                              .setGroups(currentLibraryGroupRoot);
-    }
-
-    public Stage getMainStage() {
-        return mainStage;
     }
 
     /**
@@ -855,7 +846,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                             Globals.stateManager,
                             Globals.entryTypesManager,
                             fileUpdateMonitor,
-                            getUndoManager(),
+                            undoManager,
                             Globals.TASK_EXECUTOR);
                 } catch (
                         SQLException |
@@ -923,6 +914,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         }
 
         getOpenDatabaseAction().openFiles(lastFiles);
+    }
+
+    public FileHistoryMenu getFileHistory() {
+        return fileHistory;
+    }
+
+    public Stage getMainStage() {
+        return mainStage;
     }
 
     /**

@@ -23,12 +23,14 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents the outer stage and the scene of the JabRef window.
+ */
 public class JabRefGUI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
@@ -37,11 +39,10 @@ public class JabRefGUI {
     private static DialogService dialogService;
     private static ThemeManager themeManager;
 
+    private final Stage mainStage;
     private final PreferencesService preferencesService;
-    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final List<ParserResult> parserResults;
-    private final Stage mainStage;
     private final boolean isBlank;
     private boolean correctedWindowPos;
 
@@ -50,13 +51,12 @@ public class JabRefGUI {
                      boolean isBlank,
                      PreferencesService preferencesService,
                      FileUpdateMonitor fileUpdateMonitor) {
+        this.mainStage = mainStage;
         this.parserResults = parserResults;
         this.isBlank = isBlank;
-        this.correctedWindowPos = false;
         this.preferencesService = preferencesService;
-        this.fileUpdateMonitor = fileUpdateMonitor;
 
-        this.mainStage = mainStage;
+        this.correctedWindowPos = false;
 
         WebViewStore.init();
 
@@ -65,9 +65,20 @@ public class JabRefGUI {
                 fileUpdateMonitor,
                 Runnable::run);
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
-        JabRefGUI.mainFrame = new JabRefFrame(mainStage, dialogService);
+        JabRefGUI.mainFrame = new JabRefFrame(
+                mainStage,
+                dialogService,
+                fileUpdateMonitor,
+                preferencesService);
 
         openWindow();
+
+        if (!(fileUpdateMonitor.isActive())) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to monitor file changes. Please close files " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
+        }
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
@@ -94,7 +105,6 @@ public class JabRefGUI {
             return;
         }
 
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         Optional<String> password = dialogService.showPasswordDialogAndWait(
                 Localization.lang("Proxy configuration"),
                 Localization.lang("Proxy requires password"),
@@ -147,19 +157,11 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
-        mainStage.show();
-
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
+        mainStage.show();
 
         Platform.runLater(() -> mainFrame.openDatabases(parserResults, isBlank));
-
-        if (!(fileUpdateMonitor.isActive())) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Unable to monitor file changes. Please close files " +
-                            "and processes and restart. You may encounter errors if you continue " +
-                            "with this session."));
-        }
     }
 
     public void onCloseRequest(WindowEvent event) {
