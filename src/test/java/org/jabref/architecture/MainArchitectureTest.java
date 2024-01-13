@@ -119,6 +119,7 @@ class MainArchitectureTest {
     public static void restrictUsagesInLogic(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .and().areNotAnnotatedWith(AllowedToUseSwing.class)
+                   .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);

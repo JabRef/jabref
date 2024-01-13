@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
@@ -56,12 +55,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
-    private final JabRefFrame frame;
 
-    public PreferencesDialogViewModel(DialogService dialogService, PreferencesService preferences, JabRefFrame frame) {
+    public PreferencesDialogViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
@@ -104,7 +101,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                      .ifPresent(file -> {
                          try {
                              preferences.importPreferences(file);
-                             updateAfterPreferenceChanges();
+                             setValues();
 
                              dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
                                      Localization.lang("You must restart JabRef for this to come into effect."));
@@ -156,17 +153,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
             }
 
-            updateAfterPreferenceChanges();
+            setValues();
         }
-    }
-
-    /**
-     * Reloads the preferences into the UI
-     */
-    private void updateAfterPreferenceChanges() {
-        setValues();
-
-        frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
     /**
@@ -205,12 +193,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                             + Localization.lang("You must restart JabRef for this to come into effect."));
         }
 
-        frame.setupAllTables();
-        frame.getGlobalSearchBar().updateHintVisibility();
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         dialogService.notify(Localization.lang("Preferences recorded."));
 
-        updateAfterPreferenceChanges();
+        setValues();
     }
 
     /**

@@ -51,8 +51,6 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     private BibEntry mainOriginalPaper;
     private BibEntry mainResultPaper;
 
-    private BibEntry completePaper;
-
     @BeforeAll
     static void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -111,7 +109,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
         // FixMe: Test this BibEntry
-        completePaper = new BibEntry(StandardEntryType.Article)
+        BibEntry completePaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
                 .withField(StandardField.DATE, "2020-03-10")
@@ -340,9 +338,10 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.PAGES, "17--29")
                 .withField(StandardField.DATE, "2003-07-07")
                 .withField(StandardField.YEAR, "2003")
-                .withField(StandardField.MONTH, "oct")
+                .withField(StandardField.MONTH, "#oct#")
+                .withField(StandardField.ISSN, "1434-6052")
                 .withField(StandardField.ABSTRACT, "Multi-electron production is studied at high electron transverse momentum in positron- and electron-proton collisions using the H1 detector at HERA. The data correspond to an integrated luminosity of 115 pb-1. Di-electron and tri-electron event yields are measured. Cross sections are derived in a restricted phase space region dominated by photon-photon collisions. In general good agreement is found with the Standard Model predictions. However, for electron pair invariant masses above 100 GeV, three di-electron events and three tri-electron events are observed, compared to Standard Model expectations of 0.30 \\pm 0.04 and 0.23 \\pm 0.04, respectively.")
-                .withField(StandardField.PUBLISHER, "Springer Science and Business Media {LLC}")
+                .withField(StandardField.PUBLISHER, "Springer Science and Business Media LLC")
                 .withField(StandardField.EPRINT, "hep-ex/0307015")
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/hep-ex/0307015v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
@@ -474,11 +473,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
                 .withField(StandardField.DATE, "2020-03-10")
                 .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.MONTH, "aug")
+                .withField(StandardField.MONTH, "#aug#")
                 .withField(StandardField.NUMBER, "8")
                 .withField(StandardField.VOLUME, "22")
+                .withField(StandardField.ISSN, "1367-2630")
                 .withField(StandardField.PAGES, "083005")
-                .withField(StandardField.PUBLISHER, "{IOP} Publishing")
+                .withField(StandardField.PUBLISHER, "IOP Publishing")
                 .withField(StandardField.JOURNAL, "New Journal of Physics")
                 .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
                 .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
@@ -573,12 +573,13 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
                 .withField(StandardField.ABSTRACT, "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation.")
                 .withField(StandardField.DOI, "10.1073/pnas.1617932114")
+                .withField(StandardField.ISSN, "1091-6490")
                 .withField(StandardField.EPRINT, "1701.00587")
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "q-bio.CB")
                 .withField(StandardField.KEYWORDS, "q-bio.CB")
-                .withField(StandardField.MONTH, "dec")
+                .withField(StandardField.MONTH, "#dec#")
                 .withField(StandardField.YEAR, "2016")
                 .withField(StandardField.VOLUME, "113")
                 .withField(InternalField.KEY_FIELD, "Zheng_2016")

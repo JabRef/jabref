@@ -1,10 +1,11 @@
 package org.jabref.gui.undo;
 
+import java.util.function.Supplier;
+
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -20,12 +21,12 @@ public class UndoRedoAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoRedoAction.class);
 
     private final StandardActions action;
-    private final JabRefFrame frame;
-    private DialogService dialogService;
+    private final Supplier<LibraryTab> tabSupplier;
+    private final DialogService dialogService;
 
-    public UndoRedoAction(StandardActions action, JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+    public UndoRedoAction(StandardActions action, Supplier<LibraryTab> tabSupplier, DialogService dialogService, StateManager stateManager) {
         this.action = action;
-        this.frame = frame;
+        this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
 
         // ToDo: Rework the UndoManager to something like the following, if it had a property.
@@ -35,7 +36,7 @@ public class UndoRedoAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        LibraryTab libraryTab = frame.getCurrentLibraryTab();
+        LibraryTab libraryTab = this.tabSupplier.get();
         if (action == StandardActions.UNDO) {
             try {
                 libraryTab.getUndoManager().undo();
@@ -44,7 +45,7 @@ public class UndoRedoAction extends SimpleCommand {
             } catch (CannotUndoException ex) {
                 dialogService.notify(Localization.lang("Nothing to undo") + '.');
             }
-            frame.getCurrentLibraryTab().markChangedOrUnChanged();
+            this.tabSupplier.get().markChangedOrUnChanged();
         } else if (action == StandardActions.REDO) {
             try {
                 libraryTab.getUndoManager().redo();

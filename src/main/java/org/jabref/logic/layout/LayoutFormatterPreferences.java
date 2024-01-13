@@ -7,17 +7,22 @@ import java.util.Optional;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.preferences.DOIPreferences;
 
 public class LayoutFormatterPreferences {
 
     private final NameFormatterPreferences nameFormatterPreferences;
+
+    private final DOIPreferences doiPreferences;
     private final StringProperty mainFileDirectoryProperty;
     private final Map<String, String> customExportNameFormatters = new HashMap<>();
 
     public LayoutFormatterPreferences(NameFormatterPreferences nameFormatterPreferences,
+                                      DOIPreferences doiPreferences,
                                       StringProperty mainFileDirectoryProperty) {
         this.nameFormatterPreferences = nameFormatterPreferences;
         this.mainFileDirectoryProperty = mainFileDirectoryProperty;
+        this.doiPreferences = doiPreferences;
     }
 
     public NameFormatterPreferences getNameFormatterPreferences() {
@@ -38,5 +43,9 @@ public class LayoutFormatterPreferences {
 
     public void putCustomExportNameFormatter(String formatterName, String contents) {
         customExportNameFormatters.put(formatterName, contents);
+    }
+
+    public DOIPreferences getDoiPreferences() {
+        return doiPreferences;
     }
 }

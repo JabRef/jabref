@@ -31,9 +31,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import kong.unirest.JsonNode;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jbibtex.TokenMgrException;
@@ -82,22 +82,18 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
-        uriBuilder.addParameter("pg7", "ALLF"); // search all fields
-        uriBuilder.addParameter("s7", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // query
-        uriBuilder.addParameter("r", "1"); // start index
-        uriBuilder.addParameter("extend", "1"); // should return up to 100 items (instead of default 10)
-        uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
-
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/api/publications/search");
+        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // query
+        uriBuilder.addParameter("currentPage", "1"); // start index
+        uriBuilder.addParameter("pageSize", "100"); // page size
         return uriBuilder.build().toURL();
     }
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
-        uriBuilder.addParameter("pg1", "MR"); // search MR number
-        uriBuilder.addParameter("s1", identifier); // identifier
-        uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/api/publications/format");
+        uriBuilder.addParameter("formats", "bib");
+        uriBuilder.addParameter("ids", identifier); // identifier
 
         return uriBuilder.build().toURL();
     }
@@ -106,17 +102,25 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     public Parser getParser() {
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
+            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
 
             List<BibEntry> entries = new ArrayList<>();
             try {
-                JSONObject jsonResponse = new JSONObject(response);
-                JSONArray entriesArray = jsonResponse.getJSONObject("all").getJSONArray("results");
-
-                BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
-
-                for (int i = 0; i < entriesArray.length(); i++) {
-                    String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
-                    entries.addAll(bibtexParser.parseEntries(bibTexFormat));
+                // Depending on the type of query we might get either a json object or directly a json array
+                JsonNode node = new JsonNode(response);
+                if (node.isArray()) {
+                    JSONArray entriesArray = node.getArray();
+                    for (int i = 0; i < entriesArray.length(); i++) {
+                        String bibTexFormat = entriesArray.getJSONObject(i).getString("bib");
+                        entries.addAll(bibtexParser.parseEntries(bibTexFormat));
+                    }
+                } else {
+                    var element = node.getObject();
+                    JSONArray entriesArray = element.getJSONObject("all").getJSONArray("results");
+                    for (int i = 0; i < entriesArray.length(); i++) {
+                        String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
+                        entries.addAll(bibtexParser.parseEntries(bibTexFormat));
+                    }
                 }
             } catch (JSONException | TokenMgrException e) {
                 LOGGER.error("An error occurred while parsing fetched data", e);

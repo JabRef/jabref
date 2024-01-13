@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 
 import javax.swing.undo.UndoManager;
@@ -11,7 +12,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -28,6 +29,8 @@ import org.jabref.testutils.category.GUITest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
@@ -71,12 +74,17 @@ class CommentsTabTest {
     @Mock
     private OwnerPreferences ownerPreferences;
 
+    @Mock
+    private EntryEditorPreferences entryEditorPreferences;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
+        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
         BibEntryType entryTypeMock = mock(BibEntryType.class);
         when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
@@ -96,14 +104,41 @@ class CommentsTabTest {
     }
 
     @Test
-    void testDetermineFieldsToShowWorksForASingleUser() {
+    void emptyCommentShownIfGloballyEnabled() {
         final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.COMMENT, "Standard comment text");
+
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
+
+        assertEquals(Set.of(StandardField.COMMENT, ownerComment), fields);
+    }
+
+    @Test
+    void emptyCommentFieldNotShownIfGloballyDisabled() {
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(false);
+
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.COMMENT, "Standard comment text");
+
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
+
+        assertEquals(Set.of(StandardField.COMMENT), fields);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void commentFieldShownIfContainsText(boolean shouldShowUserCommentsFields) {
+        final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
+        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(shouldShowUserCommentsFields);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.COMMENT, "Standard comment text")
                 .withField(ownerComment, "User-specific comment text");
 
-        Set<Field> fields = commentsTab.determineFieldsToShow(entry);
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
 
         assertEquals(Set.of(StandardField.COMMENT, ownerComment), fields);
     }
@@ -118,7 +153,7 @@ class CommentsTabTest {
                 .withField(ownerComment, "User-specific comment text")
                 .withField(otherUsersComment, "other-user-id comment text");
 
-        Set<Field> fields = commentsTab.determineFieldsToShow(entry);
+        SequencedSet<Field> fields = commentsTab.determineFieldsToShow(entry);
 
         assertEquals(Set.of(StandardField.COMMENT, ownerComment, otherUsersComment), fields);
     }

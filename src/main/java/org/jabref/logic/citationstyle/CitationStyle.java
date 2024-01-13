@@ -141,8 +141,11 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
-        Objects.requireNonNull(url);
+        URL url = CitationStyle.class.getResource(STYLES_ROOT + DEFAULT);
+        if (url == null) {
+            LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT);
+            return Collections.emptyList();
+        }
 
         try {
             URI uri = url.toURI();

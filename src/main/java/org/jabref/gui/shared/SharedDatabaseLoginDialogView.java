@@ -13,7 +13,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -56,12 +56,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public SharedDatabaseLoginDialogView(JabRefFrame frame) {
-        this.frame = frame;
+    public SharedDatabaseLoginDialogView(LibraryTabContainer tabContainer) {
+        this.tabContainer = tabContainer;
         this.setTitle(Localization.lang("Connect to shared database"));
 
         ViewLoader.view(this)
@@ -89,7 +89,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         visualizer.setDecoration(new IconValidationDecorator());
 
         viewModel = new SharedDatabaseLoginDialogViewModel(
-                frame,
+                tabContainer,
                 dialogService,
                 preferencesService,
                 stateManager,
