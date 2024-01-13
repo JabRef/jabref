@@ -20,7 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
 - The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
 - We changed the order of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
-- Sub libraries based on `aux` file can now also be generated if some citeations are not found library.
+- Sub libraries based on `aux` file can now also be generated if some citeations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
 
 ### Fixed
 
