@@ -3,7 +3,6 @@ package org.jabref.gui;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.remote.CLIMessageHandler;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -66,7 +65,6 @@ public class Globals {
 
     private static ClipBoardManager clipBoardManager = null;
     private static KeyBindingRepository keyBindingRepository;
-    private static ThemeManager themeManager;
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
 
@@ -86,16 +84,6 @@ public class Globals {
             clipBoardManager = new ClipBoardManager(prefs);
         }
         return clipBoardManager;
-    }
-
-    public static synchronized ThemeManager getThemeManager() {
-        if (themeManager == null) {
-            themeManager = new ThemeManager(
-                    prefs.getWorkspacePreferences(),
-                    getFileUpdateMonitor(),
-                    Runnable::run);
-        }
-        return themeManager;
     }
 
     public static synchronized FileUpdateMonitor getFileUpdateMonitor() {

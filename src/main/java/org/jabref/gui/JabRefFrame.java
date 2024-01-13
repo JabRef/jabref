@@ -114,10 +114,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     private final TaskExecutor taskExecutor;
 
-    public JabRefFrame(Stage mainStage) {
+    public JabRefFrame(Stage mainStage, DialogService dialogService) {
         this.mainStage = mainStage;
         this.stateManager = Globals.stateManager;
-        this.dialogService = new JabRefDialogService(mainStage);
+        this.dialogService = dialogService;
         this.undoManager = Globals.undoManager;
         this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
         this.entryTypesManager = Globals.entryTypesManager;
@@ -762,10 +762,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return undoManager;
     }
 
-    public DialogService getDialogService() {
-        return dialogService;
-    }
-
     private void copyGroupTreeNode(LibraryTab destinationLibraryTab, GroupTreeNode parent, GroupTreeNode groupTreeNodeToCopy) {
         List<BibEntry> allEntries = getCurrentLibraryTab()
                 .getBibDatabaseContext()
@@ -854,7 +850,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                     OpenDatabaseAction.openSharedDatabase(
                             parserResult,
                             this,
-                            getDialogService(),
+                            dialogService,
                             prefs,
                             Globals.stateManager,
                             Globals.entryTypesManager,
@@ -868,7 +864,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         NotASharedDatabaseException e) {
 
                     LOGGER.error("Connection error", e);
-                    getDialogService().showErrorDialogAndWait(
+                    dialogService.showErrorDialogAndWait(
                             Localization.lang("Connection error"),
                             Localization.lang("A local copy will be opened."),
                             e);
@@ -895,7 +891,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                     pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
                     pr.getErrorMessage();
 
-            getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
 
         // Display warnings, if any
@@ -905,7 +901,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             //  therefore for now this ok.
             ParserResult pr = parserResults.get(tabNumber);
             if (pr.hasWarnings()) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, getDialogService());
+                ParserResultWarningDialog.showParserResultWarningDialog(pr, dialogService);
                 showLibraryTabAt(tabNumber);
             }
         }
@@ -915,7 +911,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, getDialogService()));
+        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService));
 
         LOGGER.debug("Finished adding panels");
     }

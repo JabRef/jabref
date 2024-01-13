@@ -13,6 +13,7 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -33,6 +34,9 @@ public class JabRefGUI {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;
+    private static DialogService dialogService;
+    private static ThemeManager themeManager;
+
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
 
@@ -48,21 +52,27 @@ public class JabRefGUI {
                      FileUpdateMonitor fileUpdateMonitor) {
         this.parserResults = parserResults;
         this.isBlank = isBlank;
+        this.correctedWindowPos = false;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.correctedWindowPos = false;
 
         this.mainStage = mainStage;
 
         WebViewStore.init();
 
-        JabRefGUI.mainFrame = new JabRefFrame(mainStage);
+        JabRefGUI.themeManager = new ThemeManager(
+                preferencesService.getWorkspacePreferences(),
+                fileUpdateMonitor,
+                Runnable::run);
+        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+        JabRefGUI.mainFrame = new JabRefFrame(mainStage, dialogService);
+
         openWindow();
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
                 new VersionWorker(Globals.BUILD_INFO.version,
-                        mainFrame.getDialogService(),
+                        dialogService,
                         Globals.TASK_EXECUTOR,
                         preferencesService)
                         .checkForNewVersionDelayed();
@@ -129,7 +139,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeManager().installCss(scene);
+        themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
@@ -145,10 +155,10 @@ public class JabRefGUI {
         Platform.runLater(() -> mainFrame.openDatabases(parserResults, isBlank));
 
         if (!(fileUpdateMonitor.isActive())) {
-            getMainFrame().getDialogService()
-                          .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
-                                  "and processes and restart. You may encounter errors if you continue " +
-                                  "with this session."));
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to monitor file changes. Please close files " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
         }
     }
 
@@ -212,5 +222,13 @@ public class JabRefGUI {
 
     public static JabRefFrame getMainFrame() {
         return mainFrame;
+    }
+
+    public static DialogService getDialogService() {
+        return dialogService;
+    }
+
+    public static ThemeManager getThemeManager() {
+        return themeManager;
     }
 }
