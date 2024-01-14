@@ -1,4 +1,4 @@
-# For anonymizing BibTeX files, org.jabref.logic.anonymization.AnonymizationTest.anonymizeLibrary can be used.
+# For pseudonymization BibTeX files, org.jabref.logic.pseudonymization.PseudonymizationTest#pseudonymizeLibraryFiley can be used.
 
 number_of_entries = 100000
 file = open("generatedDatabase.bib", 'w')
