@@ -1,5 +1,7 @@
 package org.jabref.gui.importer;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.EnumSet;
 import java.util.Optional;
 
@@ -9,6 +11,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -17,11 +20,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import org.fxmisc.richtext.CodeArea;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
@@ -31,9 +34,13 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -57,6 +64,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public Label totalItems;
     public Label selectedItems;
     public CheckBox downloadLinkedOnlineFiles;
+    public CodeArea bibTeXData;
     private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
@@ -163,13 +171,45 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
                     return container;
                 })
-                .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
+                .withOnMouseClickedEvent((entry, event) -> {
+                    entriesListView.getCheckModel().toggleCheckState(entry);
+                    displayBibTeX(entry);
+                })
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
 
         selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
+        initBibTeX();
+    }
+
+    private void displayBibTeX(BibEntry entry) {
+        if (entriesListView.getCheckModel().isChecked(entry)) {
+            bibTeXData.clear();
+            try {
+                bibTeXData.appendText(getSourceString(entry));
+                bibTeXData.moveTo(0);
+                bibTeXData.requestFollowCaret();
+            } catch (IOException aE) {
+                bibTeXData.clear();
+            }
+        } else {
+            bibTeXData.clear();
+        }
+    }
+
+    private void initBibTeX(){
+        bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        bibTeXData.setPadding(new Insets(5.0));
+    }
+
+    private String getSourceString(BibEntry entry) throws IOException {
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
+        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, database.getMode());
+        return writer.toString();
     }
 
     private Node getEntryNode(BibEntry entry) {
