@@ -45,7 +45,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;

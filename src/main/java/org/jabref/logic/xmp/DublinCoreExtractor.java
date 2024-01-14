@@ -9,7 +9,7 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
