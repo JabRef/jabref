@@ -61,7 +61,7 @@ public class Pseudonymization {
                 //       See {@link org.jabref.model.entry.field.StandardField} for usages.
                 String fieldContent = entry.getField(field).get();
                 Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
-                newEntry.setField(field, field.getName().toLowerCase(Locale.ROOT) + "-" + id);
+                newEntry.setField(field, field.getName() + "-" + id);
             }
         }
         return newEntries;
