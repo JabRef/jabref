@@ -1,12 +1,6 @@
 package org.jabref.logic.pseudonymization;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,9 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -31,34 +22,6 @@ import org.jspecify.annotations.NullMarked;
 public class Pseudonymization {
 
     public record Result(BibDatabaseContext bibDatabaseContext, Map<String, String> valueMapping) {
-        public void writeValuesMappingAsCsv(Path path) throws IOException {
-            try (
-                    OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path), StandardCharsets.UTF_8);
-                    CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)
-            ) {
-                csvPrinter.printRecord("pseudonymized", "original value");
-                valueMapping.entrySet().stream()
-                            // We have date-1, date-2, ..., date-10, date-11. That should be sorted accordingly.
-                            .sorted(Comparator.comparing((Map.Entry<String, String> entry) -> getKeyPrefix(entry.getKey())
-                            ).thenComparingInt(entry -> extractNumber(entry.getKey())))
-                            .forEach(Unchecked.consumer(entry -> {
-                                csvPrinter.printRecord(entry.getKey(), entry.getValue());
-                            }));
-            }
-        }
-
-        private static String getKeyPrefix(String key) {
-            int dashIndex = key.lastIndexOf('-');
-            return dashIndex != -1 ? key.substring(0, dashIndex) : key;
-        }
-
-        private static int extractNumber(String key) {
-            try {
-                return Integer.parseInt(key.substring(key.lastIndexOf('-') + 1));
-            } catch (NumberFormatException e) {
-                return Integer.MAX_VALUE;
-            }
-        }
     }
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {

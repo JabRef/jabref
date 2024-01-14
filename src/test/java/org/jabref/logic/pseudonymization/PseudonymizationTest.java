@@ -125,7 +125,7 @@ class PseudonymizationTest {
 
         Files.writeString(target, stringWriter.toString());
 
-        result.writeValuesMappingAsCsv(mappingInfoTarget);
+        PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(mappingInfoTarget, result);
 
         assertTrue(Files.exists(target));
     }
