@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added git support for backing up bib files with integration to local and remote repositories and support for SSH and username/password authentication [#578](https://github.com/koppor/jabref/issues/578)
 
 ### Changed
 
@@ -83,7 +84,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a link "Get more themes..." in the preferences to that points to [themes.jabref.org](https://themes.jabref.org) allowing the user to download new themes. [#10243](https://github.com/JabRef/jabref/issues/10243)
 - We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
-- We added git support for backing up bib files with integration to local and remote repositories and support for SSH and username/password authentication [#578](https://github.com/koppor/jabref/issues/578)
 - We added support for exporting to Hayagriva YAML format. [#10382](https://github.com/JabRef/jabref/issues/10382)
 - We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
 - We added the 'Bachelor's thesis' type for Biblatex's 'Thesis' EntryType [#10029](https://github.com/JabRef/jabref/issues/10029).
