@@ -221,13 +221,12 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * The layout to display in the tab when it's loading
+     * The layout to display in the tab when it is loading
      */
     private Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
         pane.setCenter(progressIndicator);
-
         return pane;
     }
 
@@ -241,7 +240,7 @@ public class LibraryTab extends Tab {
         BibDatabaseContext context = result.getDatabaseContext();
         OpenDatabaseAction.performPostOpenActions(result, dialogService);
 
-        feedData(context);
+        setDatabaseContext(context);
 
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             try {
@@ -261,30 +260,26 @@ public class LibraryTab extends Tab {
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    private void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
+    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
-            // If you open an existing library, a library tab with a loading animation is added immediately.
-            // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
-            // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
-            // it doesn't handle the case when a library is loaded asynchronously.
-            // See org.jabref.gui.LibraryTab.createLibraryTab for the asynchronous loading.
-            stateManager.setActiveDatabase(bibDatabaseContextFromParserResult);
+            LOGGER.debug("This case should not happen.");
+            stateManager.setActiveDatabase(bibDatabaseContext);
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
         Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
         foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContextFromParserResult);
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
 
-        stateManager.getOpenDatabases().add(bibDatabaseContextFromParserResult);
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
 
-        bibDatabaseContextFromParserResult.getDatabase().registerListener(this);
-        bibDatabaseContextFromParserResult.getMetaData().registerListener(this);
+        bibDatabaseContext.getDatabase().registerListener(this);
+        bibDatabaseContext.getMetaData().registerListener(this);
 
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
-        citationStyleCache = new CitationStyleCache(bibDatabaseContextFromParserResult);
-        annotationCache = new FileAnnotationCache(bibDatabaseContextFromParserResult, preferencesService.getFilePreferences());
+        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
