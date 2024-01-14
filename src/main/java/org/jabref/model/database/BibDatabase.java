@@ -643,7 +643,12 @@ public class BibDatabase {
         if (!(o instanceof BibDatabase that)) {
             return false;
         }
-        return Objects.equals(entries, that.entries) && Objects.equals(bibtexStrings, that.bibtexStrings) && Objects.equals(preamble, that.preamble) && Objects.equals(epilog, that.epilog) && Objects.equals(sharedDatabaseID, that.sharedDatabaseID) && Objects.equals(newLineSeparator, that.newLineSeparator);
+        return Objects.equals(entries, that.entries)
+                && Objects.equals(bibtexStrings, that.bibtexStrings)
+                && Objects.equals(preamble, that.preamble)
+                && Objects.equals(epilog, that.epilog)
+                && Objects.equals(sharedDatabaseID, that.sharedDatabaseID)
+                && Objects.equals(newLineSeparator, that.newLineSeparator);
     }
 
     @Override
