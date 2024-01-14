@@ -167,7 +167,7 @@ public class JabRefGUI {
         });
         Platform.runLater(this::openDatabases);
 
-        if (!(fileUpdateMonitor.isActive())) {
+        if (!fileUpdateMonitor.isActive()) {
             getMainFrame().getDialogService()
                           .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
                                   "and processes and restart. You may encounter errors if you continue " +

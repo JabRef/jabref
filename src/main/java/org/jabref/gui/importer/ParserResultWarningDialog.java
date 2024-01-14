@@ -24,7 +24,7 @@ public class ParserResultWarningDialog {
                                                      final DialogService dialogService) {
         Objects.requireNonNull(parserResult);
         // Return if no warnings
-        if (!(parserResult.hasWarnings())) {
+        if (!parserResult.hasWarnings()) {
             return;
         }
 
