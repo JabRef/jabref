@@ -10,6 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+
 - BibTeX information in web search import screen. [#560](https://github.com/koppor/jabref/issues/560)
 
 - We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)

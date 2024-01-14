@@ -20,11 +20,17 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import org.fxmisc.richtext.CodeArea;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
@@ -55,6 +61,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
+import org.fxmisc.richtext.CodeArea;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
@@ -68,6 +75,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public CodeArea bibTeXData;
     public VBox bibTeXDataBox;
     private final BackgroundTask<ParserResult> task;
+    private final BibDatabaseContext database;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -76,7 +84,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    private final BibDatabaseContext database;
 
     /**
      * Imports the given entries into the given database. The entries are provided using the BackgroundTask
@@ -193,7 +200,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 bibTeXData.appendText(getSourceString(entry));
                 bibTeXData.moveTo(0);
                 bibTeXData.requestFollowCaret();
-            } catch (IOException aE) {
+            } catch (
+                    IOException aE) {
                 bibTeXData.clear();
             }
         } else {
@@ -201,7 +209,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         }
     }
 
-    private void initBibTeX(){
+    private void initBibTeX() {
         bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         bibTeXData.setPadding(new Insets(5.0));
         showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
