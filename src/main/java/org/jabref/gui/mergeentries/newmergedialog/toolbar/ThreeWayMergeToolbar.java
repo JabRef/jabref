@@ -17,7 +17,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.GuiPreferences;
+import org.jabref.preferences.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -51,11 +51,15 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private CheckBox onlyShowChangedFieldsCheck;
 
+    @FXML
+    private CheckBox applyToAllEntriesCheck;
+
     @Inject
     private PreferencesService preferencesService;
 
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
+    private final BooleanProperty applyToAllEntries = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -107,30 +111,33 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         }));
 
-        onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
+        onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getMergeDialogPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
+
+        applyToAllEntriesCheck.selectedProperty().bindBidirectional(preferencesService.getMergeDialogPreferences().mergeApplyToAllEntriesProperty());
+        applyToAllEntries.bind(applyToAllEntriesCheck.selectedProperty());
 
         loadSavedConfiguration();
     }
 
     private void loadSavedConfiguration() {
-        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+        MergeDialogPreferences mergeDialogPreferences = preferencesService.getMergeDialogPreferences();
 
-        PlainTextOrDiff plainTextOrDiffPreference = guiPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
+        PlainTextOrDiff plainTextOrDiffPreference = mergeDialogPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
         plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
 
-        DiffView diffViewPreference = guiPreferences.getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
+        DiffView diffViewPreference = mergeDialogPreferences.getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
         diffViewComboBox.getSelectionModel().select(diffViewPreference);
 
-        diffHighlightingMethodToggleGroup.selectToggle(guiPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
+        diffHighlightingMethodToggleGroup.selectToggle(mergeDialogPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
     }
 
     public void saveToolbarConfiguration() {
-        preferencesService.getGuiPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
-        preferencesService.getGuiPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
+        preferencesService.getMergeDialogPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
+        preferencesService.getMergeDialogPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
 
         boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
-        preferencesService.getGuiPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
+        preferencesService.getMergeDialogPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {

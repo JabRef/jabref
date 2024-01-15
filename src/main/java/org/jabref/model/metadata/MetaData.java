@@ -150,7 +150,7 @@ public class MetaData {
         if (defaultValue.isEmpty()) {
             defaultCiteKeyPattern = null;
         } else {
-            defaultCiteKeyPattern = defaultValue.get(0);
+            defaultCiteKeyPattern = defaultValue.getFirst();
         }
 
         postChange();
@@ -367,24 +367,23 @@ public class MetaData {
         if (this == o) {
             return true;
         }
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof MetaData that)) {
             return false;
         }
-        MetaData metaData = (MetaData) o;
-        return (isProtected == metaData.isProtected)
-                && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
-                && Objects.equals(encoding, metaData.encoding)
-                && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
-                && Objects.equals(saveOrder, metaData.saveOrder)
-                && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
-                && Objects.equals(userFileDirectory, metaData.userFileDirectory)
-                && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
-                && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions)
-                && (mode == metaData.mode)
-                && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
-                && Objects.equals(contentSelectors, metaData.contentSelectors)
-                && Objects.equals(versionDBStructure, metaData.versionDBStructure);
+        return (isProtected == that.isProtected)
+                && Objects.equals(groupsRoot.getValue(), that.groupsRoot.getValue())
+                && Objects.equals(encoding, that.encoding)
+                && Objects.equals(encodingExplicitlySupplied, that.encodingExplicitlySupplied)
+                && Objects.equals(saveOrder, that.saveOrder)
+                && Objects.equals(citeKeyPatterns, that.citeKeyPatterns)
+                && Objects.equals(userFileDirectory, that.userFileDirectory)
+                && Objects.equals(laTexFileDirectory, that.laTexFileDirectory)
+                && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
+                && Objects.equals(saveActions, that.saveActions)
+                && (mode == that.mode)
+                && Objects.equals(defaultFileDirectory, that.defaultFileDirectory)
+                && Objects.equals(contentSelectors, that.contentSelectors)
+                && Objects.equals(versionDBStructure, that.versionDBStructure);
     }
 
     @Override

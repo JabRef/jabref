@@ -11,6 +11,31 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+
+### Changed
+
+- The "Automatically open folders of attached files" preference default status has been changed to enabled on Windows. [koppor#56](https://github.com/koppor/jabref/issues/56)
+- The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
+- The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
+- The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
+- We changed the order of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
+- Sub libraries based on `aux` file can now also be generated if some citeations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
+
+### Fixed
+
+- We fixed an issue where attempting to cancel the importing/generation of an entry from id is ignored. [#10508](https://github.com/JabRef/jabref/issues/10508)
+- We fixed an issue where the preview panel showing the wrong entry (an entry that is not selected in the entry table). [#9172](https://github.com/JabRef/jabref/issues/9172)
+- The last page of a PDF is now indexed by the full text search. [#10193](https://github.com/JabRef/jabref/issues/10193)
+- We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
+- We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
+
+### Removed
+
+## [5.12] – 2023-12-24
+
+### Added
+
 - We added a scite.ai tab in the entry editor that retrieves 'Smart Citation' tallies for citations that have a DOI. [koppor#375](https://github.com/koppor/jabref/issues/375)  
 - We added a dropdown menu to let users change the reference library during AUX file import. [#10472](https://github.com/JabRef/jabref/issues/10472)
 - We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
@@ -18,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added [scholar.archive.org](https://scholar.archive.org/) as a new fetcher. [#10498](https://github.com/JabRef/jabref/issues/10498)
 - We integrated predatory journal checking as part of the Integrity Checker based on the [check-bib-for-predatory](https://github.com/CfKu/check-bib-for-predatory). [koppor#348](https://github.com/koppor/jabref/issues/348)
 - We added a 'More options' section in the main table right click menu opening the preferences dialog. [#9432](https://github.com/JabRef/jabref/issues/9432)
+- When creating a new group, it inherits the icon of the parent group. [#10521](https://github.com/JabRef/jabref/pull/10521)
 
 ### Changed
 
@@ -43,9 +69,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - We removed duplicate filtering and sorting operations in the MainTable when editing BibEntries. [#10619](https://github.com/JabRef/jabref/pull/10619)
-
-
-
 
 ## [5.11] – 2023-10-22
 
@@ -1202,7 +1225,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.11...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.12...HEAD
+[5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
 [5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10
 [5.9]: https://github.com/JabRef/jabref/compare/v5.8...v5.9

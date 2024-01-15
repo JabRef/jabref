@@ -196,7 +196,7 @@ public class EntryTypeViewModel {
                         Localization.lang("Return to dialog"));
                 if (addEntryFlag) {
                     new NewEntryAction(
-                            libraryTab.frame(),
+                            () -> libraryTab,
                             StandardEntryType.Article,
                             dialogService,
                             preferencesService,
@@ -210,5 +210,9 @@ public class EntryTypeViewModel {
             fetcherWorker = new FetcherWorker();
         });
         taskExecutor.execute(fetcherWorker);
+    }
+
+    public void cancelFetcherWorker() {
+        fetcherWorker.cancel();
     }
 }

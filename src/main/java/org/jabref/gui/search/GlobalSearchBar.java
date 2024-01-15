@@ -43,7 +43,7 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
@@ -109,7 +109,11 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
+    public GlobalSearchBar(LibraryTabContainer tabContainer,
+                           StateManager stateManager,
+                           PreferencesService preferencesService,
+                           CountingUndoManager undoManager,
+                           DialogService dialogService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -119,7 +123,7 @@ public class GlobalSearchBar extends HBox {
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
-        // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
+        // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
         currentResults.setPrefWidth(150);
 
         searchField.setTooltip(searchFieldTooltip);
@@ -134,7 +138,7 @@ public class GlobalSearchBar extends HBox {
                 if (keyBinding.get() == KeyBinding.CLOSE) {
                     // Clear search and select first entry, if available
                     searchField.setText("");
-                    frame.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
+                    tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
                     event.consume();
                 }
             }
@@ -144,7 +148,8 @@ public class GlobalSearchBar extends HBox {
                 keyBindingRepository,
                 stateManager,
                 searchField,
-                frame));
+                tabContainer,
+                undoManager));
 
         ObservableList<String> search = stateManager.getWholeSearchHistory();
         search.addListener((ListChangeListener.Change<? extends String> change) -> {
@@ -152,7 +157,8 @@ public class GlobalSearchBar extends HBox {
                     keyBindingRepository,
                     stateManager,
                     searchField,
-                    frame));
+                    tabContainer,
+                    undoManager));
         });
 
         ClipBoardManager.addX11Support(searchField);

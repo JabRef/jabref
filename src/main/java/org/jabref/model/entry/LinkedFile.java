@@ -18,15 +18,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents the link to an external file (e.g. associated PDF file).
  * This class is {@link Serializable} which is needed for drag and drop in gui
  */
 @AllowedToUseLogic("Uses FileUtil from logic")
+@NullMarked
 public class LinkedFile implements Serializable {
 
     private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
@@ -43,8 +48,12 @@ public class LinkedFile implements Serializable {
         this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
     }
 
+    public LinkedFile(String description, String link, FileType fileType) {
+        this(description, link, fileType.getName());
+    }
+
     /**
-     * Constructor for non-valid paths. We need to parse them, because the GUI needs to render it.
+     * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
      */
     public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
@@ -80,6 +89,10 @@ public class LinkedFile implements Serializable {
         this.fileType.setValue(fileType);
     }
 
+    public void setFileType(FileType fileType) {
+        this.setFileType(fileType.getName());
+    }
+
     public String getDescription() {
         return description.get();
     }
@@ -105,7 +118,7 @@ public class LinkedFile implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
@@ -128,7 +141,7 @@ public class LinkedFile implements Serializable {
     }
 
     /**
-     * Reads serialized object from ObjectInputStreamm, automatically called
+     * Reads serialized object from {@link ObjectInputStream}, automatically called
      */
     private void readObject(ObjectInputStream in) throws IOException {
         fileType = new SimpleStringProperty(in.readUTF());

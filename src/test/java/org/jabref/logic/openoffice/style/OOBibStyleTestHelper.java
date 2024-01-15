@@ -95,7 +95,7 @@ class OOBibStyleTestHelper {
             if (num.size() != 1) {
                 throw new IllegalArgumentException("Numeric label for the bibliography with " + num.size() + " numbers?");
             }
-            int n = num.get(0);
+            int n = num.getFirst();
             CitationMarkerNumericBibEntryImpl x =
                     new CitationMarkerNumericBibEntryImpl("key",
                             n == 0 ? Optional.empty() : Optional.of(n));

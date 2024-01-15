@@ -96,10 +96,7 @@ public abstract class Importer implements Comparable<Importer> {
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, charset));
             ParserResult parserResult = importDatabase(bufferedReader);
-
-            // store the detected encoding
             parserResult.getMetaData().setEncoding(charset);
-
             parserResult.setPath(filePath);
 
             // Make sure the mode is always set

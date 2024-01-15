@@ -12,8 +12,7 @@ import java.util.SortedSet;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
@@ -48,7 +47,7 @@ public class ImportCommand extends SimpleCommand {
 
     public enum ImportMethod { AS_NEW, TO_EXISTING }
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final ImportMethod importMethod;
 
     private final DialogService dialogService;
@@ -56,14 +55,14 @@ public class ImportCommand extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    public ImportCommand(JabRefFrame frame,
+    public ImportCommand(LibraryTabContainer tabContainer,
                          ImportMethod importMethod,
                          PreferencesService preferencesService,
                          StateManager stateManager,
                          FileUpdateMonitor fileUpdateMonitor,
                          TaskExecutor taskExecutor,
                          DialogService dialogService) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.importMethod = importMethod;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -107,7 +106,7 @@ public class ImportCommand extends SimpleCommand {
 
         if (importMethod == ImportMethod.AS_NEW) {
             task.onSuccess(parserResult -> {
-                    frame.addTab(parserResult.getDatabaseContext(), true);
+                    tabContainer.addTab(parserResult.getDatabaseContext(), true);
                     dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
                 })
                 .onFailure(ex -> {
@@ -116,9 +115,7 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            final LibraryTab libraryTab = frame.getCurrentLibraryTab();
-
-            ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tabContainer.getCurrentLibraryTab().getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }

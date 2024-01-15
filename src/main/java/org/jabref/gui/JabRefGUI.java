@@ -3,14 +3,17 @@ package org.jabref.gui;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -20,19 +23,24 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents the outer stage and the scene of the JabRef window.
+ */
 public class JabRefGUI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;
+    private static DialogService dialogService;
+    private static ThemeManager themeManager;
+
+    private final Stage mainStage;
     private final PreferencesService preferencesService;
-    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final List<UiCommand> uiCommands;
     private boolean correctedWindowPos;
@@ -41,21 +49,38 @@ public class JabRefGUI {
                      List<UiCommand> uiCommands,
                      PreferencesService preferencesService,
                      FileUpdateMonitor fileUpdateMonitor) {
+        this.mainStage = mainStage;
         this.uiCommands = uiCommands;
         this.preferencesService = preferencesService;
-        this.fileUpdateMonitor = fileUpdateMonitor;
+
         this.correctedWindowPos = false;
 
         WebViewStore.init();
 
-        mainFrame = new JabRefFrame(mainStage);
+        JabRefGUI.themeManager = new ThemeManager(
+                preferencesService.getWorkspacePreferences(),
+                fileUpdateMonitor,
+                Runnable::run);
+        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+        JabRefGUI.mainFrame = new JabRefFrame(
+                mainStage,
+                dialogService,
+                fileUpdateMonitor,
+                preferencesService);
 
-        openWindow(mainStage);
+        openWindow();
+
+        if (!(fileUpdateMonitor.isActive())) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to monitor file changes. Please close files " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
+        }
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
                 new VersionWorker(Globals.BUILD_INFO.version,
-                        mainFrame.getDialogService(),
+                        dialogService,
                         Globals.TASK_EXECUTOR,
                         preferencesService)
                         .checkForNewVersionDelayed();
@@ -77,7 +102,6 @@ public class JabRefGUI {
             return;
         }
 
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         Optional<String> password = dialogService.showPasswordDialogAndWait(
                 Localization.lang("Proxy configuration"),
                 Localization.lang("Proxy requires password"),
@@ -91,23 +115,15 @@ public class JabRefGUI {
         }
     }
 
-    private void openWindow(Stage mainStage) {
+    private void openWindow() {
         LOGGER.debug("Initializing frame");
-        mainFrame.init();
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
-        // Set the min-width and min-height for the main window
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
-
-        if (guiPreferences.isWindowFullscreen()) {
-            mainStage.setFullScreen(true);
-        }
-        // Restore window location and/or maximised state
-        if (guiPreferences.isWindowMaximised()) {
-            mainStage.setMaximized(true);
-        }
+        mainStage.setFullScreen(guiPreferences.isWindowFullscreen());
+        mainStage.setMaximized(guiPreferences.isWindowMaximised());
         if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
             LOGGER.debug("The Jabref window is outside the main screen");
@@ -130,7 +146,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeManager().installCss(scene);
+        themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
@@ -138,30 +154,33 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
+        mainStage.setOnCloseRequest(this::onCloseRequest);
+        mainStage.setOnHiding(this::onHiding);
         mainStage.show();
 
-        mainStage.setOnCloseRequest(event -> {
-            if (!correctedWindowPos) {
-                // saves the window position only if its not  corrected -> the window will rest at the old Position,
-                // if the external Screen is connected again.
-                getMainFrame().saveWindowState();
-            }
-            boolean reallyQuit = mainFrame.quit();
-            if (!reallyQuit) {
-                event.consume();
-            }
-        });
-        mainFrame.handleUiCommands(uiCommands);
+        Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
+    }
 
-        if (!(fileUpdateMonitor.isActive())) {
-            getMainFrame().getDialogService()
-                          .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
-                                  "and processes and restart. You may encounter errors if you continue " +
-                                  "with this session."));
+    public void onCloseRequest(WindowEvent event) {
+        if (!mainFrame.close()) {
+            event.consume();
         }
     }
 
-    private void saveWindowState(Stage mainStage) {
+    public void onHiding(WindowEvent event) {
+        if (!correctedWindowPos) {
+            // saves the window position only if its not corrected -> the window will rest at the old Position,
+            // if the external Screen is connected again.
+            saveWindowState();
+        }
+
+        preferencesService.flush();
+
+        // Goodbye!
+        Platform.exit();
+    }
+
+    private void saveWindowState() {
         GuiPreferences preferences = preferencesService.getGuiPreferences();
         preferences.setPositionX(mainStage.getX());
         preferences.setPositionY(mainStage.getY());
@@ -202,5 +221,13 @@ public class JabRefGUI {
 
     public static JabRefFrame getMainFrame() {
         return mainFrame;
+    }
+
+    public static DialogService getDialogService() {
+        return dialogService;
+    }
+
+    public static ThemeManager getThemeManager() {
+        return themeManager;
     }
 }

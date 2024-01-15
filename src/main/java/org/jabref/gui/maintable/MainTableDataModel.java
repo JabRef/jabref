@@ -29,7 +29,7 @@ import com.tobiasdiez.easybind.EasyBind;
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
-    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
     private final GroupsPreferences groupsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
@@ -38,8 +38,8 @@ public class MainTableDataModel {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
-        this.fieldValueFormatter = new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+
+        resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
@@ -96,7 +96,7 @@ public class MainTableDataModel {
         return entriesFilteredAndSorted;
     }
 
-    public void refresh() {
+    public void resetFieldFormatter() {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }
 }

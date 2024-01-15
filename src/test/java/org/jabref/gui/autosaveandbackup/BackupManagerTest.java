@@ -141,6 +141,7 @@ public class BackupManagerTest {
         var filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
+        when(filePreferences.shouldCreateBackup()).thenReturn(false);
 
         BackupManager manager = BackupManager.start(
                 mock(LibraryTab.class),
@@ -149,7 +150,7 @@ public class BackupManagerTest {
                 preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
-        BackupManager.shutdown(database, backupDir, false);
+        BackupManager.shutdown(database, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
 
         List<Path> files = Files.list(backupDir).toList();
         assertEquals(Collections.emptyList(), files);
@@ -185,6 +186,6 @@ public class BackupManagerTest {
         List<Path> files = Files.list(backupDir).sorted().toList();
         // we only know the first backup path because the second one is created on shutdown
         // due to timing issues we cannot test that reliable
-        assertEquals(fullBackupPath.get(), files.get(0));
+        assertEquals(fullBackupPath.get(), files.getFirst());
     }
 }

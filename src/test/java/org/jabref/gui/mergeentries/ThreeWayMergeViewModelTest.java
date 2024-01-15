@@ -56,7 +56,7 @@ public class ThreeWayMergeViewModelTest {
 
     @Test
     void getVisibleFieldsShouldHaveEntryTypeFieldAtTheHeadOfTheList() {
-        assertEquals(InternalField.TYPE_HEADER, visibleFields.get(0));
+        assertEquals(InternalField.TYPE_HEADER, visibleFields.getFirst());
     }
 
     @Test

@@ -66,7 +66,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
             case null, default -> {
                 assert field != null;
-                throw new IllegalStateException(String.format("Unable to instantiate a view model for identifier field editor '%s'", field.getDisplayName()));
+                throw new IllegalStateException("Unable to instantiate a view model for identifier field editor '%s'".formatted(field.getDisplayName()));
             }
         }
 

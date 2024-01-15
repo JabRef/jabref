@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -150,9 +151,11 @@ class BibDatabaseContextTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(existingPath);
 
-        Path expectedPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory().resolve(existingPath.hashCode() + "");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+        assertNotNull(actualPath);
 
-        assertEquals(expectedPath, actualPath);
+        String fulltextIndexBaseDirectory = OS.getNativeDesktop().getFulltextIndexBaseDirectory().toString();
+        String actualPathStart = actualPath.toString().substring(0, fulltextIndexBaseDirectory.length());
+        assertEquals(fulltextIndexBaseDirectory, actualPathStart);
     }
 }

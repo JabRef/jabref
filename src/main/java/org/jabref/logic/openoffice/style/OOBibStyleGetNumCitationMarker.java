@@ -97,7 +97,7 @@ class OOBibStyleGetNumCitationMarker {
 
         if (blockSize == 1) {
             // Add single entry:
-            CitationMarkerNumericEntry entry = block.get(0);
+            CitationMarkerNumericEntry entry = block.getFirst();
             final Optional<Integer> num = entry.getNumber();
             stringBuilder.append(num.isEmpty()
                                  ? (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
@@ -135,7 +135,7 @@ class OOBibStyleGetNumCitationMarker {
              */
 
             if (blockSize >= minGroupingCount) {
-                int first = block.get(0).getNumber().get();
+                int first = block.getFirst().getNumber().get();
                 int last = block.get(blockSize - 1).getNumber().get();
                 if (last != (first + blockSize - 1)) {
                     throw new IllegalArgumentException("blockSize and length of num range differ");
@@ -223,7 +223,7 @@ class OOBibStyleGetNumCitationMarker {
             if (currentBlock.isEmpty()) {
                 currentBlock.add(current);
             } else {
-                CitationMarkerNumericEntry prev = currentBlock.get(currentBlock.size() - 1);
+                CitationMarkerNumericEntry prev = currentBlock.getLast();
                 if (current.getNumber().isEmpty() || prev.getNumber().isEmpty()) {
                     nextBlock.add(current); // do not join if not found
                 } else if (joinIsDisabled) {

@@ -78,12 +78,11 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
             if (dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), msg, Localization.lang("Add entry manually"))) {
                 // add entry manually
-                new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
+                new NewEntryAction(() -> libraryTab, StandardEntryType.Article, dialogService,
                                    preferencesService, stateManager).execute();
             }
         });
-        backgroundTask.onSuccess(bibEntry -> {
-            Optional<BibEntry> result = bibEntry;
+        backgroundTask.onSuccess(result -> {
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
                 ImportHandler handler = new ImportHandler(

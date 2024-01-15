@@ -406,7 +406,7 @@ public class ModsImporter extends Importer implements Parser {
                 if (RecordInfo.elementNameSet.contains(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        recordContents.add(0, reader.getText());
+                        recordContents.addFirst(reader.getText());
                     }
                 } else if ("languageTerm".equals(reader.getName().getLocalPart())) {
                     reader.next();

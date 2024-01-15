@@ -52,7 +52,7 @@ public class RangeSort {
         if (rangeHolders.isEmpty()) {
             return;
         }
-        XText text = rangeHolders.get(0).getRange().getText();
+        XText text = rangeHolders.getFirst().getRange().getText();
         rangeHolders.sort(new HolderComparatorWithinPartition(text));
     }
 

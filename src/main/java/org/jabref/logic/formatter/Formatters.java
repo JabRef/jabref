@@ -3,9 +3,11 @@ package org.jabref.logic.formatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
@@ -39,6 +41,12 @@ import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
+
+    private static Map<String, Formatter> keyToFormatterMap;
+
+    static {
+        keyToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getKey, f -> f));
+    }
 
     private Formatters() {
     }
@@ -92,6 +100,11 @@ public class Formatters {
         return all;
     }
 
+    public static Optional<Formatter> getFormatterForKey(String name) {
+        Objects.requireNonNull(name);
+        return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
+    }
+
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
         Objects.requireNonNull(modifier);
 
@@ -115,7 +128,7 @@ public class Formatters {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
-            return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
+            return getFormatterForKey(modifier);
         }
     }
 }

@@ -68,13 +68,13 @@ public class ActionHelper {
             List<LinkedFile> files = entry.getFiles();
 
             if ((!entry.getFiles().isEmpty()) && stateManager.getActiveDatabase().isPresent()) {
-                if (files.get(0).isOnlineLink()) {
+                if (files.getFirst().isOnlineLink()) {
                     return true;
                 }
 
                 Optional<Path> filename = FileUtil.find(
                         stateManager.getActiveDatabase().get(),
-                        files.get(0).getLink(),
+                        files.getFirst().getLink(),
                         preferencesService.getFilePreferences());
                 return filename.isPresent();
             } else {

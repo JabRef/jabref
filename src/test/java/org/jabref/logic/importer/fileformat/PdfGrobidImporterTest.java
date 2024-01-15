@@ -53,7 +53,7 @@ public class PdfGrobidImporterTest {
 
         assertEquals(1, bibEntries.size());
 
-        BibEntry be0 = bibEntries.get(0);
+        BibEntry be0 = bibEntries.getFirst();
         assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
     }
