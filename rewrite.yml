@@ -102,9 +102,12 @@ recipeList:
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
+  - org.openrewrite.java.migrate.lang.StringFormatted
+  - org.openrewrite.java.migrate.util.SequencedCollection
 
   - org.openrewrite.java.recipes.UseJavaParserBuilderInJavaTemplate
 
+  - org.openrewrite.java.RemoveObjectsIsNull
   - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
   - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
@@ -197,4 +200,4 @@ recipeList:
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
 
   - org.openrewrite.java.testing.junit5.CleanupAssertions
-#  - org.openrewrite.java.testing.junit5.JUnit5BestPractices
+  - org.openrewrite.java.testing.junit5.JUnit5BestPractices

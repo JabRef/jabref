@@ -27,13 +27,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class GrobidServiceTest {
+class GrobidServiceTest {
 
     private static GrobidService grobidService;
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -45,7 +45,7 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processValidCitationTest() throws IOException, ParseException {
+    void processValidCitationTest() throws IOException, ParseException {
         BibEntry exampleBibEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("-1")
                 .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
@@ -67,14 +67,14 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processEmptyStringTest() throws IOException, ParseException {
+    void processEmptyStringTest() throws IOException, ParseException {
         Optional<BibEntry> response = grobidService.processCitation(" ", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         assertNotNull(response);
         assertEquals(Optional.empty(), response);
     }
 
     @Test
-    public void processInvalidCitationTest() {
+    void processInvalidCitationTest() {
         assertThrows(IOException.class, () -> grobidService.processCitation(
                 "Iiiiiiiiiiiiiiiiiiiiiiii",
                 importFormatPreferences,
@@ -82,7 +82,7 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void failsWhenGrobidDisabled() {
+    void failsWhenGrobidDisabled() {
         GrobidPreferences importSettingsWithGrobidDisabled = new GrobidPreferences(
                 false,
                 false,
@@ -91,7 +91,7 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processPdfTest() throws IOException, ParseException, URISyntaxException {
+    void processPdfTest() throws IOException, ParseException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());

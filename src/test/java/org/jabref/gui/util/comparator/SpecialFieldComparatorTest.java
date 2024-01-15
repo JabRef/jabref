@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SpecialFieldComparatorTest {
+class SpecialFieldComparatorTest {
 
     private SpecialFieldComparator comparator;
     private final SpecialFieldValue value1 = SpecialFieldValue.PRIORITY_HIGH;
@@ -21,42 +21,42 @@ public class SpecialFieldComparatorTest {
     private final Optional<SpecialFieldValueViewModel> read = Optional.of(new SpecialFieldValueViewModel(value3));
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         comparator = new SpecialFieldComparator();
     }
 
     @Test
-    public void compareHigherPriorityFirst() {
+    void compareHigherPriorityFirst() {
         assertEquals(-2, comparator.compare(prio1, prio3));
     }
 
     @Test
-    public void compareLowerPriorityFirst() {
+    void compareLowerPriorityFirst() {
         assertEquals(2, comparator.compare(prio3, prio1));
     }
 
     @Test
-    public void compareSamePriority() {
+    void compareSamePriority() {
         assertEquals(0, comparator.compare(prio1, prio1));
     }
 
     @Test
-    public void compareUnrelatedFields() {
+    void compareUnrelatedFields() {
         assertEquals(-11, comparator.compare(prio1, read));
     }
 
     @Test
-    public void compareTwoEmptyInputs() {
+    void compareTwoEmptyInputs() {
         assertEquals(0, comparator.compare(Optional.empty(), Optional.empty()));
     }
 
     @Test
-    public void compareTwoInputsWithFirstEmpty() {
+    void compareTwoInputsWithFirstEmpty() {
         assertEquals(1, comparator.compare(Optional.empty(), prio1));
     }
 
     @Test
-    public void compareTwoInputsWithSecondEmpty() {
+    void compareTwoInputsWithSecondEmpty() {
         assertEquals(-1, comparator.compare(prio1, Optional.empty()));
     }
 }

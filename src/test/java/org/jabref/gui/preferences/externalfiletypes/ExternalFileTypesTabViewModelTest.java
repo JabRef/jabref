@@ -54,18 +54,18 @@ public class ExternalFileTypesTabViewModelTest {
     }
 
     @Test
-    public void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue() {
+    void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue() {
         assertTrue(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel));
     }
 
     @Test
-    public void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse() {
+    void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse() {
         this.setupViewModelWithoutName();
         assertFalse(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel));
     }
 
     @Test
-    public void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
+    void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
         ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
         doAnswer(mocked -> {
             ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
@@ -81,7 +81,7 @@ public class ExternalFileTypesTabViewModelTest {
     }
 
     @Test
-    public void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed() {
+    void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed() {
         setupViewModelWithoutName();
         ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
         doAnswer(mocked -> {

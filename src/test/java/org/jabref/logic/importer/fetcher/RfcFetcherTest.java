@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class RfcFetcherTest {
+class RfcFetcherTest {
 
     private RfcFetcher fetcher = new RfcFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     private BibEntry bibEntry = new BibEntry(StandardEntryType.Misc)
@@ -39,12 +39,12 @@ public class RfcFetcherTest {
             .withField(StandardField.ABSTRACT, "The Hypertext Transfer Protocol (HTTP) is an application-level protocol with the lightness and speed necessary for distributed, collaborative, hypermedia information systems. This memo provides information for the Internet community. This memo does not specify an Internet standard of any kind.");
 
     @Test
-    public void getNameReturnsEqualIdName() {
+    void getNameReturnsEqualIdName() {
         assertEquals("RFC", fetcher.getName());
     }
 
     @Test
-    public void performSearchByIdFindsEntryWithDraftIdentifier() throws Exception {
+    void performSearchByIdFindsEntryWithDraftIdentifier() throws Exception {
         BibEntry bibDraftEntry = new BibEntry(StandardEntryType.TechReport)
                 .withField(InternalField.KEY_FIELD, "fielding-http-spec-01")
                 .withField(StandardField.AUTHOR, "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee")
@@ -67,12 +67,12 @@ public class RfcFetcherTest {
 
     @ParameterizedTest
     @CsvSource({"rfc1945", "RFC1945", "1945"})
-    public void performSearchByIdFindsEntry(String identifier) throws Exception {
+    void performSearchByIdFindsEntry(String identifier) throws Exception {
         assertEquals(Optional.of(bibEntry), fetcher.performSearchById(identifier));
     }
 
     @Test
-    public void performSearchByIdFindsNothingWithoutIdentifier() throws Exception {
+    void performSearchByIdFindsNothingWithoutIdentifier() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
@@ -83,7 +83,7 @@ public class RfcFetcherTest {
             "RFC9999",
             // invalid identifier
             "banana"})
-    public void performSearchByIdFindsNothingWithValidDraftIdentifier(String identifier) throws Exception {
+    void performSearchByIdFindsNothingWithValidDraftIdentifier(String identifier) throws Exception {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById(identifier));
     }
 }

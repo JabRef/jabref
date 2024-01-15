@@ -35,7 +35,7 @@ class ImportFormatReaderIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void testImportUnknownFormat(String resource, String format, int count) throws Exception {
+    void importUnknownFormat(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
         assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
@@ -43,14 +43,14 @@ class ImportFormatReaderIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void testImportFormatFromFile(String resource, String format, int count) throws Exception {
+    void importFormatFromFile(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
     }
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void testImportUnknownFormatFromString(String resource, String format, int count) throws Exception {
+    void importUnknownFormatFromString(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         String data = Files.readString(file);
         assertEquals(count, reader.importUnknownFormat(data).parserResult().getDatabase().getEntries().size());

@@ -14,13 +14,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class PersonNamesCheckerTest {
+class PersonNamesCheckerTest {
 
     private PersonNamesChecker checker;
     private PersonNamesChecker checkerb;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new PersonNamesChecker(databaseContext);
@@ -31,7 +31,7 @@ public class PersonNamesCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideValidNames")
-    public void validNames(String name) {
+    void validNames(String name) {
         assertEquals(Optional.empty(), checker.checkValue(name));
     }
 
@@ -53,20 +53,20 @@ public class PersonNamesCheckerTest {
     }
 
     @Test
-    public void complainAboutPersonStringWithTwoManyCommas() {
+    void complainAboutPersonStringWithTwoManyCommas() {
         assertEquals(Optional.of("Names are not in the standard BibTeX format."),
                 checker.checkValue("Test1, Test2, Test3, Test4, Test5, Test6"));
     }
 
     @ParameterizedTest
     @MethodSource("provideCorrectFormats")
-    public void authorNameInCorrectFormatsShouldNotComplain(String input) {
+    void authorNameInCorrectFormatsShouldNotComplain(String input) {
         assertEquals(Optional.empty(), checkerb.checkValue(input));
     }
 
     @ParameterizedTest
     @MethodSource("provideIncorrectFormats")
-    public void authorNameInIncorrectFormatsShouldComplain(String input) {
+    void authorNameInIncorrectFormatsShouldComplain(String input) {
         assertNotEquals(Optional.empty(), checkerb.checkValue(input));
     }
 

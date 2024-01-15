@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class TruncateFormatterTest {
+class TruncateFormatterTest {
     private final String TITLE = "A Title";
 
     @Test

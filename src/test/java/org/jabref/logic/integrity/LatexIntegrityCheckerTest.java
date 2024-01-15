@@ -15,7 +15,7 @@ import uk.ac.ed.ph.snuggletex.definitions.CoreErrorCode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LatexIntegrityCheckerTest {
+class LatexIntegrityCheckerTest {
 
     private final LatexIntegrityChecker checker = new LatexIntegrityChecker();
     private final BibEntry entry = new BibEntry();

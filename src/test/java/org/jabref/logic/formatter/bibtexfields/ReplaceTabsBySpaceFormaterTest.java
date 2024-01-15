@@ -6,27 +6,27 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ReplaceTabsBySpaceFormaterTest {
+class ReplaceTabsBySpaceFormaterTest {
 
     private ReplaceTabsBySpaceFormater formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new ReplaceTabsBySpaceFormater();
     }
 
     @Test
-    public void removeSingleTab() {
+    void removeSingleTab() {
         assertEquals("single tab", formatter.format("single\ttab"));
     }
 
     @Test
-    public void removeMultipleTabs() {
+    void removeMultipleTabs() {
         assertEquals("multiple tabs", formatter.format("multiple\t\ttabs"));
     }
 
     @Test
-    public void doNothingIfNoTab() {
+    void doNothingIfNoTab() {
         assertEquals("notab", formatter.format("notab"));
     }
 }

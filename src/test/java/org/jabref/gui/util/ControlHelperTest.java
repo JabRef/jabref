@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ControlHelperTest {
+class ControlHelperTest {
 
     private final String TEXT = "abcdef";
     private final int MAX_CHARACTERS = 5;

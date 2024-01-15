@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-public class ScholarArchiveFetcherTest {
+class ScholarArchiveFetcherTest {
     private ScholarArchiveFetcher fetcher;
     private BibEntry bibEntry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fetcher = new ScholarArchiveFetcher();
         bibEntry = new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.TITLE, "Query expansion using associated queries")
@@ -35,12 +35,12 @@ public class ScholarArchiveFetcherTest {
     }
 
     @Test
-    public void getNameReturnsCorrectName() {
+    void getNameReturnsCorrectName() {
         assertEquals("ScholarArchive", fetcher.getName());
     }
 
     @Test
-    public void performSearchReturnsExpectedResults() throws FetcherException {
+    void performSearchReturnsExpectedResults() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("query");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertTrue(fetchedEntries.contains(bibEntry), "Found the following entries " + fetchedEntries);

@@ -26,12 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PdfSearcherTest {
+class PdfSearcherTest {
 
     private PdfSearcher search;
 
     @BeforeEach
-    public void setUp(@TempDir Path indexDir) throws IOException {
+    void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
 
         BibDatabase database = new BibDatabase();
@@ -63,13 +63,13 @@ public class PdfSearcherTest {
     }
 
     @Test
-    public void searchForTest() throws IOException, ParseException {
+    void searchForTest() throws IOException, ParseException {
         PdfSearchResults result = search.search("test", 10);
         assertEquals(10, result.numSearchResults());
     }
 
     @Test
-    public void searchForUniversity() throws IOException, ParseException {
+    void searchForUniversity() throws IOException, ParseException {
         PdfSearchResults result = search.search("University", 10);
         assertEquals(2, result.numSearchResults());
         List<SearchResult> searchResults = result.getSearchResults();
@@ -78,36 +78,36 @@ public class PdfSearcherTest {
     }
 
     @Test
-    public void searchForStopWord() throws IOException, ParseException {
+    void searchForStopWord() throws IOException, ParseException {
         PdfSearchResults result = search.search("and", 10);
         assertEquals(0, result.numSearchResults());
     }
 
     @Test
-    public void searchForSecond() throws IOException, ParseException {
+    void searchForSecond() throws IOException, ParseException {
         PdfSearchResults result = search.search("second", 10);
         assertEquals(4, result.numSearchResults());
     }
 
     @Test
-    public void searchForAnnotation() throws IOException, ParseException {
+    void searchForAnnotation() throws IOException, ParseException {
         PdfSearchResults result = search.search("annotation", 10);
         assertEquals(2, result.numSearchResults());
     }
 
     @Test
-    public void searchForEmptyString() throws IOException {
+    void searchForEmptyString() throws IOException {
         PdfSearchResults result = search.search("", 10);
         assertEquals(0, result.numSearchResults());
     }
 
     @Test
-    public void searchWithNullString() throws IOException {
+    void searchWithNullString() throws IOException {
         assertThrows(NullPointerException.class, () -> search.search(null, 10));
     }
 
     @Test
-    public void searchForZeroResults() throws IOException {
+    void searchForZeroResults() throws IOException {
         assertThrows(IllegalArgumentException.class, () -> search.search("test", 0));
     }
 }

@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
-public class BvbFetcherTest {
+class BvbFetcherTest {
 
     BvbFetcher fetcher = new BvbFetcher();
     BibEntry bibEntryISBN0134685997;
     BibEntry bibEntryISBN9783960886402;
 
     @Test
-    void testPerformTest() throws Exception {
+    void performTest() throws Exception {
         String searchquery = "effective java author:bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
         assertFalse(result.isEmpty());
@@ -39,7 +39,7 @@ public class BvbFetcherTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fetcher = new BvbFetcher();
 
         bibEntryISBN9783960886402 = new BibEntry(StandardEntryType.Misc)
@@ -69,12 +69,12 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    void getName() {
         assertEquals("Bibliotheksverbund Bayern (Experimental)", fetcher.getName());
     }
 
     @Test
-    public void simpleSearchQueryURLCorrect() throws Exception {
+    void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
@@ -82,7 +82,7 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void complexSearchQueryURLCorrect() throws Exception {
+    void complexSearchQueryURLCorrect() throws Exception {
         String query = "title:jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
@@ -90,14 +90,14 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
+    void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
         assertEquals(bibEntryISBN9783960886402, searchResult.getFirst());
         assertEquals(bibEntryISBN0134685997, searchResult.get(1));
     }
 
     @Test
-    public void testPerformSearchEmpty() throws FetcherException {
+    void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }

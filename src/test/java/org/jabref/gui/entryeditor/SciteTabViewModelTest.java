@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SciteTabViewModelTest {
+class SciteTabViewModelTest {
 
     @Mock
     private PreferencesService preferencesService;
@@ -34,7 +34,7 @@ public class SciteTabViewModelTest {
     }
 
     @Test
-    public void testSciteTallyDTO() {
+    void sciteTallyDTO() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("total", 1);
         jsonObject.put("supporting", 2);
@@ -56,7 +56,7 @@ public class SciteTabViewModelTest {
     }
 
     @Test
-    void testFetchTallies() throws FetcherException {
+    void fetchTallies() throws FetcherException {
         var viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
         DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
         var actual = DOI.parse(viewModel.fetchTallies(doi).doi());

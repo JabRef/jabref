@@ -5,20 +5,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class OrdinalTest {
+class OrdinalTest {
 
     @Test
-    public void testEmpty() {
+    void empty() {
         assertEquals("", new Ordinal().format(""));
     }
 
     @Test
-    public void testNull() {
+    void testNull() {
         assertNull(new Ordinal().format(null));
     }
 
     @Test
-    public void testSingleDigit() {
+    void singleDigit() {
         assertEquals("1st", new Ordinal().format("1"));
         assertEquals("2nd", new Ordinal().format("2"));
         assertEquals("3rd", new Ordinal().format("3"));
@@ -26,28 +26,28 @@ public class OrdinalTest {
     }
 
     @Test
-    public void testMultiDigits() {
+    void multiDigits() {
         assertEquals("11th", new Ordinal().format("11"));
         assertEquals("111th", new Ordinal().format("111"));
         assertEquals("21st", new Ordinal().format("21"));
     }
 
     @Test
-    public void testAlreadyOrdinals() {
+    void alreadyOrdinals() {
         assertEquals("1st", new Ordinal().format("1st"));
         assertEquals("111th", new Ordinal().format("111th"));
         assertEquals("22nd", new Ordinal().format("22nd"));
     }
 
     @Test
-    public void testFullSentence() {
+    void fullSentence() {
         assertEquals("1st edn.", new Ordinal().format("1 edn."));
         assertEquals("1st edition", new Ordinal().format("1st edition"));
         assertEquals("The 2nd conference on 3rd.14th", new Ordinal().format("The 2 conference on 3.14"));
     }
 
     @Test
-    public void testLetters() {
+    void letters() {
         assertEquals("abCD eFg", new Ordinal().format("abCD eFg"));
     }
 }

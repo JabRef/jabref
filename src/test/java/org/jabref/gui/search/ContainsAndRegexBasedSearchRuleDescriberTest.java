@@ -29,7 +29,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
     }
 
     @Test
-    void testSimpleTerm() {
+    void simpleTerm() {
         String query = "test";
         List<Text> expectedTexts = List.of(
                 TooltipTextUtil.createText("This search contains entries in which any field contains the term "),
@@ -41,7 +41,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
     }
 
     @Test
-    void testNoAst() {
+    void noAst() {
         String query = "a b";
         List<Text> expectedTexts = List.of(
                 TooltipTextUtil.createText("This search contains entries in which any field contains the term "),
@@ -55,7 +55,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
     }
 
     @Test
-    void testNoAstRegex() {
+    void noAstRegex() {
         String query = "a b";
         List<Text> expectedTexts = List.of(
                 TooltipTextUtil.createText("This search contains entries in which any field contains the regular expression "),
@@ -69,7 +69,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
     }
 
     @Test
-    void testNoAstRegexCaseSensitive() {
+    void noAstRegexCaseSensitive() {
         String query = "a b";
         List<Text> expectedTexts = List.of(
                 TooltipTextUtil.createText("This search contains entries in which any field contains the regular expression "),
@@ -83,7 +83,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
     }
 
     @Test
-    void testNoAstCaseSensitive() {
+    void noAstCaseSensitive() {
         String query = "a b";
         List<Text> expectedTexts = List.of(
                 TooltipTextUtil.createText("This search contains entries in which any field contains the term "),

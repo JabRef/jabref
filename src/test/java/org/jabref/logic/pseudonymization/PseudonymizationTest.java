@@ -46,7 +46,7 @@ class PseudonymizationTest {
     private BibEntryTypesManager entryTypesManager;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
         stringWriter = new StringWriter();

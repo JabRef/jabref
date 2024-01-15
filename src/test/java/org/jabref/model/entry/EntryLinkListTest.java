@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EntryLinkListTest {
+class EntryLinkListTest {
 
     private static final String KEY = "test";
 
@@ -24,7 +24,7 @@ public class EntryLinkListTest {
     private BibEntry target;
 
     @BeforeEach
-    public void before() {
+    void before() {
         database = new BibDatabase();
         links = EntryLinkList.parse(KEY, database);
         link = links.getFirst();
@@ -40,40 +40,40 @@ public class EntryLinkListTest {
     }
 
     @Test
-    public void givenFieldValueAndDatabaseWhenParsingThenExpectKey() {
+    void givenFieldValueAndDatabaseWhenParsingThenExpectKey() {
         assertEquals(KEY, link.getKey());
     }
 
     @Test
-    public void givenFieldValueAndDatabaseWhenParsingThenExpectDataBase() {
+    void givenFieldValueAndDatabaseWhenParsingThenExpectDataBase() {
         assertEquals(database, link.getDatabase());
     }
 
     @Test
-    public void givenFieldValueAndDatabaseWhenParsingThenExpectEmptyLinkedEntry() {
+    void givenFieldValueAndDatabaseWhenParsingThenExpectEmptyLinkedEntry() {
         assertEquals(Optional.empty(), link.getLinkedEntry());
     }
 
     @Test
-    public void givenFieldValueAndDatabaseWhenParsingThenExpectLink() {
+    void givenFieldValueAndDatabaseWhenParsingThenExpectLink() {
         ParsedEntryLink expected = new ParsedEntryLink(KEY, database);
         assertEquals(expected, link);
     }
 
     @Test
-    public void givenBibEntryWhenParsingThenExpectLink() {
+    void givenBibEntryWhenParsingThenExpectLink() {
       ParsedEntryLink expected = new ParsedEntryLink(new BibEntry().withCitationKey("key"));
       assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test
-    public void givenNullFieldValueAndDatabaseWhenParsingThenExpectLinksIsEmpty() {
+    void givenNullFieldValueAndDatabaseWhenParsingThenExpectLinksIsEmpty() {
         links = EntryLinkList.parse(null, database);
         assertTrue(links.isEmpty());
     }
 
     @Test
-    public void givenTargetAndSourceWhenSourceCrossrefTargetThenSourceCrossrefsTarget() {
+    void givenTargetAndSourceWhenSourceCrossrefTargetThenSourceCrossrefsTarget() {
         source.setField(StandardField.CROSSREF, "target");
         assertSourceCrossrefsTarget(target, source);
     }

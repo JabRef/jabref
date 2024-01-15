@@ -9,8 +9,11 @@ import javafx.scene.text.Text;
 
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 
@@ -20,26 +23,26 @@ class DiffHighlightingTest {
 
     public static void assertEquals(List<Text> expected, List<Text> actual) {
         // Need to compare string values since Texts with the same string are not considered equal
-        Assertions.assertEquals(expected.toString(), actual.toString());
+        assertEquals(expected.toString(), actual.toString());
 
         // Moreover, make sure that style classes are correct
         List<String> expectedStyles = expected.stream().map(text -> text.getStyleClass().toString()).collect(Collectors.toList());
         List<String> actualStyles = actual.stream().map(text -> text.getStyleClass().toString()).collect(Collectors.toList());
-        Assertions.assertEquals(expectedStyles, actualStyles);
+        assertEquals(expectedStyles, actualStyles);
     }
 
     @Test
-    void testGenerateDiffHighlightingBothNullThrowsNPE() {
-        Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
+    void generateDiffHighlightingBothNullThrowsNPE() {
+        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
     }
 
     @Test
-    void testNullSeparatorThrowsNPE() {
-        Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
+    void nullSeparatorThrowsNPE() {
+        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
     }
 
     @Test
-    void testGenerateDiffHighlightingNoDiff() {
+    void generateDiffHighlightingNoDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forUnchanged("f"),
@@ -50,7 +53,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordAddTextWordDiff() {
+    void generateDiffHighlightingSingleWordAddTextWordDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forRemoved("foo "),
@@ -60,7 +63,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordAddTextCharacterDiff() {
+    void generateDiffHighlightingSingleWordAddTextCharacterDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forUnchanged("f"),
@@ -72,7 +75,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordDeleteTextWordDiff() {
+    void generateDiffHighlightingSingleWordDeleteTextWordDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forRemoved("foobar "),
@@ -82,7 +85,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordDeleteTextCharacterDiff() {
+    void generateDiffHighlightingSingleWordDeleteTextCharacterDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forUnchanged("f"),

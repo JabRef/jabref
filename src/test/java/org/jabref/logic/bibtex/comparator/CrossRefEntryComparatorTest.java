@@ -9,28 +9,28 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CrossRefEntryComparatorTest {
+class CrossRefEntryComparatorTest {
     private CrossRefEntryComparator comparator;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         comparator = new CrossRefEntryComparator();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         comparator = null;
     }
 
     @Test
-    public void isEqualForEntriesWithoutCrossRef() {
+    void isEqualForEntriesWithoutCrossRef() {
         BibEntry e1 = new BibEntry();
         BibEntry e2 = new BibEntry();
         assertEquals(0, comparator.compare(e1, e2));
     }
 
     @Test
-    public void isEqualForEntriesWithCrossRef() {
+    void isEqualForEntriesWithCrossRef() {
         BibEntry e1 = new BibEntry();
         e1.setField(StandardField.CROSSREF, "1");
         BibEntry e2 = new BibEntry();
@@ -39,7 +39,7 @@ public class CrossRefEntryComparatorTest {
     }
 
     @Test
-    public void isGreaterForEntriesWithoutCrossRef() {
+    void isGreaterForEntriesWithoutCrossRef() {
         BibEntry e1 = new BibEntry();
         BibEntry e2 = new BibEntry();
         e2.setField(StandardField.CROSSREF, "1");
@@ -47,7 +47,7 @@ public class CrossRefEntryComparatorTest {
     }
 
     @Test
-    public void isSmallerForEntriesWithCrossRef() {
+    void isSmallerForEntriesWithCrossRef() {
         BibEntry e1 = new BibEntry();
         e1.setField(StandardField.CROSSREF, "1");
         BibEntry e2 = new BibEntry();

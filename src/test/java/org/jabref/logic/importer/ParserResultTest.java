@@ -28,7 +28,7 @@ class ParserResultTest {
     }
 
     @Test
-    public void warningsAddedMatchErrorMessage() {
+    void warningsAddedMatchErrorMessage() {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning("Warning 1 ");
         parserResult.addWarning("Warning 2 ");
@@ -36,13 +36,13 @@ class ParserResultTest {
     }
 
     @Test
-    public void hasEmptyMessageForNoWarnings() {
+    void hasEmptyMessageForNoWarnings() {
         ParserResult parserResult = new ParserResult();
         assertEquals("", parserResult.getErrorMessage());
     }
 
     @Test
-    public void doesNotHaveDuplicateWarnings() {
+    void doesNotHaveDuplicateWarnings() {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning("Duplicate Warning");
         parserResult.addWarning("Duplicate Warning");

@@ -21,17 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-public class AuxCommandLineTest {
+class AuxCommandLineTest {
 
     private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
-    public void test() throws URISyntaxException, IOException {
+    void test() throws URISyntaxException, IOException {
         InputStream originalStream = AuxCommandLineTest.class.getResourceAsStream("origin.bib");
 
         File auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();

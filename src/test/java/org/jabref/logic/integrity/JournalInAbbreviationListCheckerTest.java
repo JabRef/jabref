@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JournalInAbbreviationListCheckerTest {
+class JournalInAbbreviationListCheckerTest {
 
     private JournalInAbbreviationListChecker checker;
     private JournalInAbbreviationListChecker checkerb;

@@ -17,14 +17,14 @@ class LayoutHelperTest {
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
 
     @Test
-    public void backslashDoesNotTriggerException() {
+    void backslashDoesNotTriggerException() {
         StringReader stringReader = new StringReader("\\");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         assertThrows(IOException.class, layoutHelper::getLayoutFromText);
     }
 
     @Test
-    public void unbalancedBeginEndIsParsed() throws Exception {
+    void unbalancedBeginEndIsParsed() throws Exception {
         StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
@@ -32,7 +32,7 @@ class LayoutHelperTest {
     }
 
     @Test
-    public void minimalExampleWithDoiGetsParsed() throws Exception {
+    void minimalExampleWithDoiGetsParsed() throws Exception {
         StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi\\end{doi}");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();

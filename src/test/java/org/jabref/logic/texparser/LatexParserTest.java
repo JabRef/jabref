@@ -22,7 +22,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class LatexParserTest {
+class LatexParserTest {
     private final static String DARWIN = "Darwin1888";
     private final static String EINSTEIN = "Einstein1920";
     private final static String NEWTON = "Newton1999";
@@ -89,7 +89,7 @@ public class LatexParserTest {
     }
 
     @Test
-    public void testSameFileDifferentDatabases() throws URISyntaxException {
+    void sameFileDifferentDatabases() throws URISyntaxException {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
@@ -117,7 +117,7 @@ public class LatexParserTest {
     }
 
     @Test
-    public void testTwoFilesDifferentDatabases() throws URISyntaxException {
+    void twoFilesDifferentDatabases() throws URISyntaxException {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
         Path texFile2 = Path.of(LatexParserTest.class.getResource("paper2.tex").toURI());
 

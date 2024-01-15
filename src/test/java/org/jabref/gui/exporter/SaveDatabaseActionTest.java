@@ -57,7 +57,7 @@ class SaveDatabaseActionTest {
     private SaveDatabaseAction saveDatabaseAction;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
@@ -66,7 +66,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAsShouldSetWorkingDirectory() {
+    void saveAsShouldSetWorkingDirectory() {
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any());
 
@@ -76,7 +76,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
+    void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doReturn(false).when(saveDatabaseAction).saveAs(any());
 
@@ -86,7 +86,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveShouldShowSaveAsIfDatabaseNotSelected() {
+    void saveShouldShowSaveAsIfDatabaseNotSelected() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
@@ -131,7 +131,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveKeepsChangedFlag() throws Exception {
+    void saveKeepsChangedFlag() throws Exception {
         BibEntry firstEntry = new BibEntry().withField(StandardField.AUTHOR, "first");
         firstEntry.setChanged(true);
         BibEntry secondEntry = new BibEntry().withField(StandardField.AUTHOR, "second");
@@ -148,7 +148,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveShouldNotSaveDatabaseIfPathNotSet() {
+    void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         boolean result = saveDatabaseAction.save();
         assertFalse(result);

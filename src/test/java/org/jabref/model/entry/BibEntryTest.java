@@ -42,7 +42,7 @@ class BibEntryTest {
     private BibEntry entry = new BibEntry();
 
     @Test
-    void testDefaultConstructor() {
+    void defaultConstructor() {
         assertEquals(StandardEntryType.Misc, entry.getType());
         assertNotNull(entry.getId());
         assertFalse(entry.getField(StandardField.AUTHOR).isPresent());
@@ -248,7 +248,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetAndAddToLinkedFileList() {
+    void getAndAddToLinkedFileList() {
         List<LinkedFile> files = entry.getFiles();
         files.add(new LinkedFile("", Path.of(""), ""));
         entry.setFiles(files);
@@ -268,14 +268,14 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetEmptyKeywords() {
+    void getEmptyKeywords() {
         KeywordList actual = entry.getKeywords(',');
 
         assertEquals(new KeywordList(), actual);
     }
 
     @Test
-    void testGetSingleKeywords() {
+    void getSingleKeywords() {
         entry.addKeyword("kw", ',');
         KeywordList actual = entry.getKeywords(',');
 
@@ -407,27 +407,27 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetSeparatedKeywordsAreCorrect() {
+    void getSeparatedKeywordsAreCorrect() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));
     }
 
     @Test
-    void testAddKeywordIsCorrect() {
+    void addKeywordIsCorrect() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FooBar", ',');
         assertEquals(new KeywordList("Foo", "Bar", "FooBar"), entry.getKeywords(','));
     }
 
     @Test
-    void testAddKeywordHasChanged() {
+    void addKeywordHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FooBar", ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testAddKeywordTwiceYiedsOnlyOne() {
+    void addKeywordTwiceYiedsOnlyOne() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FooBar", ',');
         entry.addKeyword("FooBar", ',');
@@ -442,21 +442,21 @@ class BibEntryTest {
     }
 
     @Test
-    void testAddKeywordWithDifferentCapitalizationChanges() {
+    void addKeywordWithDifferentCapitalizationChanges() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("FOO", ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testAddKeywordEmptyKeywordIsNotAdded() {
+    void addKeywordEmptyKeywordIsNotAdded() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.addKeyword("", ',');
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));
     }
 
     @Test
-    void testAddKeywordEmptyKeywordNotChanged() {
+    void addKeywordEmptyKeywordNotChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.setChanged(false);
         entry.addKeyword("", ',');
@@ -481,47 +481,47 @@ class BibEntryTest {
     }
 
     @Test
-    void testAddKeywordsWorksAsExpected() {
+    void addKeywordsWorksAsExpected() {
         entry.addKeywords(Arrays.asList("Foo", "Bar"), ',');
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));
     }
 
     @Test
-    void testPutKeywordsOverwritesOldKeywords() {
+    void putKeywordsOverwritesOldKeywords() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Arrays.asList("Yin", "Yang"), ',');
         assertEquals(new KeywordList("Yin", "Yang"), entry.getKeywords(','));
     }
 
     @Test
-    void testPutKeywordsHasChanged() {
+    void putKeywordsHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Arrays.asList("Yin", "Yang"), ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListErasesPreviousKeywords() {
+    void putKeywordsPutEmpyListErasesPreviousKeywords() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Collections.emptyList(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListHasChanged() {
+    void putKeywordsPutEmpyListHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(Collections.emptyList(), ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListToEmptyBibentry() {
+    void putKeywordsPutEmpyListToEmptyBibentry() {
         entry.putKeywords(Collections.emptyList(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
-    void testPutKeywordsPutEmpyListToEmptyBibentryNotChanged() {
+    void putKeywordsPutEmpyListToEmptyBibentryNotChanged() {
         entry.putKeywords(Collections.emptyList(), ',');
         assertFalse(entry.hasChanged());
     }
@@ -602,7 +602,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetEmptyResolvedKeywords() {
+    void getEmptyResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         entry.setField(StandardField.CROSSREF, "entry2");
         database.insertEntry(entry);
@@ -617,7 +617,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetSingleResolvedKeywords() {
+    void getSingleResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         entry.setField(StandardField.CROSSREF, "entry2");
 
@@ -634,7 +634,7 @@ class BibEntryTest {
     }
 
     @Test
-    void testGetResolvedKeywords() {
+    void getResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         entry.setField(StandardField.CROSSREF, "entry2");
 

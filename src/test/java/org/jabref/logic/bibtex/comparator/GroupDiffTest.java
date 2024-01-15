@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GroupDiffTest {
+class GroupDiffTest {
 
     private final MetaData originalMetaData = mock(MetaData.class);
     private final MetaData newMetaData = mock(MetaData.class);

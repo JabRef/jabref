@@ -33,7 +33,7 @@ class LocalizationKeyTest {
 
     @ParameterizedTest
     @MethodSource("propertiesKeyTestCases")
-    public void getPropertiesKeyReturnsCorrectValue(String expected, String input) {
+    void getPropertiesKeyReturnsCorrectValue(String expected, String input) {
         assertEquals(expected, LocalizationKey.fromEscapedJavaString(input).getEscapedPropertiesKey());
     }
 }

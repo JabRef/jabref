@@ -13,68 +13,68 @@ class AddBracesFormatterTest {
     private AddBracesFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new AddBracesFormatter();
     }
 
     @Test
-    public void formatAddsSingleEnclosingBraces() {
+    void formatAddsSingleEnclosingBraces() {
         assertEquals("{test}", formatter.format("test"));
     }
 
     @Test
-    public void formatKeepsUnmatchedBracesAtBeginning() {
+    void formatKeepsUnmatchedBracesAtBeginning() {
         assertEquals("{test", formatter.format("{test"));
     }
 
     @Test
-    public void formatKeepsUnmatchedBracesAtEnd() {
+    void formatKeepsUnmatchedBracesAtEnd() {
         assertEquals("test}", formatter.format("test}"));
     }
 
     @Test
-    public void formatKeepsShortString() {
+    void formatKeepsShortString() {
         assertEquals("t", formatter.format("t"));
     }
 
     @Test
-    public void formatKeepsEmptyString() {
+    void formatKeepsEmptyString() {
         assertEquals("", formatter.format(""));
     }
 
     @Test
-    public void formatKeepsDoubleEnclosingBraces() {
+    void formatKeepsDoubleEnclosingBraces() {
         assertEquals("{{test}}", formatter.format("{{test}}"));
     }
 
     @Test
-    public void formatKeepsTripleEnclosingBraces() {
+    void formatKeepsTripleEnclosingBraces() {
         assertEquals("{{{test}}}", formatter.format("{{{test}}}"));
     }
 
     @Test
-    public void formatKeepsNonMatchingBraces() {
+    void formatKeepsNonMatchingBraces() {
         assertEquals("{A} and {B}", formatter.format("{A} and {B}"));
     }
 
     @Test
-    public void formatKeepsOnlyMatchingBraces() {
+    void formatKeepsOnlyMatchingBraces() {
         assertEquals("{{A} and {B}}", formatter.format("{{A} and {B}}"));
     }
 
     @Test
-    public void formatDoesNotRemoveBracesInBrokenString() {
+    void formatDoesNotRemoveBracesInBrokenString() {
         // We opt here for a conservative approach although one could argue that "A} and {B}" is also a valid return
         assertEquals("{A} and {B}}", formatter.format("{A} and {B}}"));
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("{In CDMA}", formatter.format(formatter.getExampleInput()));
     }
 
     @Test
-    public void formatStringWithMinimalRequiredLength() {
+    void formatStringWithMinimalRequiredLength() {
         assertEquals("{AB}", formatter.format("AB"));
     }
 }

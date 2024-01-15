@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
-public class EditFieldContentTabViewModelTest {
+class EditFieldContentTabViewModelTest {
     EditFieldContentViewModel editFieldContentViewModel;
     BibEntry entryA;
     BibEntry entryB;

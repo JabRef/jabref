@@ -33,12 +33,12 @@ class PdfVerbatimBibTextImporterTest {
     }
 
     @Test
-    void testsGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    void testGetDescription() {
+    void getDescription() {
         assertEquals("PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.",
                      importer.getDescription());
     }
