@@ -70,14 +70,6 @@
               text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
     <CheckBox fx:id="inspectionWarningDuplicate"
               text="%Warn about unresolved duplicates when closing inspection window"/>
-    <HBox alignment="CENTER_LEFT" spacing="4.0">
-        <CheckBox fx:id="treatAllDuplicateEntriesTheSame" text="%Treat all duplicates entries the same way" >
-            <tooltip>
-                <Tooltip text="%Applies the last chosen duplicate resolving strategy to all entries without showing a dialog. Uncheck this option to show the dialog again"/>
-            </tooltip>
-        </CheckBox>
-        <ComboBox fx:id="duplicatedResolveDecision" GridPane.columnIndex="1"/>
-    </HBox>
 
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>

@@ -15,7 +15,6 @@ import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -46,8 +45,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox showAdvancedHints;
     @FXML private CheckBox inspectionWarningDuplicate;
-    @FXML private CheckBox treatAllDuplicateEntriesTheSame;
-    @FXML private ComboBox<DuplicateResolverDialog.DuplicateResolverResult> duplicatedResolveDecision;
+
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox collectTelemetry;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
@@ -120,13 +118,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
-        treatAllDuplicateEntriesTheSame.selectedProperty().bindBidirectional(viewModel.treatAllDuplicateEntriesTheSameProperty());
-
-        new ViewModelListCellFactory<DuplicateResolverDialog.DuplicateResolverResult>()
-                .withText(DuplicateResolverDialog.DuplicateResolverResult::getDefaultTranslationForImport)
-                .install(duplicatedResolveDecision);
-        duplicatedResolveDecision.itemsProperty().setValue(viewModel.duplicateResolverResults());
-        duplicatedResolveDecision.valueProperty().bindBidirectional(viewModel.duplicatedResolveDecisionProperty());
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
 
