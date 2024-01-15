@@ -247,8 +247,8 @@ public class ImportHandler {
         if (decision == BREAK) {
             decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
         }
-        if (preferencesService.getGuiPreferences().shouldMergeApplyToAllEntries()) {
-            preferencesService.getGuiPreferences().setAllEntriesDuplicateResolverDecision(decision);
+        if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+            preferencesService.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(decision);
         }
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
@@ -382,8 +382,8 @@ public class ImportHandler {
                 firstEntry = false;
                 continue;
             }
-            if (preferencesService.getGuiPreferences().shouldMergeApplyToAllEntries()) {
-                var decision = preferencesService.getGuiPreferences().getAllEntriesDuplicateResolverDecision();
+            if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+                var decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
                 importEntryWithDuplicateCheck(database, entry, decision);
             } else {

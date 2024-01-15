@@ -41,9 +41,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.LibraryPreferences;
+import org.jabref.preferences.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 import org.jabref.preferences.WorkspacePreferences;
@@ -104,7 +104,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
-    private final GuiPreferences guiPreferences;
+    private final MergeDialogPreferences mergeDialogPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -128,7 +128,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.internalPreferences = preferences.getInternalPreferences();
-        this.guiPreferences = preferences.getGuiPreferences();
+        this.mergeDialogPreferences = preferences.getMergeDialogPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
 
@@ -200,8 +200,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
-        treatAllDuplicateEntriesTheSameProperty.setValue(guiPreferences.shouldMergeApplyToAllEntries());
-        duplicatedResolveDecisionProperty.setValue(guiPreferences.getAllEntriesDuplicateResolverDecision());
+        treatAllDuplicateEntriesTheSameProperty.setValue(mergeDialogPreferences.shouldMergeApplyToAllEntries());
+        duplicatedResolveDecisionProperty.setValue(mergeDialogPreferences.getAllEntriesDuplicateResolverDecision());
 
         var availableDuplicateDecisionsForImport = EnumSet.of(KEEP_LEFT,
                 DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT,
@@ -251,8 +251,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
         workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
-        guiPreferences.setIsMergeApplyToAllEntries(treatAllDuplicateEntriesTheSameProperty.getValue());
-        guiPreferences.setAllEntriesDuplicateResolverDecision(duplicatedResolveDecisionProperty.getValue());
+        mergeDialogPreferences.setIsMergeApplyToAllEntries(treatAllDuplicateEntriesTheSameProperty.getValue());
+        mergeDialogPreferences.setAllEntriesDuplicateResolverDecision(duplicatedResolveDecisionProperty.getValue());
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
