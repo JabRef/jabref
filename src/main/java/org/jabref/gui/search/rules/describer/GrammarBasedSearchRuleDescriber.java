@@ -37,7 +37,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         DescriptionSearchBaseVisitor descriptionSearchBaseVisitor = new DescriptionSearchBaseVisitor();
 
         // describe advanced search expression
-        textFlow.getChildren().add(TooltipTextUtil.createText(String.format("%s ", Localization.lang("This search contains entries in which")), TooltipTextUtil.TextType.NORMAL));
+        textFlow.getChildren().add(TooltipTextUtil.createText("%s ".formatted(Localization.lang("This search contains entries in which")), TooltipTextUtil.TextType.NORMAL));
         textFlow.getChildren().addAll(descriptionSearchBaseVisitor.visit(parseTree));
         textFlow.getChildren().add(TooltipTextUtil.createText(". ", TooltipTextUtil.TextType.NORMAL));
         textFlow.getChildren().add(TooltipTextUtil.createText(searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? Localization
@@ -63,7 +63,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         @Override
         public List<Text> visitParenExpression(SearchParser.ParenExpressionContext context) {
             ArrayList<Text> textList = new ArrayList<>();
-            textList.add(TooltipTextUtil.createText(String.format("%s", context.expression()), TooltipTextUtil.TextType.NORMAL));
+            textList.add(TooltipTextUtil.createText("%s".formatted(context.expression()), TooltipTextUtil.TextType.NORMAL));
             return textList;
         }
 
@@ -71,9 +71,9 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         public List<Text> visitBinaryExpression(SearchParser.BinaryExpressionContext context) {
             List<Text> textList = visit(context.left);
             if ("AND".equalsIgnoreCase(context.operator.getText())) {
-                textList.add(TooltipTextUtil.createText(String.format(" %s ", Localization.lang("and")), TooltipTextUtil.TextType.NORMAL));
+                textList.add(TooltipTextUtil.createText(" %s ".formatted(Localization.lang("and")), TooltipTextUtil.TextType.NORMAL));
             } else {
-                textList.add(TooltipTextUtil.createText(String.format(" %s ", Localization.lang("or")), TooltipTextUtil.TextType.NORMAL));
+                textList.add(TooltipTextUtil.createText(" %s ".formatted(Localization.lang("or")), TooltipTextUtil.TextType.NORMAL));
             }
             textList.addAll(visit(context.right));
             return textList;

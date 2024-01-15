@@ -384,7 +384,7 @@ public class OOFrontend {
         StringBuilder msg = new StringBuilder();
         for (RangeOverlap<RangeForOverlapCheck<CitationGroupId>> overlap : overlaps) {
             String listOfRanges = overlap.valuesForOverlappingRanges.stream()
-                                                                     .map(v -> String.format("'%s'", v.format()))
+                                                                     .map(v -> "'%s'".formatted(v.format()))
                                                                      .collect(Collectors.joining(", "));
             msg.append(
                     switch (overlap.kind) {

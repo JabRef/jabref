@@ -310,7 +310,7 @@ public class GroupTreeView extends BorderPane {
             } else {
                 reducedFontSize = 0.75;
             }
-            return String.format("-fx-font-size: %fem;", reducedFontSize);
+            return "-fx-font-size: %fem;".formatted(reducedFontSize);
         }, preferencesService.getWorkspacePreferences().mainFontSizeProperty()));
 
         node.getChildren().add(text);

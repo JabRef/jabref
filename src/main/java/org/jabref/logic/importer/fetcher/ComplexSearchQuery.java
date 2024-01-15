@@ -176,7 +176,7 @@ public class ComplexSearchQuery {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
-            this.defaultFieldPhrases.add(String.format("\"%s\"", defaultFieldPhrase.replace("\"", "")));
+            this.defaultFieldPhrases.add("\"%s\"".formatted(defaultFieldPhrase.replace("\"", "")));
             return this;
         }
 
@@ -188,7 +188,7 @@ public class ComplexSearchQuery {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
-            this.authors.add(String.format("\"%s\"", author.replace("\"", "")));
+            this.authors.add("\"%s\"".formatted(author.replace("\"", "")));
             return this;
         }
 
@@ -200,7 +200,7 @@ public class ComplexSearchQuery {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
-            this.titlePhrases.add(String.format("\"%s\"", titlePhrase.replace("\"", "")));
+            this.titlePhrases.add("\"%s\"".formatted(titlePhrase.replace("\"", "")));
             return this;
         }
 
@@ -212,7 +212,7 @@ public class ComplexSearchQuery {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
             // Strip all quotes before wrapping
-            this.titlePhrases.add(String.format("\"%s\"", abstractPhrase.replace("\"", "")));
+            this.titlePhrases.add("\"%s\"".formatted(abstractPhrase.replace("\"", "")));
             return this;
         }
 
@@ -237,7 +237,7 @@ public class ComplexSearchQuery {
             if (Objects.requireNonNull(journal).isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
-            this.journal = String.format("\"%s\"", journal.replace("\"", ""));
+            this.journal = "\"%s\"".formatted(journal.replace("\"", ""));
             return this;
         }
 
