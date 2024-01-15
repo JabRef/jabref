@@ -188,7 +188,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     public boolean isValid() {
         return type != null
                 && host != null
-                && port != null
+                && port > 0
                 && database != null
                 && user != null
                 && password != null;
