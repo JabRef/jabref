@@ -118,11 +118,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                         return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
                     }
 
-                    if (dbOpt.isEmpty()) {
-                        return Localization.lang("untitled");
-                    }
-
-                    return dbOpt.get();
+                    return dbOpt.orElseGet(() -> Localization.lang("untitled"));
                 })
                 .install(libraryListView);
         viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());
