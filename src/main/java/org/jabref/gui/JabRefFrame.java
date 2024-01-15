@@ -803,16 +803,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
     }
 
-    void openDatabases(List<ParserResult> parserResults, boolean isBlank) {
+    void openDatabases(List<ParserResult> parserResults) {
         final List<ParserResult> failed = new ArrayList<>();
         final List<ParserResult> toOpenTab = new ArrayList<>();
-
-        // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
-            openLastEditedDatabases();
-        }
-
-        // From here on, the libraries provided by command line arguments are treated
 
         // Remove invalid databases
         List<ParserResult> invalidDatabases = parserResults.stream()

@@ -105,10 +105,10 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
-                List<String> lastFiles = preferences.getGuiPreferences().getLastFilesOpened();
+                List<Path> lastFiles = preferences.getGuiPreferences().getLastFilesOpened();
                 if (!argumentProcessor.isBlank() && preferences.getWorkspacePreferences().shouldOpenLastEdited() && !lastFiles.isEmpty()) {
-                    for (String file : lastFiles) {
-                        uiCommands.add(new UiCommand.OpenDatabaseFromPath(Path.of(file)));
+                    for (Path file : lastFiles) {
+                        uiCommands.add(new UiCommand.OpenDatabaseFromPath(file));
                     }
                 }
 

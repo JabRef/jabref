@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added ability to jump to an entry in the command line using `-j CITATIONKEY`. [koppor#540](https://github.com/koppor/jabref/issues/540)
 
 ### Changed
 
@@ -85,7 +86,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
 - We added support for exporting to Hayagriva YAML format. [#10382](https://github.com/JabRef/jabref/issues/10382)
 - We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
-- We added ability to jump to an entry in the command line using `-j CITATIONKEY [BIBTEXFILES]`. [koppor#540](https://github.com/koppor/jabref/issues/540)
 - We added the 'Bachelor's thesis' type for Biblatex's 'Thesis' EntryType [#10029](https://github.com/JabRef/jabref/issues/10029).
 
 ### Changed
