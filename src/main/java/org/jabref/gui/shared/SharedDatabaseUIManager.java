@@ -1,7 +1,6 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;

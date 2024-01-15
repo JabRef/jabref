@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
