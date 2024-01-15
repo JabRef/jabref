@@ -139,7 +139,7 @@ public class Launcher {
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
-        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        configuration.forEach(Configuration::set);
         initializeLogger();
     }
 
