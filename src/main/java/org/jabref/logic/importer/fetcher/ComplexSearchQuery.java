@@ -217,7 +217,7 @@ public class ComplexSearchQuery {
         }
 
         public ComplexSearchQueryBuilder fromYearAndToYear(Integer fromYear, Integer toYear) {
-            if (Objects.nonNull(singleYear)) {
+            if (singleYear != null) {
                 throw new IllegalArgumentException("You can not use single year and year range search.");
             }
             this.fromYear = Objects.requireNonNull(fromYear);
@@ -226,7 +226,7 @@ public class ComplexSearchQuery {
         }
 
         public ComplexSearchQueryBuilder singleYear(Integer singleYear) {
-            if (Objects.nonNull(fromYear) || Objects.nonNull(toYear)) {
+            if (fromYear != null || toYear != null) {
                 throw new IllegalArgumentException("You can not use single year and year range search.");
             }
             this.singleYear = Objects.requireNonNull(singleYear);
@@ -306,11 +306,11 @@ public class ComplexSearchQuery {
         }
 
         private boolean yearFieldsAreEmpty() {
-            return Objects.isNull(singleYear) && Objects.isNull(fromYear) && Objects.isNull(toYear);
+            return singleYear == null && fromYear == null && toYear == null;
         }
 
         private boolean stringListIsBlank(List<String> stringList) {
-            return Objects.isNull(stringList) || stringList.stream().allMatch(String::isBlank);
+            return stringList == null || stringList.stream().allMatch(String::isBlank);
         }
     }
 }

@@ -103,7 +103,7 @@ public class SlrGitHandler extends GitHandler {
             // Begin of a new diff
             if (currentToken.startsWith("diff --git a/")) {
                 // If the diff is related to a different file, save the diff for the previous file
-                if (!(Objects.isNull(relativePath) || Objects.isNull(joiner))) {
+                if (!(relativePath == null || joiner == null)) {
                     if (!relativePath.contains(StudyRepository.STUDY_DEFINITION_FILE_NAME)) {
                         diffsPerFile.put(Path.of(repositoryPath.toString(), relativePath), joiner.toString());
                     }
@@ -127,7 +127,7 @@ public class SlrGitHandler extends GitHandler {
                 }
             }
         }
-        if (!(Objects.isNull(relativePath) || Objects.isNull(joiner))) {
+        if (!(relativePath == null || joiner == null)) {
             // For the last file this has to be done at the end
             diffsPerFile.put(Path.of(repositoryPath.toString(), relativePath), joiner.toString());
         }

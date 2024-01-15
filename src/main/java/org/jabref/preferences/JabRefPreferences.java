@@ -1201,7 +1201,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        if (Objects.nonNull(journalAbbreviationPreferences)) {
+        if (journalAbbreviationPreferences != null) {
             return journalAbbreviationPreferences;
         }
 
@@ -1294,7 +1294,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
-        if (Objects.nonNull(openOfficePreferences)) {
+        if (openOfficePreferences != null) {
             return openOfficePreferences;
         }
 
@@ -1317,7 +1317,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
-        if (Objects.nonNull(libraryPreferences)) {
+        if (libraryPreferences != null) {
             return libraryPreferences;
         }
 
@@ -1335,7 +1335,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public TelemetryPreferences getTelemetryPreferences() {
-        if (Objects.nonNull(telemetryPreferences)) {
+        if (telemetryPreferences != null) {
             return telemetryPreferences;
         }
 
@@ -1364,7 +1364,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public DOIPreferences getDOIPreferences() {
-        if (Objects.nonNull(doiPreferences)) {
+        if (doiPreferences != null) {
             return doiPreferences;
         }
 
@@ -1380,7 +1380,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public OwnerPreferences getOwnerPreferences() {
-        if (Objects.nonNull(ownerPreferences)) {
+        if (ownerPreferences != null) {
             return ownerPreferences;
         }
 
@@ -1404,7 +1404,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public TimestampPreferences getTimestampPreferences() {
-        if (Objects.nonNull(timestampPreferences)) {
+        if (timestampPreferences != null) {
             return timestampPreferences;
         }
 
@@ -1423,7 +1423,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GroupsPreferences getGroupsPreferences() {
-        if (Objects.nonNull(groupsPreferences)) {
+        if (groupsPreferences != null) {
             return groupsPreferences;
         }
 
@@ -1448,7 +1448,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
-        if (Objects.nonNull(entryEditorPreferences)) {
+        if (entryEditorPreferences != null) {
             return entryEditorPreferences;
         }
 
@@ -1555,7 +1555,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public RemotePreferences getRemotePreferences() {
-        if (Objects.nonNull(remotePreferences)) {
+        if (remotePreferences != null) {
             return remotePreferences;
         }
 
@@ -1571,7 +1571,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProxyPreferences getProxyPreferences() {
-        if (Objects.nonNull(proxyPreferences)) {
+        if (proxyPreferences != null) {
             return proxyPreferences;
         }
 
@@ -1639,7 +1639,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SSLPreferences getSSLPreferences() {
-        if (Objects.nonNull(sslPreferences)) {
+        if (sslPreferences != null) {
             return sslPreferences;
         }
 
@@ -1706,7 +1706,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
-        if (Objects.nonNull(citationKeyPatternPreferences)) {
+        if (citationKeyPatternPreferences != null) {
             return citationKeyPatternPreferences;
         }
 
@@ -1761,7 +1761,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
-        if (Objects.nonNull(pushToApplicationPreferences)) {
+        if (pushToApplicationPreferences != null) {
             return pushToApplicationPreferences;
         }
 
@@ -1811,7 +1811,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
-        if (Objects.nonNull(externalApplicationsPreferences)) {
+        if (externalApplicationsPreferences != null) {
             return externalApplicationsPreferences;
         }
 
@@ -1853,7 +1853,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MainTablePreferences getMainTablePreferences() {
-        if (Objects.nonNull(mainTablePreferences)) {
+        if (mainTablePreferences != null) {
             return mainTablePreferences;
         }
 
@@ -1872,7 +1872,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ColumnPreferences getMainTableColumnPreferences() {
-        if (Objects.nonNull(mainTableColumnPreferences)) {
+        if (mainTableColumnPreferences != null) {
             return mainTableColumnPreferences;
         }
 
@@ -1893,7 +1893,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ColumnPreferences getSearchDialogColumnPreferences() {
-        if (Objects.nonNull(searchDialogColumnPreferences)) {
+        if (searchDialogColumnPreferences != null) {
             return searchDialogColumnPreferences;
         }
 
@@ -1989,7 +1989,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameDisplayPreferences getNameDisplayPreferences() {
-        if (Objects.nonNull(nameDisplayPreferences)) {
+        if (nameDisplayPreferences != null) {
             return nameDisplayPreferences;
         }
 
@@ -2038,7 +2038,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public BibEntryPreferences getBibEntryPreferences() {
-        if (Objects.nonNull(bibEntryPreferences)) {
+        if (bibEntryPreferences != null) {
             return bibEntryPreferences;
         }
 
@@ -2057,7 +2057,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public InternalPreferences getInternalPreferences() {
-        if (Objects.nonNull(internalPreferences)) {
+        if (internalPreferences != null) {
             return internalPreferences;
         }
 
@@ -2146,7 +2146,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FieldPreferences getFieldPreferences() {
-        if (Objects.nonNull(fieldPreferences)) {
+        if (fieldPreferences != null) {
             return fieldPreferences;
         }
 
@@ -2174,7 +2174,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FilePreferences getFilePreferences() {
-        if (Objects.nonNull(filePreferences)) {
+        if (filePreferences != null) {
             return filePreferences;
         }
 
@@ -2209,7 +2209,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
-        if (Objects.nonNull(autoLinkPreferences)) {
+        if (autoLinkPreferences != null) {
             return autoLinkPreferences;
         }
 
@@ -2249,7 +2249,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ExportPreferences getExportPreferences() {
-        if (Objects.nonNull(exportPreferences)) {
+        if (exportPreferences != null) {
             return exportPreferences;
         }
 
@@ -2379,7 +2379,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PreviewPreferences getPreviewPreferences() {
-        if (Objects.nonNull(previewPreferences)) {
+        if (previewPreferences != null) {
             return previewPreferences;
         }
 
@@ -2450,7 +2450,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SidePanePreferences getSidePanePreferences() {
-        if (Objects.nonNull(sidePanePreferences)) {
+        if (sidePanePreferences != null) {
             return sidePanePreferences;
         }
 
@@ -2529,7 +2529,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public CleanupPreferences getCleanupPreferences() {
-        if (Objects.nonNull(cleanupPreferences)) {
+        if (cleanupPreferences != null) {
             return cleanupPreferences;
         }
 
@@ -2577,7 +2577,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GuiPreferences getGuiPreferences() {
-        if (Objects.nonNull(guiPreferences)) {
+        if (guiPreferences != null) {
             return guiPreferences;
         }
 
@@ -2654,7 +2654,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SearchPreferences getSearchPreferences() {
-        if (Objects.nonNull(searchPreferences)) {
+        if (searchPreferences != null) {
             return searchPreferences;
         }
 
@@ -2692,7 +2692,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public XmpPreferences getXmpPreferences() {
-        if (Objects.nonNull(xmpPreferences)) {
+        if (xmpPreferences != null) {
             return xmpPreferences;
         }
 
@@ -2713,7 +2713,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
-        if (Objects.nonNull(nameFormatterPreferences)) {
+        if (nameFormatterPreferences != null) {
             return nameFormatterPreferences;
         }
 
@@ -2731,7 +2731,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
-        if (Objects.nonNull(autoCompletePreferences)) {
+        if (autoCompletePreferences != null) {
             return autoCompletePreferences;
         }
 
@@ -2773,7 +2773,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
-        if (Objects.nonNull(specialFieldsPreferences)) {
+        if (specialFieldsPreferences != null) {
             return specialFieldsPreferences;
         }
 
@@ -2786,7 +2786,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MrDlibPreferences getMrDlibPreferences() {
-        if (Objects.nonNull(mrDlibPreferences)) {
+        if (mrDlibPreferences != null) {
             return mrDlibPreferences;
         }
 
@@ -2806,7 +2806,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        if (Objects.nonNull(protectedTermsPreferences)) {
+        if (protectedTermsPreferences != null) {
             return protectedTermsPreferences;
         }
 
@@ -2835,7 +2835,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImporterPreferences getImporterPreferences() {
-        if (Objects.nonNull(importerPreferences)) {
+        if (importerPreferences != null) {
             return importerPreferences;
         }
 
@@ -2985,7 +2985,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GrobidPreferences getGrobidPreferences() {
-        if (Objects.nonNull(grobidPreferences)) {
+        if (grobidPreferences != null) {
             return grobidPreferences;
         }
 
