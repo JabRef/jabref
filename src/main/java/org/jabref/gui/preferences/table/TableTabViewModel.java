@@ -105,7 +105,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         columnsNotEmptyValidator = new FunctionBasedValidator<>(
                 columnsListProperty,
                 list -> !list.isEmpty(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Entry table columns"),
                         Localization.lang("Columns"),
                         Localization.lang("List must not be empty."))));

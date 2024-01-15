@@ -195,7 +195,7 @@ public abstract class AbstractQueryTransformer {
     }
 
     protected String createKeyValuePair(String fieldAsString, String term, String separator) {
-        return String.format("%s%s%s", fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
+        return "%s%s%s".formatted(fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
     }
 
     /**

@@ -87,7 +87,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+        return "Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}".formatted(
                 this.name,
                 this.abbreviation,
                 this.dotlessAbbreviation,

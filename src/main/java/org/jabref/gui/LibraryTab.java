@@ -205,7 +205,7 @@ public class LibraryTab extends Tab {
 
     private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         String mode = bibDatabaseContext.getMode().getFormattedName();
-        String modeInfo = String.format("\n%s", Localization.lang("%0 mode", mode));
+        String modeInfo = "\n%s".formatted(Localization.lang("%0 mode", mode));
         text.append(modeInfo);
     }
 
@@ -255,7 +255,7 @@ public class LibraryTab extends Tab {
 
     private void onDatabaseLoadingFailed(Exception ex) {
         String title = Localization.lang("Connection error");
-        String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
+        String content = "%s\n\n%s".formatted(ex.getMessage(), Localization.lang("A local copy will be opened."));
 
         dialogService.showErrorDialogAndWait(title, content, ex);
     }

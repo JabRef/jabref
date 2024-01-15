@@ -55,7 +55,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     void getDocument() throws IOException, FetcherException {
         String source = fetcher.getURLBySource(
-                String.format("https://api.semanticscholar.org/v1/paper/%s", DOI));
+                "https://api.semanticscholar.org/v1/paper/%s".formatted(DOI));
 
         assertEquals("https://www.semanticscholar.org/paper/7f7b38604a2c167f6d5fb1c5dffcbb127d0525c0", source);
     }

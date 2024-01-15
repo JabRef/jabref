@@ -65,7 +65,7 @@ class FileDialogConfigurationTest {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withDefaultExtension(StandardFileType.BIBTEX_DB).build();
 
-        FileChooser.ExtensionFilter filter = toFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB);
+        FileChooser.ExtensionFilter filter = toFilter("%1s %2s".formatted("BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB);
 
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
