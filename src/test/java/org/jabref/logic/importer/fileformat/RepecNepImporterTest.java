@@ -17,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RepecNepImporterTest {
+class RepecNepImporterTest {
 
     private static final String FILE_ENDING = ".txt";
 
     private RepecNepImporter testImporter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -44,39 +44,39 @@ public class RepecNepImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
     }
 
     @Test
-    public final void testGetFormatName() {
+    final void getFormatName() {
         assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
     }
 
     @Test
-    public final void testGetCliId() {
+    final void getCliId() {
         assertEquals("repecnep", testImporter.getId());
     }
 
     @Test
-    public void testGetExtension() {
+    void getExtension() {
         assertEquals(StandardFileType.TXT, testImporter.getFileType());
     }
 
     @Test
-    public final void testGetDescription() {
+    final void getDescription() {
         assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
                 testImporter.getDescription());
     }

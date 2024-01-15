@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ThemeTest {
+class ThemeTest {
     @Test
-    public void lightThemeUsedWhenPathIsBlank() {
+    void lightThemeUsedWhenPathIsBlank() {
         Theme theme = new Theme("");
 
         assertEquals(Theme.Type.DEFAULT, theme.getType());
@@ -18,7 +18,7 @@ public class ThemeTest {
     }
 
     @Test
-    public void lightThemeUsedWhenPathIsBaseCss() {
+    void lightThemeUsedWhenPathIsBaseCss() {
         Theme theme = new Theme("Base.css");
 
         assertEquals(Theme.Type.DEFAULT, theme.getType());
@@ -27,7 +27,7 @@ public class ThemeTest {
     }
 
     @Test
-    public void darkThemeUsedWhenPathIsDarkCss() {
+    void darkThemeUsedWhenPathIsDarkCss() {
         Theme theme = new Theme("Dark.css");
 
         assertEquals(Theme.Type.EMBEDDED, theme.getType());
@@ -37,7 +37,7 @@ public class ThemeTest {
     }
 
     @Test
-    public void customThemeIgnoredIfDirectory() {
+    void customThemeIgnoredIfDirectory() {
         Theme theme = new Theme(".");
 
         assertEquals(Theme.Type.DEFAULT, theme.getType());
@@ -46,7 +46,7 @@ public class ThemeTest {
     }
 
     @Test
-    public void customThemeIgnoredIfInvalidPath() {
+    void customThemeIgnoredIfInvalidPath() {
         Theme theme = new Theme("\0\0\0");
 
         assertEquals(Theme.Type.DEFAULT, theme.getType());
@@ -55,7 +55,7 @@ public class ThemeTest {
     }
 
     @Test
-    public void customThemeIfFileNotFound() {
+    void customThemeIfFileNotFound() {
         Theme theme = new Theme("Idonotexist.css");
 
         assertEquals(Theme.Type.CUSTOM, theme.getType());

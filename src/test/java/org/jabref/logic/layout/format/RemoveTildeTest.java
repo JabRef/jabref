@@ -11,11 +11,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveTildeTest {
+class RemoveTildeTest {
     private LayoutFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RemoveTilde();
     }
 

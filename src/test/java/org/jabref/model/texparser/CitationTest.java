@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class CitationTest {
+class CitationTest {
 
     Path path;
     Citation citation;
 
     @BeforeEach
-    public void init() {
+    void init() {
         path = Path.of("test");
         citation = new Citation(path, 10, 1, 4, "lineText");
     }
@@ -42,62 +42,62 @@ public class CitationTest {
 
     @ParameterizedTest
     @ValueSource(ints = {-1, 0})
-    public void constructorLineSmallerEqualZeroTest(int line) {
+    void constructorLineSmallerEqualZeroTest(int line) {
         Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, line, 1, 5, "lineText"));
         assertEquals("Line has to be greater than 0.", e.getMessage());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2})
-    public void constructorLineLargerZeroTest(int line) {
+    void constructorLineLargerZeroTest(int line) {
         Citation citation = new Citation(path, line, 1, 5, "lineText");
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndNotInBounds")
-    public void constructorColStartColEndNotInBoundsTest(int colStart, int colEnd) {
+    void constructorColStartColEndNotInBoundsTest(int colStart, int colEnd) {
         Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 10, colStart, colEnd, "lineText"));
         assertEquals("Citation has to be between 0 and line length.", e.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndInBounds")
-    public void constructorColStartColEndInBoundsTest(int colStart, int colEnd) {
+    void constructorColStartColEndInBoundsTest(int colStart, int colEnd) {
         Citation citation = new Citation(path, 10, colStart, colEnd, "lineText");
     }
 
     @Test
-    public void getPathTest() {
+    void getPathTest() {
         assertEquals(path, citation.getPath());
     }
 
     @Test
-    public void getLineTest() {
+    void getLineTest() {
         assertEquals(10, citation.getLine());
     }
 
     @Test
-    public void getColStartTest() {
+    void getColStartTest() {
         assertEquals(1, citation.getColStart());
     }
 
     @Test
-    public void getColEndTest() {
+    void getColEndTest() {
         assertEquals(4, citation.getColEnd());
     }
 
     @Test
-    public void getLineTextTest() {
+    void getLineTextTest() {
         assertEquals("lineText", citation.getLineText());
     }
 
     @Test
-    public void getContextTest() {
+    void getContextTest() {
         assertEquals("lineText", citation.getContext());
     }
 
     @Test
-    public void equalsTest() {
+    void equalsTest() {
         Citation citation1 = new Citation(path, 10, 1, 4, "lineText");
         Citation citation2 = null;
         assertEquals(citation, citation1);

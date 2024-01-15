@@ -22,7 +22,7 @@ class GitHandlerTest {
     private GitHandler gitHandler;
 
     @BeforeEach
-    public void setUpGitHandler() {
+    void setUpGitHandler() {
         gitHandler = new GitHandler(repositoryPath);
     }
 

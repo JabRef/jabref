@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BackupManagerTest {
+class BackupManagerTest {
 
     Path backupDir;
 
@@ -43,7 +43,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void backupFileNameIsCorrectlyGeneratedInAppDataDirectory() {
+    void backupFileNameIsCorrectlyGeneratedInAppDataDirectory() {
         Path bibPath = Path.of("tmp", "test.bib");
         backupDir = OS.getNativeDesktop().getBackupDirectory();
         Path bakPath = BackupManager.getBackupPathForNewBackup(bibPath, backupDir);
@@ -53,13 +53,13 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void backupFileIsEqualForNonExistingBackup() throws Exception {
+    void backupFileIsEqualForNonExistingBackup() throws Exception {
         Path originalFile = Path.of(BackupManagerTest.class.getResource("no-autosave.bib").toURI());
         assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
-    public void backupFileIsEqual() throws Exception {
+    void backupFileIsEqual() throws Exception {
         // Prepare test: Create backup file on "right" path
         Path source = Path.of(BackupManagerTest.class.getResource("no-changes.bib.bak").toURI());
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI()), BackupFileType.BACKUP, backupDir);
@@ -70,7 +70,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void backupFileDiffers() throws Exception {
+    void backupFileDiffers() throws Exception {
         // Prepare test: Create backup file on "right" path
         Path source = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of(BackupManagerTest.class.getResource("changes.bib").toURI()), BackupFileType.BACKUP, backupDir);
@@ -81,7 +81,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void correctBackupFileDeterminedForMultipleBakFiles() throws Exception {
+    void correctBackupFileDeterminedForMultipleBakFiles() throws Exception {
         Path noChangesBib = Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI());
         Path noChangesBibBak = Path.of(BackupManagerTest.class.getResource("no-changes.bib.bak").toURI());
 
@@ -105,7 +105,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void bakFileWithNewerTimeStampLeadsToDiff() throws Exception {
+    void bakFileWithNewerTimeStampLeadsToDiff() throws Exception {
         Path changesBib = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         Path changesBibBak = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
 
@@ -116,7 +116,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void bakFileWithOlderTimeStampDoesNotLeadToDiff() throws Exception {
+    void bakFileWithOlderTimeStampDoesNotLeadToDiff() throws Exception {
         Path changesBib = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         Path changesBibBak = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
 
@@ -130,7 +130,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void shouldNotCreateABackup(@TempDir Path customDir) throws Exception {
+    void shouldNotCreateABackup(@TempDir Path customDir) throws Exception {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 
@@ -157,7 +157,7 @@ public class BackupManagerTest {
     }
 
     @Test
-    public void shouldCreateABackup(@TempDir Path customDir) throws Exception {
+    void shouldCreateABackup(@TempDir Path customDir) throws Exception {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 

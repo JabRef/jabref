@@ -21,7 +21,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class YamlExporterTest {
+class YamlExporterTest {
 
     private static Exporter yamlExporter;
     private static BibDatabaseContext databaseContext;
@@ -42,7 +42,7 @@ public class YamlExporterTest {
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         yamlExporter.export(databaseContext, tempFile, Collections.emptyList());
@@ -50,7 +50,7 @@ public class YamlExporterTest {
     }
 
     @Test
-    public final void exportsCorrectContent(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContent(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -78,7 +78,7 @@ public class YamlExporterTest {
     }
 
     @Test
-    public final void formatsContentCorrect(@TempDir Path tempFile) throws Exception {
+    final void formatsContentCorrect(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")

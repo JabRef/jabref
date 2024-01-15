@@ -37,7 +37,7 @@ public class FieldRowViewModelTest {
     BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
     @BeforeEach
-    public void setup() throws ParseException {
+    void setup() throws ParseException {
         leftEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("LajnDiezScheinEtAl2012")
                 .withField(StandardField.AUTHOR, "Lajn, A and Diez, T and Schein, F and Frenzel, H and von Wenckstern, H and Grundmann, M")
@@ -78,7 +78,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void selectNonEmptyValueShouldSelectLeftFieldValueIfItIsNotEmpty() {
+    void selectNonEmptyValueShouldSelectLeftFieldValueIfItIsNotEmpty() {
         var numberFieldViewModel = createViewModelForField(StandardField.NUMBER);
         numberFieldViewModel.selectNonEmptyValue();
         assertEquals(FieldRowViewModel.Selection.LEFT, numberFieldViewModel.getSelection());
@@ -89,7 +89,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void selectNonEmptyValueShouldSelectRightFieldValueIfLeftValueIsEmpty() {
+    void selectNonEmptyValueShouldSelectRightFieldValueIfLeftValueIsEmpty() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectNonEmptyValue();
         assertEquals(FieldRowViewModel.Selection.RIGHT, monthFieldViewModel.getSelection());
@@ -100,14 +100,14 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void hasEqualLeftAndRightValuesShouldReturnFalseIfOneOfTheValuesIsEmpty() {
+    void hasEqualLeftAndRightValuesShouldReturnFalseIfOneOfTheValuesIsEmpty() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectNonEmptyValue();
         assertFalse(monthFieldViewModel.hasEqualLeftAndRightValues());
     }
 
     @Test
-    public void hasEqualLeftAndRightValuesShouldReturnTrueIfLeftAndRightAreEqual() {
+    void hasEqualLeftAndRightValuesShouldReturnTrueIfLeftAndRightAreEqual() {
         var yearFieldViewModel = createViewModelForField(StandardField.YEAR);
         yearFieldViewModel.selectNonEmptyValue();
         assertTrue(yearFieldViewModel.hasEqualLeftAndRightValues());
@@ -115,13 +115,13 @@ public class FieldRowViewModelTest {
 
     @Test
     @Disabled("This test is kept as a reminder to implement a different comparison logic based on the given field.")
-    public void hasEqualLeftAndRightValuesShouldReturnTrueIfKeywordsAreEqual() {
+    void hasEqualLeftAndRightValuesShouldReturnTrueIfKeywordsAreEqual() {
         FieldRowViewModel keywordsField = new FieldRowViewModel(StandardField.KEYWORDS, rightEntry, extraEntry, mergedEntry, fieldMergerFactory);
         assertTrue(keywordsField.hasEqualLeftAndRightValues());
     }
 
     @Test
-    public void selectLeftValueShouldBeCorrect() {
+    void selectLeftValueShouldBeCorrect() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectLeftValue();
         assertEquals(FieldRowViewModel.Selection.LEFT, monthFieldViewModel.getSelection());
@@ -134,7 +134,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void selectRightValueShouldBeCorrect() {
+    void selectRightValueShouldBeCorrect() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectRightValue();
         assertEquals(FieldRowViewModel.Selection.RIGHT, monthFieldViewModel.getSelection());
@@ -147,13 +147,13 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void isFieldsMergedShouldReturnTrueIfLeftAndRightValuesAreEqual() {
+    void isFieldsMergedShouldReturnTrueIfLeftAndRightValuesAreEqual() {
         var yearFieldViewModel = createViewModelForField(StandardField.YEAR);
         assertTrue(yearFieldViewModel.isFieldsMerged());
     }
 
     @Test
-    public void isFieldsMergedShouldReturnFalseIfLeftAndRightValuesAreNotEqual() {
+    void isFieldsMergedShouldReturnFalseIfLeftAndRightValuesAreNotEqual() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         assertFalse(monthFieldViewModel.isFieldsMerged());
 
@@ -165,27 +165,27 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void mergeFieldsShouldResultInLeftAndRightValuesBeingEqual() {
+    void mergeFieldsShouldResultInLeftAndRightValuesBeingEqual() {
         var groupsField = createViewModelForField(StandardField.GROUPS);
         groupsField.mergeFields();
         assertEquals(groupsField.getLeftFieldValue(), groupsField.getRightFieldValue());
     }
 
     @Test
-    public void mergeFieldsShouldBeCorrectEvenWhenOnOfTheValuesIsEmpty() {
+    void mergeFieldsShouldBeCorrectEvenWhenOnOfTheValuesIsEmpty() {
         var keywordsField = createViewModelForField(StandardField.KEYWORDS);
         keywordsField.mergeFields();
         assertEquals(keywordsField.getLeftFieldValue(), keywordsField.getRightFieldValue());
     }
 
     @Test
-    public void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
+    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
         var authorField = createViewModelForField(StandardField.AUTHOR);
         assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }
 
     @Test
-    public void mergeFieldsShouldSelectLeftFieldValue() {
+    void mergeFieldsShouldSelectLeftFieldValue() {
         var groupsField = createViewModelForField(StandardField.GROUPS);
         groupsField.mergeFields();
 
@@ -193,7 +193,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void unmergeFieldsShouldBeCorrect() {
+    void unmergeFieldsShouldBeCorrect() {
         var groupsField = createViewModelForField(StandardField.GROUPS);
         var oldLeftGroups = groupsField.getLeftFieldValue();
         var oldRightGroups = groupsField.getRightFieldValue();
@@ -205,7 +205,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    public void unmergeFieldsShouldDoNothingIfFieldsAreNotMerged() {
+    void unmergeFieldsShouldDoNothingIfFieldsAreNotMerged() {
         var groupsField = createViewModelForField(StandardField.GROUPS);
         var oldLeftGroups = groupsField.getLeftFieldValue();
         var oldRightGroups = groupsField.getRightFieldValue();

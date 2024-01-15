@@ -106,7 +106,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnDefaultBiblatex() {
+    void typeBasedOnDefaultBiblatex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
@@ -115,7 +115,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnDefaultBibtex() {
+    void typeBasedOnDefaultBibtex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
@@ -124,7 +124,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnInferredModeBiblatex() {
+    void typeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
         BibEntry e1 = new BibEntry(IEEETranEntryType.Electronic);
         db.insertEntry(e1);
@@ -134,7 +134,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testGetFullTextIndexPathWhenPathIsNull() {
+    void getFullTextIndexPathWhenPathIsNull() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(null);
 
@@ -145,7 +145,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testGetFullTextIndexPathWhenPathIsNotNull() {
+    void getFullTextIndexPathWhenPathIsNotNull() {
         Path existingPath = Path.of("some_path.bib");
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();

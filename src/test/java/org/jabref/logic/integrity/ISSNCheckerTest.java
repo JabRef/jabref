@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class ISSNCheckerTest {
+class ISSNCheckerTest {
 
     private final ISSNChecker checker = new ISSNChecker();
 
@@ -44,7 +44,7 @@ public class ISSNCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideIncorrectFormatArguments")
-    public void issnWithWrongFormat(String wrongISSN) {
+    void issnWithWrongFormat(String wrongISSN) {
         assertEquals(Optional.of(Localization.lang("incorrect format")), checker.checkValue(wrongISSN));
     }
 

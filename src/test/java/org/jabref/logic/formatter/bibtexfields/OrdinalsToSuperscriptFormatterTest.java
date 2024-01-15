@@ -8,17 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class OrdinalsToSuperscriptFormatterTest {
+class OrdinalsToSuperscriptFormatterTest {
 
     private OrdinalsToSuperscriptFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new OrdinalsToSuperscriptFormatter();
     }
 
     @Test
-    public void replacesSuperscript() {
+    void replacesSuperscript() {
         expectCorrect("1st", "1\\textsuperscript{st}");
         expectCorrect("2nd", "2\\textsuperscript{nd}");
         expectCorrect("3rd", "3\\textsuperscript{rd}");
@@ -27,14 +27,14 @@ public class OrdinalsToSuperscriptFormatterTest {
     }
 
     @Test
-    public void replaceSuperscriptsIgnoresCase() {
+    void replaceSuperscriptsIgnoresCase() {
         expectCorrect("1st", "1\\textsuperscript{st}");
         expectCorrect("1ST", "1\\textsuperscript{ST}");
         expectCorrect("1sT", "1\\textsuperscript{sT}");
     }
 
     @Test
-    public void replaceSuperscriptsInMultilineStrings() {
+    void replaceSuperscriptsInMultilineStrings() {
         expectCorrect(
                 "replace on 1st line\nand on 2nd line.",
                 "replace on 1\\textsuperscript{st} line\nand on 2\\textsuperscript{nd} line."
@@ -42,7 +42,7 @@ public class OrdinalsToSuperscriptFormatterTest {
     }
 
     @Test
-    public void replaceAllSuperscripts() {
+    void replaceAllSuperscripts() {
         expectCorrect(
                 "1st 2nd 3rd 4th",
                 "1\\textsuperscript{st} 2\\textsuperscript{nd} 3\\textsuperscript{rd} 4\\textsuperscript{th}"
@@ -50,12 +50,12 @@ public class OrdinalsToSuperscriptFormatterTest {
     }
 
     @Test
-    public void ignoreSuperscriptsInsideWords() {
+    void ignoreSuperscriptsInsideWords() {
         expectCorrect("1st 1stword words1st inside1stwords", "1\\textsuperscript{st} 1stword words1st inside1stwords");
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("11\\textsuperscript{th}", formatter.format(formatter.getExampleInput()));
     }
 

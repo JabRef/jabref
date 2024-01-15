@@ -10,11 +10,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DatabaseTest
-public class DBMSConnectionTest {
+class DBMSConnectionTest {
 
     @ParameterizedTest
     @EnumSource(DBMSType.class)
-    public void getConnectionFailsWhenconnectingToInvalidHost(DBMSType dbmsType) {
+    void getConnectionFailsWhenconnectingToInvalidHost(DBMSType dbmsType) {
         assertThrows(SQLException.class,
                 () -> new DBMSConnection(
                         new DBMSConnectionPropertiesBuilder()

@@ -17,17 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @AllowedToUseLogic("because class under test relies on logic classes")
-public class TexGroupTest {
+class TexGroupTest {
 
     private MetaData metaData;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         metaData = new MetaData();
     }
 
     @Test
-    public void containsReturnsTrueForEntryInAux() throws Exception {
+    void containsReturnsTrueForEntryInAux() throws Exception {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
         BibEntry inAux = new BibEntry();
@@ -37,7 +37,7 @@ public class TexGroupTest {
     }
 
     @Test
-    public void containsReturnsTrueForEntryNotInAux() throws Exception {
+    void containsReturnsTrueForEntryNotInAux() throws Exception {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
         BibEntry notInAux = new BibEntry();
@@ -47,7 +47,7 @@ public class TexGroupTest {
     }
 
     @Test
-    public void getFilePathReturnsRelativePath() throws Exception {
+    void getFilePathReturnsRelativePath() throws Exception {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         String user = "Darwin";
         metaData.setLatexFileDirectory(user, auxFile.getParent());

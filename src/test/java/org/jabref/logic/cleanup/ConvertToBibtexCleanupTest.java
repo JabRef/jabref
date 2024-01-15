@@ -10,17 +10,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConvertToBibtexCleanupTest {
+class ConvertToBibtexCleanupTest {
 
     private ConvertToBibtexCleanup worker;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         worker = new ConvertToBibtexCleanup();
     }
 
     @Test
-    public void cleanupMovesDateToYearAndMonth() {
+    void cleanupMovesDateToYearAndMonth() {
         BibEntry entry = new BibEntry().withField(StandardField.DATE, "2011-01");
 
         worker.cleanup(entry);
@@ -31,7 +31,7 @@ public class ConvertToBibtexCleanupTest {
     }
 
     @Test
-    public void cleanupWithYearAlreadyPresentDoesNothing() {
+    void cleanupWithYearAlreadyPresentDoesNothing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.DATE, "2012");
@@ -43,7 +43,7 @@ public class ConvertToBibtexCleanupTest {
     }
 
     @Test
-    public void cleanupMovesJournaltitleToJournal() {
+    void cleanupMovesJournaltitleToJournal() {
         BibEntry entry = new BibEntry().withField(StandardField.JOURNALTITLE, "Best of JabRef");
 
         worker.cleanup(entry);
@@ -53,7 +53,7 @@ public class ConvertToBibtexCleanupTest {
     }
 
     @Test
-    public void cleanUpDoesntMoveFileField() {
+    void cleanUpDoesntMoveFileField() {
         String fileField = ":Ambriola2006 - On the Systematic Analysis of Natural Language Requirements with CIRCE.pdf:PDF";
         BibEntry entry = new BibEntry().withField(StandardField.FILE, fileField);
 

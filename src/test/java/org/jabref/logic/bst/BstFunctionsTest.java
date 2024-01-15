@@ -4,11 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.bst.util.BstCaseChangersTest;
-import org.jabref.logic.bst.util.BstNameFormatterTest;
-import org.jabref.logic.bst.util.BstPurifierTest;
-import org.jabref.logic.bst.util.BstTextPrefixerTest;
-import org.jabref.logic.bst.util.BstWidthCalculatorTest;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -25,16 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * For additional tests see for
  * <ul>
- * <li> purify: {@link BstPurifierTest}</li>
- * <li> width: {@link BstWidthCalculatorTest}</li>
- * <li> format.name: {@link BstNameFormatterTest}</li>
- * <li> change.case: {@link BstCaseChangersTest}</li>
- * <li> prefix: {@link BstTextPrefixerTest}</li>
+ * <li> purify: {@link org.jabref.logic.bst.util.BstPurifierTest}</li>
+ * <li> width: {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}</li>
+ * <li> format.name: {@link org.jabref.logic.bst.util.BstNameFormatterTest}</li>
+ * <li> change.case: {@link org.jabref.logic.bst.util.BstCaseChangersTest}</li>
+ * <li> prefix: {@link org.jabref.logic.bst.util.BstTextPrefixerTest}</li>
  * </ul>
  */
 class BstFunctionsTest {
     @Test
-    public void testCompareFunctions() throws RecognitionException {
+    void compareFunctions() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test.compare } {
                     #5  #5      =   % TRUE
@@ -67,7 +62,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testArithmeticFunctions() throws RecognitionException {
+    void arithmeticFunctions() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     #1  #1  +   % 2
@@ -84,7 +79,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testArithmeticFunctionTypeMismatch() throws RecognitionException {
+    void arithmeticFunctionTypeMismatch() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     #1  "HELLO" +   % Should throw exception
@@ -96,7 +91,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testStringOperations() throws RecognitionException {
+    void stringOperations() throws RecognitionException {
         // Test for concat (*) and add.period
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
@@ -128,7 +123,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testMissing() throws RecognitionException {
+    void missing() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -154,7 +149,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testNumNames() throws RecognitionException {
+    void numNames() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     "Johnny Foo { and } Mary Bar" num.names$
@@ -171,7 +166,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testSubstring() throws RecognitionException {
+    void substring() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     "123456789" #2  #1          substring$  % 2
@@ -201,7 +196,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testEmpty() throws RecognitionException {
+    void empty() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }
                 READ
@@ -228,7 +223,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testFormatNameStatic() throws RecognitionException {
+    void formatNameStatic() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { format }{ "Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin" #1 "{vv~}{ll}{, jj}{, f}?" format.name$ }
                 EXECUTE { format }
@@ -242,7 +237,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testFormatNameInEntries() throws RecognitionException {
+    void formatNameInEntries() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { author } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -266,7 +261,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testChangeCase() throws RecognitionException {
+    void changeCase() throws RecognitionException {
         BstVM vm = new BstVM("""
                 STRINGS { title }
                 READ
@@ -296,7 +291,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testTextLength() throws RecognitionException {
+    void textLength() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     "hello world" text.length$                                  % 11
@@ -325,7 +320,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testIntToStr() throws RecognitionException {
+    void intToStr() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } { #3 int.to.str$ #9999 int.to.str$ }
                 EXECUTE { test }
@@ -339,7 +334,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testChrToInt() throws RecognitionException {
+    void chrToInt() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } { "H" chr.to.int$ }
                 EXECUTE { test }
@@ -352,7 +347,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testChrToIntIntToChr() throws RecognitionException {
+    void chrToIntIntToChr() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } { "H" chr.to.int$ int.to.chr$ }
                 EXECUTE {test}
@@ -365,7 +360,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testType() throws RecognitionException {
+    void type() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY  { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -390,7 +385,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testCallType() throws RecognitionException {
+    void callType() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -417,7 +412,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testSwap() throws RecognitionException {
+    void swap() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { a } { #3 "Hallo" swap$ }
                 EXECUTE { a }
@@ -432,7 +427,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    void testAssignFunction() {
+    void assignFunction() {
         BstVM vm = new BstVM("""
                 INTEGERS { test.var }
                 FUNCTION { test.func } { #1 'test.var := }
@@ -448,7 +443,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    void testSimpleIf() {
+    void simpleIf() {
         BstVM vm = new BstVM("""
                 FUNCTION { path1 } { #1 }
                 FUNCTION { path0 } { #0 }
@@ -467,7 +462,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    void testSimpleWhile() {
+    void simpleWhile() {
         BstVM vm = new BstVM("""
                 INTEGERS { i }
                 FUNCTION { test } {
@@ -492,7 +487,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testNestedControlFunctions() throws RecognitionException {
+    void nestedControlFunctions() throws RecognitionException {
         BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { not } { { #0 } { #1 } if$ }
@@ -537,7 +532,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testLogic() throws RecognitionException {
+    void logic() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { not } { { #0 } { #1 } if$ }
                 FUNCTION { and } { 'skip$ { pop$ #0 } if$ }
@@ -573,11 +568,11 @@ class BstFunctionsTest {
     }
 
     /**
-     * See also {@link BstWidthCalculatorTest}
+     * See also {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
      */
 
     @Test
-    public void testWidth() throws RecognitionException {
+    void width() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { address author title type } { } { label }
                 STRINGS { longest.label }
@@ -619,7 +614,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testDuplicateEmptyPopSwapIf() throws RecognitionException {
+    void duplicateEmptyPopSwapIf() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { emphasize } {
                     duplicate$ empty$
@@ -642,7 +637,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testPreambleWriteNewlineQuote() {
+    void preambleWriteNewlineQuote() {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     preamble$

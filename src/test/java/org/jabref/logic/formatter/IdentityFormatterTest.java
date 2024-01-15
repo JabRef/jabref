@@ -8,17 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class IdentityFormatterTest {
+class IdentityFormatterTest {
 
     private IdentityFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new IdentityFormatter();
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("JabRef", formatter.format(formatter.getExampleInput()));
     }
 }

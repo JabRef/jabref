@@ -23,10 +23,10 @@ import static org.mockito.Mockito.mock;
 
 @Disabled
 @FetcherTest
-public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
+class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bibEntryEffectiveJava = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("9780134685991")
                 .withField(StandardField.TITLE, "Effective Java")
@@ -85,7 +85,7 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * not available on ebook.de.
      */
     @Test
-    public void searchForValidButNotFoundISBN() throws Exception {
+    void searchForValidButNotFoundISBN() throws Exception {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));
     }
 }

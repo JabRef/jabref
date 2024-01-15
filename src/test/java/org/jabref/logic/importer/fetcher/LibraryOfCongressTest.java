@@ -19,12 +19,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class LibraryOfCongressTest {
+class LibraryOfCongressTest {
 
     private LibraryOfCongress fetcher;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -33,7 +33,7 @@ public class LibraryOfCongressTest {
     }
 
     @Test
-    public void performSearchById() throws Exception {
+    void performSearchById() throws Exception {
         BibEntry expected = new BibEntry()
                 .withField(StandardField.ADDRESS, "mau, Burlington, MA")
                 .withField(StandardField.AUTHOR, "West, Matthew")
@@ -53,12 +53,12 @@ public class LibraryOfCongressTest {
     }
 
     @Test
-    public void performSearchByEmptyId() throws Exception {
+    void performSearchByEmptyId() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
-    public void performSearchByInvalidId() {
+    void performSearchByInvalidId() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("xxx"));
     }
 }

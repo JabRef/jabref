@@ -10,16 +10,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ToLowerCaseTest {
+class ToLowerCaseTest {
 
     @Test
-    public void testNull() {
+    void testNull() {
         assertNull(new ToLowerCase().format(null));
     }
 
     @ParameterizedTest
     @MethodSource("provideArguments")
-    public void toLowerCaseWithDifferentInputs(String expectedString, String originalString) {
+    void toLowerCaseWithDifferentInputs(String expectedString, String originalString) {
         assertEquals(expectedString, new ToLowerCase().format(originalString));
     }
 

@@ -25,14 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PdfIndexerTest {
+class PdfIndexerTest {
 
     private PdfIndexer indexer;
     private BibDatabase database;
     private BibDatabaseContext context = mock(BibDatabaseContext.class);
 
     @BeforeEach
-    public void setUp(@TempDir Path indexDir) throws IOException {
+    void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         this.database = new BibDatabase();
 
@@ -46,7 +46,7 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void exampleThesisIndex() throws IOException {
+    void exampleThesisIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
@@ -62,7 +62,7 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void doNotIndexNonPdf() throws IOException {
+    void doNotIndexNonPdf() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
                 .withFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.aux", StandardFileType.AUX.getName())));
@@ -78,7 +78,7 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void dontIndexOnlineLinks() throws IOException {
+    void dontIndexOnlineLinks() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
@@ -94,7 +94,7 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void exampleThesisIndexWithKey() throws IOException {
+    void exampleThesisIndexWithKey() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setCitationKey("Example2017");
@@ -111,7 +111,7 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void metaDataIndex() throws IOException {
+    void metaDataIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
@@ -128,7 +128,7 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void exampleThesisIndexAppendMetaData() throws IOException {
+    void exampleThesisIndexAppendMetaData() throws IOException {
         // given
         BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
         exampleThesis.setCitationKey("ExampleThesis2017");

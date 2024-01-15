@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
-public class SynchronizationSimulatorTest {
+class SynchronizationSimulatorTest {
 
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
@@ -43,7 +43,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
         TestManager.clearTables(dbmsConnection);
 
@@ -62,13 +62,13 @@ public class SynchronizationSimulatorTest {
     }
 
     @AfterEach
-    public void clear() throws SQLException {
+    void clear() throws SQLException {
         clientContextA.getDBMSSynchronizer().closeSharedDatabase();
         clientContextB.getDBMSSynchronizer().closeSharedDatabase();
     }
 
     @Test
-    public void simulateEntryInsertionAndManualPull() throws Exception {
+    void simulateEntryInsertionAndManualPull() throws Exception {
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
         // client A inserts another entry
@@ -80,7 +80,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateEntryUpdateAndManualPull() throws Exception {
+    void simulateEntryUpdateAndManualPull() throws Exception {
         BibEntry bibEntry = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -95,7 +95,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateEntryDelitionAndManualPull() throws Exception {
+    void simulateEntryDelitionAndManualPull() throws Exception {
         BibEntry bibEntry = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -116,7 +116,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateUpdateOnNoLongerExistingEntry() throws Exception {
+    void simulateUpdateOnNoLongerExistingEntry() throws Exception {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
@@ -142,7 +142,7 @@ public class SynchronizationSimulatorTest {
     }
 
     @Test
-    public void simulateEntryChangeConflicts() {
+    void simulateEntryChangeConflicts() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);

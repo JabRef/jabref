@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BibtexStringTest {
+class BibtexStringTest {
 
     @Test
-    public void initalizationWorksCorrectly() {
+    void initalizationWorksCorrectly() {
         // Instantiate
         BibtexString bs = new BibtexString("AAA", "An alternative action");
         assertEquals("AAA", bs.getName());
@@ -18,7 +18,7 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void idIsUpdatedAtSetId() {
+    void idIsUpdatedAtSetId() {
         // Instantiate
         BibtexString bs = new BibtexString("AAA", "An alternative action");
         bs.setId("ID");
@@ -26,7 +26,7 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void cloningDoesNotChangeContents() {
+    void cloningDoesNotChangeContents() {
         BibtexString bs = new BibtexString("AAA", "An alternative action");
         bs.setId("ID");
 
@@ -39,7 +39,7 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void clonedBibtexStringEqualsOriginalString() {
+    void clonedBibtexStringEqualsOriginalString() {
         BibtexString bibtexString = new BibtexString("AAA", "An alternative action");
         bibtexString.setId("ID");
 
@@ -49,7 +49,7 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void usingTheIdGeneratorDoesNotHitTheOriginalId() {
+    void usingTheIdGeneratorDoesNotHitTheOriginalId() {
         // Instantiate
         BibtexString bs = new BibtexString("AAA", "An alternative action");
         bs.setId("ID");
@@ -59,7 +59,7 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void settingFieldsInACloneWorks() {
+    void settingFieldsInACloneWorks() {
         // Instantiate
         BibtexString bs = new BibtexString("AAA", "An alternative action");
         bs.setId("ID");
@@ -75,7 +75,7 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void modifyingACloneDoesNotModifyTheOriginalEntry() {
+    void modifyingACloneDoesNotModifyTheOriginalEntry() {
         // Instantiate
         BibtexString original = new BibtexString("AAA", "An alternative action");
         original.setId("ID");
@@ -90,34 +90,34 @@ public class BibtexStringTest {
     }
 
     @Test
-    public void getContentNeverReturnsNull() {
+    void getContentNeverReturnsNull() {
         BibtexString bs = new BibtexString("SomeName", null);
         assertNotNull(bs.getContent());
     }
 
     @Test
-    public void authorTypeCorrectlyDetermined() {
+    void authorTypeCorrectlyDetermined() {
         // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("aKopp", "KoppOliver");
         assertEquals(BibtexString.Type.AUTHOR, bibtexString.getType());
     }
 
     @Test
-    public void institutionTypeCorrectlyDetermined() {
+    void institutionTypeCorrectlyDetermined() {
         // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("iMIT", "{Massachusetts Institute of Technology ({MIT})}");
         assertEquals(BibtexString.Type.INSTITUTION, bibtexString.getType());
     }
 
     @Test
-    public void otherTypeCorrectlyDeterminedForLowerCase() {
+    void otherTypeCorrectlyDeterminedForLowerCase() {
         // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("anct", "Anecdote");
         assertEquals(BibtexString.Type.OTHER, bibtexString.getType());
     }
 
     @Test
-    public void otherTypeCorrectlyDeterminedForUpperCase() {
+    void otherTypeCorrectlyDeterminedForUpperCase() {
         // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("lTOSCA", "Topology and Orchestration Specification for Cloud Applications");
         assertEquals(BibtexString.Type.OTHER, bibtexString.getType());
