@@ -1,7 +1,6 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -139,7 +138,7 @@ public class SharedDatabaseUIManager {
 
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
-        if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
+        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getEntry()))) {
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"
