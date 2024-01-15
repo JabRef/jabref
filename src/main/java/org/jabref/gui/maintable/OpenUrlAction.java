@@ -44,7 +44,7 @@ public class OpenUrlAction extends SimpleCommand {
                 return;
             }
 
-            BibEntry entry = entries.get(0);
+            BibEntry entry = entries.getFirst();
 
             // ToDo: Create dialog or menu to chose which one to open
             // URL - DOI - DOI - EPRINT

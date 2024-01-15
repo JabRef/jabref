@@ -201,7 +201,7 @@ public class StyleLoaderTest {
             }
         }
 
-        assertFalse(loader.removeStyle(toremove.get(0)));
+        assertFalse(loader.removeStyle(toremove.getFirst()));
         assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
     }
 }

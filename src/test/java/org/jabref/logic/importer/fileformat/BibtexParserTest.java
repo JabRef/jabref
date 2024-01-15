@@ -301,7 +301,7 @@ class BibtexParserTest {
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         assertEquals(List.of(expected), parsed);
-        assertEquals(expected.getUserComments(), parsed.get(0).getUserComments());
+        assertEquals(expected.getUserComments(), parsed.getFirst().getUserComments());
     }
 
     @Test
@@ -329,7 +329,7 @@ class BibtexParserTest {
         String secondEntry = "@inProceedings{foo," + "  author={Norton Bar}}";
         List<BibEntry> parsedEntries = parser.parse(new StringReader(firstEntry + secondEntry))
                                              .getDatabase().getEntries();
-        assertEquals(firstEntry, parsedEntries.get(0).getParsedSerialization());
+        assertEquals(firstEntry, parsedEntries.getFirst().getParsedSerialization());
         assertEquals(secondEntry, parsedEntries.get(1).getParsedSerialization());
     }
 
@@ -611,7 +611,7 @@ class BibtexParserTest {
 
         List<BibEntry> entries = result.getDatabase().getEntries();
 
-        assertEquals(Optional.of("author bracket #too##much#"), entries.get(0).getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("author bracket #too##much#"), entries.getFirst().getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -632,7 +632,7 @@ class BibtexParserTest {
         List<BibEntry> entries = result.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
-        assertEquals(Optional.of("author @ good"), entries.get(0).getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("author @ good"), entries.getFirst().getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -1487,7 +1487,7 @@ class BibtexParserTest {
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
-        assertEquals("", entries.get(0).getUserComments());
+        assertEquals("", entries.getFirst().getUserComments());
     }
 
     @Test

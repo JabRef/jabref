@@ -2869,7 +2869,7 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 if (importerString.size() == 2) {
                     // New format: basePath, className
-                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                    importers.add(new CustomImporter(importerString.getFirst(), importerString.get(1)));
                 } else {
                     // Old format: name, cliId, className, basePath
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));

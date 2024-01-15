@@ -359,7 +359,7 @@ public class OOFrontend {
             if (partition.isEmpty()) {
                 continue;
             }
-            RangeForOverlapCheck<CitationGroupId> citationRange = partition.get(0);
+            RangeForOverlapCheck<CitationGroupId> citationRange = partition.getFirst();
 
             Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
 

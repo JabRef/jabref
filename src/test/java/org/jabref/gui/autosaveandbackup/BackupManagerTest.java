@@ -186,6 +186,6 @@ public class BackupManagerTest {
         List<Path> files = Files.list(backupDir).sorted().toList();
         // we only know the first backup path because the second one is created on shutdown
         // due to timing issues we cannot test that reliable
-        assertEquals(fullBackupPath.get(), files.get(0));
+        assertEquals(fullBackupPath.get(), files.getFirst());
     }
 }

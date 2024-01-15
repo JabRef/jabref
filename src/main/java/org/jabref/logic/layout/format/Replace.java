@@ -45,7 +45,7 @@ public class Replace extends AbstractParamLayoutFormatter {
         if (parts.size() < 2) {
             return; // TODO: too few arguments. Print an error message here?
         }
-        regex = parts.get(0);
+        regex = parts.getFirst();
         replaceWith = parts.get(1);
     }
 

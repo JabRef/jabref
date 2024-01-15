@@ -193,7 +193,7 @@ public class FieldFormatterCleanups {
     // ToDo: This should reside in MetaDataParser
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
-            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.get(0));
+            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
             String formatterString = formatterMetaList.get(1);
 
             return new FieldFormatterCleanups(enablementStatus, parse(formatterString));

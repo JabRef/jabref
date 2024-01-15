@@ -177,7 +177,7 @@ public class CitationKeyGenerator extends BracketedPattern {
         if (citationKeyPattern.isEmpty()) {
             return "";
         }
-        return expandBrackets(citationKeyPattern.get(0), expandBracketContent(entry));
+        return expandBrackets(citationKeyPattern.getFirst(), expandBracketContent(entry));
     }
 
     /**
@@ -193,7 +193,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
 
-            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database), unwantedCharacters);
+            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database), unwantedCharacters);
             // check whether there is a modifier on the end such as
             // ":lower":
             if (fieldParts.size() > 1) {

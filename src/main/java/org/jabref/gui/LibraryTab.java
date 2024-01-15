@@ -519,7 +519,7 @@ public class LibraryTab extends Tab {
             stateManager.setSelectedEntries(entries);
             if (!entries.isEmpty()) {
                 // Update entry editor and preview according to selected entries
-                entryEditor.setEntry(entries.get(0));
+                entryEditor.setEntry(entries.getFirst());
             }
         });
     }

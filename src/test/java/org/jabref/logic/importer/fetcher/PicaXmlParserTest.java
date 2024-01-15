@@ -57,7 +57,7 @@ public class PicaXmlParserTest {
             assertNotNull(entries);
             assertEquals(5, entries.size());
 
-            assertEquals(Optional.empty(), entries.get(0).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.SUBTITLE));
             assertEquals(Optional.of("C"), entries.get(1).getField(StandardField.SUBTITLE));
             assertEquals(Optional.of("Word"), entries.get(2).getField(StandardField.SUBTITLE));
             assertEquals(Optional.of("Word1 word2"), entries.get(3).getField(StandardField.SUBTITLE));

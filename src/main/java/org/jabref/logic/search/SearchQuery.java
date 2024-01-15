@@ -172,7 +172,7 @@ public class SearchQuery implements SearchMatcher {
     private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
         List<String> words = getSearchWords();
 
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
+        if ((words == null) || words.isEmpty() || words.getFirst().isEmpty()) {
             return Optional.empty();
         }
 
