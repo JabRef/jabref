@@ -201,7 +201,7 @@ public class BibDatabase {
         if (newEntries.isEmpty()) {
             eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         } else {
-            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
         }
         entries.addAll(newEntries);
     }

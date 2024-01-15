@@ -247,7 +247,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
-        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());
         refreshPreview();
     }
 
@@ -269,7 +269,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
-        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());
         refreshPreview();
     }
 

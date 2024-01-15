@@ -139,7 +139,7 @@ public class StyleLoader {
             }
         }
         // Pick the first internal
-        openOfficePreferences.setCurrentStyle(internalStyles.get(0).getPath());
-        return internalStyles.get(0);
+        openOfficePreferences.setCurrentStyle(internalStyles.getFirst().getPath());
+        return internalStyles.getFirst();
     }
 }

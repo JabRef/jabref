@@ -78,7 +78,7 @@ class MedlinePlainImporterTest {
 
         List<BibEntry> entries = importer.importDatabase(inputFile).getDatabase()
                                          .getEntries();
-        BibEntry testEntry = entries.get(0);
+        BibEntry testEntry = entries.getFirst();
 
         assertEquals(7, entries.size());
         assertEquals(StandardEntryType.Article, testEntry.getType());

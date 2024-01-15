@@ -112,7 +112,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
         if (!linkedFiles.isEmpty()) {
-            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
+            return Localization.lang("Open file %0", linkedFiles.getFirst().getLink());
         }
         return null;
     }
@@ -145,7 +145,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
-            return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.get(0), true, preferencesService.getFilePreferences())
+            return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.getFirst(), true, preferencesService.getFilePreferences())
                                     .map(ExternalFileType::getIcon)
                                     .orElse(IconTheme.JabRefIcons.FILE)
                                     .getGraphicNode();

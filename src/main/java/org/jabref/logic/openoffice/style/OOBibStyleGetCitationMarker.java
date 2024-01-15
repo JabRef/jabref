@@ -642,7 +642,7 @@ class OOBibStyleGetCitationMarker {
         int i_out = 0;
 
         if (nEntries > 0) {
-            filteredCitationMarkerEntries.add(citationMarkerEntries.get(0));
+            filteredCitationMarkerEntries.add(citationMarkerEntries.getFirst());
             startsNewGroup[i_out] = true;
             i_out++;
         }

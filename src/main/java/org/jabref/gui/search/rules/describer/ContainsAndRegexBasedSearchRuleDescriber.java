@@ -25,7 +25,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
     @Override
     public TextFlow getDescription() {
         List<String> words = new SentenceAnalyzer(query).getWords();
-        String firstWord = words.isEmpty() ? "" : words.get(0);
+        String firstWord = words.isEmpty() ? "" : words.getFirst();
 
         String temp = searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? Localization.lang(
                 "This search contains entries in which any field contains the regular expression <b>%0</b>")

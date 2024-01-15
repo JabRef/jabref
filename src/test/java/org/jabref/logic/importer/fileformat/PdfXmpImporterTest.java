@@ -68,7 +68,7 @@ public class PdfXmpImporterTest {
 
         assertEquals(1, bibEntries.size());
 
-        BibEntry be0 = bibEntries.get(0);
+        BibEntry be0 = bibEntries.getFirst();
         assertEquals(Optional.of("how to annotate a pdf"), be0.getField(StandardField.ABSTRACT));
         assertEquals(Optional.of("Chris"), be0.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("pdf, annotation"), be0.getField(StandardField.KEYWORDS));
