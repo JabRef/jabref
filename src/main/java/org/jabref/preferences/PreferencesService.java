@@ -151,5 +151,4 @@ public interface PreferencesService {
     ProtectedTermsPreferences getProtectedTermsPreferences();
 
     MergeDialogPreferences getMergeDialogPreferences();
-
 }
