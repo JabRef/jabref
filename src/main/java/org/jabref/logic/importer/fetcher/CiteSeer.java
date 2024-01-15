@@ -89,7 +89,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         // does not use a valid DOI, but Cite Seer's id / hash available for each entry
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {
-            String source = String.format(PDF_URL, id.get());
+            String source = PDF_URL.formatted(id.get());
             return Optional.of(new URL(source));
         }
 

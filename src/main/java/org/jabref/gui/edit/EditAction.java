@@ -81,7 +81,7 @@ public class EditAction extends SimpleCommand {
                     case COPY -> tabSupplier.get().copy();
                     case CUT -> tabSupplier.get().cut();
                     case PASTE -> tabSupplier.get().paste();
-                    case DELETE_ENTRY -> tabSupplier.get().delete(false);
+                    case DELETE_ENTRY -> tabSupplier.get().delete(StandardActions.DELETE_ENTRY);
                     case UNDO -> {
                         if (undoManager.canUndo()) {
                             undoManager.undo();

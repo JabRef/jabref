@@ -99,7 +99,7 @@ public class InspecImporterTest {
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
             List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
-            BibEntry entry = entries.get(0);
+            BibEntry entry = entries.getFirst();
             assertEquals(expectedEntry, entry);
         }
     }

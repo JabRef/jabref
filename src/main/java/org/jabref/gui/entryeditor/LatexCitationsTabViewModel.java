@@ -133,7 +133,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             directory.set(newDirectory);
 
             if (!newDirectory.toFile().exists()) {
-                throw new IOException(String.format("Current search directory does not exist: %s", newDirectory));
+                throw new IOException("Current search directory does not exist: %s".formatted(newDirectory));
             }
 
             List<Path> texFiles = searchDirectory(newDirectory);

@@ -53,7 +53,7 @@ class AuxParserTest {
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             List<BibEntry> newEntries = newDB.getEntries();
             assertEquals(2, newEntries.size());
-            assertTrue(newEntries.get(0).hasChanged());
+            assertTrue(newEntries.getFirst().hasChanged());
             assertTrue(newEntries.get(1).hasChanged());
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());
@@ -80,7 +80,7 @@ class AuxParserTest {
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             List<BibEntry> newEntries = newDB.getEntries();
             assertEquals(2, newEntries.size());
-            assertTrue(newEntries.get(0).hasChanged());
+            assertTrue(newEntries.getFirst().hasChanged());
             assertTrue(newEntries.get(1).hasChanged());
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());

@@ -130,7 +130,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("General"),
                         Localization.lang("Font settings"),
                         Localization.lang("You must enter an integer value higher than 8."))));
@@ -138,7 +138,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         customPathToThemeValidator = new FunctionBasedValidator<>(
                 customPathToThemeProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("General"),
                         Localization.lang("Visual theme"),
                         Localization.lang("Please specify a css theme file."))));
@@ -153,7 +153,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));

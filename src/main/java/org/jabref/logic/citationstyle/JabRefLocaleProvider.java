@@ -28,7 +28,6 @@ public class JabRefLocaleProvider implements LocaleProvider {
                 if (url == null) {
                     throw new IllegalArgumentException("Unable to load locale " + locale);
                 }
-
                 return CSLUtils.readURLToString(url, "UTF-8");
             } catch (IOException e) {
                 throw new UncheckedIOException("failed to read locale " + locale, e);

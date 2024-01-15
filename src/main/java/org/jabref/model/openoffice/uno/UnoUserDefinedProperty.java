@@ -127,7 +127,7 @@ public class UnoUserDefinedProperty {
         try {
             container.get().removeProperty(property);
         } catch (UnknownPropertyException ex) {
-            LOGGER.warn(String.format("UnoUserDefinedProperty.remove(%s) This property was not there to remove",
+            LOGGER.warn("UnoUserDefinedProperty.remove(%s) This property was not there to remove".formatted(
                     property));
         }
     }

@@ -212,7 +212,7 @@ public class TreeNodeTest {
 
         List<TreeNodeTestData.TreeNodeMock> path = node.getPathFromRoot();
         assertEquals(3, path.size());
-        assertEquals(root, path.get(0));
+        assertEquals(root, path.getFirst());
         assertEquals(node, path.get(2));
     }
 
@@ -223,7 +223,7 @@ public class TreeNodeTest {
 
         List<TreeNodeTestData.TreeNodeMock> path = node.getPathFromRoot();
         assertEquals(4, path.size());
-        assertEquals(root, path.get(0));
+        assertEquals(root, path.getFirst());
         assertEquals(node, path.get(3));
     }
 

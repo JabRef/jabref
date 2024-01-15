@@ -280,7 +280,7 @@ public class PdfIndexer {
      */
     public Set<String> getListOfFilePaths() {
         Set<String> paths = new HashSet<>();
-        try (IndexReader reader = DirectoryReader.open(indexWriter)) {
+        try (IndexReader reader = DirectoryReader.open(getIndexWriter())) {
             IndexSearcher searcher = new IndexSearcher(reader);
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);

@@ -149,10 +149,10 @@ public class FileFieldParser {
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
-                field = new LinkedFile(entry.get(0), new URL(entry.get(1)), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), new URL(entry.get(1)), entry.get(2));
             } catch (MalformedURLException e) {
                 // in case the URL is malformed, store it nevertheless
-                field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
             }
         }
 
@@ -161,16 +161,16 @@ public class FileFieldParser {
             if (pathStr.contains("//")) {
                 // In case the path contains //, we assume it is a malformed URL, not a malformed path.
                 // On linux, the double slash would be converted to a single slash.
-                field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
+                field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
             } else {
                 try {
                     // there is no Path.isValidPath(String) method
                     Path path = Path.of(pathStr);
-                    field = new LinkedFile(entry.get(0), path, entry.get(2));
+                    field = new LinkedFile(entry.getFirst(), path, entry.get(2));
                 } catch (InvalidPathException e) {
                     // Ignored
                     LOGGER.debug("Invalid path object, continueing with string", e);
-                    field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
+                    field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
                 }
             }
         }

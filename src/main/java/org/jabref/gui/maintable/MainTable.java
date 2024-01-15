@@ -255,16 +255,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (!selectedEntries.isEmpty()) {
             try {
                 clipBoardManager.setContent(selectedEntries, entryTypesManager);
-                dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
+                dialogService.notify(Localization.lang("Copied %0 entry(ies)", selectedEntries.size()));
             } catch (IOException e) {
-                LOGGER.error("Error while copying selected entries to clipboard", e);
+                LOGGER.error("Error while copying selected entries to clipboard.", e);
             }
         }
     }
 
     public void cut() {
         copy();
-        libraryTab.delete(true);
+        libraryTab.delete(StandardActions.CUT);
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
@@ -473,10 +473,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         return model;
     }
 
-    public BibEntry getEntryAt(int row) {
-        return model.getEntriesFilteredAndSorted().get(row).getEntry();
-    }
-
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
                 .getSelectedItems()
@@ -490,12 +486,5 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
-    }
-
-    public static List<MainTableColumnModel> toColumnModels(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
-        return columns.stream()
-                      .filter(col -> col instanceof MainTableColumn<?>)
-                      .map(column -> ((MainTableColumn<?>) column).getModel())
-                      .collect(Collectors.toList());
     }
 }

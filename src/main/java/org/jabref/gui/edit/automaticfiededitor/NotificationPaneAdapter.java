@@ -15,7 +15,7 @@ public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
     }
 
     public void notify(int affectedEntries, int totalEntries) {
-        String notificationMessage = String.format("%d/%d affected entries", affectedEntries, totalEntries);
+        String notificationMessage = "%d/%d affected entries".formatted(affectedEntries, totalEntries);
         Node notificationGraphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
 
         notify(notificationGraphic, notificationMessage, Collections.emptyList(), Duration.seconds(2));

@@ -227,7 +227,7 @@ public class AstrophysicsDataSystem
                 LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
                         + ". We will use the first entry.");
             }
-            BibEntry entry = fetchedEntries.get(0);
+            BibEntry entry = fetchedEntries.getFirst();
             return Optional.of(entry);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);

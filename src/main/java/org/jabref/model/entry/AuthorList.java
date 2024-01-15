@@ -155,8 +155,8 @@ public class AuthorList {
         int lastIndex = authors.size() - 1;
         return switch (authors.size()) {
             case 0 -> "";
-            case 1 -> authors.get(0);
-            case 2 -> authors.get(0) + " and " + authors.get(1);
+            case 1 -> authors.getFirst();
+            case 2 -> authors.getFirst() + " and " + authors.get(1);
             default -> String.join(", ", authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);
         };
     }
@@ -319,9 +319,9 @@ public class AuthorList {
         var authors = getAuthors();
         return switch (authors.size()) {
             case 0 -> "";
-            case 1 -> authors.get(0).getLastOnly();
-            case 2 -> authors.get(0).getLastOnly() + " and " + authors.get(1).getLastOnly();
-            default -> authors.get(0).getLastOnly() + " et al.";
+            case 1 -> authors.getFirst().getLastOnly();
+            case 2 -> authors.getFirst().getLastOnly() + " and " + authors.get(1).getLastOnly();
+            default -> authors.getFirst().getLastOnly() + " et al.";
         };
     }
 
@@ -398,13 +398,13 @@ public class AuthorList {
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         return switch (authors.size()) {
             case 0 -> "";
-            case 1 -> authors.get(0).getLastFirst(abbreviate);
+            case 1 -> authors.getFirst().getLastFirst(abbreviate);
             default -> authors.stream()
                               .skip(1)
                               .map(author -> author.getFirstLast(abbreviate))
                               .collect(Collectors.joining(
                                       " and ",
-                                      authors.get(0).getLastFirst(abbreviate) + " and ",
+                                      authors.getFirst().getLastFirst(abbreviate) + " and ",
                                       ""));
         };
     }

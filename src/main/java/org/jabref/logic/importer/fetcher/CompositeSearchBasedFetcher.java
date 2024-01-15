@@ -59,7 +59,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                            try {
                                return searchBasedFetcher.performSearch(luceneQuery).stream();
                            } catch (FetcherException e) {
-                               LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
+                               LOGGER.warn("%s API request failed".formatted(searchBasedFetcher.getName()), e);
                                return Stream.empty();
                            }
                        })

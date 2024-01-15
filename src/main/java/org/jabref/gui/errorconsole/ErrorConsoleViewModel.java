@@ -91,7 +91,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     public void reportIssue() {
         try {
             // System info
-            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
+            String systemInfo = "JabRef %s%n%s %s %s %nJava %s".formatted(buildInfo.version, BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             // Steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";

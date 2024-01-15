@@ -136,7 +136,7 @@ public class BackupManager {
      * Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
      * newer and different from the original.
      *
-     * In case a discarded file is present, the method also returns <code>false</code>, See also {@link #discardBackup()}.
+     * In case a discarded file is present, the method also returns <code>false</code>, See also {@link #discardBackup(Path)}.
      *
      * @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
      *

@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.casechanger.Word;
@@ -77,10 +77,10 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     public Optional<String> getJournal() {
-        return Objects.isNull(journal) ? Optional.empty() : Optional.of(journal);
+        return journal == null ? Optional.empty() : Optional.of(journal);
     }
 
     public Optional<String> getArticleNumber() {
-        return Objects.isNull(articleNumber) ? Optional.empty() : Optional.of(articleNumber);
+        return articleNumber == null ? Optional.empty() : Optional.of(articleNumber);
     }
 }
