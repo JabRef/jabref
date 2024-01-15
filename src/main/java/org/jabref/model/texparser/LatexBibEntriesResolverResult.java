@@ -47,7 +47,7 @@ public class LatexBibEntriesResolverResult {
 
     @Override
     public String toString() {
-        return String.format("TexBibEntriesResolverResult{texParserResult=%s, newEntries=%s}",
+        return "TexBibEntriesResolverResult{texParserResult=%s, newEntries=%s}".formatted(
                 this.latexParserResult,
                 this.newEntries);
     }

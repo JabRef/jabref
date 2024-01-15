@@ -65,7 +65,7 @@ public class Citation {
         int end = Math.min(lineLength, start + CONTEXT_WIDTH);
 
         // Add three dots when the string does not contain all the line.
-        return String.format("%s%s%s",
+        return "%s%s%s".formatted(
                 start > 0 ? "..." : "",
                 lineText.substring(start, end).trim(),
                 end < lineLength ? "..." : "");
@@ -73,7 +73,7 @@ public class Citation {
 
     @Override
     public String toString() {
-        return String.format("Citation{path=%s, line=%s, colStart=%s, colEnd=%s, lineText='%s'}",
+        return "Citation{path=%s, line=%s, colStart=%s, colEnd=%s, lineText='%s'}".formatted(
                 this.path,
                 this.line,
                 this.colStart,

@@ -27,7 +27,7 @@ class LocalizationEntry implements Comparable<LocalizationEntry> {
     }
 
     public String getId() {
-        return String.format("%s___%s", bundle, key);
+        return "%s___%s".formatted(bundle, key);
     }
 
     @Override
@@ -58,7 +58,7 @@ class LocalizationEntry implements Comparable<LocalizationEntry> {
 
     @Override
     public String toString() {
-        return String.format("%s (%s %s)", key, path, bundle);
+        return "%s (%s %s)".formatted(key, path, bundle);
     }
 
     @Override

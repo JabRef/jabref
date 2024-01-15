@@ -217,12 +217,12 @@ public class OOTextIntoOO {
                                 } else {
                                     if (setParagraphStyle(cursor, value)) {
                                         // Presumably tested already:
-                                        LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
+                                        LOGGER.debug("oo:ParaStyleName=\"%s\" failed".formatted(value));
                                     }
                                 }
                                 break;
                             default:
-                                LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                                LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
                                 break;
                         }
                     }
@@ -233,7 +233,7 @@ public class OOTextIntoOO {
                         String value = pair.b;
                         switch (key) {
                             case "target" -> UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                            default -> LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                            default -> LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
                         }
                     }
                     break;
@@ -261,10 +261,10 @@ public class OOTextIntoOO {
                                     settings.addAll(setCharCaseMap(CaseMap.SMALLCAPS));
                                     break;
                                 }
-                                LOGGER.warn(String.format("Unexpected value %s for attribute '%s' for <%s>",
+                                LOGGER.warn("Unexpected value %s for attribute '%s' for <%s>".formatted(
                                         value, key, tagName));
                             }
-                            default -> LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                            default -> LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
                         }
                     }
                     formatStack.pushLayer(settings);
@@ -283,14 +283,14 @@ public class OOTextIntoOO {
                     formatStack.popLayer();
                     String expected = expectEnd.pop();
                     if (!tagName.equals(expected)) {
-                        LOGGER.warn(String.format("expected '<%s>', found '<%s>' after '%s'",
+                        LOGGER.warn("expected '<%s>', found '<%s>' after '%s'".formatted(
                                 expected,
                                 tagName,
                                 currentSubstring));
                     }
                     break;
                 default:
-                    LOGGER.warn(String.format("ignoring unknown tag '<%s>'", tagName));
+                    LOGGER.warn("ignoring unknown tag '<%s>'".formatted(tagName));
                     break;
             }
 
@@ -306,9 +306,9 @@ public class OOTextIntoOO {
         if (!expectEnd.isEmpty()) {
             StringBuilder rest = new StringBuilder();
             for (String s : expectEnd) {
-                rest.insert(0, String.format("<%s>", s));
+                rest.insert(0, "<%s>".formatted(s));
             }
-            LOGGER.warn(String.format("OOTextIntoOO.write: expectEnd stack is not empty at the end: %s%n", rest));
+            LOGGER.warn("OOTextIntoOO.write: expectEnd stack is not empty at the end: %s%n".formatted(rest));
         }
     }
 
@@ -510,7 +510,7 @@ public class OOTextIntoOO {
                 String name = pair.a;
                 Integer index = goodNameToIndex.get(name);
                 if (index == null) {
-                    LOGGER.warn(String.format("pushLayer: '%s' is not in goodNameToIndex", name));
+                    LOGGER.warn("pushLayer: '%s' is not in goodNameToIndex".formatted(name));
                     continue;
                 }
                 Object newValue = pair.b;

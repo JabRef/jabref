@@ -127,7 +127,7 @@ public class IsiImporterTest {
     public void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
 
         assertEquals(1, entries.size());
         assertEquals(Optional.of("Optical properties of MgO doped LiNbO$_3$ single crystals"),
@@ -148,7 +148,7 @@ public class IsiImporterTest {
     public void testImportEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
 
         assertEquals(3, entries.size());
         assertEquals(Optional.of("Optical properties of MgO doped LiNbO$_3$ single crystals"),
@@ -166,7 +166,7 @@ public class IsiImporterTest {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntry first = entries.get(0);
+        BibEntry first = entries.getFirst();
         BibEntry second = entries.get(1);
 
         if (first.getField(StandardField.TITLE).equals(
@@ -203,7 +203,7 @@ public class IsiImporterTest {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntry first = entries.get(0);
+        BibEntry first = entries.getFirst();
         BibEntry second = entries.get(1);
 
         assertEquals(2, entries.size());
@@ -258,7 +258,7 @@ public class IsiImporterTest {
     public void testImportIEEEExport() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
 
         assertEquals(1, entries.size());
         assertEquals(StandardEntryType.Article, entry.getType());
@@ -281,7 +281,7 @@ public class IsiImporterTest {
     public void testIEEEImport() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
 
         assertEquals(1, entries.size());
         assertEquals(StandardEntryType.Article, entry.getType());
@@ -306,7 +306,7 @@ public class IsiImporterTest {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntry first = entries.get(0);
+        BibEntry first = entries.getFirst();
         BibEntry second = entries.get(1);
 
         assertEquals(2, entries.size());

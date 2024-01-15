@@ -1,4 +1,4 @@
-package org.jabref.logic;
+package org.jabref.logic.bibtex;
 
 import java.util.Objects;
 import java.util.Optional;

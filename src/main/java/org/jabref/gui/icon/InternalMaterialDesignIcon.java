@@ -40,7 +40,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public Node getGraphicNode() {
-        Ikon icon = icons.get(0);
+        Ikon icon = icons.getFirst();
         FontIcon fontIcon = FontIcon.of(icon);
         fontIcon.getStyleClass().add("glyph-icon");
 
@@ -64,7 +64,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public String name() {
-        return icons.get(0).toString();
+        return icons.getFirst().toString();
     }
 
     public String getCode() {

@@ -92,7 +92,7 @@ public class BvbFetcherTest {
     @Test
     public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
-        assertEquals(bibEntryISBN9783960886402, searchResult.get(0));
+        assertEquals(bibEntryISBN9783960886402, searchResult.getFirst());
         assertEquals(bibEntryISBN0134685997, searchResult.get(1));
     }
 

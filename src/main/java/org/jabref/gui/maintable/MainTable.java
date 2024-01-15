@@ -475,10 +475,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         return model;
     }
 
-    public BibEntry getEntryAt(int row) {
-        return model.getEntriesFilteredAndSorted().get(row).getEntry();
-    }
-
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
                 .getSelectedItems()
@@ -492,12 +488,5 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
-    }
-
-    public static List<MainTableColumnModel> toColumnModels(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
-        return columns.stream()
-                      .filter(col -> col instanceof MainTableColumn<?>)
-                      .map(column -> ((MainTableColumn<?>) column).getModel())
-                      .collect(Collectors.toList());
     }
 }

@@ -32,7 +32,7 @@ public class OrFields implements Comparable<OrFields> {
     }
 
     public Field getPrimary() {
-        return fields.iterator().next();
+        return fields.getFirst();
     }
 
     public Set<Field> getFields() {
