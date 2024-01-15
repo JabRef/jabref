@@ -15,7 +15,7 @@ class AuthorLastFirstAbbreviatorTest {
      * Ex: Lastname, Name
      */
     @Test
-    void testOneAuthorSimpleName() {
+    void oneAuthorSimpleName() {
         assertEquals("Lastname, N.", abbreviate("Lastname, Name"));
     }
 
@@ -25,7 +25,7 @@ class AuthorLastFirstAbbreviatorTest {
      * Ex: Lastname, Name Middlename
      */
     @Test
-    void testOneAuthorCommonName() {
+    void oneAuthorCommonName() {
         assertEquals("Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
     }
 
@@ -35,7 +35,7 @@ class AuthorLastFirstAbbreviatorTest {
      * Ex: Lastname, Name Middlename
      */
     @Test
-    void testTwoAuthorsCommonName() {
+    void twoAuthorsCommonName() {
         String result = abbreviate("Lastname, Name Middlename and Sobrenome, Nome Nomedomeio");
         String expectedResult = "Lastname, N. M. and Sobrenome, N. N.";
 
@@ -43,12 +43,12 @@ class AuthorLastFirstAbbreviatorTest {
     }
 
     @Test
-    void testJrAuthor() {
+    void jrAuthor() {
         assertEquals("Other, Jr., A. N.", abbreviate("Other, Jr., Anthony N."));
     }
 
     @Test
-    void testFormat() {
+    void format() {
         assertEquals("", abbreviate(""));
         assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
         assertEquals("Smith, J.", abbreviate("Smith, John"));

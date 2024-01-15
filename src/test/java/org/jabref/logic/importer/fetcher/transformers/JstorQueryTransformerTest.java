@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,6 +36,7 @@ class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransform
     }
 
     @Override
+    @Test
     public void convertYearField() throws Exception {
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
@@ -43,6 +45,7 @@ class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransform
     }
 
     @Override
+    @Test
     public void convertYearRangeField() throws Exception {
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);

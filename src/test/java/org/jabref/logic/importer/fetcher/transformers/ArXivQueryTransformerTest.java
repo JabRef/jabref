@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,6 +36,7 @@ class ArXivQueryTransformerTest extends YearRangeByFilteringQueryTransformerTest
     }
 
     @Override
+    @Test
     public void convertYearField() throws Exception {
         ArXivQueryTransformer transformer = getTransformer();
         String queryString = "2018";

@@ -14,7 +14,7 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EndnoteXmlImporterFilesTest {
+class EndnoteXmlImporterFilesTest {
 
     private static final String FILE_ENDING = ".xml";
     private ImportFormatPreferences importFormatPreferences;
@@ -37,19 +37,19 @@ public class EndnoteXmlImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void testIsRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new EndnoteXmlImporter(importFormatPreferences), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    void testIsNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new EndnoteXmlImporter(importFormatPreferences), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void testImportEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new EndnoteXmlImporter(importFormatPreferences), fileName, FILE_ENDING);
     }
 }

@@ -17,9 +17,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.Assertions;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
@@ -85,7 +85,7 @@ public class BibEntryAssert {
         assertNotNull(actualEntries);
         // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
         List<BibEntry> expectedEntries = getListFromInputStream(expectedInputStream);
-        Assertions.assertEquals(expectedEntries, actualEntries);
+        assertEquals(expectedEntries, actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expectedEntries, InputStream actualInputStream)
@@ -93,7 +93,7 @@ public class BibEntryAssert {
         assertNotNull(actualInputStream);
         assertNotNull(expectedEntries);
         // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
-        Assertions.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
+        assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
     }
 
     /**
@@ -141,7 +141,7 @@ public class BibEntryAssert {
         List<BibEntry> actualEntries = importer.importDatabase(fileToImport)
                                                .getDatabase().getEntries();
         // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
-        Assertions.assertEquals(expected, actualEntries);
+        assertEquals(expected, actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expected, URL fileToImport, Importer importer)

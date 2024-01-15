@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TypedBibEntryTest {
+class TypedBibEntryTest {
     private BibEntryTypesManager entryTypesManager;
 
     @BeforeEach
@@ -24,7 +24,7 @@ public class TypedBibEntryTest {
     }
 
     @Test
-    public void hasAllRequiredFieldsFail() {
+    void hasAllRequiredFieldsFail() {
         BibEntry e = new BibEntry(StandardEntryType.Article);
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
@@ -35,7 +35,7 @@ public class TypedBibEntryTest {
     }
 
     @Test
-    public void hasAllRequiredFields() {
+    void hasAllRequiredFields() {
         BibEntry e = new BibEntry(StandardEntryType.Article);
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
@@ -47,7 +47,7 @@ public class TypedBibEntryTest {
     }
 
     @Test
-    public void hasAllRequiredFieldsForUnknownTypeReturnsTrue() {
+    void hasAllRequiredFieldsForUnknownTypeReturnsTrue() {
         BibEntry e = new BibEntry(new UnknownEntryType("articlllleeeee"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
@@ -55,7 +55,7 @@ public class TypedBibEntryTest {
     }
 
     @Test
-    public void getTypeForDisplayReturnsTypeName() {
+    void getTypeForDisplayReturnsTypeName() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
@@ -63,7 +63,7 @@ public class TypedBibEntryTest {
     }
 
     @Test
-    public void getTypeForDisplayForUnknownTypeCapitalizeFirstLetter() {
+    void getTypeForDisplayForUnknownTypeCapitalizeFirstLetter() {
         BibEntry e = new BibEntry(new UnknownEntryType("articlllleeeee"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);

@@ -63,7 +63,7 @@ class StudyRepositoryTest {
      * Set up mocks
      */
     @BeforeEach
-    public void setUpMocks() throws Exception {
+    void setUpMocks() throws Exception {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);

@@ -5,30 +5,30 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class RemoveWhitespaceTest {
+class RemoveWhitespaceTest {
 
     @Test
-    public void testEmptyExpectEmpty() {
+    void emptyExpectEmpty() {
         assertEquals("", new RemoveWhitespace().format(""));
     }
 
     @Test
-    public void testNullExpectNull() {
+    void nullExpectNull() {
         assertNull(new RemoveWhitespace().format(null));
     }
 
     @Test
-    public void testNormal() {
+    void normal() {
         assertEquals("abcd EFG", new RemoveWhitespace().format("abcd EFG"));
     }
 
     @Test
-    public void testTab() {
+    void tab() {
         assertEquals("abcd EFG", new RemoveWhitespace().format("abcd\t EFG"));
     }
 
     @Test
-    public void testNewLineCombo() {
+    void newLineCombo() {
         assertEquals("abcd EFG", new RemoveWhitespace().format("abcd\r E\nFG\r\n"));
     }
 }

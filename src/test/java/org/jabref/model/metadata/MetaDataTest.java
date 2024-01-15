@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MetaDataTest {
+class MetaDataTest {
 
     private MetaData metaData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         metaData = new MetaData();
     }
 
     @Test
-    public void emptyGroupsIfNotSet() {
+    void emptyGroupsIfNotSet() {
         assertEquals(Optional.empty(), metaData.getGroups());
     }
 }

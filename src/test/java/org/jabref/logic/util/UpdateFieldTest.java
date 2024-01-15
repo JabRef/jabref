@@ -20,45 +20,45 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UpdateFieldTest {
+class UpdateFieldTest {
 
     private BibEntry entry;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         entry = new BibEntry();
         entry.setChanged(false);
     }
 
     @Test
-    public void testUpdateFieldWorksEmptyField() {
+    void updateFieldWorksEmptyField() {
         assertFalse(entry.hasField(StandardField.YEAR));
         UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertEquals(Optional.of("2016"), entry.getField(StandardField.YEAR));
     }
 
     @Test
-    public void testUpdateFieldWorksNonEmptyField() {
+    void updateFieldWorksNonEmptyField() {
         entry.setField(StandardField.YEAR, "2015");
         UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertEquals(Optional.of("2016"), entry.getField(StandardField.YEAR));
     }
 
     @Test
-    public void testUpdateFieldHasChanged() {
+    void updateFieldHasChanged() {
         assertFalse(entry.hasChanged());
         UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    public void testUpdateFieldValidFieldChange() {
+    void updateFieldValidFieldChange() {
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertTrue(change.isPresent());
     }
 
     @Test
-    public void testUpdateFieldCorrectFieldChangeContentsEmptyField() {
+    void updateFieldCorrectFieldChangeContentsEmptyField() {
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertNull(change.get().getOldValue());
         assertEquals(StandardField.YEAR, change.get().getField());
@@ -67,7 +67,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateFieldCorrectFieldChangeContentsNonEmptyField() {
+    void updateFieldCorrectFieldChangeContentsNonEmptyField() {
         entry.setField(StandardField.YEAR, "2015");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertEquals("2015", change.get().getOldValue());
@@ -77,14 +77,14 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateFieldSameValueNoChange() {
+    void updateFieldSameValueNoChange() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016");
         assertFalse(change.isPresent());
     }
 
     @Test
-    public void testUpdateFieldSameValueNotChange() {
+    void updateFieldSameValueNotChange() {
         entry.setField(StandardField.YEAR, "2016");
         entry.setChanged(false);
         UpdateField.updateField(entry, StandardField.YEAR, "2016");
@@ -92,33 +92,33 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateFieldSetToNullClears() {
+    void updateFieldSetToNullClears() {
         entry.setField(StandardField.YEAR, "2016");
         UpdateField.updateField(entry, StandardField.YEAR, null);
         assertFalse(entry.hasField(StandardField.YEAR));
     }
 
     @Test
-    public void testUpdateFieldSetEmptyToNullClears() {
+    void updateFieldSetEmptyToNullClears() {
         UpdateField.updateField(entry, StandardField.YEAR, null);
         assertFalse(entry.hasField(StandardField.YEAR));
     }
 
     @Test
-    public void testUpdateFieldSetToNullHasFieldChangeContents() {
+    void updateFieldSetToNullHasFieldChangeContents() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, null);
         assertTrue(change.isPresent());
     }
 
     @Test
-    public void testUpdateFieldSetRmptyToNullHasNoFieldChangeContents() {
+    void updateFieldSetRmptyToNullHasNoFieldChangeContents() {
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, null);
         assertFalse(change.isPresent());
     }
 
     @Test
-    public void testUpdateFieldSetToNullCorrectFieldChangeContents() {
+    void updateFieldSetToNullCorrectFieldChangeContents() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, null);
         assertNull(change.get().getNewValue());
@@ -128,14 +128,14 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateFieldSameContentClears() {
+    void updateFieldSameContentClears() {
         entry.setField(StandardField.YEAR, "2016");
         UpdateField.updateField(entry, StandardField.YEAR, "2016", true);
         assertFalse(entry.hasField(StandardField.YEAR));
     }
 
     @Test
-    public void testUpdateFieldSameContentHasChanged() {
+    void updateFieldSameContentHasChanged() {
         entry.setField(StandardField.YEAR, "2016");
         entry.setChanged(false);
         UpdateField.updateField(entry, StandardField.YEAR, "2016", true);
@@ -143,14 +143,14 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateFieldSameContentHasFieldChange() {
+    void updateFieldSameContentHasFieldChange() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016", true);
         assertTrue(change.isPresent());
     }
 
     @Test
-    public void testUpdateFieldSameContentHasCorrectFieldChange() {
+    void updateFieldSameContentHasCorrectFieldChange() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016", true);
         assertNull(change.get().getNewValue());
@@ -160,7 +160,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateNonDisplayableFieldUpdates() {
+    void updateNonDisplayableFieldUpdates() {
         assertFalse(entry.hasField(StandardField.YEAR));
         UpdateField.updateNonDisplayableField(entry, StandardField.YEAR, "2016");
         assertTrue(entry.hasField(StandardField.YEAR));
@@ -168,14 +168,14 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void testUpdateNonDisplayableFieldHasNotChanged() {
+    void updateNonDisplayableFieldHasNotChanged() {
         assertFalse(entry.hasChanged());
         UpdateField.updateNonDisplayableField(entry, StandardField.YEAR, "2016");
         assertFalse(entry.hasChanged());
     }
 
     @Test
-    public void emptyOwnerFieldNowPresentAfterAutomaticSet() {
+    void emptyOwnerFieldNowPresentAfterAutomaticSet() {
         assertEquals(Optional.empty(), entry.getField(StandardField.OWNER), "Owner is present");
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
@@ -186,7 +186,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void ownerAssignedCorrectlyAfterAutomaticSet() {
+    void ownerAssignedCorrectlyAfterAutomaticSet() {
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
         UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
@@ -195,7 +195,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void ownerIsNotResetAfterAutomaticSetIfOverwriteOwnerFalse() {
+    void ownerIsNotResetAfterAutomaticSetIfOverwriteOwnerFalse() {
         String alreadySetOwner = "alreadySetOwner";
         entry.setField(StandardField.OWNER, alreadySetOwner);
 
@@ -210,7 +210,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void emptyCreationDateFieldNowPresentAfterAutomaticSet() {
+    void emptyCreationDateFieldNowPresentAfterAutomaticSet() {
         assertEquals(Optional.empty(), entry.getField(StandardField.CREATIONDATE), "CreationDate is present");
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
@@ -223,7 +223,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void creationDateAssignedCorrectlyAfterAutomaticSet() {
+    void creationDateAssignedCorrectlyAfterAutomaticSet() {
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
         UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
@@ -234,7 +234,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void ownerSetToDefaultValueForCollectionOfBibEntries() {
+    void ownerSetToDefaultValueForCollectionOfBibEntries() {
         BibEntry entry2 = new BibEntry();
         BibEntry entry3 = new BibEntry();
 
@@ -256,7 +256,7 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void ownerNotChangedForCollectionOfBibEntriesIfOptionsDisabled() {
+    void ownerNotChangedForCollectionOfBibEntriesIfOptionsDisabled() {
         String initialOwner = "initialOwner";
 
         entry.setField(StandardField.OWNER, initialOwner);

@@ -13,22 +13,22 @@ class ShortenDOIFormatterTest {
     private ShortenDOIFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new ShortenDOIFormatter();
     }
 
     @Test
-    public void formatDoi() {
+    void formatDoi() {
         assertEquals("10/adc", formatter.format("10.1006/jmbi.1998.2354"));
     }
 
     @Test
-    public void invalidDoiIsKept() {
+    void invalidDoiIsKept() {
         assertEquals("invalid-doi", formatter.format("invalid-doi"));
     }
 
     @Test
-    public void shortDoi() {
+    void shortDoi() {
         assertEquals("10/adc", formatter.format("10/adc"));
     }
 }

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test case for ContainBasedSearchRule.
  */
-public class ContainsBasedSearchRuleTest {
+class ContainsBasedSearchRuleTest {
 
     private final BibEntry be = new BibEntry(StandardEntryType.InCollection)
             .withCitationKey("shields01")
@@ -27,7 +27,7 @@ public class ContainsBasedSearchRuleTest {
     private final RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
     @Test
-    public void testContentOfSingleField() {
+    void contentOfSingleField() {
         String query = "\"marine larviculture\"";
 
         assertFalse(bsCaseSensitive.applyRule(query, be));
@@ -37,7 +37,7 @@ public class ContainsBasedSearchRuleTest {
     }
 
     @Test
-    public void testContentDistributedOnMultipleFields() {
+    void contentDistributedOnMultipleFields() {
         String query = "marine 2001 shields";
 
         assertFalse(bsCaseSensitive.applyRule(query, be));
@@ -47,7 +47,7 @@ public class ContainsBasedSearchRuleTest {
     }
 
     @Test
-    public void testRegularExpressionMatch() {
+    void regularExpressionMatch() {
         String query = "marine [A-Za-z]* larviculture";
 
         assertFalse(bsCaseSensitive.applyRule(query, be));

@@ -21,21 +21,21 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 @Disabled
-public class CollectionOfComputerScienceBibliographiesParserTest {
+class CollectionOfComputerScienceBibliographiesParserTest {
 
     @Test
-    public void parseEntriesReturnsEmptyListIfXmlHasNoResults() throws Exception {
+    void parseEntriesReturnsEmptyListIfXmlHasNoResults() throws Exception {
         parseXmlAndCheckResults("collection_of_computer_science_bibliographies_empty_result.xml", Collections.emptyList());
     }
 
     @Disabled("Parse/fetcher remote side does not return anything valid for the link")
     @Test
-    public void parseEntriesReturnsOneBibEntryInListIfXmlHasSingleResult() throws Exception {
+    void parseEntriesReturnsOneBibEntryInListIfXmlHasSingleResult() throws Exception {
         parseXmlAndCheckResults("collection_of_computer_science_bibliographies_single_result.xml", Collections.singletonList("collection_of_computer_science_bibliographies_single_result.bib"));
     }
 
     @Test
-    public void parseEntriesReturnsMultipleBibEntriesInListIfXmlHasMultipleResults() throws Exception {
+    void parseEntriesReturnsMultipleBibEntriesInListIfXmlHasMultipleResults() throws Exception {
         parseXmlAndCheckResults("collection_of_computer_science_bibliographies_multiple_results.xml", Arrays.asList("collection_of_computer_science_bibliographies_multiple_results_first_result.bib", "collection_of_computer_science_bibliographies_multiple_results_second_result.bib"));
     }
 

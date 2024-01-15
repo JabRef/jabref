@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @FetcherTest
-public class MedraTest {
+class MedraTest {
 
     private final Medra fetcher = new Medra();
 
@@ -72,23 +72,23 @@ public class MedraTest {
     }
 
     @Test
-    public void testGetName() {
+    void getName() {
         assertEquals("mEDRA", fetcher.getName());
     }
 
     @Test
-    public void testPerformSearchEmptyDOI() throws FetcherException {
+    void performSearchEmptyDOI() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
-    public void testPerformNonExistent() throws FetcherException {
+    void performNonExistent() throws FetcherException {
         assertThrows(FetcherServerException.class, () -> fetcher.performSearchById("10.1016/j.bjoms.2007.08.004"));
     }
 
     @ParameterizedTest
     @MethodSource("getDoiBibEntryPairs")
-    public void testDoiBibEntryPairs(String identifier, Optional<BibEntry> expected) throws FetcherException {
+    void doiBibEntryPairs(String identifier, Optional<BibEntry> expected) throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier);
         assertEquals(expected, fetchedEntry);
     }

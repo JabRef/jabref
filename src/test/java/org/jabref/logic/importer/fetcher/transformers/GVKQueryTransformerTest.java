@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,6 +37,7 @@ class GVKQueryTransformerTest extends InfixTransformerTest<GVKQueryTransformer> 
     }
 
     @Override
+    @Test
     public void convertYearField() throws Exception {
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
@@ -47,6 +49,7 @@ class GVKQueryTransformerTest extends InfixTransformerTest<GVKQueryTransformer> 
 
     @Disabled("Not supported by GVK")
     @Override
+    @Test
     public void convertYearRangeField() throws Exception {
     }
 }

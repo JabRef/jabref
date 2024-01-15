@@ -5,13 +5,13 @@ import java.util.List;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TextFlowEqualityHelper {
 
     public static void assertEquals(List<Text> expectedTexts, TextFlow description) {
         if (expectedTexts.size() != description.getChildren().size()) {
-            Assertions.assertEquals(expectedTexts, description.getChildren());
+            assertEquals(expectedTexts, description.getChildren());
             return;
         }
         Text expectedText;
@@ -21,7 +21,7 @@ public class TextFlowEqualityHelper {
             // so comparing them compares the Text object as a whole
             // the equals method is not implemented...
             if (!expectedText.toString().equals(description.getChildren().get(i).toString())) {
-                Assertions.assertEquals(expectedTexts, description.getChildren());
+                assertEquals(expectedTexts, description.getChildren());
                 return;
             }
         }

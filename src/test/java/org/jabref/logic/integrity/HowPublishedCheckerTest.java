@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class HowPublishedCheckerTest {
+class HowPublishedCheckerTest {
 
     private HowPublishedChecker checker;
     private HowPublishedChecker checkerBiblatex;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);

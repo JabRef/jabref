@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class KeyChangeListenerTest {
+class KeyChangeListenerTest {
 
     private BibDatabase db;
     private BibEntry entry1;
@@ -22,7 +22,7 @@ public class KeyChangeListenerTest {
     private BibEntry entry4;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         db = new BibDatabase();
 
         entry1 = new BibEntry();
@@ -46,46 +46,46 @@ public class KeyChangeListenerTest {
     }
 
     @Test
-    public void testCrossrefChanged() {
+    void crossrefChanged() {
         assertEquals(Optional.of("Entry4"), entry1.getField(StandardField.CROSSREF));
         entry4.setCitationKey("Banana");
         assertEquals(Optional.of("Banana"), entry1.getField(StandardField.CROSSREF));
     }
 
     @Test
-    public void testRelatedChanged() {
+    void relatedChanged() {
         assertEquals(Optional.of("Entry1,Entry3"), entry2.getField(StandardField.RELATED));
         entry1.setCitationKey("Banana");
         assertEquals(Optional.of("Banana,Entry3"), entry2.getField(StandardField.RELATED));
     }
 
     @Test
-    public void testRelatedChangedInSameEntry() {
+    void relatedChangedInSameEntry() {
         assertEquals(Optional.of("Entry1,Entry2,Entry3"), entry3.getField(StandardField.RELATED));
         entry3.setCitationKey("Banana");
         assertEquals(Optional.of("Entry1,Entry2,Banana"), entry3.getField(StandardField.RELATED));
     }
 
     @Test
-    public void testCrossrefRemoved() {
+    void crossrefRemoved() {
         entry4.clearField(InternalField.KEY_FIELD);
         assertEquals(Optional.empty(), entry1.getField(StandardField.CROSSREF));
     }
 
     @Test
-    public void testCrossrefEntryRemoved() {
+    void crossrefEntryRemoved() {
         db.removeEntry(entry4);
         assertEquals(Optional.empty(), entry1.getField(StandardField.CROSSREF));
     }
 
     @Test
-    public void testRelatedEntryRemoved() {
+    void relatedEntryRemoved() {
         db.removeEntry(entry1);
         assertEquals(Optional.of("Entry3"), entry2.getField(StandardField.RELATED));
     }
 
     @Test
-    public void testRelatedAllEntriesRemoved() {
+    void relatedAllEntriesRemoved() {
         List<BibEntry> entries = Arrays.asList(entry1, entry3);
         db.removeEntries(entries);
         assertEquals(Optional.empty(), entry2.getField(StandardField.RELATED));

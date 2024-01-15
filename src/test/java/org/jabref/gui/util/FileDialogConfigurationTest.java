@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FileDialogConfigurationTest {
 
     @Test
-    void testWithValidDirectoryString(@TempDir Path folder) {
+    void withValidDirectoryString(@TempDir Path folder) {
         String tempFolder = folder.toAbsolutePath().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -28,7 +28,7 @@ class FileDialogConfigurationTest {
     }
 
     @Test
-    void testWithValidDirectoryPath(@TempDir Path tempFolder) {
+    void withValidDirectoryPath(@TempDir Path tempFolder) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
 
@@ -36,7 +36,7 @@ class FileDialogConfigurationTest {
     }
 
     @Test
-    void testWithNullStringDirectory() {
+    void withNullStringDirectory() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory((String) null).build();
 
@@ -44,7 +44,7 @@ class FileDialogConfigurationTest {
     }
 
     @Test
-    void testWithNullPathDirectory() {
+    void withNullPathDirectory() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory((Path) null).build();
 
@@ -52,7 +52,7 @@ class FileDialogConfigurationTest {
     }
 
     @Test
-    void testWithNonExistingDirectoryAndParentNull() {
+    void withNonExistingDirectoryAndParentNull() {
         String tempFolder = "workingDirectory";
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
@@ -61,7 +61,7 @@ class FileDialogConfigurationTest {
     }
 
     @Test
-    void testSingleExtension() {
+    void singleExtension() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withDefaultExtension(StandardFileType.BIBTEX_DB).build();
 

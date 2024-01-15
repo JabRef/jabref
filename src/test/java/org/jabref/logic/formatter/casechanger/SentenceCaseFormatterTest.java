@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class SentenceCaseFormatterTest {
+class SentenceCaseFormatterTest {
 
     private SentenceCaseFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new SentenceCaseFormatter();
     }
 
@@ -44,7 +44,7 @@ public class SentenceCaseFormatterTest {
 
     @ParameterizedTest
     @MethodSource("testData")
-    public void test(String expected, String input) {
+    void test(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 }

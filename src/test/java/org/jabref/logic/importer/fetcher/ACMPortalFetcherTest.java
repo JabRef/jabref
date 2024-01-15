@@ -60,7 +60,7 @@ class ACMPortalFetcherTest {
     }
 
     @Test
-    void testGetURLForQuery() throws FetcherException, MalformedURLException, URISyntaxException, QueryNodeParseException {
+    void getURLForQuery() throws FetcherException, MalformedURLException, URISyntaxException, QueryNodeParseException {
         String testQuery = "test query url";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(testQuery, NO_EXPLICIT_FIELD));
@@ -69,7 +69,7 @@ class ACMPortalFetcherTest {
     }
 
     @Test
-    void testGetParser() {
+    void getParser() {
         ACMPortalParser expected = new ACMPortalParser();
         assertEquals(expected.getClass(), fetcher.getParser().getClass());
     }

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UTF8CheckerTest {
+class UTF8CheckerTest {
 
     private static final Charset GBK = Charset.forName("GBK");
     private final BibEntry entry = new BibEntry();

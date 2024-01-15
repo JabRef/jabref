@@ -53,7 +53,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void testSerialization() throws IOException {
+    void serialization() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         // set a required field
         entry.setField(StandardField.AUTHOR, "Foo Bar");
@@ -406,7 +406,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void testEntryTypeChange() throws IOException {
+    void entryTypeChange() throws IOException {
         // @formatter:off
         String expected = """
 
@@ -830,7 +830,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void testSerializeAll() throws IOException {
+    void serializeAll() throws IOException {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article);
         // required fields
         entry1.setField(StandardField.AUTHOR, "Journal Author");
@@ -907,7 +907,7 @@ class BibEntryWriterTest {
 
     @ParameterizedTest
     @MethodSource("testGetFormattedFieldNameData")
-    void testGetFormattedFieldName(String expected, String fieldName, int indent) {
+    void getFormattedFieldName(String expected, String fieldName, int indent) {
         Field field = FieldFactory.parseField(fieldName);
         assertEquals(expected, BibEntryWriter.getFormattedFieldName(field, indent));
     }
@@ -923,7 +923,7 @@ class BibEntryWriterTest {
 
     @ParameterizedTest
     @MethodSource("testGetLengthOfLongestFieldNameData")
-    void testGetLengthOfLongestFieldName(int expected, BibEntry entry) {
+    void getLengthOfLongestFieldName(int expected, BibEntry entry) {
         assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
 }

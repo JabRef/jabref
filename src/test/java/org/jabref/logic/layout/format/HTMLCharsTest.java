@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HTMLCharsTest {
+class HTMLCharsTest {
 
     private LayoutFormatter layout;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         layout = new HTMLChars();
     }
 
     @Test
-    public void testBasicFormat() {
+    void basicFormat() {
         assertEquals("", layout.format(""));
 
         assertEquals("hallo", layout.format("hallo"));
@@ -47,7 +47,7 @@ public class HTMLCharsTest {
     }
 
     @Test
-    public void testLaTeXHighlighting() {
+    void laTeXHighlighting() {
         assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
         assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
         assertEquals("<em>hallo</em>", layout.format("{\\em hallo}"));
@@ -69,7 +69,7 @@ public class HTMLCharsTest {
     }
 
     @Test
-    public void testEquations() {
+    void equations() {
         assertEquals("&dollar;", layout.format("\\$"));
         assertEquals("&sigma;", layout.format("$\\sigma$"));
         assertEquals("A 32&nbsp;mA &Sigma;&Delta;-modulator",
@@ -77,31 +77,32 @@ public class HTMLCharsTest {
     }
 
     @Test
-    public void testNewLine() {
+    void newLine() {
         assertEquals("a<br>b", layout.format("a\nb"));
         assertEquals("a<p>b", layout.format("a\n\nb"));
     }
+
     /*
      * Is missing a lot of test cases for the individual chars...
      */
 
     @Test
-    public void testQuoteSingle() {
+    void quoteSingle() {
         assertEquals("&#39;", layout.format("{\\textquotesingle}"));
     }
 
     @Test
-    public void unknownCommandIsKept() {
+    void unknownCommandIsKept() {
         assertEquals("aaaa", layout.format("\\aaaa"));
     }
 
     @Test
-    public void unknownCommandKeepsArgument() {
+    void unknownCommandKeepsArgument() {
         assertEquals("bbbb", layout.format("\\aaaa{bbbb}"));
     }
 
     @Test
-    public void unknownCommandWithEmptyArgumentIsKept() {
+    void unknownCommandWithEmptyArgumentIsKept() {
         assertEquals("aaaa", layout.format("\\aaaa{}"));
     }
 }

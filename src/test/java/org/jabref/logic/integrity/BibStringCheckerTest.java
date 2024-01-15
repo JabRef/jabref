@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibStringCheckerTest {
+class BibStringCheckerTest {
 
     private final BibStringChecker checker = new BibStringChecker();
     private final BibEntry entry = new BibEntry();

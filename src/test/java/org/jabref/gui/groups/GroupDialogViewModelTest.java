@@ -85,7 +85,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void testHierarchicalContextFromGroup() throws Exception {
+    void hierarchicalContextFromGroup() throws Exception {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);
         viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor());
@@ -94,7 +94,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void testDefaultHierarchicalContext() throws Exception {
+    void defaultHierarchicalContext() throws Exception {
         GroupHierarchyType defaultHierarchicalContext = GroupHierarchyType.REFINING;
         when(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext()).thenReturn(defaultHierarchicalContext);
         viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, null, null, new DummyFileUpdateMonitor());

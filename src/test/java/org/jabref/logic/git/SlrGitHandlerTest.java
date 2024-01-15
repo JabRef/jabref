@@ -23,7 +23,7 @@ class SlrGitHandlerTest {
     private SlrGitHandler gitHandler;
 
     @BeforeEach
-    public void setUpGitHandler() {
+    void setUpGitHandler() {
         gitHandler = new SlrGitHandler(repositoryPath);
     }
 
