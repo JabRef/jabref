@@ -28,6 +28,7 @@ import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
+import org.jabref.logic.importer.fetcher.ISIDOREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.LOBIDFetcher;
@@ -105,6 +106,7 @@ public class WebFetchers {
     public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         SortedSet<SearchBasedFetcher> set = new TreeSet<>(new CompositeSearchFirstComparator());
         set.add(new ArXivFetcher(importFormatPreferences));
+        set.add(new ISIDOREFetcher());
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());

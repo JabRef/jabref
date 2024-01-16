@@ -42,6 +42,6 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
         if (endYear == Integer.MAX_VALUE) {
             return yearRange;
         }
-        return "sd:" + Integer.toString(startYear) + getLogicalAndOperator() + "ed:" + Integer.toString(endYear);
+        return "sd:" + startYear + getLogicalAndOperator() + "ed:" + endYear;
     }
 }
