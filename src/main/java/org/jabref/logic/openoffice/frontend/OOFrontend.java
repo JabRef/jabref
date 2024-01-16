@@ -359,7 +359,7 @@ public class OOFrontend {
             if (partition.isEmpty()) {
                 continue;
             }
-            RangeForOverlapCheck<CitationGroupId> citationRange = partition.get(0);
+            RangeForOverlapCheck<CitationGroupId> citationRange = partition.getFirst();
 
             Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
 
@@ -384,7 +384,7 @@ public class OOFrontend {
         StringBuilder msg = new StringBuilder();
         for (RangeOverlap<RangeForOverlapCheck<CitationGroupId>> overlap : overlaps) {
             String listOfRanges = overlap.valuesForOverlappingRanges.stream()
-                                                                     .map(v -> String.format("'%s'", v.format()))
+                                                                     .map(v -> "'%s'".formatted(v.format()))
                                                                      .collect(Collectors.joining(", "));
             msg.append(
                     switch (overlap.kind) {

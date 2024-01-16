@@ -76,7 +76,7 @@ class SidePaneViewModelTest {
     void moveUp() {
         sidePaneViewModel.moveUp(SidePaneType.WEB_SEARCH);
 
-        assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.get(0));
+        assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.getFirst());
         assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(1));
     }
 
@@ -84,7 +84,7 @@ class SidePaneViewModelTest {
     void moveUpFromFirstPosition() {
         sidePaneViewModel.moveUp(SidePaneType.GROUPS);
 
-        assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(0));
+        assertEquals(SidePaneType.GROUPS, sidePaneComponents.getFirst());
     }
 
     @Test
@@ -109,6 +109,6 @@ class SidePaneViewModelTest {
 
         sidePaneComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
 
-        assertTrue(sidePaneComponents.get(0) == SidePaneType.OPEN_OFFICE && sidePaneComponents.get(2) == SidePaneType.GROUPS);
+        assertTrue(sidePaneComponents.getFirst() == SidePaneType.OPEN_OFFICE && sidePaneComponents.get(2) == SidePaneType.GROUPS);
     }
 }

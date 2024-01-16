@@ -186,11 +186,11 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     @Override
     public boolean isValid() {
-        return Objects.nonNull(type)
-                && Objects.nonNull(host)
-                && Objects.nonNull(port)
-                && Objects.nonNull(database)
-                && Objects.nonNull(user)
-                && Objects.nonNull(password);
+        return type != null
+                && host != null
+                && port > 0
+                && database != null
+                && user != null
+                && password != null;
     }
 }

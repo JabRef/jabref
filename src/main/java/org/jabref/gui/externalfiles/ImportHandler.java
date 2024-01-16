@@ -56,6 +56,8 @@ import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
+
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
@@ -193,10 +195,14 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK);
+    }
+
+    private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
         Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
         if (existingDuplicateInLibrary.isPresent()) {
-            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get());
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
             if (duplicateHandledEntry.isEmpty()) {
                 return;
             }
@@ -216,8 +222,8 @@ public class ImportHandler {
         return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
     }
 
-    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
-        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
+    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext, decision);
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
@@ -236,9 +242,14 @@ public class ImportHandler {
         return Optional.of(originalEntry);
     }
 
-    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult decision) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-        DuplicateResolverDialog.DuplicateResolverResult decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        if (decision == BREAK) {
+            decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
+        }
+        if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+            preferencesService.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(decision);
+        }
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
@@ -253,17 +264,17 @@ public class ImportHandler {
     public void downloadLinkedFiles(BibEntry entry) {
         if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry.getFiles().stream()
-                    .filter(LinkedFile::isOnlineLink)
-                    .forEach(linkedFile ->
-                            new LinkedFileViewModel(
-                                    linkedFile,
-                                    entry,
-                                    bibDatabaseContext,
-                                    taskExecutor,
-                                    dialogService,
-                                    preferencesService
-                            ).download()
-                    );
+                 .filter(LinkedFile::isOnlineLink)
+                 .forEach(linkedFile ->
+                         new LinkedFileViewModel(
+                                 linkedFile,
+                                 entry,
+                                 bibDatabaseContext,
+                                 taskExecutor,
+                                 dialogService,
+                                 preferencesService
+                         ).download()
+                 );
         }
     }
 
@@ -360,5 +371,25 @@ public class ImportHandler {
         LOGGER.info("Found ISBN identifier in clipboard");
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
+    }
+
+    public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
+        boolean firstEntry = true;
+        for (BibEntry entry : entriesToAdd) {
+            if (firstEntry) {
+                LOGGER.debug("First entry to import, we use BREAK");
+                importEntryWithDuplicateCheck(database, entry, BREAK);
+                firstEntry = false;
+                continue;
+            }
+            if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+                var decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+                LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
+                importEntryWithDuplicateCheck(database, entry, decision);
+            } else {
+                LOGGER.debug("not first entry, not pref flag, break will  be used");
+                importEntryWithDuplicateCheck(database, entry);
+            }
+        }
     }
 }

@@ -226,7 +226,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+        if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
             dbmsListener.shutdown();
         }
@@ -267,5 +267,21 @@ public class BibDatabaseContext {
                 ", biblatexMode=" + isBiblatexMode() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabaseContext that)) {
+            return false;
+        }
+        return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(database, metaData, path, location);
     }
 }

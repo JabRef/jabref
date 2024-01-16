@@ -51,7 +51,7 @@ public class CitationsDisplay extends ListView<Citation> {
 
         Label fileNameLabel = new Label(String.format("%s", basePath.get().relativize(item.getPath())));
         fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());
-        Label positionLabel = new Label(String.format("(%s:%s-%s)", item.getLine(), item.getColStart(), item.getColEnd()));
+        Label positionLabel = new Label("(%s:%s-%s)".formatted(item.getLine(), item.getColStart(), item.getColEnd()));
         positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());
         HBox dataBox = new HBox(5, fileNameLabel, positionLabel);
 

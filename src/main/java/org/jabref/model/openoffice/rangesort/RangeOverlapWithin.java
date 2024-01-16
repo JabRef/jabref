@@ -58,7 +58,7 @@ public class RangeOverlapWithin {
                 continue;
             }
             XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
-                    partition.get(0).getRange().getText()).get();
+                    partition.getFirst().getRange().getText()).get();
 
             for (int i = 0; i < (partition.size() - 1); i++) {
                 V aHolder = partition.get(i);

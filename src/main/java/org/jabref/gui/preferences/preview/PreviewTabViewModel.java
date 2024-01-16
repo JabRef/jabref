@@ -101,11 +101,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
                 input -> !chosenListProperty.getValue().isEmpty(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
-                                Localization.lang("Entry preview"),
-                                Localization.lang("Selected"),
-                                Localization.lang("Selected Layouts can not be empty")
-                        )
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
+                        Localization.lang("Entry preview"),
+                        Localization.lang("Selected"),
+                        Localization.lang("Selected Layouts can not be empty")
+                )
                 )
         );
     }
@@ -247,7 +247,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
-        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());
         refreshPreview();
     }
 
@@ -269,7 +269,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
-        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());
         refreshPreview();
     }
 

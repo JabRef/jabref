@@ -74,7 +74,7 @@ public class UndoableAbbreviator {
             case SHORTEST_UNIQUE:
                 return text.getShortestUniqueAbbreviation();
             default:
-                throw new IllegalStateException(String.format("Unexpected value: %s", abbreviationType));
+                throw new IllegalStateException("Unexpected value: %s".formatted(abbreviationType));
         }
     }
 }

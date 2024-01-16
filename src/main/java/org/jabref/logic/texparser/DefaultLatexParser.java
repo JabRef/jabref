@@ -38,16 +38,16 @@ public class DefaultLatexParser implements LatexParser {
     };
     private static final String CITE_GROUP = "key";
     private static final Pattern CITE_PATTERN = Pattern.compile(
-            String.format("\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}(?:\\{[^\\}]*\\})?",
+            "\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}(?:\\{[^\\}]*\\})?".formatted(
                     String.join("|", CITE_COMMANDS), CITE_GROUP));
 
     private static final String BIBLIOGRAPHY_GROUP = "bib";
     private static final Pattern BIBLIOGRAPHY_PATTERN = Pattern.compile(
-            String.format("\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}", BIBLIOGRAPHY_GROUP));
+            "\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}".formatted(BIBLIOGRAPHY_GROUP));
 
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
-            String.format("\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}", INCLUDE_GROUP));
+            "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}".formatted(INCLUDE_GROUP));
 
     private final LatexParserResult latexParserResult;
 
@@ -139,7 +139,7 @@ public class DefaultLatexParser implements LatexParser {
                 Path bibFile = file.getParent().resolve(
                         bibString.endsWith(BIB_EXT)
                                 ? bibString
-                                : String.format("%s%s", bibString, BIB_EXT));
+                                : "%s%s".formatted(bibString, BIB_EXT));
 
                 if (bibFile.toFile().exists()) {
                     latexParserResult.addBibFile(file, bibFile);
@@ -158,7 +158,7 @@ public class DefaultLatexParser implements LatexParser {
             String filenamePassedToInclude = includeMatch.group(INCLUDE_GROUP);
             String texFileName = filenamePassedToInclude.endsWith(TEX_EXT)
                     ? filenamePassedToInclude
-                    : String.format("%s%s", filenamePassedToInclude, TEX_EXT);
+                    : "%s%s".formatted(filenamePassedToInclude, TEX_EXT);
             Path nestedFile = texFile.getParent().resolve(texFileName);
             if (nestedFile.toFile().exists() && !texFiles.contains(nestedFile)) {
                 referencedFiles.add(nestedFile);

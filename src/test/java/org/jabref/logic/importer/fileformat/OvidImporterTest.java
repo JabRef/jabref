@@ -92,7 +92,7 @@ public class OvidImporterTest {
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(5, entries.size());
 
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
         assertEquals(StandardEntryType.Misc, entry.getType());
         assertEquals(Optional.of("Mustermann and Musterfrau"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Short abstract"), entry.getField(StandardField.ABSTRACT));
@@ -156,7 +156,7 @@ public class OvidImporterTest {
                                                  .getEntries();
                 assertNotNull(entries);
                 assertEquals(1, entries.size());
-                BibEntryAssert.assertEquals(nis, entries.get(0));
+                BibEntryAssert.assertEquals(nis, entries.getFirst());
             }
         }
     }

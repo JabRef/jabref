@@ -29,7 +29,7 @@ public class MarcXmlParserTest {
             MarcXmlParser parser = new MarcXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
-            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.get(0));
+            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.getFirst());
         }
     }
 

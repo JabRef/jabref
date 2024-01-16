@@ -43,7 +43,7 @@ public enum DBMSType {
      * @return prepared connection URL for appropriate system.
      */
     public String getUrl(String host, int port, String database) {
-        return String.format(urlPattern, host, port, database);
+        return urlPattern.formatted(host, port, database);
     }
 
     /**

@@ -94,7 +94,7 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
 
-        BibEntry entryWritten = entriesWritten.get(0);
+        BibEntry entryWritten = entriesWritten.getFirst();
         entryWritten.clearField(StandardField.FILE);
         entry.clearField(StandardField.FILE);
 

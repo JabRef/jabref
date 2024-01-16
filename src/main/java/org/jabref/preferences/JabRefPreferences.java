@@ -41,6 +41,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -256,10 +257,13 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF = "mergeEntriesShouldShowUnifiedDiff";
     public static final String MERGE_ENTRIES_HIGHLIGHT_WORDS = "mergeEntriesHighlightWords";
 
-
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
 
     public static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+
+    public static final String MERGE_APPLY_TO_ALL_ENTRIES = "mergeApplyToAllEntries";
+
+    public static final String DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES = "duplicateResolverDecisionResult";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -494,6 +498,7 @@ public class JabRefPreferences implements PreferencesService {
     private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
+    private MergeDialogPreferences mergeDialogPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -643,6 +648,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, Boolean.TRUE);
         defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
+        defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
+        defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
 
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
 
@@ -1206,7 +1213,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        if (Objects.nonNull(journalAbbreviationPreferences)) {
+        if (journalAbbreviationPreferences != null) {
             return journalAbbreviationPreferences;
         }
 
@@ -1299,7 +1306,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
-        if (Objects.nonNull(openOfficePreferences)) {
+        if (openOfficePreferences != null) {
             return openOfficePreferences;
         }
 
@@ -1322,7 +1329,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
-        if (Objects.nonNull(libraryPreferences)) {
+        if (libraryPreferences != null) {
             return libraryPreferences;
         }
 
@@ -1340,7 +1347,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public TelemetryPreferences getTelemetryPreferences() {
-        if (Objects.nonNull(telemetryPreferences)) {
+        if (telemetryPreferences != null) {
             return telemetryPreferences;
         }
 
@@ -1369,7 +1376,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public DOIPreferences getDOIPreferences() {
-        if (Objects.nonNull(doiPreferences)) {
+        if (doiPreferences != null) {
             return doiPreferences;
         }
 
@@ -1385,7 +1392,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public OwnerPreferences getOwnerPreferences() {
-        if (Objects.nonNull(ownerPreferences)) {
+        if (ownerPreferences != null) {
             return ownerPreferences;
         }
 
@@ -1409,7 +1416,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public TimestampPreferences getTimestampPreferences() {
-        if (Objects.nonNull(timestampPreferences)) {
+        if (timestampPreferences != null) {
             return timestampPreferences;
         }
 
@@ -1428,7 +1435,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GroupsPreferences getGroupsPreferences() {
-        if (Objects.nonNull(groupsPreferences)) {
+        if (groupsPreferences != null) {
             return groupsPreferences;
         }
 
@@ -1453,7 +1460,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
-        if (Objects.nonNull(entryEditorPreferences)) {
+        if (entryEditorPreferences != null) {
             return entryEditorPreferences;
         }
 
@@ -1560,7 +1567,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public RemotePreferences getRemotePreferences() {
-        if (Objects.nonNull(remotePreferences)) {
+        if (remotePreferences != null) {
             return remotePreferences;
         }
 
@@ -1576,7 +1583,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProxyPreferences getProxyPreferences() {
-        if (Objects.nonNull(proxyPreferences)) {
+        if (proxyPreferences != null) {
             return proxyPreferences;
         }
 
@@ -1644,7 +1651,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SSLPreferences getSSLPreferences() {
-        if (Objects.nonNull(sslPreferences)) {
+        if (sslPreferences != null) {
             return sslPreferences;
         }
 
@@ -1711,7 +1718,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
-        if (Objects.nonNull(citationKeyPatternPreferences)) {
+        if (citationKeyPatternPreferences != null) {
             return citationKeyPatternPreferences;
         }
 
@@ -1766,7 +1773,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
-        if (Objects.nonNull(pushToApplicationPreferences)) {
+        if (pushToApplicationPreferences != null) {
             return pushToApplicationPreferences;
         }
 
@@ -1816,7 +1823,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
-        if (Objects.nonNull(externalApplicationsPreferences)) {
+        if (externalApplicationsPreferences != null) {
             return externalApplicationsPreferences;
         }
 
@@ -1851,14 +1858,13 @@ public class JabRefPreferences implements PreferencesService {
         return externalApplicationsPreferences;
     }
 
-
     //*************************************************************************************************************
     // Main table and search dialog preferences
     //*************************************************************************************************************
 
     @Override
     public MainTablePreferences getMainTablePreferences() {
-        if (Objects.nonNull(mainTablePreferences)) {
+        if (mainTablePreferences != null) {
             return mainTablePreferences;
         }
 
@@ -1877,7 +1883,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ColumnPreferences getMainTableColumnPreferences() {
-        if (Objects.nonNull(mainTableColumnPreferences)) {
+        if (mainTableColumnPreferences != null) {
             return mainTableColumnPreferences;
         }
 
@@ -1898,7 +1904,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ColumnPreferences getSearchDialogColumnPreferences() {
-        if (Objects.nonNull(searchDialogColumnPreferences)) {
+        if (searchDialogColumnPreferences != null) {
             return searchDialogColumnPreferences;
         }
 
@@ -1994,7 +2000,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameDisplayPreferences getNameDisplayPreferences() {
-        if (Objects.nonNull(nameDisplayPreferences)) {
+        if (nameDisplayPreferences != null) {
             return nameDisplayPreferences;
         }
 
@@ -2043,7 +2049,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public BibEntryPreferences getBibEntryPreferences() {
-        if (Objects.nonNull(bibEntryPreferences)) {
+        if (bibEntryPreferences != null) {
             return bibEntryPreferences;
         }
 
@@ -2062,7 +2068,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public InternalPreferences getInternalPreferences() {
-        if (Objects.nonNull(internalPreferences)) {
+        if (internalPreferences != null) {
             return internalPreferences;
         }
 
@@ -2151,7 +2157,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FieldPreferences getFieldPreferences() {
-        if (Objects.nonNull(fieldPreferences)) {
+        if (fieldPreferences != null) {
             return fieldPreferences;
         }
 
@@ -2179,7 +2185,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FilePreferences getFilePreferences() {
-        if (Objects.nonNull(filePreferences)) {
+        if (filePreferences != null) {
             return filePreferences;
         }
 
@@ -2218,7 +2224,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
-        if (Objects.nonNull(autoLinkPreferences)) {
+        if (autoLinkPreferences != null) {
             return autoLinkPreferences;
         }
 
@@ -2258,7 +2264,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ExportPreferences getExportPreferences() {
-        if (Objects.nonNull(exportPreferences)) {
+        if (exportPreferences != null) {
             return exportPreferences;
         }
 
@@ -2337,9 +2343,12 @@ public class JabRefPreferences implements PreferencesService {
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
         SaveOrder exportSaveOrder = getExportSaveOrder();
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
-            case TABLE -> this.getSelfContainedTableSaveOrder();
-            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
-            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
+            case TABLE ->
+                    this.getSelfContainedTableSaveOrder();
+            case SPECIFIED ->
+                    SelfContainedSaveOrder.of(exportSaveOrder);
+            case ORIGINAL ->
+                    SaveOrder.getDefaultSaveOrder();
         };
 
         return new SelfContainedSaveConfiguration(
@@ -2388,7 +2397,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PreviewPreferences getPreviewPreferences() {
-        if (Objects.nonNull(previewPreferences)) {
+        if (previewPreferences != null) {
             return previewPreferences;
         }
 
@@ -2459,7 +2468,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SidePanePreferences getSidePanePreferences() {
-        if (Objects.nonNull(sidePanePreferences)) {
+        if (sidePanePreferences != null) {
             return sidePanePreferences;
         }
 
@@ -2538,7 +2547,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public CleanupPreferences getCleanupPreferences() {
-        if (Objects.nonNull(cleanupPreferences)) {
+        if (cleanupPreferences != null) {
             return cleanupPreferences;
         }
 
@@ -2586,7 +2595,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GuiPreferences getGuiPreferences() {
-        if (Objects.nonNull(guiPreferences)) {
+        if (guiPreferences != null) {
             return guiPreferences;
         }
 
@@ -2603,12 +2612,7 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
-                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
-                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
-                getDouble(SIDE_PANE_WIDTH),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS));
+                getDouble(SIDE_PANE_WIDTH));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
@@ -2635,12 +2639,8 @@ public class JabRefPreferences implements PreferencesService {
         });
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
-        EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
-        EasyBind.listen(guiPreferences.mergeShouldShowDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
-        EasyBind.listen(guiPreferences.mergeShouldShowUnifiedDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
-        EasyBind.listen(guiPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
+
         return guiPreferences;
     }
 
@@ -2657,13 +2657,40 @@ public class JabRefPreferences implements PreferencesService {
                                                .toList());
     }
 
+    @Override
+    public MergeDialogPreferences getMergeDialogPreferences() {
+        if (mergeDialogPreferences != null) {
+            return mergeDialogPreferences;
+        }
+
+        mergeDialogPreferences = new MergeDialogPreferences(
+                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
+                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS),
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES),
+                DuplicateResolverDialog.DuplicateResolverResult.parse(get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES))
+        );
+
+        EasyBind.listen(mergeDialogPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
+        EasyBind.listen(mergeDialogPreferences.mergeShouldShowDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
+        EasyBind.listen(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
+        EasyBind.listen(mergeDialogPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
+        EasyBind.listen(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
+        EasyBind.listen(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_APPLY_TO_ALL_ENTRIES, newValue));
+        EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
+
+        return mergeDialogPreferences;
+    }
+
     //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
 
     @Override
     public SearchPreferences getSearchPreferences() {
-        if (Objects.nonNull(searchPreferences)) {
+        if (searchPreferences != null) {
             return searchPreferences;
         }
 
@@ -2701,7 +2728,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public XmpPreferences getXmpPreferences() {
-        if (Objects.nonNull(xmpPreferences)) {
+        if (xmpPreferences != null) {
             return xmpPreferences;
         }
 
@@ -2722,7 +2749,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
-        if (Objects.nonNull(nameFormatterPreferences)) {
+        if (nameFormatterPreferences != null) {
             return nameFormatterPreferences;
         }
 
@@ -2740,7 +2767,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
-        if (Objects.nonNull(autoCompletePreferences)) {
+        if (autoCompletePreferences != null) {
             return autoCompletePreferences;
         }
 
@@ -2782,7 +2809,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
-        if (Objects.nonNull(specialFieldsPreferences)) {
+        if (specialFieldsPreferences != null) {
             return specialFieldsPreferences;
         }
 
@@ -2795,7 +2822,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MrDlibPreferences getMrDlibPreferences() {
-        if (Objects.nonNull(mrDlibPreferences)) {
+        if (mrDlibPreferences != null) {
             return mrDlibPreferences;
         }
 
@@ -2815,7 +2842,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        if (Objects.nonNull(protectedTermsPreferences)) {
+        if (protectedTermsPreferences != null) {
             return protectedTermsPreferences;
         }
 
@@ -2844,7 +2871,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImporterPreferences getImporterPreferences() {
-        if (Objects.nonNull(importerPreferences)) {
+        if (importerPreferences != null) {
             return importerPreferences;
         }
 
@@ -2878,7 +2905,7 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 if (importerString.size() == 2) {
                     // New format: basePath, className
-                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                    importers.add(new CustomImporter(importerString.getFirst(), importerString.get(1)));
                 } else {
                     // Old format: name, cliId, className, basePath
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
@@ -2994,7 +3021,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GrobidPreferences getGrobidPreferences() {
-        if (Objects.nonNull(grobidPreferences)) {
+        if (grobidPreferences != null) {
             return grobidPreferences;
         }
 

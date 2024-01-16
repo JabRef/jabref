@@ -2,6 +2,8 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,9 +40,9 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -54,10 +56,12 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -68,7 +72,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -81,7 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The main window of the application.
+ * Represents the inner frame of the JabRef window
  */
 public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
@@ -90,7 +93,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final SplitPane splitPane = new SplitPane();
-    private final PreferencesService prefs = Globals.prefs;
+    private final PreferencesService prefs;
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
@@ -111,17 +114,24 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     private final TaskExecutor taskExecutor;
 
-    public JabRefFrame(Stage mainStage) {
+    public JabRefFrame(Stage mainStage,
+                       DialogService dialogService,
+                       FileUpdateMonitor fileUpdateMonitor,
+                       PreferencesService preferencesService) {
         this.mainStage = mainStage;
+        this.dialogService = dialogService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.prefs = preferencesService;
+
         this.stateManager = Globals.stateManager;
-        this.dialogService = new JabRefDialogService(mainStage);
         this.undoManager = Globals.undoManager;
-        this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
         this.entryTypesManager = Globals.entryTypesManager;
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.taskExecutor = Globals.TASK_EXECUTOR;
+
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs, taskExecutor);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
+
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -129,6 +139,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 }
             }
         });
+
+        init();
     }
 
     private void initDragAndDrop() {
@@ -265,7 +277,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         event.consume();
                         break;
                     case SEARCH:
-                        getGlobalSearchBar().focus();
+                        globalSearchBar.focus();
                         break;
                     case NEW_ARTICLE:
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
@@ -337,21 +349,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         telemetryPreferences.setAskToCollectTelemetry(false);
     }
 
-    /**
-     * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
-     */
-    public void openAction(String filePath) {
-        Path file = Path.of(filePath);
-        getOpenDatabaseAction().openFile(file);
-    }
-
-    /**
-     * The MacAdapter calls this method when "About" is selected from the application menu.
-     */
-    public void about() {
-        new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
-    }
-
     private void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
         if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
@@ -366,21 +363,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * General info dialog.  The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q
-     * is pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or
-     * not.
-     * <p>
-     * Non-OSX JabRef calls this when choosing "Quit" from the menu
-     * <p>
+     * Quit JabRef
      *
      * @return true if the user chose to quit; false otherwise
      */
-    public boolean quit() {
-        // First ask if the user really wants to close, if there are still background tasks running
-        /*
-        It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
-        the background tasks may make changes themselves that need saving.
-         */
+    public boolean close() {
+        // Ask if the user really wants to close, if there are still background tasks running
+        // The background tasks may make changes themselves that need saving.
         if (stateManager.getAnyTasksThatWillNotBeRecoveredRunning().getValue()) {
             Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
                     Localization.lang("Please wait..."),
@@ -407,29 +396,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             return false;
         }
 
+        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
+
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
         waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
-        // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
-        saveWindowState();
-        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
-
-        prefs.flush();
-
-        // Goodbye!
-        Platform.exit();
         return true;
-    }
-
-    public void saveWindowState() {
-        GuiPreferences preferences = prefs.getGuiPreferences();
-        preferences.setPositionX(mainStage.getX());
-        preferences.setPositionY(mainStage.getY());
-        preferences.setSizeX(mainStage.getWidth());
-        preferences.setSizeY(mainStage.getHeight());
-        preferences.setWindowMaximised(mainStage.isMaximized());
-        preferences.setWindowFullScreen(mainStage.isFullScreen());
-        debugLogWindowState(mainStage);
     }
 
     /**
@@ -744,10 +716,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         dialogService.showCustomDialogAndWait(dialog);
     }
 
-    public FileHistoryMenu getFileHistory() {
-        return fileHistory;
-    }
-
     public boolean closeTab(LibraryTab libraryTab) {
         if (libraryTab.requestClose()) {
             tabbedPane.getTabs().remove(libraryTab);
@@ -789,18 +757,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 taskExecutor);
     }
 
-    public GlobalSearchBar getGlobalSearchBar() {
-        return globalSearchBar;
-    }
-
-    public CountingUndoManager getUndoManager() {
-        return undoManager;
-    }
-
-    public DialogService getDialogService() {
-        return dialogService;
-    }
-
     private void copyGroupTreeNode(LibraryTab destinationLibraryTab, GroupTreeNode parent, GroupTreeNode groupTreeNodeToCopy) {
         List<BibEntry> allEntries = getCurrentLibraryTab()
                 .getBibDatabaseContext()
@@ -837,10 +793,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                              .setGroups(currentLibraryGroupRoot);
     }
 
-    public Stage getMainStage() {
-        return mainStage;
-    }
-
     /**
      * Refreshes the ui after preferences changes
      */
@@ -848,6 +800,128 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         globalSearchBar.updateHintVisibility();
         getLibraryTabs().forEach(LibraryTab::setupMainPanel);
         getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
+    }
+
+    void openDatabases(List<ParserResult> parserResults, boolean isBlank) {
+        final List<ParserResult> failed = new ArrayList<>();
+        final List<ParserResult> toOpenTab = new ArrayList<>();
+
+        // If the option is enabled, open the last edited libraries, if any.
+        if (!isBlank && prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
+            openLastEditedDatabases();
+        }
+
+        // From here on, the libraries provided by command line arguments are treated
+
+        // Remove invalid databases
+        List<ParserResult> invalidDatabases = parserResults.stream()
+                                                           .filter(ParserResult::isInvalid)
+                                                           .toList();
+        failed.addAll(invalidDatabases);
+        parserResults.removeAll(invalidDatabases);
+
+        // passed file (we take the first one) should be focused
+        Path focusedFile = parserResults.stream()
+                                        .findFirst()
+                                        .flatMap(ParserResult::getPath)
+                                        .orElse(prefs.getGuiPreferences()
+                                                     .getLastFocusedFile())
+                                        .toAbsolutePath();
+
+        // Add all bibDatabases databases to the frame:
+        boolean first = false;
+        for (ParserResult parserResult : parserResults) {
+            // Define focused tab
+            if (parserResult.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
+                first = true;
+            }
+
+            if (parserResult.getDatabase().isShared()) {
+                try {
+                    OpenDatabaseAction.openSharedDatabase(
+                            parserResult,
+                            this,
+                            dialogService,
+                            prefs,
+                            Globals.stateManager,
+                            Globals.entryTypesManager,
+                            fileUpdateMonitor,
+                            undoManager,
+                            Globals.TASK_EXECUTOR);
+                } catch (
+                        SQLException |
+                        DatabaseNotSupportedException |
+                        InvalidDBMSConnectionPropertiesException |
+                        NotASharedDatabaseException e) {
+
+                    LOGGER.error("Connection error", e);
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Connection error"),
+                            Localization.lang("A local copy will be opened."),
+                            e);
+                    toOpenTab.add(parserResult);
+                }
+            } else if (parserResult.toOpenTab()) {
+                // things to be appended to an opened tab should be done after opening all tabs
+                // add them to the list
+                toOpenTab.add(parserResult);
+            } else {
+                addTab(parserResult, first);
+                first = false;
+            }
+        }
+
+        // finally add things to the currently opened tab
+        for (ParserResult parserResult : toOpenTab) {
+            addTab(parserResult, first);
+            first = false;
+        }
+
+        for (ParserResult pr : failed) {
+            String message = Localization.lang("Error opening file '%0'",
+                    pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
+                    pr.getErrorMessage();
+
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+        }
+
+        // Display warnings, if any
+        for (int tabNumber = 0; tabNumber < parserResults.size(); tabNumber++) {
+            // ToDo: Method needs to be rewritten, because the index of the parser result and of the libraryTab may not
+            //  be identical, if there are also other tabs opened, that are not libraryTabs. Currently there are none,
+            //  therefore for now this ok.
+            ParserResult pr = parserResults.get(tabNumber);
+            if (pr.hasWarnings()) {
+                ParserResultWarningDialog.showParserResultWarningDialog(pr, dialogService);
+                showLibraryTabAt(tabNumber);
+            }
+        }
+
+        // After adding the databases, go through each and see if
+        // any post open actions need to be done. For instance, checking
+        // if we found new entry types that can be imported, or checking
+        // if the database contents should be modified due to new features
+        // in this version of JabRef.
+        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService));
+
+        LOGGER.debug("Finished adding panels");
+    }
+
+    private void openLastEditedDatabases() {
+        List<Path> lastFiles = prefs.getGuiPreferences().getLastFilesOpened();
+        if (lastFiles.isEmpty()) {
+            return;
+        }
+
+        getOpenDatabaseAction().openFiles(lastFiles);
+    }
+
+    public FileHistoryMenu getFileHistory() {
+        return fileHistory;
+    }
+
+    public Stage getMainStage() {
+        return mainStage;
     }
 
     /**
@@ -863,7 +937,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         @Override
         public void execute() {
-            frame.quit();
+            if (frame.close()) {
+                frame.mainStage.close();
+            }
         }
     }
 
