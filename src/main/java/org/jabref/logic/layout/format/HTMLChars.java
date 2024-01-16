@@ -164,8 +164,7 @@ public class HTMLChars implements LayoutFormatter {
     }
 
     private String normalizedField(String inField) {
-        // When we encounter a '&' we check if it starts an HTML entity then we skip it, otherwise
-        // we should replace it with '&amp;' to be rendered correctly.
+        // Cannot use StringEscapeUtils#escapeHtml4 because it does not handle LaTeX characters and commands.
         return HTML_ENTITY_PATTERN.matcher(inField).replaceAll("&amp;") // Replace & with &amp; if it does not begin an HTML entity
                                   .replaceAll("\\\\&", "&amp;") // Replace \& with &amp;
                                   .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
