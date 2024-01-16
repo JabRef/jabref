@@ -127,4 +127,21 @@ public class HTMLCharsTest {
     void unknownCommandWithEmptyArgumentIsKept() {
         assertEquals("aaaa", layout.format("\\aaaa{}"));
     }
+
+    private static Stream<Arguments> provideHTMLEntityFormattingData() {
+        return Stream.of(
+                Arguments.of("&amp;", "&"),
+                Arguments.of("&gt;", "&gt;"),
+                Arguments.of("&amp;HelloWorld", "&HelloWorld"),
+                Arguments.of("&amp;amp;", "\\\\&"),
+                Arguments.of("&lt;", "&lt;"),
+                Arguments.of("&gt;", "&gt;")
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideHTMLEntityFormattingData")
+    void testHTMLEntityFormatting(String expected, String input) {
+        assertEquals(expected, layout.format(input));
+    }
 }
