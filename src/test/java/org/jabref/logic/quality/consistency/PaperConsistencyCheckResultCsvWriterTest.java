@@ -1,18 +1,19 @@
 package org.jabref.logic.quality.consistency;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -20,7 +21,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-class PaperConsistencyCheckTest {
+class PaperConsistencyCheckResultCsvWriterTest {
 
     private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
@@ -34,9 +35,15 @@ class PaperConsistencyCheckTest {
                 .withField(StandardField.PUBLISHER, "publisher");
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
 
-        PaperConsistencyCheck.EntryTypeResult entryTypeResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
-        assertEquals(expected, result);
+        Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
+        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+            paperConsistencyCheckResultCsvWriter.writeFindings();
+        }
+        assertEquals("""
+                entry type,citation key,Pages,Publisher
+                Article,first,o,-
+                Article,second,-,?
+                """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
     @Test
@@ -51,9 +58,14 @@ class PaperConsistencyCheckTest {
                 .withField(StandardField.AUTHOR, "Author One");
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
 
-        PaperConsistencyCheck.EntryTypeResult entryTypeResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.TITLE, customField), List.of(first));
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
-        assertEquals(expected, result);
+        Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
+        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+            paperConsistencyCheckResultCsvWriter.writeFindings();
+        }
+        assertEquals("""
+                entry type,citation key,Custom,Pages,Title
+                Article,first,?,o,x
+                """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
     @Test
@@ -80,13 +92,17 @@ class PaperConsistencyCheckTest {
 
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
 
-        PaperConsistencyCheck.EntryTypeResult articleResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
-        PaperConsistencyCheck.EntryTypeResult inProceedingsResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION), List.of(fourth, third));
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of(
-                StandardEntryType.Article, articleResult,
-                StandardEntryType.InProceedings, inProceedingsResult
-        ));
-        assertEquals(expected, result);
+        Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
+        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+            paperConsistencyCheckResultCsvWriter.writeFindings();
+        }
+        assertEquals("""
+                entry type,citation key,Location,Pages,Publisher
+                Article,first,-,o,-
+                Article,second,-,-,?
+                InProceedings,fourth,-,-,o
+                InProceedings,third,?,o,-
+                """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
     @Test
@@ -99,7 +115,24 @@ class PaperConsistencyCheckTest {
                 .withField(StandardField.PAGES, "some pages");
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
 
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of());
-        assertEquals(expected, result);
+        Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");
+        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+            paperConsistencyCheckResultCsvWriter.writeFindings();
+        }
+        assertEquals("""
+                entry type,citation key
+                """, Files.readString(csvFile).replace("\r\n", "\n"));
+    }
+
+    @Test
+    @Disabled("This test is only for manual generation of a report")
+    void checkManualInput() throws Exception {
+        Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
+        Path csvFile = file.resolveSibling("biblio-cited.csv");
+        BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
+        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(databaseContext.getEntries());
+        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+            paperConsistencyCheckResultCsvWriter.writeFindings();
+        }
     }
 }
