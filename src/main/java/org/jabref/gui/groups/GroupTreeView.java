@@ -169,7 +169,6 @@ public class GroupTreeView extends BorderPane {
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
-        mainColumn.setStyle("-fx-border-width: 1px; -fx-border-color: black;");
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -297,6 +296,8 @@ public class GroupTreeView extends BorderPane {
         final StackPane node = new StackPane();
         Button addSubgroupButton = IconTheme.JabRefIcons.ADD.asButton();
         addSubgroupButton.setTooltip(new Tooltip(Localization.lang("Add Subgroup")));
+        ContextAction action = new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group);
+        addSubgroupButton.setOnAction(e -> action.execute());
         addSubgroupButton.setVisible(false); // Initially, hide the button
         node.getChildren().add(addSubgroupButton);
         node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -311,24 +312,21 @@ public class GroupTreeView extends BorderPane {
                 Bounds localStackPaneBounds = node.getBoundsInLocal();
                 Bounds sceneStackPaneBounds = node.localToScene(localStackPaneBounds);
                 double minY = sceneStackPaneBounds.getMinY();
-                double maxX = sceneGroupTreeBounds.getMaxX();
+                double maxX = sceneGroupTreeBounds.getMaxX() - 10;
                 double maxY = sceneStackPaneBounds.getMaxY();
                 double minX = sceneGroupTreeBounds.getMinX();
 
                 double mouseX = event.getSceneX();
                 double mouseY = event.getSceneY();
-                System.out.println(mouseX);
-                System.out.println(mouseY);
-                System.out.println(maxX);
-                System.out.println(maxY);
-                System.out.println(minX);
-                System.out.println(minY);
-                System.out.println("-----------------------");
                 boolean mouseInBounds = (mouseX < maxX && mouseX > minX && mouseY < maxY && mouseY > minY);
                 node.getChildren().get(0).setVisible(mouseInBounds);
             }
+        });
 
-
+        groupTree.setOnMouseExited(event -> {
+            for (StackPane node : stackPaneList) {
+                node.getChildren().get(0).setVisible(false);
+            }
         });
     }
 

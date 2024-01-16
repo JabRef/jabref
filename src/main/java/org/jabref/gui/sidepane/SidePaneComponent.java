@@ -23,6 +23,7 @@ public class SidePaneComponent extends BorderPane {
     private final SidePaneContentFactory contentFactory;
     private Button addButton;
     private Label label;
+    private Node headerView;
 
     private HBox buttonContainer;
 
@@ -36,13 +37,14 @@ public class SidePaneComponent extends BorderPane {
         this.moveUpCommand = moveUpCommand;
         this.moveDownCommand = moveDownCommand;
         this.contentFactory = contentFactory;
-        setMouseHoverListener();
         initialize();
+        setMouseHoverListener();
     }
 
     private void initialize() {
         getStyleClass().add("sidePaneComponent");
-        setTop(createHeaderView());
+        headerView = createHeaderView();
+        setTop(headerView);
         setCenter(contentFactory.create(sidePaneType));
         VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);
     }
@@ -78,18 +80,22 @@ public class SidePaneComponent extends BorderPane {
     }
 
     private void setMouseHoverListener() {
-        this.setOnMouseMoved(this::checkMouseHover);
+
+        headerView.setOnMouseMoved(event -> {
+            double mouseX = event.getX();
+            double mouseY = event.getY();
+            if (isMouseInBounds(mouseX, mouseY)) {
+                applyHoverEffect();
+            } else {
+                removeHoverEffect();
+            }
+        });
+
+        headerView.setOnMouseExited(event -> {
+            removeHoverEffect();
+        });
     }
 
-    private void checkMouseHover(MouseEvent event) {
-        double mouseX = event.getX();
-        double mouseY = event.getY();
-        if (isMouseInBounds(mouseX, mouseY)) {
-            applyHoverEffect();
-        } else {
-            removeHoverEffect();
-        }
-    }
 
     private boolean isMouseInBounds(double mouseX, double mouseY) {
         double minX = label.getBoundsInParent().getMinX();
