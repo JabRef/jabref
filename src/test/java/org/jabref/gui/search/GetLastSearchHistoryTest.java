@@ -8,11 +8,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
