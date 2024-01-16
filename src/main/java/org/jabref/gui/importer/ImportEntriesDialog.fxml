@@ -26,7 +26,7 @@
                         <Button onAction="#selectAllEntries"  text="%Select all entries"/>
                         <Button onAction="#unselectAll"  text="%Unselect all"/>
                     </HBox>
-                    <VBox>
+                    <VBox fx:id="bibTeXDataBox" visible="false" managed="false">
                         <Label text="%Entry BibTeX data:"/>
                         <CodeArea fx:id="bibTeXData" editable="false" minHeight="30.0" prefHeight="200.0" prefWidth="700.0" wrapText="true"/>
                     </VBox>
@@ -52,7 +52,10 @@
                     <Label fx:id="selectedItems" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                 </GridPane>
             </HBox>
-            <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+            <HBox spacing="4">
+                <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+                <CheckBox fx:id="showEntryInformation" text="%Show entry information"/>
+            </HBox>
         </VBox>
     </content>
     <ButtonType fx:id="importButton" buttonData="OK_DONE" text="%Import entries"/>

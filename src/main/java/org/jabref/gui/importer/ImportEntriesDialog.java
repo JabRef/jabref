@@ -64,7 +64,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public Label totalItems;
     public Label selectedItems;
     public CheckBox downloadLinkedOnlineFiles;
+    public CheckBox showEntryInformation;
     public CodeArea bibTeXData;
+    public VBox bibTeXDataBox;
     private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
@@ -202,6 +204,10 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private void initBibTeX(){
         bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         bibTeXData.setPadding(new Insets(5.0));
+        showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
+            bibTeXDataBox.setVisible(new_val);
+            bibTeXDataBox.setManaged(new_val);
+        });
     }
 
     private String getSourceString(BibEntry entry) throws IOException {
