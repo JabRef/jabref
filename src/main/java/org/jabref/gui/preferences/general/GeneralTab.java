@@ -45,6 +45,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox showAdvancedHints;
     @FXML private CheckBox inspectionWarningDuplicate;
+
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox collectTelemetry;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;

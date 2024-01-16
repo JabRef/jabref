@@ -149,4 +149,6 @@ public interface PreferencesService {
     MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
+    MergeDialogPreferences getMergeDialogPreferences();
 }
