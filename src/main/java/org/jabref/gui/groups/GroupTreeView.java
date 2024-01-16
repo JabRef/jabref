@@ -16,8 +16,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
@@ -43,6 +45,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
@@ -82,6 +86,7 @@ public class GroupTreeView extends BorderPane {
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> buttonColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     private CustomTextField searchField;
@@ -93,6 +98,7 @@ public class GroupTreeView extends BorderPane {
 
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
+    private List<StackPane> stackPaneList = new ArrayList<>();
 
     private DragExpansionHandler dragExpansionHandler;
 
@@ -118,6 +124,7 @@ public class GroupTreeView extends BorderPane {
         createNodes();
         this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
         initialize();
+        addAddSubgroupButtonsOnHover();
     }
 
     private void createNodes() {
@@ -135,10 +142,18 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(60d);
-        numberColumn.setMaxWidth(60d);
-        numberColumn.setPrefWidth(60d);
+        numberColumn.setMinWidth(30d);
+        numberColumn.setMaxWidth(30d);
+        numberColumn.setPrefWidth(30d);
         numberColumn.setResizable(false);
+
+        buttonColumn = new TreeTableColumn<>();
+        buttonColumn.getStyleClass().add("buttonColumn");
+        buttonColumn.setMinWidth(30d);
+        buttonColumn.setMaxWidth(30d);
+        buttonColumn.setPrefWidth(30d);
+        buttonColumn.setResizable(false);
+
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
         expansionNodeColumn.setMaxWidth(20d);
@@ -146,13 +161,15 @@ public class GroupTreeView extends BorderPane {
         expansionNodeColumn.setPrefWidth(20d);
         expansionNodeColumn.setResizable(false);
 
+
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
+        groupTree.getColumns().addAll(List.of(mainColumn, buttonColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
+        mainColumn.setStyle("-fx-border-width: 1px; -fx-border-color: black;");
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -212,6 +229,11 @@ public class GroupTreeView extends BorderPane {
                 .withTooltip(GroupNodeViewModel::getDescription)
                 .install(mainColumn);
 
+        //Add subgroup button on hover
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
+                .withGraphic(this::createAddSubgroupButton)
+                .install(buttonColumn);
+
         // Number of hits (only if user wants to see them)
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(this::createNumberCell)
@@ -270,6 +292,46 @@ public class GroupTreeView extends BorderPane {
         disclosureNode.getChildren().add(disclosureNodeArrow);
         return disclosureNode;
     }
+
+    private StackPane createAddSubgroupButton(GroupNodeViewModel group) {
+        final StackPane node = new StackPane();
+        Button addSubgroupButton = IconTheme.JabRefIcons.ADD.asButton();
+        addSubgroupButton.setTooltip(new Tooltip(Localization.lang("Add Subgroup")));
+        addSubgroupButton.setVisible(false); // Initially, hide the button
+        node.getChildren().add(addSubgroupButton);
+        node.setMaxWidth(Control.USE_PREF_SIZE);
+        stackPaneList.add(node);
+        return node;
+    }
+
+    private void addAddSubgroupButtonsOnHover(){
+       groupTree.setOnMouseMoved(event -> {
+            for (StackPane node: stackPaneList) {
+                Bounds sceneGroupTreeBounds = groupTree.localToScene(groupTree.getBoundsInLocal());
+                Bounds localStackPaneBounds = node.getBoundsInLocal();
+                Bounds sceneStackPaneBounds = node.localToScene(localStackPaneBounds);
+                double minY = sceneStackPaneBounds.getMinY();
+                double maxX = sceneGroupTreeBounds.getMaxX();
+                double maxY = sceneStackPaneBounds.getMaxY();
+                double minX = sceneGroupTreeBounds.getMinX();
+
+                double mouseX = event.getSceneX();
+                double mouseY = event.getSceneY();
+                System.out.println(mouseX);
+                System.out.println(mouseY);
+                System.out.println(maxX);
+                System.out.println(maxY);
+                System.out.println(minX);
+                System.out.println(minY);
+                System.out.println("-----------------------");
+                boolean mouseInBounds = (mouseX < maxX && mouseX > minX && mouseY < maxY && mouseY > minY);
+                node.getChildren().get(0).setVisible(mouseInBounds);
+            }
+
+
+        });
+    }
+
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();

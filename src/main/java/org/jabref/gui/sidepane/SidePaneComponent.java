@@ -13,6 +13,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
+import javafx.scene.input.MouseEvent;
 
 public class SidePaneComponent extends BorderPane {
     private final SidePaneType sidePaneType;
@@ -20,6 +21,8 @@ public class SidePaneComponent extends BorderPane {
     private final SimpleCommand moveUpCommand;
     private final SimpleCommand moveDownCommand;
     private final SidePaneContentFactory contentFactory;
+    private Button addButton;
+    private Label label;
 
     private HBox buttonContainer;
 
@@ -33,6 +36,7 @@ public class SidePaneComponent extends BorderPane {
         this.moveUpCommand = moveUpCommand;
         this.moveDownCommand = moveDownCommand;
         this.contentFactory = contentFactory;
+        setMouseHoverListener();
         initialize();
     }
 
@@ -56,10 +60,14 @@ public class SidePaneComponent extends BorderPane {
         downButton.setTooltip(new Tooltip(Localization.lang("Move panel down")));
         downButton.setOnAction(e -> moveDownCommand.execute());
 
+        addButton = IconTheme.JabRefIcons.ADD.asButton();
+        addButton.setTooltip(new Tooltip(Localization.lang("Add group")));
+        addButton.setOnAction(e -> moveDownCommand.execute());
+
         this.buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(upButton, downButton, closeButton);
 
-        Label label = new Label(sidePaneType.getTitle());
+        label = new Label(sidePaneType.getTitle());
 
         BorderPane headerView = new BorderPane();
         headerView.setLeft(label);
@@ -67,6 +75,37 @@ public class SidePaneComponent extends BorderPane {
         headerView.getStyleClass().add("sidePaneComponentHeader");
 
         return headerView;
+    }
+
+    private void setMouseHoverListener() {
+        this.setOnMouseMoved(this::checkMouseHover);
+    }
+
+    private void checkMouseHover(MouseEvent event) {
+        double mouseX = event.getX();
+        double mouseY = event.getY();
+        if (isMouseInBounds(mouseX, mouseY)) {
+            applyHoverEffect();
+        } else {
+            removeHoverEffect();
+        }
+    }
+
+    private boolean isMouseInBounds(double mouseX, double mouseY) {
+        double minX = label.getBoundsInParent().getMinX();
+        double minY = buttonContainer.getBoundsInParent().getMinY();
+        double maxX = buttonContainer.getBoundsInParent().getMaxX();
+        double maxY = buttonContainer.getBoundsInParent().getMaxY();
+        return (mouseX < maxX && mouseX > minX && mouseY < maxY && mouseY > minY);
+    }
+
+    private void applyHoverEffect() {
+        if (!buttonContainer.getChildren().contains(addButton))
+        addExtraButtonToHeader(addButton, 0);
+    }
+
+    private void removeHoverEffect() {
+        buttonContainer.getChildren().remove(addButton);
     }
 
     protected void addExtraButtonToHeader(Button button, int position) {

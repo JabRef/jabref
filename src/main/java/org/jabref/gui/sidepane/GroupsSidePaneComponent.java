@@ -29,9 +29,6 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
         setupIntersectionUnionToggle();
-        addButton.setTooltip(new Tooltip(Localization.lang("Add group")));
-        addButton.setOnAction(e -> );
-        addExtraButtonToHeader(addButton, 0);
 
         EasyBind.subscribe(groupsPreferences.groupViewModeProperty(), mode -> {
             GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
