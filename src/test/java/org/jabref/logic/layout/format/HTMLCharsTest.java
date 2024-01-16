@@ -44,7 +44,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideBasicFormattingData")
-    public void testBasicFormat(String expected, String input) {
+    void testBasicFormat(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 
@@ -73,7 +73,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideLaTeXHighlightingFormattingData")
-    public void testLaTeXHighlighting(String expected, String input) {
+    void testLaTeXHighlighting(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 
@@ -109,22 +109,22 @@ public class HTMLCharsTest {
      */
 
     @Test
-    public void testQuoteSingle() {
+    void testQuoteSingle() {
         assertEquals("&#39;", layout.format("{\\textquotesingle}"));
     }
 
     @Test
-    public void unknownCommandIsKept() {
+    void unknownCommandIsKept() {
         assertEquals("aaaa", layout.format("\\aaaa"));
     }
 
     @Test
-    public void unknownCommandKeepsArgument() {
+    void unknownCommandKeepsArgument() {
         assertEquals("bbbb", layout.format("\\aaaa{bbbb}"));
     }
 
     @Test
-    public void unknownCommandWithEmptyArgumentIsKept() {
+    void unknownCommandWithEmptyArgumentIsKept() {
         assertEquals("aaaa", layout.format("\\aaaa{}"));
     }
 }
