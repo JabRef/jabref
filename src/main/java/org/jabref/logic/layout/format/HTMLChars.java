@@ -25,7 +25,7 @@ public class HTMLChars implements LayoutFormatter {
 
     @Override
     public String format(String inField) {
-        String field = normalizedFiled(inField);
+        String field = normalizedField(inField);
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -163,7 +163,7 @@ public class HTMLChars implements LayoutFormatter {
         return sb.toString().replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
     }
 
-    private String normalizedFiled(String inField) {
+    private String normalizedField(String inField) {
         // When we encounter a '&' we check if it starts an HTML entity then we skip it, otherwise
         // we should replace it with '&amp;' to be rendered correctly.
         return HTML_ENTITY_PATTERN.matcher(inField).replaceAll("&amp;") // Replace & with &amp; if it does not begin an HTML entity
