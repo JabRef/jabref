@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.casechanger.Word;
