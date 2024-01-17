@@ -115,11 +115,11 @@ public abstract class BackgroundTask<V> {
         return workDonePercentage;
     }
 
-    public BackgroundProgress getProgress() {
+    protected BackgroundProgress getProgress() {
         return progress.get();
     }
 
-    public ObjectProperty<BackgroundProgress> progressProperty() {
+    protected ObjectProperty<BackgroundProgress> progressProperty() {
         return progress;
     }
 
@@ -270,30 +270,16 @@ public abstract class BackgroundTask<V> {
         return BackgroundTask.iconMap.getOrDefault(task.getTitle(), null);
     }
 
-    static class BackgroundProgress {
-
-        private final double workDone;
-        private final double max;
-
-        public BackgroundProgress(double workDone, double max) {
-            this.workDone = workDone;
-            this.max = max;
-        }
-
-        public double getWorkDone() {
-            return workDone;
-        }
-
-        public double getMax() {
-            return max;
-        }
+    protected record BackgroundProgress(
+            double workDone,
+            double max) {
 
         public double getWorkDonePercentage() {
-            if (max == 0) {
-                return 0;
-            } else {
-                return workDone / max;
+                if (max == 0) {
+                    return 0;
+                } else {
+                    return workDone / max;
+                }
             }
         }
-    }
 }

@@ -233,9 +233,6 @@ public class LibraryTab extends Tab {
     private void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        // don't raise panel by default as one tab will already be raised.
-        // See org.jabref.gui.JabRefFrame.openDatabases() and org.jabref.gui.importer.actions.OpenDatabasesAction.openFiles()
-        tabContainer.addTab(this, true);
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {

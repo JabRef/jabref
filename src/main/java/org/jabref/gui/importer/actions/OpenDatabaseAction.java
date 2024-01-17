@@ -202,6 +202,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 undoManager,
                 taskExecutor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
+        tabContainer.addTab(newTab, true);
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
