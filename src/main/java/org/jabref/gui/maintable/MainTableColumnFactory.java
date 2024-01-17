@@ -204,7 +204,6 @@ public class MainTableColumnFactory {
                                                .flatMap(group -> group.getColor().stream())
                                                .toList();
 
-
         if (!groupColors.isEmpty()) {
             HBox container = new HBox();
             container.setSpacing(2);
