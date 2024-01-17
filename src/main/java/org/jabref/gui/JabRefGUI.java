@@ -154,11 +154,20 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
+        mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
         mainStage.show();
 
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
+    }
+
+    public void onShowing(WindowEvent event) {
+        // Open last edited databases
+        if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
+            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+            mainFrame.openLastEditedDatabases();
+        }
     }
 
     public void onCloseRequest(WindowEvent event) {

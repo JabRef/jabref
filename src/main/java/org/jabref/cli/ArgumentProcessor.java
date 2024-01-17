@@ -278,8 +278,12 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
+        if (cli.isBlank()) {
+            uiCommands.add(new UiCommand.BlankWorkspace());
+        }
+
         if (!cli.isBlank() && cli.isJumpToKey()) {
-            jumpToKey(loaded, cli.getJumpToKey());
+            uiCommands.add(new UiCommand.JumpToEntryKey(cli.getJumpToKey()));
         }
 
         if (!cli.isBlank() && !loaded.isEmpty()) {
@@ -778,21 +782,6 @@ public class ArgumentProcessor {
                 return Optional.empty();
             }
         }
-    }
-
-    private void jumpToKey(List<ParserResult> loaded, String citationKey) {
-        for (ParserResult parserResult : loaded) {
-            Optional<BibEntry> entry = parserResult.getDatabase().getEntryByCitationKey(citationKey);
-            if (entry.isPresent()) {
-                uiCommands.add(new UiCommand.JumpToEntryKey(parserResult, entry.get()));
-                return;
-            }
-        }
-        System.out.printf("Could not find citation key %s in any library%n", citationKey);
-    }
-
-    public boolean isBlank() {
-        return cli.isBlank();
     }
 
     public boolean shouldShutDown() {

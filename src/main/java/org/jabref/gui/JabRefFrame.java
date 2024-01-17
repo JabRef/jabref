@@ -901,7 +901,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         LOGGER.debug("Finished adding panels");
     }
 
-    private void openLastEditedDatabases() {
+    public void openLastEditedDatabases() {
         List<Path> lastFiles = prefs.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
@@ -918,26 +918,49 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return mainStage;
     }
 
+    /**
+     * Handles commands submitted by the command line or by the remote host to be executed in the ui
+     * Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
+     *
+     * @param uiCommands to be handled
+     */
     public void handleUiCommands(List<UiCommand> uiCommands) {
+        // Needs to be checked preliminary to avoid opening additional databases
+        boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
+        Optional<String> jumpToEntry = Optional.empty();
+
         for (UiCommand uiCommand : uiCommands) {
             switch (uiCommand) {
-                case UiCommand.OpenDatabaseFromPath command ->
-                        getOpenDatabaseAction().openFile(command.path());
-                case UiCommand.JumpToEntryKey jumpToEntryKey -> {
-                    Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
-                                                                      .filter(tab -> tab.getDatabase()
-                                                                                        .equals(jumpToEntryKey.parserResult()
-                                                                                                              .getDatabase()))
-                                                                      .findFirst();
-                    libraryTab.ifPresent(tab -> {
-                        tab.clearAndSelect(jumpToEntryKey.bibEntry());
-                        showLibraryTab(tab);
-                    });
-                }
-                case UiCommand.OpenDatabases command ->
+                case UiCommand.JumpToEntryKey command ->
+                        jumpToEntry = Optional.ofNullable(command.citationKey());
+                case UiCommand.OpenDatabases command -> {
+                    if (!blank) {
                         openDatabases(command.parserResults());
+                    }
+                }
+                case UiCommand.BlankWorkspace command -> {
+                    // ignored
+                }
             }
         }
+
+        // Tabs must be present and contents async loaded for an entry to be selected
+        // FixMe: Wait here for every database loaded
+
+        jumpToEntry.ifPresent(entryKey -> {
+            for (LibraryTab libraryTab : getLibraryTabs()) {
+                Optional<BibEntry> bibEntry = libraryTab.getDatabase()
+                                                        .getEntries().stream()
+                                                        .filter(entry -> entry.getCitationKey().orElse("")
+                                                                              .equals(entryKey))
+                                                        .findAny();
+                if (bibEntry.isPresent()) {
+                    libraryTab.clearAndSelect(bibEntry.get());
+                    showLibraryTab(libraryTab);
+                    break;
+                }
+            }
+        });
     }
 
     /**

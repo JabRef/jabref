@@ -105,13 +105,6 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
-                List<Path> lastFiles = preferences.getGuiPreferences().getLastFilesOpened();
-                if (!argumentProcessor.isBlank() && preferences.getWorkspacePreferences().shouldOpenLastEdited() && !lastFiles.isEmpty()) {
-                    for (Path file : lastFiles) {
-                        uiCommands.add(new UiCommand.OpenDatabaseFromPath(file));
-                    }
-                }
-
                 MainApplication.main(uiCommands, preferences, fileUpdateMonitor, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
