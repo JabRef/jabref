@@ -35,13 +35,15 @@ public class MainTableColumnModel {
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
         FILES("files", Localization.lang("Linked files")),
+
         GROUPS("groups", Localization.lang("Groups")),
         LINKED_IDENTIFIER("linked_id", Localization.lang("Linked identifiers")),
         NORMALFIELD("field"),
         SPECIALFIELD("special", Localization.lang("Special")),
-        LIBRARY_NAME("library", Localization.lang("Library"));
+        LIBRARY_NAME("library", Localization.lang("Library")),
+        GROUP_ICONS("group_icons", Localization.lang("Group icons"));
 
-        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, LINKED_IDENTIFIER);
+        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, GROUP_ICONS, LINKED_IDENTIFIER);
 
         private final String name;
         private final String displayName;
