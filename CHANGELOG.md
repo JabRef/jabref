@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added a new group icon column to the main table showing the icons of the entry's groups. [#10801](https://github.com/JabRef/jabref/pull/10801)
 
 ### Changed
 
@@ -21,7 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
 - The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
 - We changed the order of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
-- Sub libraries based on `aux` file can now also be generated if some citeations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
+- Sub libraries based on `aux` file can now also be generated if some citations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
 
 ### Fixed
 
