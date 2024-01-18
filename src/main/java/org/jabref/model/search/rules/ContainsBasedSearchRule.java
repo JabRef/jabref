@@ -54,6 +54,10 @@ public class ContainsBasedSearchRule extends FullTextSearchRule {
             }
         }
 
-        return getFulltextResults(query, bibEntry).numSearchResults() > 0; // Didn't match all words.
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
+            return false;
+        }
+
+        return getFulltextResults(query, bibEntry).numSearchResults() > 0;
     }
 }

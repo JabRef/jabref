@@ -17,38 +17,30 @@ public final class Word {
      * Set containing common lowercase function words
      */
     public static final Set<String> SMALLER_WORDS;
-    public static final Set<Character> DASHES;
-    public static final Set<String> CONJUNCTIONS;
+
+    public static final Set<Character> DASHES = Set.of('-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
+            '–', '—', '―', '⁓', '⁻', '₋', '−', '⸺', '⸻',
+            '〜', '゠', '︱', '︲', '﹘', '﹣', '－');
+
+    // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
+    public static final Set<String> CONJUNCTIONS = Set.of("and", "but", "for", "nor", "or", "so", "yet");
+
     private final char[] chars;
+
     private final boolean[] protectedChars;
 
     static {
         Set<String> smallerWords = new HashSet<>();
-        Set<Character> dashes = new HashSet<>();
-        Set<String> conjunctions = new HashSet<>();
 
-        // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
-        conjunctions.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
+
         // Prepositions
         smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
+
         // Conjunctions used as part of all case capitalisation to check if it is a small word or not
-        smallerWords.addAll(conjunctions);
-        // Dashes
-        dashes.addAll(Arrays.asList(
-                '-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
-                '–', '—', '―', '⁓', '⁻', '₋', '−', '⸺', '⸻',
-                '〜', '゠', '︱', '︲', '﹘', '﹣', '－'
-        ));
+        smallerWords.addAll(CONJUNCTIONS);
 
-        // unmodifiable for thread safety
-        DASHES = dashes;
-
-        // unmodifiable for thread safety
-        CONJUNCTIONS = conjunctions;
-
-        // unmodifiable for thread safety
         SMALLER_WORDS = smallerWords.stream()
                                     .map(word -> word.toLowerCase(Locale.ROOT))
                                     .collect(Collectors.toUnmodifiableSet());

@@ -126,7 +126,7 @@ public class CffImporter extends Importer {
                             .filter(id -> "doi".equals(id.type))
                             .collect(Collectors.toList());
             if (doiIds.size() == 1) {
-                entryMap.put(StandardField.DOI, doiIds.get(0).value);
+                entryMap.put(StandardField.DOI, doiIds.getFirst().value);
             }
         }
 
@@ -138,14 +138,14 @@ public class CffImporter extends Importer {
                                            .collect(Collectors.toList());
 
             if (swhIds.size() == 1) {
-                entryMap.put(BiblatexSoftwareField.SWHID, swhIds.get(0));
+                entryMap.put(BiblatexSoftwareField.SWHID, swhIds.getFirst());
             } else if (swhIds.size() > 1) {
                 List<String> relSwhIds = swhIds.stream()
                                                .filter(id -> id.split(":").length > 3) // quick filter for invalid swhids
                                                .filter(id -> "rel".equals(id.split(":")[2]))
                                                .collect(Collectors.toList());
                 if (relSwhIds.size() == 1) {
-                    entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.get(0));
+                    entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.getFirst());
                 }
             }
         }

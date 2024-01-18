@@ -49,7 +49,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         Button generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
-        generateButton.disableProperty().bind(viewModel.parseFailedProperty().or(viewModel.notFoundList().emptyProperty().not()));
+        generateButton.disableProperty().bind(viewModel.parseFailedProperty());
         generateButton.defaultButtonProperty().bind(generateButton.disableProperty().not());
         setResultConverter(button -> {
             if (button == generateButtonType) {

@@ -13,7 +13,7 @@ public enum StandardActions implements Action {
     COPY_MORE(Localization.lang("Copy") + "..."),
     COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
     COPY_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
-    COPY_CITE_KEY(Localization.lang("Copy \\cite{citation key}"), KeyBinding.COPY_CITE_CITATION_KEY),
+    COPY_CITE_KEY(Localization.lang("Copy citation key with configured cite command"), KeyBinding.COPY_CITE_CITATION_KEY),
     COPY_KEY_AND_TITLE(Localization.lang("Copy citation key and title"), KeyBinding.COPY_CITATION_KEY_AND_TITLE),
     COPY_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
     COPY_CITATION_HTML(Localization.lang("Copy citation (html)"), KeyBinding.COPY_PREVIEW),
@@ -85,7 +85,7 @@ public enum StandardActions implements Action {
 
     AUTOMATIC_FIELD_EDITOR(Localization.lang("Automatic field editor")),
     TOGGLE_GROUPS(Localization.lang("Groups"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
-    TOOGLE_OO(Localization.lang("OpenOffice/LibreOffice"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
+    TOGGLE_OO(Localization.lang("OpenOffice/LibreOffice"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
     TOGGLE_WEB_SEARCH(Localization.lang("Web search"), Localization.lang("Toggle web search interface"), IconTheme.JabRefIcons.WWW, KeyBinding.WEB_SEARCH),
 
     PARSE_LATEX(Localization.lang("Search for citations in LaTeX files..."), IconTheme.JabRefIcons.LATEX_CITATIONS),
@@ -158,6 +158,7 @@ public enum StandardActions implements Action {
     DELETE_FILE(Localization.lang("Permanently delete local file"), IconTheme.JabRefIcons.DELETE_FILE, KeyBinding.DELETE_ENTRY),
 
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
+    HELP_GROUPS(Localization.lang("Open Help page"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_KEY_PATTERNS(Localization.lang("Help on key patterns"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_REGEX_SEARCH(Localization.lang("Help on regular expression search"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_NAME_FORMATTER(Localization.lang("Help on Name Formatting"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),

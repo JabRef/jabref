@@ -138,10 +138,10 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()
         ));
         // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry).get();
+        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
 
         // Assert that the duplicate entry was removed from the database
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry));
@@ -170,10 +170,10 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()
         ));
         // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry).get();
+        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
 
         // Assert
         assertTrue(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry is still in the database
@@ -205,14 +205,12 @@ class ImportHandlerTest {
                 new CurrentThreadTaskExecutor()
         ));
         // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry)
-                                       .orElseGet(() -> {
-                                           // create and return a default BibEntry or do other computations
-                                           return new BibEntry();
-                                       });
+        // create and return a default BibEntry or do other computations
+        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
+                                       .orElseGet(BibEntry::new);
 
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database

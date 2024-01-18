@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -54,18 +53,15 @@ class SaveDatabaseActionTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final JabRefPreferences preferences = mock(JabRefPreferences.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
-    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
     @BeforeEach
     public void setUp() {
-        when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExportPreferences()).thenReturn(mock(ExportPreferences.class));
-        when(jabRefFrame.getDialogService()).thenReturn(dialogService);
         saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class)));
     }
 
@@ -127,7 +123,6 @@ class SaveDatabaseActionTest {
         when(preferences.getCitationKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalCitationKeyPattern);
         when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
-        when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);

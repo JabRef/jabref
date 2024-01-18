@@ -90,7 +90,6 @@ public class LibraryResource {
     private java.nio.file.Path getLibraryPath(String id) {
         return preferences.getGuiPreferences().getLastFilesOpened()
                           .stream()
-                          .map(java.nio.file.Path::of)
                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
                           .findAny()
                           .orElseThrow(NotFoundException::new);

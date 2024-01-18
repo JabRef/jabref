@@ -70,10 +70,3 @@ Then, each weak do `choco upgrade all` to ensure all tooling is kept updated.
 ### Tools for working with XMP
 
 * Validate XMP: [https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/](https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/)
-
-### Some useful keyboard shortcuts
-
-* [AutoHotkey](http://autohotkey.com) - Preparation for the next step
-* [https://github.com/koppor/autohotkey-scripts](https://github.com/koppor/autohotkey-scripts) - Aim: Have Win+C opening ConEmu
-  1. Clone the repository locally.
-  2. Then link `ConEmu.ahk` and `WindowsExplorer.ahk` at the startup menu (Link creation works with drag'n'drop using the right mouse key and then choosing "Create link" when dropping). Hint: Startup is in the folder `Startup` (German: `Autostart`) at `%APPDATA%\Microsoft\Windows\Start Menu\Programs\` - accessible via <kbd>Win</kbd>+<kbd>R</kbd>: `shell:startup`

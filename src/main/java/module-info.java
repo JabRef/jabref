@@ -61,7 +61,7 @@ open module org.jabref {
     // http server and client exchange
     requires java.net.http;
     requires jakarta.ws.rs;
-    requires grizzly.framework;
+    requires org.glassfish.grizzly;
 
     // data mapping
     requires jakarta.xml.bind;
@@ -135,6 +135,8 @@ open module org.jabref {
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
+
+    requires transitive org.jspecify;
 
     // other libraries
     requires org.antlr.antlr4.runtime;

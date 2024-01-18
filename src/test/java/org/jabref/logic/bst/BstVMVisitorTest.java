@@ -187,7 +187,7 @@ class BstVMVisitorTest {
         vm.render(testEntries);
 
         List<BstEntry> sortedEntries = vm.latestContext.entries();
-        assertEquals(Optional.of("a"), sortedEntries.get(0).entry.getCitationKey());
+        assertEquals(Optional.of("a"), sortedEntries.getFirst().entry.getCitationKey());
         assertEquals(Optional.of("b"), sortedEntries.get(1).entry.getCitationKey());
         assertEquals(Optional.of("c"), sortedEntries.get(2).entry.getCitationKey());
         assertEquals(Optional.of("d"), sortedEntries.get(3).entry.getCitationKey());

@@ -1,11 +1,9 @@
 package org.jabref.gui.auximport;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-
-import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -16,17 +14,18 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
  */
 public class NewSubLibraryAction extends SimpleCommand {
 
-    private final JabRefFrame jabRefFrame;
+    private final LibraryTabContainer tabContainer;
+    private final DialogService dialogService;
 
-    public NewSubLibraryAction(JabRefFrame jabRefFrame, StateManager stateManager) {
-        this.jabRefFrame = jabRefFrame;
+    public NewSubLibraryAction(LibraryTabContainer tabContainer, StateManager stateManager, DialogService dialogService) {
+        this.tabContainer = tabContainer;
+        this.dialogService = dialogService;
 
         this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.showCustomDialogAndWait(new FromAuxDialog(jabRefFrame));
+        dialogService.showCustomDialogAndWait(new FromAuxDialog(tabContainer));
     }
 }

@@ -53,7 +53,7 @@ class XmpUtilReaderTest {
         Path path = Path.of(XmpUtilShared.class.getResource("article_dublinCore_without_day.pdf").toURI());
         List<XMPMetadata> meta = xmpUtilReader.readRawXmp(path);
 
-        DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.get(0).getDublinCoreSchema());
+        DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.getFirst().getDublinCoreSchema());
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
 

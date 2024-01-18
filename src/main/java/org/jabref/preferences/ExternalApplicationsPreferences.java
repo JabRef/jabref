@@ -1,17 +1,21 @@
 package org.jabref.preferences;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
+import org.jabref.logic.push.CitationCommandString;
 
 public class ExternalApplicationsPreferences {
 
     private final StringProperty eMailSubject;
     private final BooleanProperty shouldAutoOpenEmailAttachmentsFolder;
-    private final StringProperty citeCommand;
+    private final ObjectProperty<CitationCommandString> citeCommand;
 
-    private final StringProperty defaultCiteCommand;
+    private final ObjectProperty<CitationCommandString> defaultCiteCommand;
 
     private final BooleanProperty useCustomTerminal;
     private final StringProperty customTerminalCommand;
@@ -21,8 +25,8 @@ public class ExternalApplicationsPreferences {
 
     public ExternalApplicationsPreferences(String eMailSubject,
                                            boolean shouldAutoOpenEmailAttachmentsFolder,
-                                           String citeCommand,
-                                           String defaultCiteCommand,
+                                           CitationCommandString citeCommand,
+                                           CitationCommandString defaultCiteCommand,
                                            boolean useCustomTerminal,
                                            String customTerminalCommand,
                                            boolean useCustomFileBrowser,
@@ -31,8 +35,8 @@ public class ExternalApplicationsPreferences {
 
         this.eMailSubject = new SimpleStringProperty(eMailSubject);
         this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
-        this.citeCommand = new SimpleStringProperty(citeCommand);
-        this.defaultCiteCommand = new SimpleStringProperty(defaultCiteCommand);
+        this.citeCommand = new SimpleObjectProperty<>(citeCommand);
+        this.defaultCiteCommand = new SimpleObjectProperty<>(defaultCiteCommand);
         this.useCustomTerminal = new SimpleBooleanProperty(useCustomTerminal);
         this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);
         this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
@@ -64,15 +68,15 @@ public class ExternalApplicationsPreferences {
         this.shouldAutoOpenEmailAttachmentsFolder.set(shouldAutoOpenEmailAttachmentsFolder);
     }
 
-    public String getCiteCommand() {
+    public CitationCommandString getCiteCommand() {
         return citeCommand.get();
     }
 
-    public StringProperty citeCommandProperty() {
+    public ObjectProperty<CitationCommandString> citeCommandProperty() {
         return citeCommand;
     }
 
-    public void setCiteCommand(String citeCommand) {
+    public void setCiteCommand(CitationCommandString citeCommand) {
         this.citeCommand.set(citeCommand);
     }
 
@@ -136,7 +140,7 @@ public class ExternalApplicationsPreferences {
         this.kindleEmail.set(kindleEmail);
     }
 
-    public String getDefaultCiteCommand() {
+    public CitationCommandString getDefaultCiteCommand() {
         return defaultCiteCommand.getValue();
     }
 }

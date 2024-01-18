@@ -30,7 +30,7 @@ public class FileExtensionViewModel {
     }
 
     public JabRefIcon getIcon() {
-        return ExternalFileTypes.getExternalFileTypeByExt(extensions.get(0), filePreferences)
+        return ExternalFileTypes.getExternalFileTypeByExt(extensions.getFirst(), filePreferences)
                                 .map(ExternalFileType::getIcon)
                                 .orElse(null);
     }

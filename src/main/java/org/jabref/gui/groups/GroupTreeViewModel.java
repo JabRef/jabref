@@ -173,6 +173,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     database,
+                    parent.getGroupNode(),
                     null,
                     groupDialogHeader));
 
@@ -257,6 +258,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     database,
+                    oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {

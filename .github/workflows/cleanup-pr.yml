@@ -26,7 +26,7 @@ jobs:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Delete folder on builds.jabref.org
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
           host: build-upload.jabref.org

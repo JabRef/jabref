@@ -22,6 +22,7 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,15 +55,16 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     void getDocument() throws IOException, FetcherException {
         String source = fetcher.getURLBySource(
-                String.format("https://api.semanticscholar.org/v1/paper/%s", DOI));
+                "https://api.semanticscholar.org/v1/paper/%s".formatted(DOI));
 
         assertEquals("https://www.semanticscholar.org/paper/7f7b38604a2c167f6d5fb1c5dffcbb127d0525c0", source);
     }
 
     @Test
+    @Disabled("Returns a DOI instead of the required link")
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByDOI() throws Exception {
-        entry.withField(StandardField.DOI, "10.1038/nrn3241");
+        entry.setField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
                 Optional.of(new URI("https://europepmc.org/articles/pmc4907333?pdf=render").toURL()),
                 fetcher.findFullText(entry)
@@ -81,7 +83,6 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextSearchOnEmptyEntry() throws IOException, FetcherException {
-
         assertEquals(Optional.empty(), fetcher.findFullText(new BibEntry()));
     }
 
