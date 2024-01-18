@@ -50,24 +50,24 @@ public class HTMLCharsTest {
 
     private static Stream<Arguments> provideLaTeXHighlightingFormattingData() {
         return Stream.of(
-                Arguments.of("<em>hallo</em>","\\emph{hallo}"),
-                Arguments.of("<em>hallo</em>","{\\emph hallo}"),
-                Arguments.of("<em>hallo</em>","{\\em hallo}"),
+                Arguments.of("<em>hallo</em>", "\\emph{hallo}"),
+                Arguments.of("<em>hallo</em>", "{\\emph hallo}"),
+                Arguments.of("<em>hallo</em>", "{\\em hallo}"),
 
-                Arguments.of("<i>hallo</i>","\\textit{hallo}"),
-                Arguments.of("<i>hallo</i>","{\\textit hallo}"),
-                Arguments.of("<i>hallo</i>","{\\it hallo}"),
+                Arguments.of("<i>hallo</i>", "\\textit{hallo}"),
+                Arguments.of("<i>hallo</i>", "{\\textit hallo}"),
+                Arguments.of("<i>hallo</i>", "{\\it hallo}"),
 
-                Arguments.of("<b>hallo</b>","\\textbf{hallo}"),
-                Arguments.of("<b>hallo</b>","{\\textbf hallo}"),
-                Arguments.of("<b>hallo</b>","{\\bf hallo}"),
+                Arguments.of("<b>hallo</b>", "\\textbf{hallo}"),
+                Arguments.of("<b>hallo</b>", "{\\textbf hallo}"),
+                Arguments.of("<b>hallo</b>", "{\\bf hallo}"),
 
-                Arguments.of("<sup>hallo</sup>","\\textsuperscript{hallo}"),
-                Arguments.of("<sub>hallo</sub>","\\textsubscript{hallo}"),
+                Arguments.of("<sup>hallo</sup>", "\\textsuperscript{hallo}"),
+                Arguments.of("<sub>hallo</sub>", "\\textsubscript{hallo}"),
 
-                Arguments.of("<u>hallo</u>","\\underline{hallo}"),
-                Arguments.of("<s>hallo</s>","\\sout{hallo}"),
-                Arguments.of("<tt>hallo</tt>","\\texttt{hallo}")
+                Arguments.of("<u>hallo</u>", "\\underline{hallo}"),
+                Arguments.of("<s>hallo</s>", "\\sout{hallo}"),
+                Arguments.of("<tt>hallo</tt>", "\\texttt{hallo}")
         );
     }
 
@@ -136,7 +136,7 @@ public class HTMLCharsTest {
                 Arguments.of("&amp;amp;", "\\\\&"),
                 Arguments.of("&lt;", "&lt;"),
                 Arguments.of("&gt;", "&gt;")
-                );
+        );
     }
 
     @ParameterizedTest
