@@ -36,6 +36,7 @@ public enum HelpFile {
     FETCHER_IEEEXPLORE("collect/import-using-online-bibliographic-database#ieeexplore"),
     FETCHER_INSPIRE("collect/import-using-online-bibliographic-database#inspire"),
     FETCHER_ISBN("collect/add-entry-using-an-id"),
+    FETCHER_ISIDORE("collect/import-using-online-bibliographic-database#isidore"),
     FETCHER_MEDLINE("collect/import-using-online-bibliographic-database#medline"),
     FETCHER_OAI2_ARXIV("collect/import-using-online-bibliographic-database#arxiv"),
     FETCHER_RFC("collect/add-entry-using-an-id"),
