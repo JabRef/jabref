@@ -13,7 +13,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import javafx.scene.input.MouseEvent;
 
 public class SidePaneComponent extends BorderPane {
     private final SidePaneType sidePaneType;
@@ -79,7 +78,6 @@ public class SidePaneComponent extends BorderPane {
     }
 
     private void setMouseHoverListener() {
-
         headerView.setOnMouseMoved(event -> {
             double mouseX = event.getX();
             double mouseY = event.getY();
@@ -95,7 +93,6 @@ public class SidePaneComponent extends BorderPane {
         });
     }
 
-
     private boolean isMouseInBounds(double mouseX, double mouseY) {
         double minX = label.getBoundsInParent().getMinX();
         double minY = buttonContainer.getBoundsInParent().getMinY();
@@ -105,8 +102,9 @@ public class SidePaneComponent extends BorderPane {
     }
 
     private void applyHoverEffect() {
-        if (!buttonContainer.getChildren().contains(addButton))
-        addExtraButtonToHeader(addButton, 0);
+        if (!buttonContainer.getChildren().contains(addButton)) {
+            addExtraButtonToHeader(addButton, 0);
+        }
     }
 
     private void removeHoverEffect() {

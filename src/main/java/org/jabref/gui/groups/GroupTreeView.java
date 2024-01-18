@@ -15,8 +15,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
-import javafx.geometry.Orientation;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
@@ -45,10 +45,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -228,7 +227,7 @@ public class GroupTreeView extends BorderPane {
                 .withTooltip(GroupNodeViewModel::getDescription)
                 .install(mainColumn);
 
-        //Add subgroup button on hover
+        // Add subgroup button on hover
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(this::createAddSubgroupButton)
                 .install(buttonColumn);
@@ -305,7 +304,7 @@ public class GroupTreeView extends BorderPane {
         return node;
     }
 
-    private void addAddSubgroupButtonsOnHover(){
+    private void addAddSubgroupButtonsOnHover() {
        groupTree.setOnMouseMoved(event -> {
             for (StackPane node: stackPaneList) {
                 Bounds sceneGroupTreeBounds = groupTree.localToScene(groupTree.getBoundsInLocal());

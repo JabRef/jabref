@@ -1,7 +1,6 @@
 package org.jabref.gui.sidepane;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
