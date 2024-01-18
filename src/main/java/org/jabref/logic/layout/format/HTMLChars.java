@@ -22,11 +22,6 @@ public class HTMLChars implements LayoutFormatter {
                               .replace("\n", "<br>") // Replace single line breaks with <br>
                               .replace("\\$", "&dollar;") // Replace \$ with &dollar;
                               .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
-        // Replace &amp; with &
-        field = field.replace("&amp;", "&")
-                     .replace("&lt;", "<")
-                     .replace("&gt;", ">");
-
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
 

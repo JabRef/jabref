@@ -1,55 +1,50 @@
 # SPDX-License-Identifier: MIT
 
 NAME
-Default [Author year] style file
+Frontiers Journal Harvard Style
 
 JOURNALS
-Journal name 1
-Journal name 2
+Frontiers
 
 PROPERTIES
 Title="References"
-IsSortByPosition="false"
+IsSortByPosition="true"
 IsNumberEntries="false"
 ReferenceParagraphFormat="Text body"
-ReferenceHeaderParagraphFormat="Heading 2"
+ReferenceHeaderParagraphFormat="Heading 1"
 
 CITATION
-BibtexKeyCitations=false
+BibtexKeyCitations="false"
 AuthorField="author/editor"
 YearField="year"
 MaxAuthors="2"
-MaxAuthorsFirst="6"
+MaxAuthorsFirst="2"
 AuthorSeparator=","
-AuthorLastSeparator=" & "
+AuthorLastSeparator=""
 AuthorLastSeparatorInText=" and "
 EtAlString=" et al."
-ItalicEtAl="false"
 YearSeparator=" "
 InTextYearSeparator=" "
-BracketBefore="["
-BracketAfter="]"
+BracketBefore="("
+BracketAfter=")"
 BracketBeforeInList="["
 BracketAfterInList="] "
-CitationSeparator="; "
+CitationSeparator=", "
 UniquefierSeparator=","
 GroupedNumbersSeparator="-"
 MinimumGroupingCount="3"
 FormatCitations="false"
 CitationCharacterFormat="Default"
 MultiCiteChronological="true"
-PageInfoSeparator="; "
-
 LAYOUT
-article=<b>\format[Authors(LastFirst,Semicolon)]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
+article=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year\uniq). \title, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
 
-book=\format[Authors(LastFirst,Semicolon)]{\author}\begin{editor}\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)\end{editor}, <b>\year\uniq</b>. <i>\title</i>. \publisher, \address.
+book=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}\begin{editor}\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)\end{editor}, \year\uniq. \title. \publisher, \address.
 
-incollection=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\booktitle</i>, \publisher.
+incollection=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year\uniq). \title. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), \booktitle, \publisher.
 
-inbook=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\chapter</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\title</i>, \publisher.
+inbook=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year\uniq). \chapter. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), \title, \publisher.
 
-phdthesis=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>, \school.
+phdthesis=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year\uniq). \title, \school.
 
-default=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
-
+default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year\uniq). \title, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
