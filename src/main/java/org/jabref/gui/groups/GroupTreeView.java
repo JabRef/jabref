@@ -94,7 +94,7 @@ public class GroupTreeView extends BorderPane {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
 
-    private GroupTreeViewModel viewModel;
+    private static GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
     private List<StackPane> stackPaneList = new ArrayList<>();
 
@@ -626,7 +626,7 @@ public class GroupTreeView extends BorderPane {
         return contextMenu;
     }
 
-    private void addNewGroup() {
+    public static void addNewGroup() {
         viewModel.addNewGroupToRoot();
     }
 
