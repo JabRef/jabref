@@ -94,7 +94,7 @@ public class OOFormatBibliography {
     public static OOText formatBibliographyEntryBody(CitedKey citedKey, OOBibStyle style) {
         if (citedKey.getLookupResult().isEmpty()) {
             // Unresolved entry
-            return OOText.fromString(String.format("Unresolved(%s)", citedKey.citationKey));
+            return OOText.fromString("Unresolved(%s)".formatted(citedKey.citationKey));
         } else {
             // Resolved entry, use the layout engine
             BibEntry bibentry = citedKey.getLookupResult().get().entry;
@@ -161,7 +161,7 @@ public class OOFormatBibliography {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        final String prefix = String.format(" (%s: ", Localization.lang("Cited on pages"));
+        final String prefix = " (%s: ".formatted(Localization.lang("Cited on pages"));
         final String suffix = ")";
         stringBuilder.append(prefix);
 

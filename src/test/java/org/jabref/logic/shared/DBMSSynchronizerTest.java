@@ -124,7 +124,7 @@ public class DBMSSynchronizerTest {
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
-        assertEquals(bibEntry, actualEntries.get(0));
+        assertEquals(bibEntry, actualEntries.getFirst());
 
         bibDatabase.removeEntry(bibEntry);
         actualEntries = dbmsProcessor.getSharedEntries();
@@ -136,7 +136,7 @@ public class DBMSSynchronizerTest {
 
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
-        assertEquals(bibEntry, actualEntries.get(0));
+        assertEquals(bibEntry, actualEntries.getFirst());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class DBMSSynchronizerTest {
     public void testSynchronizeLocalDatabaseWithEntryRemoval() throws Exception {
         List<BibEntry> expectedBibEntries = Arrays.asList(createExampleBibEntry(1), createExampleBibEntry(2));
 
-        dbmsProcessor.insertEntry(expectedBibEntries.get(0));
+        dbmsProcessor.insertEntry(expectedBibEntries.getFirst());
         dbmsProcessor.insertEntry(expectedBibEntries.get(1));
 
         assertTrue(bibDatabase.getEntries().isEmpty());
@@ -174,7 +174,7 @@ public class DBMSSynchronizerTest {
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.get(0)));
+        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.getFirst()));
 
         expectedBibEntries = Collections.singletonList(expectedBibEntries.get(1));
 

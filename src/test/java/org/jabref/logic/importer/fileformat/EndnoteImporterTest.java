@@ -80,7 +80,7 @@ public class EndnoteImporterTest {
 
         assertEquals(5, bibEntries.size());
 
-        BibEntry first = bibEntries.get(0);
+        BibEntry first = bibEntries.getFirst();
         assertEquals(StandardEntryType.Misc, first.getType());
         assertEquals(Optional.of("testA0 and testA1"), first.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("testE0 and testE1"), first.getField(StandardField.EDITOR));
@@ -124,7 +124,7 @@ public class EndnoteImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(medlineString))).getDatabase()
                                             .getEntries();
 
-        BibEntry entry = bibEntries.get(0);
+        BibEntry entry = bibEntries.getFirst();
 
         assertEquals(1, bibEntries.size());
         assertEquals(StandardEntryType.Misc, entry.getType());
@@ -138,7 +138,7 @@ public class EndnoteImporterTest {
         Path file = Path.of(EndnoteImporterTest.class.getResource("Endnote.book.example.enw").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntry entry = bibEntries.get(0);
+        BibEntry entry = bibEntries.getFirst();
 
         assertEquals(1, bibEntries.size());
         assertEquals(StandardEntryType.Book, entry.getType());

@@ -5,13 +5,13 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -46,7 +46,7 @@ public class ExportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
 
     private final ExportMethod exportMethod;
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final StateManager stateManager;
     private final PreferencesService preferences;
     private final DialogService dialogService;
@@ -55,7 +55,7 @@ public class ExportCommand extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public ExportCommand(ExportMethod exportMethod,
-                         JabRefFrame frame,
+                         Supplier<LibraryTab> tabSupplier,
                          StateManager stateManager,
                          DialogService dialogService,
                          PreferencesService preferences,
@@ -63,7 +63,7 @@ public class ExportCommand extends SimpleCommand {
                          JournalAbbreviationRepository abbreviationRepository,
                          TaskExecutor taskExecutor) {
         this.exportMethod = exportMethod;
-        this.frame = frame;
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -96,7 +96,7 @@ public class ExportCommand extends SimpleCommand {
     }
 
     private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
-        String selectedExtension = selectedExtensionFilter.getExtensions().get(0).replace("*", "");
+        String selectedExtension = selectedExtensionFilter.getExtensions().getFirst().replace("*", "");
         if (!file.endsWith(selectedExtension)) {
             FileUtil.addExtension(file, selectedExtension);
         }
@@ -135,7 +135,7 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
-                    LibraryTab.DatabaseNotification notificationPane = frame.getCurrentLibraryTab().getNotificationPane();
+                    LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
                     notificationPane.notify(
                             IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
                             Localization.lang("Export operation finished successfully."),

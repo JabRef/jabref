@@ -48,9 +48,10 @@ public class ThemeManager {
     private final StyleSheet baseStyleSheet;
     private Theme theme;
 
+    private OsThemeDetector detector;
+
     private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
-    private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
     public ThemeManager(WorkspacePreferences workspacePreferences,
                         FileUpdateMonitor fileUpdateMonitor,
@@ -71,13 +72,20 @@ public class ThemeManager {
         EasyBind.subscribe(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
         EasyBind.subscribe(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
         EasyBind.subscribe(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
-        detector.registerListener(isDark -> updateThemeSettings());
+
+        try {
+            detector = OsThemeDetector.getDetector();
+            detector.registerListener(isDark -> updateThemeSettings());
+        } catch (Exception ex) {
+            LOGGER.error("Could not initialize Theme detector!", ex);
+            workspacePreferences.setThemeSyncOs(false);
+        }
     }
 
     private void updateThemeSettings() {
         Theme newTheme = Objects.requireNonNull(workspacePreferences.getTheme());
 
-        if (workspacePreferences.themeSyncOsProperty().getValue()) {
+        if (workspacePreferences.themeSyncOsProperty().getValue() && detector != null) {
             if (detector.isDark()) {
                 newTheme = Theme.dark();
             } else {
@@ -162,10 +170,10 @@ public class ThemeManager {
         getMainWindowScene().ifPresent(scene -> {
             List<String> stylesheets = scene.getStylesheets();
             if (!stylesheets.isEmpty()) {
-                stylesheets.remove(0);
+                stylesheets.removeFirst();
             }
 
-            stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
+            stylesheets.addFirst(baseStyleSheet.getSceneStylesheet().toExternalForm());
         });
     }
 

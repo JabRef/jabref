@@ -92,7 +92,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     private void setCurrentEntries(List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-            BibEntry firstSelectedEntry = entries.get(0);
+            BibEntry firstSelectedEntry = entries.getFirst();
             setCurrentEntry(firstSelectedEntry);
         }
     }

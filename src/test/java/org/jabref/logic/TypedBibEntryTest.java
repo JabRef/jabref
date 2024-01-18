@@ -1,5 +1,6 @@
 package org.jabref.logic;
 
+import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
