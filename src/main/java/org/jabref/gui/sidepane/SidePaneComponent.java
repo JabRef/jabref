@@ -63,8 +63,7 @@ public class SidePaneComponent extends BorderPane {
         downButton.setOnAction(e -> moveDownCommand.execute());
 
         addButton = IconTheme.JabRefIcons.ADD.asButton();
-        addButton.setTooltip(new Tooltip(Localization.lang("Add group")));
-        addButton.setOnAction(e -> moveDownCommand.execute());
+        addButton.setTooltip(new Tooltip(Localization.lang("New group")));
 
         this.buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(upButton, downButton, closeButton);

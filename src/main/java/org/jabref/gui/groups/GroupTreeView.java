@@ -295,7 +295,7 @@ public class GroupTreeView extends BorderPane {
     private StackPane createAddSubgroupButton(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
         Button addSubgroupButton = IconTheme.JabRefIcons.ADD.asButton();
-        addSubgroupButton.setTooltip(new Tooltip(Localization.lang("Add Subgroup")));
+        addSubgroupButton.setTooltip(new Tooltip(Localization.lang("New subgroup")));
         ContextAction action = new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group);
         addSubgroupButton.setOnAction(e -> action.execute());
         addSubgroupButton.setVisible(false); // Initially, hide the button
