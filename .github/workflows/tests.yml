@@ -1,0 +1,319 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - main-release
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
+  GRADLE_OPTS: -Xmx4g
+  JAVA_OPTS: -Xmx4g
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  checkstyle:
+    name: Checkstyle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Run checkstyle reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+          checkstyle_version: '10.3'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run checkstyle using gradle
+        run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+  openrewrite:
+    name: OpenRewrite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run OpenRewrite
+        run: |
+          ./gradlew rewriteDryRun
+  modernizer:
+    name: Modernizer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run modernizer
+        run: |
+          # enable failing of this task if modernizer complains
+          sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
+          ./gradlew modernizer
+  markdown:
+    name: Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@v14
+        with:
+          globs: |
+            *.md
+            docs/**/*.md
+  changelog:
+    name: CHANGELOG.md
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Lint CHANGELOG.md
+        run: |
+          # Install jbang
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          export PATH=$PATH:$HOME/.jbang/bin
+
+          # run heylogs verification
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.7.2:bin check CHANGELOG.md > heylogs.txt || true
+
+          # improve output
+          sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
+
+          cat heylogs.txt
+
+          # exit 1 in case of error
+          # We have 1 "valid" issue in CHANGELOG.md
+          grep -q "1 problem" heylogs.txt || exit 1
+  changelog-unreleased-only:
+    name: CHANGELOG.md - only unreleased touched
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+          fetch-depth: 0
+      - name: Install clparse
+        run: |
+          curl -LO https://github.com/marcaddeo/clparse/releases/download/0.9.1/clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
+          sudo mv clparse /usr/local/bin/clparse
+      - name: Check CHANGELOG.md diff
+        run: |
+          diff \
+            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
+  tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run tests
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        env:
+          CI: "true"
+      - name: Format failed test results
+        if: failure()
+        run: |
+          sudo apt-get install -qq -y xml-twig-tools xsltproc
+          scripts/after-failure.sh
+  databasetests:
+    name: Database tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run tests on PostgreSQL
+        run: ./gradlew databaseTest --rerun-tasks
+        env:
+          CI: "true"
+          DBMS: "postgresql"
+      - name: Shutdown Ubuntu MySQL
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+      - name: Start custom MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3800
+          container port: 3307
+          character set server: 'utf8'
+          collation server: 'utf8_general_ci'
+          mysql version: '8.0'
+          mysql database: 'jabref'
+          mysql root password: 'root'
+      - name: Run tests on MySQL
+        run: ./gradlew databaseTest --rerun-tasks
+        env:
+          CI: "true"
+          DBMS: "mysql"
+  guitests:
+    name: GUI tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run GUI tests
+        run: xvfb-run --auto-servernum ./gradlew guiTest
+        env:
+          CI: "true"
+  codecoverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Check secrets presence
+        id: checksecrets
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          if [ "$CODECOV_TOKEN" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+          fi
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Checkout source
+        if: github.ref == 'refs/heads/main'
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        if: github.ref == 'refs/heads/main'
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Update test coverage metrics
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
+        env:
+          CI: "true"
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          DBMS: "postgresql"
+      - uses: codecov/codecov-action@v3
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+  # This is https://github.com/marketplace/actions/gradle-wrapper-validation
+  # It ensures that the jar file is from gradle and not by a strange third party.
+  gradlevalidation:
+    name: "Validate Gradle Wrapper"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - uses: gradle/wrapper-validation-action@v1
+  # This ensures that no git merge conflict markers (<<<, ...) are contained
+  merge_conflict_job:
+    name: Find merge conflicts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Merge Conflict finder
+        uses: olivernybroe/action-conflict-finder@v4.0

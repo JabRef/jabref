@@ -1,0 +1,45 @@
+name: Refresh Citation Style Language Files
+
+on:
+  schedule:
+    - cron: '1 2 1,15 * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Refresh Citation Style Language Files
+    runs-on: ubuntu-latest
+    if: (github.repository == 'JabRef/jabref')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Initialize git
+        run: |
+          git config --local core.editor /usr/bin/cat
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Update src/main/resources/csl-styles
+        run: |
+          cd src/main/resources/csl-styles
+          git checkout master
+          git pull
+      - name: Update src/main/resources/csl-locales
+        run: |
+          cd src/main/resources/csl-locales
+          git checkout master
+          git pull
+      - name: Persist changes
+        run: |
+          git add -f src/main/resources/csl-styles
+          git add -f src/main/resources/csl-locales
+          git diff-index --quiet HEAD || git commit -m 'Update CSL styles'
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
+          branch: refresh-csl
+          title: "[Bot] Update CSL styles"
+          commit-message: Update CSL styles
+          labels: dependencies

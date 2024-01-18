@@ -1,0 +1,49 @@
+name: Refresh Journal Lists
+
+on:
+  schedule:
+    - cron: '1 2 2,16 * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Refresh Journal List Files
+    runs-on: ubuntu-latest
+    if: (github.repository == 'JabRef/jabref')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Initialize git
+        run: |
+          git config --local core.editor /usr/bin/cat
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Update buildres/abbrv.jabref.org
+        run: |
+          cd buildres/abbrv.jabref.org
+          git checkout main
+          git pull
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Check whether journal-list.mv can be generated (the "real" generation is done inside JabRef's build process)
+        run: |
+          ./gradlew generateJournalListMV
+      - name: Persist changes
+        run: |
+          git add -f buildres/abbrv.jabref.org
+          git diff-index --quiet HEAD || git commit -m 'Update journal abbreviation lists'
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
+          branch: update-journal-lists
+          title: "[Bot] Update journal abbreviation lists"
+          commit-message: Update journal abbreviation lists

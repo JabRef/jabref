@@ -1,0 +1,93 @@
+name: Gource
+
+on:
+  push:
+    branches:
+      - gource
+      - fix-gource
+  schedule:
+    - cron:  '15 3 5 * *'
+  workflow_dispatch:
+
+concurrency:
+  group: gource
+  cancel-in-progress: true
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: 'false'
+      - name: 'Development history of current build'
+        uses: BoundfoxStudios/action-gource@v2
+        with:
+          gource_title: 'JabRef v5.13 (in development) | more information at contribute.jabref.org'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          avatars_auto_fetch: true
+          # 5s * 365 / 4 = 7.5min
+          gource_seconds_per_day: 1
+          gource_start_date: '2023-12-24'
+          gource_file_filter: 'buildres/csl|\.csl'
+      - name: 'Store video'
+        run: |
+          mkdir gource-videos
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.10-dev.mp4
+      - name: 'Development history of last release'
+        uses: BoundfoxStudios/action-gource@v2
+        with:
+          gource_title: 'JabRef v5.12 | more information at contribute.jabref.org'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          avatars_auto_fetch: true
+          # 5s * 365 / 4 = 7.5min
+          gource_seconds_per_day: 2
+          gource_start_date: '2023-10-22'
+          gource_stop_date: '2023-12-24'
+          gource_file_filter: 'buildres/csl|\.csl'
+      - name: 'Store video'
+        run: |
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.9.mp4
+      - name: 'Complete development history'
+        uses: BoundfoxStudios/action-gource@v2
+        with:
+          gource_title: 'JabRef | more information at contribute.jabref.org'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          avatars_auto_fetch: true
+          # 0.01 leads to a 45 second video for the complete history until end of 2020
+          # 0.1 leads to a 8 minute video
+          gource_seconds_per_day: 0.1
+          gource_file_filter: 'buildres/csl|\.csl'
+      - name: 'Store video'
+        run: |
+          mv gource/gource.mp4 gource-videos/jabref-complete.mp4
+      - name: 'Upload gource video'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gource
+          path: gource-videos/
+          retention-days: 80
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Upload to files.jabref.org
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: Pendect/action-rsyncer@v2.0.0
+        env:
+          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
+        with:
+          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial
+          options: ''
+          ssh_options: '-p 9922'
+          src: 'gource-videos/'
+          dest: jrrsync@build-upload.jabref.org:/var/www/files.jabref.org/www/gource/
