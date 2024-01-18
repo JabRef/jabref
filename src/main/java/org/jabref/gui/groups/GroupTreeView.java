@@ -81,6 +81,7 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
     private static final double SCROLL_SPEED_UP = 3.0;
+    private static GroupTreeViewModel viewModel;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -94,7 +95,6 @@ public class GroupTreeView extends BorderPane {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
 
-    private static GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
     private List<StackPane> stackPaneList = new ArrayList<>();
 
