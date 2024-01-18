@@ -19,7 +19,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
@@ -47,11 +46,11 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -159,7 +158,6 @@ public class GroupTreeView extends BorderPane {
         expansionNodeColumn.setMinWidth(20d);
         expansionNodeColumn.setPrefWidth(20d);
         expansionNodeColumn.setResizable(false);
-
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
@@ -328,7 +326,6 @@ public class GroupTreeView extends BorderPane {
             }
         });
     }
-
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
