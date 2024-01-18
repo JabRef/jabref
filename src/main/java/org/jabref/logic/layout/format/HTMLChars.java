@@ -1,5 +1,6 @@
 package org.jabref.logic.layout.format;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,11 +18,36 @@ public class HTMLChars implements LayoutFormatter {
     @Override
     public String format(String inField) {
         int i;
+
+
         String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
-                              .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
-                              .replace("\n", "<br>") // Replace single line breaks with <br>
-                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+                .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                .replace("\n", "<br>") // Replace single line breaks with <br>
+                .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+
+        // Replace &amp; with &
+      field = field.replace("&amp;", "&")
+          .replace("&lt;", "<")
+              .replace("&gt;", ">");
+
+
+
+
+
+
+
+
+
+       // String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
+                        //      .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                           //   .replace("\n", "<br>") // Replace single line breaks with <br>
+                            //  .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                            //  .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+
+       // field = field.replace("&lt;", "<")
+        //        .replace("&gt;", ">")
+           //     .replace("&amp;", "&");
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -201,5 +227,6 @@ public class HTMLChars implements LayoutFormatter {
                 break;
         }
         return result;
+
     }
 }
