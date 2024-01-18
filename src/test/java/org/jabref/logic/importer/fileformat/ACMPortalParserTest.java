@@ -75,7 +75,7 @@ public class ACMPortalParserTest {
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertEquals(Optional.of(searchEntryList.get(0)), bibEntries.stream().findFirst());
+        assertEquals(Optional.of(searchEntryList.getFirst()), bibEntries.stream().findFirst());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ACMPortalParserTest {
         CookieHandler.setDefault(new CookieManager());
         List<String> doiList = parser.parseDoiSearchPage(new URLDownload(searchUrl).asInputStream());
         assertFalse(doiList.isEmpty());
-        assertEquals(testDoi, doiList.get(0));
+        assertEquals(testDoi, doiList.getFirst());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class ACMPortalParserTest {
     void testParseBibEntry() {
         BibEntry bibEntry = parser.parseBibEntry(jsonStr);
         bibEntry.clearField(StandardField.ABSTRACT);
-        assertEquals(searchEntryList.get(0), bibEntry);
+        assertEquals(searchEntryList.getFirst(), bibEntry);
     }
 
     @Test

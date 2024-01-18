@@ -25,7 +25,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

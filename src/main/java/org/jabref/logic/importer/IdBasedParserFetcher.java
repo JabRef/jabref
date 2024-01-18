@@ -72,7 +72,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
                 LOGGER.info("Fetcher {} found more than one result for identifier {}. We will use the first entry.", getName(), identifier);
             }
 
-            BibEntry entry = fetchedEntries.get(0);
+            BibEntry entry = fetchedEntries.getFirst();
 
             // Post-cleanup
             doPostCleanup(entry);

@@ -127,7 +127,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             return Optional.empty();
         }
 
-        String url = elements.get(0).attr("href");
+        String url = elements.getFirst().attr("href");
         return Optional.of(new URL(url));
     }
 

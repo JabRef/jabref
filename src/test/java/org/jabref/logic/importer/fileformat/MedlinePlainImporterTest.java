@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,7 +78,7 @@ class MedlinePlainImporterTest {
 
         List<BibEntry> entries = importer.importDatabase(inputFile).getDatabase()
                                          .getEntries();
-        BibEntry testEntry = entries.get(0);
+        BibEntry testEntry = entries.getFirst();
 
         assertEquals(7, entries.size());
         assertEquals(StandardEntryType.Article, testEntry.getType());
@@ -123,21 +123,21 @@ class MedlinePlainImporterTest {
     @Test
     void testEmptyFileImport() throws IOException {
         List<BibEntry> emptyEntries = importer.importDatabase(readerForString("")).getDatabase().getEntries();
-
         assertEquals(Collections.emptyList(), emptyEntries);
     }
 
-    @Test
-    void testImportSingleEntriesInSingleFiles() throws IOException, URISyntaxException {
-        List<String> testFiles = Arrays.asList("MedlinePlainImporterTestCompleteEntry",
-                "MedlinePlainImporterTestMultiAbstract", "MedlinePlainImporterTestMultiTitle",
-                "MedlinePlainImporterTestDOI", "MedlinePlainImporterTestInproceeding");
-
-        for (String testFile : testFiles) {
-            String medlineFile = testFile + ".txt";
-            String bibtexFile = testFile + ".bib";
-            assertImportOfMedlineFileEqualsBibtexFile(medlineFile, bibtexFile);
-        }
+    @ParameterizedTest
+    @CsvSource({
+            "MedlinePlainImporterTestCompleteEntry",
+            "MedlinePlainImporterTestMultiAbstract",
+            "MedlinePlainImporterTestMultiTitle",
+            "MedlinePlainImporterTestDOI",
+            "MedlinePlainImporterTestInproceeding"
+    })
+    void testImportSingleEntriesInSingleFiles(String testFile) throws IOException, URISyntaxException {
+        String medlineFile = testFile + ".txt";
+        String bibtexFile = testFile + ".bib";
+        assertImportOfMedlineFileEqualsBibtexFile(medlineFile, bibtexFile);
     }
 
     private void assertImportOfMedlineFileEqualsBibtexFile(String medlineFile, String bibtexFile)
@@ -147,8 +147,7 @@ class MedlinePlainImporterTest {
         try (InputStream nis = MedlinePlainImporter.class.getResourceAsStream(bibtexFile)) {
             List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
             assertNotNull(entries);
-            assertEquals(1, entries.size());
-            BibEntryAssert.assertEquals(nis, entries.get(0));
+            BibEntryAssert.assertEquals(nis, entries);
         }
     }
 

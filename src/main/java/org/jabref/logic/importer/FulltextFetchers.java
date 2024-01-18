@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -71,7 +70,7 @@ public class FulltextFetchers {
                      .map(FulltextFetchers::getResults)
                      .filter(Optional::isPresent)
                      .map(Optional::get)
-                     .filter(res -> Objects.nonNull(res.getSource()))
+                     .filter(res -> (res.getSource()) != null)
                      .sorted(Comparator.comparingInt((FetcherResult res) -> res.getTrust().getTrustScore()).reversed())
                      .map(FetcherResult::getSource)
                      .findFirst();

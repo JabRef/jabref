@@ -31,7 +31,7 @@ public enum Month {
     Month(String fullName, String shortName, int number) {
         this.fullName = fullName;
         this.shortName = shortName;
-        this.twoDigitNumber = String.format("%02d", number);
+        this.twoDigitNumber = "%02d".formatted(number);
         this.number = number;
     }
 
@@ -176,7 +176,7 @@ public enum Month {
      * @return Month in JabRef format
      */
     public String getJabRefFormat() {
-        return String.format(FieldWriter.BIBTEX_STRING_START_END_SYMBOL + "%s" + FieldWriter.BIBTEX_STRING_START_END_SYMBOL, shortName);
+        return (FieldWriter.BIBTEX_STRING_START_END_SYMBOL + "%s" + FieldWriter.BIBTEX_STRING_START_END_SYMBOL).formatted(shortName);
     }
 
     /**

@@ -1,17 +1,19 @@
 package org.jabref.gui.entryeditor;
 
-import org.jabref.gui.JabRefFrame;
+import java.util.function.Supplier;
+
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 
 public class OpenEntryEditorAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final StateManager stateManager;
 
-    public OpenEntryEditorAction(JabRefFrame frame, StateManager stateManager) {
-        this.frame = frame;
+    public OpenEntryEditorAction(Supplier<LibraryTab> tabSupplier, StateManager stateManager) {
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -19,7 +21,7 @@ public class OpenEntryEditorAction extends SimpleCommand {
 
     public void execute() {
         if (!stateManager.getSelectedEntries().isEmpty()) {
-            frame.getCurrentLibraryTab().showAndEdit(stateManager.getSelectedEntries().get(0));
+            tabSupplier.get().showAndEdit(stateManager.getSelectedEntries().getFirst());
         }
     }
 }

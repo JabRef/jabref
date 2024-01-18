@@ -29,7 +29,7 @@ public class DefaultInjector implements PresenterFactory {
      */
     private static Object createDependency(Class<?> clazz) {
         if (clazz == DialogService.class) {
-            return JabRefGUI.getMainFrame().getDialogService();
+            return JabRefGUI.getDialogService();
         } else if (clazz == TaskExecutor.class) {
             return Globals.TASK_EXECUTOR;
         } else if (clazz == PreferencesService.class) {
@@ -41,7 +41,7 @@ public class DefaultInjector implements PresenterFactory {
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
         } else if (clazz == ThemeManager.class) {
-            return Globals.getThemeManager();
+            return JabRefGUI.getThemeManager();
         } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else if (clazz == ProtectedTermsLoader.class) {

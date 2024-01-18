@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -56,7 +56,7 @@ public class RisImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        List<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibEntries = new ArrayList<>();
 
         // use optional here, so that no exception will be thrown if the file is empty
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
@@ -78,7 +78,9 @@ public class RisImporter extends Importer {
             String editor = "";
             String startPage = "";
             String endPage = "";
-            String comment = "";
+            String year = "";
+            StringJoiner abstractContent = new StringJoiner("\n");
+            StringJoiner comment = new StringJoiner("\n");
             Optional<Month> month = Optional.empty();
             Map<Field, String> fields = new HashMap<>();
 
@@ -195,26 +197,23 @@ public class RisImporter extends Importer {
                     } else if ("VL".equals(tag)) {
                         fields.put(StandardField.VOLUME, value);
                     } else if ("N2".equals(tag) || "AB".equals(tag)) {
-                        String oldAb = fields.get(StandardField.ABSTRACT);
-                        if (oldAb == null) {
-                            fields.put(StandardField.ABSTRACT, value);
-                        } else if (!oldAb.equals(value) && !value.isEmpty()) {
-                            fields.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + value);
+                        if (!abstractContent.toString().equals(value)) {
+                            abstractContent.add(value);
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(StandardField.URL, value);
                     } else if (((tagPriority = dateTags.indexOf(tag)) != -1) && (value.length() >= 4)) {
                         if (tagPriority < datePriority) {
-                            String year = value.substring(0, 4);
-
+                            String readYear = value.substring(0, 4);
                             try {
-                                Year.parse(year, YEAR_FORMATTER);
-                                // if the year is parsebale we have found a higher priority date
+                                Year.parse(readYear, YEAR_FORMATTER);
+                                // if the year is parseable we have found a higher priority date
                                 dateTag = tag;
                                 dateValue = value;
                                 datePriority = tagPriority;
                             } catch (DateTimeParseException ex) {
-                                // We can't parse the year, we ignore it
+                                // We cannot parse the year, we store as is
+                                year = readYear;
                             }
                         }
                     } else if ("KW".equals(tag)) {
@@ -225,10 +224,7 @@ public class RisImporter extends Importer {
                             fields.put(StandardField.KEYWORDS, value);
                         }
                     } else if ("U1".equals(tag) || "U2".equals(tag) || "N1".equals(tag)) {
-                        if (!comment.isEmpty()) {
-                            comment = comment + OS.NEWLINE;
-                        }
-                        comment = comment + value;
+                        comment.add(value);
                     } else if ("M3".equals(tag) || "DO".equals(tag)) {
                         addDoi(fields, value);
                     } else if ("C3".equals(tag)) {
@@ -264,7 +260,6 @@ public class RisImporter extends Importer {
                         fields.put(new UnknownField("refid"), value);
                     }
                 }
-                // fix authors
                 if (!author.isEmpty()) {
                     author = AuthorList.fixAuthorLastNameFirst(author);
                     fields.put(StandardField.AUTHOR, author);
@@ -273,10 +268,12 @@ public class RisImporter extends Importer {
                     editor = AuthorList.fixAuthorLastNameFirst(editor);
                     fields.put(StandardField.EDITOR, editor);
                 }
-                if (!comment.isEmpty()) {
-                    fields.put(StandardField.COMMENT, comment);
+                if (abstractContent.length() > 0) {
+                    fields.put(StandardField.ABSTRACT, abstractContent.toString());
                 }
-
+                if (comment.length() > 0) {
+                    fields.put(StandardField.COMMENT, comment.toString());
+                }
                 fields.put(StandardField.PAGES, startPage + endPage);
             }
 
@@ -293,20 +290,21 @@ public class RisImporter extends Importer {
                         // The month part is unparseable, so we ignore it.
                     }
                 }
+            } else if (!year.isEmpty()) {
+                fields.put(StandardField.YEAR, year);
             }
 
-            // Remove empty fields:
+            // Remove empty fields
             fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
 
-            // create one here
-            // type is set in the loop above
+            // Create final entry
             BibEntry entry = new BibEntry(type);
             entry.setField(fields);
             // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
             month.ifPresent(entry::setMonth);
-            bibitems.add(entry);
+            bibEntries.add(entry);
         }
-        return new ParserResult(bibitems);
+        return new ParserResult(bibEntries);
     }
 
   private void addDoi(Map<Field, String> hm, String val) {
