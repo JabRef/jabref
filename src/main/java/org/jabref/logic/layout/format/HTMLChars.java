@@ -33,7 +33,7 @@ public class HTMLChars implements LayoutFormatter {
 
         char c;
         boolean escaped = false;
-        boolean incommand = false;g
+        boolean incommand = false;
 
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
