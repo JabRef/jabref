@@ -33,7 +33,7 @@ public class HTMLChars implements LayoutFormatter {
 
         char c;
         boolean escaped = false;
-        boolean incommand = false;
+        boolean incommand = false;g
 
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
@@ -204,6 +204,5 @@ public class HTMLChars implements LayoutFormatter {
                 break;
         }
         return result;
-
     }
 }
