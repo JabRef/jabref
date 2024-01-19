@@ -9,20 +9,24 @@ import org.jabref.logic.l10n.Localization;
 /**
  * Dialog shown when closing of application needs to wait for a save operation to finish.
  */
-public class WaitForSaveFinishedDialog {
+public class ProcessingLibraryDialog {
+
+    public enum Mode { LOAD, SAVE }
 
     private final DialogService dialogService;
+    private final Mode mode;
 
-    public WaitForSaveFinishedDialog(DialogService dialogService) {
+    public ProcessingLibraryDialog(DialogService dialogService, Mode mode) {
         this.dialogService = dialogService;
+        this.mode = mode;
     }
 
-    public void showAndWait(List<LibraryTab> LibraryTabs) {
-        if (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
+    public void showAndWait(List<LibraryTab> libraryTabs) {
+        if (libraryTabs.stream().anyMatch(tab -> mode == Mode.LOAD ? tab.isLoading() : tab.isSaving())) {
             Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
+                    while (libraryTabs.stream().anyMatch(tab -> tab.isLoading() || tab.isSaving())) {
                         if (isCancelled()) {
                             return null;
                         } else {
@@ -35,7 +39,9 @@ public class WaitForSaveFinishedDialog {
 
             dialogService.showProgressDialog(
                     Localization.lang("Please wait..."),
-                    Localization.lang("Waiting for save operation to finish") + "...",
+                    mode == Mode.LOAD
+                            ? Localization.lang("Waiting for databases being processed") + "..."
+                            : Localization.lang("Waiting for save operation to finish") + "...",
                     waitForSaveFinished
             );
         }

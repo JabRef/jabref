@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
@@ -112,6 +113,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private TabPane tabbedPane;
 
     private Subscription dividerSubscription;
+    private BooleanBinding loadingBinding;
+    private Subscription loadingSubscription;
 
     private final TaskExecutor taskExecutor;
 
@@ -399,8 +402,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
 
-        WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
-        waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
+        ProcessingLibraryDialog processingLibraryDialog =
+                new ProcessingLibraryDialog(dialogService, ProcessingLibraryDialog.Mode.SAVE);
+        processingLibraryDialog.showAndWait(getLibraryTabs());
 
         return true;
     }
@@ -945,7 +949,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         }
 
         // Tabs must be present and contents async loaded for an entry to be selected
-        // FixMe: Wait here for every database loaded
+        ProcessingLibraryDialog processingLibraryDialog =
+                new ProcessingLibraryDialog(dialogService, ProcessingLibraryDialog.Mode.LOAD);
+        processingLibraryDialog.showAndWait(getLibraryTabs());
 
         jumpToEntry.ifPresent(entryKey -> {
             for (LibraryTab libraryTab : getLibraryTabs()) {

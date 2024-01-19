@@ -120,6 +120,7 @@ public class LibraryTab extends Tab {
     private PanelMode mode = PanelMode.MAIN_TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
+    private boolean loading;
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
 
@@ -231,6 +232,7 @@ public class LibraryTab extends Tab {
     }
 
     private void onDatabaseLoadingStarted() {
+        loading = true;
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
     }
@@ -249,10 +251,13 @@ public class LibraryTab extends Tab {
             }
         }
 
+        loading = false;
         dataLoadingTask = null;
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
+        loading = false;
+
         String title = Localization.lang("Connection error");
         String content = "%s\n\n%s".formatted(ex.getMessage(), Localization.lang("A local copy will be opened."));
 
@@ -804,6 +809,10 @@ public class LibraryTab extends Tab {
 
     public void setSaving(boolean saving) {
         this.saving = saving;
+    }
+
+    public boolean isLoading() {
+        return loading;
     }
 
     public CountingUndoManager getUndoManager() {
