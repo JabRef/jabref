@@ -1,5 +1,7 @@
 package org.jabref.gui.importer;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,10 +22,14 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -115,6 +121,19 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return findInternalDuplicate(entry).isPresent() ||
                 new DuplicateCheck(entryTypesManager)
                 .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
+    }
+
+    public String getSourceString(BibEntry entry) {
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
+        try {
+            new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode());
+        } catch (
+                IOException ioException) {
+            return null;
+        }
+        return writer.toString();
     }
 
     /**

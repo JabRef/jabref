@@ -1,7 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.EnumSet;
 import java.util.Optional;
 
@@ -40,13 +38,9 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -182,7 +176,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 })
                 .withOnMouseClickedEvent((entry, event) -> {
                     entriesListView.getCheckModel().toggleCheckState(entry);
-                    displayBibTeX(entry);
+                    displayBibTeX(entry, viewModel.getSourceString(entry));
                 })
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
@@ -193,17 +187,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         initBibTeX();
     }
 
-    private void displayBibTeX(BibEntry entry) {
+    private void displayBibTeX(BibEntry entry, String bibTeX) {
         if (entriesListView.getCheckModel().isChecked(entry)) {
             bibTeXData.clear();
-            try {
-                bibTeXData.appendText(getSourceString(entry));
-                bibTeXData.moveTo(0);
-                bibTeXData.requestFollowCaret();
-            } catch (
-                    IOException aE) {
-                bibTeXData.clear();
-            }
+            bibTeXData.appendText(bibTeX);
+            bibTeXData.moveTo(0);
+            bibTeXData.requestFollowCaret();
         } else {
             bibTeXData.clear();
         }
@@ -216,14 +205,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
-    }
-
-    private String getSourceString(BibEntry entry) throws IOException {
-        StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
-        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, database.getMode());
-        return writer.toString();
     }
 
     private Node getEntryNode(BibEntry entry) {
