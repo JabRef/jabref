@@ -27,7 +27,7 @@
                         <Button onAction="#unselectAll"  text="%Unselect all"/>
                     </HBox>
                     <VBox fx:id="bibTeXDataBox" visible="false" managed="false">
-                        <Label text="%Entry BibTeX data:"/>
+                        <Label fx:id="bibTeXDataLabel"/>
                         <CodeArea fx:id="bibTeXData" editable="false" minHeight="30.0" prefHeight="200.0" prefWidth="700.0" wrapText="true"/>
                     </VBox>
                     <HBox spacing="4" alignment="CENTER_LEFT">
@@ -54,7 +54,7 @@
             </HBox>
             <HBox spacing="4">
                 <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
-                <CheckBox fx:id="showEntryInformation" text="%Show entry information"/>
+                <CheckBox fx:id="showEntryInformation" text="%Show Bibtex"/>
             </HBox>
         </VBox>
     </content>

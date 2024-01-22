@@ -64,6 +64,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ButtonType importButton;
     public Label totalItems;
     public Label selectedItems;
+    public Label bibTeXDataLabel;
     public CheckBox downloadLinkedOnlineFiles;
     public CheckBox showEntryInformation;
     public CodeArea bibTeXData;
@@ -199,6 +200,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     }
 
     private void initBibTeX() {
+        bibTeXDataLabel.setText(Localization.lang("%0 source", "BibTeX") + ":");
         bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         bibTeXData.setPadding(new Insets(5.0));
         showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
