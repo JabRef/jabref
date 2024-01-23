@@ -40,7 +40,7 @@ public class HTMLUnicodeConversionMaps {
             {"168", "uml", "{\\\"{}}"}, // diaeresis = spacing diaeresis,
             //                                 U+00A8 ISOdia
             {"169", "copy", "{\\copyright}"}, // copyright sign, U+00A9 ISOnum
-            {"170", "ordf", "{\\textordfeminine}"}, // feminine ordinal indicator, U+00A A ISOnum
+            {"170", "ordf", "{\\textordfeminine}"}, // feminine ordinal indicator, U+00AA ISOnum
             {"171", "laquo", "{\\guillemotleft}"}, // left-pointing double angle quotation mark
             //                                 = left pointing guillemet, U+00AB ISOnum
             {"172", "not", "$\\neg$"}, // not sign, U+00AC ISOnum
@@ -134,8 +134,6 @@ public class HTMLUnicodeConversionMaps {
             //                                 U+00D8 ISOlat1
             {"217", "Ugrave", "{{\\`{U}}}"}, // latin capital letter U with grave,
             //                                 U+00D9 ISOlat1
-
-
             {"218", "Uacute", "{{\\'{U}}}"}, // latin capital letter U with acute,
             //                                 U+00DA ISOlat1
             {"219", "Ucirc", "{{\\^{U}}}"}, // latin capital letter U with circumflex,
