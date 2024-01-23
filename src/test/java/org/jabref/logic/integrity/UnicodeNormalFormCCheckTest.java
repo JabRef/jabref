@@ -1,12 +1,15 @@
 package org.jabref.logic.integrity;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnicodeNormalFormCCheckTest {
     UnicodeNormalFormCCheck checker = new UnicodeNormalFormCCheck();
@@ -17,7 +20,7 @@ public class UnicodeNormalFormCCheckTest {
         entry.setField(StandardField.TITLE, "Some Title");
         entry.setField(StandardField.AUTHOR, "John Doe");
 
-        assertTrue(checker.check(entry).isEmpty());
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
@@ -26,5 +29,6 @@ public class UnicodeNormalFormCCheckTest {
         entry.setField(StandardField.AUTHOR, "John Doe");
 
         assertFalse(checker.check(entry).isEmpty());
+        assertEquals(List.of(new IntegrityMessage("Value is not in Normal Form C (NFC) format", entry, StandardField.TITLE)), checker.check(entry));
     }
 }
