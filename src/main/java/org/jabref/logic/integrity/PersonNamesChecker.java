@@ -42,5 +42,6 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
         }
         return Optional.empty();
+
     }
 }
