@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added a new integrity check and clean up option for non NFC format values. [#10506](https://github.com/JabRef/jabref/issues/10506)
 
 ### Changed
 
@@ -32,17 +33,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
 
 ### Removed
-
-
-### Fixed
-
-- Fixed an open issue Add quality check and cleanup for problematic unicode characters.[#10506](https://github.com/JabRef/jabref/issues/10506)
-
-### Added
-
-- Added new Integrity check option for Non NFC format values.[#10506](https://github.com/JabRef/jabref/issues/10506)
-- Added new Clean up option to formate the Non NFC values.[#10506](https://github.com/JabRef/jabref/issues/10506)
-
 
 ## [5.12] – 2023-12-24
 
