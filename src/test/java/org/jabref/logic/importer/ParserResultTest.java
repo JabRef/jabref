@@ -72,7 +72,7 @@ class ParserResultTest {
         File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
         Files.write(tempFile.toPath(), bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals(parserResult.warnings().getFirst(), "Line 1: Found corrupted citation key  (contains whitespaces).");
+        assertEquals("Line 1: Found corrupted citation key  (contains whitespaces).", parserResult.warnings().getFirst());
     }
 
     @Test
@@ -91,7 +91,7 @@ class ParserResultTest {
         File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
         Files.write(tempFile.toPath(), bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals(parserResult.warnings().getFirst(), "Line 1: Found corrupted citation key  (comma missing).");
+        assertEquals("Line 1: Found corrupted citation key  (comma missing).", parserResult.warnings().getFirst());
     }
 
     @Test
@@ -110,7 +110,7 @@ class ParserResultTest {
         File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
         Files.write(tempFile.toPath(), bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals(parserResult.warnings().getFirst(), "Line 2: Found corrupted citation key .");
+        assertEquals("Line 2: Found corrupted citation key .", parserResult.warnings().getFirst());
     }
 
     @Test
