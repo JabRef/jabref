@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
@@ -10,6 +11,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,8 +57,8 @@ class ParserResultTest {
     }
 
     @Test
-    public void warningAddedForWhitespaceInCitationKeyImport() throws IOException {
-        //whitespace after citation key "myArticle "
+    public void warningAddedForWhitespaceInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+        // whitespace after citation key "myArticle "
         String bibtexEntry = """
                 @article{ myArticle ,
                   author    = "Author Name",
@@ -67,23 +69,15 @@ class ParserResultTest {
                   publisher = "Publisher Name"
                 }
                 """;
-
-        File tempFile = File.createTempFile("invalidBibTex", ".bib");
-        try {
-            Files.write(tempFile.toPath(), bibtexEntry.getBytes());
-            ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-            assertEquals(parserResult.warnings().getFirst(),"Line 1: Found corrupted citation key  (contains whitespaces).");
-        } finally {
-            if (!tempFile.delete()) {
-                System.err.println("Warning: Unable to delete temporary file " + tempFile.getAbsolutePath());
-            }
-        }
+        File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
+        Files.write(tempFile.toPath(), bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertEquals(parserResult.warnings().getFirst(), "Line 1: Found corrupted citation key  (contains whitespaces).");
     }
 
-
     @Test
-    public void warningAddedForMissingCommaInCitationKeyImport() throws IOException {
-        //Comma replaced by whitespace instead in citation key "myArticle "
+    public void warningAddedForMissingCommaInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+        // Comma replaced by whitespace instead in citation key "myArticle "
         String bibtexEntry = """
             @article{myArticle\s
                author    = "Author Name",
@@ -94,21 +88,14 @@ class ParserResultTest {
                publisher = "Publisher Name"
              }
             """;
-
-        File tempFile = File.createTempFile("invalidBibTex", ".bib");
-        try {
-            Files.write(tempFile.toPath(), bibtexEntry.getBytes());
-            ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-            assertEquals(parserResult.warnings().getFirst(),"Line 1: Found corrupted citation key  (comma missing).");
-        } finally {
-            if (!tempFile.delete()) {
-                System.err.println("Warning: Unable to delete temporary file " + tempFile.getAbsolutePath());
-            }
-        }
+        File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
+        Files.write(tempFile.toPath(), bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertEquals(parserResult.warnings().getFirst(), "Line 1: Found corrupted citation key  (comma missing).");
     }
+
     @Test
-    public void warningAddedForCorruptedCitationKeyInImport() throws IOException {
-        //
+    public void warningAddedForCorruptedCitationKeyInImport(@TempDir Path tmpDir) throws IOException {
         String bibtexEntry = """
             @article{myArticle
                author    = "Author Name",
@@ -120,20 +107,15 @@ class ParserResultTest {
              }
             """;
 
-        File tempFile = File.createTempFile("invalidBibTex", ".bib");
-        try {
-            Files.write(tempFile.toPath(), bibtexEntry.getBytes());
-            ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-            assertEquals(parserResult.warnings().getFirst(),"Line 2: Found corrupted citation key .");
-        } finally {
-            if (!tempFile.delete()) {
-                System.err.println("Warning: Unable to delete temporary file " + tempFile.getAbsolutePath());
-            }
-        }
+        File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
+        Files.write(tempFile.toPath(), bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertEquals(parserResult.warnings().getFirst(), "Line 2: Found corrupted citation key .");
     }
+
     @Test
-    public void skipsImportEntryForImproperSyntax() throws IOException {
-        //Comma after '=' character on line 2 throws error
+    public void skipsImportEntryForImproperSyntax(@TempDir Path tmpDir) throws IOException {
+        // Comma after '=' character on line 2 throws error
         String bibtexEntry = """
             @article{myArticle,
                author    =, "Author Name",
@@ -144,18 +126,9 @@ class ParserResultTest {
                publisher = "Publisher Name"
              }
             """;
-
-        File tempFile = File.createTempFile("invalidBibTex", ".bib");
-        try {
-            Files.write(tempFile.toPath(), bibtexEntry.getBytes());
-            ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-            assertFalse(parserResult.getDatabase().hasEntries());
-        } finally {
-            if (!tempFile.delete()) {
-                System.err.println("Warning: Unable to delete temporary file " + tempFile.getAbsolutePath());
-            }
-        }
+        File tempFile = new File(tmpDir.toFile(), "invalidBibTex.bib");
+        Files.write(tempFile.toPath(), bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile.toPath(), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertFalse(parserResult.getDatabase().hasEntries());
     }
-
-
 }
