@@ -85,7 +85,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         switch (autoLinkPreferences.getCitationKeyDependency()) {
             case START -> autolinkFileStartsBibtexProperty.setValue(true);
             case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
-            case REGEX -> autolinkUseRegexProperty.setValue(true) ;
+            case REGEX -> autolinkUseRegexProperty.setValue(true);
         }
 
         autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
