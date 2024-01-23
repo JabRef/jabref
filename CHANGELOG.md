@@ -33,7 +33,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-## [5.13] – 2024-01-23
 
 ### Fixed
 
