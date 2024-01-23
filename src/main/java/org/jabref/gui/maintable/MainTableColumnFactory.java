@@ -185,7 +185,7 @@ public class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, ?> createGroupIconColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
-        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
+        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLUMN.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group icons")));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);

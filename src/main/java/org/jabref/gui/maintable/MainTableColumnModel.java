@@ -37,11 +37,11 @@ public class MainTableColumnModel {
         FILES("files", Localization.lang("Linked files")),
 
         GROUPS("groups", Localization.lang("Groups")),
+        GROUP_ICONS("group_icons", Localization.lang("Group icons")),
         LINKED_IDENTIFIER("linked_id", Localization.lang("Linked identifiers")),
         NORMALFIELD("field"),
         SPECIALFIELD("special", Localization.lang("Special")),
-        LIBRARY_NAME("library", Localization.lang("Library")),
-        GROUP_ICONS("group_icons", Localization.lang("Group icons"));
+        LIBRARY_NAME("library", Localization.lang("Library"));
 
         public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, GROUP_ICONS, LINKED_IDENTIFIER);
 
