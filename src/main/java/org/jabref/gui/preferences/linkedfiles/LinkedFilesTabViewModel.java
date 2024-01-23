@@ -77,7 +77,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         mainFileDirectoryProperty.setValue(filePreferences.getMainFileDirectory().orElse(Path.of("")).toString());
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
-        fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
+        fulltextIndex.setValue(!filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
 
@@ -85,7 +85,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         switch (autoLinkPreferences.getCitationKeyDependency()) {
             case START -> autolinkFileStartsBibtexProperty.setValue(true);
             case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
-            case REGEX -> autolinkUseRegexProperty.setValue(true);
+            case REGEX -> autolinkUseRegexProperty.setValue(true) ;
         }
 
         autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
