@@ -32,6 +32,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
 
 ### Removed
+## [5.13] – 2024-01-23
+### Fixed
+- Fixed an open issue Add quality check and cleanup for problematic unicode characters.[#10506]
+
+### Added
+
+- Added new Integrity check option for Non NFC format values.[#10506]
+- Added new Clean up option to formate the Non NFC values.[#10506]
+
 
 ## [5.12] – 2023-12-24
 

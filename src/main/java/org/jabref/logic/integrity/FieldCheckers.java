@@ -53,6 +53,8 @@ public class FieldCheckers {
             fieldCheckers.put(StandardField.URLDATE, new DateChecker());
             fieldCheckers.put(StandardField.EVENTDATE, new DateChecker());
             fieldCheckers.put(StandardField.ORIGDATE, new DateChecker());
+//            fieldCheckers.put(StandardField.TITLE, new UnicodeNormalFormCCheck(databaseContext));
+//            fieldCheckers.put(StandardField.AUTHOR, new UnicodeNormalFormCCheck(databaseContext));
         }
 
         return fieldCheckers;

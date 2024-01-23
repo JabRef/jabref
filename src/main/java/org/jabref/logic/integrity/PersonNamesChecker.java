@@ -40,8 +40,9 @@ public class PersonNamesChecker implements ValueChecker {
         if (!authorList.getAsLastFirstNamesWithAnd(false).equals(value)
                 && !authorList.getAsFirstLastNamesWithAnd().equals(value)) {
             return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
-        }
 
+        }
+//        boolean asciiOnly = CharMatcher.ascii().matchesAllOf(authorList.);
         return Optional.empty();
     }
 }
