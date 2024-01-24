@@ -388,7 +388,7 @@ class StringUtilTest {
         assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
     }
 
-    static Stream<Arguments> testContainsWhitespace() {
+    static Stream<Arguments> containsWhitespace() {
         return Stream.of(
                 Arguments.of(true, "file url"),
                 Arguments.of(true, "file\nurl"),
