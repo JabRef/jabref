@@ -410,7 +410,7 @@ public class BibtexParser implements Parser {
     private String purgeEOFCharacters(String input) {
         StringBuilder remainingText = new StringBuilder();
         for (Character character : input.toCharArray()) {
-            if (!(isEOFCharacter(character))) {
+            if (!isEOFCharacter(character)) {
                 remainingText.append(character);
             }
         }
@@ -865,7 +865,7 @@ public class BibtexParser implements Parser {
             if (Character.isWhitespace((char) character)) {
                 String whitespacesReduced = skipAndRecordWhitespace(character);
 
-                if (!(whitespacesReduced.isEmpty()) && !"\n\t".equals(whitespacesReduced)) { // &&
+                if (!whitespacesReduced.isEmpty() && !"\n\t".equals(whitespacesReduced)) { // &&
                     whitespacesReduced = whitespacesReduced.replace("\t", ""); // Remove tabulators.
                     value.append(whitespacesReduced);
                 } else {

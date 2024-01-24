@@ -126,6 +126,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 new MainTableColumnModel(MainTableColumnModel.Type.INDEX),
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
                 new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
+                new MainTableColumnModel(MainTableColumnModel.Type.GROUP_ICONS),
                 new MainTableColumnModel(MainTableColumnModel.Type.FILES),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.TIMESTAMP.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.OWNER.getName()),
@@ -172,7 +173,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         EnumSet.allOf(SpecialField.class).stream()
                .map(Field::getName)
                .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, name))
-               .forEach(item -> availableColumnsProperty.getValue().add(0, item));
+               .forEach(item -> availableColumnsProperty.getValue().addFirst(item));
     }
 
     private void removeSpecialFieldColumns() {
