@@ -44,39 +44,39 @@ public class RepecNepImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    public void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+    public void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
     }
 
     @Test
-    public final void testGetFormatName() {
+    public final void getFormatName() {
         assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
     }
 
     @Test
-    public final void testGetCliId() {
+    public final void getCliId() {
         assertEquals("repecnep", testImporter.getId());
     }
 
     @Test
-    public void testGetExtension() {
+    public void getExtension() {
         assertEquals(StandardFileType.TXT, testImporter.getFileType());
     }
 
     @Test
-    public final void testGetDescription() {
+    public final void getDescription() {
         assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
                 testImporter.getDescription());
     }

@@ -8,66 +8,66 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ISBNTest {
 
     @Test
-    public void testIsValidFormat10Correct() {
+    public void isValidFormat10Correct() {
         assertTrue(new ISBN("0-123456-47-9").isValidFormat());
         assertTrue(new ISBN("0-9752298-0-X").isValidFormat());
     }
 
     @Test
-    public void testIsValidFormat10Incorrect() {
+    public void isValidFormat10Incorrect() {
         assertFalse(new ISBN("0-12B456-47-9").isValidFormat());
     }
 
     @Test
-    public void testIsValidChecksum10Correct() {
+    public void isValidChecksum10Correct() {
         assertTrue(new ISBN("0-123456-47-9").isValidChecksum());
         assertTrue(new ISBN("0-9752298-0-X").isValidChecksum());
         assertTrue(new ISBN("0-9752298-0-x").isValidChecksum());
     }
 
     @Test
-    public void testIsValidChecksum10Incorrect() {
+    public void isValidChecksum10Incorrect() {
         assertFalse(new ISBN("0-123456-47-8").isValidChecksum());
     }
 
     @Test
-    public void testIsValidFormat13Correct() {
+    public void isValidFormat13Correct() {
         assertTrue(new ISBN("978-1-56619-909-4").isValidFormat());
     }
 
     @Test
-    public void testIsValidFormat13Incorrect() {
+    public void isValidFormat13Incorrect() {
         assertFalse(new ISBN("978-1-56619-9O9-4 ").isValidFormat());
     }
 
     @Test
-    public void testIsValidChecksum13Correct() {
+    public void isValidChecksum13Correct() {
         assertTrue(new ISBN("978-1-56619-909-4 ").isValidChecksum());
     }
 
     @Test
-    public void testIsValidChecksum13Incorrect() {
+    public void isValidChecksum13Incorrect() {
         assertFalse(new ISBN("978-1-56619-909-5").isValidChecksum());
     }
 
     @Test
-    public void testIsIsbn10Correct() {
+    public void isIsbn10Correct() {
         assertTrue(new ISBN("0-123456-47-9").isIsbn10());
         assertTrue(new ISBN("0-9752298-0-X").isIsbn10());
     }
 
     @Test
-    public void testIsIsbn10Incorrect() {
+    public void isIsbn10Incorrect() {
         assertFalse(new ISBN("978-1-56619-909-4").isIsbn10());
     }
 
     @Test
-    public void testIsIsbn13Correct() {
+    public void isIsbn13Correct() {
         assertTrue(new ISBN("978-1-56619-909-4").isIsbn13());
     }
 
     @Test
-    public void testIsIsbn13Incorrect() {
+    public void isIsbn13Incorrect() {
         assertFalse(new ISBN("0-123456-47-9").isIsbn13());
     }
 }

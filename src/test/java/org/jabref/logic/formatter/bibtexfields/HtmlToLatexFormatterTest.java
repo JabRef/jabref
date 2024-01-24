@@ -33,12 +33,12 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
-    public void testBasic() {
+    public void basic() {
         assertEquals("aaa", formatter.format("aaa"));
     }
 
     @Test
-    public void testHTML() {
+    public void hTML() {
         assertEquals("{\\\"{a}}", formatter.format("&auml;"));
         assertEquals("{\\\"{a}}", formatter.format("&#228;"));
         assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
@@ -46,12 +46,12 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
-    public void testHTMLRemoveTags() {
+    public void hTMLRemoveTags() {
         assertEquals("aaa", formatter.format("<b>aaa</b>"));
     }
 
     @Test
-    public void testHTMLCombiningAccents() {
+    public void hTMLCombiningAccents() {
         assertEquals("{\\\"{a}}", formatter.format("a&#776;"));
         assertEquals("{\\\"{a}}", formatter.format("a&#x308;"));
         assertEquals("{\\\"{a}}b", formatter.format("a&#776;b"));

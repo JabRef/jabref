@@ -65,7 +65,7 @@ public class ThreeWayMergeCellViewModelTest {
 
     @ParameterizedTest
     @MethodSource
-    void testOddEvenLogic(boolean setIsOdd, boolean setIsEven, boolean expectedIsOdd, boolean expectedIsEven) {
+    void oddEvenLogic(boolean setIsOdd, boolean setIsEven, boolean expectedIsOdd, boolean expectedIsEven) {
         viewModel.setOdd(setIsOdd);
         viewModel.setEven(setIsEven);
         assertEquals(expectedIsOdd, viewModel.isOdd());

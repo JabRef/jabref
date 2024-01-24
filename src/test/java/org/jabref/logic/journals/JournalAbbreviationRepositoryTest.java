@@ -93,35 +93,35 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testDuplicates() {
+    void duplicates() {
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    void testDuplicatesWithShortestUniqueAbbreviation() {
+    void duplicatesWithShortestUniqueAbbreviation() {
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         assertEquals(1, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    void testDuplicatesIsoOnly() {
+    void duplicatesIsoOnly() {
         repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N."));
         repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N."));
         assertEquals(2, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    void testDuplicatesIsoOnlyWithShortestUniqueAbbreviation() {
+    void duplicatesIsoOnlyWithShortestUniqueAbbreviation() {
         repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N.", "LN"));
         repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N.", "LN"));
         assertEquals(2, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    void testDuplicateKeys() {
+    void duplicateKeys() {
         Abbreviation abbreviationOne = new Abbreviation("Long Name", "L. N.");
         repository.addCustomAbbreviation(abbreviationOne);
         assertEquals(Set.of(abbreviationOne), repository.getCustomAbbreviations());
@@ -137,7 +137,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testDuplicateKeysWithShortestUniqueAbbreviation() {
+    void duplicateKeysWithShortestUniqueAbbreviation() {
         Abbreviation abbreviationOne = new Abbreviation("Long Name", "L. N.", "LN");
         repository.addCustomAbbreviation(abbreviationOne);
         assertEquals(Set.of(abbreviationOne), repository.getCustomAbbreviations());
@@ -165,7 +165,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testAbbreviationsWithEscapedAmpersand() {
+    void abbreviationsWithEscapedAmpersand() {
         assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials & Interfaces").get());
         assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials \\& Interfaces").get());
         assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Sign."), repository.get("Antioxidants & Redox Signaling").get());
@@ -177,7 +177,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testJournalAbbreviationWithEscapedAmpersand() {
+    void journalAbbreviationWithEscapedAmpersand() {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(repository, AbbreviationType.DEFAULT, false);
 
         BibEntry entryWithEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article);
@@ -190,7 +190,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testJournalUnabbreviate() {
+    void journalUnabbreviate() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article);
         abbreviatedJournalEntry.setField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
@@ -201,7 +201,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testJournalAbbreviateWithoutEscapedAmpersand() {
+    void journalAbbreviateWithoutEscapedAmpersand() {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(repository, AbbreviationType.DEFAULT, false);
 
         BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
@@ -214,7 +214,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testJournalAbbreviateWithEmptyFJournal() {
+    void journalAbbreviateWithEmptyFJournal() {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(repository, AbbreviationType.DEFAULT, true);
 
         BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
@@ -229,7 +229,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testUnabbreviateWithJournalExistsAndFJournalNot() {
+    void unabbreviateWithJournalExistsAndFJournalNot() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
@@ -240,7 +240,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testUnabbreviateWithJournalExistsAndFJournalExists() {
+    void unabbreviateWithJournalExistsAndFJournalExists() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
             .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
@@ -252,7 +252,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testJournalDotlessAbbreviation() {
+    void journalDotlessAbbreviation() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl Mater Interfaces");
 
@@ -263,7 +263,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testJournalDotlessAbbreviationWithCurlyBraces() {
+    void journalDotlessAbbreviationWithCurlyBraces() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "{ACS Appl Mater Interfaces}");
 
@@ -277,7 +277,7 @@ class JournalAbbreviationRepositoryTest {
      * Tests <a href="https://github.com/JabRef/jabref/issues/9475">Issue 9475</a>
      */
     @Test
-    void testTitleEmbeddedWithCurlyBracesHavingNoChangesKeepsBraces() {
+    void titleEmbeddedWithCurlyBracesHavingNoChangesKeepsBraces() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.JOURNAL, "{The Visualization Handbook}");
 
@@ -292,7 +292,7 @@ class JournalAbbreviationRepositoryTest {
      * Tests <a href="https://github.com/JabRef/jabref/issues/9503">Issue 9503</a>
      */
     @Test
-    void testTitleWithNestedCurlyBracesHavingNoChangesKeepsBraces() {
+    void titleWithNestedCurlyBracesHavingNoChangesKeepsBraces() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.BOOKTITLE, "2015 {IEEE} International Conference on Digital Signal Processing, {DSP} 2015, Singapore, July 21-24, 2015");
 
@@ -304,7 +304,7 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    void testDotlessForPhysRevB() {
+    void dotlessForPhysRevB() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "Phys Rev B");
 

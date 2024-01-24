@@ -101,7 +101,7 @@ class CrawlerTest {
     }
 
     @Test
-    public void testWhetherAllFilesAreCreated() throws Exception {
+    public void whetherAllFilesAreCreated() throws Exception {
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
                 gitHandler,
                 preferencesService,

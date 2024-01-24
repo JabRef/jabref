@@ -24,19 +24,19 @@ public class CopacImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    public void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new CopacImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("nonCopacfileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+    public void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new CopacImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new CopacImporter(), fileName, FILE_ENDING);
     }
 }
