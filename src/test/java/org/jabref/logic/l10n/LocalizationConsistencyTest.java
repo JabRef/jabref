@@ -64,9 +64,11 @@ class LocalizationConsistencyTest {
 
             // read in
             DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
-            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
-                 InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                properties.load(reader);
+            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath)) {
+                assert is != null;
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
