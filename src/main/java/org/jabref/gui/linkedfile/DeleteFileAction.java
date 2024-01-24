@@ -91,6 +91,8 @@ public class DeleteFileAction extends SimpleCommand {
                 dialogTitle = Localization.lang("Delete '%0'", path.getFileName().toString());
             } else {
                 dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
+                // Deleting a non-existing file is a success
+                success = true;
                 return;
             }
         }
@@ -140,6 +142,8 @@ public class DeleteFileAction extends SimpleCommand {
      * @param deleteFromDisk if true, the files are deleted from disk, otherwise they are only removed from the entry
      */
     private void deleteFiles(boolean deleteFromDisk) {
+        // default: We have a success
+        success = true;
         for (LinkedFileViewModel fileViewModel : filesToDelete) {
             if (!fileViewModel.getFile().isOnlineLink() && deleteFromDisk) {
                 deleteFileHelper(databaseContext, fileViewModel.getFile());
@@ -161,6 +165,8 @@ public class DeleteFileAction extends SimpleCommand {
         if (file.isEmpty()) {
             LOGGER.warn("Could not find file {}", linkedFile.getLink());
             dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
+            // Deleting a non-existing file is a success
+            success = true;
             return;
         }
 
