@@ -318,6 +318,26 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
+    public <V> void showProgressDialogAndWait(String title, String content, Task<V> task) {
+        ProgressDialog progressDialog = new ProgressDialog(task);
+        progressDialog.setHeaderText(null);
+        progressDialog.setTitle(title);
+        progressDialog.setContentText(content);
+        progressDialog.setGraphic(null);
+        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefImage());
+        progressDialog.setOnCloseRequest(evt -> task.cancel());
+        DialogPane dialogPane = progressDialog.getDialogPane();
+        dialogPane.getButtonTypes().add(ButtonType.CANCEL);
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setOnAction(evt -> {
+            task.cancel();
+            progressDialog.close();
+        });
+        progressDialog.initOwner(mainWindow);
+        progressDialog.showAndWait();
+    }
+
+    @Override
     public <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
         TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
         EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
