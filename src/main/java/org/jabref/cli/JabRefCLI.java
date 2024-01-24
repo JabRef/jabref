@@ -299,7 +299,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("j")
                 .longOpt("jumpToKey")
-                .desc(String.format("%s: '%s'", Localization.lang("Jump to the entry of the given citation key."), "-j key"))
+                .desc("%s: '%s'".formatted(Localization.lang("Jump to the entry of the given citation key."), "-j key"))
                 .hasArg()
                 .argName("CITATIONKEY")
                 .build());
