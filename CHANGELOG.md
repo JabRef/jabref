@@ -26,8 +26,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the fulltext search button in entry editor used to disappear on click till the search is completed. [#10425](https://github.com/JabRef/jabref/issues/10425)
 - We fixed an issue where attempting to cancel the importing/generation of an entry from id is ignored. [#10508](https://github.com/JabRef/jabref/issues/10508)
 - We fixed an issue where the preview panel showing the wrong entry (an entry that is not selected in the entry table). [#9172](https://github.com/JabRef/jabref/issues/9172)
+- We fixed an issue where HTML-reserved characters like '&' and '<', in addition to HTML entities like '&amp;' were not rendered correctly in entry preview. [#10677](https://github.com/JabRef/jabref/issues/10677)
 - The last page of a PDF is now indexed by the full text search. [#10193](https://github.com/JabRef/jabref/issues/10193)
 - We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
