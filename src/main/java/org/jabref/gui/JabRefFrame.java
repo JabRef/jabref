@@ -966,6 +966,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                     break;
                 }
             }
+
+            if (stateManager.getSelectedEntries().isEmpty()) {
+                dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
+            }
         });
     }
 

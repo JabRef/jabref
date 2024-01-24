@@ -42,8 +42,8 @@ public class ProcessingLibraryDialog {
             dialogService.showProgressDialogAndWait(
                     Localization.lang("Please wait..."),
                     mode == Mode.LOAD
-                            ? Localization.lang("Waiting for databases being processed") + "..."
-                            : Localization.lang("Waiting for save operation to finish") + "...",
+                            ? Localization.lang("Waiting for databases being processed.") + "..."
+                            : Localization.lang("Waiting for save operation to finish.") + "...",
                     waitForSaveFinished
             );
         }
