@@ -16,7 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a button to let users reset the cite command to the default value. [#10569](https://github.com/JabRef/jabref/issues/10569)
 - We added the option to use System Preference for Light/Dark Theme [#8729](https://github.com/JabRef/jabref/issues/8729).
 - We added [scholar.archive.org](https://scholar.archive.org/) as a new fetcher. [#10498](https://github.com/JabRef/jabref/issues/10498)
-
+- We added journal abbreviations directory in jabref data directory with automatic processing. [#10557](https://github.com/JabRef/jabref/issues/10557)
 ### Changed
 
 - We moved the location of the 'Open only one instance of JabRef' preference option from "Network" to "General". [#9306](https://github.com/JabRef/jabref/issues/9306)
