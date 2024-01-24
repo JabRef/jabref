@@ -503,7 +503,7 @@ class CitationKeyGeneratorTest {
         assertEquals("NewtonMaxwellEinstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORS));
     }
 
-    static Stream<Arguments> testAuthorsAlpha() {
+    static Stream<Arguments> authorsAlpha() {
         return Stream.of(
                 Arguments.of("New", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA),
                 Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA),

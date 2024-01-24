@@ -135,7 +135,7 @@ public class BibtexImporterTest {
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
 
-    static Stream<Arguments> testParsingOfEncodedFileWithHeader() {
+    static Stream<Arguments> parsingOfEncodedFileWithHeader() {
         return Stream.of(
                 Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
                 Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),

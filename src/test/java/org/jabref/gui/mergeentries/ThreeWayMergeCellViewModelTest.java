@@ -20,7 +20,7 @@ public class ThreeWayMergeCellViewModelTest {
         viewModel = new ThreeWayMergeCellViewModel("Hello", 0);
     }
 
-    private static Stream<Arguments> testOddEvenLogic() {
+    private static Stream<Arguments> oddEvenLogic() {
         return Stream.of(
                 Arguments.of(true, false, true, false),
                 Arguments.of(false, false, true, false),

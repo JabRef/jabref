@@ -68,7 +68,7 @@ public class JavaLocalizationEntryParserTest {
     @ParameterizedTest
     @MethodSource("singleLineChecks")
     public void localizationKeyParsing(String code, String expectedLanguageKeys) {
-        testLocalizationKeyParsing(code, List.of(expectedLanguageKeys));
+        localizationKeyParsing(code, List.of(expectedLanguageKeys));
     }
 
     @ParameterizedTest

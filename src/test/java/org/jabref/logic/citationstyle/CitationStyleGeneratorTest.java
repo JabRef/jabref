@@ -168,7 +168,7 @@ class CitationStyleGeneratorTest {
         assertEquals(expectedCitation, actualCitation);
     }
 
-    static Stream<Arguments> testCslMapping() {
+    static Stream<Arguments> cslMapping() {
         // if the default citation style changes this has to be modified
         return Stream.of(
                 Arguments.of(
