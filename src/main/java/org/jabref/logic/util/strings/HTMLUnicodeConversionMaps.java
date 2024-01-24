@@ -855,17 +855,17 @@ public class HTMLUnicodeConversionMaps {
 
     static {
         for (String[] aConversionList : CONVERSION_LIST) {
-            if (!(aConversionList[2].isEmpty())) {
+            if (!aConversionList[2].isEmpty()) {
                 String strippedLaTeX = cleanLaTeX(aConversionList[2]);
-                if (!(aConversionList[1].isEmpty())) {
+                if (!aConversionList[1].isEmpty()) {
                     HTML_LATEX_CONVERSION_MAP.put("&" + aConversionList[1] + ";", aConversionList[2]);
                     if (!strippedLaTeX.isEmpty()) {
                         LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&" + aConversionList[1] + ";");
                     }
-                } else if (!(aConversionList[0].isEmpty()) && !strippedLaTeX.isEmpty()) {
+                } else if (!aConversionList[0].isEmpty() && !strippedLaTeX.isEmpty()) {
                     LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
                 }
-                if (!(aConversionList[0].isEmpty())) {
+                if (!aConversionList[0].isEmpty()) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
                         String unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));
