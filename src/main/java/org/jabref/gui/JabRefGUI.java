@@ -70,7 +70,7 @@ public class JabRefGUI {
 
         openWindow();
 
-        if (!(fileUpdateMonitor.isActive())) {
+        if (!fileUpdateMonitor.isActive()) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Unable to monitor file changes. Please close files " +
                             "and processes and restart. You may encounter errors if you continue " +

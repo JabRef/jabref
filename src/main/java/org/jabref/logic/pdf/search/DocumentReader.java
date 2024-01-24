@@ -134,7 +134,7 @@ public final class DocumentReader {
     }
 
     private boolean isValidField(String value) {
-        return !(StringUtil.isNullOrEmpty(value));
+        return !StringUtil.isNullOrEmpty(value);
     }
 
     public static String mergeLines(String text) {
