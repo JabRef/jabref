@@ -131,7 +131,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode());
         } catch (
                 IOException ioException) {
-            return null;
+            return "";
         }
         return writer.toString();
     }

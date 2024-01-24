@@ -200,7 +200,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     }
 
     private void initBibTeX() {
-        bibTeXDataLabel.setText(Localization.lang("%0 source", "BibTeX") + ":");
+        bibTeXDataLabel.setText(Localization.lang("%0 source", "BibTeX"));
         bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         bibTeXData.setPadding(new Insets(5.0));
         showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
@@ -255,6 +255,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         for (BibEntry entry : entriesListView.getItems()) {
             if (!viewModel.hasDuplicate(entry)) {
                 entriesListView.getCheckModel().check(entry);
+                displayBibTeX(entry, viewModel.getSourceString(entry));
             }
         }
     }
