@@ -4,6 +4,7 @@ import java.util.List;
 
 import javafx.concurrent.Task;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 
 /**
@@ -44,6 +45,7 @@ public class ProcessingLibraryDialog {
                             : Localization.lang("Waiting for save operation to finish") + "...",
                     waitForSaveFinished
             );
+            DefaultTaskExecutor.runInJavaFXThread(waitForSaveFinished);
         }
     }
 }

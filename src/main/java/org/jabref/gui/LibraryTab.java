@@ -197,6 +197,9 @@ public class LibraryTab extends Tab {
 
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
+
+        loading = false;
+        saving = false;
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -219,6 +222,7 @@ public class LibraryTab extends Tab {
 
     private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
         this.dataLoadingTask = dataLoadingTask;
+        loading = true;
     }
 
     /**
@@ -232,7 +236,6 @@ public class LibraryTab extends Tab {
     }
 
     private void onDatabaseLoadingStarted() {
-        loading = true;
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
     }
