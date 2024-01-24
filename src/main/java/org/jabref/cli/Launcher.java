@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
-import org.jabref.logic.journals.JournalAbbreviationManager;
+import org.jabref.logic.journals.JournalAbbreviationDirectoryManager;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -114,7 +114,7 @@ public class Launcher {
     }
 
     private static void initJournalAbbreviations(JournalAbbreviationPreferences journalAbbreviationPreferences) {
-        JournalAbbreviationManager.init(journalAbbreviationPreferences);
+        JournalAbbreviationDirectoryManager.init(journalAbbreviationPreferences);
     }
 
     private static void routeLoggingToSlf4J() {

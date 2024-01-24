@@ -79,6 +79,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.JournalAbbreviationDirectoryManager;
 import org.jabref.logic.journals.JournalAbbreviationDirectoryWatcher;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
@@ -1208,6 +1209,11 @@ public class JabRefPreferences implements PreferencesService {
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
         EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+        EasyBind.listen(journalAbbreviationPreferences.getJournalAbbreviationsDirectory(),
+                (obs, oldValue, newValue) -> {
+                    put(JOURNAL_ABBREVIATIONS_DIRECTORY_PATH, newValue.toString());
+                    JournalAbbreviationDirectoryManager.onDirectoryChange(journalAbbreviationPreferences);
+                });
 
         return journalAbbreviationPreferences;
     }

@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -59,6 +60,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML private CustomTextField searchBox;
     @FXML private CheckBox useFJournal;
+
+    @FXML private TextField journalAbbreviationsDirectory;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
@@ -135,6 +138,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm)));
 
         useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
+        journalAbbreviationsDirectory.textProperty().bind(viewModel.journalAbbreviationsDirectory());
     }
 
     private void setAnimations() {
@@ -211,5 +215,10 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @Override
     public String getTabName() {
         return Localization.lang("Journal abbreviations");
+    }
+
+    @FXML
+    public void journalAbbreviationsDirBrowse() {
+        viewModel.journalAbbreviationsDirBrowse();
     }
 }

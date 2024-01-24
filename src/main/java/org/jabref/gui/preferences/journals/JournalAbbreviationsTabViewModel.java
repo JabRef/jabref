@@ -2,14 +2,18 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
@@ -17,11 +21,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationDirectoryChangeListener;
+import org.jabref.logic.journals.JournalAbbreviationDirectoryManager;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationManager;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -34,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * This class provides a model for managing journal abbreviation lists. It provides all necessary methods to create,
  * modify or delete journal abbreviations and files. To visualize the model one can bind the properties to UI elements.
  */
-public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel {
+public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel, JournalAbbreviationDirectoryChangeListener {
 
     private final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
 
@@ -51,6 +57,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
 
+    private final SimpleStringProperty journalAbbreviationsDirectory = new SimpleStringProperty("");
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
@@ -104,13 +111,13 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 }
             }
         });
-        JournalAbbreviationManager.registerRefreshAction(this::setValues);
+        JournalAbbreviationDirectoryManager.registerJournalAbbreviationDirectoryChangeListener(this);
     }
 
     @Override
     public void setValues() {
         journalFiles.clear();
-
+        journalAbbreviationsDirectory.set(this.abbreviationsPreferences.getJournalAbbreviationsDirectory().getValue().toString());
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
@@ -183,7 +190,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         if (abbreviationsFile.exists()) {
             try {
                 abbreviationsFile.readAbbreviations();
-            } catch (IOException e) {
+            } catch (
+                    IOException e) {
                 LOGGER.debug("Could not read abbreviations file", e);
             }
         }
@@ -206,10 +214,14 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      */
     public void removeCurrentFile() {
         if (isFileRemovable.get()) {
-            journalFiles.remove(currentFile.get());
-            if (journalFiles.isEmpty()) {
-                currentFile.set(null);
-            }
+            removeFile(currentFile.get());
+        }
+    }
+
+    public void removeFile(AbbreviationsFileViewModel file) {
+        journalFiles.remove(file);
+        if (journalFiles.isEmpty()) {
+            currentFile.set(null);
         }
     }
 
@@ -315,7 +327,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         journalFiles.forEach(file -> {
             try {
                 file.writeOrCreate();
-            } catch (IOException e) {
+            } catch (
+                    IOException e) {
                 LOGGER.debug("Error during writing journal CSV", e);
             }
         });
@@ -337,7 +350,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
-
+                    abbreviationsPreferences.setJournalAbbreviationsDirectory(Path.of(journalAbbreviationsDirectory.get()));
                     if (shouldWriteLists) {
                         saveJournalAbbreviationFiles();
                         shouldWriteLists = false;
@@ -387,5 +400,30 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty useFJournalProperty() {
         return useFJournal;
+    }
+
+    public SimpleStringProperty journalAbbreviationsDirectory() {
+        return journalAbbreviationsDirectory;
+    }
+
+    @Override
+    public void onJournalAbbreviationDirectoryChangeListener(Path dir, WatchEvent<Path> event) {
+        if (event.kind().name().equals(StandardWatchEventKinds.ENTRY_CREATE.name())) {
+            Platform.runLater(() -> openFile(dir.resolve(event.context())));
+        } else if (event.kind().name().equals(StandardWatchEventKinds.ENTRY_MODIFY.name())) {
+            Platform.runLater(() -> {
+                removeFile(new AbbreviationsFileViewModel(dir.resolve(event.context())));
+                openFile(dir.resolve(event.context()));
+            });
+        } else if (event.kind().name().equals(StandardWatchEventKinds.ENTRY_DELETE.name())) {
+            Platform.runLater(() -> removeFile(new AbbreviationsFileViewModel(dir.resolve(event.context()))));
+        }
+    }
+
+    public void journalAbbreviationsDirBrowse() {
+        DirectoryDialogConfiguration dirDialogConfiguration =
+                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(journalAbbreviationsDirectory().getValue())).build();
+        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
+                     .ifPresent(dir -> journalAbbreviationsDirectory.setValue(dir.toString()));
     }
 }
