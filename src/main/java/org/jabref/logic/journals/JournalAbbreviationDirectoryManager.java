@@ -12,11 +12,13 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationDirectoryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationDirectoryManager.class);
     private static JournalAbbreviationDirectoryWatcher directoryWatcher;
+    private static JournalAbbreviationDirectorySynchronizer directorySynchronizer;
     private static Thread directoryWatcherThread;
     public static void init(JournalAbbreviationPreferences preferences) {
         initJournalAbbreviationDirectory(preferences);
         startDirectoryWatcher(preferences);
-        registerJournalAbbreviationDirectoryChangeListener(new JournalAbbreviationDirectorySynchronizer(preferences));
+        directorySynchronizer = new JournalAbbreviationDirectorySynchronizer(preferences);
+        registerJournalAbbreviationDirectoryChangeListener(directorySynchronizer);
         registerJournalAbbreviationDirectoryChangeListener(new JournalAbbreviationStorer());
     }
 
@@ -26,6 +28,7 @@ public class JournalAbbreviationDirectoryManager {
         directoryWatcherThread.interrupt();
         startDirectoryWatcher(preferences);
         previousListeners.forEach(JournalAbbreviationDirectoryManager::registerJournalAbbreviationDirectoryChangeListener);
+        directorySynchronizer.init(preferences);
     }
 
     private static void startDirectoryWatcher(JournalAbbreviationPreferences preferences) {

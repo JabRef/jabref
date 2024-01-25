@@ -15,11 +15,15 @@ import java.util.function.Consumer;
 
 public class JournalAbbreviationDirectorySynchronizer implements JournalAbbreviationDirectoryChangeListener {
 
-    private final JournalAbbreviationPreferences preferences;
+    private JournalAbbreviationPreferences preferences;
 
     private final Map<String, Consumer<Path>> journalExternalFilesActions = new HashMap<>();
 
     public JournalAbbreviationDirectorySynchronizer(JournalAbbreviationPreferences preferences) {
+        init(preferences);
+    }
+
+    public void init(JournalAbbreviationPreferences preferences) {
         this.preferences = preferences;
         initialSync();
         initJournalExternalFilesActionsMap();
