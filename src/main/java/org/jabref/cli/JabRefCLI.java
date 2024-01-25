@@ -283,7 +283,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("embeddBibfileInPdf")
-                .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeX as attached file in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
