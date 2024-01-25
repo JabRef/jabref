@@ -13,12 +13,16 @@ import org.jabref.logic.l10n.Localization;
  * TODO: Architecture smell. Instead of busy waiting, we should support a callback mechanism.
  *       For loading, this could be adapting {@link org.jabref.gui.util.BackgroundTask#onSuccess} to accept multiple
  *       callbacks.
+ *
+ * @implNote Even though changing behavior based on mode instead of using inheritance is not ideal,
+ *           introducing three classes instead of one would be overkill.
  */
 public class ProcessingLibraryDialog {
 
     public enum Mode { LOAD, SAVE }
 
     private final DialogService dialogService;
+
     private final Mode mode;
 
     public ProcessingLibraryDialog(DialogService dialogService, Mode mode) {
