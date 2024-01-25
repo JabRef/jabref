@@ -29,6 +29,7 @@ public class CLIMessageHandler implements RemoteMessageHandler {
     @Override
     public void handleCommandLineArguments(String[] message) {
         try {
+            LOGGER.info("Processing message {}", message);
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                     message,
                     ArgumentProcessor.Mode.REMOTE_START,
