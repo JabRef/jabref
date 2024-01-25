@@ -178,7 +178,11 @@ public class BackupManager {
                 return false;
             }
             try {
-                return Files.mismatch(originalPath, latestBackupPath) != -1L;
+                boolean result = Files.mismatch(originalPath, latestBackupPath) != -1L;
+                if (result) {
+                    LOGGER.info("Backup file {} differs from current file {}", latestBackupPath, originalPath);
+                }
+                return result;
             } catch (IOException e) {
                 LOGGER.debug("Could not compare original file and backup file.", e);
                 // User has to investigate in this case
