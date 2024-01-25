@@ -77,7 +77,7 @@ public class ArgumentProcessor {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
 
-    private boolean noGUINeeded;
+    private boolean guiNeeded;
     private final List<UiCommand> uiCommands = new ArrayList<>();
 
     /**
@@ -191,7 +191,7 @@ public class ArgumentProcessor {
 
     public void processArguments() {
         uiCommands.clear();
-        noGUINeeded = false;
+        guiNeeded = true;
 
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
@@ -199,7 +199,7 @@ public class ArgumentProcessor {
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             JabRefCLI.printUsage(preferencesService);
-            noGUINeeded = true;
+            guiNeeded = false;
             return;
         }
 
@@ -471,7 +471,7 @@ public class ArgumentProcessor {
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
                                                    .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                    noGUINeeded = true;
+                    guiNeeded = false;
                     return false;
                 }
             }
@@ -785,7 +785,7 @@ public class ArgumentProcessor {
     }
 
     public boolean shouldShutDown() {
-        return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
+        return cli.isDisableGui() || cli.isShowVersion() || !guiNeeded;
     }
 
     public List<UiCommand> getUiCommands() {
