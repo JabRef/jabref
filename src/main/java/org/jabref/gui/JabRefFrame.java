@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -954,7 +955,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         processingLibraryDialog.showAndWait(getLibraryTabs());
 
         jumpToEntry.ifPresent(entryKey -> {
-            for (LibraryTab libraryTab : getLibraryTabs()) {
+            LibraryTab currentLibraryTab = getCurrentLibraryTab();
+            // check current library tab first
+            List<LibraryTab> sortedTabs = getLibraryTabs().stream()
+                                                    .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
+                                                    .toList();
+            for (LibraryTab libraryTab : sortedTabs) {
                 Optional<BibEntry> bibEntry = libraryTab.getDatabase()
                                                         .getEntries().stream()
                                                         .filter(entry -> entry.getCitationKey().orElse("")
