@@ -78,7 +78,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
         Desktop desktop = Desktop.getDesktop();
         desktop.mail(uriMailTo);
 
-        return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
+        return "%s: %d".formatted(Localization.lang("Entries added to an email"), entries.size());
     }
 
     private URI getUriMailTo(List<BibEntry> entries) throws URISyntaxException {

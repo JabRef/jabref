@@ -73,7 +73,7 @@ class StudyFetcher {
             }
             return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
         } catch (FetcherException e) {
-            LOGGER.warn(String.format("%s API request failed", fetcher.getName()), e);
+            LOGGER.warn("%s API request failed".formatted(fetcher.getName()), e);
             return null;
         }
     }

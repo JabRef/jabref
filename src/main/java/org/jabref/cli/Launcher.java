@@ -14,6 +14,7 @@ import org.jabref.gui.MainApplication;
 import org.jabref.logic.journals.JournalAbbreviationDirectoryManager;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
@@ -145,7 +146,7 @@ public class Launcher {
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
-        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        configuration.forEach(Configuration::set);
         initializeLogger();
     }
 
@@ -176,6 +177,8 @@ public class Launcher {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
+        Globals.predatoryJournalRepository = PredatoryJournalListLoader
+                .loadRepository();
 
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());

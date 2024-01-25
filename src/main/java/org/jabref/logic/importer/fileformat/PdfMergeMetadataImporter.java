@@ -79,7 +79,7 @@ public class PdfMergeMetadataImporter extends Importer {
             if (extractedEntries.isEmpty()) {
                 continue;
             }
-            candidates.add(extractedEntries.get(0));
+            candidates.add(extractedEntries.getFirst());
         }
         if (candidates.isEmpty()) {
             return new ParserResult();

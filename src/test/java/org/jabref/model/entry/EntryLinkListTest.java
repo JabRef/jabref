@@ -27,7 +27,7 @@ public class EntryLinkListTest {
     public void before() {
         database = new BibDatabase();
         links = EntryLinkList.parse(KEY, database);
-        link = links.get(0);
+        link = links.getFirst();
         source = create("source");
         target = create("target");
     }

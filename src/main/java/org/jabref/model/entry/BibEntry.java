@@ -6,10 +6,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,25 +54,23 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
  * <p>
- *     Example:
+ * Example:
  *
- *     <pre>{@code
+ * <pre>{@code
  * Some commment
  * @misc{key,
  *   fieldName = {fieldValue},
- *   otherFieldName = {otherVieldValue}
+ *   otherFieldName = {otherFieldValue}
  * }
- *     }</pre>
- *
- *     Then,
+ * }</pre>
+ * <p>
+ * Then,
  *     <ul>
  *         <li>"Some comment" is the comment before the entry,</li>
  *         <li>"misc" is the entry type</li>
  *         <li>"key" the citation key</li>
  *         <li>"fieldName" and "otherFieldName" the fields of the BibEntry</li>
  *     </ul>
- * </p>
- * <p>
  * A BibTeX entry has following properties:
  * <ul>
  *     <li>comments before entry</li>
@@ -87,7 +87,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </p>
  * <p>
- * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}.
+ * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}. All these methods set {@link #hasChanged()} to <code>false</code>. In case <code>changed</code>, use {@link #withChanged(boolean)}.
  * </p>
  */
 @AllowedToUseLogic("because it needs access to parser and writers")
@@ -144,6 +144,11 @@ public class BibEntry implements Cloneable {
         this(DEFAULT_TYPE);
     }
 
+    public BibEntry(String citationKey) {
+        this();
+        this.setCitationKey(citationKey);
+    }
+
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -151,6 +156,11 @@ public class BibEntry implements Cloneable {
         this.id = IdGenerator.next();
         setType(type);
         this.sharedBibEntryData = new SharedBibEntryData();
+    }
+
+    public BibEntry(EntryType type, String citationKey) {
+        this(type);
+        this.setCitationKey(citationKey);
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -434,12 +444,10 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns an {@link Collections#unmodifiableSet(Set)} containing the names of all fields that are set for this particular entry.
-     *
-     * @return a set of existing field names
+     * Returns an unmodifiable sequence containing the names of all fields that are set for this particular entry.
      */
-    public Set<Field> getFields() {
-        return Collections.unmodifiableSet(fields.keySet());
+    public SequencedSet<Field> getFields() {
+        return new LinkedHashSet<>(fields.keySet());
     }
 
     /**
@@ -945,6 +953,7 @@ public class BibEntry implements Cloneable {
      */
     public BibEntry withFields(Map<Field, String> content) {
         this.fields = FXCollections.observableMap(new HashMap<>(content));
+        this.setChanged(false);
         return this;
     }
 
@@ -969,6 +978,7 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withUserComments(String commentsBeforeEntry) {
         this.commentsBeforeEntry = commentsBeforeEntry;
+        this.setChanged(false);
         return this;
     }
 
@@ -1037,6 +1047,12 @@ public class BibEntry implements Cloneable {
         }
 
         return this.setField(StandardField.FILE, newValue);
+    }
+
+    public BibEntry withFiles(List<LinkedFile> files) {
+        setFiles(files);
+        this.setChanged(false);
+        return this;
     }
 
     /**
@@ -1122,7 +1138,7 @@ public class BibEntry implements Cloneable {
             i++;
         }
         if (oldFileIndex == -1) {
-            linkedFiles.add(0, downloadedFile);
+            linkedFiles.addFirst(downloadedFile);
         } else {
             linkedFiles.set(oldFileIndex, downloadedFile);
         }

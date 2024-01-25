@@ -42,13 +42,13 @@ public class SaveOrder {
 
         OrderType orderType;
         try {
-            orderType = OrderType.valueOf(data.get(0).toUpperCase());
+            orderType = OrderType.valueOf(data.getFirst().toUpperCase());
         } catch (IllegalArgumentException ex) {
             if (data.size() > 1 && data.size() % 2 == 1) {
-                LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
+                LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.getFirst());
                 orderType = OrderType.SPECIFIED;
             } else {
-                LOGGER.warn("Could not parse sort order: {}", data.get(0));
+                LOGGER.warn("Could not parse sort order: {}", data.getFirst());
                 this.sortCriteria = List.of();
                 this.orderType = OrderType.ORIGINAL;
                 return;

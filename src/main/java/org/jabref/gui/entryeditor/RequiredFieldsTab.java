@@ -2,7 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedSet;
 
 import javax.swing.undo.UndoManager;
 
@@ -16,7 +16,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -51,9 +51,9 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
-        Set<Field> fields = new LinkedHashSet<>();
+        SequencedSet<Field> fields = new LinkedHashSet<>();
         if (entryType.isPresent()) {
             for (OrFields orFields : entryType.get().getRequiredFields()) {
                 fields.addAll(orFields.getFields());

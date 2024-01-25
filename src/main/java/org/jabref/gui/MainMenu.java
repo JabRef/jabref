@@ -65,6 +65,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -82,6 +83,7 @@ public class MainMenu extends MenuBar {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
+    private final PredatoryJournalRepository predatoryJournalRepository;
     private final BibEntryTypesManager entryTypesManager;
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
@@ -95,6 +97,7 @@ public class MainMenu extends MenuBar {
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
+                    PredatoryJournalRepository predatoryJournalRepository,
                     BibEntryTypesManager entryTypesManager,
                     UndoManager undoManager,
                     ClipBoardManager clipBoardManager) {
@@ -107,6 +110,7 @@ public class MainMenu extends MenuBar {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
+        this.predatoryJournalRepository = predatoryJournalRepository;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
@@ -129,9 +133,9 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, frame.getOpenDatabaseAction()),
                 frame.getFileHistory(),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame, dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame, preferencesService)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferencesService, dialogService)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame)),
 
                 new SeparatorMenuItem(),
@@ -141,19 +145,19 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferencesService, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame, dialogService, preferencesService, stateManager))),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame::getCurrentLibraryTab, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager))),
 
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.REMOTE_DB,
-                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame)),
+                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
                         factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, taskExecutor)),
+                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, dialogService)),
 
                 new SeparatorMenuItem(),
 
@@ -161,14 +165,14 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame, stateManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame, stateManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
                 factory.createSubMenu(StandardActions.COPY_MORE,
                         factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
                         factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository)),
@@ -178,12 +182,12 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService, abbreviationRepository)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService))),
 
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame, stateManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame, stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame, dialogService, stateManager, taskExecutor, preferencesService)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame::getCurrentLibraryTab, stateManager, dialogService)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferencesService, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -196,12 +200,12 @@ public class MainMenu extends MenuBar {
                 specialFieldsSeparator,
                 // ToDo: SpecialField needs the active BasePanel to mark it as changed.
                 //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame, dialogService, preferencesService, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame, dialogService, preferencesService, undoManager, stateManager));
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager),
+                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame::getCurrentLibraryTab, dialogService, preferencesService, undoManager, stateManager));
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.
@@ -212,9 +216,9 @@ public class MainMenu extends MenuBar {
 
         // @formatter:off
         library.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame, dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame, stateManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -222,10 +226,10 @@ public class MainMenu extends MenuBar {
         );
 
         quality.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository, predatoryJournalRepository)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
 
@@ -234,16 +238,16 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferencesService.getImportFormatPreferences())) {
-            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(frame, fetcher, stateManager, undoManager, taskExecutor);
+            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(fetcher, stateManager, undoManager, dialogService, taskExecutor);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
 
@@ -261,7 +265,7 @@ public class MainMenu extends MenuBar {
 
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
-                factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),
 
                 new SeparatorMenuItem(),
 
@@ -277,7 +281,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, fileUpdateMonitor, taskExecutor, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, frame::getOpenDatabaseAction, fileUpdateMonitor, taskExecutor, preferencesService, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, frame.getOpenDatabaseAction(), dialogService, fileUpdateMonitor, taskExecutor, preferencesService, stateManager)),
 
@@ -295,13 +299,13 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, frame, stateManager)),
-                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, frame, stateManager)),
+                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, frame::getCurrentLibraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, frame::getCurrentLibraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, preferencesService)),
-                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(frame, stateManager)),
+                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(frame::getCurrentLibraryTab, stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferencesService, dialogService))
         );
 

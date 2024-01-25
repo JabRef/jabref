@@ -514,9 +514,9 @@ public class PreferencesMigrations {
         List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
-                && (formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
-                || formatterCleanups.get(0).equals(FieldFormatterCleanups.DISABLED))) {
-            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
+                && (formatterCleanups.getFirst().equals(FieldFormatterCleanups.ENABLED)
+                || formatterCleanups.getFirst().equals(FieldFormatterCleanups.DISABLED))) {
+            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.getFirst().equals(FieldFormatterCleanups.ENABLED)
                     ? Boolean.TRUE
                     : Boolean.FALSE);
 

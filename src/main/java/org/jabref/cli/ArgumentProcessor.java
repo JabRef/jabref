@@ -294,7 +294,7 @@ public class ArgumentProcessor {
             LOGGER.error("The write xmp option depends on a valid import option.");
             return;
         }
-        ParserResult pr = loaded.get(loaded.size() - 1);
+        ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
@@ -439,7 +439,7 @@ public class ArgumentProcessor {
         String[] data = cli.getExportMatches().split(",");
         String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
         // $ stands for a blank
-        ParserResult pr = loaded.get(loaded.size() - 1);
+        ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
@@ -572,7 +572,7 @@ public class ArgumentProcessor {
 
     private boolean generateAux(List<ParserResult> loaded, String[] data) {
         if (data.length == 2) {
-            ParserResult pr = loaded.get(0);
+            ParserResult pr = loaded.getFirst();
             AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
             BibDatabase newBase = acl.perform();
 
@@ -625,7 +625,7 @@ public class ArgumentProcessor {
             // This signals that the latest import should be stored in BibTeX
             // format to the given file.
             if (!loaded.isEmpty()) {
-                ParserResult pr = loaded.get(loaded.size() - 1);
+                ParserResult pr = loaded.getLast();
                 if (!pr.isInvalid()) {
                     saveDatabase(pr.getDatabase(), data[0]);
                 }
@@ -635,7 +635,7 @@ public class ArgumentProcessor {
         } else if (data.length == 2) {
             // This signals that the latest import should be stored in the given
             // format to the given file.
-            ParserResult parserResult = loaded.get(loaded.size() - 1);
+            ParserResult parserResult = loaded.getLast();
 
             Path path = parserResult.getPath().get().toAbsolutePath();
             BibDatabaseContext databaseContext = parserResult.getDatabaseContext();

@@ -429,7 +429,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
             List<ArXivEntry> entries = queryApi(searchQuery, Collections.emptyList(), 0, 1);
             if (entries.size() == 1) {
-                return Optional.of(entries.get(0));
+                return Optional.of(entries.getFirst());
             } else {
                 return Optional.empty();
             }
@@ -443,7 +443,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
             List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
             if (!entries.isEmpty()) {
-                return Optional.of(entries.get(0));
+                return Optional.of(entries.getFirst());
             } else {
                 return Optional.empty();
             }
@@ -568,7 +568,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             //      <summary>incorrect id format for 0307015</summary>
             // </entry>
             if (entries.size() == 1) {
-                Node node = entries.get(0);
+                Node node = entries.getFirst();
                 Optional<String> id = XMLUtil.getNodeContent(node, "id");
                 Boolean isError = id.map(idContent -> idContent.startsWith("http://arxiv.org/api/errors")).orElse(false);
                 if (isError) {

@@ -10,10 +10,15 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * JabRef's main class to process command line options and to start the UI
  */
 public class MainApplication extends Application {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainApplication.class);
+
     private static List<ParserResult> parserResults;
     private static boolean isBlank;
     private static JabRefPreferences preferences;
@@ -43,5 +48,10 @@ public class MainApplication extends Application {
         OOBibBaseConnect.closeOfficeConnection();
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
+        try {
+            Globals.predatoryJournalRepository.close();
+        } catch (Exception e) {
+            LOGGER.warn("Cloud not shut down predatoryJournalRepository", e);
+        }
     }
 }

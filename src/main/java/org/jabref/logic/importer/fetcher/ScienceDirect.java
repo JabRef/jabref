@@ -103,7 +103,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         if (pdfDownload.has("linkToPdf")) {
             String linkToPdf = pdfDownload.getString("linkToPdf");
             URL url = new URL(urlFromDoi);
-            fullLinkToPdf = String.format("%s://%s%s", url.getProtocol(), url.getAuthority(), linkToPdf);
+            fullLinkToPdf = "%s://%s%s".formatted(url.getProtocol(), url.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
             JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");

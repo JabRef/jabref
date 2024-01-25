@@ -1,10 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,7 +20,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -72,23 +72,23 @@ public class OtherFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             Set<Field> allKnownFields = entryType.get().getAllFields();
-            Set<Field> otherFields = entry.getFields().stream()
+            SequencedSet<Field> otherFields = entry.getFields().stream()
                                           .filter(field -> !allKnownFields.contains(field) &&
                                                   !(field.equals(StandardField.COMMENT) || field instanceof UserSpecificCommentField))
                                           .collect(Collectors.toCollection(LinkedHashSet::new));
             otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
-            otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::field).collect(Collectors.toSet()));
+            otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::field).toList());
             otherFields.remove(InternalField.KEY_FIELD);
             customTabFieldNames.forEach(otherFields::remove);
             return otherFields;
         } else {
-            // Entry type unknown -> treat all fields as required
-            return Collections.emptySet();
+            // Entry type unknown -> treat all fields as required (thus no other fields)
+            return new LinkedHashSet<>();
         }
     }
 }

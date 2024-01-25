@@ -209,7 +209,7 @@ public class BracketedPattern {
             List<String> fieldParts = parseFieldAndModifiers(bracket);
             // check whether there is a modifier on the end such as
             // ":lower":
-            expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+            expandedPattern = getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database);
             if (fieldParts.size() > 1) {
                 // apply modifiers:
                 expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(keywordDelimiter, entry, database));
@@ -1299,7 +1299,7 @@ public class BracketedPattern {
 
         // Cleanup: remove unnecessary words.
         for (String part : name.replaceAll("\\{[A-Z]+}", "").split("[ \\-_]")) {
-            if ((!(part.isEmpty()) // remove empty
+            if ((!part.isEmpty() // remove empty
                     && !ignore.contains(part.toLowerCase(Locale.ENGLISH)) // remove ignored words
                     && (part.charAt(part.length() - 1) != '.')
                     && Character.isUpperCase(part.charAt(0)))
