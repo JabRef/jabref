@@ -63,7 +63,9 @@ public class JournalAbbreviationDirectoryManager {
     }
 
     public static void registerJournalAbbreviationDirectoryChangeListener(JournalAbbreviationDirectoryChangeListener listener) {
-        directoryWatcher.registerListener(listener);
+        if (directoryWatcher != null) {
+            directoryWatcher.registerListener(listener);
+        }
     }
 
     public static void tearDown() {
