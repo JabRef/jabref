@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class JournalAbbreviationDirectorySynchronizer implements JournalAbbreviationDirectoryChangeListener {
@@ -51,20 +50,16 @@ public class JournalAbbreviationDirectorySynchronizer implements JournalAbbrevia
     }
 
     private void initJournalExternalFilesActionsMap() {
-        journalExternalFilesActions.put(StandardWatchEventKinds.ENTRY_CREATE.name(), (path) -> {
-            preferences.getExternalJournalLists().add(String.valueOf(
-                    preferences.getJournalAbbreviationsDirectory().getValue().resolve(path)));
-        });
-        journalExternalFilesActions.put(StandardWatchEventKinds.ENTRY_DELETE.name(), (path) -> {
-            preferences.getExternalJournalLists().remove(String.valueOf(
-                    preferences.getJournalAbbreviationsDirectory().getValue().resolve(path)));
-        });
+        journalExternalFilesActions.put(StandardWatchEventKinds.ENTRY_CREATE.name(), path -> preferences.getExternalJournalLists().add(String.valueOf(
+                preferences.getJournalAbbreviationsDirectory().getValue().resolve(path))));
+        journalExternalFilesActions.put(StandardWatchEventKinds.ENTRY_DELETE.name(), path -> preferences.getExternalJournalLists().remove(String.valueOf(
+                preferences.getJournalAbbreviationsDirectory().getValue().resolve(path))));
     }
 
     @Override
     public void onJournalAbbreviationDirectoryChangeListener(Path dir, WatchEvent<Path> event) {
         Consumer<Path> journalExternalFilesAction = journalExternalFilesActions.get(event.kind().name());
-        if (Objects.nonNull(journalExternalFilesAction)) {
+        if (journalExternalFilesAction != null) {
             journalExternalFilesAction.accept(dir.resolve(event.context()));
         }
     }
