@@ -29,6 +29,10 @@ import com.tobiasdiez.easybind.EasyBind;
  * and so makes testing harder.
  * We take the opportunity and implement a fluid interface.
  *
+ * TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
+ *       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
+ *       If this is not possible, add an @implNote why.
+ *
  * @param <V> type of the return value of the task
  */
 public abstract class BackgroundTask<V> {

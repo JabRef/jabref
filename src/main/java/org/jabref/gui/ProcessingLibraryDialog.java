@@ -9,6 +9,10 @@ import org.jabref.logic.l10n.Localization;
 
 /**
  * Dialog shown when closing of application needs to wait for a save operation to finish.
+ *
+ * TODO: Architecture smell. Instead of busy waiting, we should support a callback mechanism.
+ *       For loading, this could be adapting {@link org.jabref.gui.util.BackgroundTask#onSuccess} to accept multiple
+ *       callbacks.
  */
 public class ProcessingLibraryDialog {
 
