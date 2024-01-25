@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +161,7 @@ public class Launcher {
                 // arguments to other instance
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
-                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    LOGGER.info(Localization.lang("Arguments {} passed on to running JabRef instance. Shutting down.", Arrays.stream(args).toList()));
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");

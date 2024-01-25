@@ -1,5 +1,7 @@
 package org.jabref.gui.remote;
 
+import java.util.Arrays;
+
 import javafx.application.Platform;
 
 import org.jabref.cli.ArgumentProcessor;
@@ -29,7 +31,7 @@ public class CLIMessageHandler implements RemoteMessageHandler {
     @Override
     public void handleCommandLineArguments(String[] message) {
         try {
-            LOGGER.info("Processing message {}", message);
+            LOGGER.info("Processing message {}", Arrays.stream(message).toList());
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                     message,
                     ArgumentProcessor.Mode.REMOTE_START,
