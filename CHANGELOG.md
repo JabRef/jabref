@@ -60,6 +60,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - A user-specific comment fields is not enabled by default, but can be enabled using the "Add" button. [#10424](https://github.com/JabRef/jabref/issues/10424)
 - We upgraded to Lucene 9.9 for the fulltext search. The search index will be rebuild. [#10686](https://github.com/JabRef/jabref/pull/10686)
 - When using "Copy..." -> "Copy citation key", the delimiter configured at "Push applications" is respected. [#10707](https://github.com/JabRef/jabref/pull/10707)
+- We rearranged the tab order in the entry editor after "File Annotations": Scite Tab (Renamed to "Citation information"), "Citation relations", "Related articles". [#10821] (https://github.com/JabRef/jabref/issues/10821)
 
 ### Fixed
 
