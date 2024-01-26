@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
 - We changed the order of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
 - Sub libraries based on `aux` file can now also be generated if some citations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
+- We rearranged the tab order in the entry editor after "File Annotations": Scite Tab (Renamed to "Citation information"), "Citation relations", "Related articles". [#10821] (https://github.com/JabRef/jabref/issues/10821)
 
 ### Fixed
 
@@ -61,7 +62,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - A user-specific comment fields is not enabled by default, but can be enabled using the "Add" button. [#10424](https://github.com/JabRef/jabref/issues/10424)
 - We upgraded to Lucene 9.9 for the fulltext search. The search index will be rebuild. [#10686](https://github.com/JabRef/jabref/pull/10686)
 - When using "Copy..." -> "Copy citation key", the delimiter configured at "Push applications" is respected. [#10707](https://github.com/JabRef/jabref/pull/10707)
-- We rearranged the tab order in the entry editor after "File Annotations": Scite Tab (Renamed to "Citation information"), "Citation relations", "Related articles". [#10821] (https://github.com/JabRef/jabref/issues/10821)
 
 ### Fixed
 
