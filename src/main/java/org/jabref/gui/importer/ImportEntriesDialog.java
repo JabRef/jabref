@@ -9,6 +9,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -17,9 +18,15 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -48,6 +55,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
+import org.fxmisc.richtext.CodeArea;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
@@ -56,8 +64,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ButtonType importButton;
     public Label totalItems;
     public Label selectedItems;
+    public Label bibTeXDataLabel;
     public CheckBox downloadLinkedOnlineFiles;
+    public CheckBox showEntryInformation;
+    public CodeArea bibTeXData;
+    public VBox bibTeXDataBox;
     private final BackgroundTask<ParserResult> task;
+    private final BibDatabaseContext database;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -66,7 +79,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    private final BibDatabaseContext database;
 
     /**
      * Imports the given entries into the given database. The entries are provided using the BackgroundTask
@@ -163,13 +175,38 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
                     return container;
                 })
-                .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
+                .withOnMouseClickedEvent((entry, event) -> {
+                    entriesListView.getCheckModel().toggleCheckState(entry);
+                    displayBibTeX(entry, viewModel.getSourceString(entry));
+                })
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
 
         selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
+        initBibTeX();
+    }
+
+    private void displayBibTeX(BibEntry entry, String bibTeX) {
+        if (entriesListView.getCheckModel().isChecked(entry)) {
+            bibTeXData.clear();
+            bibTeXData.appendText(bibTeX);
+            bibTeXData.moveTo(0);
+            bibTeXData.requestFollowCaret();
+        } else {
+            bibTeXData.clear();
+        }
+    }
+
+    private void initBibTeX() {
+        bibTeXDataLabel.setText(Localization.lang("%0 source", "BibTeX"));
+        bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        bibTeXData.setPadding(new Insets(5.0));
+        showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
+            bibTeXDataBox.setVisible(new_val);
+            bibTeXDataBox.setManaged(new_val);
+        });
     }
 
     private Node getEntryNode(BibEntry entry) {
@@ -218,6 +255,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         for (BibEntry entry : entriesListView.getItems()) {
             if (!viewModel.hasDuplicate(entry)) {
                 entriesListView.getCheckModel().check(entry);
+                displayBibTeX(entry, viewModel.getSourceString(entry));
             }
         }
     }

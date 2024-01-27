@@ -42,7 +42,7 @@ public class SciteTabTest {
 
     @Test
     public void name() {
-        Assertions.assertEquals(SciteTab.NAME, "Scite");
+        Assertions.assertEquals(SciteTab.NAME, "Citation information");
     }
 
     @Test

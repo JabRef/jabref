@@ -267,11 +267,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                                                      .toList();
             Optional<Color> parentColor = parentGroup().getColor();
             Color color;
-            if (parentColor.isEmpty()) {
-                color = GroupColorPicker.generateColor(colorsOfSiblings);
-            } else {
-                color = GroupColorPicker.generateColor(colorsOfSiblings, parentColor.get());
-            }
+            color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value)).orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
             viewModel.colorFieldProperty().setValue(color);
         });
     }
