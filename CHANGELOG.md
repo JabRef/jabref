@@ -24,7 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
 - We changed the arrangement of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
 - Sub libraries based on `aux` file can now also be generated if some citations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
-- We rearranged the tab order in the entry editor and renamed the "Scite Tab" to "Citation information". [#10821] (https://github.com/JabRef/jabref/issues/10821)
+- We rearranged the tab order in the entry editor and renamed the "Scite Tab" to "Citation information". [#10821](https://github.com/JabRef/jabref/issues/10821)
 
 ### Fixed
 
