@@ -15,9 +15,9 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
 3. Navigate to **File > Settings... > Build, Execution, Deployment > Compiler > Java Compiler**.
 4. Uncheck `--Use 'release' option for cross-compilation`.
 5. **Build > Build Project**
-6. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd> , on mac <kbd>cmd><kbd>+<kbd>1</kbd>)
+6. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd>, on macOS <kbd>cmd</kbd>+<kbd>1</kbd>)
 7. Copy all build resources to the folder of the build classes
-   1. Navigate to the folder `build/resoruces/main`
+   1. Navigate to the folder `build/resources/main`
    1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
    1. Navigate into directory "main"
    1. Select the folder `out/production/classes`

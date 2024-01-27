@@ -181,6 +181,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         // Create the MainTableColumn Models from qualifiers + types.
         List<MainTableColumnModel> commonColumns = new ArrayList<>();
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+        commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUP_ICONS));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, entryTypeQualifier));
