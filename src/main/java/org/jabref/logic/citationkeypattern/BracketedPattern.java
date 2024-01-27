@@ -1299,7 +1299,7 @@ public class BracketedPattern {
 
         // Cleanup: remove unnecessary words.
         for (String part : name.replaceAll("\\{[A-Z]+}", "").split("[ \\-_]")) {
-            if ((!(part.isEmpty()) // remove empty
+            if ((!part.isEmpty() // remove empty
                     && !ignore.contains(part.toLowerCase(Locale.ENGLISH)) // remove ignored words
                     && (part.charAt(part.length() - 1) != '.')
                     && Character.isUpperCase(part.charAt(0)))
