@@ -186,7 +186,7 @@ class RTFCharsTest {
     }
 
     @Test
-    void rTFCharacters() {
+    void rtfCharacters() {
         assertEquals("\\'e0", formatter.format("\\`{a}"));
         assertEquals("\\'e8", formatter.format("\\`{e}"));
         assertEquals("\\'ec", formatter.format("\\`{i}"));
