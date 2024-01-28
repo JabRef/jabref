@@ -225,6 +225,7 @@ jobs:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn
           path: build/distribution
+          compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES')
         uses: actions/upload-artifact@v4
@@ -232,6 +233,7 @@ jobs:
           # tbn = to-be-notarized
           name: JabRef-${{ matrix.os }}
           path: build/distribution
+          compression-level: 0 # no compression
   announce:
     name: Comment on pull request
     runs-on: ubuntu-latest
