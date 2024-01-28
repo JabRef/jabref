@@ -61,7 +61,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Clean up keychain
         run: |
