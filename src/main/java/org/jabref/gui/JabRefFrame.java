@@ -995,6 +995,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             if (observable != null) {
                 loadings.remove(observable);
             }
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Count of loading tabs: {}", loadings.size());
+                LOGGER.trace("Count of loading tabs really true: {}", loadings.stream().filter(ObservableBooleanValue::get).count());
+            }
             for (ObservableBooleanValue obs : loadings) {
                 if (obs.get()) {
                     // Exit the listener if any of the observables is still true
@@ -1002,6 +1006,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 }
             }
             // All observables are false, complete the future
+            LOGGER.trace("Future completed");
             future.complete(null);
         };
 
