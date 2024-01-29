@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -34,6 +35,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,7 @@ public class PdfIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexer.class);
 
     @VisibleForTesting
+    @Nullable // null might happen if lock is held by another JabRef instance
     IndexWriter indexWriter;
 
     private final BibDatabaseContext databaseContext;
@@ -86,7 +90,7 @@ public class PdfIndexer {
     /**
      * Needs to be accessed by {@link PdfSearcher}
      */
-    IndexWriter getIndexWriter() {
+    Optional<IndexWriter> getIndexWriter() {
         LOGGER.trace("Getting the index writer");
         if (indexWriter == null) {
             LOGGER.trace("Initializing the index writer");
@@ -94,7 +98,7 @@ public class PdfIndexer {
         } else {
             LOGGER.trace("Using existing index writer");
         }
-        return indexWriter;
+        return Optional.ofNullable(indexWriter);
     }
 
     private void initializeIndexWriterAndReader(IndexWriterConfig.OpenMode mode) {
@@ -105,6 +109,7 @@ public class PdfIndexer {
                             new EnglishStemAnalyzer()).setOpenMode(mode));
         } catch (IOException e) {
             LOGGER.error("Could not initialize the IndexWriter", e);
+            return;
         }
         try {
             reader = DirectoryReader.open(indexWriter);
@@ -171,8 +176,8 @@ public class PdfIndexer {
 
     private void doCommit() {
         try {
-            getIndexWriter().commit();
-        } catch (IOException e) {
+            getIndexWriter().ifPresent(Unchecked.consumer(writer -> writer.commit()));
+        } catch (UncheckedIOException e) {
             LOGGER.warn("Could not commit changes to the index.", e);
         }
     }
@@ -184,9 +189,11 @@ public class PdfIndexer {
      */
     public void removeFromIndex(String linkedFilePath) {
         try {
-            getIndexWriter().deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
-            getIndexWriter().commit();
-        } catch (IOException e) {
+            getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
+                writer.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
+                writer.commit();
+            }));
+        } catch (UncheckedIOException e) {
             LOGGER.debug("Could not remove document {} from the index.", linkedFilePath, e);
         }
     }
@@ -261,14 +268,16 @@ public class PdfIndexer {
             // If no document was found, add the new one
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
-                getIndexWriter().addDocuments(pages.get());
-                if (shouldCommit) {
-                    getIndexWriter().commit();
-                }
+                getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
+                    writer.addDocuments(pages.get());
+                    if (shouldCommit) {
+                        writer.commit();
+                    }
+                }));
             } else {
                 LOGGER.debug("No content found in file {}", linkedFile.getLink());
             }
-        } catch (IOException e) {
+        } catch (UncheckedIOException | IOException e) {
             LOGGER.warn("Could not add document {} to the index.", linkedFile.getLink(), e);
         }
     }
@@ -280,7 +289,12 @@ public class PdfIndexer {
      */
     public Set<String> getListOfFilePaths() {
         Set<String> paths = new HashSet<>();
-        try (IndexReader reader = DirectoryReader.open(getIndexWriter())) {
+        Optional<IndexWriter> optionalIndexWriter = getIndexWriter();
+        if (optionalIndexWriter.isEmpty()) {
+            LOGGER.debug("IndexWriter is empty. Returning empty list.");
+            return paths;
+        }
+        try (IndexReader reader = DirectoryReader.open(optionalIndexWriter.get())) {
             IndexSearcher searcher = new IndexSearcher(reader);
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
