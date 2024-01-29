@@ -217,7 +217,7 @@ public class SaveDatabaseAction {
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
         if (mode == SaveDatabaseMode.NORMAL) {
-            dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
+//            dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
         }
 
         synchronized (libraryTab) {
