@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @FetcherTest
 class CiteSeerTest {
@@ -73,6 +74,7 @@ class CiteSeerTest {
     @Test
     void searchWithSortingByYearAndYearRange() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year-range:2002-2012 AND sortBy:Year");
+        assertNotEquals(List.of(), fetchedEntries);
         Iterator<BibEntry> fetchedEntriesIter = fetchedEntries.iterator();
         BibEntry recentEntry = fetchedEntriesIter.next();
         while (fetchedEntriesIter.hasNext()) {
