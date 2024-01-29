@@ -296,6 +296,10 @@ public class PdfIndexer {
     }
 
     public void close() throws IOException {
+        if (indexWriter == null) {
+            LOGGER.debug("IndexWriter is null.");
+            return;
+        }
         indexWriter.close();
     }
 }
