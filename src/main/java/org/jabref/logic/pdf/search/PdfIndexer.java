@@ -52,13 +52,28 @@ public class PdfIndexer {
     IndexWriter indexWriter;
 
     private final BibDatabaseContext databaseContext;
+
     private final FilePreferences filePreferences;
+
+    @Nullable
     private final Directory indexDirectory;
+
     private IndexReader reader;
 
     private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
-        this.indexDirectory = indexDirectory;
+        if (indexDirectory == null) {
+            LOGGER.info("Index directory must not be null. Falling back to /tmp");
+            Directory tmpIndexDirectory = null;
+            try {
+                tmpIndexDirectory = new NIOFSDirectory(Path.of("/tmp"));
+            } catch (IOException e) {
+                LOGGER.info("Could not use /tmp. Indexing unavailable.", e);
+            }
+            this.indexDirectory = tmpIndexDirectory;
+        } else {
+            this.indexDirectory = indexDirectory;
+        }
         this.filePreferences = filePreferences;
     }
 
@@ -83,6 +98,10 @@ public class PdfIndexer {
      * Any previous state of the Lucene search is deleted.
      */
     public void createIndex() {
+        if (indexDirectory == null) {
+            LOGGER.info("Index directory must not be null. Returning.");
+            return;
+        }
         LOGGER.debug("Creating new index for directory {}.", indexDirectory);
         initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE);
     }
@@ -102,6 +121,10 @@ public class PdfIndexer {
     }
 
     private void initializeIndexWriterAndReader(IndexWriterConfig.OpenMode mode) {
+        if (indexDirectory == null) {
+            LOGGER.info("Index directory must not be null. Returning.");
+            return;
+        }
         try {
             indexWriter = new IndexWriter(
                     indexDirectory,
