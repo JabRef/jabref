@@ -1013,6 +1013,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         listener.changed(null, null, false);
 
         future.thenRun(() -> {
+            LOGGER.debug("All tabs loaded. Jumping to entry.");
             for (ObservableBooleanValue obs : loadings) {
                 obs.removeListener(listener);
             }
