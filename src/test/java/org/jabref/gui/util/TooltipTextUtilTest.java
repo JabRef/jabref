@@ -62,7 +62,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void testCreateTextMonospaced() {
+    public void createTextMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         assertEquals("tooltip-text-monospaced", text.getStyleClass().toString());
         assertEquals(testText, text.getText());

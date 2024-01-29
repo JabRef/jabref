@@ -17,34 +17,34 @@ public class RemotePreferencesTest {
     }
 
     @Test
-    public void testGetPort() {
+    public void getPort() {
         assertEquals(1000, preferences.getPort());
     }
 
     @Test
-    public void testSetPort() {
+    public void setPort() {
         preferences.setPort(2000);
         assertEquals(2000, preferences.getPort());
     }
 
     @Test
-    public void testUseRemoteServer() {
+    public void useRemoteServer() {
         assertTrue(preferences.useRemoteServer());
     }
 
     @Test
-    public void testSetUseRemoteServer() {
+    public void setUseRemoteServer() {
         preferences.setUseRemoteServer(false);
         assertFalse(preferences.useRemoteServer());
     }
 
     @Test
-    public void testIsDifferentPortTrue() {
+    public void isDifferentPortTrue() {
         assertTrue(preferences.isDifferentPort(2000));
     }
 
     @Test
-    public void testIsDifferentPortFalse() {
+    public void isDifferentPortFalse() {
         assertFalse(preferences.isDifferentPort(1000));
     }
 }

@@ -37,7 +37,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -62,7 +62,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -81,7 +81,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -163,7 +163,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -199,7 +199,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -237,7 +237,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -282,7 +282,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2

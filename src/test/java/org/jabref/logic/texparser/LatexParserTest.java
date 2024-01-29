@@ -89,7 +89,7 @@ public class LatexParserTest {
     }
 
     @Test
-    public void testSameFileDifferentDatabases() throws URISyntaxException {
+    public void sameFileDifferentDatabases() throws URISyntaxException {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
@@ -117,7 +117,7 @@ public class LatexParserTest {
     }
 
     @Test
-    public void testTwoFilesDifferentDatabases() throws URISyntaxException {
+    public void twoFilesDifferentDatabases() throws URISyntaxException {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
         Path texFile2 = Path.of(LatexParserTest.class.getResource("paper2.tex").toURI());
 

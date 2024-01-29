@@ -99,7 +99,7 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void testExistingEntryCitesOtherPaperWithCitationKeys() {
+    void existingEntryCitesOtherPaperWithCitationKeys() {
         var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
@@ -109,7 +109,7 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void testImportedEntriesWithExistingCitationKeysCiteExistingEntry() {
+    void importedEntriesWithExistingCitationKeysCiteExistingEntry() {
         var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
@@ -119,7 +119,7 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void testExistingEntryCitesOtherPaperWithCitationKeysAndExistingCiteField() {
+    void existingEntryCitesOtherPaperWithCitationKeysAndExistingCiteField() {
         existingEntry.setField(StandardField.CITES, "Asdf1222");
         var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));

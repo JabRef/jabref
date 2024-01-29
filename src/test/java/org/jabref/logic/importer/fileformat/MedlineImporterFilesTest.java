@@ -26,19 +26,19 @@ public class MedlineImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    public void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+    public void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new MedlineImporter(), fileName, FILE_ENDING);
     }
 
@@ -50,7 +50,7 @@ public class MedlineImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("malformedFileNames")
-    public void testImportMalfomedFiles(String fileName) throws IOException {
+    public void importMalfomedFiles(String fileName) throws IOException {
         ImporterTestEngine.testImportMalformedFiles(new MedlineImporter(), fileName);
     }
 }

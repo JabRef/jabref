@@ -14,7 +14,7 @@ public class EntryTypeFormatterTest {
 
     @ParameterizedTest
     @MethodSource("formatTests")
-    void testCorrectFormat(String expectedString, String inputString) {
+    void correctFormat(String expectedString, String inputString) {
         assertEquals(expectedString, formatter.format(inputString));
     }
 

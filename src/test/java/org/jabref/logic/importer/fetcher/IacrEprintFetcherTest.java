@@ -145,7 +145,7 @@ public class IacrEprintFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals(IacrEprintFetcher.NAME, fetcher.getName());
     }
 

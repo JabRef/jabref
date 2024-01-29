@@ -12,7 +12,7 @@ public class AuthorAndsCommaReplacerTest {
      * Test method for {@link org.jabref.logic.layout.format.AuthorAndsCommaReplacer#format(java.lang.String)}.
      */
     @Test
-    public void testFormat() {
+    public void format() {
         LayoutFormatter a = new AuthorAndsCommaReplacer();
 
         // Empty case

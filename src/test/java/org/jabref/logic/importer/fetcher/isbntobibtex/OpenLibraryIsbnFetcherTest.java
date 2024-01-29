@@ -71,7 +71,7 @@ public class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    public void testIsbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
+    public void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9785646216541"));
