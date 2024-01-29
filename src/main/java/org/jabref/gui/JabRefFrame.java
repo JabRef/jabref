@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,8 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.Node;
@@ -403,8 +406,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
 
-        ProcessingLibraryDialog processingLibraryDialog =
-                new ProcessingLibraryDialog(dialogService, ProcessingLibraryDialog.Mode.SAVE);
+        ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
         processingLibraryDialog.showAndWait(getLibraryTabs());
 
         return true;
@@ -950,33 +952,71 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             }
         }
 
-        // Tabs must be present and contents async loaded for an entry to be selected
-        ProcessingLibraryDialog processingLibraryDialog =
-                new ProcessingLibraryDialog(dialogService, ProcessingLibraryDialog.Mode.LOAD);
-        processingLibraryDialog.showAndWait(getLibraryTabs());
-
         jumpToEntry.ifPresent(entryKey -> {
-            LibraryTab currentLibraryTab = getCurrentLibraryTab();
-            // check current library tab first
-            List<LibraryTab> sortedTabs = getLibraryTabs().stream()
-                                                    .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
-                                                    .toList();
-            for (LibraryTab libraryTab : sortedTabs) {
-                Optional<BibEntry> bibEntry = libraryTab.getDatabase()
-                                                        .getEntries().stream()
-                                                        .filter(entry -> entry.getCitationKey().orElse("")
-                                                                              .equals(entryKey))
-                                                        .findAny();
-                if (bibEntry.isPresent()) {
-                    libraryTab.clearAndSelect(bibEntry.get());
-                    showLibraryTab(libraryTab);
-                    break;
+            LOGGER.debug("Jump to entry {} requested", entryKey);
+            // tabs must be present and contents async loaded for an entry to be selected
+            waitForLoadingFinished(() -> jumpToEntry(entryKey));
+        });
+    }
+
+    private void jumpToEntry(String entryKey) {
+        // check current library tab first
+        LibraryTab currentLibraryTab = getCurrentLibraryTab();
+        List<LibraryTab> sortedTabs = getLibraryTabs().stream()
+                                                .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
+                                                .toList();
+        for (LibraryTab libraryTab : sortedTabs) {
+            Optional<BibEntry> bibEntry = libraryTab.getDatabase()
+                                                    .getEntries().stream()
+                                                    .filter(entry -> entry.getCitationKey().orElse("")
+                                                                          .equals(entryKey))
+                                                    .findAny();
+            if (bibEntry.isPresent()) {
+                libraryTab.clearAndSelect(bibEntry.get());
+                showLibraryTab(libraryTab);
+                break;
+            }
+        }
+
+        if (stateManager.getSelectedEntries().isEmpty()) {
+            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
+        }
+    }
+
+    private void waitForLoadingFinished(Runnable runnable) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        List<ObservableBooleanValue> loadings = getLibraryTabs().stream().map(LibraryTab::getLoading)
+                                                                .collect(Collectors.toList());
+
+        // Create a listener for each observable
+        ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
+            assert newValue = false;
+            if (observable != null) {
+                loadings.remove(observable);
+            }
+            for (ObservableBooleanValue obs : loadings) {
+                if (obs.get()) {
+                    // Exit the listener if any of the observables is still true
+                    return;
                 }
             }
+            // All observables are false, complete the future
+            future.complete(null);
+        };
 
-            if (stateManager.getSelectedEntries().isEmpty()) {
-                dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
+        for (ObservableBooleanValue obs : loadings) {
+            obs.addListener(listener);
+        }
+
+        // Due to concurrency, it might be that the observables are already false, so we trigger one evaluation
+        listener.changed(null, null, false);
+
+        future.thenRun(() -> {
+            for (ObservableBooleanValue obs : loadings) {
+                obs.removeListener(listener);
             }
+            runnable.run();
         });
     }
 

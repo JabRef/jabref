@@ -15,6 +15,7 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
@@ -120,8 +121,13 @@ public class LibraryTab extends Tab {
     private PanelMode mode = PanelMode.MAIN_TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
-    private boolean loading;
-    private boolean saving;
+
+    // indicates whether the tab is initializing or doing the load itself
+    private SimpleBooleanProperty loading = new SimpleBooleanProperty(true);
+
+    // initally, the dialog is loading, not saving
+    private boolean saving = false;
+
     private PersonNameSuggestionProvider searchAutoCompleter;
 
     // Used to track whether the base has changed since last save.
@@ -197,9 +203,6 @@ public class LibraryTab extends Tab {
 
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
-
-        loading = false;
-        saving = false;
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -222,7 +225,6 @@ public class LibraryTab extends Tab {
 
     private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
         this.dataLoadingTask = dataLoadingTask;
-        loading = true;
     }
 
     /**
@@ -254,12 +256,12 @@ public class LibraryTab extends Tab {
             }
         }
 
-        loading = false;
+        loading.set(false);
         dataLoadingTask = null;
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
-        loading = false;
+        loading.set(false);
 
         String title = Localization.lang("Connection error");
         String content = "%s\n\n%s".formatted(ex.getMessage(), Localization.lang("A local copy will be opened."));
@@ -723,6 +725,7 @@ public class LibraryTab extends Tab {
         // Database could not have been changed, since it is still loading
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
+            loading.setValue(false);
             return true;
         }
 
@@ -814,7 +817,7 @@ public class LibraryTab extends Tab {
         this.saving = saving;
     }
 
-    public boolean isLoading() {
+    public ObservableBooleanValue getLoading() {
         return loading;
     }
 
