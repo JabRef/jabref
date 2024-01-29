@@ -7,7 +7,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +151,9 @@ public class Launcher {
         LOGGER = LoggerFactory.getLogger(MainApplication.class);
     }
 
+    /**
+     * @return true if JabRef should continue starting up, false if it should quit.
+     */
     private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
@@ -161,7 +163,7 @@ public class Launcher {
                 // arguments to other instance
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
-                    LOGGER.info(Localization.lang("Arguments {} passed on to running JabRef instance. Shutting down.", Arrays.stream(args).toList()));
+                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
