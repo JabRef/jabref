@@ -85,7 +85,7 @@ jobs:
           security create-keychain -p jabref ${{runner.temp}}/keychain/notarization.keychain
           security set-keychain-settings ${{runner.temp}}/keychain/notarization.keychain
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
       - name: Prepare merged jars and modules dir (macOS)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build dmg (macOS)
