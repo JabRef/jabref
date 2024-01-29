@@ -160,7 +160,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:33.0.0-jre') {
+    implementation ('com.google.guava:guava:23.0') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -266,7 +266,7 @@ dependencies {
 
     configurations.checkstyle {
         resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
-            select("com.google.guava:guava:0")
+            select("com.google.guava:guava:23.0")
         }
     }
 }
