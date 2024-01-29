@@ -22,6 +22,8 @@ import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.ImmutableMap;
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is essentially a wrapper around {@link Task}.
@@ -36,6 +38,8 @@ public abstract class BackgroundTask<V> {
     public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundTask.class);
 
     private Runnable onRunning;
     private Consumer<V> onSuccess;
@@ -92,6 +96,7 @@ public abstract class BackgroundTask<V> {
     }
 
     public void cancel() {
+        LOGGER.debug("Canceling task");
         this.isCanceled.set(true);
     }
 
