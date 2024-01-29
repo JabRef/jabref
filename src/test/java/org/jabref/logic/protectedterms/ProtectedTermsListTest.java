@@ -30,70 +30,70 @@ public class ProtectedTermsListTest {
     }
 
     @Test
-    public void testProtectedTermsListStringListOfStringStringBoolean() {
+    public void protectedTermsListStringListOfStringStringBoolean() {
         assertTrue(internalList.isInternalList());
     }
 
     @Test
-    public void testProtectedTermsListStringListOfStringString() {
+    public void protectedTermsListStringListOfStringString() {
         assertFalse(externalList.isInternalList());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Name", internalList.getDescription());
     }
 
     @Test
-    public void testGetTermList() {
+    public void getTermList() {
         assertEquals(Arrays.asList("AAA", "BBB"), internalList.getTermList());
     }
 
     @Test
-    public void testGetLocation() {
+    public void getLocation() {
         assertEquals("location", internalList.getLocation());
     }
 
     @Test
-    public void testGetTermListing() {
+    public void getTermListing() {
         assertEquals("AAA\nBBB", internalList.getTermListing());
     }
 
     @Test
-    public void testCompareTo() {
+    public void compareTo() {
         assertEquals(-2, internalList.compareTo(externalList));
     }
 
     @Test
-    public void testSetEnabledIsEnabled() {
+    public void setEnabledIsEnabled() {
         assertFalse(internalList.isEnabled());
         internalList.setEnabled(true);
         assertTrue(internalList.isEnabled());
     }
 
     @Test
-    public void testNotEnabledByDefault() {
+    public void notEnabledByDefault() {
         assertFalse(internalList.isEnabled());
     }
 
     @Test
-    public void testCanNotAddTermToInternalList() {
+    public void canNotAddTermToInternalList() {
         assertFalse(internalList.addProtectedTerm("CCC"));
     }
 
     @Test
-    public void testTermNotAddedToInternalList() {
+    public void termNotAddedToInternalList() {
         internalList.addProtectedTerm("CCC");
         assertFalse(internalList.getTermList().contains("CCC"));
     }
 
     @Test
-    public void testCanAddTermToExternalList() {
+    public void canAddTermToExternalList() {
         assertTrue(externalList.addProtectedTerm("CCC"));
     }
 
     @Test
-    public void testTermAddedToExternalList() {
+    public void termAddedToExternalList() {
         externalList.addProtectedTerm("CCC");
         assertTrue(externalList.getTermList().contains("CCC"));
     }

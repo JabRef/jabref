@@ -11,7 +11,7 @@ public class ProxyTest {
     * even though it's no longer stored in register.
     */
    @Test
-   public void testProxyPreferencesStorePassword() {
+   public void proxyPreferencesStorePassword() {
        // mock data
        boolean useProxy = true;
        String hostname = "testName";

@@ -9,41 +9,41 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class IfPluralTest {
 
     @Test
-    public void testStandardUsageOneEditor() {
+    public void standardUsageOneEditor() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
         assertEquals("Ed.", a.format("Bob Bruce"));
     }
 
     @Test
-    public void testStandardUsageTwoEditors() {
+    public void standardUsageTwoEditors() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
         assertEquals("Eds.", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
-    public void testFormatNull() {
+    public void formatNull() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
         assertEquals("", a.format(null));
     }
 
     @Test
-    public void testFormatEmpty() {
+    public void formatEmpty() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
         assertEquals("", a.format(""));
     }
 
     @Test
-    public void testNoArgumentSet() {
+    public void noArgumentSet() {
         ParamLayoutFormatter a = new IfPlural();
         assertEquals("", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
-    public void testNoProperArgument() {
+    public void noProperArgument() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.");
         assertEquals("", a.format("Bob Bruce and Jolly Jumper"));

@@ -147,7 +147,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void testSortByDateDescendingNegativeTest() {
+        public void sortByDateDescendingNegativeTest() {
             List<String> sortedPaths = fileFilterUtils
                 .sortByDateDescending(files)
                 .stream()

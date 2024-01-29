@@ -208,7 +208,7 @@ public class DOITest {
 
     @ParameterizedTest
     @MethodSource("testData")
-    public void testEquals(String expected, String input) {
+    public void equals(String expected, String input) {
         assertEquals(expected, input);
     }
 

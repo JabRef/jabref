@@ -38,7 +38,7 @@ public class PersonNameStringConverterTest {
             "FALSE, TRUE, BOTH, 'Reagle, Jr., J. M.'",
             "FALSE, FALSE, BOTH, 'Reagle'"
     })
-    void testToStringWithoutAutoCompletePreferences(boolean autoCompFF, boolean autoCompLF, AutoCompleteFirstNameMode autoCompleteFirstNameMode, String expectedResult) {
+    void toStringWithoutAutoCompletePreferences(boolean autoCompFF, boolean autoCompLF, AutoCompleteFirstNameMode autoCompleteFirstNameMode, String expectedResult) {
         PersonNameStringConverter converter = new PersonNameStringConverter(autoCompFF, autoCompLF, autoCompleteFirstNameMode);
         String formattedStr = converter.toString(author);
         assertEquals(expectedResult, formattedStr);
@@ -58,7 +58,7 @@ public class PersonNameStringConverterTest {
             "TRUE, ONLY_ABBREVIATED, BOTH, 'Reagle, Jr., J. M.'",
             "TRUE, BOTH, BOTH, 'Reagle, Jr., J. M.'"
     })
-    void testToStringWithAutoCompletePreferences(boolean shouldAutoComplete,
+    void toStringWithAutoCompletePreferences(boolean shouldAutoComplete,
                                                  AutoCompleteFirstNameMode firstNameMode,
                                                  AutoCompletePreferences.NameFormat nameFormat,
                                                  String expectedResult) {

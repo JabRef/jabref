@@ -25,7 +25,7 @@ public class AbbreviationParserTest {
     }
 
     @Test
-    void testReadingFileFromCSVWithSemicolon() throws Exception {
+    void readingFileFromCSVWithSemicolon() throws Exception {
         // String name, String abbreviation, String shortestUniqueAbbreviation
         String testAbbrev = "Long Name;L.N.;L.N.";
         try (BufferedWriter writer = Files.newBufferedWriter(csvFile, StandardCharsets.UTF_8)) {
@@ -36,7 +36,7 @@ public class AbbreviationParserTest {
     }
 
     @Test
-    void testReadingFileFromCSVWithComma() throws Exception {
+    void readingFileFromCSVWithComma() throws Exception {
         String testAbbrev = "Long Name,L.N.,L.N.";
         try (BufferedWriter writer = Files.newBufferedWriter(csvFile, StandardCharsets.UTF_8)) {
             writer.write(testAbbrev);

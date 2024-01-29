@@ -61,7 +61,7 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("GVK", fetcher.getName());
     }
 
@@ -82,26 +82,26 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
+    public void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("title:\"effective java\"");
         assertTrue(searchResult.contains(bibEntryPPN591166003));
         assertTrue(searchResult.contains(bibEntryPPN66391437X));
     }
 
     @Test
-    public void testPerformSearch591166003() throws FetcherException {
+    public void performSearch591166003() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:591166003");
         assertEquals(Collections.singletonList(bibEntryPPN591166003), searchResult);
     }
 
     @Test
-    public void testPerformSearch66391437X() throws FetcherException {
+    public void performSearch66391437X() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:66391437X");
         assertEquals(Collections.singletonList(bibEntryPPN66391437X), searchResult);
     }
 
     @Test
-    public void testPerformSearchEmpty() throws FetcherException {
+    public void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }
