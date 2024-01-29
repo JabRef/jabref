@@ -125,6 +125,7 @@ public class ArgumentProcessor {
     }
 
     private Optional<ParserResult> importFile(String argument) {
+        LOGGER.debug("Importing file {}", argument);
         String[] data = argument.split(",");
 
         String address = data[0];

@@ -854,7 +854,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         DatabaseNotSupportedException |
                         InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
-
                     LOGGER.error("Connection error", e);
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Connection error"),
@@ -882,7 +881,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             String message = Localization.lang("Error opening file '%0'",
                     pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
                     pr.getErrorMessage();
-
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
 
@@ -932,6 +930,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * @param uiCommands to be handled
      */
     public void handleUiCommands(List<UiCommand> uiCommands) {
+        LOGGER.debug("Handling {} commands", uiCommands);
+
         // Needs to be checked preliminary to avoid opening additional databases
         boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
         Optional<String> jumpToEntry = Optional.empty();
