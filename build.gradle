@@ -244,7 +244,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.1'
 
-    testImplementation 'org.mockito:mockito-core:5.9.0'
+    testImplementation 'org.mockito:mockito-core:5.10.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.2.1'
