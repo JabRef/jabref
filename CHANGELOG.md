@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the possibility to show the BibTeX source in the [web search](https://docs.jabref.org/collect/import-using-online-bibliographic-database) import screen. [#560](https://github.com/koppor/jabref/issues/560)
 - We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
 - We added a new integrity check and clean up option for non NFC format values. [#10506](https://github.com/JabRef/jabref/issues/10506)
@@ -22,8 +23,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
 - The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
 - The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
-- We changed the order of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We changed the arrangement of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
 - Sub libraries based on `aux` file can now also be generated if some citations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
+- We rearranged the tab order in the entry editor and renamed the "Scite Tab" to "Citation information". [#10821](https://github.com/JabRef/jabref/issues/10821)
+- We made the command "Push to TexShop" more robust to allow cite commands with a character before the first slash [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699/17?u=siedlerchr)
 
 ### Fixed
 
