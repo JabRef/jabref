@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BstFunctionsTest {
     @Test
-    public void testCompareFunctions() throws RecognitionException {
+    public void compareFunctions() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test.compare } {
                     #5  #5      =   % TRUE
@@ -67,7 +67,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testArithmeticFunctions() throws RecognitionException {
+    public void arithmeticFunctions() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     #1  #1  +   % 2
@@ -84,7 +84,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testArithmeticFunctionTypeMismatch() throws RecognitionException {
+    public void arithmeticFunctionTypeMismatch() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     #1  "HELLO" +   % Should throw exception
@@ -96,7 +96,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testStringOperations() throws RecognitionException {
+    public void stringOperations() throws RecognitionException {
         // Test for concat (*) and add.period
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
@@ -128,7 +128,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testMissing() throws RecognitionException {
+    public void missing() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -154,7 +154,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testNumNames() throws RecognitionException {
+    public void numNames() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     "Johnny Foo { and } Mary Bar" num.names$
@@ -171,7 +171,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testSubstring() throws RecognitionException {
+    public void substring() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     "123456789" #2  #1          substring$  % 2
@@ -201,7 +201,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testEmpty() throws RecognitionException {
+    public void empty() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }
                 READ
@@ -228,7 +228,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testFormatNameStatic() throws RecognitionException {
+    public void formatNameStatic() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { format }{ "Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin" #1 "{vv~}{ll}{, jj}{, f}?" format.name$ }
                 EXECUTE { format }
@@ -242,7 +242,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testFormatNameInEntries() throws RecognitionException {
+    public void formatNameInEntries() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { author } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -266,7 +266,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testChangeCase() throws RecognitionException {
+    public void changeCase() throws RecognitionException {
         BstVM vm = new BstVM("""
                 STRINGS { title }
                 READ
@@ -296,7 +296,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testTextLength() throws RecognitionException {
+    public void textLength() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     "hello world" text.length$                                  % 11
@@ -325,7 +325,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testIntToStr() throws RecognitionException {
+    public void intToStr() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } { #3 int.to.str$ #9999 int.to.str$ }
                 EXECUTE { test }
@@ -339,7 +339,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testChrToInt() throws RecognitionException {
+    public void chrToInt() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } { "H" chr.to.int$ }
                 EXECUTE { test }
@@ -352,7 +352,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testChrToIntIntToChr() throws RecognitionException {
+    public void chrToIntIntToChr() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } { "H" chr.to.int$ int.to.chr$ }
                 EXECUTE {test}
@@ -365,7 +365,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testType() throws RecognitionException {
+    public void type() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY  { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -390,7 +390,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testCallType() throws RecognitionException {
+    public void callType() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -417,7 +417,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testSwap() throws RecognitionException {
+    public void swap() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { a } { #3 "Hallo" swap$ }
                 EXECUTE { a }
@@ -432,7 +432,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    void testAssignFunction() {
+    void assignFunction() {
         BstVM vm = new BstVM("""
                 INTEGERS { test.var }
                 FUNCTION { test.func } { #1 'test.var := }
@@ -448,7 +448,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    void testSimpleIf() {
+    void simpleIf() {
         BstVM vm = new BstVM("""
                 FUNCTION { path1 } { #1 }
                 FUNCTION { path0 } { #0 }
@@ -467,7 +467,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    void testSimpleWhile() {
+    void simpleWhile() {
         BstVM vm = new BstVM("""
                 INTEGERS { i }
                 FUNCTION { test } {
@@ -492,7 +492,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testNestedControlFunctions() throws RecognitionException {
+    public void nestedControlFunctions() throws RecognitionException {
         BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { not } { { #0 } { #1 } if$ }
@@ -537,7 +537,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testLogic() throws RecognitionException {
+    public void logic() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { not } { { #0 } { #1 } if$ }
                 FUNCTION { and } { 'skip$ { pop$ #0 } if$ }
@@ -577,7 +577,7 @@ class BstFunctionsTest {
      */
 
     @Test
-    public void testWidth() throws RecognitionException {
+    public void width() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { address author title type } { } { label }
                 STRINGS { longest.label }
@@ -619,7 +619,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testDuplicateEmptyPopSwapIf() throws RecognitionException {
+    public void duplicateEmptyPopSwapIf() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { emphasize } {
                     duplicate$ empty$
@@ -642,7 +642,7 @@ class BstFunctionsTest {
     }
 
     @Test
-    public void testPreambleWriteNewlineQuote() {
+    public void preambleWriteNewlineQuote() {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {
                     preamble$

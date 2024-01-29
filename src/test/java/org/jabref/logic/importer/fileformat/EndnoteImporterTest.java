@@ -31,28 +31,28 @@ public class EndnoteImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("Refer/Endnote", importer.getName());
     }
 
     @Test
-    public void testGetCLIId() {
+    public void getCLIId() {
         assertEquals("refer", importer.getId());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.ENDNOTE, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Importer for the Refer/Endnote format."
                 + " Modified to use article number for pages if pages are missing.", importer.getDescription());
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    public void isRecognizedFormat() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("Endnote.pattern.A.enw", "Endnote.pattern.E.enw", "Endnote.book.example.enw");
 
         for (String string : list) {
@@ -62,7 +62,7 @@ public class EndnoteImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
+    public void isRecognizedFormatReject() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris",
                 "Endnote.pattern.no_enw", "empty.pdf", "annotated.pdf");
@@ -74,7 +74,7 @@ public class EndnoteImporterTest {
     }
 
     @Test
-    public void testImportEntries0() throws IOException, URISyntaxException {
+    public void importEntries0() throws IOException, URISyntaxException {
         Path file = Path.of(EndnoteImporterTest.class.getResource("Endnote.entries.enw").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -119,7 +119,7 @@ public class EndnoteImporterTest {
     }
 
     @Test
-    public void testImportEntries1() throws IOException {
+    public void importEntries1() throws IOException {
         String medlineString = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
         List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(medlineString))).getDatabase()
                                             .getEntries();
@@ -134,7 +134,7 @@ public class EndnoteImporterTest {
     }
 
     @Test
-    public void testImportEntriesBookExample() throws IOException, URISyntaxException {
+    public void importEntriesBookExample() throws IOException, URISyntaxException {
         Path file = Path.of(EndnoteImporterTest.class.getResource("Endnote.book.example.enw").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 

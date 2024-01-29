@@ -12,35 +12,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FileAnnotationTest {
 
     @Test
-    public void testParseDateMinusBeforeTimezone() {
+    public void parseDateMinusBeforeTimezone() {
         String dateString = "D:20170512224019-03'00'";
         LocalDateTime date = FileAnnotation.extractModifiedTime(dateString);
         assertEquals(LocalDateTime.of(2017, 05, 12, 22, 40, 19), date);
     }
 
     @Test
-    public void testParseDatePlusBeforeTimezone() {
+    public void parseDatePlusBeforeTimezone() {
         String dateString = "D:20170512224019+03'00'";
         LocalDateTime date = FileAnnotation.extractModifiedTime(dateString);
         assertEquals(LocalDateTime.of(2017, 05, 12, 22, 40, 19), date);
     }
 
     @Test
-    public void testParseDateNoTimezone() {
+    public void parseDateNoTimezone() {
         String dateString = "D:20170512224019";
         LocalDateTime date = FileAnnotation.extractModifiedTime(dateString);
         assertEquals(LocalDateTime.of(2017, 05, 12, 22, 40, 19), date);
     }
 
     @Test
-    public void testParseNotADate() {
+    public void parseNotADate() {
         String dateString = "gsdfgwergsdf";
         LocalDateTime date = FileAnnotation.extractModifiedTime(dateString);
         assertTrue(ChronoUnit.SECONDS.between(LocalDateTime.now(), date) <= 1);
     }
 
     @Test
-    public void testAbbreviateAnnotationName() {
+    public void abbreviateAnnotationName() {
         final FileAnnotation fileAnnotation = new FileAnnotation("John Robertson",
                 LocalDateTime.of(2020, 4, 18, 17, 10), 1,
                 "this is an annotation that is very long and goes over the character limit of 45",

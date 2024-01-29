@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BstNameFormatterTest {
 
     @Test
-    public void testUmlautsFullNames() {
+    public void umlautsFullNames() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("de~laVall{\\'e}e~PoussinCharles Louis Xavier~Joseph",
@@ -17,7 +17,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void testUmlautsAbbreviations() {
+    public void umlautsAbbreviations() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J.",
@@ -25,7 +25,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void testUmlautsAbbreviationsWithQuestionMark() {
+    public void umlautsAbbreviationsWithQuestionMark() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?",
@@ -33,7 +33,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void testFormatName() {
+    public void formatName() {
         AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         assertEquals("dlVP", BstNameFormatter.formatName(list.getAuthor(0), "{v{}}{l{}}"));
@@ -84,14 +84,14 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void testConsumeToMatchingBrace() {
+    public void consumeToMatchingBrace() {
         StringBuilder sb = new StringBuilder();
         assertEquals(10, BstNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}".toCharArray(), 0));
         assertEquals("{HE{L{}L}O}", sb.toString());
     }
 
     @Test
-    public void testGetFirstCharOfString() {
+    public void getFirstCharOfString() {
         assertEquals("C", BstNameFormatter.getFirstCharOfString("Charles"));
         assertEquals("V", BstNameFormatter.getFirstCharOfString("Vall{\\'e}e"));
         assertEquals("{\\'e}", BstNameFormatter.getFirstCharOfString("{\\'e}"));
@@ -100,7 +100,7 @@ public class BstNameFormatterTest {
     }
 
     @Test
-    public void testNumberOfChars() {
+    public void numberOfChars() {
         assertEquals(6, BstNameFormatter.numberOfChars("Vall{\\'e}e", -1));
         assertEquals(2, BstNameFormatter.numberOfChars("Vall{\\'e}e", 2));
         assertEquals(1, BstNameFormatter.numberOfChars("Vall{\\'e}e", 1));

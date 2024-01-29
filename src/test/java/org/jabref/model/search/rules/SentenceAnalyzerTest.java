@@ -28,7 +28,7 @@ public class SentenceAnalyzerTest {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    public void testGetWords(List<String> expected, String input) {
+    public void getWords(List<String> expected, String input) {
         assertEquals(expected, new SentenceAnalyzer(input).getWords());
     }
 }

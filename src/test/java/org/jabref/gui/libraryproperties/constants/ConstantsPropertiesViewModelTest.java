@@ -30,7 +30,7 @@ class ConstantsPropertiesViewModelTest {
 
     @DisplayName("Check that the list of strings is sorted according to their keys")
     @Test
-    void testStringsListPropertySorting() {
+    void stringsListPropertySorting() {
         BibtexString string1 = new BibtexString("TSE", "Transactions on Software Engineering");
         BibtexString string2 = new BibtexString("ICSE", "International Conference on Software Engineering");
         BibDatabase db = new BibDatabase();
@@ -51,7 +51,7 @@ class ConstantsPropertiesViewModelTest {
 
     @DisplayName("Check that the list of strings is sorted after resorting it")
     @Test
-    void testStringsListPropertyResorting() {
+    void stringsListPropertyResorting() {
         BibDatabase db = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of("ICSE", "TSE");

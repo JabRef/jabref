@@ -94,7 +94,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void testFileChecks() throws Exception {
+    void fileChecks() throws Exception {
         MetaData metaData = mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
@@ -120,7 +120,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void testEntryIsUnchangedAfterChecks() throws Exception {
+    void entryIsUnchangedAfterChecks() throws Exception {
         BibEntry entry = new BibEntry();
 
         // populate with all known fields

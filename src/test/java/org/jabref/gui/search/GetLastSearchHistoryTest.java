@@ -23,7 +23,7 @@ public class GetLastSearchHistoryTest {
     }
 
     @Test
-    void testGetLastSearchHistory() {
+    void getLastSearchHistory() {
         StateManager stateManager = new StateManager();
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
@@ -35,7 +35,7 @@ public class GetLastSearchHistoryTest {
     }
 
     @Test
-    void testduplicateSearchHistory() {
+    void duplicateSearchHistory() {
         StateManager stateManager = new StateManager();
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
@@ -48,7 +48,7 @@ public class GetLastSearchHistoryTest {
     }
 
     @Test
-    void testclearSearchHistory() {
+    void clearSearchHistory() {
         StateManager stateManager = new StateManager();
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");

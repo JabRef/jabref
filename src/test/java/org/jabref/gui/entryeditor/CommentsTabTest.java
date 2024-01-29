@@ -144,7 +144,7 @@ class CommentsTabTest {
     }
 
     @Test
-    void testDetermineFieldsToShowWorksForMultipleUsers() {
+    void determineFieldsToShowWorksForMultipleUsers() {
         final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
         final UserSpecificCommentField otherUsersComment = new UserSpecificCommentField("other-user-id");
 
@@ -159,7 +159,7 @@ class CommentsTabTest {
     }
 
     @Test
-    public void testDifferentiateCaseInUserName() {
+    public void differentiateCaseInUserName() {
         UserSpecificCommentField field1 = new UserSpecificCommentField("USER");
         UserSpecificCommentField field2 = new UserSpecificCommentField("user");
         assertNotEquals(field1, field2, "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different");

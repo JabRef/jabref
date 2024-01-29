@@ -42,12 +42,12 @@ public class PdfGrobidImporterTest {
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    public void testImportEntries() throws URISyntaxException {
+    public void importEntries() throws URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -59,19 +59,19 @@ public class PdfGrobidImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    public void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
+    public void isRecognizedFormatReject() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertFalse(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void testGetCommandLineId() {
+    public void getCommandLineId() {
         assertEquals("grobidPdf", importer.getId());
     }
 }

@@ -22,17 +22,17 @@ public class CopacImporterTest {
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.TXT, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Importer for COPAC format.", importer.getDescription());
     }
 
     @Test
-    public void testImportEmptyEntries() throws Exception {
+    public void importEmptyEntries() throws Exception {
         Path path = Path.of(CopacImporterTest.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(path).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
