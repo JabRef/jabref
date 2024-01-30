@@ -686,10 +686,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      */
     public void addTab(ParserResult parserResult, boolean raisePanel) {
         if (parserResult.toOpenTab()) {
-            // Add the entries to the open tab.
+            LOGGER.trace("Adding the entries to the open tab.");
             LibraryTab libraryTab = getCurrentLibraryTab();
             if (libraryTab == null) {
-                // There is no open tab to add to, so we create a new tab:
+                LOGGER.debug("No open tab found to add entries to. Creating a new tab.");
                 addTab(parserResult.getDatabaseContext(), raisePanel);
             } else {
                 addImportedEntries(libraryTab, parserResult);
@@ -931,7 +931,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * @param uiCommands to be handled
      */
     public void handleUiCommands(List<UiCommand> uiCommands) {
-        LOGGER.debug("Handling {} commands", uiCommands);
+        LOGGER.debug("Handling UI commands {}", uiCommands);
 
         // Needs to be checked preliminary to avoid opening additional databases
         boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
@@ -947,7 +947,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                     }
                 }
                 case UiCommand.BlankWorkspace command -> {
-                    // ignored
+                    LOGGER.trace("Ignoring BlankWorkspace command");
                 }
             }
         }

@@ -192,7 +192,6 @@ public class ArgumentProcessor {
 
     public void processArguments() {
         uiCommands.clear();
-        guiNeeded = true;
 
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
@@ -204,6 +203,8 @@ public class ArgumentProcessor {
             return;
         }
 
+        guiNeeded = true;
+
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
             resetPreferences(cli.getPreferencesReset());
@@ -214,7 +215,6 @@ public class ArgumentProcessor {
             importPreferences();
         }
 
-        // List to put imported/loaded database(s) in.
         List<ParserResult> loaded = importAndOpenFiles();
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
@@ -522,6 +522,9 @@ public class ArgumentProcessor {
         }
     }
 
+    /**
+     * @return List of opened files (could be .bib, but also other formats). May also contain error results.
+     */
     private List<ParserResult> importAndOpenFiles() {
         List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
