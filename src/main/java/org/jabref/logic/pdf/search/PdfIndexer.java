@@ -63,12 +63,13 @@ public class PdfIndexer {
     private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         if (indexDirectory == null) {
-            LOGGER.info("Index directory must not be null. Falling back to /tmp");
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            LOGGER.info("Index directory must not be null. Falling back to {}", tmpDir);
             Directory tmpIndexDirectory = null;
             try {
-                tmpIndexDirectory = new NIOFSDirectory(Path.of("/tmp"));
+                tmpIndexDirectory = new NIOFSDirectory(Path.of(tmpDir));
             } catch (IOException e) {
-                LOGGER.info("Could not use /tmp. Indexing unavailable.", e);
+                LOGGER.info("Could not use {}. Indexing unavailable.", tmpDir, e);
             }
             this.indexDirectory = tmpIndexDirectory;
         } else {
