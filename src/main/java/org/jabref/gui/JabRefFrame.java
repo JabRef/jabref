@@ -987,7 +987,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     private void waitForLoadingFinished(Runnable runnable) {
-        LOGGER.trace("Waiting for all tabs beging loaded");
+        LOGGER.trace("Waiting for all tabs being loaded");
 
         CompletableFuture<Void> future = new CompletableFuture<>();
 
@@ -1019,8 +1019,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             obs.addListener(listener);
         }
 
+        LOGGER.trace("Fire once");
         // Due to concurrency, it might be that the observables are already false, so we trigger one evaluation
         listener.changed(null, null, false);
+        LOGGER.trace("Waiting for state changes...");
 
         future.thenRun(() -> {
             LOGGER.debug("All tabs loaded. Jumping to entry.");

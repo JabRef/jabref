@@ -255,6 +255,7 @@ public class LibraryTab extends Tab {
             }
         }
 
+        LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
     }
