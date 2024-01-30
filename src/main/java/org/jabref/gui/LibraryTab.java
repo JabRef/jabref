@@ -26,6 +26,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
@@ -272,7 +273,12 @@ public class LibraryTab extends Tab {
     }
 
     private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
-        if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
+        TabPane tabPane = this.getTabPane();
+        if (tabPane == null) {
+            LOGGER.debug("User interrupted loading. Not showing any library.");
+            return;
+        }
+        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
             LOGGER.debug("This case should not happen.");
             stateManager.setActiveDatabase(bibDatabaseContext);
         }
@@ -790,12 +796,31 @@ public class LibraryTab extends Tab {
      * Perform necessary cleanup when this Library is closed.
      */
     private void onClosed(Event event) {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
-        AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext,
-                preferencesService.getFilePreferences().getBackupDirectory(),
-                preferencesService.getFilePreferences().shouldCreateBackup());
+        if (dataLoadingTask != null) {
+            dataLoadingTask.cancel();
+        }
+        try {
+            changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing change monitor", e);
+        }
+        try {
+            PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down PDF indexer", e);
+        }
+        try {
+            AutosaveManager.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down autosave manager", e);
+        }
+        try {
+            BackupManager.shutdown(bibDatabaseContext,
+                    preferencesService.getFilePreferences().getBackupDirectory(),
+                    preferencesService.getFilePreferences().shouldCreateBackup());
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down backup manager", e);
+        }
     }
 
     /**
