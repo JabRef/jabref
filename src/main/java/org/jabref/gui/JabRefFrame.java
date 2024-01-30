@@ -661,10 +661,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     /**
      * Opens a new tab with existing data.
      * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
+     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
                 this,
@@ -675,12 +675,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 entryTypesManager,
                 undoManager,
                 taskExecutor);
-
         addTab(libraryTab, raisePanel);
     }
 
     /**
-     * Might be called when a user asks JabRef at the command line
+     * Should be called when a user asks JabRef at the command line
      * i) to import a file or
      * ii) to open a .bib file
      */
@@ -705,6 +704,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             if (libraryTab.isPresent()) {
                 tabbedPane.getSelectionModel().select(libraryTab.get());
             } else {
+                // On this place, a tab is added after loading using the command line
+                // This takes a different execution path than loading a library using the GUI
                 addTab(parserResult.getDatabaseContext(), raisePanel);
             }
         }

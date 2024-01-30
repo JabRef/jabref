@@ -180,6 +180,8 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
      *
+     * Similar method: {@link org.jabref.gui.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
+     *
      * @param file the file, may be NOT null, but may not be existing
      */
     private void openTheFile(Path file) {

@@ -542,6 +542,7 @@ public class ArgumentProcessor {
                                 Path.of(aLeftOver),
                                 preferencesService.getImportFormatPreferences(),
                                 fileUpdateMonitor);
+                        // In contrast to org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed, we do not execute OpenDatabaseAction.performPostOpenActions(result, dialogService);
                     } catch (IOException ex) {
                         pr = ParserResult.fromError(ex);
                         LOGGER.error("Error opening file '{}'", aLeftOver, ex);

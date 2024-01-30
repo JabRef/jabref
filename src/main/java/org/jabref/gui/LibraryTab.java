@@ -121,8 +121,9 @@ public class LibraryTab extends Tab {
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
 
-    // indicates whether the tab is initializing or doing the load itself
-    private SimpleBooleanProperty loading = new SimpleBooleanProperty(true);
+    // Indicates whether the tab is loading data using a dataloading task
+    // The constructors take care to the right true/false assignment during start.
+    private SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
 
     // initally, the dialog is loading, not saving
     private boolean saving = false;
@@ -223,6 +224,7 @@ public class LibraryTab extends Tab {
     }
 
     private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+        this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
 
