@@ -778,28 +778,12 @@ public class LibraryTab extends Tab {
      * Perform necessary cleanup when this Library is closed.
      */
     private void onClosed(Event event) {
-        try {
-            changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        } catch (RuntimeException e) {
-            LOGGER.error("Problem when closing change monitor", e);
-        }
-        try {
-            PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
-        } catch (RuntimeException e) {
-            LOGGER.error("Problem when shutting down PDF indexer", e);
-        }
-        try {
-            AutosaveManager.shutdown(bibDatabaseContext);
-        } catch (RuntimeException e) {
-            LOGGER.error("Problem when shutting down autosave manager", e);
-        }
-        try {
-            BackupManager.shutdown(bibDatabaseContext,
-                    preferencesService.getFilePreferences().getBackupDirectory(),
-                    preferencesService.getFilePreferences().shouldCreateBackup());
-        } catch (RuntimeException e) {
-            LOGGER.error("Problem when shutting down backup manager", e);
-        }
+        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
+        AutosaveManager.shutdown(bibDatabaseContext);
+        BackupManager.shutdown(bibDatabaseContext,
+                preferencesService.getFilePreferences().getBackupDirectory(),
+                preferencesService.getFilePreferences().shouldCreateBackup());
     }
 
     /**
