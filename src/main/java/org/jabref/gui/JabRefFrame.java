@@ -20,6 +20,7 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
@@ -991,21 +992,41 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         List<ObservableBooleanValue> loadings = getLibraryTabs().stream().map(LibraryTab::getLoading)
-                                                                .toList();
+                                                                .collect(Collectors.toList());
 
-        BooleanBinding loadingBinding = Bindings.createBooleanBinding(
-                () -> loadings.stream().anyMatch(ObservableBooleanValue::get),
-                loadings.toArray(Observable[]::new)
-        );
-
-        EasyBind.subscribe(loadingBinding, loading -> {
-            if (!loading) {
-                future.complete(null);
+        // Create a listener for each observable
+        ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
+            assert newValue = false;
+            if (observable != null) {
+                loadings.remove(observable);
             }
-        });
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Count of loading tabs: {}", loadings.size());
+                LOGGER.trace("Count of loading tabs really true: {}", loadings.stream().filter(ObservableBooleanValue::get).count());
+            }
+            for (ObservableBooleanValue obs : loadings) {
+                if (obs.get()) {
+                    // Exit the listener if any of the observables is still true
+                    return;
+                }
+            }
+            // All observables are false, complete the future
+            LOGGER.trace("Future completed");
+            future.complete(null);
+        };
+
+        for (ObservableBooleanValue obs : loadings) {
+            obs.addListener(listener);
+        }
+
+        // Due to concurrency, it might be that the observables are already false, so we trigger one evaluation
+        listener.changed(null, null, false);
 
         future.thenRun(() -> {
             LOGGER.debug("All tabs loaded. Jumping to entry.");
+            for (ObservableBooleanValue obs : loadings) {
+                obs.removeListener(listener);
+            }
             runnable.run();
         });
     }
