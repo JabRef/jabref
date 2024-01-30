@@ -155,12 +155,15 @@ public class Launcher {
      * @return true if JabRef should continue starting up, false if it should quit.
      */
     private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
+        LOGGER.trace("Checking for remote handling...");
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
+                LOGGER.debug("Pinging other instance succeeded.");
                 // We are not alone, there is already a server out there, send command line
                 // arguments to other instance
+                LOGGER.debug("Passing arguments passed on to running JabRef...");
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.debug("Arguments passed on to running JabRef instance.");
@@ -168,6 +171,8 @@ public class Launcher {
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
+                    // We do not launch a new instance in presence of an error
+                    return false;
                 }
             } else {
                 LOGGER.debug("Could not ping JabRef instance.");

@@ -95,7 +95,6 @@ import org.slf4j.LoggerFactory;
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
 public class LibraryTab extends Tab {
-
     /**
      * Defines the different modes that the tab can operate in
      */
@@ -1055,5 +1054,13 @@ public class LibraryTab extends Tab {
 
     public DatabaseNotification getNotificationPane() {
         return databaseNotificationPane;
+    }
+
+    @Override
+    public String toString() {
+        return "LibraryTab{" +
+                "bibDatabaseContext=" + bibDatabaseContext +
+                ", showing=" + showing +
+                '}';
     }
 }

@@ -971,11 +971,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                                                                           .equals(entryKey))
                                                     .findAny();
             if (bibEntry.isPresent()) {
+                LOGGER.debug("Found entry {} in library tab {}", entryKey, libraryTab);
                 libraryTab.clearAndSelect(bibEntry.get());
                 showLibraryTab(libraryTab);
                 break;
             }
         }
+
+        LOGGER.trace("End of loop");
 
         if (stateManager.getSelectedEntries().isEmpty()) {
             dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
@@ -983,6 +986,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     private void waitForLoadingFinished(Runnable runnable) {
+        LOGGER.trace("Waiting for all tabs beging loaded");
+
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         List<ObservableBooleanValue> loadings = getLibraryTabs().stream().map(LibraryTab::getLoading)
