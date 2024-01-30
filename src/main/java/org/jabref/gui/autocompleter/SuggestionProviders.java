@@ -39,9 +39,6 @@ public class SuggestionProviders {
             }
             return new EmptySuggestionProvider();
         }
-//        if (isEmpty || !autoCompletePreferences.getCompleteFields().contains(field)) {
-//            return new EmptySuggestionProvider();
-//        }
 
         Set<FieldProperty> fieldProperties = field.getProperties();
         if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
