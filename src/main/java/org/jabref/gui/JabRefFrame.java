@@ -933,31 +933,32 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      */
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
-
-        // Needs to be checked preliminary to avoid opening additional databases
-        boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
-        Optional<String> jumpToEntry = Optional.empty();
-
-        for (UiCommand uiCommand : uiCommands) {
-            switch (uiCommand) {
-                case UiCommand.JumpToEntryKey command ->
-                        jumpToEntry = Optional.ofNullable(command.citationKey());
-                case UiCommand.OpenDatabases command -> {
-                    if (!blank) {
-                        openDatabases(command.parserResults());
-                    }
-                }
-                case UiCommand.BlankWorkspace command -> {
-                    LOGGER.trace("Ignoring BlankWorkspace command");
-                }
-            }
+        if (uiCommands.isEmpty()) {
+            return;
         }
 
-        jumpToEntry.ifPresent(entryKey -> {
-            LOGGER.debug("Jump to entry {} requested", entryKey);
-            // tabs must be present and contents async loaded for an entry to be selected
-            waitForLoadingFinished(() -> jumpToEntry(entryKey));
-        });
+        // Handle blank workspace
+        boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
+
+        // Handle OpenDatabases
+        if (!blank) {
+            uiCommands.stream()
+                    .filter(UiCommand.OpenDatabases.class::isInstance)
+                    .map(UiCommand.OpenDatabases.class::cast)
+                    .forEach(command -> openDatabases(command.parserResults()));
+        }
+
+        // Handle jumpToEntry
+        uiCommands.stream()
+                  .filter(UiCommand.JumpToEntryKey.class::isInstance)
+                  .map(UiCommand.JumpToEntryKey.class::cast)
+                  .map(UiCommand.JumpToEntryKey::citationKey)
+                  .filter(Objects::nonNull)
+                  .findAny().ifPresent(entryKey -> {
+                      LOGGER.debug("Jump to entry {} requested", entryKey);
+                      // tabs must be present and contents async loaded for an entry to be selected
+                      waitForLoadingFinished(() -> jumpToEntry(entryKey));
+                  });
     }
 
     private void jumpToEntry(String entryKey) {
