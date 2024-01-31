@@ -2,7 +2,8 @@ package org.jabref.logic.quality.consistency;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -21,21 +22,43 @@ import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
 
+/**
+ * Outputs the findings as CSV.
+ * <p>
+ * Following symbols are used (as default):
+ *
+ * <ul>
+ *     <li><code>x</code> - required field is present</li>
+ *     <li><code>o</code> - optional field is present</li>
+ *     <li><code>?</code> - unknown field is present</li>
+ * </ul>
+ * <p>
+ * Note that this classification is based on JabRef's definition and might not match the publisher's definition.
+ *
+ * @implNote We could have implemented a <code>PaperConsistencyCheckResultFormatter</code>, but that would have been too much effort.
+ */
 public abstract class PaperConsistencyCheckResultWriter implements Closeable {
 
+    protected static final String REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "x";
+    protected static final String OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "o";
+    protected static final String UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "?";
+
     protected final PaperConsistencyCheck.Result result;
-    protected final Path path;
+    protected final Writer writer;
     protected final BibEntryTypesManager entryTypesManager;
     protected final BibDatabaseMode bibDatabaseMode;
-    protected List<Field> allFields;
+    protected final List<String> allFieldNames;
+    protected final int columnCount;
 
-    public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Path path) {
-        this(result, path, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);
+    private final List<Field> allFields;
+
+    public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Writer writer) {
+        this(result, writer, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);
     }
 
-    public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Path path, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+    public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
         this.result = result;
-        this.path = path;
+        this.writer = writer;
         this.entryTypesManager = entryTypesManager;
         this.bibDatabaseMode = bibDatabaseMode;
         this.allFields = result.entryTypeToResultMap().values().stream()
@@ -43,6 +66,8 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
                                .sorted(Comparator.comparing(Field::getName))
                                .distinct()
                                .toList();
+        this.allFieldNames = getAllReportedFieldNames();
+        this.columnCount = allFields.size();
     }
 
     public void writeFindings() throws IOException {
@@ -51,6 +76,34 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
               .forEach(Unchecked.consumer(mapEntry -> {
                   writeMapEntry(mapEntry);
               }));
+    }
+
+    private List<String> getAllReportedFieldNames() {
+        List<String> result = new ArrayList(allFields.size() + 2);
+        result.add("entry type");
+        result.add("citation key");
+        allFields.forEach(field -> {
+            result.add(field.getDisplayName());
+        });
+        return result;
+    }
+
+    protected List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
+        List<String> result = new ArrayList(columnCount);
+        result.add(entryType);
+        result.add(bibEntry.getCitationKey().orElse(""));
+        allFields.forEach(field -> {
+            result.add(bibEntry.getField(field).map(value -> {
+                if (requiredFields.contains(field)) {
+                    return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                } else if (optionalFields.contains(field)) {
+                    return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                } else {
+                    return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                }
+            }).orElse("-"));
+        });
+        return result;
     }
 
     protected void writeMapEntry(Map.Entry<EntryType, PaperConsistencyCheck.EntryTypeResult> mapEntry) {

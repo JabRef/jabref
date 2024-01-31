@@ -1,5 +1,7 @@
 package org.jabref.logic.quality.consistency;
 
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -36,7 +38,8 @@ class PaperConsistencyCheckResultCsvWriterTest {
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
-        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, writer)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
@@ -59,7 +62,8 @@ class PaperConsistencyCheckResultCsvWriterTest {
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
 
         Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
-        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, writer)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
@@ -93,7 +97,8 @@ class PaperConsistencyCheckResultCsvWriterTest {
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
-        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, writer)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
@@ -116,7 +121,8 @@ class PaperConsistencyCheckResultCsvWriterTest {
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
 
         Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");
-        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, writer)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
@@ -131,7 +137,8 @@ class PaperConsistencyCheckResultCsvWriterTest {
         Path csvFile = file.resolveSibling("biblio-cited.csv");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
         PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(databaseContext.getEntries());
-        try (PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, csvFile)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             PaperConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new PaperConsistencyCheckResultCsvWriter(result, writer)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
     }
