@@ -63,6 +63,7 @@ public class PdfIndexer {
     private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         if (indexDirectory == null) {
+            // FIXME: This should never happen, but was reported at https://github.com/JabRef/jabref/issues/10781.
             String tmpDir = System.getProperty("java.io.tmpdir");
             LOGGER.info("Index directory must not be null. Falling back to {}", tmpDir);
             Directory tmpIndexDirectory = null;
@@ -89,7 +90,6 @@ public class PdfIndexer {
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
-    @VisibleForTesting
     public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
     }
@@ -133,6 +133,11 @@ public class PdfIndexer {
                             new EnglishStemAnalyzer()).setOpenMode(mode));
         } catch (IOException e) {
             LOGGER.error("Could not initialize the IndexWriter", e);
+            // FIXME: This can also happen if another instance of JabRef is launched in parallel.
+            //        We could implement a read-only access to the index in this case.
+            //        This requires a major rewrite of the code, though.
+            //        Accessing the index using a permanent writer object is (much) faster than always
+            //        closing and opening the writer and reader on demand.
             return;
         }
         try {
