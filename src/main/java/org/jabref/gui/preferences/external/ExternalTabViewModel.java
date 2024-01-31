@@ -73,7 +73,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("External programs"),
                         Localization.lang("Custom applications"),
                         Localization.lang("Please specify a terminal application."))));
@@ -81,7 +81,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         fileBrowserCommandValidator = new FunctionBasedValidator<>(
                 customFileBrowserCommandProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("External programs"),
                         Localization.lang("Custom applications"),
                         Localization.lang("Please specify a file browser."))));

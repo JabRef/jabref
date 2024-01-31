@@ -32,12 +32,12 @@ class PdfEmbeddedBibFileImporterTest {
     }
 
     @Test
-    void testsGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    void testGetDescription() {
+    void getDescription() {
         assertEquals("PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.",
                      importer.getDescription());
     }

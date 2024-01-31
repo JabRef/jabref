@@ -12,7 +12,7 @@ public class BstPurifierTest {
 
     @ParameterizedTest
     @MethodSource("provideTestStrings")
-    public void testPurify(String expected, String toBePurified) {
+    public void purify(String expected, String toBePurified) {
         assertEquals(expected, BstPurifier.purify(toBePurified));
     }
 

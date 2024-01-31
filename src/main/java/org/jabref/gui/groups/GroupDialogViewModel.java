@@ -186,7 +186,7 @@ public class GroupDialogViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %n %s %n %n %s",
+                ValidationMessage.error("%s > %n %s %n %n %s".formatted(
                         Localization.lang("Searching for a keyword"),
                         Localization.lang("Keywords"),
                         Localization.lang("Invalid regular expression."))));
@@ -199,7 +199,7 @@ public class GroupDialogViewModel {
         keywordSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %n %s %n %n %s",
+                ValidationMessage.error("%s > %n %s %n %n %s".formatted(
                         Localization.lang("Searching for a keyword"),
                         Localization.lang("Keywords"),
                         Localization.lang("Search term is empty.")
@@ -224,14 +224,14 @@ public class GroupDialogViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %n %s",
+                ValidationMessage.error("%s > %n %s".formatted(
                         Localization.lang("Free search expression"),
                         Localization.lang("Invalid regular expression."))));
 
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %n %s",
+                ValidationMessage.error("%s > %n %s".formatted(
                         Localization.lang("Free search expression"),
                         Localization.lang("Search term is empty."))));
 

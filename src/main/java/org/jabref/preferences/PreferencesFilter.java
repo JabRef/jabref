@@ -73,7 +73,7 @@ public class PreferencesFilter {
 
         @Override
         public String toString() {
-            return String.format("%s: %s=%s (%s)", type, key, value, defaultValue.orElse("NULL"));
+            return "%s: %s=%s (%s)".formatted(type, key, value, defaultValue.orElse("NULL"));
         }
 
         public String getKey() {

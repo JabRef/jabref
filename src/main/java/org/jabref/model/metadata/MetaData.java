@@ -150,7 +150,7 @@ public class MetaData {
         if (defaultValue.isEmpty()) {
             defaultCiteKeyPattern = null;
         } else {
-            defaultCiteKeyPattern = defaultValue.get(0);
+            defaultCiteKeyPattern = defaultValue.getFirst();
         }
 
         postChange();

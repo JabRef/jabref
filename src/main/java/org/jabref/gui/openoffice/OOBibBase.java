@@ -836,7 +836,7 @@ class OOBibBase {
                 String msg = Localization.lang(
                         "Your OpenOffice/LibreOffice document references the citation key '%0',"
                                 + " which could not be found in your current library.",
-                        unresolvedKeys.get(0));
+                        unresolvedKeys.getFirst());
                 dialogService.showErrorDialogAndWait(errorTitle, msg);
             }
         } catch (NoDocumentException ex) {

@@ -85,7 +85,7 @@ public class DublinCoreExtractor {
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
-            String date = dates.get(0).trim();
+            String date = dates.getFirst().trim();
             Date.parse(date)
                     .ifPresent(dateValue -> {
                         dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
@@ -223,7 +223,7 @@ public class DublinCoreExtractor {
     private void extractType() {
         List<String> types = dcSchema.getTypes();
         if ((types != null) && !types.isEmpty()) {
-            String type = types.get(0);
+            String type = types.getFirst();
             if (!StringUtil.isNullOrEmpty(type)) {
                 bibEntry.setType(EntryTypeFactory.parse(type));
             }

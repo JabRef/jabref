@@ -73,7 +73,7 @@ public class PdfSearcherTest {
         PdfSearchResults result = search.search("University", 10);
         assertEquals(2, result.numSearchResults());
         List<SearchResult> searchResults = result.getSearchResults();
-        assertEquals(0, searchResults.get(0).getPageNumber());
+        assertEquals(0, searchResults.getFirst().getPageNumber());
         assertEquals(9, searchResults.get(1).getPageNumber());
     }
 

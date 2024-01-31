@@ -95,7 +95,7 @@ public class GrobidServiceTest {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());
-        BibEntry be0 = response.get(0);
+        BibEntry be0 = response.getFirst();
         assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         // assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
         // assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));

@@ -1138,7 +1138,7 @@ public class BibEntry implements Cloneable {
             i++;
         }
         if (oldFileIndex == -1) {
-            linkedFiles.add(0, downloadedFile);
+            linkedFiles.addFirst(downloadedFile);
         } else {
             linkedFiles.set(oldFileIndex, downloadedFile);
         }

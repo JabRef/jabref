@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RisMonthTest {
 
     @Test
-    public void testEmpty() {
+    public void empty() {
         assertEquals("", new RisMonth().format(""));
     }
 
@@ -33,13 +33,13 @@ public class RisMonthTest {
             "nov, 11", // nov
             "dec, 12", // dec
     })
-    public void testValidMonth(String input, String expectedResult) {
+    public void validMonth(String input, String expectedResult) {
         String formattedStr = new RisMonth().format(input);
         assertEquals(expectedResult, formattedStr);
     }
 
     @Test
-    public void testInvalidMonth() {
+    public void invalidMonth() {
         assertEquals("abcd", new RisMonth().format("abcd"));
     }
 }

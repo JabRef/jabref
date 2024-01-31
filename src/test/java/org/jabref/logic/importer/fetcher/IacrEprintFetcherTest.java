@@ -145,7 +145,7 @@ public class IacrEprintFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals(IacrEprintFetcher.NAME, fetcher.getName());
     }
 
@@ -182,7 +182,7 @@ public class IacrEprintFetcherTest {
     private static List<String> getIdsFor(int year, int maxId) {
         List<String> result = new ArrayList<>();
         for (int i = 1; i <= maxId; i++) {
-            result.add(String.format("%04d/%03d", year, i));
+            result.add("%04d/%03d".formatted(year, i));
         }
         return result;
     }

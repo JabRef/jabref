@@ -175,7 +175,7 @@ public class MetaDataParser {
      */
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
-            return value.get(0);
+            return value.getFirst();
         } else {
             throw new ParseException("Expected a single item but received " + value);
         }

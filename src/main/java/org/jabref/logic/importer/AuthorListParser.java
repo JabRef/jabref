@@ -61,7 +61,7 @@ public class AuthorListParser {
     /**
      * Builds a new array of strings with stringbuilder. Regarding to the name affixes.
      *
-     * @return New string with correct seperation
+     * @return New string with correct separation
      */
     private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
         StringBuilder stringBuilder = new StringBuilder();
