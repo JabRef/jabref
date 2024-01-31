@@ -65,13 +65,17 @@ public class PushToTexShop extends AbstractPushToApplication {
     protected String[] getCommandLine(String keyString) {
         String citeCommand = getCitePrefix();
         // we need to escape the extra slashses
-        if (getCitePrefix().contains("\\")) {
-            citeCommand = "\"\\" + getCitePrefix();
+        int intSlashPosition = getCitePrefix().indexOf("\\");
+
+        if (intSlashPosition != -1) {
+            StringBuilder sb = new StringBuilder(getCitePrefix());
+            sb.insert(intSlashPosition, "\\");
+            citeCommand = sb.toString();
         }
 
         String osascriptTexShop = "osascript -e 'tell application \"TeXShop\"\n" +
                 "activate\n" +
-                "set TheString to " + citeCommand + keyString + getCiteSuffix() + "\"\n" +
+                "set TheString to \"" + citeCommand + keyString + getCiteSuffix() + "\"\n" +
                 "set content of selection of front document to TheString\n" +
                 "end tell'";
 

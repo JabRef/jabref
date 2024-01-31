@@ -109,6 +109,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_FIELD = "AuthorField";
     private static final String BRACKET_AFTER = "BracketAfter";
     private static final String BRACKET_BEFORE = "BracketBefore";
+    private static final String SPACE_BEFORE = "SpaceBefore";
     private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
     private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
     private static final String SORT_ALGORITHM = "SortAlgorithm";
@@ -203,6 +204,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         citProperties.put(IN_TEXT_YEAR_SEPARATOR, " ");
         citProperties.put(BRACKET_BEFORE, "(");
         citProperties.put(BRACKET_AFTER, ")");
+        citProperties.put(SPACE_BEFORE, Boolean.TRUE);
         citProperties.put(CITATION_SEPARATOR, "; ");
         citProperties.put(PAGE_INFO_SEPARATOR, "; ");
         citProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
@@ -491,6 +493,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public boolean isFormatCitations() {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
+    }
+
+    public boolean spaceBeforeCitation() {
+        return (Boolean) citProperties.get(SPACE_BEFORE);
     }
 
     public boolean isCitationKeyCiteMarkers() {

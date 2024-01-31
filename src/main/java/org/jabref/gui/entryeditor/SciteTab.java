@@ -26,7 +26,7 @@ import org.controlsfx.control.HyperlinkLabel;
 
 public class SciteTab extends EntryEditorTab {
 
-    public static final String NAME = "Scite";
+    public static final String NAME = "Citation information";
     public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
 
     private final GridPane sciteResultsPane;

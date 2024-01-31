@@ -47,13 +47,13 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    public void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void testImportEntries() throws IOException, URISyntaxException {
+    public void importEntries() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -112,30 +112,30 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("BibTeX", importer.getName());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.BIBTEX_DB, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals(
                 "This importer enables `--importToOpen someEntry.bib`",
                 importer.getDescription());
     }
 
     @Test
-    public void testRecognizesDatabaseID() throws Exception {
+    public void recognizesDatabaseID() throws Exception {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
         String sharedDatabaseID = importer.importDatabase(file).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
 
-    static Stream<Arguments> testParsingOfEncodedFileWithHeader() {
+    static Stream<Arguments> parsingOfEncodedFileWithHeader() {
         return Stream.of(
                 Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
                 Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),
@@ -147,7 +147,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    public void testParsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
+    public void parsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(fileName).toURI()));
         assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
@@ -155,7 +155,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
-    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
+    public void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -166,7 +166,7 @@ public class BibtexImporterTest {
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
                 "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
-    public void testParsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
+    public void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(

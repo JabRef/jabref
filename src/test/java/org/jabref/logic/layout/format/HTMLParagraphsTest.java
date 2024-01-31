@@ -16,7 +16,7 @@ public class HTMLParagraphsTest {
 
     @ParameterizedTest
     @MethodSource("htmlFormatTests")
-    void testCorrectFormat(String expectedString, String inputString) {
+    void correctFormat(String expectedString, String inputString) {
         assertEquals(expectedString, htmlFormatter.format(inputString));
     }
 
