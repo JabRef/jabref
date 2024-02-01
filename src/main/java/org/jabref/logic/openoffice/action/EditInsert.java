@@ -89,7 +89,8 @@ public class EditInsert {
         } else {
             citeText = style.createCitationMarker(citations,
                     citationType.inParenthesis(),
-                    NonUniqueCitationMarker.FORGIVEN);
+                    NonUniqueCitationMarker.FORGIVEN,
+                    citationType.plainCit());
         }
 
         if (StringUtil.isBlank(OOText.toString(citeText))) {

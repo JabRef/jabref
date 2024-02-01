@@ -77,6 +77,7 @@ public class OpenOfficePanel {
     private final Button setStyleFile = new Button(Localization.lang("Select style"));
     private final Button pushEntries = new Button(Localization.lang("Cite"));
     private final Button pushEntriesInt = new Button(Localization.lang("Cite in-text"));
+    private final Button pushEntriesPlain = new Button(Localization.lang("Cite plain"));
     private final Button pushEntriesEmpty = new Button(Localization.lang("Insert empty citation"));
     private final Button pushEntriesAdvanced = new Button(Localization.lang("Cite special"));
     private final Button update;
@@ -205,6 +206,9 @@ public class OpenOfficePanel {
         pushEntriesInt.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
         pushEntriesInt.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, false));
         pushEntriesInt.setMaxWidth(Double.MAX_VALUE);
+        pushEntriesPlain.setTooltip(new Tooltip(Localization.lang("Cite selected entries without brackets")));
+        pushEntriesPlain.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_PLAIN, false));
+        pushEntriesPlain.setMaxWidth(Double.MAX_VALUE);
         pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
         pushEntriesEmpty.setOnAction(e -> pushEntries(CitationType.INVISIBLE_CIT, false));
         pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);
@@ -257,7 +261,7 @@ public class OpenOfficePanel {
         flow.setVgap(4);
         flow.setHgap(4);
         flow.setPrefWrapLength(200);
-        flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
+        flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt, pushEntriesPlain);
         flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge, unmerge);
         flow.getChildren().addAll(manageCitations, exportCitations, settingsB);
 
@@ -367,6 +371,7 @@ public class OpenOfficePanel {
 
         boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
         pushEntriesInt.setDisable(!canCite);
+        pushEntriesPlain.setDisable(!canCite);
         pushEntriesEmpty.setDisable(!canCite);
         pushEntriesAdvanced.setDisable(!canCite);
 
@@ -438,9 +443,12 @@ public class OpenOfficePanel {
      * @param withText      False means invisible citation (no text).
      * @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
      */
-    private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {
+    private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis, boolean isPlain) {
         if (!withText) {
             return CitationType.INVISIBLE_CIT;
+        }
+        if (isPlain) {
+            return CitationType.AUTHORYEAR_PLAIN;
         }
         return inParenthesis
                 ? CitationType.AUTHORYEAR_PAR
@@ -481,6 +489,7 @@ public class OpenOfficePanel {
         String pageInfo = null;
         if (addPageInfo) {
             boolean withText = citationType.withText();
+            boolean isPlain = citationType.plainCit();
 
             Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
             if (citeDialogViewModel.isPresent()) {
@@ -488,7 +497,7 @@ public class OpenOfficePanel {
                 if (!model.pageInfoProperty().getValue().isEmpty()) {
                     pageInfo = model.pageInfoProperty().getValue();
                 }
-                citationType = citationTypeFromOptions(withText, model.citeInParProperty().getValue());
+                citationType = citationTypeFromOptions(withText, model.citeInParProperty().getValue(), isPlain);
             } else {
                 // user canceled
                 return;

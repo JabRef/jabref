@@ -703,7 +703,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
+        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty(), false);
     }
 
     /**
@@ -739,11 +739,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
                                        boolean inParenthesis,
-                                       NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
+                                       NonUniqueCitationMarker nonUniqueCitationMarkerHandling,
+                                       boolean isPlain) {
         return OOBibStyleGetCitationMarker.createCitationMarker(this,
                                                                 citationMarkerEntries,
                                                                 inParenthesis,
-                                                                nonUniqueCitationMarkerHandling);
+                                                                nonUniqueCitationMarkerHandling,
+                                                                isPlain);
     }
 
     /**

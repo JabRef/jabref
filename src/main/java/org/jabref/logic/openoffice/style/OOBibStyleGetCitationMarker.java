@@ -371,7 +371,8 @@ class OOBibStyleGetCitationMarker {
                                                           AuthorYearMarkerPurpose purpose,
                                                           List<CitationMarkerEntry> entries,
                                                           boolean[] startsNewGroup,
-                                                          Optional<Integer> maxAuthorsOverride) {
+                                                          Optional<Integer> maxAuthorsOverride,
+                                                          boolean isPlain) {
 
         boolean inParenthesis = purpose == AuthorYearMarkerPurpose.IN_PARENTHESIS
                                  || purpose == AuthorYearMarkerPurpose.NORMALIZED;
@@ -465,7 +466,9 @@ class OOBibStyleGetCitationMarker {
                 stringBuilder.append(yearSep);
 
                 if (!inParenthesis) {
+                  if (!isPlain) {
                     stringBuilder.append(startBrace); // parenthesis before year
+                  }
                 }
 
                 String year = getCitationMarkerField(style, db, yearFieldNames);
@@ -485,7 +488,9 @@ class OOBibStyleGetCitationMarker {
                 }
 
                 if (!inParenthesis && endingAGroup) {
+                  if (!isPlain) {
                     stringBuilder.append(endBrace);  // parenthesis after year
+                  }
                 }
             }
         } // for j
@@ -546,26 +551,30 @@ class OOBibStyleGetCitationMarker {
      */
     static OOText getNormalizedCitationMarker(OOBibStyle style,
                                               CitationMarkerNormEntry normEntry,
-                                              Optional<Integer> maxAuthorsOverride) {
+                                              Optional<Integer> maxAuthorsOverride,
+                                              boolean isPlain) {
         boolean[] startsNewGroup = {true};
         CitationMarkerEntry entry = new CitationMarkerNormEntryWrap(normEntry);
         return getAuthorYearParenthesisMarker2(style,
                                                AuthorYearMarkerPurpose.NORMALIZED,
                                                Collections.singletonList(entry),
                                                startsNewGroup,
-                                               maxAuthorsOverride);
+                                               maxAuthorsOverride,
+                                               isPlain);
     }
 
     private static List<OOText>
     getNormalizedCitationMarkers(OOBibStyle style,
                                  List<CitationMarkerEntry> citationMarkerEntries,
-                                 Optional<Integer> maxAuthorsOverride) {
+                                 Optional<Integer> maxAuthorsOverride,
+                                 boolean isPlain) {
 
         List<OOText> normalizedMarkers = new ArrayList<>(citationMarkerEntries.size());
         for (CitationMarkerEntry citationMarkerEntry : citationMarkerEntries) {
             OOText normalized = getNormalizedCitationMarker(style,
                                                             citationMarkerEntry,
-                                                            maxAuthorsOverride);
+                                                            maxAuthorsOverride,
+                                                            isPlain);
             normalizedMarkers.add(normalized);
         }
         return normalizedMarkers;
@@ -604,7 +613,8 @@ class OOBibStyleGetCitationMarker {
     createCitationMarker(OOBibStyle style,
                          List<CitationMarkerEntry> citationMarkerEntries,
                          boolean inParenthesis,
-                         NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
+                         NonUniqueCitationMarker nonUniqueCitationMarkerHandling,
+                         boolean isPlain) {
 
         final int nEntries = citationMarkerEntries.size();
 
@@ -625,7 +635,8 @@ class OOBibStyleGetCitationMarker {
 
         List<OOText> normalizedMarkers = getNormalizedCitationMarkers(style,
                                                                       citationMarkerEntries,
-                                                                      Optional.empty());
+                                                                      Optional.empty(),
+                                                                      isPlain);
 
         // How many authors would be emitted without grouping.
         int[] nAuthorsToEmit = new int[nEntries];
@@ -697,9 +708,9 @@ class OOBibStyleGetCitationMarker {
                             // prevShown >= need
                             // Check with extended normalizedMarkers.
                             OOText nmx1 =
-                                getNormalizedCitationMarker(style, ce1, Optional.of(prevShown));
+                                getNormalizedCitationMarker(style, ce1, Optional.of(prevShown), isPlain);
                             OOText nmx2 =
-                                getNormalizedCitationMarker(style, ce2, Optional.of(prevShown));
+                                getNormalizedCitationMarker(style, ce2, Optional.of(prevShown), isPlain);
                             boolean extendedMarkersDiffer = !nmx2.equals(nmx1);
                             nAuthorsShownInhibitsJoin = extendedMarkersDiffer;
                         }
@@ -763,6 +774,7 @@ class OOBibStyleGetCitationMarker {
                                                : AuthorYearMarkerPurpose.IN_TEXT),
                                               filteredCitationMarkerEntries,
                                               startsNewGroup,
-                                              Optional.empty());
+                                              Optional.empty(),
+                                              isPlain);
     }
 }
