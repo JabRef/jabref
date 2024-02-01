@@ -16,17 +16,17 @@ import org.apache.commons.csv.CSVPrinter;
 /**
  * Outputs the findings as CSV.
  * <p>
- * The symbols from {@link PaperConsistencyCheckResultWriter} are used.
+ * The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
  */
-public class PaperConsistencyCheckResultCsvWriter extends PaperConsistencyCheckResultWriter {
+public class BibliographyConsistencyCheckResultCsvWriter extends BibliographyConsistencyCheckResultWriter {
 
     private CSVPrinter csvPrinter;
 
-    public PaperConsistencyCheckResultCsvWriter(PaperConsistencyCheck.Result result, Writer writer) {
+    public BibliographyConsistencyCheckResultCsvWriter(BibliographyConsistencyCheck.Result result, Writer writer) {
         super(result, writer);
     }
 
-    public PaperConsistencyCheckResultCsvWriter(PaperConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+    public BibliographyConsistencyCheckResultCsvWriter(BibliographyConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
         super(result, writer, entryTypesManager, bibDatabaseMode);
     }
 
