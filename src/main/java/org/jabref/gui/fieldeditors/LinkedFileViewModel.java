@@ -425,6 +425,80 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
+    public void redownload() {
+        LOGGER.info("Redownloading file from " + linkedFile.getSourceUrl());
+        if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {
+            throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
+        }
+
+        Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences());
+        if (targetDirectory.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
+            return;
+        }
+
+        try {
+            URLDownload urlDownload = new URLDownload(linkedFile.getSourceUrl());
+            if (!checkSSLHandshake(urlDownload)) {
+                return;
+            }
+
+            BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
+            downloadTask.onSuccess(destination -> {
+                boolean isDuplicate;
+                try {
+                    isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
+                } catch (IOException e) {
+                    LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
+                    return;
+                }
+
+                if (isDuplicate) {
+                    destination = targetDirectory.get().resolve(
+                            FileNameUniqueness.eraseDuplicateMarks(destination.getFileName()));
+                }
+
+                linkedFile.setLink(FileUtil.relativize(destination,
+                        databaseContext.getFileDirectories(preferencesService.getFilePreferences())).toString());
+
+                // Notify in bar when the file type is HTML.
+                if (linkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
+                    dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
+                    LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
+                }
+            });
+            downloadProgress.bind(downloadTask.workDonePercentageProperty());
+            downloadTask.titleProperty().set(Localization.lang("Downloading"));
+            downloadTask.messageProperty().set(
+                    Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
+            downloadTask.showToUser(true);
+            downloadTask.onFailure(ex -> {
+                LOGGER.error("Error downloading from URL: " + urlDownload, ex);
+                String fetcherExceptionMessage = ex.getMessage();
+                int statusCode;
+                if (ex instanceof FetcherClientException clientException) {
+                    statusCode = clientException.getStatusCode();
+                    if (statusCode == 401) {
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
+                    } else if (statusCode == 403) {
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
+                    } else if (statusCode == 404) {
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
+                    }
+                } else if (ex instanceof FetcherServerException serverException) {
+                    statusCode = serverException.getStatusCode();
+                    dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"),
+                            Localization.lang("Error downloading from URL. Cause is likely the server side. HTTP Error %0 \n %1 \nURL: %2 \nPlease try again later or contact the server administrator.", statusCode, fetcherExceptionMessage, urlDownload.getSource()));
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("Error message: %0 \nURL: %1 \nPlease check the URL and try again.", fetcherExceptionMessage, urlDownload.getSource()));
+                }
+            });
+            taskExecutor.execute(downloadTask);
+        } catch (MalformedURLException exception) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+        }
+    }
+
     public void download() {
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
