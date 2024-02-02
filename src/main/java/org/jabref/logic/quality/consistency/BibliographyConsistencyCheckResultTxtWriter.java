@@ -48,9 +48,7 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
 
         super.writeFindings();
 
-        writer.write("\n\n");
-        writer.write(Localization.lang("Legend"));
-        writer.write("\n\n");
+        writer.write("\n");
         writer.write("%s | %s\n".formatted(REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("required field is present")));
         writer.write("%s | %s\n".formatted(OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("optional field is present")));
         writer.write("%s | %s\n".formatted(UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("unknown field is present")));

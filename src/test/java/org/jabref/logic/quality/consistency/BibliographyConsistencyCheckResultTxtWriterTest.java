@@ -23,7 +23,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-class BibliopraphyConsistencyCheckResultTxtWriterTest {
+class BibliographyConsistencyCheckResultTxtWriterTest {
     private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
     @Test
@@ -42,12 +42,17 @@ class BibliopraphyConsistencyCheckResultTxtWriterTest {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
-                Paper Consistency Check Result
+                Field Presence Consistency Check Result
 
                 | entry type | citation key | Pages | Publisher |
                 | ---------- | ------------ | ----- | --------- |
                 | Article    | first        | o     | -         |
                 | Article    | second       | -     | ?         |
+
+                x | required field is present
+                o | optional field is present
+                ? | unknown field is present
+                - | field is absent
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -69,11 +74,16 @@ class BibliopraphyConsistencyCheckResultTxtWriterTest {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
-                Paper Consistency Check Result
+                Field Presence Consistency Check Result
 
                 | entry type | citation key | Custom | Pages | Title |
                 | ---------- | ------------ | ------ | ----- | ----- |
                 | Article    | first        | ?      | o     | x     |
+
+                x | required field is present
+                o | optional field is present
+                ? | unknown field is present
+                - | field is absent
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -107,7 +117,7 @@ class BibliopraphyConsistencyCheckResultTxtWriterTest {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
-                Paper Consistency Check Result
+                Field Presence Consistency Check Result
 
                 | entry type    | citation key  | Location | Pages | Publisher |
                 | ------------- | ------------- | -------- | ----- | --------- |
@@ -115,6 +125,11 @@ class BibliopraphyConsistencyCheckResultTxtWriterTest {
                 | Article       | second        | -        | -     | ?         |
                 | InProceedings | fourth        | -        | -     | o         |
                 | InProceedings | third         | ?        | o     | -         |
+
+                x | required field is present
+                o | optional field is present
+                ? | unknown field is present
+                - | field is absent
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -134,7 +149,7 @@ class BibliopraphyConsistencyCheckResultTxtWriterTest {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
-                Paper Consistency Check Result
+                Field Presence Consistency Check Result
 
                 No errors found.
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
