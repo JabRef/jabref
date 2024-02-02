@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabaseMode;
@@ -23,23 +24,37 @@ public class PaperConsistencyCheckResultTxtWriter extends PaperConsistencyCheckR
 
     public PaperConsistencyCheckResultTxtWriter(PaperConsistencyCheck.Result result, Writer writer) {
         super(result, writer);
-        initializeColumnWidths();
     }
 
     public PaperConsistencyCheckResultTxtWriter(PaperConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
         super(result, writer, entryTypesManager, bibDatabaseMode);
-        initializeColumnWidths();
     }
 
     public void writeFindings() throws IOException {
         writer.write("Paper Consistency Check Result\n\n");
-        writer.write(allFieldNames.stream().collect(Collectors.joining(" | ", "", "\n")));
-        writer.write(columnWidths.stream().map(width -> "-".repeat(width)).collect(Collectors.joining(" | ", "| ", " | \n")));
+        if (result.entryTypeToResultMap().isEmpty()) {
+            writer.write("No errors found.\n");
+            return;
+        }
+
+        initializeColumnWidths();
+
+        StringJoiner headerJoiner = new StringJoiner(" | ", "| ", " |\n");
+        for (int i = 0; i < columnNames.size(); i++) {
+            String fieldName = columnNames.get(i);
+            int columnWidth = columnWidths.get(i);
+            String formattedField = String.format("%-" + columnWidth + "s", fieldName);
+            headerJoiner.add(formattedField);
+        }
+        writer.write(headerJoiner.toString());
+
+        writer.write(columnWidths.stream().map(width -> "-".repeat(width)).collect(Collectors.joining(" | ", "| ", " |\n")));
+
         super.writeFindings();
     }
 
     private void initializeColumnWidths() {
-        columnWidths = new ArrayList<>(allFieldNames.size() + 2);
+        columnWidths = new ArrayList<>(columnNames.size());
 
         Integer max = getColumnWidthOfEntryTypes();
         columnWidths.add(max);
@@ -47,7 +62,7 @@ public class PaperConsistencyCheckResultTxtWriter extends PaperConsistencyCheckR
         max = getColumnWidthOfCitationKeys(max);
         columnWidths.add(max);
 
-        columnWidths.addAll(allFieldNames.stream().map(String::length).toList());
+        columnWidths.addAll(columnNames.stream().skip(2).map(String::length).toList());
     }
 
     private Integer getColumnWidthOfEntryTypes() {
@@ -73,10 +88,16 @@ public class PaperConsistencyCheckResultTxtWriter extends PaperConsistencyCheckR
     @Override
     protected void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
-        String output = theRecord.stream()
-                                  .map(string -> String.format("%-" + columnWidths.get(theRecord.indexOf(string)) + "s", string))
-                                  .collect(Collectors.joining(" | ", "| ", " |\n"));
-        writer.write(output);
+
+        StringJoiner outputJoiner = new StringJoiner(" | ", "| ", " |\n");
+        for (int i = 0; i < theRecord.size(); i++) {
+            String fieldValue = theRecord.get(i);
+            int columnWidth = columnWidths.get(i);
+            String formattedField = String.format("%-" + columnWidth + "s", fieldValue);
+            outputJoiner.add(formattedField);
+        }
+
+        writer.write(outputJoiner.toString());
     }
 
     @Override

@@ -47,10 +47,10 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
     protected final Writer writer;
     protected final BibEntryTypesManager entryTypesManager;
     protected final BibDatabaseMode bibDatabaseMode;
-    protected final List<String> allFieldNames;
+    protected final List<String> columnNames;
     protected final int columnCount;
 
-    private final List<Field> allFields;
+    private final List<Field> allReportedFields;
 
     public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Writer writer) {
         this(result, writer, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);
@@ -61,13 +61,13 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
         this.writer = writer;
         this.entryTypesManager = entryTypesManager;
         this.bibDatabaseMode = bibDatabaseMode;
-        this.allFields = result.entryTypeToResultMap().values().stream()
-                               .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
-                               .sorted(Comparator.comparing(Field::getName))
-                               .distinct()
-                               .toList();
-        this.allFieldNames = getAllReportedFieldNames();
-        this.columnCount = allFields.size();
+        this.allReportedFields = result.entryTypeToResultMap().values().stream()
+                                       .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
+                                       .sorted(Comparator.comparing(Field::getName))
+                                       .distinct()
+                                       .toList();
+        this.columnNames = getColumnNames();
+        this.columnCount = columnNames.size();
     }
 
     public void writeFindings() throws IOException {
@@ -78,21 +78,21 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
               }));
     }
 
-    private List<String> getAllReportedFieldNames() {
-        List<String> result = new ArrayList(allFields.size() + 2);
+    private List<String> getColumnNames() {
+        List<String> result = new ArrayList(columnCount + 2);
         result.add("entry type");
         result.add("citation key");
-        allFields.forEach(field -> {
+        allReportedFields.forEach(field -> {
             result.add(field.getDisplayName());
         });
         return result;
     }
 
     protected List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList(columnCount);
+        List<String> result = new ArrayList(columnCount + 2);
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
-        allFields.forEach(field -> {
+        allReportedFields.forEach(field -> {
             result.add(bibEntry.getField(field).map(value -> {
                 if (requiredFields.contains(field)) {
                     return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;

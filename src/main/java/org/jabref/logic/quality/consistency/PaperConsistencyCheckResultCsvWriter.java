@@ -33,7 +33,7 @@ public class PaperConsistencyCheckResultCsvWriter extends PaperConsistencyCheckR
     @Override
     public void writeFindings() throws IOException {
         csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-        csvPrinter.printRecord(allFieldNames);
+        csvPrinter.printRecord(columnNames);
         super.writeFindings();
     }
 
