@@ -23,7 +23,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-class PaperConsistencyCheckResultTxtWriterTest {
+class BibliopraphyConsistencyCheckResultTxtWriterTest {
     private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
     @Test
@@ -34,12 +34,12 @@ class PaperConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             PaperConsistencyCheckResultTxtWriter PaperConsistencyCheckResultTxtWriter = new PaperConsistencyCheckResultTxtWriter(result, writer)) {
-            PaperConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
                 Paper Consistency Check Result
@@ -61,12 +61,12 @@ class PaperConsistencyCheckResultTxtWriterTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
 
         Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             PaperConsistencyCheckResultTxtWriter PaperConsistencyCheckResultTxtWriter = new PaperConsistencyCheckResultTxtWriter(result, writer)) {
-            PaperConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
                 Paper Consistency Check Result
@@ -99,12 +99,12 @@ class PaperConsistencyCheckResultTxtWriterTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
 
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             PaperConsistencyCheckResultTxtWriter PaperConsistencyCheckResultTxtWriter = new PaperConsistencyCheckResultTxtWriter(result, writer)) {
-            PaperConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
                 Paper Consistency Check Result
@@ -126,12 +126,12 @@ class PaperConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
 
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             PaperConsistencyCheckResultTxtWriter PaperConsistencyCheckResultTxtWriter = new PaperConsistencyCheckResultTxtWriter(result, writer)) {
-            PaperConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
                 Paper Consistency Check Result
@@ -146,10 +146,10 @@ class PaperConsistencyCheckResultTxtWriterTest {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
         Path txtFile = file.resolveSibling("biblio-cited.txt");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(databaseContext.getEntries());
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext.getEntries());
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             PaperConsistencyCheckResultTxtWriter PaperConsistencyCheckResultTxtWriter = new PaperConsistencyCheckResultTxtWriter(result, writer)) {
-            PaperConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
     }
 }

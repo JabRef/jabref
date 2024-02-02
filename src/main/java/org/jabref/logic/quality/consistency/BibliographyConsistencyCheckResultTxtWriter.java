@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -16,22 +17,24 @@ import org.jabref.model.entry.field.Field;
 /**
  * Outputs the findings as plain text.
  * <p>
- * The symbols from {@link PaperConsistencyCheckResultWriter} are used.
+ * The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
  */
-public class PaperConsistencyCheckResultTxtWriter extends PaperConsistencyCheckResultWriter {
+public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyConsistencyCheckResultWriter {
 
     private List<Integer> columnWidths;
 
-    public PaperConsistencyCheckResultTxtWriter(PaperConsistencyCheck.Result result, Writer writer) {
+    public BibliographyConsistencyCheckResultTxtWriter(BibliographyConsistencyCheck.Result result, Writer writer) {
         super(result, writer);
     }
 
-    public PaperConsistencyCheckResultTxtWriter(PaperConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+    public BibliographyConsistencyCheckResultTxtWriter(BibliographyConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
         super(result, writer, entryTypesManager, bibDatabaseMode);
     }
 
     public void writeFindings() throws IOException {
-        writer.write("Paper Consistency Check Result\n\n");
+        writer.write(Localization.lang("Field Presence Consistency Check Result"));
+        writer.write("\n\n");
+
         if (result.entryTypeToResultMap().isEmpty()) {
             writer.write("No errors found.\n");
             return;
@@ -39,18 +42,19 @@ public class PaperConsistencyCheckResultTxtWriter extends PaperConsistencyCheckR
 
         initializeColumnWidths();
 
-        StringJoiner headerJoiner = new StringJoiner(" | ", "| ", " |\n");
-        for (int i = 0; i < columnNames.size(); i++) {
-            String fieldName = columnNames.get(i);
-            int columnWidth = columnWidths.get(i);
-            String formattedField = String.format("%-" + columnWidth + "s", fieldName);
-            headerJoiner.add(formattedField);
-        }
-        writer.write(headerJoiner.toString());
+        outputRow(columnNames);
 
         writer.write(columnWidths.stream().map(width -> "-".repeat(width)).collect(Collectors.joining(" | ", "| ", " |\n")));
 
         super.writeFindings();
+
+        writer.write("\n\n");
+        writer.write(Localization.lang("Legend"));
+        writer.write("\n\n");
+        writer.write("%s | %s\n".formatted(REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("required field is present")));
+        writer.write("%s | %s\n".formatted(OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("optional field is present")));
+        writer.write("%s | %s\n".formatted(UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("unknown field is present")));
+        writer.write("%s | %s\n".formatted(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("field is absent")));
     }
 
     private void initializeColumnWidths() {
@@ -88,7 +92,10 @@ public class PaperConsistencyCheckResultTxtWriter extends PaperConsistencyCheckR
     @Override
     protected void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
+        outputRow(theRecord);
+    }
 
+    private void outputRow(List<String> theRecord) throws IOException {
         StringJoiner outputJoiner = new StringJoiner(" | ", "| ", " |\n");
         for (int i = 0; i < theRecord.size(); i++) {
             String fieldValue = theRecord.get(i);

@@ -31,19 +31,21 @@ import org.jooq.lambda.Unchecked;
  *     <li><code>x</code> - required field is present</li>
  *     <li><code>o</code> - optional field is present</li>
  *     <li><code>?</code> - unknown field is present</li>
+ *     <li><code>-</code> - field is absent</li>
  * </ul>
  * <p>
  * Note that this classification is based on JabRef's definition and might not match the publisher's definition.
  *
  * @implNote We could have implemented a <code>PaperConsistencyCheckResultFormatter</code>, but that would have been too much effort.
  */
-public abstract class PaperConsistencyCheckResultWriter implements Closeable {
+public abstract class BibliographyConsistencyCheckResultWriter implements Closeable {
 
     protected static final String REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "x";
     protected static final String OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "o";
     protected static final String UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "?";
+    protected static final String UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "-";
 
-    protected final PaperConsistencyCheck.Result result;
+    protected final BibliographyConsistencyCheck.Result result;
     protected final Writer writer;
     protected final BibEntryTypesManager entryTypesManager;
     protected final BibDatabaseMode bibDatabaseMode;
@@ -52,11 +54,11 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
 
     private final List<Field> allReportedFields;
 
-    public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Writer writer) {
+    public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer) {
         this(result, writer, new BibEntryTypesManager(), BibDatabaseMode.BIBTEX);
     }
 
-    public PaperConsistencyCheckResultWriter(PaperConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
+    public BibliographyConsistencyCheckResultWriter(BibliographyConsistencyCheck.Result result, Writer writer, BibEntryTypesManager entryTypesManager, BibDatabaseMode bibDatabaseMode) {
         this.result = result;
         this.writer = writer;
         this.entryTypesManager = entryTypesManager;
@@ -101,12 +103,12 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
                 } else {
                     return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
                 }
-            }).orElse("-"));
+            }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY));
         });
         return result;
     }
 
-    protected void writeMapEntry(Map.Entry<EntryType, PaperConsistencyCheck.EntryTypeResult> mapEntry) {
+    protected void writeMapEntry(Map.Entry<EntryType, BibliographyConsistencyCheck.EntryTypeResult> mapEntry) {
         String entryType = mapEntry.getKey().getDisplayName();
 
         Optional<BibEntryType> bibEntryType = this.entryTypesManager.enrich(mapEntry.getKey(), bibDatabaseMode);
@@ -123,7 +125,7 @@ public abstract class PaperConsistencyCheckResultWriter implements Closeable {
                 .map(BibField::field)
                 .collect(Collectors.toSet());
 
-        PaperConsistencyCheck.EntryTypeResult entries = mapEntry.getValue();
+        BibliographyConsistencyCheck.EntryTypeResult entries = mapEntry.getValue();
         SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
 
         bibEntries.forEach(Unchecked.consumer(bibEntry -> {
