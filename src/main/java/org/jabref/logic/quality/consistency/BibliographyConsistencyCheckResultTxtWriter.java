@@ -100,7 +100,7 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
         for (int i = 0; i < theRecord.size(); i++) {
             String fieldValue = theRecord.get(i);
             int columnWidth = columnWidths.get(i);
-            String formattedField = String.format("%-" + columnWidth + "s", fieldValue);
+            String formattedField = ("%-" + columnWidth + "s").formatted(fieldValue);
             outputJoiner.add(formattedField);
         }
 
