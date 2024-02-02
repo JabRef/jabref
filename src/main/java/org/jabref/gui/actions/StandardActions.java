@@ -30,6 +30,7 @@ public enum StandardActions implements Action {
     SEND_AS_EMAIL(Localization.lang("As Email")),
     SEND_TO_KINDLE(Localization.lang("To Kindle")),
     REBUILD_FULLTEXT_SEARCH_INDEX(Localization.lang("Rebuild fulltext search index"), IconTheme.JabRefIcons.FILE),
+    REDOWNLOAD_MISSING_FILES(Localization.lang("Redownload missing files"), IconTheme.JabRefIcons.DOWNLOAD),
     OPEN_EXTERNAL_FILE(Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
