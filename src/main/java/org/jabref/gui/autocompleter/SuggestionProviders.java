@@ -22,12 +22,21 @@ public class SuggestionProviders {
         this.isEmpty = false;
     }
 
+    public SuggestionProviders(BibDatabase database) {
+        this.database = database;
+        this.isEmpty = true;
+    }
+
     public SuggestionProviders() {
         this.isEmpty = true;
     }
 
     public SuggestionProvider<?> getForField(Field field) {
         if (isEmpty || !autoCompletePreferences.getCompleteFields().contains(field)) {
+            Set<FieldProperty> fieldProperties = field.getProperties();
+            if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+                return new BibEntrySuggestionProvider(database);
+            }
             return new EmptySuggestionProvider();
         }
 
