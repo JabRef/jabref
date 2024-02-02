@@ -23,6 +23,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     @FXML private TextField link;
     @FXML private TextField description;
     @FXML private ComboBox<ExternalFileType> fileType;
+    @FXML private TextField sourceUrl;
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
@@ -65,6 +66,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
         description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
+        sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
     }
 
     @FXML

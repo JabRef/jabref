@@ -421,6 +421,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             this.linkedFile.setLink(file.getLink());
             this.linkedFile.setDescription(file.getDescription());
             this.linkedFile.setFileType(file.getFileType());
+            this.linkedFile.setSourceURL(file.getSourceUrl());
         });
     }
 
@@ -456,6 +457,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                             destination,
                             databaseContext.getFileDirectories(preferencesService.getFilePreferences()),
                             preferencesService.getFilePreferences());
+                    if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
+                        newLinkedFile.setDescription((linkedFile.getDescription()));
+                    }
+                    newLinkedFile.setSourceURL(linkedFile.getLink());
                     entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
 
                     // Notify in bar when the file type is HTML.
