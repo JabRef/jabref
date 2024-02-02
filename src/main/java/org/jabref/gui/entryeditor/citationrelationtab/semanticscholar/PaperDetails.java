@@ -1,10 +1,12 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class PaperDetails {
     private String paperId;
@@ -13,6 +15,8 @@ public class PaperDetails {
     private int citationCount;
     private int referenceCount;
     private List<AuthorResponse> authors;
+    private List<String> publicationTypes;
+    private Map<String, String> externalIds;
 
     public String getPaperId() {
         return paperId;
@@ -58,6 +62,51 @@ public class PaperDetails {
         return authors;
     }
 
+    public String getPublicationType() {
+        if (publicationTypes == null || publicationTypes.isEmpty()) {
+            return "Misc";
+        }
+        if (publicationTypes.contains("Conference")) {
+            return "InProceedings";
+        } else if (publicationTypes.contains("JournalArticle")) {
+            return "Article";
+        } else {
+            return switch (publicationTypes.getFirst()) {
+                case "Review" ->
+                        "Misc";
+                case "CaseReport" ->
+                        "Report";
+                case "ClinicalTrial" ->
+                        "Report";
+                case "Dataset" ->
+                        "Dataset";
+                case "Editorial" ->
+                        "Misc";
+                case "LettersAndComments" ->
+                        "Misc";
+                case "MetaAnalysis" ->
+                        "Article";
+                case "News" ->
+                        "Misc";
+                case "Study" ->
+                        "Article";
+                case "Book" ->
+                        "Book";
+                case "BookSection" ->
+                        "InBook";
+                default ->
+                        "Misc";
+            };
+        }
+    }
+
+    public String getDOI() {
+        if (externalIds != null && externalIds.containsKey("DOI")) {
+            return externalIds.get("DOI");
+        }
+        return "";
+    }
+
     public BibEntry toBibEntry() {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.TITLE, getTitle());
@@ -69,6 +118,10 @@ public class PaperDetails {
                                      .map(AuthorResponse::getName)
                                      .collect(Collectors.joining(" and "));
         bibEntry.setField(StandardField.AUTHOR, authors);
+
+        bibEntry.setType(StandardEntryType.valueOf(getPublicationType()));
+
+        bibEntry.setField(StandardField.DOI, getDOI());
 
         return bibEntry;
     }

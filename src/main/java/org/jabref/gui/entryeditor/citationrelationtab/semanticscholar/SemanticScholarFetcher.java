@@ -33,7 +33,8 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                     .append("paper/")
                     .append("DOI:").append(entry.getDOI().get().getDOI())
                     .append("/citations")
-                    .append("?fields=").append("title,authors,year,citationCount,referenceCount")
+                    .append("?fields=")
+                    .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes")
                     .append("&limit=1000");
             try {
                 URL citationsUrl = URI.create(urlBuilder.toString()).toURL();
@@ -65,7 +66,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                     .append("DOI:").append(entry.getDOI().get().getDOI())
                     .append("/references")
                     .append("?fields=")
-                    .append("title,authors,year,citationCount,referenceCount")
+                    .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes")
                     .append("&limit=1000");
             try {
                 URL referencesUrl = URI.create(urlBuilder.toString()).toURL();
