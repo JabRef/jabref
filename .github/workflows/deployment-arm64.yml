@@ -48,9 +48,9 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          [ -n "$BUILDJABREFPRIVATEKEY" ] || exit 1
+         [ -n "$BUILDJABREFPRIVATEKEY" ] || exit 1
         env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+         BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
