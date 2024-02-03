@@ -1,16 +1,23 @@
-name: Deployment Release for ARM64 - Run manually!
-
+name: Deployment for Arm64
 on:
+  push:
+    branches:
+      - main
+      - main-release
+    paths-ignore:
+      - 'docs/**'
+      - 'src/test/**'
+      - 'README.md'
+    tags:
+       - '*'
+  pull_request:
+  merge_group:
   workflow_dispatch:
     inputs:
       notarization:
         type: boolean
-        required: true
-        default: true
-  push:
-   branches:
-    - arm64mac-release
-    - updateArm64Notarization
+        required: false
+        default: false
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
