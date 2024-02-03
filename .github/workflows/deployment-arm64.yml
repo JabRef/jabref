@@ -42,6 +42,10 @@ jobs:
             displayName: macOS (Arm64)
             suffix: '_arm64'
     runs-on: ${{ matrix.os }}
+    outputs:
+      major: ${{ steps.gitversion.outputs.Major }}
+      minor: ${{ steps.gitversion.outputs.Minor }}
+      branchname: ${{ steps.gitversion.outputs.branchName }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
       - name: Check secrets presence
