@@ -48,9 +48,13 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-         [ -n "$BUILDJABREFPRIVATEKEY" ] || exit 1
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+          fi
         env:
-         BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
