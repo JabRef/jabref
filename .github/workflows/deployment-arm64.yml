@@ -72,7 +72,7 @@ jobs:
       - name: Clean up keychain
         run: |
          security delete-keychain signing_temp.keychain ${{runner.temp}}/keychain/notarization.keychain || true
-      - name: Setup OSX key chain on macOS
+      - name: Setup OSX key chain on macOS-arm
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
@@ -181,7 +181,7 @@ jobs:
           compression-level: 0 # no compression
 
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: macOS notarization
+    name: macOS notarization-arm
     runs-on: macos-14
     needs: [build]
     if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
