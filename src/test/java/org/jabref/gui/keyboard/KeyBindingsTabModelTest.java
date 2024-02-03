@@ -37,7 +37,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testInvalidKeyBindingIsNotSaved() {
+    void invalidKeyBindingIsNotSaved() {
         setKeyBindingViewModel(KeyBinding.COPY);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "Q", "Q", KeyCode.Q, false, false, false,
                 false);
@@ -50,7 +50,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSpecialKeysValidKeyBindingIsSaved() {
+    void specialKeysValidKeyBindingIsSaved() {
         setKeyBindingViewModel(KeyBinding.IMPORT_INTO_NEW_DATABASE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "F1", "F1", KeyCode.F1, false, false, false,
                 false);
@@ -70,7 +70,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testKeyBindingCategory() {
+    void keyBindingCategory() {
         KeyBindingViewModel bindViewModel = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
         model.selectedKeyBindingProperty().set(Optional.of(bindViewModel));
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "M", "M", KeyCode.M, true, true, true, false);
@@ -80,7 +80,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testRandomNewKeyKeyBindingInRepository() {
+    void randomNewKeyKeyBindingInRepository() {
         setKeyBindingViewModel(KeyBinding.CLEANUP);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "K", "K", KeyCode.K, true, true, true, false);
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent));
@@ -94,7 +94,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSaveNewKeyBindingsToPreferences() {
+    void saveNewKeyBindingsToPreferences() {
         assumeFalse(OS.OS_X);
 
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
@@ -108,7 +108,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSaveNewSpecialKeysKeyBindingsToPreferences() {
+    void saveNewSpecialKeysKeyBindingsToPreferences() {
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false,
                 false);
@@ -122,7 +122,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSetAllKeyBindingsToDefault() {
+    void setAllKeyBindingsToDefault() {
         assumeFalse(OS.OS_X);
 
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
@@ -142,7 +142,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testCloseEntryEditorCloseEntryKeybinding() {
+    void closeEntryEditorCloseEntryKeybinding() {
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.CLOSE);
         model.selectedKeyBindingProperty().set(Optional.of(viewModel));
         KeyEvent closeEditorEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE, false, false, false, false);
@@ -156,7 +156,7 @@ class KeyBindingsTabModelTest {
     }
 
     @Test
-    void testSetSingleKeyBindingToDefault() {
+    void setSingleKeyBindingToDefault() {
         assumeFalse(OS.OS_X);
 
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);

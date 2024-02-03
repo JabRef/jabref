@@ -14,7 +14,7 @@ public class LocalizationKeyParamsTest {
 
     @ParameterizedTest
     @MethodSource("provideTestData")
-    public void testReplacePlaceholders(String expected, LocalizationKeyParams input) {
+    public void replacePlaceholders(String expected, LocalizationKeyParams input) {
         assertEquals(expected, input.replacePlaceholders());
     }
 
@@ -29,7 +29,7 @@ public class LocalizationKeyParamsTest {
     }
 
     @Test
-    public void testTooManyParams() {
+    public void tooManyParams() {
         assertThrows(IllegalStateException.class, () -> new LocalizationKeyParams("", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"));
     }
 }

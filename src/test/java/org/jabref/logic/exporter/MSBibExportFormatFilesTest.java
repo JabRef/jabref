@@ -61,7 +61,7 @@ public class MSBibExportFormatFilesTest {
 
     @ParameterizedTest(name = "{index} file={0}")
     @MethodSource("fileNames")
-    void testPerformExport(String filename) throws IOException, SaveException {
+    void performExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path expectedFile = resourceDir.resolve(xmlFileName);
         Path importFile = resourceDir.resolve(filename);

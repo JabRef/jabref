@@ -15,24 +15,24 @@ public class ReplaceUnicodeLigaturesFormatterTest {
     }
 
     @Test
-    public void testPlainFormat() {
+    public void plainFormat() {
         assertEquals("lorem ipsum", formatter.format("lorem ipsum"));
     }
 
     @Test
-    public void testSingleLigatures() {
+    public void singleLigatures() {
         assertEquals("AA", formatter.format("\uA732"));
         assertEquals("fi", formatter.format("ﬁ"));
         assertEquals("et", formatter.format("\uD83D\uDE70"));
     }
 
     @Test
-    public void testLigatureSequence() {
+    public void ligatureSequence() {
         assertEquals("aefffflstue", formatter.format("æﬀﬄﬆᵫ"));
     }
 
     @Test
-    public void testSampleInput() {
+    public void sampleInput() {
         assertEquals("AEneas", formatter.format("Æneas"));
     }
 }

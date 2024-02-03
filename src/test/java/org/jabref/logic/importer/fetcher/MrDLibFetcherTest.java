@@ -31,7 +31,7 @@ public class MrDLibFetcherTest {
     }
 
     @Test
-    public void testPerformSearch() throws FetcherException {
+    public void performSearch() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.TITLE, "lernen");
         List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
@@ -39,7 +39,7 @@ public class MrDLibFetcherTest {
     }
 
     @Test
-    public void testPerformSearchForHornecker2006() throws FetcherException {
+    public void performSearchForHornecker2006() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setCitationKey("Hornecker:2006:GGT:1124772.1124838");
         bibEntry.setField(StandardField.ADDRESS, "New York, NY, USA");
@@ -60,7 +60,7 @@ public class MrDLibFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("MDL_FETCHER", fetcher.getName());
     }
 }

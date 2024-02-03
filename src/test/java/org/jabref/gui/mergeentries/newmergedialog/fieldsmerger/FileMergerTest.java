@@ -30,7 +30,7 @@ class FileMergerTest {
                 :A2012 -A.pdf:;B2013 - B.pdf:PDF:,A2012 -A.pdf,B2013 - B.pdf:PDF
                 :A2012 -A.pdf:;:asdf:,A2012 -A.pdf,asdf
             """)
-    void testMerge(String expect, String fileA, String fileB) {
+    void merge(String expect, String fileA, String fileB) {
         assertEquals(expect, fileMerger.merge(fileA, fileB));
     }
 }

@@ -41,7 +41,7 @@ public class BiodiversityLibraryTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("Biodiversity Heritage", fetcher.getName());
         assertNotEquals("Biodiversity Heritage Library", fetcher.getName());
         assertNotEquals("Biodiversity Library", fetcher.getName());
@@ -90,7 +90,7 @@ public class BiodiversityLibraryTest {
     }
 
     @Test
-    public void testPerformSearch() throws FetcherException {
+    public void performSearch() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Clark, John L. (John Littner)  and Neill, David A. ")
             .withField(StandardField.JOURNALTITLE, "PhytoKeys")

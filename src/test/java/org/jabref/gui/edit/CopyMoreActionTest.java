@@ -67,7 +67,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteOnFail() {
+    public void executeOnFail() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
@@ -78,7 +78,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyTitleWithNoTitle() {
+    public void executeCopyTitleWithNoTitle() {
         BibEntry entryWithNoTitle = (BibEntry) entry.clone();
         entryWithNoTitle.clearField(StandardField.TITLE);
         ObservableList<BibEntry> entriesWithNoTitles = FXCollections.observableArrayList(entryWithNoTitle);
@@ -94,7 +94,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyTitleOnPartialSuccess() {
+    public void executeCopyTitleOnPartialSuccess() {
         BibEntry entryWithNoTitle = (BibEntry) entry.clone();
         entryWithNoTitle.clearField(StandardField.TITLE);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoTitle, entry);
@@ -112,7 +112,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyTitleOnSuccess() {
+    public void executeCopyTitleOnSuccess() {
         ObservableList<BibEntry> entriesWithTitles = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithTitles));
 
@@ -128,7 +128,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyKeyWithNoKey() {
+    public void executeCopyKeyWithNoKey() {
         BibEntry entryWithNoKey = (BibEntry) entry.clone();
         entryWithNoKey.clearCiteKey();
         ObservableList<BibEntry> entriesWithNoKeys = FXCollections.observableArrayList(entryWithNoKey);
@@ -144,7 +144,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyKeyOnPartialSuccess() {
+    public void executeCopyKeyOnPartialSuccess() {
         BibEntry entryWithNoKey = (BibEntry) entry.clone();
         entryWithNoKey.clearCiteKey();
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoKey, entry);
@@ -162,7 +162,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyKeyOnSuccess() {
+    public void executeCopyKeyOnSuccess() {
         ObservableList<BibEntry> entriesWithKeys = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithKeys));
 
@@ -178,7 +178,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyDoiWithNoDoi() {
+    public void executeCopyDoiWithNoDoi() {
         BibEntry entryWithNoDoi = (BibEntry) entry.clone();
         entryWithNoDoi.clearField(StandardField.DOI);
         ObservableList<BibEntry> entriesWithNoDois = FXCollections.observableArrayList(entryWithNoDoi);
@@ -194,7 +194,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyDoiOnPartialSuccess() {
+    public void executeCopyDoiOnPartialSuccess() {
         BibEntry entryWithNoDoi = (BibEntry) entry.clone();
         entryWithNoDoi.clearField(StandardField.DOI);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDoi, entry);
@@ -212,7 +212,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void testExecuteCopyDoiOnSuccess() {
+    public void executeCopyDoiOnSuccess() {
         ObservableList<BibEntry> entriesWithDois = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithDois));
 

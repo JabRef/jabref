@@ -27,7 +27,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testGetProtectedTerms() throws URISyntaxException {
+    void getProtectedTerms() throws URISyntaxException {
         List<ProtectedTermsList> backupList = new ArrayList<>(loader.getProtectedTermsLists());
 
         for (ProtectedTermsList list : backupList) {
@@ -42,7 +42,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddProtectedTermsListFromFile() throws URISyntaxException {
+    void addProtectedTermsListFromFile() throws URISyntaxException {
         String filename = Path.of(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
                                                             .toURI())
                               .toFile().getPath();
@@ -52,7 +52,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException {
+    void readProtectedTermsListFromFileReadsDescription() throws URISyntaxException {
         Path file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
                                           .toURI());
@@ -62,7 +62,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException {
+    void readProtectedTermsListFromFileDisabledWorks() throws URISyntaxException {
         Path file = Path.of(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
                                                       .toURI());
 
@@ -71,7 +71,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException {
+    void readProtectedTermsListFromFileEnabledWorks() throws URISyntaxException {
         Path file = Path.of(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
                                                       .toURI());
 
@@ -80,7 +80,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException {
+    void readProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException {
         Path file = Path.of(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
                                                       .toURI());
 
@@ -89,7 +89,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testReadProtectedTermsListFromFileNoDescriptionGivesDefaultDescription()
+    void readProtectedTermsListFromFileNoDescriptionGivesDefaultDescription()
             throws URISyntaxException {
         Path file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/unnamedterms.terms")
@@ -100,7 +100,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testNewListsAreIncluded() {
+    void newListsAreIncluded() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -110,7 +110,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testNewListsAreEnabled() {
+    void newListsAreEnabled() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -122,7 +122,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testInitalizedAllInternalDisabled() {
+    void initalizedAllInternalDisabled() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -134,7 +134,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testUnknownExternalFileWillNotLoad() {
+    void unknownExternalFileWillNotLoad() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 ProtectedTermsLoader.getInternalLists(),
                 Collections.singletonList("someUnlikelyNameThatNeverWillExist"),
@@ -144,7 +144,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAllDisabledNoWords() {
+    void allDisabledNoWords() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -154,7 +154,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testDoNotLoadTheSameInternalListTwice() {
+    void doNotLoadTheSameInternalListTwice() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(
                         ProtectedTermsLoader.getInternalLists(),
@@ -165,7 +165,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddNewTermListAddsList(@TempDir Path tempDir) {
+    void addNewTermListAddsList(@TempDir Path tempDir) {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -176,7 +176,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddNewTermListNewListInList(@TempDir Path tempDir) {
+    void addNewTermListNewListInList(@TempDir Path tempDir) {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(
                         Collections.emptyList(),
@@ -190,7 +190,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testRemoveTermList(@TempDir Path tempDir) {
+    void removeTermList(@TempDir Path tempDir) {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(
                         Collections.emptyList(),
@@ -202,7 +202,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testRemoveTermListReduceTheCount(@TempDir Path tempDir) {
+    void removeTermListReduceTheCount(@TempDir Path tempDir) {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -214,7 +214,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddNewTermListSetsCorrectDescription(@TempDir Path tempDir) {
+    void addNewTermListSetsCorrectDescription(@TempDir Path tempDir) {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 Collections.emptyList(),
                 Collections.emptyList(),

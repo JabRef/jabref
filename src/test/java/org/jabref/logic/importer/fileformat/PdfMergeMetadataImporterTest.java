@@ -44,12 +44,12 @@ class PdfMergeMetadataImporterTest {
     }
 
     @Test
-    void testsGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    void testGetDescription() {
+    void getDescription() {
         assertEquals("PdfMergeMetadataImporter imports metadata from a PDF using multiple strategies and merging the result.",
                      importer.getDescription());
     }

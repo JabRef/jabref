@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BstVMVisitorTest {
 
     @Test
-    public void testVisitStringsCommand() {
+    public void visitStringsCommand() {
         BstVM vm = new BstVM("STRINGS { test.string1 test.string2 test.string3 }");
 
         vm.render(Collections.emptyList());
@@ -36,7 +36,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitIntegersCommand() {
+    public void visitIntegersCommand() {
         BstVM vm = new BstVM("INTEGERS { variable.a variable.b variable.c }");
 
         vm.render(Collections.emptyList());
@@ -51,7 +51,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitFunctionCommand() {
+    void visitFunctionCommand() {
         BstVM vm = new BstVM("""
                 FUNCTION { test.func } { #1 'test.var := }
                 EXECUTE { test.func }
@@ -65,7 +65,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitMacroCommand() {
+    void visitMacroCommand() {
         BstVM vm = new BstVM("""
                 MACRO { jan } { "January" }
                 EXECUTE { jan }
@@ -81,7 +81,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitEntryCommand() {
+    void visitEntryCommand() {
         BstVM vm = new BstVM("ENTRY { address author title type } { variable } { label }");
         List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
@@ -98,7 +98,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitReadCommand() {
+    void visitReadCommand() {
         BstVM vm = new BstVM("""
                 ENTRY { author title booktitle year owner timestamp url } { } { }
                 READ
@@ -118,7 +118,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitExecuteCommand() throws RecognitionException {
+    public void visitExecuteCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 INTEGERS { variable.a }
                 FUNCTION { init.state.consts } { #5 'variable.a := }
@@ -131,7 +131,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitIterateCommand() throws RecognitionException {
+    public void visitIterateCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
@@ -151,7 +151,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitReverseCommand() throws RecognitionException {
+    public void visitReverseCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
@@ -171,7 +171,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitSortCommand() throws RecognitionException {
+    public void visitSortCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -194,7 +194,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitIdentifier() {
+    void visitIdentifier() {
         BstVM vm = new BstVM("""
                 ENTRY { } { local.variable } { local.label }
                 READ
@@ -222,7 +222,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitStackitem() {
+    void visitStackitem() {
         BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { test2 } { #3 }

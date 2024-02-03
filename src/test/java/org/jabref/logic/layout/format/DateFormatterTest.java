@@ -19,12 +19,12 @@ public class DateFormatterTest {
     }
 
     @Test
-    public void testDefaultFormat() {
+    public void defaultFormat() {
         assertEquals("2016-07-15", formatter.format("2016-07-15"));
     }
 
     @Test
-    public void testRequestedFormat() {
+    public void requestedFormat() {
         formatter.setArgument("MM/yyyy");
         assertEquals("07/2016", formatter.format("2016-07-15"));
     }
@@ -37,7 +37,7 @@ public class DateFormatterTest {
             "yyyy.MM.dd, 2016-07-15, 2016.07.15", // yyyy.MM.dd
             "yyyy/MM, 2016-07-15, 2016/07", // yyyy/MM
     })
-    public void testOtherFormats(String formatArg, String input, String expectedResult) {
+    public void otherFormats(String formatArg, String input, String expectedResult) {
         formatter.setArgument(formatArg);
         String formattedStr = formatter.format(input);
         assertEquals(expectedResult, formattedStr);

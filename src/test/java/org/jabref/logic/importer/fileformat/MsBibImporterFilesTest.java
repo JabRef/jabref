@@ -24,19 +24,19 @@ public class MsBibImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    public void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+    public void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new MsBibImporter(), fileName, FILE_ENDING);
     }
 }

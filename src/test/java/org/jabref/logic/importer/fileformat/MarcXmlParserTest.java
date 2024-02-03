@@ -35,7 +35,7 @@ public class MarcXmlParserTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         String bibName = FileUtil.getBaseName(fileName) + ".bib";
         doTest(fileName, bibName);
     }
