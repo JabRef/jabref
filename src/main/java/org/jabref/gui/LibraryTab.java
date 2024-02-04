@@ -15,6 +15,7 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
@@ -95,7 +96,6 @@ import org.slf4j.LoggerFactory;
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
 public class LibraryTab extends Tab {
-
     /**
      * Defines the different modes that the tab can operate in
      */
@@ -121,7 +121,14 @@ public class LibraryTab extends Tab {
     private PanelMode mode = PanelMode.MAIN_TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
-    private boolean saving;
+
+    // Indicates whether the tab is loading data using a dataloading task
+    // The constructors take care to the right true/false assignment during start.
+    private SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
+
+    // initally, the dialog is loading, not saving
+    private boolean saving = false;
+
     private PersonNameSuggestionProvider searchAutoCompleter;
 
     // Used to track whether the base has changed since last save.
@@ -218,6 +225,7 @@ public class LibraryTab extends Tab {
     }
 
     private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+        this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
 
@@ -234,7 +242,6 @@ public class LibraryTab extends Tab {
     private void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        tabContainer.addTab(this, true);
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
@@ -251,10 +258,14 @@ public class LibraryTab extends Tab {
             }
         }
 
+        LOGGER.trace("loading.set(false);");
+        loading.set(false);
         dataLoadingTask = null;
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
+        loading.set(false);
+
         String title = Localization.lang("Connection error");
         String content = "%s\n\n%s".formatted(ex.getMessage(), Localization.lang("A local copy will be opened."));
 
@@ -722,6 +733,7 @@ public class LibraryTab extends Tab {
         // Database could not have been changed, since it is still loading
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
+            loading.setValue(false);
             return true;
         }
 
@@ -830,6 +842,10 @@ public class LibraryTab extends Tab {
 
     public void setSaving(boolean saving) {
         this.saving = saving;
+    }
+
+    public ObservableBooleanValue getLoading() {
+        return loading;
     }
 
     public CountingUndoManager getUndoManager() {
@@ -1066,5 +1082,13 @@ public class LibraryTab extends Tab {
 
     public DatabaseNotification getNotificationPane() {
         return databaseNotificationPane;
+    }
+
+    @Override
+    public String toString() {
+        return "LibraryTab{" +
+                "bibDatabaseContext=" + bibDatabaseContext +
+                ", showing=" + showing +
+                '}';
     }
 }

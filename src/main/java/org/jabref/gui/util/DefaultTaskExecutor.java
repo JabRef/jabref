@@ -145,7 +145,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
             {
                 this.updateMessage(task.messageProperty().get());
                 this.updateTitle(task.titleProperty().get());
-                BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+                BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.workDone(), progress.max()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
                 BindingsHelper.subscribeFuture(task.isCanceledProperty(), cancelled -> {
