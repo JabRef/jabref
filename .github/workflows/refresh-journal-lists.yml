@@ -41,7 +41,7 @@ jobs:
         run: |
           git add -f buildres/abbrv.jabref.org
           git diff-index --quiet HEAD || git commit -m 'Update journal abbreviation lists'
-      - uses: peter-evans/create-pull-request@v5
+      - uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
           branch: update-journal-lists
