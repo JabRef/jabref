@@ -169,6 +169,14 @@ public class JabRefCLI {
                         cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
+    public String getJumpToKey() {
+        return cl.getOptionValue("jumpToKey");
+    }
+
+    public boolean isJumpToKey() {
+        return cl.hasOption("jumpToKey");
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -275,7 +283,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("embeddBibfileInPdf")
-                .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeX as attached file in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
@@ -286,6 +294,14 @@ public class JabRefCLI {
                 .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("j")
+                .longOpt("jumpToKey")
+                .desc("%s: '%s'".formatted(Localization.lang("Jump to the entry of the given citation key."), "-j key"))
+                .hasArg()
+                .argName("CITATIONKEY")
                 .build());
 
         return options;

@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
 - We added a new group icon column to the main table showing the icons of the entry's groups. [#10801](https://github.com/JabRef/jabref/pull/10801)
+- We added ability to jump to an entry in the command line using `-j CITATIONKEY`. [koppor#540](https://github.com/koppor/jabref/issues/540)
+- We added a new boolean to the style files for Openoffice/Libreoffice integration to switch between ZERO_WIDTH_SPACE (default) and no space. [#10843](https://github.com/JabRef/jabref/pull/10843)
 
 ### Changed
 
@@ -36,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The last page of a PDF is now indexed by the full text search. [#10193](https://github.com/JabRef/jabref/issues/10193)
 - We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
+- We fixed an issue where the CrossRef field did not work if autocompletion was disabled [#8145](https://github.com/JabRef/jabref/issues/8145)
 
 ### Removed
 
