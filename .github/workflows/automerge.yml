@@ -17,7 +17,8 @@ jobs:
         (
           startsWith(github.event.pull_request.title, '[Bot] ') || 
           startsWith(github.event.pull_request.title, 'Bump ') || 
-          startsWith(github.event.pull_request.title, 'New Crowdin updates')
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
         )
       )
     steps:
