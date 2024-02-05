@@ -46,6 +46,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private final DialogService dialogService;
     private final BibEntry entry;
     private final LinkedFile linkedFile;
+    private final String suggestedName;
     private final String downloadUrl;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
@@ -62,10 +63,12 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor,
+                                    String suggestedName,
                                     DoubleProperty downloadProgress) {
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.linkedFile = linkedFile;
+        this.suggestedName = suggestedName;
         this.downloadUrl = downloadUrl;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
@@ -81,8 +84,30 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     String downloadUrl,
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
+                                    TaskExecutor taskExecutor,
+                                    String suggestedName) {
+        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, suggestedName, null);
+    }
+
+    public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
+                                    BibEntry entry,
+                                    LinkedFile linkedFile,
+                                    String downloadUrl,
+                                    DialogService dialogService,
+                                    FilePreferences filePreferences,
+                                    TaskExecutor taskExecutor,
+                                    DoubleProperty downloadProgress) {
+        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, "", downloadProgress);
+    }
+
+    public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
+                                    BibEntry entry,
+                                    LinkedFile linkedFile,
+                                    String downloadUrl,
+                                    DialogService dialogService,
+                                    FilePreferences filePreferences,
                                     TaskExecutor taskExecutor) {
-        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, null);
+        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, "", null);
     }
 
     @Override
@@ -200,12 +225,17 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
         return BackgroundTask
                 .wrap(() -> {
-                    Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                    ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-
-                    String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
+                    String suggestedName;
+                    if (this.suggestedName.isEmpty()) {
+                        Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+                        ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
+                        suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
+                    } else {
+                        suggestedName = this.suggestedName;
+                    }
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
+
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))

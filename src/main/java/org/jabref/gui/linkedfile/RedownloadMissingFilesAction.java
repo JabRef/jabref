@@ -80,9 +80,10 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
                 if (path.isPresent() && Files.exists(path.get())) {
                     return;
                 }
+                String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
                 DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(databaseContext, entry,
-                        linkedFile, linkedFile.getSourceUrl(), dialogService, filePreferences, taskExecutor);
+                        linkedFile, linkedFile.getSourceUrl(), dialogService, filePreferences, taskExecutor, fileName);
                 downloadAction.execute();
             });
         });

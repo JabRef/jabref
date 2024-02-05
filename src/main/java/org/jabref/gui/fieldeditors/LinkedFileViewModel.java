@@ -432,8 +432,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
             throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
         }
 
+        String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
+
         DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(databaseContext, entry, linkedFile,
-                linkedFile.getSourceUrl(), dialogService, preferencesService.getFilePreferences(), taskExecutor);
+                linkedFile.getSourceUrl(), dialogService, preferencesService.getFilePreferences(), taskExecutor, fileName, downloadProgress);
         downloadLinkedFileAction.execute();
     }
 
