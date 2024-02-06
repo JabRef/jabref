@@ -21,6 +21,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.FilePreferences;
 
 import org.jspecify.annotations.NullMarked;
@@ -200,7 +201,7 @@ public class LinkedFile implements Serializable {
                 "description='" + description.get() + '\'' +
                 ", link='" + link.get() + '\'' +
                 ", fileType='" + fileType.get() + '\'' +
-                ", sourceUrl='" + sourceURL.get() + '\'' +
+                (StringUtil.isNullOrEmpty(sourceURL.get()) ? "" : (", sourceUrl='" + sourceURL.get() + '\'')) +
                 '}';
     }
 

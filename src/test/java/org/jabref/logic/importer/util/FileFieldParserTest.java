@@ -150,12 +150,6 @@ class FileFieldParserTest {
                         "::file.pdf"
                 ),
 
-                // tooManySeparators
-                Arguments.of(
-                        Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF")),
-                        "desc:file.pdf:PDF:asdf"
-                ),
-
                 // www inside filename
                 Arguments.of(
                         Collections.singletonList(new LinkedFile("", Path.of("/home/www.google.de.pdf"), "")),
@@ -183,7 +177,12 @@ class FileFieldParserTest {
                 Arguments.of(
                              Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
                              "desc:http\\://ceur-ws.org/Vol-438:URL"
-               )
+                ),
+                // link with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "matheus.ea explicit.pdf", "application/pdf", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        "arXiv Fulltext PDF:matheus.ea explicit.pdf:application/pdf:https\\://arxiv.org/pdf/1109.0517.pdf"
+                )
         );
     }
 
