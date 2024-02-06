@@ -31,6 +31,10 @@ import org.slf4j.LoggerFactory;
  * and so makes testing harder.
  * We take the opportunity and implement a fluid interface.
  *
+ * TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
+ *       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
+ *       If this is not possible, add an @implNote why.
+ *
  * @param <V> type of the return value of the task
  */
 public abstract class BackgroundTask<V> {
@@ -120,11 +124,11 @@ public abstract class BackgroundTask<V> {
         return workDonePercentage;
     }
 
-    public BackgroundProgress getProgress() {
+    protected BackgroundProgress getProgress() {
         return progress.get();
     }
 
-    public ObjectProperty<BackgroundProgress> progressProperty() {
+    protected ObjectProperty<BackgroundProgress> progressProperty() {
         return progress;
     }
 
@@ -275,30 +279,16 @@ public abstract class BackgroundTask<V> {
         return BackgroundTask.iconMap.getOrDefault(task.getTitle(), null);
     }
 
-    static class BackgroundProgress {
-
-        private final double workDone;
-        private final double max;
-
-        public BackgroundProgress(double workDone, double max) {
-            this.workDone = workDone;
-            this.max = max;
-        }
-
-        public double getWorkDone() {
-            return workDone;
-        }
-
-        public double getMax() {
-            return max;
-        }
+    protected record BackgroundProgress(
+            double workDone,
+            double max) {
 
         public double getWorkDonePercentage() {
-            if (max == 0) {
-                return 0;
-            } else {
-                return workDone / max;
+                if (max == 0) {
+                    return 0;
+                } else {
+                    return workDone / max;
+                }
             }
         }
-    }
 }

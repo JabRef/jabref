@@ -4,9 +4,14 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface LibraryTabContainer {
     List<LibraryTab> getLibraryTabs();
 
+    @Nullable
     LibraryTab getCurrentLibraryTab();
 
     void showLibraryTab(LibraryTab libraryTab);

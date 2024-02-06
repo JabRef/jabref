@@ -22,6 +22,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -241,6 +242,7 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
+    @NonNull
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
