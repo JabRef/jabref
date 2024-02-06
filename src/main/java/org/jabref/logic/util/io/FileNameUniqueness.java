@@ -119,8 +119,7 @@ public class FileNameUniqueness {
     }
 
     public static Path eraseDuplicateMarks(Path filePath) {
-        String extensionSuffix = FileUtil.getFileExtension(filePath).orElse("");
-        extensionSuffix = "".equals(extensionSuffix) ? extensionSuffix : "." + extensionSuffix;
+        String extensionSuffix = FileUtil.getFileExtension(filePath).map(ext -> "." + ext).orElse("");
 
         return filePath.resolveSibling(eraseDuplicateMarks(FileUtil.getBaseName(filePath)) + extensionSuffix);
     }
