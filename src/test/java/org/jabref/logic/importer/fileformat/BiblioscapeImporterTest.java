@@ -20,28 +20,28 @@ public class BiblioscapeImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("Biblioscape", importer.getName());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.TXT, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Imports a Biblioscape Tag File.\n" +
                 "Several Biblioscape field types are ignored. Others are only included in the BibTeX field \"comment\".", importer.getDescription());
     }
 
     @Test
-    public void testGetCLIID() {
+    public void getCLIID() {
         assertEquals("biblioscape", importer.getId());
     }
 
     @Test
-    public void testImportEntriesAbortion() throws Throwable {
+    public void importEntriesAbortion() throws Throwable {
         Path file = Path.of(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
         assertEquals(Collections.emptyList(),
                 importer.importDatabase(file).getDatabase().getEntries());

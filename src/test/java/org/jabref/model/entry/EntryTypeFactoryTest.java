@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EntryTypeFactoryTest {
 
     @Test
-    public void testParseEntryTypePatent() {
+    public void parseEntryTypePatent() {
         EntryType patent = IEEETranEntryType.Patent;
         assertEquals(patent, EntryTypeFactory.parse("patent"));
     }

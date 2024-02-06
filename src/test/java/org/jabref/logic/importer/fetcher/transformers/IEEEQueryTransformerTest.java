@@ -86,7 +86,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
 
     @ParameterizedTest
     @MethodSource("getTitleTestData")
-    public void testStopWordRemoval(String expected, String queryString) throws Exception {
+    public void stopWordRemoval(String expected, String queryString) throws Exception {
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> result = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.ofNullable(expected), result);

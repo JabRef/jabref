@@ -204,13 +204,25 @@ public interface DialogService {
     <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
-     * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
+     * Constructs and shows a cancelable {@link ProgressDialog}.
+     * Clicking cancel will cancel the underlying service and close the dialog
      *
      * @param title   title of the dialog
      * @param content message to show above the progress bar
      * @param task    The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showProgressDialog(String title, String content, Task<V> task);
+
+    /**
+     * Constructs and shows a cancelable {@link ProgressDialog}.
+     * Clicking cancel will cancel the underlying service and close the dialog,
+     * otherwise will wait for the task to finish.
+     *
+     * @param title   title of the dialog
+     * @param content message to show above the progress bar
+     * @param task    The {@link Task} which executes the work and for which to show the dialog
+     */
+    <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /**
      * Constructs and shows a dialog showing the progress of running background tasks.

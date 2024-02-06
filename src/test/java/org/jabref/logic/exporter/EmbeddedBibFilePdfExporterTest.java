@@ -190,7 +190,7 @@ class EmbeddedBibFilePdfExporterTest {
 
     @ParameterizedTest
     @MethodSource("providePathToNewPDFs")
-    public void testRoundtripExportImport(Path path) throws Exception {
+    public void roundtripExportImport(Path path) throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")

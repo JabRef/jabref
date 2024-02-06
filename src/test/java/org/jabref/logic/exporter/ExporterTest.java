@@ -56,7 +56,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void testExportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
+    public void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
         exportFormat.export(databaseContext, tmpFile, entries);
@@ -65,7 +65,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void testExportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
+    public void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);

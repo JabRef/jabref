@@ -41,25 +41,25 @@ public class SciteTabTest {
     }
 
     @Test
-    public void testName() {
-        Assertions.assertEquals(SciteTab.NAME, "Scite");
+    public void name() {
+        Assertions.assertEquals(SciteTab.NAME, "Citation information");
     }
 
     @Test
-    public void testShouldShow() {
+    public void shouldShow() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         boolean shouldShow = tab.shouldShow(null);
         Assertions.assertTrue(shouldShow);
     }
 
     @Test
-    public void testBindNullEntry() {
+    public void bindNullEntry() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         tab.bindToEntry(null);
     }
 
     @Test
-    public void testBindEntry() {
+    public void bindEntry() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         var entry = new BibEntry()
                 .withField(StandardField.DOI, SAMPLE_DOI);

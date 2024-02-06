@@ -73,7 +73,7 @@ public class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherT
     }
 
     @Test
-    public void testIsbnNeitherAvailable() {
+    public void isbnNeitherAvailable() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9785646216541"));
     }
 

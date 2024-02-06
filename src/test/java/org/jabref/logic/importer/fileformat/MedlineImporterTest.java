@@ -27,22 +27,22 @@ public class MedlineImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("Medline/PubMed", importer.getName());
     }
 
     @Test
-    public void testGetCLIId() {
+    public void getCLIId() {
         assertEquals("medline", importer.getId());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.MEDLINE, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Importer for the Medline format.", importer.getDescription());
     }
 }

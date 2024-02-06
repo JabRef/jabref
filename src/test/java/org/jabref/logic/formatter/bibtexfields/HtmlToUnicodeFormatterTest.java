@@ -34,7 +34,7 @@ public class HtmlToUnicodeFormatterTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    void testFormatterWorksCorrectly(String expected, String input) {
+    void formatterWorksCorrectly(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 }

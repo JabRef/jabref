@@ -78,8 +78,11 @@ public class UpdateCitationMarkers {
 
         if (withText) {
             OOText citationText2 = style.decorateCitationMarker(citationText);
-            // inject a ZERO_WIDTH_SPACE to hold the initial character format
-            final String ZERO_WIDTH_SPACE = "\u200b";
+            String ZERO_WIDTH_SPACE = "";
+            if (style.spaceBeforeCitation()) {
+              // inject a ZERO_WIDTH_SPACE to hold the initial character format
+              ZERO_WIDTH_SPACE = "\u200b";
+            }
             citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
             OOTextIntoOO.write(doc, cursor, citationText2);
         } else {

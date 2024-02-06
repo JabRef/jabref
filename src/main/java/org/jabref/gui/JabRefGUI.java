@@ -14,7 +14,7 @@ import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.util.WebViewStore;
@@ -42,18 +42,15 @@ public class JabRefGUI {
     private final Stage mainStage;
     private final PreferencesService preferencesService;
 
-    private final List<ParserResult> parserResults;
-    private final boolean isBlank;
+    private final List<UiCommand> uiCommands;
     private boolean correctedWindowPos;
 
     public JabRefGUI(Stage mainStage,
-                     List<ParserResult> parserResults,
-                     boolean isBlank,
+                     List<UiCommand> uiCommands,
                      PreferencesService preferencesService,
                      FileUpdateMonitor fileUpdateMonitor) {
         this.mainStage = mainStage;
-        this.parserResults = parserResults;
-        this.isBlank = isBlank;
+        this.uiCommands = uiCommands;
         this.preferencesService = preferencesService;
 
         this.correctedWindowPos = false;
@@ -157,11 +154,20 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
+        mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
         mainStage.show();
 
-        Platform.runLater(() -> mainFrame.openDatabases(parserResults, isBlank));
+        Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
+    }
+
+    public void onShowing(WindowEvent event) {
+        // Open last edited databases
+        if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
+            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+            mainFrame.openLastEditedDatabases();
+        }
     }
 
     public void onCloseRequest(WindowEvent event) {

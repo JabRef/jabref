@@ -95,14 +95,14 @@ public class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    public void testIsbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
+    public void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
        assertEquals(Optional.empty(), fetcher.performSearchById("9785646216541"));
     }
 
     @Test
-    void testEResourceIsbnIsReturnedAsBoook() throws Exception {
+    void eResourceIsbnIsReturnedAsBoook() throws Exception {
         assertEquals(Optional.of(StandardEntryType.Book), fetcher.performSearchById("978-0-8229-4557-4").map(BibEntry::getType));
     }
 }

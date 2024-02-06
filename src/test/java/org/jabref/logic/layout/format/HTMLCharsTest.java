@@ -44,7 +44,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideBasicFormattingData")
-    void testBasicFormat(String expected, String input) {
+    void basicFormat(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 
@@ -73,7 +73,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideLaTeXHighlightingFormattingData")
-    void testLaTeXHighlighting(String expected, String input) {
+    void laTeXHighlighting(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 
@@ -87,7 +87,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideEquationTestData")
-    void testEquations(String expected, String input) {
+    void equations(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 
@@ -100,7 +100,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideNewLineTestData")
-    void testNewLine(String expected, String input) {
+    void newLine(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 
@@ -109,7 +109,7 @@ public class HTMLCharsTest {
      */
 
     @Test
-    void testQuoteSingle() {
+    void quoteSingle() {
         assertEquals("&#39;", layout.format("{\\textquotesingle}"));
     }
 
@@ -141,7 +141,7 @@ public class HTMLCharsTest {
 
     @ParameterizedTest
     @MethodSource("provideHTMLEntityFormattingData")
-    void testHTMLEntityFormatting(String expected, String input) {
+    void hTMLEntityFormatting(String expected, String input) {
         assertEquals(expected, layout.format(input));
     }
 }

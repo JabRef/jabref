@@ -42,7 +42,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void testCorruptedTitleBraces(@TempDir Path testFolder) throws Exception {
+    public void corruptedTitleBraces(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
@@ -58,7 +58,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void testCorruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
+    public void corruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();

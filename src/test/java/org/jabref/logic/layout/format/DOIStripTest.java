@@ -16,7 +16,7 @@ public class DOIStripTest {
 
   @ParameterizedTest
   @MethodSource("provideDOI")
-  public void testFormatDOIStrip(String formattedDOI, String originalDOI) {
+  public void formatDOIStrip(String formattedDOI, String originalDOI) {
       assertEquals(formattedDOI, layoutFormatter.format(originalDOI));
   }
 
