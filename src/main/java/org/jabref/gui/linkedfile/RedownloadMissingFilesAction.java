@@ -30,8 +30,6 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
 
     private BibDatabaseContext databaseContext;
 
-    private boolean shouldContinue = true;
-
     public RedownloadMissingFilesAction(StateManager stateManager,
                                         DialogService dialogService,
                                         FilePreferences filePreferences,
@@ -46,43 +44,33 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        init();
-        redownloadMissing();
-    }
-
-    public void init() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
-
-        databaseContext = stateManager.getActiveDatabase().get();
-        boolean confirm = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Redownload missing files"),
-                Localization.lang("Redownload missing files for current library?"));
-        if (!confirm) {
-            shouldContinue = false;
-            return;
+        if (stateManager.getActiveDatabase().isPresent()) {
+            databaseContext = stateManager.getActiveDatabase().get();
+            boolean confirm = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Redownload missing files"),
+                    Localization.lang("Redownload missing files for current library?"));
+            if (!confirm) {
+                return;
+            }
+            redownloadMissing(stateManager.getActiveDatabase().get());
         }
     }
 
-    private void redownloadMissing() {
-        if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+    private void redownloadMissing(BibDatabaseContext databaseContext) {
         LOGGER.info("Redownloading missing files");
-        stateManager.getActiveDatabase().get().getEntries().forEach(entry -> {
+        databaseContext.getEntries().forEach(entry -> {
             entry.getFiles().forEach(linkedFile -> {
                 if (linkedFile.isOnlineLink() || linkedFile.getSourceUrl().isEmpty()) {
                     return;
                 }
 
-                Optional<Path> path = FileUtil.find(databaseContext, linkedFile.getLink(), filePreferences);
+                Optional<Path> path = FileUtil.find(this.databaseContext, linkedFile.getLink(), filePreferences);
                 if (path.isPresent() && Files.exists(path.get())) {
                     return;
                 }
                 String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-                DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(databaseContext, entry,
+                DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(this.databaseContext, entry,
                         linkedFile, linkedFile.getSourceUrl(), dialogService, filePreferences, taskExecutor, fileName);
                 downloadAction.execute();
             });
