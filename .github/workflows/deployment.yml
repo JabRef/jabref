@@ -99,7 +99,7 @@ jobs:
           distribution: 'liberica'
       - name: Setup Gradle
         if: (matrix.os != 'buildjet-2vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir (macOS)
         if: (matrix.os == 'macos-latest')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
