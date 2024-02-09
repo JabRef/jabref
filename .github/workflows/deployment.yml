@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, buildjet-2vcpu-ubuntu-2204-arm]
+        os: [ubuntu-latest, windows-latest, macos-latest, buildjet-4vcpu-ubuntu-2204-arm]
         include:
           - os: ubuntu-latest
             displayName: linux
@@ -49,7 +49,7 @@ jobs:
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
           - os: macos-latest
             displayName: macOS
-          - os: buildjet-2vcpu-ubuntu-2204-arm
+          - os: buildjet-4vcpu-ubuntu-2204-arm
             displayName: linux-aarch64
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-aarch64.tar.gz && rm -R build/distribution/JabRef
     runs-on: ${{ matrix.os }}
@@ -71,28 +71,28 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
-        if: (matrix.os != 'buildjet-2vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
       - name: Change JavaFX version for aarch64
-        if: (matrix.os == 'buildjet-2vcpu-ubuntu-2204-arm') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: sed -i "s/21.0.2/22-ea+27/g" build.gradle
       - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-latest') || ((matrix.os == 'buildjet-2vcpu-ubuntu-2204-arm') && (steps.checksecrets.outputs.secretspresent == 'YES'))
+        if: (matrix.os == 'ubuntu-latest') || ((matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm') && (steps.checksecrets.outputs.secretspresent == 'YES'))
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
           version: 1.0
       - name: Install GitVersion
-        if: (matrix.os != 'buildjet-2vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
-        if: (matrix.os != 'buildjet-2vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
       - name: Setup JDK
@@ -101,7 +101,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        if: (matrix.os != 'buildjet-2vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir (macOS)
         if: (matrix.os == 'macos-latest')
