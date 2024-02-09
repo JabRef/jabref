@@ -77,6 +77,9 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Change JavaFX version for aarch64
+        if: (matrix.os == 'buildjet-2vcpu-ubuntu-2204-arm') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: sed -i "s/21.0.2/22-ea+27/g" build.gradle
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-latest') || ((matrix.os == 'buildjet-2vcpu-ubuntu-2204-arm') && (steps.checksecrets.outputs.secretspresent == 'YES'))
         uses: awalsh128/cache-apt-pkgs-action@latest
