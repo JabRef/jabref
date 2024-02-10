@@ -486,8 +486,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             downloadTask.titleProperty().set(Localization.lang("Downloading"));
-            downloadTask.messageProperty().set(
-                    Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
+            entry.getCitationKey().ifPresentOrElse(
+                    citationkey -> downloadTask.messageProperty().set(Localization.lang("Fulltext for %0", citationkey)),
+                    () -> downloadTask.messageProperty().set(Localization.lang("Fulltext for a new entry")));
             downloadTask.showToUser(true);
             downloadTask.onFailure(ex -> {
                 LOGGER.error("Error downloading from URL: " + urlDownload, ex);
