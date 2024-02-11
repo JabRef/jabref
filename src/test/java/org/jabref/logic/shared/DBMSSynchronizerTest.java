@@ -73,7 +73,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testEntryAddedEventListener() throws Exception {
+    public void entryAddedEventListener() throws Exception {
         BibEntry expectedEntry = createExampleBibEntry(1);
         BibEntry furtherEntry = createExampleBibEntry(1);
 
@@ -118,7 +118,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testEntriesRemovedEventListener() throws Exception {
+    public void entriesRemovedEventListener() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -140,7 +140,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testMetaDataChangedEventListener() throws Exception {
+    public void metaDataChangedEventListener() throws Exception {
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -154,7 +154,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testInitializeDatabases() throws Exception {
+    public void initializeDatabases() throws Exception {
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
@@ -162,7 +162,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testSynchronizeLocalDatabaseWithEntryRemoval() throws Exception {
+    public void synchronizeLocalDatabaseWithEntryRemoval() throws Exception {
         List<BibEntry> expectedBibEntries = Arrays.asList(createExampleBibEntry(1), createExampleBibEntry(2));
 
         dbmsProcessor.insertEntry(expectedBibEntries.getFirst());
@@ -184,7 +184,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws Exception {
+    public void synchronizeLocalDatabaseWithEntryUpdate() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
@@ -220,7 +220,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testApplyMetaData() throws Exception {
+    public void applyMetaData() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 

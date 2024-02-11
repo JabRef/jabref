@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
@@ -67,6 +68,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML private ListView<LinkedFileViewModel> listView;
     @FXML private JabRefIconView fulltextFetcher;
+    @FXML private ProgressIndicator progressIndicator;
 
     private final Field field;
     private final BibDatabaseContext databaseContext;
@@ -127,6 +129,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
+        progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
     }

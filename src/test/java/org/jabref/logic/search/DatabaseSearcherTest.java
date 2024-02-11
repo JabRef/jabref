@@ -27,26 +27,26 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testNoMatchesFromEmptyDatabase() {
+    public void noMatchesFromEmptyDatabase() {
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
     @Test
-    public void testNoMatchesFromEmptyDatabaseWithInvalidSearchExpression() {
+    public void noMatchesFromEmptyDatabaseWithInvalidSearchExpression() {
         List<BibEntry> matches = new DatabaseSearcher(INVALID_SEARCH_QUERY, database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
     @Test
-    public void testGetDatabaseFromMatchesDatabaseWithEmptyEntries() {
+    public void getDatabaseFromMatchesDatabaseWithEmptyEntries() {
         database.insertEntry(new BibEntry());
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
     @Test
-    public void testNoMatchesFromDatabaseWithArticleTypeEntry() {
+    public void noMatchesFromDatabaseWithArticleTypeEntry() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
@@ -55,7 +55,7 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testCorrectMatchFromDatabaseWithArticleTypeEntry() {
+    public void correctMatchFromDatabaseWithArticleTypeEntry() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
@@ -64,14 +64,14 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testNoMatchesFromEmptyDatabaseWithInvalidQuery() {
+    public void noMatchesFromEmptyDatabaseWithInvalidQuery() {
         SearchQuery query = new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
     }
 
     @Test
-    public void testCorrectMatchFromDatabaseWithIncollectionTypeEntry() {
+    public void correctMatchFromDatabaseWithIncollectionTypeEntry() {
         BibEntry entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
@@ -83,7 +83,7 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testNoMatchesFromDatabaseWithTwoEntries() {
+    public void noMatchesFromDatabaseWithTwoEntries() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
@@ -98,7 +98,7 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testNoMatchesFromDabaseWithIncollectionTypeEntry() {
+    public void noMatchesFromDabaseWithIncollectionTypeEntry() {
         BibEntry entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
@@ -110,7 +110,7 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testNoMatchFromDatabaseWithEmptyEntry() {
+    public void noMatchFromDatabaseWithEmptyEntry() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 

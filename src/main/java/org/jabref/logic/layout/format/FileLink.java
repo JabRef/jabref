@@ -34,7 +34,7 @@ public class FileLink implements ParamLayoutFormatter {
         LinkedFile link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.
-            if (!(fileList.isEmpty())) {
+            if (!fileList.isEmpty()) {
                 link = fileList.getFirst();
             }
         } else {

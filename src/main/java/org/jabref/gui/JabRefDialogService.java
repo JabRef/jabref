@@ -297,8 +297,7 @@ public class JabRefDialogService implements DialogService {
         return dialog.showAndWait();
     }
 
-    @Override
-    public <V> void showProgressDialog(String title, String content, Task<V> task) {
+    private <V> ProgressDialog createProgressDialog(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
         progressDialog.setHeaderText(null);
         progressDialog.setTitle(title);
@@ -314,7 +313,19 @@ public class JabRefDialogService implements DialogService {
             progressDialog.close();
         });
         progressDialog.initOwner(mainWindow);
+        return progressDialog;
+    }
+
+    @Override
+    public <V> void showProgressDialog(String title, String content, Task<V> task) {
+        ProgressDialog progressDialog = createProgressDialog(title, content, task);
         progressDialog.show();
+    }
+
+    @Override
+    public <V> void showProgressDialogAndWait(String title, String content, Task<V> task) {
+        ProgressDialog progressDialog = createProgressDialog(title, content, task);
+        progressDialog.showAndWait();
     }
 
     @Override

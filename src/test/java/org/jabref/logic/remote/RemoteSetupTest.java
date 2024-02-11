@@ -34,7 +34,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testGoodCase() {
+    void goodCase() {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
@@ -50,7 +50,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testGoodCaseWithAllLifecycleMethods() {
+    void goodCaseWithAllLifecycleMethods() {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
@@ -76,7 +76,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testPortAlreadyInUse() throws IOException {
+    void portAlreadyInUse() throws IOException {
         assumeFalse(OS.OS_X);
 
         final int port = 34567;
@@ -94,7 +94,7 @@ class RemoteSetupTest {
     }
 
     @Test
-    void testClientTimeout() {
+    void clientTimeout() {
         final int port = 34567;
         final String message = "MYMESSAGE";
 

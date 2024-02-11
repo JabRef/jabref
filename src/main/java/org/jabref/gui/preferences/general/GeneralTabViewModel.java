@@ -260,12 +260,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
+        // stop in all cases, because the port might have changed
+        Globals.REMOTE_LISTENER.stop();
+
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
-            Globals.REMOTE_LISTENER.stop();
         }
         trustStoreManager.flush();
 

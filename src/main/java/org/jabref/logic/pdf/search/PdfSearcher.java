@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
@@ -13,6 +14,7 @@ import org.jabref.model.strings.StringUtil;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
@@ -57,7 +59,12 @@ public final class PdfSearcher {
         List<SearchResult> resultDocs = new ArrayList<>();
         // We need to point the DirectoryReader to the indexer, because we get errors otherwise
         // Hint from https://stackoverflow.com/a/63673753/873282.
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexWriter())) {
+        Optional<IndexWriter> optionalIndexWriter = indexer.getIndexWriter();
+        if (optionalIndexWriter.isEmpty()) {
+            LOGGER.info("No index writer present, returning empty result set.");
+            return new PdfSearchResults();
+        }
+        try (IndexReader reader = DirectoryReader.open(optionalIndexWriter.get())) {
             Query query = new MultiFieldQueryParser(PDF_FIELDS, englishStemAnalyzer).parse(searchString);
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs results = searcher.search(query, maxHits);

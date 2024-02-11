@@ -25,21 +25,21 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testIsContainsBasedSearch() {
+    public void isContainsBasedSearch() {
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isContainsBasedSearch());
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isContainsBasedSearch());
     }
 
     @Test
-    public void testIsGrammarBasedSearch() {
+    public void isGrammarBasedSearch() {
         assertFalse(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isGrammarBasedSearch());
         assertFalse(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isGrammarBasedSearch());
     }
 
     @Test
-    public void testGrammarSearch() {
+    public void grammarSearch() {
         BibEntry entry = new BibEntry();
         entry.addKeyword("one two", ',');
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", EnumSet.noneOf(SearchFlags.class));
@@ -47,7 +47,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testGrammarSearchFullEntryLastCharMissing() {
+    public void grammarSearchFullEntryLastCharMissing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "systematic revie");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", EnumSet.noneOf(SearchFlags.class));
@@ -55,7 +55,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testGrammarSearchFullEntry() {
+    public void grammarSearchFullEntry() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "systematic review");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", EnumSet.noneOf(SearchFlags.class));
@@ -63,7 +63,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSearchingForOpenBraketInBooktitle() {
+    public void searchingForOpenBraketInBooktitle() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.BOOKTITLE, "Super Conference (SC)");
 
@@ -72,7 +72,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSearchMatchesSingleKeywordNotPart() {
+    public void searchMatchesSingleKeywordNotPart() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -81,7 +81,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSearchMatchesSingleKeyword() {
+    public void searchMatchesSingleKeyword() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -90,7 +90,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSearchAllFields() {
+    public void searchAllFields() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
@@ -100,7 +100,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSearchAllFieldsNotForSpecificField() {
+    public void searchAllFieldsNotForSpecificField() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
@@ -110,7 +110,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSearchAllFieldsAndSpecificField() {
+    public void searchAllFieldsAndSpecificField() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
@@ -120,7 +120,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testIsMatch() {
+    public void isMatch() {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "asdf");
@@ -131,52 +131,52 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testIsValidQueryNotAsRegEx() {
+    public void isValidQueryNotAsRegEx() {
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void testIsValidQueryContainsBracketNotAsRegEx() {
+    public void isValidQueryContainsBracketNotAsRegEx() {
         assertTrue(new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void testIsNotValidQueryContainsBracketNotAsRegEx() {
+    public void isNotValidQueryContainsBracketNotAsRegEx() {
         assertTrue(new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void testIsValidQueryAsRegEx() {
+    public void isValidQueryAsRegEx() {
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void testIsValidQueryWithNumbersAsRegEx() {
+    public void isValidQueryWithNumbersAsRegEx() {
         assertTrue(new SearchQuery("123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void testIsValidQueryContainsBracketAsRegEx() {
+    public void isValidQueryContainsBracketAsRegEx() {
         assertTrue(new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void testIsValidQueryWithEqualSignAsRegEx() {
+    public void isValidQueryWithEqualSignAsRegEx() {
         assertTrue(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void testIsValidQueryWithNumbersAndEqualSignAsRegEx() {
+    public void isValidQueryWithNumbersAndEqualSignAsRegEx() {
         assertTrue(new SearchQuery("author=123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void testIsValidQueryWithEqualSignNotAsRegEx() {
+    public void isValidQueryWithEqualSignNotAsRegEx() {
         assertTrue(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
+    public void isValidQueryWithNumbersAndEqualSignNotAsRegEx() {
         assertTrue(new SearchQuery("author=123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
@@ -191,7 +191,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testSimpleTerm() {
+    public void simpleTerm() {
         String query = "progress";
 
         SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
@@ -199,7 +199,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testGetPattern() {
+    public void getPattern() {
         String query = "progress";
         SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
         Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
@@ -208,7 +208,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testGetRegexpPattern() {
+    public void getRegexpPattern() {
         String queryText = "[a-c]\\d* \\d*";
         SearchQuery regexQuery = new SearchQuery(queryText, EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
@@ -216,7 +216,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testGetRegexpJavascriptPattern() {
+    public void getRegexpJavascriptPattern() {
         String queryText = "[a-c]\\d* \\d*";
         SearchQuery regexQuery = new SearchQuery(queryText, EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
@@ -224,7 +224,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testEscapingInPattern() {
+    public void escapingInPattern() {
         // first word contain all java special regex characters
         String queryText = "<([{\\\\^-=$!|]})?*+.> word1 word2.";
         SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, EnumSet.noneOf(SearchFlags.class));
@@ -233,7 +233,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testEscapingInJavascriptPattern() {
+    public void escapingInJavascriptPattern() {
         // first word contain all javascript special regex characters that should be escaped individually in text based search
         String queryText = "([{\\\\^$|]})?*+./ word1 word2.";
         SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, EnumSet.noneOf(SearchFlags.class));

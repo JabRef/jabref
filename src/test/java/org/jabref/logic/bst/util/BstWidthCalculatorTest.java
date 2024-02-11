@@ -39,7 +39,7 @@ public class BstWidthCalculatorTest {
 
     @ParameterizedTest
     @MethodSource("provideTestWidth")
-    public void testWidth(int i, String str) {
+    public void width(int i, String str) {
         assertEquals(i, BstWidthCalculator.width(str));
     }
 
@@ -59,7 +59,7 @@ public class BstWidthCalculatorTest {
 
     @ParameterizedTest
     @MethodSource("provideTestGetCharWidth")
-    public void testGetCharWidth(int i, Character c) {
+    public void getCharWidth(int i, Character c) {
         assertEquals(i, BstWidthCalculator.getCharWidth(c));
     }
 

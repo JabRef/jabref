@@ -84,14 +84,14 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    void testParsingEmptyOrFieldsReturnsEmptyCollections() {
+    void parsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getRequiredFields());
     }
 
     @Test
-    void testParsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
+    void parsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 Collections.emptySet(),

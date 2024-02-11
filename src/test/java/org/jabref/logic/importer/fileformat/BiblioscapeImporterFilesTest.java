@@ -19,13 +19,13 @@ public class BiblioscapeImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    public void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new BiblioscapeImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new BiblioscapeImporter(), fileName, FILE_ENDING);
     }
 }

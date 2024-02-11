@@ -27,7 +27,7 @@ public class ContainsBasedSearchRuleTest {
     private final RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
     @Test
-    public void testContentOfSingleField() {
+    public void contentOfSingleField() {
         String query = "\"marine larviculture\"";
 
         assertFalse(bsCaseSensitive.applyRule(query, be));
@@ -37,7 +37,7 @@ public class ContainsBasedSearchRuleTest {
     }
 
     @Test
-    public void testContentDistributedOnMultipleFields() {
+    public void contentDistributedOnMultipleFields() {
         String query = "marine 2001 shields";
 
         assertFalse(bsCaseSensitive.applyRule(query, be));
@@ -47,7 +47,7 @@ public class ContainsBasedSearchRuleTest {
     }
 
     @Test
-    public void testRegularExpressionMatch() {
+    public void regularExpressionMatch() {
         String query = "marine [A-Za-z]* larviculture";
 
         assertFalse(bsCaseSensitive.applyRule(query, be));

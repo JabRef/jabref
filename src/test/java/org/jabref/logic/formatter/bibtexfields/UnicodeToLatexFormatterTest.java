@@ -30,7 +30,7 @@ class UnicodeToLatexFormatterTest {
 
     @ParameterizedTest()
     @MethodSource("testCases")
-    void testFormat(String expectedResult, String input) {
+    void format(String expectedResult, String input) {
         assertEquals(expectedResult, formatter.format(input));
     }
 }

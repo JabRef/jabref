@@ -37,7 +37,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -47,7 +47,7 @@ jobs:
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
           checkstyle_version: '10.3'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
   openrewrite:
@@ -62,10 +62,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
@@ -81,10 +81,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -100,7 +100,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v14
+        uses: DavidAnson/markdownlint-cli2-action@v15
         with:
           globs: |
             *.md
@@ -163,10 +163,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -199,10 +199,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -237,10 +237,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -282,10 +282,10 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
+          java-version: 21.0.2
           distribution: 'liberica'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -293,7 +293,7 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -306,7 +306,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/wrapper-validation-action@v2
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts

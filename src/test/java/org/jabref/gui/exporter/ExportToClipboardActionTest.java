@@ -73,7 +73,7 @@ public class ExportToClipboardActionTest {
     }
 
     @Test
-    public void testExecuteIfNoSelectedEntries() {
+    public void executeIfNoSelectedEntries() {
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
 
         exportToClipboardAction.execute();
@@ -81,7 +81,7 @@ public class ExportToClipboardActionTest {
     }
 
     @Test
-    public void testExecuteOnSuccess() {
+    public void executeOnSuccess() {
         Exporter selectedExporter = new Exporter("html", "HTML", StandardFileType.HTML) {
             @Override
             public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) {

@@ -54,7 +54,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
-        // TODO: Implement jump to entry
+        // TODO: Implement jump to entry - The implementation can be based on <a href="org.jabref.gui.JabRefFrame.jumpToEntry">JabRefFrame.jumpToEntry</a>
         // TODO: Add toolitp for tag: Localization.lang("Jump to entry")
         // This feature was removed while converting the linked entries editor to JavaFX
         // Right now there is no nice way to re-implement it as we have no good interface to control the focus of the main table

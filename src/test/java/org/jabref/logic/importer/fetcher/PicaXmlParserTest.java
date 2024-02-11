@@ -45,7 +45,7 @@ public class PicaXmlParserTest {
     }
 
     @Test
-    public void testGMP() throws Exception {
+    public void gMP() throws Exception {
         doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }
 
