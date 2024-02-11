@@ -25,6 +25,7 @@ public class TestArchitectureTest {
                    .and().doNotHaveSimpleName("PreferencesMigrationsTest")
                    .and().doNotHaveSimpleName("SaveDatabaseActionTest")
                    .and().doNotHaveSimpleName("UpdateTimestampListenerTest")
+                   .and().doNotHaveSimpleName("DatabaseSearcherWithBibFilesTest")
                    .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
                    .and().doNotHaveFullyQualifiedName("org.jabref.testutils.interactive.styletester.StyleTesterMain")
                    .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)

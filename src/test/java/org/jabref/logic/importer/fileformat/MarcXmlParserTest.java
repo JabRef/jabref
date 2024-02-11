@@ -29,13 +29,13 @@ public class MarcXmlParserTest {
             MarcXmlParser parser = new MarcXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
-            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.get(0));
+            BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.getFirst());
         }
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    public void importEntries(String fileName) throws Exception {
         String bibName = FileUtil.getBaseName(fileName) + ".bib";
         doTest(fileName, bibName);
     }

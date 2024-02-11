@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -105,7 +106,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnDefaultBiblatex() {
+    void typeBasedOnDefaultBiblatex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
@@ -114,7 +115,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnDefaultBibtex() {
+    void typeBasedOnDefaultBibtex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
@@ -123,7 +124,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testTypeBasedOnInferredModeBiblatex() {
+    void typeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
         BibEntry e1 = new BibEntry(IEEETranEntryType.Electronic);
         db.insertEntry(e1);
@@ -133,7 +134,7 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testGetFullTextIndexPathWhenPathIsNull() {
+    void getFullTextIndexPathWhenPathIsNull() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(null);
 
@@ -144,15 +145,17 @@ class BibDatabaseContextTest {
     }
 
     @Test
-    void testGetFullTextIndexPathWhenPathIsNotNull() {
+    void getFullTextIndexPathWhenPathIsNotNull() {
         Path existingPath = Path.of("some_path.bib");
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(existingPath);
 
-        Path expectedPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory().resolve(existingPath.hashCode() + "");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+        assertNotNull(actualPath);
 
-        assertEquals(expectedPath, actualPath);
+        String fulltextIndexBaseDirectory = OS.getNativeDesktop().getFulltextIndexBaseDirectory().toString();
+        String actualPathStart = actualPath.toString().substring(0, fulltextIndexBaseDirectory.length());
+        assertEquals(fulltextIndexBaseDirectory, actualPathStart);
     }
 }

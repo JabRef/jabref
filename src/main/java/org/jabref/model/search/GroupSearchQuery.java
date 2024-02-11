@@ -22,7 +22,7 @@ public class GroupSearchQuery implements SearchMatcher {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s)", query, getCaseSensitiveDescription(),
+        return "\"%s\" (%s, %s)".formatted(query, getCaseSensitiveDescription(),
                 getRegularExpressionDescription());
     }
 

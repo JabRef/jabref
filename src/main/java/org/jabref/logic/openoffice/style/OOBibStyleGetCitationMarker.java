@@ -444,7 +444,7 @@ class OOBibStyleGetCitationMarker {
 
             final boolean isUnresolved = entry.getLookupResult().isEmpty();
             if (isUnresolved) {
-                stringBuilder.append(String.format("Unresolved(%s)", entry.getCitationKey()));
+                stringBuilder.append("Unresolved(%s)".formatted(entry.getCitationKey()));
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
                     stringBuilder.append(pageInfoPart);
                 }
@@ -642,7 +642,7 @@ class OOBibStyleGetCitationMarker {
         int i_out = 0;
 
         if (nEntries > 0) {
-            filteredCitationMarkerEntries.add(citationMarkerEntries.get(0));
+            filteredCitationMarkerEntries.add(citationMarkerEntries.getFirst());
             startsNewGroup[i_out] = true;
             i_out++;
         }

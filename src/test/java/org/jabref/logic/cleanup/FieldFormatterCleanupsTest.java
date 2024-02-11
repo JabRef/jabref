@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.formatter.IdentityFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
@@ -18,11 +19,15 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -72,7 +77,7 @@ public class FieldFormatterCleanupsTest {
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, FieldFormatterCleanups.parse("title[lower_case]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter());
-        assertEquals(Collections.singletonList(lowerCaseTitle), actions.getConfiguredActions());
+        assertEquals(List.of(lowerCaseTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
@@ -310,6 +315,24 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
+    void identityCanBeParsed() {
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanups.parse("""
+                all-text-fields[identity]
+                date[normalize_date]
+                month[normalize_month]
+                pages[normalize_page_numbers]
+                """);
+        assertEquals(
+                List.of(
+                        new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new IdentityFormatter()),
+                        new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter())
+                ),
+                fieldFormatterCleanups);
+    }
+
+    @Test
     void getMetaDataStringWorks() {
         assertEquals("""
                 pages[normalize_page_numbers]
@@ -329,8 +352,16 @@ public class FieldFormatterCleanupsTest {
                 """));
     }
 
-    @Test
-    void formatterFromString() {
-        assertEquals(new ReplaceUnicodeLigaturesFormatter(), FieldFormatterCleanups.getFormatterFromString("replace_unicode_ligatures"));
+    public static Stream<Arguments> formatterFromString() {
+        return Stream.of(
+                Arguments.of(new ReplaceUnicodeLigaturesFormatter(), "replace_unicode_ligatures"),
+                Arguments.of(new LowerCaseFormatter(), "lower_case")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void formatterFromString(Formatter expected, String input) {
+        assertEquals(expected, FieldFormatterCleanups.getFormatterFromString(input));
     }
 }

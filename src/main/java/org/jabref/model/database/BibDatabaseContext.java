@@ -16,11 +16,13 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +163,7 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. BIB file directory or Main file directory
+        // 3. BIB file directory or main file directory
         // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
         // (in the metadata of the bib file)
         if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -225,7 +227,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+        if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
             dbmsListener.shutdown();
         }
@@ -237,12 +239,18 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    /**
+     * @return The path to store the lucene index files. One directory for each library.
+     */
+    @NonNull
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            Path databaseFileName = getDatabasePath().get().getFileName();
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
+            indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
         }
@@ -261,5 +269,21 @@ public class BibDatabaseContext {
                 ", biblatexMode=" + isBiblatexMode() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabaseContext that)) {
+            return false;
+        }
+        return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(database, metaData, path, location);
     }
 }

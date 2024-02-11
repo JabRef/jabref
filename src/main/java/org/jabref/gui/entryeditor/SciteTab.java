@@ -26,7 +26,7 @@ import org.controlsfx.control.HyperlinkLabel;
 
 public class SciteTab extends EntryEditorTab {
 
-    public static final String NAME = "Scite";
+    public static final String NAME = "Citation information";
     public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
 
     private final GridPane sciteResultsPane;
@@ -93,13 +93,13 @@ public class SciteTab extends EntryEditorTab {
     private VBox getTalliesPane(SciteTallyModel tallModel) {
         Label titleLabel = new Label(Localization.lang("Tallies for %0", tallModel.doi()));
         titleLabel.getStyleClass().add("scite-tallies-label");
-        Text message = new Text(String.format("Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d",
-            tallModel.total(),
-            tallModel.supporting(),
-            tallModel.contradicting(),
-            tallModel.mentioning(),
-            tallModel.unclassified(),
-            tallModel.citingPublications()
+        Text message = new Text("Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d".formatted(
+                tallModel.total(),
+                tallModel.supporting(),
+                tallModel.contradicting(),
+                tallModel.mentioning(),
+                tallModel.unclassified(),
+                tallModel.citingPublications()
         ));
 
         String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);

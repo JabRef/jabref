@@ -108,8 +108,8 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
         }
 
         // Page numbers
-        if (springerJsonEntry.has("startingPage") && !(springerJsonEntry.getString("startingPage").isEmpty())) {
-            if (springerJsonEntry.has("endingPage") && !(springerJsonEntry.getString("endingPage").isEmpty())) {
+        if (springerJsonEntry.has("startingPage") && !springerJsonEntry.getString("startingPage").isEmpty()) {
+            if (springerJsonEntry.has("endingPage") && !springerJsonEntry.getString("endingPage").isEmpty()) {
                 entry.setField(StandardField.PAGES,
                         springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endingPage"));
             } else {

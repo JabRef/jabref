@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AuthorFirstAbbrLastCommasTest {
 
     @Test
-    public void testFormat() {
+    public void format() {
         LayoutFormatter a = new AuthorFirstAbbrLastCommas();
 
         // Empty case

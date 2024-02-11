@@ -16,7 +16,7 @@ public class DoiDecodeCleanupTest {
 
     @ParameterizedTest
     @MethodSource("provideDoiForAllLowers")
-    public void testChangeDoi(BibEntry expected, BibEntry doiInfoField) {
+    public void changeDoi(BibEntry expected, BibEntry doiInfoField) {
         DoiCleanup cleanUp = new DoiCleanup();
         cleanUp.cleanup(doiInfoField);
 

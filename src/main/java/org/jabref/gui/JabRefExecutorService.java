@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.pdf.search.PdfIndexerManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,6 +147,8 @@ public class JabRefExecutorService {
 
         gracefullyShutdown(this.executorService);
         gracefullyShutdown(this.lowPriorityExecutorService);
+
+        PdfIndexerManager.shutdownAllIndexers();
 
         timer.cancel();
     }

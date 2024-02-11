@@ -88,7 +88,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyHostnameValidator = new FunctionBasedValidator<>(
                 proxyHostnameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a hostname"))));
@@ -96,7 +96,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPortValidator = new FunctionBasedValidator<>(
                 proxyPortProperty,
                 input -> getPortAsInt(input).isPresent(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a port"))));
@@ -104,7 +104,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUsernameValidator = new FunctionBasedValidator<>(
                 proxyUsernameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a username"))));
@@ -112,7 +112,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPasswordValidator = new FunctionBasedValidator<>(
                 proxyPasswordProperty,
                 input -> !input.isBlank(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
@@ -322,6 +322,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private String formatCustomAlias(String thumbprint) {
-        return String.format("%s[custom]", thumbprint);
+        return "%s[custom]".formatted(thumbprint);
     }
 }

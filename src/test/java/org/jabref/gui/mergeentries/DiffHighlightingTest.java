@@ -29,17 +29,17 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingBothNullThrowsNPE() {
+    void generateDiffHighlightingBothNullThrowsNPE() {
         Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
     }
 
     @Test
-    void testNullSeparatorThrowsNPE() {
+    void nullSeparatorThrowsNPE() {
         Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
     }
 
     @Test
-    void testGenerateDiffHighlightingNoDiff() {
+    void generateDiffHighlightingNoDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forUnchanged("f"),
@@ -50,7 +50,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordAddTextWordDiff() {
+    void generateDiffHighlightingSingleWordAddTextWordDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forRemoved("foo "),
@@ -60,7 +60,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordAddTextCharacterDiff() {
+    void generateDiffHighlightingSingleWordAddTextCharacterDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forUnchanged("f"),
@@ -72,7 +72,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordDeleteTextWordDiff() {
+    void generateDiffHighlightingSingleWordDeleteTextWordDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forRemoved("foobar "),
@@ -82,7 +82,7 @@ class DiffHighlightingTest {
     }
 
     @Test
-    void testGenerateDiffHighlightingSingleWordDeleteTextCharacterDiff() {
+    void generateDiffHighlightingSingleWordDeleteTextCharacterDiff() {
         assertEquals(
                 Arrays.asList(
                         DiffHighlighting.forUnchanged("f"),

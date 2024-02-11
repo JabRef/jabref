@@ -27,7 +27,7 @@ public class BvbFetcherTest {
     BibEntry bibEntryISBN9783960886402;
 
     @Test
-    void testPerformTest() throws Exception {
+    void performTest() throws Exception {
         String searchquery = "effective java author:bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
         assertFalse(result.isEmpty());
@@ -69,7 +69,7 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("Bibliotheksverbund Bayern (Experimental)", fetcher.getName());
     }
 
@@ -90,14 +90,14 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
+    public void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
-        assertEquals(bibEntryISBN9783960886402, searchResult.get(0));
+        assertEquals(bibEntryISBN9783960886402, searchResult.getFirst());
         assertEquals(bibEntryISBN0134685997, searchResult.get(1));
     }
 
     @Test
-    public void testPerformSearchEmpty() throws FetcherException {
+    public void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }

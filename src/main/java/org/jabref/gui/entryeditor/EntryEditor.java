@@ -45,7 +45,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -283,9 +283,10 @@ public class EntryEditor extends BorderPane {
         // "Special" tabs
         entryEditorTabs.add(new MathSciNetTab());
         entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
-        entryEditorTabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
+        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
         entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext,
-                undoManager, stateManager, fileMonitor, preferencesService, libraryTab));
+                undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
+        entryEditorTabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
 
         sourceTab = new SourceTab(
                 databaseContext,
@@ -302,8 +303,6 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
-
-        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
 
         return entryEditorTabs;
     }

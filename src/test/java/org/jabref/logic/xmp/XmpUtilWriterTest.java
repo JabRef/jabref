@@ -94,7 +94,7 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
 
-        BibEntry entryWritten = entriesWritten.get(0);
+        BibEntry entryWritten = entriesWritten.getFirst();
         entryWritten.clearField(StandardField.FILE);
         entry.clearField(StandardField.FILE);
 
@@ -117,7 +117,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void testWriteTwoBibEntries(@TempDir Path tempDir) throws Exception {
+    void writeTwoBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeTwo.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
@@ -132,7 +132,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void testWriteThreeBibEntries(@TempDir Path tempDir) throws Exception {
+    void writeThreeBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeThree.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);

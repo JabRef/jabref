@@ -44,7 +44,7 @@ public class MergeEntriesAction extends SimpleCommand {
         }
 
         // Store the two entries
-        BibEntry one = selectedEntries.get(0);
+        BibEntry one = selectedEntries.getFirst();
         BibEntry two = selectedEntries.get(1);
 
         // compare two entries

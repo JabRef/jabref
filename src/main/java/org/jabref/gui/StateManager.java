@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -31,7 +30,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.util.OptionalUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -142,11 +140,6 @@ public class StateManager {
         } else {
             activeDatabaseProperty().set(Optional.of(database));
         }
-    }
-
-    public List<BibEntry> getEntriesInCurrentDatabase() {
-        return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
-                           .collect(Collectors.toList());
     }
 
     public void clearSearchQuery() {

@@ -36,6 +36,6 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleYear(String year) {
-        return String.format("year:%s", year);
+        return "year:%s".formatted(year);
     }
 }

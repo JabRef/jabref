@@ -29,42 +29,42 @@ public class MrDLibImporterTest {
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry", importer.getDescription());
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("MrDLibImporter", importer.getName());
     }
 
     @Test
-    public void testGetFileExtention() {
+    public void getFileExtention() {
         assertEquals(StandardFileType.JSON, importer.getFileType());
     }
 
     @Test
-    public void testImportDatabaseIsYearSetCorrectly() throws IOException {
+    public void importDatabaseIsYearSetCorrectly() throws IOException {
         ParserResult parserResult = importer.importDatabase(input);
 
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
 
         assertEquals("2006",
-                resultList.get(0).getFieldLatexFree(StandardField.YEAR).get());
+                resultList.getFirst().getFieldLatexFree(StandardField.YEAR).get());
     }
 
     @Test
-    public void testImportDatabaseIsTitleSetCorrectly() throws IOException {
+    public void importDatabaseIsTitleSetCorrectly() throws IOException {
         ParserResult parserResult = importer.importDatabase(input);
 
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
 
         assertEquals("The protection of rural lands with the spatial development strategy on the case of Hrastnik commune",
-                resultList.get(0).getFieldLatexFree(StandardField.TITLE).get());
+                resultList.getFirst().getFieldLatexFree(StandardField.TITLE).get());
     }
 
     @Test
-    public void testImportDatabaseMin() throws IOException {
+    public void importDatabaseMin() throws IOException {
         ParserResult parserResult = importer.importDatabase(input);
 
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();

@@ -144,8 +144,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         new ViewModelListCellFactory<DiffMode>()
                 .withText(DiffMode::getDisplayText)
                 .install(diffMode);
-        diffMode.setValue(preferences.getGuiPreferences().getMergeDiffMode());
-        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> preferences.getGuiPreferences().setMergeDiffMode(mode));
+        diffMode.setValue(preferences.getMergeDialogPreferences().getMergeDiffMode());
+        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> preferences.getMergeDialogPreferences().setMergeDiffMode(mode));
     }
 
     private void addColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn) {

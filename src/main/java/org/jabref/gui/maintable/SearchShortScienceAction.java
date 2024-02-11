@@ -41,9 +41,9 @@ public class SearchShortScienceAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
-            ExternalLinkCreator.getShortScienceSearchURL(bibEntries.get(0)).ifPresent(url -> {
+            ExternalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
-                    JabRefDesktop.openExternalViewer(databaseContext, preferencesService, url, StandardField.URL, dialogService, bibEntries.get(0));
+                    JabRefDesktop.openExternalViewer(databaseContext, preferencesService, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open ShortScience."), ex);
                 }

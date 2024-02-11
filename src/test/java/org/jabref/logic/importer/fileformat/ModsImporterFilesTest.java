@@ -32,13 +32,13 @@ class ModsImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void testIsRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new ModsImporter(importFormatPreferences), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void testImportEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new ModsImporter(importFormatPreferences), fileName, FILE_ENDING);
     }
 }

@@ -157,7 +157,7 @@ public class BibtexExtractor {
             nonDigitParts++;
         }
         if (nonDigitParts > 0) {
-            title = lastParts.get(0);
+            title = lastParts.getFirst();
         }
         if (nonDigitParts > 1) {
             journalOrPublisher = lastParts.get(1);

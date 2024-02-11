@@ -22,7 +22,7 @@ public class HTMLCharacterCheckerTest {
     private final BibEntry entry = new BibEntry();
 
     @Test
-    void testSettingNullThrowsNPE() {
+    void settingNullThrowsNPE() {
         assertThrows(
                 NullPointerException.class,
                 () -> entry.setField(StandardField.AUTHOR, null)

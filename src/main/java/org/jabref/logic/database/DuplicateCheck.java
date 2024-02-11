@@ -154,14 +154,14 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {
-        final Optional<String> optionalStringOne = one.getField(field);
-        final Optional<String> optionalStringTwo = two.getField(field);
-        if (!optionalStringOne.isPresent()) {
-            if (!optionalStringTwo.isPresent()) {
+        final Optional<String> optionalStringOne = one.getFieldLatexFree(field);
+        final Optional<String> optionalStringTwo = two.getFieldLatexFree(field);
+        if (optionalStringOne.isEmpty()) {
+            if (optionalStringTwo.isEmpty()) {
                 return EMPTY_IN_BOTH;
             }
             return EMPTY_IN_ONE;
-        } else if (!optionalStringTwo.isPresent()) {
+        } else if (optionalStringTwo.isEmpty()) {
             return EMPTY_IN_TWO;
         }
 
