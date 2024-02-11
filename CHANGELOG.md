@@ -20,7 +20,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We Added a test case MSBibExportFormatFilesTest to ensure proper functioning of the MSBib export format.[#10864] (`https://github.com/JabRef/jabref/pull/10864/commits`)
 - The "Automatically open folders of attached files" preference default status has been changed to enabled on Windows. [koppor#56](https://github.com/koppor/jabref/issues/56)
 - The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
 - The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
@@ -29,6 +28,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Sub libraries based on `aux` file can now also be generated if some citations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
 - We rearranged the tab order in the entry editor and renamed the "Scite Tab" to "Citation information". [#10821](https://github.com/JabRef/jabref/issues/10821)
 - We made the command "Push to TexShop" more robust to allow cite commands with a character before the first slash [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699/17?u=siedlerchr)
+- We only show the notification "Saving library..." if the library contains more than 2000 entries [#9803](https://github.com/JabRef/jabref/issues/9803)
+
 
 ### Fixed
 
@@ -40,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
 - We fixed an issue where the CrossRef field did not work if autocompletion was disabled [#8145](https://github.com/JabRef/jabref/issues/8145)
+- We fixed an issue where exporting`@electronic` and `@online` entry types to the Office XMl would duplicate the field `title`  [#10807](https://github.com/JabRef/jabref/issues/10807)
 
 ### Removed
 
