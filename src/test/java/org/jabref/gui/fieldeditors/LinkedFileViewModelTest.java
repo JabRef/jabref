@@ -22,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
+import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -226,9 +227,9 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
+        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(databaseContext, entry, linkedFile, linkedFile.getLink(), dialogService, preferences.getFilePreferences(), new CurrentThreadTaskExecutor());
 
-        BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
+        BackgroundTask<Path> task = downloadLinkedFileAction.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
         task.onSuccess(destination -> {
             LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), filePreferences);
             assertEquals("asdf.pdf", newLinkedFile.getLink());

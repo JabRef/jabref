@@ -21,6 +21,7 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -175,6 +176,17 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         if (isDuplicate) {
             destination = targetDirectory.resolve(
                     FileNameUniqueness.eraseDuplicateMarks(destination.getFileName()));
+        }
+
+        if (linkedFile.getFileType().equals("URL")) {
+            String fileExtension = FileUtil.getFileExtension(destination).orElse("");
+            ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
+                                                                  .orElse(new UnknownExternalFileType(fileExtension));
+            linkedFile.setFileType(suggestedFileType.getName());
+        }
+
+        if (linkedFile.getSourceUrl().isEmpty()) {
+            linkedFile.setSourceURL(linkedFile.getLink());
         }
 
         linkedFile.setLink(FileUtil.relativize(destination,
