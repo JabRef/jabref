@@ -178,17 +178,20 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                     FileNameUniqueness.eraseDuplicateMarks(destination.getFileName()));
         }
 
-        if (linkedFile.getFileType().equals("URL")) {
+        // If the file type was set to URL because it was a link, try to find a more suitable type now
+        if (linkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
             String fileExtension = FileUtil.getFileExtension(destination).orElse("");
             ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
                                                                   .orElse(new UnknownExternalFileType(fileExtension));
             linkedFile.setFileType(suggestedFileType.getName());
         }
 
+        // Store the download url to the source URL
         if (linkedFile.getSourceUrl().isEmpty()) {
             linkedFile.setSourceURL(linkedFile.getLink());
         }
 
+        // Set the linked file's link to the downloaded file's path
         linkedFile.setLink(FileUtil.relativize(destination,
                 databaseContext.getFileDirectories(filePreferences)).toString());
 
