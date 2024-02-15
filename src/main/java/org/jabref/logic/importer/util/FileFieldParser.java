@@ -137,6 +137,9 @@ public class FileFieldParser {
      *
      * SIDE EFFECT: The given entry list is cleared upon completion
      *
+     * Expected format is: description:link:fileType:mediaType:sourceURL
+     * mediaType is not currently used, but documented here for reference to backwards compatibility
+     *
      * @param entry the list of elements in the linked file textual representation
      * @return a LinkedFile object
      */
@@ -172,8 +175,8 @@ public class FileFieldParser {
             }
         }
 
-        if (entry.size() > 3) {
-            field.setSourceURL(entry.get(3));
+        if (entry.size() > 4) {
+            field.setSourceURL(entry.get(4));
         }
 
         // link is the only mandatory field

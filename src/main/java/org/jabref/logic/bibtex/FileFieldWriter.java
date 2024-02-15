@@ -20,7 +20,7 @@ public class FileFieldWriter {
             if (StringUtil.isNullOrEmpty(entry.getSourceUrl())) {
                 array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
             } else {
-                array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType(), entry.getSourceUrl()};
+                array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType(), "", entry.getSourceUrl()};
             }
             i++;
         }
