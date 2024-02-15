@@ -33,8 +33,9 @@ import static org.mockito.Mockito.when;
 
 class DownloadLinkedFileActionTest {
     private BibEntry entry;
-    private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);;
-    private DialogService dialogService;
+
+    private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+    private final DialogService dialogService = mock(DialogService.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final PreferencesService preferences = mock(PreferencesService.class);
 
@@ -42,8 +43,6 @@ class DownloadLinkedFileActionTest {
     void setUp(@TempDir Path tempFolder) throws Exception {
         entry = new BibEntry()
                 .withCitationKey("asdf");
-
-        dialogService = mock(DialogService.class);
 
         when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
