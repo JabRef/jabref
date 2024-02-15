@@ -421,18 +421,34 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(databaseContext, entry, linkedFile,
-                linkedFile.getSourceUrl(), dialogService, preferencesService.getFilePreferences(), taskExecutor, fileName, downloadProgress);
+        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
+                databaseContext,
+                entry,
+                linkedFile,
+                linkedFile.getSourceUrl(),
+                dialogService,
+                preferencesService.getFilePreferences(),
+                taskExecutor,
+                fileName);
+        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
     }
 
     public void download() {
+        LOGGER.info("Downloading file from " + linkedFile.getSourceUrl());
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
         }
 
-        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(databaseContext, entry, linkedFile,
-                linkedFile.getLink(), dialogService, preferencesService.getFilePreferences(), taskExecutor, downloadProgress);
+        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
+                databaseContext,
+                entry,
+                linkedFile,
+                linkedFile.getLink(),
+                dialogService,
+                preferencesService.getFilePreferences(),
+                taskExecutor);
+        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
     }
 

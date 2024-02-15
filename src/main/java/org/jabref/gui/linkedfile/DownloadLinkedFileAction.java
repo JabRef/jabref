@@ -12,7 +12,8 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.concurrent.Task;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -54,7 +55,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
     private final BibDatabaseContext databaseContext;
 
-    private final DoubleProperty downloadProgress;
+    private final DoubleProperty downloadProgress = new SimpleDoubleProperty();
     private final LinkedFileHandler linkedFileHandler;
 
     public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
@@ -64,8 +65,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor,
-                                    String suggestedName,
-                                    DoubleProperty downloadProgress) {
+                                    String suggestedName) {
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.linkedFile = linkedFile;
@@ -74,7 +74,6 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
-        this.downloadProgress = downloadProgress;
 
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
     }
@@ -267,7 +266,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
                 .onFailure(ex -> LOGGER.error("Error in download", ex))
-                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier));
+                .onFinished(() -> {
+                    URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier);
+                    downloadProgress.unbind();
+                    downloadProgress.set(1);
+                });
     }
 
     private Optional<ExternalFileType> inferFileType(URLDownload urlDownload) {
@@ -294,5 +297,33 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
         return URLUtil.getSuffix(url, filePreferences)
                       .flatMap(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences));
+    }
+
+    public ReadOnlyDoubleProperty downloadProgress() {
+        return downloadProgress;
+    }
+
+    private static class FileDownloadTask extends BackgroundTask<Path> {
+        private final URL source;
+        private final Path destination;
+
+        public FileDownloadTask(URL source, Path destination) {
+            this.source = source;
+            this.destination = destination;
+        }
+
+        @Override
+        protected Path call() throws Exception {
+            URLDownload download = new URLDownload(source);
+            try (ProgressInputStream inputStream = download.asInputStream()) {
+                EasyBind.subscribe(
+                        inputStream.totalNumBytesReadProperty(),
+                        bytesRead -> updateProgress(bytesRead.longValue(), inputStream.getMaxNumBytes()));
+                // Make sure directory exists since otherwise copy fails
+                Files.createDirectories(destination.getParent());
+                Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
+            }
+            return destination;
+        }
     }
 }
