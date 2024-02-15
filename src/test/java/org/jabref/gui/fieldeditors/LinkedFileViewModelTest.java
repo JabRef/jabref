@@ -8,8 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -22,12 +20,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
-import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -37,7 +32,6 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -198,45 +192,6 @@ class LinkedFileViewModelTest {
         viewModel.download();
 
         verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
-    }
-
-    @FetcherTest
-    @Test
-    void downloadOfFileReplacesLink(@TempDir Path tempFolder) throws Exception {
-        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
-        entry.setFiles(new ArrayList<>(List.of(linkedFile)));
-
-        databaseContext = mock(BibDatabaseContext.class);
-        when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
-
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-        viewModel.download();
-
-        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF")), entry.getFiles());
-    }
-
-    @FetcherTest
-    @Test
-    void downloadDoesNotOverwriteFileTypeExtension() throws Exception {
-        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
-
-        databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
-
-        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(databaseContext, entry, linkedFile, linkedFile.getLink(), dialogService, preferences.getFilePreferences(), new CurrentThreadTaskExecutor());
-
-        BackgroundTask<Path> task = downloadLinkedFileAction.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
-        task.onSuccess(destination -> {
-            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), filePreferences);
-            assertEquals("asdf.pdf", newLinkedFile.getLink());
-            assertEquals("PDF", newLinkedFile.getFileType());
-        });
-        task.onFailure(Assertions::fail);
-        new CurrentThreadTaskExecutor().execute(task);
     }
 
     @FetcherTest
