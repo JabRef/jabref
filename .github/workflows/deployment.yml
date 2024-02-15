@@ -88,13 +88,13 @@ jobs:
           version: 1.0
       - name: Install GitVersion
         if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: gittools/actions/gitversion/setup@v0.10.2
+        uses: gittools/actions/gitversion/setup@v0.11.0
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm') || (steps.checksecrets.outputs.secretspresent == 'YES')
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.10.2
+        uses: gittools/actions/gitversion/execute@v0.11.0
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:

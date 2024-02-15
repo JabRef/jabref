@@ -27,7 +27,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.8.1'
+    id 'org.openrewrite.rewrite' version '6.8.2'
 }
 
 // Enable following for debugging
@@ -187,10 +187,10 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'com.konghq:unirest-java:3.14.5'
 
-    implementation 'org.slf4j:slf4j-api:2.0.11'
+    implementation 'org.slf4j:slf4j-api:2.0.12'
     implementation "org.tinylog:tinylog-api:2.7.0"
-    implementation "org.tinylog:slf4j-tinylog:2.6.2"
-    implementation "org.tinylog:tinylog-impl:2.6.2"
+    implementation "org.tinylog:slf4j-tinylog:2.7.0"
+    implementation "org.tinylog:tinylog-impl:2.7.0"
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.9'
@@ -226,7 +226,7 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.5'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.5'
-    implementation 'org.glassfish.hk2:hk2-api:3.0.5'
+    implementation 'org.glassfish.hk2:hk2-api:3.0.6'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
