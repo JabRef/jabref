@@ -205,26 +205,27 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private void onFailure(URLDownload urlDownload, Exception ex) {
         LOGGER.error("Error downloading from URL: " + urlDownload, ex);
         String fetcherExceptionMessage = ex.getMessage();
+        String failedTitle = Localization.lang("Failed to download from URL");
         int statusCode;
         if (ex instanceof FetcherClientException clientException) {
             statusCode = clientException.getStatusCode();
             if (statusCode == 401) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
             } else if (statusCode == 403) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
             } else if (statusCode == 404) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
             }
         } else if (ex instanceof FetcherServerException serverException) {
             statusCode = serverException.getStatusCode();
-            dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"),
+            dialogService.showInformationDialogAndWait(failedTitle,
                     Localization.lang("Error downloading from URL. Cause is likely the server side. HTTP Error %0 \n %1 \nURL: %2 \nPlease try again later or contact the server administrator.", statusCode, fetcherExceptionMessage, urlDownload.getSource()));
         } else {
-            dialogService.showErrorDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("Error message: %0 \nURL: %1 \nPlease check the URL and try again.", fetcherExceptionMessage, urlDownload.getSource()));
+            dialogService.showErrorDialogAndWait(failedTitle, Localization.lang("Error message: %0 \nURL: %1 \nPlease check the URL and try again.", fetcherExceptionMessage, urlDownload.getSource()));
         }
     }
 
-    public boolean checkSSLHandshake(URLDownload urlDownload) {
+    private boolean checkSSLHandshake(URLDownload urlDownload) {
         try {
             urlDownload.canBeReached();
         } catch (kong.unirest.UnirestException ex) {
