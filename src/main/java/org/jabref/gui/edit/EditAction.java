@@ -7,6 +7,7 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
+import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -16,6 +17,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
  * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
@@ -59,7 +61,7 @@ public class EditAction extends SimpleCommand {
                     case SELECT_ALL -> textInput.selectAll();
                     case COPY -> textInput.copy();
                     case CUT -> textInput.cut();
-                    case PASTE -> textInput.paste();
+                    case PASTE -> paste(textInput);
                     case DELETE -> textInput.clear();
                     case DELETE_ENTRY -> textInput.deleteNextChar();
                     case UNDO -> textInput.undo();
@@ -96,5 +98,11 @@ public class EditAction extends SimpleCommand {
                 }
             }
         });
+    }
+
+    private void paste(TextInputControl textInput) {
+        String text = Globals.getClipboardManager().getHtmlContents();
+        String md = FlexmarkHtmlConverter.builder().build().convert(text);
+        textInput.replaceSelection(md);
     }
 }

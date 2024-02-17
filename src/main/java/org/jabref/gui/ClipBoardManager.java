@@ -88,6 +88,19 @@ public class ClipBoardManager {
     }
 
     /**
+     * Get the HTML String residing on the system clipboard.
+     *
+     * @return any HTML text found on the Clipboard; if none found, return an empty String.
+     */
+    public static String getHtmlContents() {
+        String result = clipboard.getHtml();
+        if (result == null) {
+            return "";
+        }
+        return result;
+    }
+
+    /**
      * Get the String residing on the primary clipboard (if it exists).
      *
      * @return any text found on the primary Clipboard; if none found, try with the system clipboard.
