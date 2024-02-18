@@ -63,6 +63,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
         useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
 
+        moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
         moveToTrash.setDisable(!JabRefDesktop.moveToTrashSupported());
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
