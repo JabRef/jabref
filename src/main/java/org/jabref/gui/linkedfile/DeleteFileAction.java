@@ -172,9 +172,13 @@ public class DeleteFileAction extends SimpleCommand {
 
         Path theFile = file.get();
         try {
-            if (filePreferences.moveToTrash()) {
+            boolean preferencesMoveToTrash = filePreferences.moveToTrash();
+            LOGGER.debug("filePreferences.moveToTrash() = {}", preferencesMoveToTrash);
+            if (preferencesMoveToTrash) {
+                LOGGER.debug("Moving to trash: {}", theFile);
                 JabRefDesktop.moveToTrash(theFile);
             } else {
+                LOGGER.debug("Deleting: {}", theFile);
                 Files.delete(theFile);
             }
             success = true;
