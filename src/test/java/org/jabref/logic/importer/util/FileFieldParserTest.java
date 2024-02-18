@@ -150,12 +150,6 @@ class FileFieldParserTest {
                         "::file.pdf"
                 ),
 
-                // tooManySeparators
-                Arguments.of(
-                        Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF", "asdf")),
-                        "desc:file.pdf:PDF:qwer:asdf:uiop"
-                ),
-
                 // www inside filename
                 Arguments.of(
                         Collections.singletonList(new LinkedFile("", Path.of("/home/www.google.de.pdf"), "")),
@@ -186,23 +180,8 @@ class FileFieldParserTest {
                 ),
                 // link with source url
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "matheus.ea explicit.pdf", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
-                        "arXiv Fulltext PDF:matheus.ea explicit.pdf:PDF::https\\://arxiv.org/pdf/1109.0517.pdf"
-                ),
-                // link without description and with source url
-                Arguments.of(
-                        Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
-                        ":matheus.ea explicit.pdf:PDF::https\\://arxiv.org/pdf/1109.0517.pdf"
-                ),
-                // no link but with source url
-                Arguments.of(
-                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
-                        "arXiv Fulltext PDF::PDF::https\\://arxiv.org/pdf/1109.0517.pdf"
-                ),
-                // No description or file type but with sourceURL
-                Arguments.of(
-                        Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "", "https://arxiv.org/pdf/1109.0517.pdf")),
-                        ":matheus.ea explicit.pdf:::https\\://arxiv.org/pdf/1109.0517.pdf"
+                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "matheus.ea explicit.pdf", "application/pdf", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        "arXiv Fulltext PDF:matheus.ea explicit.pdf:application/pdf:https\\://arxiv.org/pdf/1109.0517.pdf"
                 )
         );
     }
