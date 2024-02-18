@@ -56,11 +56,18 @@ public class DeleteFileAction extends SimpleCommand {
         this.filesToDelete = List.copyOf(filesToDelete);
     }
 
+    /**
+     * Called when the user wants to delete a complete entry.
+     */
     public DeleteFileAction(DialogService dialogService,
                             FilePreferences filePreferences,
                             BibDatabaseContext databaseContext,
                             List<LinkedFileViewModel> filesToDelete) {
         this(dialogService, filePreferences, databaseContext, null, filesToDelete);
+    }
+
+    private boolean deletionOfCompleteEntry() {
+        return viewModel == null;
     }
 
     @Override
@@ -80,7 +87,8 @@ public class DeleteFileAction extends SimpleCommand {
         String dialogDescription;
 
         int numberOfLinkedFiles = filesToDelete.size();
-        dialogDescription = Localization.lang("Delete %0 file(s) permanently from disk - or remove the file(s) from the entry?", numberOfLinkedFiles);
+
+        dialogDescription = Localization.lang("How should these files be handled?");
         if (numberOfLinkedFiles != 1) {
             dialogTitle = Localization.lang("Delete %0 files", numberOfLinkedFiles);
         } else {
@@ -99,17 +107,24 @@ public class DeleteFileAction extends SimpleCommand {
 
         DialogPane dialogPane = createDeleteFilesDialog(dialogDescription);
 
-        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonBar.ButtonData.YES);
-        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        String label;
+        if (filePreferences.moveToTrash()) {
+            label = Localization.lang("Move file(s) to trash");
+        } else {
+            label = Localization.lang("Delete from disk");
+        }
+        ButtonType deleteFromDisk = new ButtonType(label);
+
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Keep file(s)"), ButtonBar.ButtonData.YES);
 
         Optional<ButtonType> buttonType = dialogService.showCustomDialogAndWait(
-                dialogTitle, dialogPane, removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+                dialogTitle, dialogPane, removeFromEntry, deleteFromDisk, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
             ButtonType theButtonType = buttonType.get();
             if (theButtonType.equals(removeFromEntry)) {
                 deleteFiles(false);
-            } else if (theButtonType.equals(deleteFromEntry)) {
+            } else if (theButtonType.equals(deleteFromDisk)) {
                 deleteFiles(true);
             }
         }
