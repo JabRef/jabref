@@ -206,17 +206,14 @@ public class SaveDatabaseAction {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            if (savePath.isEmpty()) {
-                return false;
-            }
-            return saveAs(savePath.get(), mode);
+            return savePath.filter(path -> saveAs(path, mode)).isPresent();
         }
 
         return save(databasePath.get(), mode);
     }
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
-        if (mode == SaveDatabaseMode.NORMAL) {
+        if (mode == SaveDatabaseMode.NORMAL && libraryTab.getBibDatabaseContext().getEntries().size() > 2_000) {
             dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
         }
 
