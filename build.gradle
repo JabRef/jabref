@@ -56,7 +56,7 @@ java {
 }
 
 application {
-    mainClass.set('org.jabref.cli.Launcher')
+    mainClass.set('org.jabref.Launcher')
     mainModule.set('org.jabref')
 }
 
