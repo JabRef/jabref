@@ -14,7 +14,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
  */
 public enum StandardField implements Field {
 
-    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
+    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT, FieldProperty.MARKDOWN),
     ADDENDUM("addendum"),
     ADDRESS("address"),
     AFTERWORD("afterword", FieldProperty.PERSON_NAMES),
@@ -32,7 +32,7 @@ public enum StandardField implements Field {
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
-    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
+    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     CITES("cites", FieldProperty.MULTIPLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
