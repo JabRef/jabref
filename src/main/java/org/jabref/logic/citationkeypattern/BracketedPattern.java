@@ -735,7 +735,11 @@ public class BracketedPattern {
     private static String getTitleWordsWithSpaces(int number, String title) {
         String formattedTitle = formatTitle(title);
 
-        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+        return getSomeWords(number, formattedTitle);
+    }
+
+    private static String getSomeWords(int number, String string) {
+        try (Scanner titleScanner = new Scanner(string)) {
             return titleScanner.tokens()
                                .limit(number)
                                .collect(Collectors.joining(" "));
