@@ -104,8 +104,7 @@ public class JabRefGUI extends Application {
         Globals.shutdownThreadPools();
         try {
             Globals.predatoryJournalRepository.close();
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             LOGGER.warn("Cloud not shut down predatoryJournalRepository", e);
         }
     }
