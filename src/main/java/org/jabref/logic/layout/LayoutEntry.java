@@ -144,8 +144,8 @@ class LayoutEntry {
         this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
 
         List<LayoutEntry> tmpEntries = new ArrayList<>();
-        String blockStart = parsedEntries.get(0).s;
-        String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
+        String blockStart = parsedEntries.getFirst().s;
+        String blockEnd = parsedEntries.getLast().s;
 
         if (!blockStart.equals(blockEnd)) {
             LOGGER.warn("Field start and end entry must be equal.");
@@ -392,9 +392,9 @@ class LayoutEntry {
         List<String> v = StringUtil.tokenizeToList(s, "\n");
 
         if (v.size() == 1) {
-            text = v.get(0);
+            text = v.getFirst();
         } else {
-            text = v.get(0).trim();
+            text = v.getFirst().trim();
 
             option = getOptionalLayout(v.get(1));
             // See if there was an undefined formatter:
@@ -498,7 +498,7 @@ class LayoutEntry {
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
         Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(preferences.getNameFormatterPreferences());
         for (List<String> strings : formatterStrings) {
-            String nameFormatterName = strings.get(0).trim();
+            String nameFormatterName = strings.getFirst().trim();
 
             // Check if this is a name formatter defined by this export filter:
             Optional<String> contents = preferences.getCustomExportNameFormatter(nameFormatterName);

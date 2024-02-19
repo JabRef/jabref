@@ -71,56 +71,56 @@ public class DoiFetcherTest {
             .withField(StandardField.NUMBER, "2");
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("DOI", fetcher.getName());
     }
 
     @Test
-    public void testPerformSearchBurd2011() throws FetcherException {
+    public void performSearchBurd2011() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/9781118257517");
         assertEquals(Optional.of(bibEntryBurd2011), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchDecker2007() throws FetcherException {
+    public void performSearchDecker2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/ICWS.2007.59");
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchIannarelli2019() throws FetcherException {
+    public void performSearchIannarelli2019() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.3303/CET1977146");
         assertEquals(Optional.of(bibEntryIannarelli2019), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchEmptyDOI() {
+    public void performSearchEmptyDOI() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
     }
 
     @Test
-    public void testPerformSearchInvalidDOI() {
+    public void performSearchInvalidDOI() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
     }
 
     @Test
-    public void testPerformSearchInvalidDOIClientResultsinFetcherClientException() {
+    public void performSearchInvalidDOIClientResultsinFetcherClientException() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
     }
 
     @Test
-    public void testPerformSearchInvalidDOIClientResultsinFetcherClientException2() {
+    public void performSearchInvalidDOIClientResultsinFetcherClientException2() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
     }
 
     @Test
-    public void testPerformSearchNonTrimmedDOI() throws FetcherException {
+    public void performSearchNonTrimmedDOI() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("http s://doi.org/ 10.1109 /ICWS .2007.59 ");
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 
     @Test
-    public void testAPSJournalCopiesArticleIdToPageField() throws FetcherException {
+    public void aPSJournalCopiesArticleIdToPageField() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1103/physreva.102.023315");
         assertEquals(Optional.of(bibEntryStenzel2020), fetchedEntry);
     }

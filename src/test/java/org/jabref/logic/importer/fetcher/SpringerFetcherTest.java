@@ -122,7 +122,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     }
 
     @Test
-    void testSpringerJSONToBibtex() {
+    void springerJSONToBibtex() {
         String jsonString = """
                 {\r
                             "identifier":"doi:10.1007/BF01201962",\r

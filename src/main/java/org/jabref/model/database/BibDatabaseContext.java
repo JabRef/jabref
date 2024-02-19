@@ -22,6 +22,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,7 +227,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+        if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
             dbmsListener.shutdown();
         }
@@ -241,6 +242,7 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
+    @NonNull
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
@@ -267,5 +269,21 @@ public class BibDatabaseContext {
                 ", biblatexMode=" + isBiblatexMode() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabaseContext that)) {
+            return false;
+        }
+        return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(database, metaData, path, location);
     }
 }

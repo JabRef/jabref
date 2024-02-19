@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
@@ -13,15 +14,18 @@ import org.jabref.model.strings.StringUtil;
 public class HTMLChars implements LayoutFormatter {
 
     private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
+    /**
+     * This regex matches '<b>&</b>' that DO NOT BEGIN an HTML entity.
+     * <p>
+     * <b>&</b>{@literal amp;} <b>Not Matched</b><br>
+     * <b>&</b>{@literal #34;} <b>Not Matched</b><br>
+     * <b>&</b>Hey <b>Matched</b>
+     * */
+    private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
     @Override
     public String format(String inField) {
-        int i;
-        String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
-                              .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
-                              .replace("\n", "<br>") // Replace single line breaks with <br>
-                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+        String field = normalizedField(inField);
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -30,7 +34,7 @@ public class HTMLChars implements LayoutFormatter {
         boolean escaped = false;
         boolean incommand = false;
 
-        for (i = 0; i < field.length(); i++) {
+        for (int i = 0; i < field.length(); i++) {
             c = field.charAt(i);
             if (escaped && (c == '\\')) {
                 sb.append('\\');
@@ -157,6 +161,16 @@ public class HTMLChars implements LayoutFormatter {
         }
 
         return sb.toString().replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
+    }
+
+    private String normalizedField(String inField) {
+        // Cannot use StringEscapeUtils#escapeHtml4 because it does not handle LaTeX characters and commands.
+        return HTML_ENTITY_PATTERN.matcher(inField).replaceAll("&amp;") // Replace & with &amp; if it does not begin an HTML entity
+                                  .replaceAll("\\\\&", "&amp;") // Replace \& with &amp;
+                                  .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                                  .replace("\n", "<br>") // Replace single line breaks with <br>
+                                  .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                                  .replaceAll("\\$([^$]*)\\$", "\\{$1\\}");
     }
 
     private String getHTMLTag(String latexCommand) {

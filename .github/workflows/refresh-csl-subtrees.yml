@@ -36,7 +36,7 @@ jobs:
           git add -f src/main/resources/csl-styles
           git add -f src/main/resources/csl-locales
           git diff-index --quiet HEAD || git commit -m 'Update CSL styles'
-      - uses: peter-evans/create-pull-request@v5
+      - uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
           branch: refresh-csl

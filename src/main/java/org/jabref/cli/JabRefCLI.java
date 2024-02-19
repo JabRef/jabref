@@ -37,7 +37,7 @@ public class JabRefCLI {
     }
 
     public static String getExportMatchesSyntax() {
-        return String.format("[%s]searchTerm,outputFile:%s[,%s]",
+        return "[%s]searchTerm,outputFile:%s[,%s]".formatted(
                 Localization.lang("field"),
                 Localization.lang("file"),
                 Localization.lang("exportFormat"));
@@ -169,6 +169,14 @@ public class JabRefCLI {
                         cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
+    public String getJumpToKey() {
+        return cl.getOptionValue("jumpToKey");
+    }
+
+    public boolean isJumpToKey() {
+        return cl.hasOption("jumpToKey");
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -187,7 +195,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("i")
                 .longOpt("import")
-                .desc(String.format("%s: '%s'", Localization.lang("Import file"), "-i library.bib"))
+                .desc("%s: '%s'".formatted(Localization.lang("Import file"), "-i library.bib"))
                 .hasArg()
                 .argName("FILE[,FORMAT]")
                 .build());
@@ -203,7 +211,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("ib")
                 .longOpt("importBibtex")
-                .desc(String.format("%s: '%s'", Localization.lang("Import BibTeX"), "-ib @article{entry}"))
+                .desc("%s: '%s'".formatted(Localization.lang("Import BibTeX"), "-ib @article{entry}"))
                 .hasArg()
                 .argName("BIBTEXT_STRING")
                 .build());
@@ -211,7 +219,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("o")
                 .longOpt("output")
-                .desc(String.format("%s: '%s'", Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html"))
+                .desc("%s: '%s'".formatted(Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html"))
                 .hasArg()
                 .argName("FILE[,FORMAT]")
                 .build());
@@ -219,7 +227,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("m")
                 .longOpt("exportMatches")
-                .desc(String.format("%s: '%s'", Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html"))
+                .desc("%s: '%s'".formatted(Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html"))
                 .hasArg()
                 .argName("QUERY,FILE[,FORMAT]")
                 .build());
@@ -227,7 +235,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("f")
                 .longOpt("fetch")
-                .desc(String.format("%s: '%s'", Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer"))
+                .desc("%s: '%s'".formatted(Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer"))
                 .hasArg()
                 .argName("FETCHER:QUERY")
                 .build());
@@ -235,7 +243,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("a")
                 .longOpt("aux")
-                .desc(String.format("%s: '%s'", Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib"))
+                .desc("%s: '%s'".formatted(Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib"))
                 .hasArg()
                 .argName("FILE[.aux],FILE[.bib] FILE")
                 .build());
@@ -243,7 +251,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("x")
                 .longOpt("prexp")
-                .desc(String.format("%s: '%s'", Localization.lang("Export preferences to a file"), "-x prefs.xml"))
+                .desc("%s: '%s'".formatted(Localization.lang("Export preferences to a file"), "-x prefs.xml"))
                 .hasArg()
                 .argName("[FILE]")
                 .build());
@@ -251,7 +259,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("p")
                 .longOpt("primp")
-                .desc(String.format("%s: '%s'", Localization.lang("Import preferences from a file"), "-p prefs.xml"))
+                .desc("%s: '%s'".formatted(Localization.lang("Import preferences from a file"), "-p prefs.xml"))
                 .hasArg()
                 .argName("[FILE]")
                 .build());
@@ -259,7 +267,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("d")
                 .longOpt("prdef")
-                .desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
+                .desc("%s: '%s'".formatted(Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
                 .hasArg()
                 .argName("KEY1[,KEY2][,KEYn] | all")
                 .build());
@@ -267,7 +275,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("writeXMPtoPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
@@ -275,7 +283,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("embeddBibfileInPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Embed BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeX as attached file in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
@@ -283,9 +291,17 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("w")
                 .longOpt("writeMetadatatoPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("j")
+                .longOpt("jumpToKey")
+                .desc("%s: '%s'".formatted(Localization.lang("Jump to the entry of the given citation key."), "-j key"))
+                .hasArg()
+                .argName("CITATIONKEY")
                 .build());
 
         return options;
@@ -326,7 +342,7 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        return String.format("JabRef %s", Globals.BUILD_INFO.version);
+        return "JabRef %s".formatted(Globals.BUILD_INFO.version);
     }
 
     public List<String> getLeftOver() {

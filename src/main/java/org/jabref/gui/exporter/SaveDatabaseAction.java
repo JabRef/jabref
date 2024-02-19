@@ -189,7 +189,7 @@ public class SaveDatabaseAction {
         if (selectedPath.isPresent()) {
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
-            if (!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))) {
+            if (!savePath.getFileName().toString().toLowerCase().endsWith(".bib")) {
                 savePath = Path.of(savePath.toString() + ".bib");
                 if (!Files.notExists(savePath)) {
                     if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
@@ -206,18 +206,15 @@ public class SaveDatabaseAction {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            if (savePath.isEmpty()) {
-                return false;
-            }
-            return saveAs(savePath.get(), mode);
+            return savePath.filter(path -> saveAs(path, mode)).isPresent();
         }
 
         return save(databasePath.get(), mode);
     }
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
-        if (mode == SaveDatabaseMode.NORMAL) {
-            dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
+        if (mode == SaveDatabaseMode.NORMAL && libraryTab.getBibDatabaseContext().getEntries().size() > 2_000) {
+            dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
         }
 
         synchronized (libraryTab) {
@@ -246,7 +243,7 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
-            LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
+            LOGGER.error("A problem occurred when trying to save the file %s".formatted(targetPath), ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {

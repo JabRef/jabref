@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AuthorAbbreviatorTest {
 
     @Test
-    public void testFormat() {
+    public void format() {
         LayoutFormatter a = new AuthorLastFirstAbbreviator();
         LayoutFormatter b = new AuthorAbbreviator();
 

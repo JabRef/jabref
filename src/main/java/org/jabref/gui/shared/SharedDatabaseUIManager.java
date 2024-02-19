@@ -1,7 +1,6 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -139,7 +138,7 @@ public class SharedDatabaseUIManager {
 
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
-        if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
+        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getEntry()))) {
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"
@@ -157,14 +156,7 @@ public class SharedDatabaseUIManager {
     public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(
-                bibDatabaseContext,
-                preferencesService.getBibEntryPreferences().getKeywordSeparator(),
-                preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
-                fileUpdateMonitor);
-        bibDatabaseContext.convertToSharedDatabase(synchronizer);
+        BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
@@ -198,6 +190,20 @@ public class SharedDatabaseUIManager {
         String sharedDatabaseID = sharedDatabaseIDOptional.get();
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
 
+        BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
+
+        bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
+        bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
+
+        dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
+        dbmsSynchronizer.registerListener(this);
+        dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
+
+        parserResult.setDatabaseContext(bibDatabaseContext);
+    }
+
+    private BibDatabaseContext getBibDatabaseContextForSharedDatabase() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
@@ -206,14 +212,6 @@ public class SharedDatabaseUIManager {
                 preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
                 fileUpdateMonitor);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
-
-        bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
-        bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
-
-        dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
-        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
-        dbmsSynchronizer.registerListener(this);
-        parserResult.setDatabaseContext(bibDatabaseContext);
-        dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
+        return bibDatabaseContext;
     }
 }

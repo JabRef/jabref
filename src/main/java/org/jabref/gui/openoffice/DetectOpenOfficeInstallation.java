@@ -79,7 +79,7 @@ public class DetectOpenOfficeInstallation {
         }
 
         if (installDirs.size() == 1) {
-            return Optional.of(installDirs.get(0).toAbsolutePath());
+            return Optional.of(installDirs.getFirst().toAbsolutePath());
         }
 
         return dialogService.showChoiceDialogAndWait(

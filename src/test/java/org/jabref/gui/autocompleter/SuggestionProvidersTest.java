@@ -57,7 +57,7 @@ class SuggestionProvidersTest {
 
     @ParameterizedTest
     @MethodSource("getTestPairs")
-    public void testAppropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
+    public void appropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
         assertEquals(expected, suggestionProviders.getForField(field).getClass());
     }
 

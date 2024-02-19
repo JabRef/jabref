@@ -106,7 +106,7 @@ public class MSBibConverter {
         }
 
         // TODO: currently only Misc can happen
-        if ("ElectronicSource".equals(msBibType) || "Art".equals(msBibType) || "Misc".equals(msBibType)) {
+        if ("Art".equals(msBibType) || "Misc".equals(msBibType)) {
             result.publicationTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);
         }
 

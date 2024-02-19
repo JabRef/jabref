@@ -6,11 +6,14 @@ import java.net.Authenticator;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
 import org.jabref.logic.l10n.Localization;
@@ -101,7 +104,8 @@ public class Launcher {
                     System.exit(0);
                 }
 
-                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
+                List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
+                MainApplication.main(uiCommands, preferences, fileUpdateMonitor, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
@@ -139,7 +143,7 @@ public class Launcher {
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
-        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        configuration.forEach(Configuration::set);
         initializeLogger();
     }
 
@@ -147,20 +151,31 @@ public class Launcher {
         LOGGER = LoggerFactory.getLogger(MainApplication.class);
     }
 
+    /**
+     * @return true if JabRef should continue starting up, false if it should quit.
+     */
     private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
+        LOGGER.trace("Checking for remote handling...");
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
+                LOGGER.debug("Pinging other instance succeeded.");
                 // We are not alone, there is already a server out there, send command line
                 // arguments to other instance
+                LOGGER.debug("Passing arguments passed on to running JabRef...");
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
-                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    LOGGER.debug("Arguments passed on to running JabRef instance.");
+                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
+                    // We do not launch a new instance in presence of an error
+                    return false;
                 }
+            } else {
+                LOGGER.debug("Could not ping JabRef instance.");
             }
         }
         return true;

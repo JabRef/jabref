@@ -62,7 +62,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(String.format("Failed to read file '%s'.", path), e);
+            LOGGER.error("Failed to read file '%s'.".formatted(path), e);
         }
         return annotationsList;
     }
@@ -107,17 +107,17 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn(String.format("File '%s' does not end with .pdf!", path));
+            LOGGER.warn("File '%s' does not end with .pdf!".formatted(path));
             return false;
         }
 
         if (!Files.exists(path)) {
-            LOGGER.warn(String.format("File '%s' does not exist!", path));
+            LOGGER.warn("File '%s' does not exist!".formatted(path));
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn(String.format("File '%s' is not readable!", path));
+            LOGGER.warn("File '%s' is not readable!".formatted(path));
             return false;
         }
 

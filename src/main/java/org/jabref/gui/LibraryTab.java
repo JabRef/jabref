@@ -15,6 +15,7 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
@@ -25,6 +26,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
@@ -94,7 +96,6 @@ import org.slf4j.LoggerFactory;
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
 public class LibraryTab extends Tab {
-
     /**
      * Defines the different modes that the tab can operate in
      */
@@ -120,7 +121,14 @@ public class LibraryTab extends Tab {
     private PanelMode mode = PanelMode.MAIN_TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
-    private boolean saving;
+
+    // Indicates whether the tab is loading data using a dataloading task
+    // The constructors take care to the right true/false assignment during start.
+    private SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
+
+    // initally, the dialog is loading, not saving
+    private boolean saving = false;
+
     private PersonNameSuggestionProvider searchAutoCompleter;
 
     // Used to track whether the base has changed since last save.
@@ -205,7 +213,7 @@ public class LibraryTab extends Tab {
 
     private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         String mode = bibDatabaseContext.getMode().getFormattedName();
-        String modeInfo = String.format("\n%s", Localization.lang("%0 mode", mode));
+        String modeInfo = "\n%s".formatted(Localization.lang("%0 mode", mode));
         text.append(modeInfo);
     }
 
@@ -217,31 +225,30 @@ public class LibraryTab extends Tab {
     }
 
     private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+        this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
 
     /**
-     * The layout to display in the tab when it's loading
+     * The layout to display in the tab when it is loading
      */
     private Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
         pane.setCenter(progressIndicator);
-
         return pane;
     }
 
     private void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        tabContainer.addTab(this, true);
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
         BibDatabaseContext context = result.getDatabaseContext();
         OpenDatabaseAction.performPostOpenActions(result, dialogService);
 
-        feedData(context);
+        setDatabaseContext(context);
 
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             try {
@@ -251,40 +258,45 @@ public class LibraryTab extends Tab {
             }
         }
 
+        LOGGER.trace("loading.set(false);");
+        loading.set(false);
         dataLoadingTask = null;
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
+        loading.set(false);
+
         String title = Localization.lang("Connection error");
-        String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
+        String content = "%s\n\n%s".formatted(ex.getMessage(), Localization.lang("A local copy will be opened."));
 
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    private void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
-        if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
-            // If you open an existing library, a library tab with a loading animation is added immediately.
-            // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
-            // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
-            // it doesn't handle the case when a library is loaded asynchronously.
-            // See org.jabref.gui.LibraryTab.createLibraryTab for the asynchronous loading.
-            stateManager.setActiveDatabase(bibDatabaseContextFromParserResult);
+    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+        TabPane tabPane = this.getTabPane();
+        if (tabPane == null) {
+            LOGGER.debug("User interrupted loading. Not showing any library.");
+            return;
+        }
+        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
+            LOGGER.debug("This case should not happen.");
+            stateManager.setActiveDatabase(bibDatabaseContext);
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
         Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
         foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContextFromParserResult);
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
 
-        stateManager.getOpenDatabases().add(bibDatabaseContextFromParserResult);
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
 
-        bibDatabaseContextFromParserResult.getDatabase().registerListener(this);
-        bibDatabaseContextFromParserResult.getMetaData().registerListener(this);
+        bibDatabaseContext.getDatabase().registerListener(this);
+        bibDatabaseContext.getMetaData().registerListener(this);
 
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
-        citationStyleCache = new CitationStyleCache(bibDatabaseContextFromParserResult);
-        annotationCache = new FileAnnotationCache(bibDatabaseContextFromParserResult, preferencesService.getFilePreferences());
+        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
@@ -524,7 +536,7 @@ public class LibraryTab extends Tab {
             stateManager.setSelectedEntries(entries);
             if (!entries.isEmpty()) {
                 // Update entry editor and preview according to selected entries
-                entryEditor.setEntry(entries.get(0));
+                entryEditor.setEntry(entries.getFirst());
             }
         });
     }
@@ -567,8 +579,8 @@ public class LibraryTab extends Tab {
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository, autoCompletePreferences);
         } else {
-            // Create empty suggestion providers if auto-completion is deactivated
-            suggestionProviders = new SuggestionProviders();
+            // Create suggestion providers with database for crossref if auto-completion is deactivated
+            suggestionProviders = new SuggestionProviders(getDatabase());
         }
         searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
@@ -721,6 +733,7 @@ public class LibraryTab extends Tab {
         // Database could not have been changed, since it is still loading
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
+            loading.setValue(false);
             return true;
         }
 
@@ -783,12 +796,31 @@ public class LibraryTab extends Tab {
      * Perform necessary cleanup when this Library is closed.
      */
     private void onClosed(Event event) {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
-        AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext,
-                preferencesService.getFilePreferences().getBackupDirectory(),
-                preferencesService.getFilePreferences().shouldCreateBackup());
+        if (dataLoadingTask != null) {
+            dataLoadingTask.cancel();
+        }
+        try {
+            changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing change monitor", e);
+        }
+        try {
+            PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down PDF indexer", e);
+        }
+        try {
+            AutosaveManager.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down autosave manager", e);
+        }
+        try {
+            BackupManager.shutdown(bibDatabaseContext,
+                    preferencesService.getFilePreferences().getBackupDirectory(),
+                    preferencesService.getFilePreferences().shouldCreateBackup());
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down backup manager", e);
+        }
     }
 
     /**
@@ -810,6 +842,10 @@ public class LibraryTab extends Tab {
 
     public void setSaving(boolean saving) {
         this.saving = saving;
+    }
+
+    public ObservableBooleanValue getLoading() {
+        return loading;
     }
 
     public CountingUndoManager getUndoManager() {
@@ -1046,5 +1082,13 @@ public class LibraryTab extends Tab {
 
     public DatabaseNotification getNotificationPane() {
         return databaseNotificationPane;
+    }
+
+    @Override
+    public String toString() {
+        return "LibraryTab{" +
+                "bibDatabaseContext=" + bibDatabaseContext +
+                ", showing=" + showing +
+                '}';
     }
 }

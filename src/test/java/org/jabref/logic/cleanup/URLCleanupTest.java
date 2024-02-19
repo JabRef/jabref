@@ -15,7 +15,7 @@ public class URLCleanupTest {
 
     @ParameterizedTest
     @MethodSource("provideURL")
-    public void testChangeURL(BibEntry expected, BibEntry urlInputField) {
+    public void changeURL(BibEntry expected, BibEntry urlInputField) {
         URLCleanup cleanUp = new URLCleanup();
         cleanUp.cleanup(urlInputField);
 

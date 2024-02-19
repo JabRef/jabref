@@ -55,7 +55,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testGetStylesWithEmptyExternal() {
+    public void getStylesWithEmptyExternal() {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
@@ -63,7 +63,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testAddStyleLeadsToOneMoreStyle() throws URISyntaxException {
+    public void addStyleLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
@@ -74,7 +74,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testAddInvalidStyleLeadsToNoMoreStyle() {
+    public void addInvalidStyleLeadsToNoMoreStyle() {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
@@ -83,7 +83,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testInitalizeWithOneExternalFile() throws URISyntaxException {
+    public void initalizeWithOneExternalFile() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
@@ -92,7 +92,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testInitalizeWithIncorrectExternalFile() {
+    public void initalizeWithIncorrectExternalFile() {
         preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -100,7 +100,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
+    public void initalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
@@ -121,7 +121,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
+    public void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
@@ -142,7 +142,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testAddSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
+    public void addSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
@@ -154,13 +154,13 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testAddNullStyleThrowsNPE() {
+    public void addNullStyleThrowsNPE() {
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
     }
 
     @Test
-    public void testGetDefaultUsedStyleWhenEmpty() {
+    public void getDefaultUsedStyleWhenEmpty() {
         when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         preferences.clearCurrentStyle();
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -171,7 +171,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testGetStoredUsedStyle() {
+    public void getStoredUsedStyle() {
         when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         OOBibStyle style = loader.getUsedStyle();
@@ -181,7 +181,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testGetDefaultUsedStyleWhenIncorrect() {
+    public void getDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
         OOBibStyle style = loader.getUsedStyle();
@@ -190,7 +190,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testRemoveInternalStyleReturnsFalseAndDoNotRemove() {
+    public void removeInternalStyleReturnsFalseAndDoNotRemove() {
         preferences.setExternalStyles(Collections.emptyList());
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -201,7 +201,7 @@ public class StyleLoaderTest {
             }
         }
 
-        assertFalse(loader.removeStyle(toremove.get(0)));
+        assertFalse(loader.removeStyle(toremove.getFirst()));
         assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
     }
 }

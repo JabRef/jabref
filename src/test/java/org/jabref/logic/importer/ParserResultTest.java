@@ -1,18 +1,24 @@
 package org.jabref.logic.importer;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class ParserResultTest {
-
     @Test
     void isEmptyForNewParseResult() {
         ParserResult empty = new ParserResult();
@@ -47,5 +53,81 @@ class ParserResultTest {
         parserResult.addWarning("Duplicate Warning");
         parserResult.addWarning("Duplicate Warning");
         assertEquals("Duplicate Warning", parserResult.getErrorMessage());
+    }
+
+    @Test
+    public void warningAddedForWhitespaceInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+        // whitespace after citation key "myArticle "
+        String bibtexEntry = """
+                @article{ myArticle ,
+                  author    = "Author Name",
+                  title     = "Title of the Article",
+                  journal   = "Journal Name",
+                  year      = "2024",
+                  pages     = "1-10",
+                  publisher = "Publisher Name"
+                }
+                """;
+        Path tempFile = tmpDir.resolve("invalidBibTex.bib");
+        Files.write(tempFile, bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertEquals("Line 1: Found corrupted citation key  (contains whitespaces).", parserResult.warnings().getFirst());
+    }
+
+    @Test
+    public void warningAddedForMissingCommaInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+        // Comma replaced by whitespace instead in citation key "myArticle "
+        String bibtexEntry = """
+            @article{myArticle\s
+               author    = "Author Name",
+               title     = "Title of the Article",
+               journal   = "Journal Name",
+               year      = "2024",
+               pages     = "1-10",
+               publisher = "Publisher Name"
+             }
+            """;
+        Path tempFile = tmpDir.resolve("invalidBibTex.bib");
+        Files.write(tempFile, bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertEquals("Line 1: Found corrupted citation key  (comma missing).", parserResult.warnings().getFirst());
+    }
+
+    @Test
+    public void warningAddedForCorruptedCitationKeyInImport(@TempDir Path tmpDir) throws IOException {
+        String bibtexEntry = """
+            @article{myArticle
+               author    = "Author Name",
+               title     = "Title of the Article",
+               journal   = "Journal Name",
+               year      = "2024",
+               pages     = "1-10",
+               publisher = "Publisher Name"
+             }
+            """;
+
+        Path tempFile = tmpDir.resolve("invalidBibTex.bib");
+        Files.write(tempFile, bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertEquals("Line 2: Found corrupted citation key .", parserResult.warnings().getFirst());
+    }
+
+    @Test
+    public void skipsImportEntryForImproperSyntax(@TempDir Path tmpDir) throws IOException {
+        // Comma after '=' character on line 2 throws error
+        String bibtexEntry = """
+            @article{myArticle,
+               author    =, "Author Name",
+               title     = "Title of the Article",
+               journal   = "Journal Name",
+               year      = "2024",
+               pages     = "1-10",
+               publisher = "Publisher Name"
+             }
+            """;
+        Path tempFile = tmpDir.resolve("invalidBibTex.bib");
+        Files.write(tempFile, bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        assertFalse(parserResult.getDatabase().hasEntries());
     }
 }

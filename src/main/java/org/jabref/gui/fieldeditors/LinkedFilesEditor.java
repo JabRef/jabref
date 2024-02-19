@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
@@ -67,6 +68,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML private ListView<LinkedFileViewModel> listView;
     @FXML private JabRefIconView fulltextFetcher;
+    @FXML private ProgressIndicator progressIndicator;
 
     private final Field field;
     private final BibDatabaseContext databaseContext;
@@ -127,6 +129,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
+        progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
     }
@@ -320,6 +323,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferencesService))
         );
@@ -351,6 +355,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),
                                 linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        case REDOWNLOAD_FILE -> Bindings.createBooleanBinding(
+                                () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
+                                linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
@@ -366,6 +373,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 case OPEN_FILE -> linkedFile.open();
                 case OPEN_FOLDER -> linkedFile.openFolder();
                 case DOWNLOAD_FILE -> linkedFile.download();
+                case REDOWNLOAD_FILE -> linkedFile.redownload();
                 case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
                 case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
                 case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();

@@ -27,7 +27,7 @@ public class MsBibExportFormatTest {
     }
 
     @Test
-    public final void testPerformExportWithNoEntry(@TempDir Path tempFile) throws IOException, SaveException {
+    public final void performExportWithNoEntry(@TempDir Path tempFile) throws IOException, SaveException {
         Path path = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
         List<BibEntry> entries = Collections.emptyList();
