@@ -168,7 +168,7 @@ public class Launcher {
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.debug("Arguments passed on to running JabRef instance.");
-                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
