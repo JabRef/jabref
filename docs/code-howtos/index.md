@@ -25,7 +25,7 @@ Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/master/
 
 ## Drag and Drop
 
-Drag and Drop makes usage of the Dragboard. For JavaFX the following [tutorial](https://docs.oracle.com/javafx/2/drag\_drop/jfxpub-drag\_drop.htm) is helpful. Note that the data has to be serializable which is put on the dragboard. For drag and drop of Bib-entries between the maintable and the groups panel, a custom Dragboard is used, `CustomLocalDragboard` which is a generic alternative to the system one.
+Drag and Drop makes usage of the Dragboard. For JavaFX the following [tutorial](https://docs.oracle.com/javafx/2/drag_drop/jfxpub-drag_drop.htm) is helpful. Note that the data has to be serializable which is put on the dragboard. For drag and drop of Bib-entries between the maintable and the groups panel, a custom Dragboard is used, `CustomLocalDragboard` which is a generic alternative to the system one.
 
 For accessing or putting data into the Clipboard use the `ClipboardManager`.
 
