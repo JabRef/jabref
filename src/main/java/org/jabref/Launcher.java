@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.Globals;
@@ -47,6 +48,7 @@ import org.tinylog.configuration.Configuration;
  * - Handle the command line arguments
  * - Start the JavaFX application (if not in cli mode)
  */
+@AllowedToUseStandardStreams("Direct output to the user")
 public class Launcher {
     private static Logger LOGGER;
     private static boolean isDebugEnabled;
@@ -149,7 +151,7 @@ public class Launcher {
     }
 
     private static void initializeLogger() {
-        LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
+        LOGGER = LoggerFactory.getLogger(Launcher.class);
     }
 
     /**
@@ -168,7 +170,8 @@ public class Launcher {
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.debug("Arguments passed on to running JabRef instance.");
-                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    // Used for script-use output etc. to the user
+                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
