@@ -690,9 +690,11 @@ public class BracketedPattern {
             }
         }
 
-        return stringBuilder.toString();
+        String camelString = stringBuilder.toString();
+
+        return getSomeWords(number, camelString);
     }
-    
+
     /**
      * Capitalises the significant words of the "title" field in the given BibTeX entry
      */
