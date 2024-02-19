@@ -9,7 +9,7 @@ plugins {
 
     id 'me.champeau.jmh' version '0.7.2'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.javamodularity.moduleplugin' version '1.8.13'
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
@@ -122,7 +122,7 @@ dependencies {
     implementation 'org.apache.lucene:lucene-core:9.9.2'
     implementation 'org.apache.lucene:lucene-queryparser:9.9.2'
     implementation 'org.apache.lucene:lucene-queries:9.9.1'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.9.1'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.9.2'
     implementation 'org.apache.lucene:lucene-highlighter:9.9.2'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
@@ -242,7 +242,7 @@ dependencies {
 
     testImplementation 'io.github.classgraph:classgraph:4.8.165'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.1'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 
     testImplementation 'org.mockito:mockito-core:5.10.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
@@ -258,7 +258,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.6.3"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.6.4"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
