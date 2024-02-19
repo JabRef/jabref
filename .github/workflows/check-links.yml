@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/check-links.yml'
       - '.lycheeignore'
+      - 'lychee.toml'
       - '**/*.md'
   schedule:
     # Run on the first of each month at 9:00 AM (See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07)
