@@ -14,10 +14,10 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
  * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
