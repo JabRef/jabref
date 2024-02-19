@@ -454,8 +454,9 @@ public class BracketedPattern {
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
-            } else if ("shortcamel".equals(pattern)) { 
-                return getCamelizedTitleShort(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
+            } else if (pattern.matches("camel[\\d]+")) {
+                int num = Integer.parseInt(pattern.substring(5));
+                return getCamelizedTitle_N(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""), num);
             } else if ("camel".equals(pattern)) {
                 return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("shortyear".equals(pattern)) {
@@ -665,20 +666,18 @@ public class BracketedPattern {
     }
 
     /**
-     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry, to a maximum of 7 words.
+     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry, to a maximum of N words.
      */
-    public static String getCamelizedTitleShort(String title) {
-        return keepLettersAndDigitsOnly(camelizeTitleShort(title));
+    public static String getCamelizedTitle_N(String title, int number) {
+        return keepLettersAndDigitsOnly(camelizeTitle_N(title, number));
     }
 
-    public static String camelizeTitleShort(String title) {
+    private static String camelizeTitle_N(String title, int number) {
         StringBuilder stringBuilder = new StringBuilder();
         String formattedTitle = formatTitle(title);
-        int count = 0;
+
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
             while (titleScanner.hasNext()) {
-                if (count >= 7) { break; }
-                
                 String word = titleScanner.next();
 
                 // Camelize the word
@@ -688,7 +687,6 @@ public class BracketedPattern {
                     stringBuilder.append(' ');
                 }
                 stringBuilder.append(word);
-                count += 1;
             }
         }
 
