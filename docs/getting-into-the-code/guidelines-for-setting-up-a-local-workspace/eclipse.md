@@ -29,7 +29,7 @@ Always make sure your Eclipse installation us up to date.
 3. Open or import the existing project in Eclipse as Java project.
    * Remark: Importing it as gradle project will not work correctly.
    * Refresh the project in Eclipse
-4. Create a run/debug configuration for the main class `org.jabref.cli.Launcher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
+4. Create a run/debug configuration for the main class `org.jabref.Launcher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
    * Remark: The run/debug configuration needs to be added by right-clicking the class (e.g. `Launcher` or JabRefMain) otherwise it will not work.
 
        ![Creating the run/debug configuration by right-clicking on the class](../../images/eclipse-create-run-config.png)

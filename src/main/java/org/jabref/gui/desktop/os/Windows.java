@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.cli.Launcher;
+import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -94,7 +94,7 @@ public class Windows extends NativeDesktop {
                 return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
             }
         } catch (Win32Exception e) {
-            // needs to be non-static because of org.jabref.cli.Launcher.addLogToDisk
+            // needs to be non-static because of org.jabref.Launcher.addLogToDisk
             LoggerFactory.getLogger(Windows.class).error("Error accessing folder", e);
             return Path.of(System.getProperty("user.home"));
         }
