@@ -3,8 +3,8 @@ package org.jabref.gui.fieldeditors;
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.TextInputControl;
-import javafx.scene.input.Clipboard;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
@@ -25,9 +25,8 @@ public class MarkdownEditor extends SimpleEditor {
         return new EditorTextArea() {
             @Override
             public void paste() {
-                Clipboard clipboard = Clipboard.getSystemClipboard();
-                if (clipboard.hasHtml()) {
-                    String htmlText = clipboard.getHtml();
+                if (ClipBoardManager.hasHtml()) {
+                    String htmlText = ClipBoardManager.getHtmlContents();
                     String mdText = flexmarkHtmlConverter.convert(htmlText);
                     super.replaceSelection(mdText);
                 } else {
