@@ -1,15 +1,14 @@
 package org.jabref.gui;
-import org.jabref.gui.ClipBoardManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javafx.scene.input.Clipboard;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.mockito.Mockito.when;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javafx.scene.input.Clipboard;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class ClipBoardManagerTest {
 
@@ -24,7 +23,7 @@ public class ClipBoardManagerTest {
   }
 
   @Test
-  public void testGetHtmlContents() {
+  public void getHtmlContents() {
     String expectedHtml = "<li>Hello World!</li>";
     when(clipboard.getHtml()).thenReturn(expectedHtml);
 
