@@ -454,6 +454,9 @@ public class BracketedPattern {
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
+            } else if (pattern.matches("camel[\\d]+")) {
+                int num = Integer.parseInt(pattern.substring(5));
+                return getCamelizedTitle_N(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""), num);
             } else if ("camel".equals(pattern)) {
                 return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("shortyear".equals(pattern)) {
@@ -663,6 +666,36 @@ public class BracketedPattern {
     }
 
     /**
+     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry, to a maximum of N words.
+     */
+    public static String getCamelizedTitle_N(String title, int number) {
+        return keepLettersAndDigitsOnly(camelizeTitle_N(title, number));
+    }
+
+    private static String camelizeTitle_N(String title, int number) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String formattedTitle = formatTitle(title);
+
+        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+            while (titleScanner.hasNext()) {
+                String word = titleScanner.next();
+
+                // Camelize the word
+                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
+
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(' ');
+                }
+                stringBuilder.append(word);
+            }
+        }
+
+        String camelString = stringBuilder.toString();
+
+        return getSomeWords(number, camelString);
+    }
+
+    /**
      * Capitalises the significant words of the "title" field in the given BibTeX entry
      */
     public static String camelizeSignificantWordsInTitle(String title) {
@@ -704,7 +737,11 @@ public class BracketedPattern {
     private static String getTitleWordsWithSpaces(int number, String title) {
         String formattedTitle = formatTitle(title);
 
-        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+        return getSomeWords(number, formattedTitle);
+    }
+
+    private static String getSomeWords(int number, String string) {
+        try (Scanner titleScanner = new Scanner(string)) {
             return titleScanner.tokens()
                                .limit(number)
                                .collect(Collectors.joining(" "));
