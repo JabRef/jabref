@@ -189,13 +189,18 @@ public class ArgumentProcessor {
     }
 
     public void processArguments() {
+        ArrayList<Boolean> coverage = new ArrayList<>(Collections.nCopies(34, false));
         uiCommands.clear();
 
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
+            coverage.set(1, true);
+            coverage.set(2, true);
             cli.displayVersion();
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
+            coverage.set(3, true);
+            coverage.set(4, true);
             JabRefCLI.printUsage(preferencesService);
             guiNeeded = false;
             return;
@@ -205,23 +210,30 @@ public class ArgumentProcessor {
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
+            coverage.set(5, true);
             resetPreferences(cli.getPreferencesReset());
         }
 
         // Check if we should import preferences from a file:
         if (cli.isPreferencesImport()) {
+            coverage.set(6, true);
             importPreferences();
         }
 
         List<ParserResult> loaded = importAndOpenFiles();
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
+            coverage.set(7, true);
+            coverage.set(8, true);
             fetch(cli.getFetcherEngine()).ifPresent(loaded::add);
         }
 
         if (cli.isExportMatches()) {
+            coverage.set(9, true);
             if (!loaded.isEmpty()) {
+                coverage.set(10, true);
                 if (!exportMatches(loaded)) {
+                    coverage.set(11, true);
                     return;
                 }
             } else {
@@ -230,19 +242,30 @@ public class ArgumentProcessor {
         }
 
         if (cli.isGenerateCitationKeys()) {
+            coverage.set(12, true);
             regenerateCitationKeys(loaded);
         }
 
         if (cli.isAutomaticallySetFileLinks()) {
+            coverage.set(13, true);
             automaticallySetFileLinks(loaded);
         }
 
         if ((cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf()) || (cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()))) {
+            coverage.set(14, true);
+            coverage.set(15, true);
+            coverage.set(16, true);
+            coverage.set(17, true);
+            coverage.set(18, true);
             System.err.println("Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf]");
         }
 
         if (cli.isWriteMetadatatoPdf() || cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()) {
+            coverage.set(19, true);
+            coverage.set(20, true);
+            coverage.set(21, true);
             if (!loaded.isEmpty()) {
+                coverage.set(22, true);
                 writeMetadataToPdf(loaded,
                         cli.getWriteMetadatatoPdf(),
                         preferencesService.getXmpPreferences(),
@@ -257,7 +280,9 @@ public class ArgumentProcessor {
         }
 
         if (cli.isFileExport()) {
+            coverage.set(23, true);
             if (!loaded.isEmpty()) {
+                coverage.set(24, true);
                 exportFile(loaded, cli.getFileExport().split(","));
                 LOGGER.debug("Finished export");
             } else {
@@ -266,7 +291,9 @@ public class ArgumentProcessor {
         }
 
         if (cli.isPreferencesExport()) {
+            coverage.set(25, true);
             try {
+                coverage.set(26, true);
                 preferencesService.exportPreferences(Path.of(cli.getPreferencesExport()));
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
@@ -274,19 +301,29 @@ public class ArgumentProcessor {
         }
 
         if (!cli.isBlank() && cli.isAuxImport()) {
+            coverage.set(27, true);
+            coverage.set(28, true);
             doAuxImport(loaded);
         }
 
         if (cli.isBlank()) {
+            coverage.set(29, true);
             uiCommands.add(new UiCommand.BlankWorkspace());
         }
 
         if (!cli.isBlank() && cli.isJumpToKey()) {
+            coverage.set(30, true);
+            coverage.set(31, true);
             uiCommands.add(new UiCommand.JumpToEntryKey(cli.getJumpToKey()));
         }
 
         if (!cli.isBlank() && !loaded.isEmpty()) {
+            coverage.set(32, true);
+            coverage.set(33, true);
             uiCommands.add(new UiCommand.OpenDatabases(loaded));
+        }
+        for(int i = 1; i < coverage.size(); i++) {
+            System.out.println("Branch ID " + Integer.toString(i) + ": " + coverage.get(i).toString());
         }
     }
 
