@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.architecture.AllowedToUseStandardStreams;
+import org.jabref.cli.ArgumentProcessor;
+import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.Globals;
-import org.jabref.gui.MainApplication;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
@@ -45,20 +48,19 @@ import org.tinylog.configuration.Configuration;
  * - Handle the command line arguments
  * - Start the JavaFX application (if not in cli mode)
  */
+@AllowedToUseStandardStreams("Direct output to the user")
 public class Launcher {
     private static Logger LOGGER;
-    private static String[] ARGUMENTS;
     private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
         routeLoggingToSlf4J();
-        ARGUMENTS = args;
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options .e.g. --debug
         JabRefCLI jabRefCLI;
         try {
-            jabRefCLI = new JabRefCLI(ARGUMENTS);
+            jabRefCLI = new JabRefCLI(args);
             isDebugEnabled = jabRefCLI.isDebugLogging();
         } catch (ParseException e) {
             isDebugEnabled = false;
@@ -73,7 +75,7 @@ public class Launcher {
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(ARGUMENTS, preferences.getRemotePreferences())) {
+            if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
                 return;
             }
 
@@ -91,7 +93,7 @@ public class Launcher {
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                        ARGUMENTS,
+                        args,
                         ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
                         fileUpdateMonitor,
@@ -105,7 +107,8 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
-                MainApplication.main(uiCommands, preferences, fileUpdateMonitor, ARGUMENTS);
+                JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
+                JabRefGUI.launch(JabRefGUI.class, args);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
@@ -148,7 +151,7 @@ public class Launcher {
     }
 
     private static void initializeLogger() {
-        LOGGER = LoggerFactory.getLogger(MainApplication.class);
+        LOGGER = LoggerFactory.getLogger(Launcher.class);
     }
 
     /**
@@ -167,6 +170,7 @@ public class Launcher {
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.debug("Arguments passed on to running JabRef instance.");
+                    // Used for script-use output etc. to the user
                     System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 } else {

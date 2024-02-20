@@ -543,6 +543,19 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
     }
 
+    /**
+     * Test the [camelN] title marker.
+     */
+    @Test
+    void expandBracketsCamelNTitle() {
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[camel1]", ';', dbentry, database));
+        assertEquals("OpenSourceSoftwareAnd",
+                BracketedPattern.expandBrackets("[camel4]", ';', dbentry, database));
+        assertEquals("OpenSourceSoftwareAndThePrivateCollectiveInnovationModelIssues",
+                BracketedPattern.expandBrackets("[camel10]", ';', dbentry, database));
+    }
+
     @Test
     void expandBracketsWithAuthorStartingWithBrackets() {
         // Issue https://github.com/JabRef/jabref/issues/3920
