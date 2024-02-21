@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
@@ -23,6 +19,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
  * </pre>
  */
 public class LayoutHelper {
+    public Map<Integer, Boolean> branchCoverage = new HashMap<>();
 
     public static final int IS_LAYOUT_TEXT = 1;
     public static final int IS_SIMPLE_COMMAND = 2;
@@ -129,15 +126,20 @@ public class LayoutHelper {
         String tmp;
 
         while (!endOfFile) {
+            branchCoverage.put(1, true);
             c = read();
 
             if (c == -1) {
+                branchCoverage.put(1, true);
                 endOfFile = true;
 
                 if (buffer != null) {
+                    branchCoverage.put(2, true);
                     if (option == null) {
+                        branchCoverage.put(3, true);
                         tmp = buffer.toString();
                     } else {
+                        branchCoverage.put(4, true);
                         tmp = buffer.toString() + '\n' + option;
                     }
 
@@ -147,24 +149,38 @@ public class LayoutHelper {
                 return;
             }
             if (!inQuotes && ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))) {
+                branchCoverage.put(5, true);
+                branchCoverage.put(6, true);
+                branchCoverage.put(7, true);
+                branchCoverage.put(8, true);
+                branchCoverage.put(9, true);
+                branchCoverage.put(10, true);
                 if ((c == ']') || (doneWithOptions && (c == '}'))) {
+                    branchCoverage.put(11, true);
+                    branchCoverage.put(12, true);
+                    branchCoverage.put(13, true);
                     // changed section start - arudert
                     // buffer may be null for parameters
                     if ((c == ']') && (buffer != null)) {
+                        branchCoverage.put(14, true);
+                        branchCoverage.put(15, true);
                         // changed section end - arudert
                         option = buffer.toString();
                         buffer = null;
                         start = false;
                         doneWithOptions = true;
                     } else if (c == '}') {
+                        branchCoverage.put(16, true);
                         // changed section begin - arudert
                         // bracketed option must be followed by an (optionally empty) parameter
                         // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
                         // splits the string later on ignores the empty parameter)
                         String parameter = buffer == null ? " " : buffer.toString();
                         if (option == null) {
+                            branchCoverage.put(17, true);
                             tmp = parameter;
                         } else {
+                            branchCoverage.put(18, true);
                             tmp = parameter + '\n' + option;
                         }
 
@@ -177,21 +193,27 @@ public class LayoutHelper {
                     // }
                     // changed section end - arudert
                 } else {
+                    branchCoverage.put(19, true);
                     start = true;
                 }
             } else if (c == '"') {
+                branchCoverage.put(20, true);
                 inQuotes = !inQuotes;
 
                 if (buffer == null) {
+                    branchCoverage.put(21, true);
                     buffer = new StringBuilder(100);
                 }
                 buffer.append('"');
             } else {
+                branchCoverage.put(22, true);
                 if (buffer == null) {
+                    branchCoverage.put(23, true);
                     buffer = new StringBuilder(100);
                 }
 
                 if (start) {
+                    branchCoverage.put(24, true);
                     // changed section begin - arudert
                     // keep the backslash so we know wether this is a fieldname or an ordinary parameter
                     // if (c != '\\') {
