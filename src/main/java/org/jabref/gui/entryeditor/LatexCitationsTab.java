@@ -93,7 +93,10 @@ public class LatexCitationsTab extends EntryEditorTab {
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
         latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
-        HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton);
+        Button latexDirectoryRefreshButton = new Button(Localization.lang("Refresh"));
+        latexDirectoryRefreshButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        latexDirectoryRefreshButton.setOnAction(event -> viewModel.refreshLatexDirectory());
+        HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton, latexDirectoryRefreshButton);
         latexDirectoryBox.setAlignment(Pos.CENTER);
         return latexDirectoryBox;
     }
