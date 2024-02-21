@@ -5,7 +5,7 @@ parent: Code Howtos
 
 ## FXML
 
-The following expressions can be used in FXML attributes, according to the [official documentation](https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction\_to\_fxml.html#attributes)
+The following expressions can be used in FXML attributes, according to the [official documentation](https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#attributes)
 
 | Type                             | Expression                                       | Value point to                                                         | Remark                                                                                                                                             |
 | -------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
