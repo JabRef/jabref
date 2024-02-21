@@ -55,7 +55,7 @@ jobs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: ${{ steps.gitversion.outputs.branchName }}
-    name: ${{ matrix.displayName }} installer and portable version
+    name: "JDK ${{ matrix.jdk }}: ${{ matrix.displayName }} installer and portable version"
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -197,6 +197,14 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+      - name: Rename files with JDK version
+        shell: bash
+        run: |
+          for file in build/distribution/*.*; do
+            base=${file%.*}
+            ext=${file##*.}
+            mv "$file" "${base}-${{ matrix.jdk }}.${ext}"
+          done
       - name: Setup rsync (macOS)
         if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
         run: brew install rsync
