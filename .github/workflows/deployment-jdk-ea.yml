@@ -93,7 +93,7 @@ jobs:
           website: jdk.java.net
           release: ${{ matrix.jdk }}
           version: latest
-      - name: 'Prepare JDK${{ matrix.jdk }} env var'
+      - name: 'Set JDK${{ matrix.jdk }} env var'
         shell: bash
         run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
       - name: Setup JDK
@@ -126,7 +126,7 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          jpackage \
+          JDK${{ matrix.jdk }}/bin/jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
@@ -151,7 +151,7 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          jpackage \
+          JDK${{ matrix.jdk }}/bin/jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
