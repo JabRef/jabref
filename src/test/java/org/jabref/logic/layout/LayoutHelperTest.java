@@ -20,14 +20,14 @@ class LayoutHelperTest {
 
     private final LayoutFormatterPreferences layoutFormatterPreferences = mock(LayoutFormatterPreferences.class);
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
-    private static Map<Integer, Boolean> branchCoverage= new HashMap<>();;
+
 
     @Test
     public void backslashDoesNotTriggerException() {
         StringReader stringReader = new StringReader("\\");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         assertThrows(IOException.class, layoutHelper::getLayoutFromText);
-        branchCoverage.putAll(layoutHelper.branchCoverage);
+
     }
 
     @Test
@@ -35,7 +35,7 @@ class LayoutHelperTest {
         StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
-        branchCoverage.putAll(layoutHelper.branchCoverage);
+
         assertNotNull(layout);
     }
 
@@ -44,7 +44,7 @@ class LayoutHelperTest {
         StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi\\end{doi}");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
-        branchCoverage.putAll(layoutHelper.branchCoverage);
+
         assertNotNull(layout);
     }
 
@@ -60,7 +60,7 @@ class LayoutHelperTest {
 
     @AfterAll
     public static void print() {
-        System.out.println("Amount: " + LayoutHelper.branchCoverage.size() + "Covered");
+        System.out.println("Amount: " + LayoutHelper.branchCoverage.size() + " Covered");
         for (HashMap.Entry<Integer, Boolean> entry : LayoutHelper.branchCoverage.entrySet()) {
             System.out.println("ID: " + entry.getKey() + ", Covered: " + entry.getValue());
         }

@@ -3,12 +3,15 @@ package org.jabref.logic.util.io;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -28,6 +31,7 @@ class RegExpBasedFileFinderTest {
             "directory/subdirectory/GUO ea - INORG CHEM COMMUN 2010 - Ferroelectric Metal Organic Framework (MOF).pdf"
             );
     private Path directory;
+
     private BibEntry entry;
 
     @BeforeEach
@@ -173,6 +177,8 @@ class RegExpBasedFileFinderTest {
         // then
         assertTrue(result.isEmpty());
     }
+
+
     @Test
     void findFileNonRecursiveTriggerID_1_3() throws Exception {
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
@@ -191,6 +197,14 @@ class RegExpBasedFileFinderTest {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/../[citationkey].*\\.[extension]", ',');
 
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+
         assertTrue(result.isEmpty());
+    }
+    @AfterAll
+    public static void print(){
+        System.out.println("Amount: "+RegExpBasedFileFinder.branchCoverage.size()+" Covered");
+        for (Map.Entry<Integer, Boolean> entry : RegExpBasedFileFinder.branchCoverage.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Covered: " + entry.getValue());
+        }
     }
 }
