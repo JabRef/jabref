@@ -3,8 +3,10 @@ package org.jabref.cli;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashMap;
 
 import javafx.collections.FXCollections;
 
@@ -27,6 +29,7 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -34,6 +37,9 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 
 class ArgumentProcessorTest {
 
@@ -62,6 +68,50 @@ class ArgumentProcessorTest {
         String outputBibFile = outputBib.toAbsolutePath().toString();
 
         List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib);
+
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+
+        assertTrue(Files.exists(outputBib));
+    }
+    
+    @Test
+    void noFileImport(@TempDir Path tempDir) throws Exception {
+        String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String noExistBib = "nonexistant.bib";
+
+        Path outputBib = tempDir.resolve("output.bisb").toAbsolutePath();
+        String outputBibFile = outputBib.toAbsolutePath().toString();
+
+        List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib, noExistBib);
+
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+
+        assertTrue(Files.exists(outputBib));
+    }
+    
+    @Test
+    void notBibImport(@TempDir Path tempDir) throws Exception {
+        String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String notBib = "nonexistant";
+
+        Path outputBib = tempDir.resolve("output.bisb").toAbsolutePath();
+        String outputBibFile = outputBib.toAbsolutePath().toString();
+
+        List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib, notBib);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
@@ -103,7 +153,8 @@ class ArgumentProcessorTest {
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
-
+    
+ 
     @Test
     void convertBibtexToTablerefsabsbib(@TempDir Path tempDir) throws Exception {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
@@ -134,4 +185,13 @@ class ArgumentProcessorTest {
 
         assertTrue(Files.exists(outputHtml));
     }
+    
+    @AfterAll
+    public static void print() {
+        System.out.println("Amount: " + ArgumentProcessor.branchCoverage.size() + "Covered");
+        for (HashMap.Entry<Integer, Boolean> entry : ArgumentProcessor.branchCoverage.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Covered: " + entry.getValue());
+        }
+    }
+    
 }
