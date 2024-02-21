@@ -100,6 +100,10 @@ jobs:
         if: (matrix.os != 'macos-latest')
         shell: bash
         run: sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
+        if: (matrix.os == 'macos-latest')
+        shell: bash
+        run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
