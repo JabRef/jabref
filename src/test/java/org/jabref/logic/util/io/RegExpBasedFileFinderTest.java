@@ -3,12 +3,15 @@ package org.jabref.logic.util.io;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -28,6 +31,8 @@ class RegExpBasedFileFinderTest {
             "directory/subdirectory/GUO ea - INORG CHEM COMMUN 2010 - Ferroelectric Metal Organic Framework (MOF).pdf"
             );
     private Path directory;
+    private static Map<Integer, Boolean> branchCoverage= new HashMap<>();;
+
     private BibEntry entry;
 
     @BeforeEach
@@ -65,6 +70,7 @@ class RegExpBasedFileFinderTest {
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
         List<Path> expected = List.of(directory.resolve("pdfInDatabase.pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         // then
         assertEquals(expected, result);
@@ -78,6 +84,7 @@ class RegExpBasedFileFinderTest {
         // when
         List<Path> result = fileFinder.findAssociatedFiles(entry, List.of(directory), PDF_EXTENSION);
         List<Path> expected = List.of(directory.resolve("directory/subdirectory/2003_Hippel_209.pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         // then
         assertEquals(expected, result);
@@ -91,6 +98,7 @@ class RegExpBasedFileFinderTest {
 
         List<Path> result = fileFinder.findAssociatedFiles(bibEntry, List.of(directory), PDF_EXTENSION);
         List<Path> pdfFile = List.of(directory.resolve("Regexp from [A-Z].pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         assertEquals(pdfFile, result);
     }
@@ -103,6 +111,7 @@ class RegExpBasedFileFinderTest {
 
         List<Path> result = fileFinder.findAssociatedFiles(bibEntry, List.of(directory), PDF_EXTENSION);
         List<Path> pdfFile = List.of(directory.resolve("ACM_IEEE-CS.pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         assertEquals(pdfFile, result);
     }
@@ -119,6 +128,7 @@ class RegExpBasedFileFinderTest {
 
         List<Path> result = fileFinder.findAssociatedFiles(bibEntry, List.of(directory), PDF_EXTENSION);
         List<Path> pdfFile = List.of(directory.resolve("directory/subdirectory/GUO ea - INORG CHEM COMMUN 2010 - Ferroelectric Metal Organic Framework (MOF).pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         assertEquals(pdfFile, result);
     }
@@ -136,6 +146,7 @@ class RegExpBasedFileFinderTest {
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
         List<Path> expected = List.of(directory.resolve("directory/subdirectory/2017_Gražulis_726.pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         // then
         assertEquals(expected, result);
@@ -153,6 +164,7 @@ class RegExpBasedFileFinderTest {
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
         List<Path> expected = List.of(directory.resolve("directory/subdirectory/pdfInSubdirectory.pdf"));
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         // then
         assertEquals(expected, result);
@@ -169,8 +181,16 @@ class RegExpBasedFileFinderTest {
 
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
 
         // then
         assertTrue(result.isEmpty());
+    }
+    @AfterAll
+    public static void print(){
+        System.out.println("Amount: "+branchCoverage.size()+" Covered");
+        for (Map.Entry<Integer, Boolean> entry : branchCoverage.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Covered: " + entry.getValue());
+        }
     }
 }

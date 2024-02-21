@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -26,6 +28,7 @@ class RegExpBasedFileFinder implements FileFinder {
     private static final String EXT_MARKER = "__EXTENSION__";
 
     private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
+    public static Map<Integer, Boolean> branchCoverage = new HashMap<>();
 
     private final String regExp;
     private final Character keywordDelimiter;
@@ -139,9 +142,11 @@ class RegExpBasedFileFinder implements FileFinder {
         String fileName = file;
         Path actualDirectory;
         if (fileName.startsWith("/")) {
+            branchCoverage.put(1, true);
             actualDirectory = Path.of(".");
             fileName = fileName.substring(1);
         } else {
+            branchCoverage.put(2, true);
             actualDirectory = directory;
         }
 
@@ -149,6 +154,7 @@ class RegExpBasedFileFinder implements FileFinder {
         Matcher m = ESCAPE_PATTERN.matcher(fileName);
         StringBuilder s = new StringBuilder();
         while (m.find()) {
+            branchCoverage.put(3, true);
             m.appendReplacement(s, m.group(1) + '/' + m.group(2));
         }
         m.appendTail(s);
@@ -156,29 +162,38 @@ class RegExpBasedFileFinder implements FileFinder {
         String[] fileParts = fileName.split("/");
 
         if (fileParts.length == 0) {
+            branchCoverage.put(4, true);
             return resultFiles;
         }
 
         for (int index = 0; index < (fileParts.length - 1); index++) {
+            branchCoverage.put(5, true);
             String dirToProcess = fileParts[index];
 
             if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
                 actualDirectory = Path.of(dirToProcess + '/');
+                branchCoverage.put(6, true);
                 continue;
             }
             if (".".equals(dirToProcess)) { // Stay in current directory
+                branchCoverage.put(7, true);
                 continue;
             }
             if ("..".equals(dirToProcess)) {
+                branchCoverage.put(8, true);
                 actualDirectory = actualDirectory.getParent();
                 continue;
             }
             if ("*".equals(dirToProcess)) { // Do for all direct subdirs
+                branchCoverage.put(9, true);
                 File[] subDirs = actualDirectory.toFile().listFiles();
                 if (subDirs != null) {
+                    branchCoverage.put(10, true);
                     String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
                     for (File subDir : subDirs) {
+                        branchCoverage.put(11, true);
                         if (subDir.isDirectory()) {
+                            branchCoverage.put(12, true);
                             resultFiles.addAll(findFile(entry, subDir.toPath(), restOfFileString, extensionRegExp));
                         }
                     }
@@ -186,15 +201,19 @@ class RegExpBasedFileFinder implements FileFinder {
             }
             // Do for all direct and indirect subdirs
             if ("**".equals(dirToProcess)) {
+                branchCoverage.put(13, true);
                 String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
 
                 final Path rootDirectory = actualDirectory;
                 try (Stream<Path> pathStream = Files.walk(actualDirectory)) {
+                    branchCoverage.put(14, true);
                     // We only want to transverse directory (and not the current one; this is already done below)
                     for (Path path : pathStream.filter(element -> isSubDirectory(rootDirectory, element)).collect(Collectors.toList())) {
+                        branchCoverage.put(15, true);
                         resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
                     }
                 } catch (UncheckedIOException ioe) {
+                    branchCoverage.put(16, true);
                     throw ioe.getCause();
                 }
             } // End process directory information
@@ -204,8 +223,10 @@ class RegExpBasedFileFinder implements FileFinder {
         Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
+            branchCoverage.put(17, true);
             resultFiles.addAll(pathStream.collect(Collectors.toList()));
         } catch (UncheckedIOException uncheckedIOException) {
+            branchCoverage.put(18, true);
             // Previously, an empty list were returned here on both IOException and UncheckedIOException
             throw uncheckedIOException.getCause();
         }
