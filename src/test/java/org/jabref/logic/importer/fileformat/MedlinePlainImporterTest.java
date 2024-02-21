@@ -233,6 +233,18 @@ class MedlinePlainImporterTest {
             assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
+    @Test
+    void createDateCorrectFormat() throws IOException {
+        try (BufferedReader reader = readerForString("PMID-22664795" + "\n" + "MH  - Female\n" + "PT  - journal article" + "\n" + "DEP - 2023/01/ 04:42")) {
+            List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
+
+            BibEntry expectedEntry = new BibEntry();
+            expectedEntry.setType(StandardEntryType.Article);
+            expectedEntry.setField(StandardField.KEYWORDS, "Female");
+
+            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+        }
+    }
 
     @Test
     void getFormatName() {
