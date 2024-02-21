@@ -34,6 +34,9 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 
 class ArgumentProcessorTest {
 
@@ -62,6 +65,50 @@ class ArgumentProcessorTest {
         String outputBibFile = outputBib.toAbsolutePath().toString();
 
         List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib);
+
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+
+        assertTrue(Files.exists(outputBib));
+    }
+    
+    @Test
+    void noFileImport(@TempDir Path tempDir) throws Exception {
+        String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String noExistBib = "nonexistant.bib";
+
+        Path outputBib = tempDir.resolve("output.bisb").toAbsolutePath();
+        String outputBibFile = outputBib.toAbsolutePath().toString();
+
+        List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib, noExistBib);
+
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+
+        assertTrue(Files.exists(outputBib));
+    }
+    
+    @Test
+    void notBibImport(@TempDir Path tempDir) throws Exception {
+        String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String notBib = "nonexistant";
+
+        Path outputBib = tempDir.resolve("output.bisb").toAbsolutePath();
+        String outputBibFile = outputBib.toAbsolutePath().toString();
+
+        List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib, notBib);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
@@ -103,7 +150,8 @@ class ArgumentProcessorTest {
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
-
+    
+ 
     @Test
     void convertBibtexToTablerefsabsbib(@TempDir Path tempDir) throws Exception {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
