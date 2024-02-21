@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
@@ -23,7 +25,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
  * </pre>
  */
 public class LayoutHelper {
-
+    static Map<Integer, Boolean> branchCoverage = new HashMap<>();
     public static final int IS_LAYOUT_TEXT = 1;
     public static final int IS_SIMPLE_COMMAND = 2;
     public static final int IS_FIELD_START = 3;
@@ -257,23 +259,30 @@ public class LayoutHelper {
         String name;
 
         while (!endOfFile) {
+            branchCoverage.put(1, true);
             c = read();
             if (c == -1) {
+                branchCoverage.put(2, true);
                 endOfFile = true;
             }
 
             if (!Character.isLetter((char) c) && (c != '_')) {
                 unread(c);
+                branchCoverage.put(3, true);
 
                 name = buffer == null ? "" : buffer.toString();
 
                 if (name.isEmpty()) {
+                    branchCoverage.put(4, true);
                     StringBuilder lastFive = new StringBuilder(10);
                     if (parsedEntries.isEmpty()) {
+                        branchCoverage.put(5, true);
                         lastFive.append("unknown");
                     } else {
+                        branchCoverage.put(6, true);
                         for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),
                                 parsedEntries.size() - 1)) {
+                            branchCoverage.put(7, true);
                             lastFive.append(entry.s);
                         }
                     }
@@ -283,22 +292,27 @@ public class LayoutHelper {
 
                 if ("begin".equalsIgnoreCase(name)) {
                     // get field name
+                    branchCoverage.put(8, true);
                     doBracketedField(LayoutHelper.IS_FIELD_START);
 
                     return;
                 } else if ("begingroup".equalsIgnoreCase(name)) {
                     // get field name
+                    branchCoverage.put(9, true);
                     doBracketedField(LayoutHelper.IS_GROUP_START);
                     return;
                 } else if ("format".equalsIgnoreCase(name)) {
+                    branchCoverage.put(10, true);
                     if (c == '[') {
                         // get format parameter
                         // get field name
+                        branchCoverage.put(11, true);
                         doBracketedOptionField();
 
                         return;
                     } else {
                         // get field name
+                        branchCoverage.put(12, true);
                         doBracketedField(LayoutHelper.IS_OPTION_FIELD);
 
                         return;
@@ -307,26 +321,31 @@ public class LayoutHelper {
                     // Print the name of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
+                    branchCoverage.put(13, true);
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                     return;
                 } else if ("filepath".equalsIgnoreCase(name)) {
                     // Print the full path of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
+                    branchCoverage.put(14, true);
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));
                     return;
                 } else if ("end".equalsIgnoreCase(name)) {
                     // get field name
+                    branchCoverage.put(15, true);
                     doBracketedField(LayoutHelper.IS_FIELD_END);
                     return;
                 } else if ("endgroup".equalsIgnoreCase(name)) {
                     // get field name
+                    branchCoverage.put(16, true);
                     doBracketedField(LayoutHelper.IS_GROUP_END);
                     return;
                 } else if ("encoding".equalsIgnoreCase(name)) {
                     // Print the name of the current encoding used for export.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
+                    branchCoverage.put(17, true);
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));
                     return;
                 }
@@ -336,10 +355,11 @@ public class LayoutHelper {
 
                 return;
             } else {
+                branchCoverage.put(18, true);
                 if (buffer == null) {
+                    branchCoverage.put(19, true);
                     buffer = new StringBuilder(100);
                 }
-
                 buffer.append((char) c);
             }
         }
