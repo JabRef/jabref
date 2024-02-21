@@ -126,7 +126,7 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          JDK${{ matrix.jdk }}/bin/jpackage \
+          $JDK${{ matrix.jdk }}/bin/jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
@@ -151,7 +151,7 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          JDK${{ matrix.jdk }}/bin/jpackage \
+          $JDK${{ matrix.jdk }}/bin/jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
