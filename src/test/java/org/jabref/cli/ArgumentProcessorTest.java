@@ -3,8 +3,10 @@ package org.jabref.cli;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashMap;
 
 import javafx.collections.FXCollections;
 
@@ -27,6 +29,7 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -182,4 +185,13 @@ class ArgumentProcessorTest {
 
         assertTrue(Files.exists(outputHtml));
     }
+    
+    @AfterAll
+    public static void print() {
+        System.out.println("Amount: " + ArgumentProcessor.branchCoverage.size() + "Covered");
+        for (HashMap.Entry<Integer, Boolean> entry : ArgumentProcessor.branchCoverage.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Covered: " + entry.getValue());
+        }
+    }
+    
 }

@@ -6,12 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
+import org.jabref.cli.ArgumentProcessor.Mode;
 import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
@@ -78,11 +80,15 @@ public class ArgumentProcessor {
 
     private boolean guiNeeded;
     private final List<UiCommand> uiCommands = new ArrayList<>();
+    
+    static HashMap<Integer, Boolean> branchCoverage = new HashMap<>();
 
     /**
      * First call the constructor, then call {@link #processArguments()}.
      * Afterward, you can access the {@link #getUiCommands()}.
      */
+    
+    
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
@@ -524,9 +530,11 @@ public class ArgumentProcessor {
      * @return List of opened files (could be .bib, but also other formats). May also contain error results.
      */
     private List<ParserResult> importAndOpenFiles() {
+
         List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
         if (!cli.isBlank() && (!cli.getLeftOver().isEmpty())) {
+            branchCoverage.put(2, true);
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // BIB files to open. Other files, and files that could not be opened
@@ -535,6 +543,8 @@ public class ArgumentProcessor {
 
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {
+                    branchCoverage.put(5, true);
+
                     try {
                         pr = OpenDatabase.loadDatabase(
                                 Path.of(aLeftOver),
@@ -542,11 +552,14 @@ public class ArgumentProcessor {
                                 fileUpdateMonitor);
                         // In contrast to org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed, we do not execute OpenDatabaseAction.performPostOpenActions(result, dialogService);
                     } catch (IOException ex) {
+                        branchCoverage.put(7, true);
                         pr = ParserResult.fromError(ex);
                         LOGGER.error("Error opening file '{}'", aLeftOver, ex);
                     }
                 }
-
+                else {
+                    branchCoverage.put(6, true);
+                }
                 if (!bibExtension || (pr.isEmpty())) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
@@ -555,30 +568,47 @@ public class ArgumentProcessor {
                     // This will enable easy integration with web browsers that can
                     // open a reference file in JabRef.
                     if (startupMode == Mode.INITIAL_START) {
+                        branchCoverage.put(10, true);
                         toImport.add(aLeftOver);
                     } else {
+                        branchCoverage.put(11, true);
                         loaded.add(importToOpenBase(aLeftOver).orElse(new ParserResult()));
                     }
                 } else {
+                    branchCoverage.put(9, true);
                     loaded.add(pr);
                 }
             }
         }
+        else {
+            branchCoverage.put(3, true);
+        }
+
 
         if (!cli.isBlank() && cli.isFileImport()) {
+            branchCoverage.put(12, true);
             toImport.add(cli.getFileImport());
+        } else {
+            branchCoverage.put(13, true);
         }
 
         for (String filenameString : toImport) {
+            branchCoverage.put(14, true);
             importFile(filenameString).ifPresent(loaded::add);
         }
 
         if (!cli.isBlank() && cli.isImportToOpenBase()) {
+            branchCoverage.put(15, true);
             importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
+        } else {
+            branchCoverage.put(4, true);
         }
 
         if (!cli.isBlank() && cli.isBibtexImport()) {
+            branchCoverage.put(8, true);
             importBibtexToOpenBase(cli.getBibtexImport(), preferencesService.getImportFormatPreferences()).ifPresent(loaded::add);
+        } else {
+            branchCoverage.put(1, true);
         }
 
         return loaded;
