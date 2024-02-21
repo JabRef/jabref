@@ -173,4 +173,54 @@ class ArgumentProcessorTest {
         // Reset stdout
         System.setOut(stdout);
     }
+
+    @Test
+    void fetchEntriesFromWeb() throws Exception {
+        // This test checks if using the --fetch flag for
+        // the CLI works correctly. The test will attempt
+        // searching a query given a fetcher and verify that no
+        // error occurred when fetching. Whether the fetch found 20
+        // results or 0 the test will still pass, it will also pass
+        // if an invalid fetcher was given as long as the program
+        // properly reports it. However, if a network error occurred during
+        // a fetch then the test will fail.
+
+        // Redirect stout to capture cli output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream stdout = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        // Setup parameters for fetching
+        String found = "Found \\d+ results\\.";
+        String notFound = "No results found\\.";
+        String fetcher = "ACM Portal";
+        String query = "AI";
+        String invalidFetcher = "Could not find fetcher '" + fetcher + "'";
+        boolean fetchSucceeded = false;
+        List<String> args = List.of("-n", "--fetch=" + fetcher + ":" + query);
+
+        // Simulate processArguments with --fetch
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+        String output = outputStream.toString();
+
+        List<String> result = List.of(output.split("\r"));
+        // Check that proper result are displayed to the user
+        for(String outputRow : result) {
+            if (outputRow.matches(found) || outputRow.matches(notFound) || outputRow.matches(invalidFetcher)) {
+                fetchSucceeded = true;
+                break;
+            }
+        }
+
+        assertTrue(fetchSucceeded);
+
+        // Reset stdout
+        System.setOut(stdout);
+    }
 }
