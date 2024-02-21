@@ -67,7 +67,7 @@ class RemoveLatexCommandsFormatterTest {
     @Test
     public void specialCommandFollowedByCharacter() {
         assertEquals("o", formatter.format("\\^o"));
-
+    }
 
     @AfterAll
     public static void print(){

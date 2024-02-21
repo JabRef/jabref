@@ -56,7 +56,7 @@ class LayoutHelperTest {
         Layout layout = layoutHelper.getLayoutFromText();
 
         assertNotNull(layout);
-
+    }
 
     @AfterAll
     public static void print() {

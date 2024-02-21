@@ -30,7 +30,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
  */
 public class LayoutHelper {
   
-    public Map<Integer, Boolean> branchCoverage = new HashMap<>();
+    public static Map<Integer, Boolean> branchCoverage = new HashMap<>();
 
   
     public static final int IS_LAYOUT_TEXT = 1;
