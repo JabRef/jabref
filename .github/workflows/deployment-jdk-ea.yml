@@ -108,7 +108,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir (macOS)
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
-        if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
+        if: (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
@@ -125,61 +125,8 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build dmg (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          # We cannot use "$JDK${{ matrix.jdk }}/bin/jpackage", because jlink expects the same java class version at .class files
-          #  Gradle can use a toolchain of a newer JDK, but does not support .class files produced by a newer Java version.
-          # Here we call the latest release jpackage
-          jpackage \
-          --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
-          --add-modules org.jabref,org.jabref.merged.module  \
-          --dest build/distribution \
-          --app-content buildres/mac/jabrefHost.py \
-          --app-content buildres/mac/native-messaging-host \
-          --name JabRef \
-          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
-          --verbose \
-          --mac-sign \
-          --vendor "JabRef e.V." \
-          --mac-package-identifier JabRef \
-          --mac-package-name JabRef \
-          --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
-          --mac-entitlements buildres/mac/jabref.entitlements \
-          --icon src/main/resources/icons/jabref.icns \
-          --resource-dir buildres/mac \
-          --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
-      - name: Build pkg (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          jpackage \
-          --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
-          --add-modules org.jabref,org.jabref.merged.module  \
-          --dest build/distribution \
-          --app-content buildres/mac/jabrefHost.py \
-          --app-content buildres/mac/native-messaging-host \
-          --name JabRef \
-          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
-          --verbose \
-          --mac-sign \
-          --vendor "JabRef e.V." \
-          --mac-package-identifier JabRef \
-          --mac-package-name JabRef \
-          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
-          --mac-entitlements buildres/mac/jabref.entitlements \
-          --icon src/main/resources/icons/jabref.icns \
-          --resource-dir buildres/mac \
-          --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
-      - name: Build runtime image and installer (linux, Windows)
-        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+      - name: Build runtime image and installer
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
       - name: Package application image (linux, Windows)
@@ -187,7 +134,7 @@ jobs:
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
-        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
