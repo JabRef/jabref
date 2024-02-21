@@ -1,13 +1,16 @@
 package org.jabref.logic.layout.format;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RemoveLatexCommandsFormatterTest {
 
-    private RemoveLatexCommandsFormatter formatter;
+    private static RemoveLatexCommandsFormatter formatter;
 
     @BeforeEach
     public void setUp() {
@@ -57,5 +60,13 @@ class RemoveLatexCommandsFormatterTest {
     @Test
     public void exampleUrlCorrectlyCleaned() {
         assertEquals("http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf", formatter.format("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf"));
+    }
+    @AfterAll
+    public static void print(){
+        Map<Integer, Boolean> branchCoverage = formatter.branchCoverage;
+        System.out.println("Amount: "+branchCoverage.size()+" Covered");
+        for (Map.Entry<Integer, Boolean> entry : branchCoverage.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Covered: " + entry.getValue());
+        }
     }
 }
