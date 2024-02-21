@@ -173,4 +173,25 @@ class RegExpBasedFileFinderTest {
         // then
         assertTrue(result.isEmpty());
     }
+    @Test
+    void findFileNonRecursiveTriggerID_1_3() throws Exception {
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
+        localEntry.setCitationKey("pdfInSubdirectory");
+        localEntry.setField(StandardField.YEAR, "2017");
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("/[citationkey].*\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory.getParent()), PDF_EXTENSION);
+
+        assertTrue(result.isEmpty());
+        branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
+    }
+    @Test
+    void navigateUpToParentDirectory() throws Exception {
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("pdfInSubdirectory");
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/../[citationkey].*\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+        assertTrue(result.isEmpty());
+    }
 }
