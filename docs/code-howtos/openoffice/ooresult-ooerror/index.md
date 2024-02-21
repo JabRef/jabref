@@ -1,7 +1,7 @@
 ---
 nav_order: 5
 parent: The LibreOffice Panel
-has_children: true
+grand_parent: Code Howtos
 ---
 # About OOError, OOResult, and OOVoidResult
 
