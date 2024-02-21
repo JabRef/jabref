@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.Map;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.StandardFileType;
@@ -20,6 +21,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -242,5 +244,13 @@ class MedlinePlainImporterTest {
     @Test
     void getCLIId() {
         assertEquals("medlineplain", importer.getId());
+    }
+
+    @AfterAll
+    public static void print(){
+        System.out.println("Amount: "+MedlinePlainImporter.branchCoverage.size()+" branches covered");
+        for (Map.Entry<String, Boolean> entry : MedlinePlainImporter.branchCoverage.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + "\t|\t " + entry.getValue());
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.HashMap;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -82,55 +83,69 @@ public class FieldComparator implements Comparator<BibEntry> {
         return null;
     }
 
+	static HashMap<String, Boolean> branchCoverage = new HashMap<String, Boolean>();
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
         String f1;
         String f2;
 
         if (fieldType == FieldType.TYPE) {
+			branchCoverage.put("0.T", true);
             // Sort by type.
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
         } else {
+			branchCoverage.put("0.F", true);
             f1 = getFieldValue(e1);
             f2 = getFieldValue(e2);
         }
 
         // Catch all cases involving null:
         if ((f1 == null) && (f2 == null)) {
+			branchCoverage.put("1.0.T", true);
             return 0;
         } else if (f1 == null) {
+			branchCoverage.put("1.1.T", true);
             return -multiplier;
         } else if (f2 == null) {
+			branchCoverage.put("1.*.F", true);
             return +multiplier;
         }
 
         // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
+			branchCoverage.put("2.0.T", true);
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
+			branchCoverage.put("2.1.T", true);
             int f1year;
             try {
                 f1year = StringUtil.intValueOf(f1);
             } catch (NumberFormatException ex) {
+			    branchCoverage.put("2.1.1.Catch", true);
                 f1year = 0;
             }
             int f2year;
             try {
                 f2year = StringUtil.intValueOf(f2);
             } catch (NumberFormatException ex) {
+			    branchCoverage.put("2.1.2.Catch", true);
                 f2year = 0;
             }
             int comparisonResult = Integer.compare(f1year, f2year);
             return comparisonResult * multiplier;
         } else if (fieldType == FieldType.MONTH) {
+			branchCoverage.put("2.2.Catch", true);
             int month1 = Month.parse(f1).map(Month::getNumber).orElse(-1);
             int month2 = Month.parse(f2).map(Month::getNumber).orElse(-1);
             return Integer.compare(month1, month2) * multiplier;
+        }else{            
+			branchCoverage.put("2.X.F", true);
         }
 
         if (isNumeric) {
+			branchCoverage.put("3.1.T", true);
             // Cannot use {@link org.jabref.logic.util.comparator.NumericFieldComparator}, because
             //   we need the "Else both are strings" branch and
             //   unparseable strings are sorted differently.
@@ -140,6 +155,7 @@ public class FieldComparator implements Comparator<BibEntry> {
                 i1 = StringUtil.intValueOf(f1);
                 i1present = true;
             } catch (NumberFormatException ex) {
+			    branchCoverage.put("3.1.1.Catch", true);
                 i1 = 0;
                 i1present = false;
             }
@@ -149,21 +165,27 @@ public class FieldComparator implements Comparator<BibEntry> {
                 i2 = StringUtil.intValueOf(f2);
                 i2present = true;
             } catch (NumberFormatException ex) {
+			    branchCoverage.put("3.1.2.Catch", true);
                 i2 = 0;
                 i2present = false;
             }
 
             if (i1present && i2present) {
+			    branchCoverage.put("3.1.1.T", true);
                 // Ok, parsing was successful. Update f1 and f2:
                 return Integer.compare(i1, i2) * multiplier;
             } else if (i1present) {
+			    branchCoverage.put("3.1.2.T", true);
                 // The first one was parsable, but not the second one.
                 // This means we consider one < two
                 return -1 * multiplier;
             } else if (i2present) {
+			    branchCoverage.put("3.1.3.T", true);
                 // The second one was parsable, but not the first one.
                 // This means we consider one > two
                 return multiplier;
+            }else{
+			    branchCoverage.put("3.1.4.T", true);
             }
             // Else none of them were parseable, and we can fall back on comparing strings.
         }
