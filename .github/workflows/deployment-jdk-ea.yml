@@ -106,7 +106,7 @@ jobs:
       - name: Prepare merged jars and modules dir (macOS)
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
-        run: ./gradlew -PjavaToolchainVersion=${{ matrix.jdk }} -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
+        run: ./gradlew -i -Porg.gradle.java.installations.auto-download=false javaToolchains -PjavaToolchainVersion=${{ matrix.jdk }} -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
@@ -175,7 +175,7 @@ jobs:
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
-        run: ./gradlew -i -PjavaToolchainVersion=${{ matrix.jdk }} -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
+        run: ./gradlew -i -Porg.gradle.java.installations.auto-download=false javaToolchains -PjavaToolchainVersion=${{ matrix.jdk }}  -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
       - name: Package application image (linux, Windows)
         if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
