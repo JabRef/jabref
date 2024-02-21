@@ -1,5 +1,7 @@
 package org.jabref.cli;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -9,6 +11,7 @@ import java.util.Objects;
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
+import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -31,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -133,5 +137,40 @@ class ArgumentProcessorTest {
         processor.processArguments();
 
         assertTrue(Files.exists(outputHtml));
+    }
+
+    @Test
+    void printVersion() throws Exception {
+        // This test will attempt to verify that when using the CLI
+        // with the flag --version that the appropriate version information
+        // is printed.
+        // The test checks that a line including "JabRef" followed
+        // by a version number is printed and if not then the test fails.
+
+        // Redirect stdout to capture CLI output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream stdout = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        List<String> args = List.of("-n", "--version");
+
+        // Simulate processArguments with --version
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+        String output = outputStream.toString();
+
+        // Check that output contains version information
+        List<String> version = List.of(output.split(" "));
+        String versionNr = String.valueOf(Globals.BUILD_INFO.version);
+        assertEquals("JabRef", version.get(0));
+        assertTrue(version.get(1).contains(versionNr));
+
+        // Reset stdout
+        System.setOut(stdout);
     }
 }
