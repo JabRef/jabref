@@ -2,10 +2,13 @@ package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.HashMap;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,12 +20,14 @@ class LayoutHelperTest {
 
     private final LayoutFormatterPreferences layoutFormatterPreferences = mock(LayoutFormatterPreferences.class);
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
+    private static Map<Integer, Boolean> branchCoverage= new HashMap<>();;
 
     @Test
     public void backslashDoesNotTriggerException() {
         StringReader stringReader = new StringReader("\\");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         assertThrows(IOException.class, layoutHelper::getLayoutFromText);
+        branchCoverage.putAll(layoutHelper.branchCoverage);
     }
 
     @Test
@@ -30,6 +35,7 @@ class LayoutHelperTest {
         StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
+        branchCoverage.putAll(layoutHelper.branchCoverage);
         assertNotNull(layout);
     }
 
@@ -38,6 +44,7 @@ class LayoutHelperTest {
         StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi\\end{doi}");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
+        branchCoverage.putAll(layoutHelper.branchCoverage);
         assertNotNull(layout);
     }
 
@@ -49,7 +56,7 @@ class LayoutHelperTest {
         Layout layout = layoutHelper.getLayoutFromText();
 
         assertNotNull(layout);
-
+    }
 
     @AfterAll
     public static void print() {
