@@ -188,6 +188,7 @@ class RegExpBasedFileFinderTest {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("/[citationkey].*\\.[extension]", ',');
 
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory.getParent()), PDF_EXTENSION);
+
         assertTrue(result.isEmpty());
     }
     @Test
