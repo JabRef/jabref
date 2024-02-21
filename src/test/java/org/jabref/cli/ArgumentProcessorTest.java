@@ -211,7 +211,7 @@ class ArgumentProcessorTest {
 
         List<String> result = List.of(output.split("\r"));
         // Check that proper result are displayed to the user
-        for(String outputRow : result) {
+        for (String outputRow : result) {
             if (outputRow.matches(found) || outputRow.matches(notFound) || outputRow.matches(invalidFetcher)) {
                 fetchSucceeded = true;
                 break;
@@ -222,5 +222,36 @@ class ArgumentProcessorTest {
 
         // Reset stdout
         System.setOut(stdout);
+    }
+
+    @Test
+    void tooManyWriteFlags() throws Exception {
+        // This test checks that if too many -write flags
+        // are given to the CLI that the program correctly
+        // reports the error. Specifically in this test, the flags
+        // -writeMetadatatoPdf and -writeXMPtoPdf are used.
+
+        // Redirect stderr to capture cli output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream stderr = System.err;
+        System.setErr(new PrintStream(outputStream));
+
+        List<String> args = List.of("-n", "-writeMetadatatoPdf all", "-writeXMPtoPdf all");
+        String expectedOutput = "Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf";
+
+        // Simulate processArguments with -writeMetadatatoPdf all -writeXMPtoPdf all
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+        String output = outputStream.toString();
+
+        assertTrue(output.contains(expectedOutput));
+
+        // Reset stderr
+        System.setOut(stderr);
     }
 }
