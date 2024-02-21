@@ -159,7 +159,7 @@ jobs:
             mv "$file" "${base}-jdk${{ matrix.jdk }}.${ext}"
           done
       - name: Setup rsync (macOS)
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         run: brew install rsync
       - name: Setup rsync (Windows)
         if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
@@ -180,21 +180,10 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
       - name: Upload to builds.jabref.org (linux, macOS)
-        # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
-        #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
-        # needs to be on one line; multi line does not work
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+        if: (matrix.os != 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
-      - name: Upload to GitHub workflow artifacts store (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
-        uses: actions/upload-artifact@v4
-        with:
-          # tbn = to-be-notarized
-          name: JabRef-macOS-tbn
-          path: build/distribution
-          compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES')
         uses: actions/upload-artifact@v4
@@ -227,47 +216,3 @@ jobs:
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
           comment_tag: download-link
           mode: recreate
-  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: macOS notarization
-    runs-on: macos-latest
-    needs: [build]
-    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
-    steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Download from GitHub workflow artifacts store (macOS)
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-macOS-tbn
-          path: build/distribution/
-      - name: Notarize dmg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.dmg
-      - name: Notarize pkg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg
-      - name: Upload to builds.jabref.org
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
