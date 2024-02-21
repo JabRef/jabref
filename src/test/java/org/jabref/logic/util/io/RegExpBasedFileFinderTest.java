@@ -198,6 +198,7 @@ class RegExpBasedFileFinderTest {
 
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory.getParent()), PDF_EXTENSION);
         branchCoverage.putAll(RegExpBasedFileFinder.branchCoverage);
+
         assertTrue(result.isEmpty());
     }
     @Test
