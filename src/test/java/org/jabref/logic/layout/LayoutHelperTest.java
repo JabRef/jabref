@@ -85,7 +85,8 @@ class LayoutHelperTest {
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
         assertNotNull(layout);
-
+    }
+    @Test
     public void testBracketedOptionFieldParsing() throws Exception {
         StringReader stringReader = new StringReader("\\format[doi] DOI: \\doi");
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
