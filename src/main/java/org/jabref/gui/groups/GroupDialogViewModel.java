@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -132,7 +131,6 @@ public class GroupDialogViewModel {
     }
 
     private void setupValidation() {
-        ArrayList<Boolean> coverage = new ArrayList<>(Collections.nCopies(16, false));
         validator = new CompositeValidator();
 
         nameValidator = new FunctionBasedValidator<>(
@@ -154,11 +152,8 @@ public class GroupDialogViewModel {
                 name -> {
                     Optional<GroupTreeNode> rootGroup = currentDatabase.getMetaData().getGroups();
                     if (rootGroup.isPresent()) {
-                        coverage.set(1, true);
                         int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).size();
                         if ((editedGroup == null) && (groupsWithSameName > 0)) {
-                            coverage.set(2, true);
-                            coverage.set(3, true);
                             // New group but there is already one group with the same name
                             return false;
                         }
@@ -177,17 +172,14 @@ public class GroupDialogViewModel {
                 keywordGroupSearchTermProperty,
                 input -> {
                     if (!keywordGroupRegexProperty.getValue()) {
-                        coverage.set(4, true);
                         return true;
                     }
 
                     if (StringUtil.isNullOrEmpty(input)) {
-                        coverage.set(5, true);
                         return false;
                     }
 
                     try {
-                        coverage.set(6, true);
                         Pattern.compile(input);
                         return true;
                     } catch (PatternSyntaxException ignored) {
@@ -217,17 +209,14 @@ public class GroupDialogViewModel {
                 searchGroupSearchTermProperty,
                 input -> {
                     if (!searchFlagsProperty.getValue().contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-                        coverage.set(7, true);
                         return true;
                     }
 
                     if (StringUtil.isNullOrEmpty(input)) {
-                        coverage.set(8, true);
                         return false;
                     }
 
                     try {
-                        coverage.set(9, true);
                         Pattern.compile(input);
                         return true;
                     } catch (PatternSyntaxException e) {
@@ -250,13 +239,10 @@ public class GroupDialogViewModel {
                 texGroupFilePathProperty,
                 input -> {
                     if (StringUtil.isBlank(input)) {
-                        coverage.set(10, true);
                         return false;
                     } else {
                         Path inputPath = getAbsoluteTexGroupPath(input);
                         if (!inputPath.isAbsolute() || !Files.isRegularFile(inputPath)) {
-                            coverage.set(11, true);
-                            coverage.set(12, true);
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
@@ -268,7 +254,6 @@ public class GroupDialogViewModel {
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {
-                coverage.set(13, true);
                 validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
@@ -277,7 +262,6 @@ public class GroupDialogViewModel {
 
         typeKeywordsProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {
-                coverage.set(14, true);
                 validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
@@ -286,7 +270,6 @@ public class GroupDialogViewModel {
 
         typeTexProperty.addListener((obs, oldValue, isSelected) -> {
             if (isSelected) {
-                coverage.set(15, true);
                 validator.addValidators(texGroupFilePathValidator);
             } else {
                 validator.removeValidators(texGroupFilePathValidator);
@@ -296,9 +279,6 @@ public class GroupDialogViewModel {
         validator.addValidators(nameValidator,
                 nameContainsDelimiterValidator,
                 sameNameValidator);
-        for(int i = 1; i < coverage.size(); i++) {
-            System.out.println("Brand ID " + Integer.toString(i) + ": " + coverage.get(i).toString());
-        }
     }
 
     /**
