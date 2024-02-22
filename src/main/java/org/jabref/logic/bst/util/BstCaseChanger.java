@@ -1,5 +1,6 @@
 package org.jabref.logic.bst.util;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -7,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class BstCaseChanger {
+
+
+    static Map<Integer, Boolean> branchCoverage = new HashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BstCaseChanger.class);
 
@@ -265,6 +269,7 @@ public final class BstCaseChanger {
      * @return the special LaTeX character or null
      */
     public static Optional<String> findSpecialChar(char[] c, int pos) {
+        System.out.println("\n\nPRINT SOMETHING\n\n");
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
                 return Optional.of("oe");
@@ -293,4 +298,126 @@ public final class BstCaseChanger {
         }
         return Optional.empty();
     }
+
+
+
+    public static Optional<String> findSpecialCharToTest(char[] c, int pos ) {
+        if ((pos + 1) < c.length){
+            branchCoverage.put(1, true);
+        }
+        if ((pos + 1) < c.length) {
+            ////////// IF 1.1
+            if (c[pos] == 'o'){
+                branchCoverage.put(2, true);
+            }
+            if (c[pos + 1] == 'e'){
+                branchCoverage.put(3, true);
+            }
+            ////////// IF 1.1
+            if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
+                return Optional.of("oe");
+            }
+
+
+
+            ////////// IF 1.2
+            if (c[pos] == 'O'){
+                branchCoverage.put(4, true);
+            }
+            if (c[pos + 1] == 'E'){
+                branchCoverage.put(5, true);
+            }
+
+            ////////// 1.2
+            if ((c[pos] == 'O') && (c[pos + 1] == 'E')) {
+                return Optional.of("OE");
+            }
+
+
+
+            ////////// IF 1.3
+            if (c[pos] == 'a'){
+                branchCoverage.put(6, true);
+            }
+            if (c[pos + 1] == 'e'){
+                branchCoverage.put(7, true);
+            }
+
+            ////////// IF 1.3
+
+            if ((c[pos] == 'a') && (c[pos + 1] == 'e')) {
+                return Optional.of("ae");
+            }
+
+
+
+            ////////// IF 1.4
+            if (c[pos] == 'A'){
+                branchCoverage.put(8, true);
+            }
+            if (c[pos + 1] == 'E'){
+                branchCoverage.put(9, true);
+            }
+
+            ////////// IF 1.4
+
+            if ((c[pos] == 'A') && (c[pos + 1] == 'E')) {
+                return Optional.of("AE");
+            }
+
+
+
+            ////////// IF 1.5
+            if (c[pos] == 's'){
+                branchCoverage.put(10, true);
+            }
+            if (c[pos + 1] == 's'){
+                branchCoverage.put(11, true);
+            }
+
+            ////////// IF 1.5
+
+            if ((c[pos] == 's') && (c[pos + 1] == 's')) {
+                return Optional.of("ss");
+            }
+
+
+
+            ////////// IF 1.6
+            if (c[pos] == 'A'){
+                branchCoverage.put(12, true);
+            }
+            if (c[pos + 1] == 'A'){
+                branchCoverage.put(13, true);
+            }
+            //////////
+
+            if ((c[pos] == 'A') && (c[pos + 1] == 'A')) {
+                return Optional.of("AA");
+            }
+            /////////// IF 1.7
+            if (c[pos] == 'a'){
+                branchCoverage.put(14, true);
+            }
+            if (c[pos + 1] == 'a'){
+                branchCoverage.put(15, true);
+            }
+            //////////
+
+            if ((c[pos] == 'a') && (c[pos + 1] == 'a')) {
+                return Optional.of("aa");
+            }
+        }
+        /////////// IF 2
+        if  ("ijoOlL".indexOf(c[pos]) >= 0) {
+            branchCoverage.put(16, true);
+        }
+        //////////  IF 2
+
+        if ("ijoOlL".indexOf(c[pos]) >= 0) {
+            return Optional.of(String.valueOf(c[pos]));
+        }
+        return Optional.empty();
+    }
+
 }
