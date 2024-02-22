@@ -356,28 +356,175 @@ public class MedlinePlainImporter extends Importer {
         }
     }
 
+	static HashMap<String, Boolean> branchCoverage = new HashMap<String, Boolean>();
+    
     private void addDates(Map<Field, String> hm, String lab, String val) {
-        if ("CRDT".equals(lab) && isCreateDateFormat(val)) {
+		// If 0
+		boolean a0, a1, a2, a3, a4, a5, a6, a7;
+		boolean b0, b1, b2, b3, b4, 	b6, b7;
+		a0 = "CRDT".equals(lab);
+		b0 = isCreateDateFormat(val);
+		a1 = "DEP".equals(lab);
+		b1 = isDateFormat(val);
+		a2 = "DA".equals(lab);
+		b2 = isDateFormat(val);
+		a3 = "DCOM".equals(lab);
+		b3 = isDateFormat(val);
+		a4 ="LR".equals(lab);
+		b4 = isDateFormat(val);
+		a5 = "DP".equals(lab);
+		a6 = "EDAT".equals(lab);
+		b6 = isCreateDateFormat(val);
+		a7 = "MHDA".equals(lab);
+		b7 = isCreateDateFormat(val);
+		if (!a0 && !b0){
+			branchCoverage.put("0.FF", true);
+		}
+		if (a0 && !b0){
+			branchCoverage.put("0.TF", true);
+		}
+		if (!a0 && b0){
+			branchCoverage.put("0.FT", true);
+		}
+		if (!(a0 && b0)){
+			// If 1
+			if (!a1 && !b1){
+				branchCoverage.put("1.FF", true);
+			}
+			else if (a1 && !b1){
+				branchCoverage.put("1.TF", true);
+			}
+			else if (!a1 && b1){
+				branchCoverage.put("1.FT", true);
+			}
+			
+			if(!(a1 && b1)){
+				// If 2
+				
+				if (!a2 && !b2){
+					branchCoverage.put("2.FF", true);
+				}
+				else if (a2 && !b2){
+					branchCoverage.put("2.TF", true);
+				}
+				else if (!a2 && b2){
+					branchCoverage.put("2.FT", true);
+				}
+				
+				if(!(a2 && b2)){
+					// If 3
+					if (!a3 && !b3){
+						branchCoverage.put("3.FF", true);
+					}
+					else if (a3 && !b3){
+						branchCoverage.put("3.TF", true);
+					}
+					else if (!a3 && b3){
+						branchCoverage.put("3.FT", true);
+					}
+					
+					if(!(a3 && b3)){
+						// If 4
+						if (!a4 && !b4){
+							branchCoverage.put("4.FF", true);
+						}
+						else if (a4 && !b4){
+							branchCoverage.put("4.TF", true);
+						}
+						else if (!a4 && b4){
+							branchCoverage.put("4.FT", true);
+						}
+						
+						if(!(a4 && b4)){
+							// If 5							
+							if(!(a5)){
+								branchCoverage.put("5..F", true);
+								// If 6
+								if (!a6 && !b6){
+									branchCoverage.put("6.FF", true);
+								}
+								else if (a6 && !b6){
+									branchCoverage.put("6.TF", true);
+								}
+								else if (!a6 && b6){
+									branchCoverage.put("6.FT", true);
+								}
+								
+								if(!(a6 && b6)){
+									// If 7
+									if (!a7 && !b7){
+										branchCoverage.put("7.FF", true);
+									}
+									else if (a7 && !b7){
+										branchCoverage.put("7.TF", true);
+									}
+									else if (!a7 && b7){
+										branchCoverage.put("7.FT", true);
+									}
+									
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		
+		// If 0
+        if (a0 && b0){
+			branchCoverage.put("0.TT", true);
             hm.put(new UnknownField("create-date"), val);
-        } else if ("DEP".equals(lab) && isDateFormat(val)) {
+        } 
+		// If 1
+		else if (a1 && b1) {
+			branchCoverage.put("1.TT", true);
             hm.put(new UnknownField("electronic-publication"), val);
-        } else if ("DA".equals(lab) && isDateFormat(val)) {
+        } 
+		// If 2
+		else if (a2 && b2) {
+			branchCoverage.put("2.TT", true);
             hm.put(new UnknownField("date-created"), val);
-        } else if ("DCOM".equals(lab) && isDateFormat(val)) {
+        } 
+		// If 3
+		else if (a3 && b3) {
+			branchCoverage.put("3.TT", true);
             hm.put(new UnknownField("completed"), val);
-        } else if ("LR".equals(lab) && isDateFormat(val)) {
+        } 
+		// If 4
+		else if (a4 && b4) {
+			branchCoverage.put("4.TT", true);
             hm.put(new UnknownField("revised"), val);
-        } else if ("DP".equals(lab)) {
+        }  
+		// If 5
+		else if (a5) {
+			branchCoverage.put("5..T", true);
             String[] parts = val.split(" ");
             hm.put(StandardField.YEAR, parts[0]);
+			
             if ((parts.length > 1) && !parts[1].isEmpty()) {
+				branchCoverage.put("5.1.TT", true);
                 hm.put(StandardField.MONTH, parts[1]);
-            }
-        } else if ("EDAT".equals(lab) && isCreateDateFormat(val)) {
+            }else if((parts.length > 1) && parts[1].isEmpty()){
+				branchCoverage.put("5.1.TF", true);
+			}else if(!(parts.length > 1)){
+				branchCoverage.put("5.1.F*", true);
+			}
+        }  
+		// If 6
+		else if (a6 && b6) {
+			branchCoverage.put("6.TT", true);
             hm.put(new UnknownField("publication"), val);
-        } else if ("MHDA".equals(lab) && isCreateDateFormat(val)) {
+        }  
+		// If 7
+		else if (a7 && b7) {
+			branchCoverage.put("7.TT", true);
             hm.put(new UnknownField("mesh-date"), val);
         }
+		else{
+			branchCoverage.put("NO_TRUE", true);
+		}
+		
     }
 
     private boolean isCreateDateFormat(String value) {
