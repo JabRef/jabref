@@ -37,6 +37,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ArgumentProcessorTest {
@@ -253,5 +254,27 @@ class ArgumentProcessorTest {
 
         // Reset stderr
         System.setOut(stderr);
+    }
+
+    @Test
+    void exportPreferences() throws Exception {
+        // This tests check that the exportPreferences
+        // function is correctly called with the correct arguments
+        // when the CLI is used with the flag -x `filename.xml`
+
+        String filename = "test_preferences.xml";
+        List<String> args = List.of("-n", "-x", filename);
+
+        // Simulate processArguments with -x
+        ArgumentProcessor processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
+        processor.processArguments();
+
+        // Check that exportPreferences is correctly called
+        verify(preferencesService).exportPreferences(Path.of(filename));
     }
 }
