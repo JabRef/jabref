@@ -271,6 +271,7 @@ public class FieldComparatorTest {
             System.out.println("ID: " + entry.getKey() + "\t|\t " + entry.getValue());
         }
     }
+  
         @Test
     public void compareYearFieldFirstNan() throws Exception {
         FieldComparator comparator = new FieldComparator(StandardField.YEAR);
