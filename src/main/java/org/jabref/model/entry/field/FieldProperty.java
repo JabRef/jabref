@@ -13,6 +13,7 @@ public enum FieldProperty {
     ISSN,
     JOURNAL_NAME,
     LANGUAGE,
+    MARKDOWN, // Field content is text, but should be interpreted as markdown
     MONTH,
     MULTIPLE_ENTRY_LINK,
     MULTILINE_TEXT,
