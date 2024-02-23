@@ -181,7 +181,6 @@ public class FieldComparator implements Comparator<BibEntry> {
                 // The second one was parsable, but not the first one.
                 // This means we consider one > two
                 return multiplier;
-            }else{
             }
             // Else none of them were parseable, and we can fall back on comparing strings.
         }
@@ -191,5 +190,4 @@ public class FieldComparator implements Comparator<BibEntry> {
         return COLLATOR.compare(ours, theirs) * multiplier;
     }
 
-    //17 -> 10
 }
