@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -86,6 +87,7 @@ public class AutoSetFileLinksUtil {
                     // store undo information
                     String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
                     String oldVal = entry.getField(StandardField.FILE).orElse(null);
+                    //field values to be discussed
                     UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
                     ce.addEdit(fieldChange);
                     changed = true;
@@ -105,12 +107,31 @@ public class AutoSetFileLinksUtil {
 
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
-
-        List<String> extensions = filePreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+        List<String> bibFile = entry.getFiles().stream().map(obj -> obj.getLink()).collect(Collectors.toList());
+        List<String> extensions = filePreferences.getExternalFileTypes().stream()
+                                                 .map(ExternalFileType::getExtension)
+                                                 .collect(Collectors.toList());
 
         // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
-        List<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
+        List<Path> result = new ArrayList<>();
+
+        // Search in each directory and its subdirectories
+        for (Path directory : directories) {
+            List<Path> filesInDirectory = Files.walk(directory)
+                                               .filter(Files::isRegularFile)
+                                               .collect(Collectors.toList());
+            for (Path file : filesInDirectory) {
+                String fileNameDir = file.getFileName().toString();
+                for (String bibFilePath : bibFile) {
+                    Path bibFileNamePath = Paths.get(bibFilePath).getFileName();
+                    if (bibFileNamePath != null && bibFileNamePath.toString().equals(fileNameDir)) {
+                        result.add(file);
+
+                    }
+                }
+            }
+        }
 
         // Collect the found files that are not yet linked
         for (Path foundFile : result) {
@@ -118,6 +139,7 @@ public class AutoSetFileLinksUtil {
                                              .map(file -> file.findIn(directories))
                                              .anyMatch(file -> {
                                                  try {
+
                                                      return file.isPresent() && Files.isSameFile(file.get(), foundFile);
                                                  } catch (IOException e) {
                                                      LOGGER.error("Problem with isSameFile", e);
@@ -127,8 +149,8 @@ public class AutoSetFileLinksUtil {
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
-                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
-                                                            .orElse(Optional.of(new UnknownExternalFileType("")));
+                                                          .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
+                                                          .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
@@ -138,5 +160,6 @@ public class AutoSetFileLinksUtil {
         }
 
         return linkedFiles;
+        
     }
 }
