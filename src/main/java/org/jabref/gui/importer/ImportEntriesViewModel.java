@@ -205,7 +205,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
-        importHandler.importEntries(entriesToImport);
+        importHandler.importEntriesWithDuplicateCheck(selectedDb.getValue(), entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
 
