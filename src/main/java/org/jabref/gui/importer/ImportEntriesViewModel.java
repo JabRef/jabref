@@ -169,7 +169,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 parserResult.getDatabase().getEntries());
 
         buildImportHandlerThenImportEntries(entriesToImport);
-
     }
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
