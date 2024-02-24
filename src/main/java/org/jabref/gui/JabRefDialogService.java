@@ -154,6 +154,7 @@ public class JabRefDialogService implements DialogService {
         ComboBox<T> comboBox = (ComboBox<T>) choiceDialog.getDialogPane().lookup(".combo-box");
         comboBox.setEditable(true);
         comboBox.setConverter(converter);
+        EasyBind.subscribe(comboBox.getEditor().textProperty(), text -> comboBox.setValue(converter.fromString(text)));
         return choiceDialog.showAndWait();
     }
 
