@@ -142,31 +142,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param entriesToImport subset of the entries contained in parserResult
      */
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
-        // Check if we are supposed to warn about duplicates.
-        // If so, then see if there are duplicates, and warn if yes.
-        if (preferences.getImporterPreferences().shouldWarnAboutDuplicatesOnImport()) {
-            BackgroundTask.wrap(() -> entriesToImport.stream()
-                                                     .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
-                if (duplicateFound) {
-                    boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                            Localization.lang("There are possible duplicates that haven't been resolved. Continue?"),
-                            Localization.lang("Continue with import"),
-                            Localization.lang("Cancel import"),
-                            Localization.lang("Do not ask again"),
-                            optOut -> preferences.getImporterPreferences().setWarnAboutDuplicatesOnImport(!optOut));
-
-                    if (!continueImport) {
-                        dialogService.notify(Localization.lang("Import canceled"));
-                    } else {
-                        buildImportHandlerThenImportEntries(entriesToImport);
-                    }
-                } else {
-                    buildImportHandlerThenImportEntries(entriesToImport);
-                }
-            }).executeWith(taskExecutor);
-        } else {
-            buildImportHandlerThenImportEntries(entriesToImport);
-        }
 
         // Remember the selection in the dialog
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
@@ -193,7 +168,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
 
-//        JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
+        buildImportHandlerThenImportEntries(entriesToImport);
+
     }
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
