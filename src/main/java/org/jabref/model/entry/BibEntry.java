@@ -1190,4 +1190,7 @@ public class BibEntry implements Cloneable {
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
     }
+    public List<String> getAuthors() {
+        return null;
+    }
 }
