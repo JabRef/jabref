@@ -27,7 +27,7 @@
                         <Button onAction="#unselectAll"  text="%Unselect all"/>
                         <Button fx:id="previousButton"  text="Previous" />
                         <Button fx:id="nextButton" text="Next" />
-<!--                        <Label fx:id="pageLabel"/>-->
+                        <Label fx:id="pageLabel"/>
                     </HBox>
                     <VBox fx:id="bibTeXDataBox" visible="false" managed="false">
                         <Label fx:id="bibTeXDataLabel"/>

@@ -1,12 +1,18 @@
 package org.jabref.gui.importer;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -57,8 +63,7 @@ import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.richtext.CodeArea;
 
-public class ImportEntriesDialog extends BaseDialog<Boolean> {
-
+public class WebImportEntriesDialog extends BaseDialog<Boolean> {
     public CheckListView<BibEntry> entriesListView;
     public ComboBox<BibDatabaseContext> libraryListView;
     public ButtonType importButton;
@@ -76,9 +81,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private final BackgroundTask<ParserResult> task;
     private final BibDatabaseContext database;
     private ImportEntriesViewModel viewModel;
-    // private final int entriesPerPage = 20;
-   // private final ObservableList<BibEntry> allEntries;
-   // private final IntegerProperty currentPage = new SimpleIntegerProperty(1);
+    private List<BibEntry> entries = new ArrayList<>();
+     private IntegerProperty currentPage;
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
@@ -93,22 +97,41 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * @param database the database to import into
      * @param task     the task executed for parsing the selected files(s).
      */
-    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
+    public WebImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
-      //  this.allEntries = FXCollections.observableArrayList();
+        this.currentPage = new SimpleIntegerProperty(1);
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
+        task.onSuccess(parserResult -> {
+            entries = parserResult.getDatabase().getEntries();
+            setItemsForCurrentPage(currentPage.get(), 20);
+        });
+        previousButton.setOnAction(event -> {
+            if (currentPage.get() > 1) {
+                currentPage.set(currentPage.get() - 1);
+                setItemsForCurrentPage(currentPage.get(), 20);
+            }
+        });
+
+        nextButton.setOnAction(event -> {
+            int totalPages = (int) Math.ceil((double) entries.size() / 20);
+            if (currentPage.get() < totalPages) {
+                currentPage.set(currentPage.get() + 1);
+                setItemsForCurrentPage(currentPage.get(), 20);
+            }
+        });
+
+        task.executeWith(taskExecutor);
+
         BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
+        previousButton.disableProperty().bind(currentPage.lessThanOrEqualTo(1));
 
         downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
-
-//        allEntries.addAll(database.getEntries());
-//        setEntries(Collections.emptyList());
 
         setResultConverter(button -> {
             if (button == importButton) {
@@ -197,31 +220,19 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
-      //  addPagination();
     }
 
-//    public void setEntries(List<BibEntry> entries) {
-//        this.allEntries.setAll(entries);
-//        currentPage.set(1);
-//    }
-//
-//    public void addPagination() {
-//        previousButton.setOnAction(event -> {
-//            if (currentPage.get() > 1) {
-//                currentPage.set(currentPage.get() - 1);
-//            }
-//        });
-//
-//        nextButton.setOnAction(event -> {
-//            int totalPages = calculateTotalPages();
-//            if (currentPage.get() < totalPages) {
-//                currentPage.set(currentPage.get() + 1);
-//            }
-//        });
-//       currentPage.addListener(((observable, oldValue, newValue) -> updatePageEntries()));
-//
-//        updatePageEntries();
-//    }
+    public void setItemsForCurrentPage(int pageNumber, int itemsPerPage) {
+        if (entries == null) {
+            return;
+        }
+       int startIndex = (pageNumber - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, entries.size());
+        ObservableList<BibEntry> pageEntries = FXCollections.observableArrayList(entries.subList(startIndex, endIndex));
+        entriesListView.setItems(pageEntries);
+        int totalPages = (int) Math.ceil((double) entries.size() / itemsPerPage);
+        pageLabel.setText("Page " + pageNumber + " of " + totalPages);
+    }
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
         if (entriesListView.getCheckModel().isChecked(entry)) {
@@ -299,15 +310,4 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
     }
-
-//    private void updatePageEntries() {
-//        int startIndex = (currentPage.get() - 1) * entriesPerPage;
-//        int endIndex = Math.min(startIndex + entriesPerPage, allEntries.size());
-//        this.entriesListView.setItems(FXCollections.observableArrayList(allEntries.subList(startIndex, endIndex)));
-//        pageLabel.setText(String.valueOf(currentPage.get()));
-//    }
-
-//    private int calculateTotalPages() {
-//        return (int) Math.ceil((double) allEntries.size() / entriesPerPage);
-//    }
 }

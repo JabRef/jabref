@@ -40,9 +40,9 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ImportEntriesViewModel extends AbstractViewModel {
+public class WebimportEntriesViewmodel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebimportEntriesViewmodel.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -56,13 +56,12 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
-    // private final IntegerProperty totalNumberOfEntries = new SimpleIntegerProperty(0);
 
     /**
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
      */
-    public ImportEntriesViewModel(BackgroundTask<ParserResult> task,
+    public WebimportEntriesViewmodel(BackgroundTask<ParserResult> task,
                                   TaskExecutor taskExecutor,
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
@@ -90,14 +89,12 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
             if (entries.isEmpty()) {
-               task.updateMessage(Localization.lang("No entries corresponding to given query"));
+                task.updateMessage(Localization.lang("No entries corresponding to given query"));
             }
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);
         }).executeWith(taskExecutor);
-
-        // totalNumberOfEntries.set(getTotalNumberOfEntries());
     }
 
     public String getMessage() {
@@ -120,14 +117,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return entries;
     }
 
-//    public int getTotalNumberOfEntries() {
-//        return databaseContext.getDatabase().getEntries().size();
-//    }
-
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
                 new DuplicateCheck(entryTypesManager)
-                .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
+                        .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
     }
 
     public String getSourceString(BibEntry entry) {
