@@ -51,7 +51,7 @@ public class CffDate implements LayoutFormatter {
                     int year = Year.parse(fieldText, formatter).getValue();
                     builder.append("year: ");
                     builder.append(year);
-                } catch (DateTimeParseException g){
+                } catch (DateTimeParseException g) {
                     builder.append("issue-date: ");
                     builder.append(fieldText);
                 }
