@@ -8,6 +8,9 @@ preferred-citation:
   authors:
     - name: \format[Default(No author specified.)]{\author}
   title: \format[Default(No title specified.)]{\title}
+\begin{date}
+  \format[CffDate]{\date}
+\end{date}
 \begin{abstract}  abstract: \abstract\end{abstract}
 \begin{doi}  doi: \doi\end{doi}
 \begin{volume}  volume: \volume\end{volume}

@@ -35,6 +35,7 @@ import org.jabref.logic.layout.format.AuthorNatBib;
 import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
 import org.jabref.logic.layout.format.CSLType;
+import org.jabref.logic.layout.format.CffDate;
 import org.jabref.logic.layout.format.CffType;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
@@ -488,6 +489,7 @@ class LayoutEntry {
             case "ReplaceWithEscapedDoubleQuotes" -> new ReplaceWithEscapedDoubleQuotes();
             case "HayagrivaType" -> new HayagrivaType();
             case "CffType" -> new CffType();
+            case "CffDate" -> new CffDate();
             default -> null;
         };
     }
