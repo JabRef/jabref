@@ -1,18 +1,14 @@
-name: Deployment
+# This workflow is a clone of "deployment.yml"
+# The difference is that this workflow uses JDK early access builds (jdk-ea) to check the build of JabRef
+# We separated this from the main workflow as we do not want to check on each PR if the JDK build, but only on main
+name: Deployment (JDK early access builds)
 
 on:
-  push:
-    branches:
-      - main
-      - main-release
-    paths-ignore:
-      - 'docs/**'
-      - 'src/test/**'
-      - 'README.md'
-    tags:
-       - '*'
+  schedule:
+    - cron: "0 5 * * 2"
   pull_request:
-  merge_group:
+    paths:
+      - .github/workflows/deployment-jdk-ea.yml
   workflow_dispatch:
     inputs:
       notarization:
@@ -39,6 +35,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        jdk: [22, 23]
         include:
           - os: ubuntu-latest
             displayName: linux
@@ -48,12 +45,13 @@ jobs:
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
           - os: macos-latest
             displayName: macOS
+            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: ${{ steps.gitversion.outputs.branchName }}
-    name: ${{ matrix.displayName }} installer and portable version
+    name: "JDK ${{ matrix.jdk }}: ${{ matrix.displayName }} installer and portable version"
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -85,6 +83,23 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.11.0
+      - name: 'Set up JDK ${{ matrix.jdk }}'
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: jdk.java.net
+          release: ${{ matrix.jdk }}
+          version: latest
+      - name: 'Set JDK${{ matrix.jdk }} env var'
+        shell: bash
+        run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (linux, Windows)'
+        if: (matrix.os != 'macos-latest')
+        shell: bash
+        run: sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
+        if: (matrix.os == 'macos-latest')
+        shell: bash
+        run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -94,7 +109,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir (macOS)
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
-        if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
+        if: (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
@@ -111,62 +126,12 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build dmg (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          jpackage \
-          --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
-          --add-modules org.jabref,org.jabref.merged.module  \
-          --dest build/distribution \
-          --app-content buildres/mac/jabrefHost.py \
-          --app-content buildres/mac/native-messaging-host \
-          --name JabRef \
-          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
-          --verbose \
-          --mac-sign \
-          --vendor "JabRef e.V." \
-          --mac-package-identifier JabRef \
-          --mac-package-name JabRef \
-          --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
-          --mac-entitlements buildres/mac/jabref.entitlements \
-          --icon src/main/resources/icons/jabref.icns \
-          --resource-dir buildres/mac \
-          --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
-      - name: Build pkg (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          jpackage \
-          --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
-          --add-modules org.jabref,org.jabref.merged.module  \
-          --dest build/distribution \
-          --app-content buildres/mac/jabrefHost.py \
-          --app-content buildres/mac/native-messaging-host \
-          --name JabRef \
-          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
-          --verbose \
-          --mac-sign \
-          --vendor "JabRef e.V." \
-          --mac-package-identifier JabRef \
-          --mac-package-name JabRef \
-          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
-          --mac-entitlements buildres/mac/jabref.entitlements \
-          --icon src/main/resources/icons/jabref.icns \
-          --resource-dir buildres/mac \
-          --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
-      - name: Build runtime image and installer (linux, Windows)
-        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+      - name: Build runtime image and installer
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
-      - name: Package application image (linux, Windows)
-        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+      - name: Package application image
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
@@ -186,8 +151,16 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+      - name: Rename files with JDK version
+        shell: bash
+        run: |
+          for file in build/distribution/*.*; do
+            base=${file%.*}
+            ext=${file##*.}
+            mv "$file" "${base}-jdk${{ matrix.jdk }}.${ext}"
+          done
       - name: Setup rsync (macOS)
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         run: brew install rsync
       - name: Setup rsync (Windows)
         if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
@@ -206,23 +179,12 @@ jobs:
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
       - name: Upload to builds.jabref.org (linux, macOS)
-        # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
-        #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
-        # needs to be on one line; multi line does not work
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+        if: (matrix.os != 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-      - name: Upload to GitHub workflow artifacts store (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
-        uses: actions/upload-artifact@v4
-        with:
-          # tbn = to-be-notarized
-          name: JabRef-macOS-tbn
-          path: build/distribution
-          compression-level: 0 # no compression
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES')
         uses: actions/upload-artifact@v4
@@ -255,47 +217,3 @@ jobs:
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
           comment_tag: download-link
           mode: recreate
-  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: macOS notarization
-    runs-on: macos-latest
-    needs: [build]
-    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
-    steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Download from GitHub workflow artifacts store (macOS)
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-macOS-tbn
-          path: build/distribution/
-      - name: Notarize dmg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.dmg
-      - name: Notarize pkg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg
-      - name: Upload to builds.jabref.org
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
