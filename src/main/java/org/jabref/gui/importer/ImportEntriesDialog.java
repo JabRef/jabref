@@ -62,10 +62,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public CheckListView<BibEntry> entriesListView;
     public ComboBox<BibDatabaseContext> libraryListView;
     public ButtonType importButton;
-    public Button previousButton;
-    public Button nextButton;
-    @FXML
-    public Label pageLabel;
     public Label totalItems;
     public Label selectedItems;
     public Label bibTeXDataLabel;
@@ -76,9 +72,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private final BackgroundTask<ParserResult> task;
     private final BibDatabaseContext database;
     private ImportEntriesViewModel viewModel;
-    // private final int entriesPerPage = 20;
-   // private final ObservableList<BibEntry> allEntries;
-   // private final IntegerProperty currentPage = new SimpleIntegerProperty(1);
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
@@ -96,7 +89,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
-      //  this.allEntries = FXCollections.observableArrayList();
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -106,9 +98,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         btn.disableProperty().bind(booleanBind);
 
         downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
-
-//        allEntries.addAll(database.getEntries());
-//        setEntries(Collections.emptyList());
 
         setResultConverter(button -> {
             if (button == importButton) {
@@ -197,31 +186,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
-      //  addPagination();
     }
-
-//    public void setEntries(List<BibEntry> entries) {
-//        this.allEntries.setAll(entries);
-//        currentPage.set(1);
-//    }
-//
-//    public void addPagination() {
-//        previousButton.setOnAction(event -> {
-//            if (currentPage.get() > 1) {
-//                currentPage.set(currentPage.get() - 1);
-//            }
-//        });
-//
-//        nextButton.setOnAction(event -> {
-//            int totalPages = calculateTotalPages();
-//            if (currentPage.get() < totalPages) {
-//                currentPage.set(currentPage.get() + 1);
-//            }
-//        });
-//       currentPage.addListener(((observable, oldValue, newValue) -> updatePageEntries()));
-//
-//        updatePageEntries();
-//    }
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
         if (entriesListView.getCheckModel().isChecked(entry)) {
@@ -299,15 +264,4 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
     }
-
-//    private void updatePageEntries() {
-//        int startIndex = (currentPage.get() - 1) * entriesPerPage;
-//        int endIndex = Math.min(startIndex + entriesPerPage, allEntries.size());
-//        this.entriesListView.setItems(FXCollections.observableArrayList(allEntries.subList(startIndex, endIndex)));
-//        pageLabel.setText(String.valueOf(currentPage.get()));
-//    }
-
-//    private int calculateTotalPages() {
-//        return (int) Math.ceil((double) allEntries.size() / entriesPerPage);
-//    }
 }

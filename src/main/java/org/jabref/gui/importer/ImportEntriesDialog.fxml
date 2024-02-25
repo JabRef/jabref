@@ -14,7 +14,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import org.fxmisc.richtext.CodeArea?>
 <DialogPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.WebImportEntriesDialog">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.ImportEntriesDialog">
     <content>
         <VBox spacing="10.0">
             <Label text="%Select the entries to be imported:"/>
@@ -25,9 +25,7 @@
                         <Button onAction="#selectAllNewEntries"  text="%Select all new entries"/>
                         <Button onAction="#selectAllEntries"  text="%Select all entries"/>
                         <Button onAction="#unselectAll"  text="%Unselect all"/>
-                        <Button fx:id="previousButton"  text="Previous" />
-                        <Button fx:id="nextButton" text="Next" />
-<!--                        <Label fx:id="pageLabel"/>-->
+
                     </HBox>
                     <VBox fx:id="bibTeXDataBox" visible="false" managed="false">
                         <Label fx:id="bibTeXDataLabel"/>

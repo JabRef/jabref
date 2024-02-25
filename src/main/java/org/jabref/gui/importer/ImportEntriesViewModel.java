@@ -56,7 +56,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
-    // private final IntegerProperty totalNumberOfEntries = new SimpleIntegerProperty(0);
 
     /**
      * @param databaseContext the database to import into
@@ -96,8 +95,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);
         }).executeWith(taskExecutor);
-
-        // totalNumberOfEntries.set(getTotalNumberOfEntries());
     }
 
     public String getMessage() {
@@ -119,10 +116,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public ObservableList<BibEntry> getEntries() {
         return entries;
     }
-
-//    public int getTotalNumberOfEntries() {
-//        return databaseContext.getDatabase().getEntries().size();
-//    }
 
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
@@ -199,8 +192,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 parserResult.getMetaData(),
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
-
-//        JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
     }
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
