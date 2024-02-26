@@ -30,28 +30,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.javafx_versions.outputs.matrix }}
+    steps:
+      - id: javafx_versions
+        run: |
+          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=5&core=gav" > /tmp/versions.json
+          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < versions.json > versions-latest.json
+          versions_json=$(jq -r '[.[].version]' versions-latest.json | jq -r tostring)
+
+          # Define the "include" section as a JSON string
+          include_json='[
+              {"os": "ubuntu-latest", "displayName": "linux", "archivePortable": "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef"},
+              {"os": "windows-latest", "displayName": "windows", "archivePortable": "7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef"},
+              {"os": "macos-latest", "displayName": "macOS", "archivePortable": "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"}
+          ]'
+
+          matrix="{\"os\": [\"ubuntu-latest\", \"windows-latest\", \"macos-latest\"], \"jdk\": [22, 23], \"javafx\": $versions_json, \"include\": $include_json}"
+
+          echo "::set-output name=matrix::$matrix"
   build:
+    needs: setup-matrix
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        jdk: [22, 23]
-        include:
-          - os: ubuntu-latest
-            displayName: linux
-            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-          - os: windows-latest
-            displayName: windows
-            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: macos-latest
-            displayName: macOS
-            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
+      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: ${{ steps.gitversion.outputs.branchName }}
-    name: "JDK ${{ matrix.jdk }}: ${{ matrix.displayName }} installer and portable version"
+    name: "JDK ${{ matrix.jdk }}: ${{ matrix.displayName }} JavaFX ${{ matrix.javafx }}"
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -100,6 +110,10 @@ jobs:
         if: (matrix.os == 'macos-latest')
         shell: bash
         run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+      - name: 'Set JavaFX (linux, Windows)'
+        run: sed -i '/javafx {/{n;s/version = ".*"/version = ${{ matrix.javafx }}"/}' build.gradle
+      - name: 'Set JavaFX (macOS)'
+        run: sed -i'.bak' '/javafx {/{n;s/version = ".*"/version = ${{ matrix.javafx }}"/}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
