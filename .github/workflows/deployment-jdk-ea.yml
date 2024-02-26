@@ -40,11 +40,11 @@ jobs:
           curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=5&core=gav" > /tmp/versions.json
           jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
           versions_json=$(jq -r '[.[].version]' /tmp/versions-latest.json | jq -r tostring)
-          include_json='[
-              {"os": "ubuntu-latest", "displayName": "linux", "archivePortable": "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef"},
-              {"os": "windows-latest", "displayName": "windows", "archivePortable": "7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef"},
-              {"os": "macos-latest", "displayName": "macOS", "archivePortable": "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"}
-          ]'
+          include_json=$(jq -n '[
+            {"os": "ubuntu-latest", "displayName": "linux", "archivePortable": "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef"},
+            {"os": "windows-latest", "displayName": "windows", "archivePortable": "7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef"},
+            {"os": "macos-latest", "displayName": "macOS", "archivePortable": "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"}
+          ]')
           matrix=$(jq -n \
             --argjson versions "$versions_json" \
             --argjson include "$include_json" \
