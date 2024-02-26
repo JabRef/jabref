@@ -170,7 +170,7 @@ jobs:
           for file in build/distribution/*.*; do
             base=${file%.*}
             ext=${file##*.}
-            mv "$file" "${base}-jdk${{ matrix.jdk }}.${ext}"
+            mv "$file" "${base}-jdk${{ matrix.jdk }}-javafx${{ matrix.javafx }}.${ext}"
           done
       - name: Setup rsync (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
