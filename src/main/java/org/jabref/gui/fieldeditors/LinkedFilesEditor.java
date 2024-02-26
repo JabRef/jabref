@@ -254,8 +254,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        new DeleteFileAction(dialogService, preferencesService, databaseContext,
-                                viewModel, listView).execute();
+                        deleteAttachedFilesWithConfirmation();
                         event.consume();
                         break;
                     default:
@@ -263,6 +262,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 }
             }
         });
+    }
+
+    private void deleteAttachedFilesWithConfirmation() {
+        new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), databaseContext,
+                viewModel, listView.getSelectionModel().getSelectedItems()).execute();
     }
 
     public LinkedFilesEditorViewModel getViewModel() {
