@@ -110,9 +110,11 @@ jobs:
         shell: bash
         run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
       - name: 'Set JavaFX (linux, Windows)'
+        if: (matrix.os != 'macos-latest')
         run: sed -i '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: 'Set JavaFX (macOS)'
-        run: sed -i '.bak' '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
+        if: (matrix.os == 'macos-latest')
+        run: sed -i'.bak' '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
