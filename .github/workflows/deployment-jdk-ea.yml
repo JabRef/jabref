@@ -51,7 +51,7 @@ jobs:
           matrix=$(jq -n \
             --argjson versions "$versions_json" \
             --argjson include "$include_json" \
-            '{os: ["ubuntu-latest", "windows-latest", "macos-latest"], jdk: [22, 23], javafx: $versions, include: $include}')
+            '{"os": ["ubuntu-latest", "windows-latest", "macos-latest"], "jdk": [22, 23], "javafx": $versions, "include": $include}')
           echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
   build:
