@@ -159,7 +159,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
                         if (duplicateFound) {
                             Node icon = IconTheme.JabRefIcons.ERROR.getGraphicNode();
-                            Tooltip tooltip = new Tooltip(Localization.lang("Possible duplicate of existing entry. Will be resolved on import"));
+                            Tooltip tooltip = new Tooltip(Localization.lang("Possible duplicate of existing entry. Will be resolved on import."));
                             Tooltip.install(icon, tooltip);
                             container.getChildren().add(icon);
                         }
