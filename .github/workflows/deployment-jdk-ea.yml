@@ -45,6 +45,9 @@ jobs:
             {"os": "windows-latest", "displayName": "windows", "archivePortable": "7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef"},
             {"os": "macos-latest", "displayName": "macOS", "archivePortable": "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"}
           ]')
+          echo "$versions_json"
+          echo "$include_json"
+          jq -n --argjson versions "$versions_json" '{versions: $versions}'
           matrix=$(jq -n \
             --argjson versions "$versions_json" \
             --argjson include "$include_json" \
