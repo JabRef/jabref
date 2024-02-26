@@ -1,5 +1,7 @@
 package org.jabref.gui.desktop;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -52,7 +54,7 @@ public class JabRefDesktop {
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
-     *
+     * <p>
      * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
@@ -239,7 +241,6 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
-     *
      */
     public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
@@ -313,5 +314,27 @@ public class JabRefDesktop {
             dialogService.notify(couldNotOpenBrowser);
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
+    }
+
+    /**
+     * Moves the given file to the trash.
+     *
+     * @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
+     * @see Desktop#moveToTrash(File)
+     */
+    public static void moveToTrash(Path path) {
+        NATIVE_DESKTOP.moveToTrash(path);
+    }
+
+    public static boolean moveToTrashSupported() {
+        return NATIVE_DESKTOP.moveToTrashSupported();
+    }
+
+    public static Path getApplicationDirectory() {
+        return NATIVE_DESKTOP.getApplicationDirectory();
+    }
+
+    public static Path getFulltextIndexBaseDirectory() {
+        return NATIVE_DESKTOP.getFulltextIndexBaseDirectory();
     }
 }

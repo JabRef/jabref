@@ -19,9 +19,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -30,6 +27,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
 import org.jabref.gui.mergeentries.MultiMergeEntriesView;
@@ -86,7 +84,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
                                PreferencesService preferencesService) {
-
         this.linkedFile = linkedFile;
         this.preferencesService = preferencesService;
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferencesService.getFilePreferences());
@@ -365,42 +362,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /**
-     * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link).
+     * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link)
+     * and then proceeds accordingly.
      *
-     * @return true if the linked file should be removed afterwards from the entry (i.e because it was deleted
-     * successfully, does not exist in the first place or the user choose to remove it)
+     * @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
+     * successfully, does not exist in the first place, or the user choose to remove it)
      */
     public boolean delete() {
-        Optional<Path> file = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences());
-
-        if (file.isEmpty()) {
-            LOGGER.warn("Could not find file {}", linkedFile.getLink());
-            return true;
-        }
-
-        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
-        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
-        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                Localization.lang("Delete '%0'", file.get().getFileName().toString()),
-                Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk.", file.get().toString()),
-                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
-
-        if (buttonType.isPresent()) {
-            if (buttonType.get().equals(removeFromEntry)) {
-                return true;
-            }
-
-            if (buttonType.get().equals(deleteFromEntry)) {
-                try {
-                    Files.delete(file.get());
-                    return true;
-                } catch (IOException ex) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
-                    LOGGER.warn("File permission error while deleting: {}", linkedFile, ex);
-                }
-            }
-        }
-        return false;
+        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), databaseContext, null, List.of(this));
+        deleteFileAction.execute();
+        return deleteFileAction.isSuccess();
     }
 
     public void edit() {
