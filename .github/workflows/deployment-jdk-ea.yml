@@ -114,7 +114,7 @@ jobs:
         run: sed -i '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: 'Set JavaFX (macOS)'
         if: (matrix.os == 'macos-latest')
-        run: sed -i'.bak' '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
+        run: sed -i '.bak' -e '/javafx {/{n' -e 's/version = ".*"/version = "${{ matrix.javafx }}"/;}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
