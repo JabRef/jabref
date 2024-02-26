@@ -33,7 +33,6 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -156,8 +155,7 @@ public class ArgumentProcessor {
         Optional<ParserResult> importResult = importFile(file, importFormat);
         importResult.ifPresent(result -> {
             if (result.hasWarnings()) {
-                OutputPrinter printer = new SystemOutputPrinter();
-                printer.showMessage(result.getErrorMessage());
+                System.out.println(result.getErrorMessage());
             }
         });
         return importResult;

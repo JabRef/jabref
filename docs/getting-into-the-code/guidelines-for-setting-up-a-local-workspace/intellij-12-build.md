@@ -158,7 +158,7 @@ Now, `BibEntryTest` should appear first:
 
 Press <kbd>Enter</kbd> to jump to that class.
 
-Hover on the green play button on `testDefaultConstructor`:
+Hover on the green play button on `defaultConstructor`:
 
 {% figure caption:"However on green play button" %}
 ![However on green play button](guidelines-intellij-run-single-test.png)

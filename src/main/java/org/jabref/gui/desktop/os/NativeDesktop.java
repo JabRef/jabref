@@ -8,8 +8,8 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;

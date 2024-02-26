@@ -54,7 +54,7 @@ public class JabRefDesktop {
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
-     *
+     * <p>
      * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
@@ -241,7 +241,6 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
-     *
      */
     public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
