@@ -80,14 +80,14 @@ public class CommentsTab extends FieldsEditorTab {
         comments.add(StandardField.COMMENT);
 
         // Also show comment field of the current user (if enabled in the preferences)
-        if (entryEditorPreferences.shouldShowUserCommentsFields()) {
+        if (entry.hasField(userSpecificCommentField) || entryEditorPreferences.shouldShowUserCommentsFields()) {
             comments.add(userSpecificCommentField);
         }
 
         // Show all non-empty comment fields (otherwise, they are completely hidden)
         comments.addAll(entry.getFields().stream()
                 .filter(field -> (field instanceof UserSpecificCommentField && !field.equals(userSpecificCommentField))
-                        && field.getName().toLowerCase().contains("comment"))
+                        || field.getName().toLowerCase().contains("comment"))
                 .sorted(Comparator.comparing(Field::getName))
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
         return comments;
