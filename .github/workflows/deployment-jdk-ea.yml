@@ -112,7 +112,7 @@ jobs:
       - name: 'Set JavaFX (linux, Windows)'
         run: sed -i '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: 'Set JavaFX (macOS)'
-        run: sed -i'.bak' '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
+        run: sed -i '.bak' '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
