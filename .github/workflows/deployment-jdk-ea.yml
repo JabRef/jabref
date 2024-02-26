@@ -45,16 +45,11 @@ jobs:
             {"os": "windows-latest", "displayName": "windows", "archivePortable": "7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef"},
             {"os": "macos-latest", "displayName": "macOS", "archivePortable": "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"}
           ]')
-          echo "$versions_json"
-          echo "$include_json"
-          jq -n --argjson versions "$versions_json" '{versions: $versions}'
           matrix=$(jq -n \
             --argjson versionsContent "$versions_json" \
             --argjson includeContent "$include_json" \
             '{"os": ["ubuntu-latest", "windows-latest", "macos-latest"], "jdk": [22, 23], "javafx": $versionsContent, "include": $includeContent}')
-          echo $matrix
           echo matrix=$matrix >> $GITHUB_OUTPUT
-          cat $GITHUB_OUTPUT
   build:
     needs: setup-matrix
     strategy:
@@ -115,9 +110,9 @@ jobs:
         shell: bash
         run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
       - name: 'Set JavaFX (linux, Windows)'
-        run: sed -i '/javafx {/{n;s/version = ".*"/version = ${{ matrix.javafx }}"/}' build.gradle
+        run: sed -i '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: 'Set JavaFX (macOS)'
-        run: sed -i'.bak' '/javafx {/{n;s/version = ".*"/version = ${{ matrix.javafx }}"/}' build.gradle
+        run: sed -i'.bak' '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
