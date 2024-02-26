@@ -119,11 +119,12 @@ dependencies {
         exclude group: 'org.junit.jupiter'
     }
 
-    implementation 'org.apache.lucene:lucene-core:9.9.2'
-    implementation 'org.apache.lucene:lucene-queryparser:9.9.2'
-    implementation 'org.apache.lucene:lucene-queries:9.9.1'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.9.2'
-    implementation 'org.apache.lucene:lucene-highlighter:9.9.2'
+    def luceneVersion = "9.10.0"
+    implementation "org.apache.lucene:lucene-core:$luceneVersion"
+    implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
+    implementation "org.apache.lucene:lucene-queries:$luceneVersion"
+    implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
+    implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
