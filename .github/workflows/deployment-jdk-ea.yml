@@ -49,9 +49,9 @@ jobs:
           echo "$include_json"
           jq -n --argjson versions "$versions_json" '{versions: $versions}'
           matrix=$(jq -n \
-            --argjson versions "$versions_json" \
-            --argjson include "$include_json" \
-            '{"os": ["ubuntu-latest", "windows-latest", "macos-latest"], "jdk": [22, 23], "javafx": $versions, "include": $include}')
+            --argjson versionsContent "$versions_json" \
+            --argjson includeContent "$include_json" \
+            '{"os": ["ubuntu-latest", "windows-latest", "macos-latest"], "jdk": [22, 23], "javafx": $versionsContent, "include": $includeContent}')
           echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
   build:
