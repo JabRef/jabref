@@ -53,7 +53,8 @@ jobs:
             --argjson includeContent "$include_json" \
             '{"os": ["ubuntu-latest", "windows-latest", "macos-latest"], "jdk": [22, 23], "javafx": $versionsContent, "include": $includeContent}')
           echo $matrix
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo matrix=$matrix >> $GITHUB_OUTPUT
+          cat $GITHUB_OUTPUT
   build:
     needs: setup-matrix
     strategy:
