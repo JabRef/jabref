@@ -142,11 +142,11 @@ public class LinkedFileHandler {
      * @return First identified path that matches an existing file.  This name can be used in subsequent calls to
      * override the existing file.
      */
-    public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry, String targetFileName) {
+    public Optional<Path> findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.
-        Path targetFilePath = flEntry.findIn(databaseContext, filePreferences)
+        Path targetFilePath = linkedFile.findIn(databaseContext, filePreferences)
                                      .get().getParent().resolve(targetFileName);
-        Path oldFilePath = flEntry.findIn(databaseContext, filePreferences).get();
+        Path oldFilePath = linkedFile.findIn(databaseContext, filePreferences).get();
         // Check if file already exists in directory with different case.
         // This is necessary because other entries may have such a file.
         Optional<Path> matchedByDiffCase = Optional.empty();

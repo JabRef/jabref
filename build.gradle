@@ -5,7 +5,7 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.9.0'
+    id 'com.github.andygoossens.modernizer' version '1.9.2'
 
     id 'me.champeau.jmh' version '0.7.2'
 
@@ -119,11 +119,12 @@ dependencies {
         exclude group: 'org.junit.jupiter'
     }
 
-    implementation 'org.apache.lucene:lucene-core:9.9.2'
-    implementation 'org.apache.lucene:lucene-queryparser:9.9.2'
-    implementation 'org.apache.lucene:lucene-queries:9.9.1'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.9.2'
-    implementation 'org.apache.lucene:lucene-highlighter:9.9.2'
+    def luceneVersion = "9.10.0"
+    implementation "org.apache.lucene:lucene-core:$luceneVersion"
+    implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
+    implementation "org.apache.lucene:lucene-queries:$luceneVersion"
+    implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
+    implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
@@ -176,7 +177,7 @@ dependencies {
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.97.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.0.3') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
@@ -195,7 +196,7 @@ dependencies {
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.9'
     // route all requests to log4j to SLF4J
-    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.22.1'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.0'
 
     implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
         exclude group: 'org.antlr'
