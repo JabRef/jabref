@@ -18,6 +18,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
@@ -28,6 +29,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -55,6 +57,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private Future<?> searchTask;
     private LatexParserResult latexParserResult;
     private BibEntry currentEntry;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext,
                                       PreferencesService preferencesService,
@@ -69,6 +72,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
+
+        this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
     }
 
     public void init(BibEntry entry) {
@@ -130,6 +135,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                            .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
 
         if (latexParserResult == null || !newDirectory.equals(directory.get())) {
+            fileUpdateMonitor.addListenerForFile(newDirectory, this::refreshLatexDirectory);
             directory.set(newDirectory);
 
             if (!newDirectory.toFile().exists()) {
