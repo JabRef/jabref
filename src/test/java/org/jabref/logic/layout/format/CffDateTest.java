@@ -1,6 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.util.OS;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ public class CffDateTest {
     @BeforeEach
     public void setUp() {
         formatter = new CffDate();
-        newLine = System.lineSeparator();
+        newLine = OS.NEWLINE;
     }
 
     @Test

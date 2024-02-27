@@ -7,21 +7,30 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.util.OS;
 
+/**
+ * This class is used to parse dates for CFF exports. Since we do not know if the input String contains
+ *         year, month and day, we must go through all these cases to return the best CFF format possible.
+ *         Different cases are stated below.
+ * <p>
+ *         Year, Month and Day contained   => preferred-citation:
+ *                                              date-released: yyyy-mm-dd
+ * <p>
+ *         Year and Month contained        => preferred-citation
+ *                                              ...
+ *                                              month: mm
+ *                                              year: yyyy
+ * <p>
+ *         Year contained                  => preferred-citation:
+ *                                              ...
+ *                                              year: yyyy
+ * <p>
+ *         Poorly formatted                => preferred-citation:
+ *                                              ...
+ *                                              issue-date: text-as-is
+ */
 public class CffDate implements LayoutFormatter {
-
-    /*
-        This class is used to parse dates for CFF exports. Since we do not know if the input String contains
-        year, month and day, we must go through all these cases to return the best CFF format possible.
-        Different cases are stated below.
-
-        Year, Month and Day contained   => date-released: yyyy-mm-dd
-        Year and Month contained        => month: mm
-                                           year: yyyy
-        Year contained                  => year: yyyy
-        Poorly formatted                => issue-date: <fieldText>
-    */
-
     @Override
     public String format(String fieldText) {
         StringBuilder builder = new StringBuilder();
@@ -40,9 +49,8 @@ public class CffDate implements LayoutFormatter {
                 int year = yearMonth.getYear();
                 builder.append("month: ");
                 builder.append(month);
-                builder.append(System.lineSeparator());
-                builder.append("  ");
-                builder.append("year: ");
+                builder.append(OS.NEWLINE);
+                builder.append("  year: "); // Account for indent since we are in `preferred-citation` indentation block
                 builder.append(year);
             } catch (DateTimeParseException f) {
                 try {
