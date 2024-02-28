@@ -264,7 +264,7 @@ public class SaveDatabaseAction {
 
             return success;
         } catch (SaveException ex) {
-            LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
+            LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {
