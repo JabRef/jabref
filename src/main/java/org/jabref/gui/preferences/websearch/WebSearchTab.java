@@ -1,6 +1,8 @@
 package org.jabref.gui.preferences.websearch;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -95,8 +97,11 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
         catalogTable.setItems(viewModel.getCatalogs());
 
+        BooleanProperty isEditable = new SimpleBooleanProperty();
+
         new ViewModelTableRowFactory<FetcherApiKey>()
                 .install(apiKeySelectorTable);
+
         apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
                 updateFetcherApiKey(oldValue);
@@ -104,6 +109,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             if (newValue != null) {
                 viewModel.selectedApiKeyProperty().setValue(newValue);
                 testCustomApiKey.disableProperty().bind(newValue.useProperty().not());
+                isEditable.bind(newValue.useProperty());
+                customApiKey.setEditable(newValue.shouldUse());
             }
         });
 
@@ -115,8 +122,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         customApiKey.setCellValueFactory(param -> param.getValue().keyProperty());
         customApiKey.setCellFactory(TextFieldTableCell.forTableColumn());
         customApiKey.setReorderable(false);
-        customApiKey.setEditable(true);
         customApiKey.setResizable(true);
+        isEditable.addListener((observable, oldValue, newValue) -> customApiKey.setEditable(newValue));
 
         useCustomApiKey.setCellValueFactory(param -> param.getValue().useProperty());
         useCustomApiKey.setCellFactory(CheckBoxTableCell.forTableColumn(useCustomApiKey));
