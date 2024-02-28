@@ -20,7 +20,7 @@ public class PushToTeXworks extends AbstractPushToApplication {
 
     @Override
     public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO; // Temporary Icon that needs to be changed
+        return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON; // Temporary Icon that needs to be changed
     }
 
     @Override
