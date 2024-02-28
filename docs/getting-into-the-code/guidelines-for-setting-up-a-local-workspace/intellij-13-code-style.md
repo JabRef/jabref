@@ -139,7 +139,8 @@ Press "OK".
 ## Disable too advanced code folding
 
 Go to **File > Settings... > Editor > General > Code Folding**.
-At "Java", disable "General > File header", "General > Imports", and "Java > One-line methods".
+
+Disable "General > File header", "General > Imports", and "Java > One-line methods".
 
 {% figure caption:"Code foldings disabled" %}
 ![Code foldings disabled](guidelines-settings-intellij-code-foldings.png)
