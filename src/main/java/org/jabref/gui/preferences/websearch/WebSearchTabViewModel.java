@@ -181,63 +181,64 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     public void checkCustomApiKey() {
-        try {
-            final String apiKeyName = selectedApiKeyProperty.get().getName();
+        if (selectedApiKeyProperty.get() == null) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No API was selected"),
+                    Localization.lang("Please select an API first to be tested."));
+            return;
+        }
 
-            final Optional<CustomizableKeyFetcher> fetcherOpt =
-                    WebFetchers.getCustomizableKeyFetchers(
-                                       preferencesService.getImportFormatPreferences(),
-                                       preferencesService.getImporterPreferences())
-                               .stream()
-                               .filter(fetcher -> fetcher.getName().equals(apiKeyName))
-                               .findFirst();
+        final String apiKeyName = selectedApiKeyProperty.get().getName();
 
-            if (fetcherOpt.isEmpty()) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Check %0 API Key Setting", apiKeyName),
-                        Localization.lang("Fetcher unknown!"));
-                return;
-            }
+        final Optional<CustomizableKeyFetcher> fetcherOpt =
+                WebFetchers.getCustomizableKeyFetchers(
+                                   preferencesService.getImportFormatPreferences(),
+                                   preferencesService.getImporterPreferences())
+                           .stream()
+                           .filter(fetcher -> fetcher.getName().equals(apiKeyName))
+                           .findFirst();
 
-            final String testUrlWithoutApiKey = fetcherOpt.get().getTestUrl();
-            if (testUrlWithoutApiKey == null) {
-                dialogService.showWarningDialogAndWait(
-                        Localization.lang("Check %0 API Key Setting", apiKeyName),
-                        Localization.lang("Fetcher cannot be tested!"));
-                return;
-            }
+        if (fetcherOpt.isEmpty()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Check %0 API Key Setting", apiKeyName),
+                    Localization.lang("Fetcher unknown!"));
+            return;
+        }
 
-            final String apiKey = selectedApiKeyProperty.get().getKey();
+        final String testUrlWithoutApiKey = fetcherOpt.get().getTestUrl();
+        if (testUrlWithoutApiKey == null) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Check %0 API Key Setting", apiKeyName),
+                    Localization.lang("Fetcher cannot be tested!"));
+            return;
+        }
 
-            boolean keyValid;
-            if (!apiKey.isEmpty()) {
-                URLDownload urlDownload;
-                try {
-                    SSLSocketFactory defaultSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
-                    HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+        final String apiKey = selectedApiKeyProperty.get().getKey();
 
-                    urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
-                    // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
-                    int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
-                    keyValid = (statusCode >= 200) && (statusCode < 300);
+        boolean keyValid;
+        if (!apiKey.isEmpty()) {
+            URLDownload urlDownload;
+            try {
+                SSLSocketFactory defaultSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+                HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
 
-                    URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
-                } catch (
-                        IOException |
-                        UnirestException e) {
-                    keyValid = false;
-                }
-            } else {
+                urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
+                // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
+                int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+                keyValid = (statusCode >= 200) && (statusCode < 300);
+
+                URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
+            } catch (IOException | UnirestException e) {
                 keyValid = false;
             }
+        } else {
+            keyValid = false;
+        }
 
-            if (keyValid) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection successful!"));
-            } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
-            }
-        } catch (Exception e) {
-                dialogService.showErrorDialogAndWait(Localization.lang("No API was selected"), Localization.lang("Please select an API first"));
+        if (keyValid) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection successful!"));
+        } else {
+            dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
         }
     }
 
