@@ -1779,6 +1779,7 @@ public class JabRefPreferences implements PreferencesService {
         applicationCommands.put(PushToApplications.LYX, get(PUSH_LYXPIPE));
         applicationCommands.put(PushToApplications.TEXMAKER, get(PUSH_TEXMAKER_PATH));
         applicationCommands.put(PushToApplications.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplications.TEXWORKS, get(PUSH_TEXWORKS_PATH));
         applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
         applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
         applicationCommands.put(PushToApplications.SUBLIME_TEXT, get(PUSH_SUBLIME_TEXT_PATH));
