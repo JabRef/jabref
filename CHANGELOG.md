@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When pasting HTML into the abstract or a comment field, the hypertext is automatically converted to Markdown. [#10558](https://github.com/JabRef/jabref/issues/10558)
 - We added the possibility to redownload files that had been present but are no longer in the specified location. [#10848](https://github.com/JabRef/jabref/issues/10848)
 - We added the citation key pattern `[camelN]`. Equivalent to the first N words of the `[camel]` pattern.
+- We added ability to export in CFF (Citation File Format) [#10661](https://github.com/JabRef/jabref/issues/10661).
 
 ### Changed
 
@@ -49,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
 - We fixed an issue where the CrossRef field did not work if autocompletion was disabled [#8145](https://github.com/JabRef/jabref/issues/8145)
 - We fixed an issue where exporting`@electronic` and `@online` entry types to the Office XMl would duplicate the field `title`  [#10807](https://github.com/JabRef/jabref/issues/10807)
+- We fixed an issue where the `CommentsTab` was not properly formatted when the `defaultOwner` contained capital or special letters. [#10870](https://github.com/JabRef/jabref/issues/10870)
 
 ### Removed
 

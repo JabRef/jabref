@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this, please cite the work from preferred-citation."
+authors:
+  - name: \format[Default(No author specified.)]{\author}
+title: \format[Default(No title specified.)]{\title}
+preferred-citation:
+  type: \format[CffType, Default(generic)]{\entrytype}
+  authors:
+    - name: \format[Default(No author specified.)]{\author}
+  title: \format[Default(No title specified.)]{\title}
+\begin{date}
+  \format[CffDate]{\date}
+\end{date}
+\begin{abstract}  abstract: \abstract\end{abstract}
+\begin{doi}  doi: \doi\end{doi}
+\begin{volume}  volume: \volume\end{volume}
+\begin{url}  url: "\url"\end{url}
