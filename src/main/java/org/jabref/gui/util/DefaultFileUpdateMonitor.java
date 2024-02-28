@@ -12,8 +12,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javafx.application.Platform;
-
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
 import org.jabref.model.util.FileUpdateListener;
@@ -21,7 +19,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +31,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
-
-    private final Multimap<Path, FileUpdateListener> listeners = Multimaps.synchronizedListMultimap(ArrayListMultimap.create(20, 4));
+    private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
@@ -85,7 +81,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     }
 
     private void notifyAboutChange(Path path) {
-        Platform.runLater(() -> listeners.get(path).forEach(FileUpdateListener::fileUpdated));
+        listeners.get(path).forEach(FileUpdateListener::fileUpdated);
     }
 
     @Override

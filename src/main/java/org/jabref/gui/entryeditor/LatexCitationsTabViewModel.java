@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleObjectProperty;
@@ -197,7 +198,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     public void refreshLatexDirectory() {
         latexParserResult = null;
-        init(currentEntry);
+        Platform.runLater(() -> init(currentEntry));
     }
 
     public boolean shouldShow() {
