@@ -58,6 +58,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private LatexParserResult latexParserResult;
     private BibEntry currentEntry;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private boolean hasListener;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext,
                                       PreferencesService preferencesService,
@@ -74,6 +75,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.searchError = new SimpleStringProperty("");
 
         this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
+        this.hasListener = false;
     }
 
     public void init(BibEntry entry) {
@@ -81,6 +83,16 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         currentEntry = entry;
         Optional<String> citeKey = entry.getCitationKey();
+
+        // make sure that we only add the listener once at the beginning
+        if (!hasListener) {
+            try {
+                fileUpdateMonitor.addListenerForFile(directory.get(), this::refreshLatexDirectory);
+                hasListener = true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         if (citeKey.isPresent()) {
             startSearch(citeKey.get());
@@ -135,7 +147,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                            .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
 
         if (latexParserResult == null || !newDirectory.equals(directory.get())) {
-            fileUpdateMonitor.addListenerForFile(newDirectory, this::refreshLatexDirectory);
             directory.set(newDirectory);
 
             if (!newDirectory.toFile().exists()) {
@@ -170,8 +181,16 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(directory.get()).build();
 
-        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
+        fileUpdateMonitor.removeListener(directory.get(), this::refreshLatexDirectory);
+
+        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
+                    databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath());
+                    try {
+                        fileUpdateMonitor.addListenerForFile(selectedDirectory, this::refreshLatexDirectory);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+        });
 
         init(currentEntry);
     }
