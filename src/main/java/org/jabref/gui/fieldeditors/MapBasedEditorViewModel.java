@@ -3,8 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -22,7 +20,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);
 
-    public MapBasedEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public MapBasedEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
     }
 

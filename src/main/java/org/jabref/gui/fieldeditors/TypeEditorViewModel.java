@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -14,18 +12,18 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(8);
 
-    public TypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
+    public TypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
 
-        itemMap.put("mathesis", Localization.lang("Master's thesis"));
-        itemMap.put("phdthesis", Localization.lang("PhD thesis"));
-        itemMap.put("candthesis", Localization.lang("Candidate thesis"));
-        itemMap.put("bathesis", Localization.lang("Bachelor's thesis"));
-        itemMap.put("techreport", Localization.lang("Technical report"));
-        itemMap.put("resreport", Localization.lang("Research report"));
-        itemMap.put("software", Localization.lang("Software"));
-        itemMap.put("datacd", Localization.lang("Data CD"));
-        itemMap.put("audiocd", Localization.lang("Audio CD"));
+        // Initialize default types
+        addCustomType("mathesis", Localization.lang("Master's thesis"));
+        addCustomType("phdthesis", Localization.lang("PhD thesis"));
+        addCustomType("candthesis", Localization.lang("Candidate thesis"));
+        addCustomType("techreport", Localization.lang("Technical report"));
+        addCustomType("resreport", Localization.lang("Research report"));
+        addCustomType("software", Localization.lang("Software"));
+        addCustomType("datacd", Localization.lang("Data CD"));
+        addCustomType("audiocd", Localization.lang("Audio CD"));
     }
 
     @Override
@@ -36,5 +34,10 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
     @Override
     public String convertToDisplayText(String object) {
         return object;
+    }
+
+    // Method to add custom types
+    public void addCustomType(String key, String displayName) {
+        itemMap.put(key, displayName);
     }
 }

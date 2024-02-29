@@ -14,7 +14,7 @@ public class YesNoEditorViewModel extends MapBasedEditorViewModel<String> {
     private BiMap<String, String> itemMap = HashBiMap.create(2);
 
     public YesNoEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
+        super(field, suggestionProvider, fieldCheckers);
 
         itemMap.put("yes", "Yes");
         itemMap.put("no", "No");

@@ -15,7 +15,7 @@ public class EditorTypeEditorViewModel extends MapBasedEditorViewModel<String> {
     private BiMap<String, String> itemMap = HashBiMap.create(7);
 
     public EditorTypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
+        super(field, suggestionProvider, fieldCheckers);
 
         itemMap.put("editor", Localization.lang("Editor"));
         itemMap.put("compiler", Localization.lang("Compiler"));

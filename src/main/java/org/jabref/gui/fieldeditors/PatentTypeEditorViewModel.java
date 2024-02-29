@@ -15,7 +15,7 @@ public class PatentTypeEditorViewModel extends MapBasedEditorViewModel<String> {
     private BiMap<String, String> itemMap = HashBiMap.create(12);
 
     public PatentTypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
+        super(field, suggestionProvider, fieldCheckers);
 
         itemMap.put("patent", Localization.lang("Patent"));
         itemMap.put("patentde", Localization.lang("German patent"));
