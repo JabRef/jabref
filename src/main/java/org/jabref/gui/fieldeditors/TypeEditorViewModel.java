@@ -36,7 +36,7 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
         return object;
     }
 
-    // Method to add custom types
+    // Method to add custom types with key value pair
     public void addCustomType(String key, String displayName) {
         itemMap.put(key, displayName);
     }
