@@ -97,6 +97,22 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         }
     }
 
+    /**
+     * Add a new directory to monitor.
+     *
+     * @param directory The directory to monitor.
+     * @throws IOException if the directory does not exist.
+     */
+    public void addListenerForDirectory(Path directory, FileUpdateListener listener) throws IOException {
+        // This function was created because it makes more sense to call addListenerForDirectory when
+        // the Path is a directory and not a file, even though it does the same thing as addListenerForFile.
+        // The function addListenerForFile works for directories as well. We have to listen to the parent
+        // directory in this case too otherwise if a new file is created in the child directory, no
+        // event will be triggered as the path linked to the event doesn't match any paths in the MultiMap.
+
+        addListenerForFile(directory, listener);
+    }
+
     @Override
     public void removeListener(Path path, FileUpdateListener listener) {
         listeners.remove(path, listener);

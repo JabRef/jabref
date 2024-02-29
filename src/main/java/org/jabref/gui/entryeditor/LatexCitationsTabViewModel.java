@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
@@ -22,6 +24,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -31,7 +34,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
-import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.FileUpdateListener;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -64,8 +67,9 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private Future<?> searchTask;
     private LatexParserResult latexParserResult;
     private BibEntry currentEntry;
-    private final FileUpdateMonitor fileUpdateMonitor;
+    private final DefaultFileUpdateMonitor fileUpdateMonitor;
     private boolean hasListener;
+    private final Map<Path, FileUpdateListener> listeners = new HashMap<>();
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext,
                                       PreferencesService preferencesService,
@@ -81,7 +85,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
 
-        this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
+        this.fileUpdateMonitor = (DefaultFileUpdateMonitor) Globals.getFileUpdateMonitor();
         this.hasListener = false;
     }
 
@@ -179,9 +183,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private void setListener(Path path) {
         if (!hasListener) {
             try {
-                fileUpdateMonitor.addListenerForFile(path, this::refreshLatexDirectory);
-                hasListener = true;
                 listenerOnDirectory(path, Action.ADD);
+                hasListener = true;
             } catch (IOException e) {
                 LOGGER.error("Could not find file", e);
             }
@@ -190,8 +193,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     private void setListener(Path oldPath, Path newPath) {
         try {
-            fileUpdateMonitor.removeListener(oldPath, this::refreshLatexDirectory);
-            fileUpdateMonitor.addListenerForFile(newPath, this::refreshLatexDirectory);
             listenerOnDirectory(newPath, Action.ADD);
             listenerOnDirectory(oldPath, Action.REMOVE);
         } catch (IOException e) {
@@ -205,9 +206,12 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                  .forEach(curDir -> {
                      try {
                          if (action == Action.ADD) {
-                             fileUpdateMonitor.addListenerForFile(curDir, this::refreshLatexDirectory);
+                             FileUpdateListener newListener = this::refreshLatexDirectory;
+                             listeners.put(curDir, newListener);
+                             fileUpdateMonitor.addListenerForDirectory(curDir, newListener);
                          } else if (action == Action.REMOVE) {
-                             fileUpdateMonitor.removeListener(curDir, this::refreshLatexDirectory);
+                             FileUpdateListener oldListener = listeners.remove(curDir);
+                             fileUpdateMonitor.removeListener(curDir, oldListener);
                          }
                      } catch (IOException e) {
                          LOGGER.error("Could not find file", e);
