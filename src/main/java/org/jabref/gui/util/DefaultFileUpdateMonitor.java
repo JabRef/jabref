@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
+
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);

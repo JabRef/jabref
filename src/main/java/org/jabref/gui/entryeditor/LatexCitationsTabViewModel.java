@@ -85,15 +85,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         currentEntry = entry;
         Optional<String> citeKey = entry.getCitationKey();
 
-        // make sure that we only add the listener once at the beginning
-        if (!hasListener) {
-            try {
-                fileUpdateMonitor.addListenerForFile(directory.get(), this::refreshLatexDirectory);
-                hasListener = true;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        setListener(directory.get());
 
         if (citeKey.isPresent()) {
             startSearch(citeKey.get());
@@ -178,19 +170,33 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
     }
 
+    private void setListener(Path path) {
+        if (!hasListener) {
+            try {
+                fileUpdateMonitor.addListenerForFile(path, this::refreshLatexDirectory);
+                hasListener = true;
+            } catch (IOException e) {
+                LOGGER.error("Could not find file", e);
+            }
+        }
+    }
+
+    private void setListener(Path oldPath, Path newPath) {
+        try {
+            fileUpdateMonitor.removeListener(oldPath, this::refreshLatexDirectory);
+            fileUpdateMonitor.addListenerForFile(newPath, this::refreshLatexDirectory);
+        } catch (IOException e) {
+            LOGGER.error("Could not find file", e);
+        }
+    }
+
     public void setLatexDirectory() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(directory.get()).build();
 
-        fileUpdateMonitor.removeListener(directory.get(), this::refreshLatexDirectory);
-
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
                     databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath());
-                    try {
-                        fileUpdateMonitor.addListenerForFile(selectedDirectory, this::refreshLatexDirectory);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    setListener(directory.get(), selectedDirectory);
         });
 
         init(currentEntry);
