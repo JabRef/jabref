@@ -104,6 +104,11 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
+    public ViewModelTableRowFactory<S> withTooltip(BiConsumer<S, ? super DragEvent> toOnDragOver) {
+        this.toTooltip = toTooltip;
+        return this;
+    }
+
     @Override
     public TableRow<S> call(TableView<S> tableView) {
         TableRow<S> row = new TableRow<>();
@@ -200,4 +205,5 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     public void install(TableView<S> table) {
         table.setRowFactory(this);
     }
+
 }

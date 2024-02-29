@@ -150,6 +150,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnDragOver(this::handleOnDragOver)
                 .setOnDragExited(this::handleOnDragExited)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
+                .withTooltip(this::handleHoverOverEntry)
                 .install(this);
 
         this.getSortOrder().clear();
@@ -202,6 +203,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, keyBindingRepository, dialogService).show(true);
+
+        // new ViewModelTableRowFactory<BibEntryTableViewModel>().withTooltip(this::handleHoverOverEntry).install(this);
     }
 
     /**
@@ -363,6 +366,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
         importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
+    }
+
+    private String handleHoverOverEntry(BibEntryTableViewModel bibEntryTableViewModel) {
+        if (bibEntryTableViewModel != null) {
+            return bibEntryTableViewModel.getBibPreview().toString();
+        }
+        return "hello";
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
