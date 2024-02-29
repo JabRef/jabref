@@ -98,6 +98,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         catalogTable.setItems(viewModel.getCatalogs());
 
         BooleanProperty isEditable = new SimpleBooleanProperty();
+        testCustomApiKey.setDisable(true);
 
         new ViewModelTableRowFactory<FetcherApiKey>()
                 .install(apiKeySelectorTable);

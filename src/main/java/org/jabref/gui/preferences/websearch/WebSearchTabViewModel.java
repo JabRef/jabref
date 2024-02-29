@@ -181,13 +181,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     public void checkCustomApiKey() {
-        if (selectedApiKeyProperty.get() == null) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("No API was selected"),
-                    Localization.lang("Please select an API first to be tested."));
-            return;
-        }
-
         final String apiKeyName = selectedApiKeyProperty.get().getName();
 
         final Optional<CustomizableKeyFetcher> fetcherOpt =
