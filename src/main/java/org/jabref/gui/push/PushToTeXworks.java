@@ -25,7 +25,6 @@ public class PushToTeXworks extends AbstractPushToApplication {
      *
      * @return The display name for the push operation.
      */
-
     @Override
     public String getDisplayName() {
         return NAME;
@@ -37,23 +36,30 @@ public class PushToTeXworks extends AbstractPushToApplication {
      *
      * @return The icon for the TeXworks application.
      */
-
     @Override
     public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON; // Temporary Icon that needs to be changed
     }
 
-
-     /**
-     * Constructs the command line arguments for pushing citations to TeXworks.
-     * The method formats the citation key and prefixes/suffixes as per user preferences
-     * before invoking TeXworks with the command to insert text.
-     *
-     * @param keyString The citation key to be pushed.
-     * @return An array of {@code String} containing the command line to execute.
-     */
+    /**
+    * Constructs the command line arguments for pushing citations to TeXworks.
+    * The method formats the citation key and prefixes/suffixes as per user preferences
+    * before invoking TeXworks with the command to insert text.
+    *
+    * @param keyString The citation key to be pushed.
+    * @return An array of {@code String} containing the command line to execute.
+    */
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "--insert-text", "%s%s%s".formatted(getCitePrefix(), keyString, getCiteSuffix())};
+    }
+
+    /**
+    * Gets the tooltip for the TeXworks push operation. The tooltip is used to display a short description of the push operation in the GUI.
+    *
+    * @param newCommandPath The new command path to be set.
+    */
+    public void setCommandPath(String newCommandPath) {
+        commandPath = newCommandPath;
     }
 }
