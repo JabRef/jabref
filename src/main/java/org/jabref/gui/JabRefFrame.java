@@ -752,7 +752,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public boolean closeCurrentTab() {
-        return closeTab(getCurrentLibraryTab());
+        LibraryTab currentTab = getCurrentLibraryTab();
+        if (currentTab == null) {
+            return false;
+        }
+        return closeTab(currentTab);
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
