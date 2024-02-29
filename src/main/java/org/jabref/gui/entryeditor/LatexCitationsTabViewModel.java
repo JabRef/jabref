@@ -30,6 +30,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -175,6 +176,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             try {
                 fileUpdateMonitor.addListenerForFile(path, this::refreshLatexDirectory);
                 hasListener = true;
+                listenerOnDirectory(path, "add", this::refreshLatexDirectory);
             } catch (IOException e) {
                 LOGGER.error("Could not find file", e);
             }
@@ -185,9 +187,27 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         try {
             fileUpdateMonitor.removeListener(oldPath, this::refreshLatexDirectory);
             fileUpdateMonitor.addListenerForFile(newPath, this::refreshLatexDirectory);
+            listenerOnDirectory(newPath, "add", this::refreshLatexDirectory);
+            listenerOnDirectory(oldPath, "remove", this::refreshLatexDirectory);
         } catch (IOException e) {
             LOGGER.error("Could not find file", e);
         }
+    }
+
+    private void listenerOnDirectory(Path path, String action, FileUpdateListener listener) throws IOException {
+        Files.walk(path)
+             .filter(curPath -> !Files.isRegularFile(curPath))
+             .forEach(curDir -> {
+                 try {
+                     if (action.equals("add")) {
+                         fileUpdateMonitor.addListenerForFile(curDir, listener);
+                     } else if (action.equals("remove")) {
+                         fileUpdateMonitor.removeListener(curDir, listener);
+                     }
+                 } catch (IOException e) {
+                     LOGGER.error("Could not find file", e);
+                 }
+             });
     }
 
     public void setLatexDirectory() {
