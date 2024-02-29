@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -30,7 +31,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
-import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -44,6 +44,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         CITATIONS_FOUND,
         NO_RESULTS,
         ERROR
+    }
+
+    enum Action {
+        ADD,
+        REMOVE,
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
@@ -176,7 +181,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             try {
                 fileUpdateMonitor.addListenerForFile(path, this::refreshLatexDirectory);
                 hasListener = true;
-                listenerOnDirectory(path, "add", this::refreshLatexDirectory);
+                listenerOnDirectory(path, Action.ADD);
             } catch (IOException e) {
                 LOGGER.error("Could not find file", e);
             }
@@ -187,27 +192,30 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         try {
             fileUpdateMonitor.removeListener(oldPath, this::refreshLatexDirectory);
             fileUpdateMonitor.addListenerForFile(newPath, this::refreshLatexDirectory);
-            listenerOnDirectory(newPath, "add", this::refreshLatexDirectory);
-            listenerOnDirectory(oldPath, "remove", this::refreshLatexDirectory);
+            listenerOnDirectory(newPath, Action.ADD);
+            listenerOnDirectory(oldPath, Action.REMOVE);
         } catch (IOException e) {
             LOGGER.error("Could not find file", e);
         }
     }
 
-    private void listenerOnDirectory(Path path, String action, FileUpdateListener listener) throws IOException {
-        Files.walk(path)
-             .filter(curPath -> !Files.isRegularFile(curPath))
-             .forEach(curDir -> {
-                 try {
-                     if (action.equals("add")) {
-                         fileUpdateMonitor.addListenerForFile(curDir, listener);
-                     } else if (action.equals("remove")) {
-                         fileUpdateMonitor.removeListener(curDir, listener);
+    private void listenerOnDirectory(Path path, Action action) throws IOException {
+        try (Stream<Path> paths = Files.walk(path)) {
+             paths.filter(curPath -> !Files.isRegularFile(curPath))
+                 .forEach(curDir -> {
+                     try {
+                         if (action == Action.ADD) {
+                             fileUpdateMonitor.addListenerForFile(curDir, this::refreshLatexDirectory);
+                         } else if (action == Action.REMOVE) {
+                             fileUpdateMonitor.removeListener(curDir, this::refreshLatexDirectory);
+                         }
+                     } catch (IOException e) {
+                         LOGGER.error("Could not find file", e);
                      }
-                 } catch (IOException e) {
-                     LOGGER.error("Could not find file", e);
-                 }
-             });
+                 });
+        } catch (IOException e) {
+            LOGGER.error("Could not create a Stream<Path>", e);
+        }
     }
 
     public void setLatexDirectory() {
