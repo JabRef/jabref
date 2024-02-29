@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -42,7 +43,9 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -430,7 +433,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries and files linked to selected entries from the database
      *
      * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
@@ -439,7 +442,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries and files linked to selected entries from the database
      *
      * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
@@ -451,16 +454,31 @@ public class LibraryTab extends Tab {
             return;
         }
 
+        // Delete selected entries
         getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
         bibDatabaseContext.getDatabase().removeEntries(entries);
+
+        if (mode != StandardActions.CUT) {
+            List<LinkedFile> linkedFileList = entries.stream()
+                                                     .flatMap(entry -> entry.getFiles().stream())
+                                                     .distinct()
+                                                     .toList();
+
+            if (!linkedFileList.isEmpty()) {
+                List<LinkedFileViewModel> viewModels = linkedFileList.stream()
+                                                                     .map(linkedFile -> linkedFile.toModel(null, bibDatabaseContext, null, null, preferencesService))
+                                                                     .collect(Collectors.toList());
+
+                new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), bibDatabaseContext, viewModels).execute();
+            }
+        }
+
         ensureNotShowingBottomPanel(entries);
 
         this.changedProperty.setValue(true);
         switch (mode) {
-            case StandardActions.CUT ->
-                    dialogService.notify(Localization.lang("Cut %0 entry(ies)", entries.size()));
-            case StandardActions.DELETE_ENTRY ->
-                    dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entries.size()));
+            case StandardActions.CUT -> dialogService.notify(Localization.lang("Cut %0 entry(ies)", entries.size()));
+            case StandardActions.DELETE_ENTRY -> dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entries.size()));
         }
 
         // prevent the main table from loosing focus
@@ -678,6 +696,14 @@ public class LibraryTab extends Tab {
         return bibDatabaseContext.getDatabase();
     }
 
+    /**
+     * Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
+     * Keep track of user preference:
+     * if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
+     *
+     * @param numberOfEntries number of entries user is selecting
+     * @return true if user confirm to delete entry
+     */
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (preferencesService.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
@@ -691,7 +717,8 @@ public class LibraryTab extends Tab {
                 cancelButton = Localization.lang("Keep entries");
             }
 
-            return dialogService.showConfirmationDialogWithOptOutAndWait(title,
+            return dialogService.showConfirmationDialogWithOptOutAndWait(
+                    title,
                     message,
                     okButton,
                     cancelButton,
