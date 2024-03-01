@@ -51,6 +51,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -257,8 +258,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         List<BibEntry> selectedEntries = getSelectedEntries();
 
         if (!selectedEntries.isEmpty()) {
+            List<BibtexString> stringConstants = getStringValues();
+
             try {
-                clipBoardManager.setContent(selectedEntries, entryTypesManager);
+                if (!stringConstants.isEmpty()) {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
+                } else {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager);
+                }
                 dialogService.notify(Localization.lang("Copied %0 entry(ies)", selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard.", e);
@@ -488,5 +495,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
+    }
+
+    private List<BibtexString> getStringValues() {
+        return database.getDatabase()
+                       .getStringValues()
+                       .stream()
+                       .toList();
     }
 }
