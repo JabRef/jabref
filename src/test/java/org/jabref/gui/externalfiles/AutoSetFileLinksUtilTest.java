@@ -111,7 +111,6 @@ public class AutoSetFileLinksUtilTest {
         entry.setFiles(listLinked2);
         assertEquals(entry.getFiles(), list);
 
-
         // After this point, tested different extension along with the case where document has multiple file references
         Path filePath2 = B.resolve("Test1.txt");
         Files.createFile(filePath2);
@@ -132,8 +131,4 @@ public class AutoSetFileLinksUtilTest {
 
         assertEquals(listLinked2, list);
     }
-    // todo There should be another test where the file stays the same
-    // In test code, it is very OK to have duplicated code fragments.
-
-
 }
