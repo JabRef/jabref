@@ -88,7 +88,7 @@ public class AutoSetFileLinksUtilTest {
         Files.createDirectory(B);
         Path filePath = A.resolve("Test.pdf");
         Files.createFile(filePath);
-        entry.setCitationKey("CiteKey");
+        entry.setCitationKey("Test");
 
         LinkedFile linkedFile = new LinkedFile("desc", filePath, "PDF");
         List<LinkedFile> listLinked = new ArrayList<>();
@@ -110,9 +110,30 @@ public class AutoSetFileLinksUtilTest {
         listLinked2.add(linkedDestFile);
         entry.setFiles(listLinked2);
         assertEquals(entry.getFiles(), list);
-    }
 
+
+        // After this point, tested different extension along with the case where document has multiple file references
+        Path filePath2 = B.resolve("Test1.txt");
+        Files.createFile(filePath2);
+        linkedFile = new LinkedFile("desc", filePath2, "TXT");
+        listLinked.add(linkedFile);
+        entry.setFiles(listLinked);
+
+        destination = A.resolve("Test1.txt");
+        Files.move(B.resolve("Test1.txt"), destination, StandardCopyOption.REPLACE_EXISTING);
+        util = new AutoSetFileLinksUtil(databaseContext, filePreferences, autoLinkPrefs);
+        results = util.relinkingFiles(entry.getFiles());
+        list = results.relinkedFiles();
+        exceptions = results.exceptions();
+
+        listLinked2.clear();
+        listLinked2.add(new LinkedFile("desc", B.resolve("Test.pdf"), "PDF"));
+        listLinked2.add(new LinkedFile("desc", A.resolve("Test1.txt"), "TXT"));
+
+        assertEquals(listLinked2, list);
+    }
     // todo There should be another test where the file stays the same
     // In test code, it is very OK to have duplicated code fragments.
+
 
 }
