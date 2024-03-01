@@ -2,33 +2,26 @@ package org.jabref.gui.push;
 
 import java.util.Map;
 
+import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
+import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
-import org.jabref.preferences.ExternalApplicationsPreferences;
-import org.jabref.preferences.JabRefPreferences;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import org.junit.jupiter.api.Test;
-
-import javafx.beans.property.MapProperty;
-import java.util.Arrays;
 
 // @Disabled("Needs running TeXworks in the background. Start TeXworks with &")
 class PushToTeXworksTest {
@@ -37,7 +30,6 @@ class PushToTeXworksTest {
 
     @BeforeEach
     public void setup() {
-
         // Mock the DialogService and PreferencesService
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
         PreferencesService preferencesService = mock(PreferencesService.class);
@@ -53,7 +45,7 @@ class PushToTeXworksTest {
         when(pushToApplicationPreferences.getCommandPaths()).thenReturn(new SimpleMapProperty<>(observableCommandPaths));
         when(preferencesService.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
-        //Mock the return value for getCiteCommand()
+        // Mock the return value for getCiteCommand()
         CitationCommandString mockCiteCommand = mock(CitationCommandString.class);
         when(mockCiteCommand.prefix()).thenReturn("");
         when(mockCiteCommand.suffix()).thenReturn("");
@@ -75,9 +67,9 @@ class PushToTeXworksTest {
     /**
      * To verify that the PushToTeXworks class correctly returns its designated display name.
      * The display name is used to identify the application in the GUI.
-     * 
+     *
      * Method: getDisplayName()
-     * 
+     *
      */
     @Test
     void testDisplayName() {
@@ -88,9 +80,9 @@ class PushToTeXworksTest {
     /**
      * To verify that the PushToTeXworks class correctly returns the command line for TeXworks.
      * The command line is used to execute the application from the command line.
-     * 
+     *
      * Method: getCommandLine()
-     * 
+     *
      */
     @Test
     void testGetCommandLine() {
@@ -105,10 +97,10 @@ class PushToTeXworksTest {
     }
 
     /**
-     * This test run the external application to push the keys to be cited 
-     * 
+     * This test run the external application to push the keys to be cited
+     *
      * Method: pushEntries()
-     * 
+     *
      * [Precondition]: TeXworks should be running in the background
      */
     @Disabled("Disabled as it needs running TeXworks in the background. Start TeXworks with &")
@@ -120,9 +112,9 @@ class PushToTeXworksTest {
     /**
      * To verify that the PushToTeXworks class correctly returns the tooltip for TeXworks.
      * The tooltip is used to display a short description of the application in the GUI.
-     * 
+     *
      * Method: getTooltip()
-     * 
+     *
      */
     @Test
     void testGetTooltip() {
