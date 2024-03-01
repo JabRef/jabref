@@ -40,6 +40,7 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -295,6 +296,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_DELETE = "confirmDelete";
+    public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
+    public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -708,6 +711,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
+        defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
+        defaults.put(TRASH_INSTEAD_OF_DELETE, JabRefDesktop.moveToTrashSupported());
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
@@ -813,7 +818,7 @@ public class JabRefPreferences implements PreferencesService {
                         "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
                         "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
-                        "\\begin{comment}<BR><BR><b>Comment: </b>\\format[HTMLChars]{\\comment}\\end{comment}__NEWLINE__" +
+                        "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars]{\\comment}\\end{comment}__NEWLINE__" +
                         "</font>__NEWLINE__");
 
         // set default theme
@@ -1403,8 +1408,9 @@ public class JabRefPreferences implements PreferencesService {
             put(DEFAULT_OWNER, newValue);
             // trigger re-determination of userAndHost and the dependent preferences
             userAndHost = null;
-            filePreferences = null;
-            internalPreferences = null;
+
+            // this propagates down to filePreferences
+            getInternalPreferences().getUserAndHostProperty().setValue(newValue);
         });
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
 
@@ -2092,7 +2098,7 @@ public class JabRefPreferences implements PreferencesService {
                 try {
                     Files.deleteIfExists(Path.of("jabref.xml"));
                 } catch (IOException e) {
-                    LOGGER.warn("Error accessing filesystem");
+                    LOGGER.warn("Error accessing filesystem", e);
                 }
             }
         });
@@ -2201,8 +2207,11 @@ public class JabRefPreferences implements PreferencesService {
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 getBoolean(CREATE_BACKUP),
                 // We choose the data directory, because a ".bak" file should survive cache cleanups
-                getPath(BACKUP_DIRECTORY, OS.getNativeDesktop().getBackupDirectory()));
+                getPath(BACKUP_DIRECTORY, OS.getNativeDesktop().getBackupDirectory()),
+                getBoolean(CONFIRM_LINKED_FILE_DELETE),
+                getBoolean(TRASH_INSTEAD_OF_DELETE));
 
+        EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
@@ -2214,6 +2223,8 @@ public class JabRefPreferences implements PreferencesService {
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
         EasyBind.listen(filePreferences.createBackupProperty(), (obs, oldValue, newValue) -> putBoolean(CREATE_BACKUP, newValue));
         EasyBind.listen(filePreferences.backupDirectoryProperty(), (obs, oldValue, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
+        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
+        EasyBind.listen(filePreferences.moveToTrashProperty(), (obs, oldValue, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
 
         return filePreferences;
     }

@@ -14,7 +14,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
  */
 public enum StandardField implements Field {
 
-    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT, FieldProperty.MARKDOWN),
+    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
     ADDRESS("address"),
     AFTERWORD("afterword", FieldProperty.PERSON_NAMES),
@@ -104,7 +104,7 @@ public enum StandardField implements Field {
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
     REPORTNO("reportno"),
-    REVIEW("review", FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
+    REVIEW("review", FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     REVISION("revision"),
     SCHOOL("school"),
     SERIES("series"),

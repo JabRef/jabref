@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -34,7 +34,9 @@ import org.jabref.testutils.category.FetcherTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,9 +49,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+// Need to run on JavaFX thread since {@link org.jabref.gui.linkedfile.DeleteFileAction.execute} creates a DialogPane
+@ExtendWith(ApplicationExtension.class)
 class LinkedFileViewModelTest {
 
     private Path tempFile;
@@ -72,6 +75,7 @@ class LinkedFileViewModelTest {
         dialogService = mock(DialogService.class);
 
         when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
@@ -102,19 +106,21 @@ class LinkedFileViewModelTest {
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
-        verifyNoInteractions(dialogService); // dialog was never shown
+
+        // We show "Error accessing file '%0'.", thus the next condition does not hold
+        // verifyNoInteractions(dialogService); // dialog was never shown
     }
 
     @Test
     void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() {
         linkedFile = new LinkedFile("", tempFile, "");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        // Mock the dialog created at {@link org.jabref.gui.linkedfile.DeleteFileAction.execute}
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(2))); // first vararg - remove button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -126,13 +132,12 @@ class LinkedFileViewModelTest {
     @Test
     void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() {
         linkedFile = new LinkedFile("", tempFile, "");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -144,13 +149,12 @@ class LinkedFileViewModelTest {
     @Test
     void deleteMissingFileReturnsTrue() {
         linkedFile = new LinkedFile("", Path.of("!!nonexistent file!!"), "");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -161,13 +165,12 @@ class LinkedFileViewModelTest {
     @Test
     void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // third vararg - cancel button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();

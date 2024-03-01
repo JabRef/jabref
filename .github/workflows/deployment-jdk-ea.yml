@@ -30,28 +30,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.javafx_versions.outputs.matrix }}
+    steps:
+      - id: javafx_versions
+        run: |
+          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=5&core=gav" > /tmp/versions.json
+          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
+          versions_json=$(jq -r '[.[].version]' /tmp/versions-latest.json | jq -r tostring)
+          include_json=$(jq -n '[
+            {"os": "ubuntu-latest", "displayName": "linux", "archivePortable": "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef"},
+            {"os": "buildjet-4vcpu-ubuntu-2204-arm", "displayName": "linux-arm", "archivePortable": "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"},
+            {"os": "windows-latest", "displayName": "windows", "archivePortable": "7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef"},
+            {"os": "macos-latest", "displayName": "macOS", "archivePortable": "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"}
+          ]')
+          matrix=$(jq -n \
+            --argjson versionsContent "$versions_json" \
+            --argjson includeContent "$include_json" \
+            '{"os": ["ubuntu-latest", "windows-latest", "macos-latest", "buildjet-4vcpu-ubuntu-2204-arm"], "jdk": [22, 23], "javafx": $versionsContent, "include": $includeContent}')
+          echo matrix=$matrix >> $GITHUB_OUTPUT
   build:
+    needs: setup-matrix
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        jdk: [22, 23]
-        include:
-          - os: ubuntu-latest
-            displayName: linux
-            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-          - os: windows-latest
-            displayName: windows
-            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: macos-latest
-            displayName: macOS
-            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
+      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: ${{ steps.gitversion.outputs.branchName }}
-    name: "JDK ${{ matrix.jdk }}: ${{ matrix.displayName }} installer and portable version"
+    name: "JDK ${{ matrix.jdk }}: ${{ matrix.displayName }} JavaFX ${{ matrix.javafx }}"
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -71,8 +81,9 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-latest')
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
+        # 1.3.1 works, 1.4.1 does not (https://github.com/awalsh128/cache-apt-pkgs-action/issues/126)
+        uses: koppor/cache-apt-pkgs-action@add-arm64-support
         with:
           packages: pigz
           version: 1.0
@@ -100,6 +111,12 @@ jobs:
         if: (matrix.os == 'macos-latest')
         shell: bash
         run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+      - name: 'Set JavaFX (linux, Windows)'
+        if: (matrix.os != 'macos-latest')
+        run: sed -i '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle
+      - name: 'Set JavaFX (macOS)'
+        if: (matrix.os == 'macos-latest')
+        run: sed -i '.bak' -e '/javafx {/{n' -e 's/version = ".*"/version = "${{ matrix.javafx }}"/;}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -141,7 +158,7 @@ jobs:
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Repack deb file for Debian
-        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os == 'ubuntu-latest')
         shell: bash
         run: |
           cd build/distribution
@@ -157,7 +174,7 @@ jobs:
           for file in build/distribution/*.*; do
             base=${file%.*}
             ext=${file##*.}
-            mv "$file" "${base}-jdk${{ matrix.jdk }}.${ext}"
+            mv "$file" "${base}-jdk${{ matrix.jdk }}-javafx${{ matrix.javafx }}.${ext}"
           done
       - name: Setup rsync (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
