@@ -1,7 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -51,7 +50,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     private final LinkedEntriesEditorViewModel viewModel;
 
-    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<BibEntry> suggestionProvider, FieldCheckers fieldCheckers) {
+    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -59,13 +58,8 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers, undoManager);
 
         entryLinkField.setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
-        // Mind the .collect(Collectors.toList()) as the list needs to be mutable
-        entryLinkField.setSuggestionProvider(request ->
-                suggestionProvider.getPossibleSuggestions().stream()
-                                  .filter(suggestion -> suggestion.getCitationKey().orElse("").toLowerCase()
-                                                                  .contains(request.getUserText().toLowerCase()))
-                                  .map(ParsedEntryLink::new)
-                                  .collect(Collectors.toList()));
+        entryLinkField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
+
         entryLinkField.setTagViewFactory(this::createTag);
         entryLinkField.setConverter(viewModel.getStringConverter());
         entryLinkField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
