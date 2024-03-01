@@ -1,8 +1,9 @@
 package org.jabref.gui.preferences.websearch;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -97,7 +98,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
         catalogTable.setItems(viewModel.getCatalogs());
 
-        BooleanProperty isEditable = new SimpleBooleanProperty();
+        StringProperty customApiKeyProperty = new SimpleStringProperty();
+        ReadOnlyObjectProperty<FetcherApiKey> selectedItem = apiKeySelectorTable.getSelectionModel().selectedItemProperty();
         testCustomApiKey.setDisable(true);
 
         new ViewModelTableRowFactory<FetcherApiKey>()
@@ -110,8 +112,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             if (newValue != null) {
                 viewModel.selectedApiKeyProperty().setValue(newValue);
                 testCustomApiKey.disableProperty().bind(newValue.useProperty().not());
-                isEditable.bind(newValue.useProperty());
-                customApiKey.setEditable(newValue.shouldUse());
+                customApiKeyProperty.bind(newValue.keyProperty());
             }
         });
 
@@ -124,11 +125,16 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         customApiKey.setCellFactory(TextFieldTableCell.forTableColumn());
         customApiKey.setReorderable(false);
         customApiKey.setResizable(true);
-        isEditable.addListener((observable, oldValue, newValue) -> customApiKey.setEditable(newValue));
+        customApiKey.setEditable(true);
+        customApiKeyProperty.addListener((observable, oldValue, newValue) -> {
+            if (selectedItem != null) {
+                selectedItem.get().setUse(!customApiKeyProperty.get().trim().isEmpty());
+            }
+        });
 
         useCustomApiKey.setCellValueFactory(param -> param.getValue().useProperty());
         useCustomApiKey.setCellFactory(CheckBoxTableCell.forTableColumn(useCustomApiKey));
-        useCustomApiKey.setEditable(true);
+        useCustomApiKey.setEditable(false);
         useCustomApiKey.setResizable(true);
         useCustomApiKey.setReorderable(false);
 
@@ -150,7 +156,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     private void updateFetcherApiKey(FetcherApiKey apiKey) {
         if (apiKey != null) {
-            apiKey.setKey(customApiKey.getCellData(apiKey));
+            apiKey.setKey(customApiKey.getCellData(apiKey).trim());
         }
     }
 
