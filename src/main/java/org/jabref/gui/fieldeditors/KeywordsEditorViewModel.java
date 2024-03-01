@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.ListProperty;
@@ -16,6 +19,7 @@ import org.jabref.preferences.PreferencesService;
 public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
     private final ListProperty<Keyword> keywordListProperty;
+    private final SuggestionProvider<?> suggestionProvider;
 
     public KeywordsEditorViewModel(Field field,
                                    SuggestionProvider<?> suggestionProvider,
@@ -25,6 +29,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
+        this.suggestionProvider = suggestionProvider;
         Character keywordSeparator = preferencesService.getBibEntryPreferences().getKeywordSeparator();
         keywordListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     }
@@ -48,5 +53,13 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                 return new Keyword(keywordString);
             }
         };
+    }
+
+    public List<Keyword> getSuggestions(String request) {
+        return suggestionProvider.getPossibleSuggestions().stream()
+                                 .map(String.class::cast)
+                                 .filter(keyword -> keyword.toLowerCase().contains(request.toLowerCase()))
+                                 .map(Keyword::new)
+                                 .collect(Collectors.toList());
     }
 }
