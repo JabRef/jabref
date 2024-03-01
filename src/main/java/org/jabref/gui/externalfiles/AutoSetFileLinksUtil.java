@@ -1,6 +1,8 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,15 +32,17 @@ import org.slf4j.LoggerFactory;
 
 public class AutoSetFileLinksUtil {
 
+    record RelinkedResults(List<LinkedFile> relinkedFiles, List<String> exceptions) { }
+
     public static class LinkFilesResult {
         private final List<BibEntry> changedEntries = new ArrayList<>();
-        private final List<IOException> fileExceptions = new ArrayList<>();
+        private final List<String> fileExceptions = new ArrayList<String>();
 
         protected void addBibEntry(BibEntry bibEntry) {
             changedEntries.add(bibEntry);
         }
 
-        protected void addFileException(IOException exception) {
+        protected void addFileException(String exception) {
             fileExceptions.add(exception);
         }
 
@@ -46,7 +50,7 @@ public class AutoSetFileLinksUtil {
             return changedEntries;
         }
 
-        public List<IOException> getFileExceptions() {
+        public List<String> getFileExceptions() {
             return fileExceptions;
         }
     }
@@ -66,7 +70,7 @@ public class AutoSetFileLinksUtil {
         this.filePreferences = filePreferences;
     }
 
-    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
+    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) throws FileNotFoundException {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
@@ -75,7 +79,7 @@ public class AutoSetFileLinksUtil {
             try {
                 linkedFiles = findAssociatedNotLinkedFiles(entry);
             } catch (IOException e) {
-                result.addFileException(e);
+                result.addFileException(String.valueOf(e));
                 LOGGER.error("Problem finding files", e);
             }
 
@@ -94,9 +98,17 @@ public class AutoSetFileLinksUtil {
                         entry.addFile(linkedFile);
                     });
                 }
-
                 if (changed) {
                     result.addBibEntry(entry);
+                }
+                // Run Relinking Process
+                RelinkedResults relink = relinkingFiles(entry.getFiles());
+                entry.setFiles(relink.relinkedFiles);
+                if (!relink.relinkedFiles().isEmpty()) {
+                    result.addBibEntry(entry);
+                }
+                for (String e : (relink.exceptions)) {
+                    result.addFileException(e);
                 }
             }
         }
@@ -127,8 +139,8 @@ public class AutoSetFileLinksUtil {
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
-                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
-                                                            .orElse(Optional.of(new UnknownExternalFileType("")));
+                                                          .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
+                                                          .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
@@ -136,7 +148,48 @@ public class AutoSetFileLinksUtil {
                 linkedFiles.add(linkedFile);
             }
         }
-
         return linkedFiles;
+    }
+
+    public RelinkedResults relinkingFiles(List<LinkedFile> listlinked) throws FileNotFoundException {
+        List<LinkedFile> changedFiles = new ArrayList<>();
+        List<String> exceptions = new ArrayList<>();
+
+        for (LinkedFile file : listlinked) {
+            Path path = Path.of(file.getLink());
+            if (!Files.exists(path)) {
+                Path filePath = Path.of(file.getLink());
+                String directoryPath = filePath.getParent().getParent().toString();
+
+                String fileNameString = filePath.getFileName().toString();
+
+                List<String> fileLocations = searchFileInDirectoryAndSubdirectories(Path.of(directoryPath), fileNameString);
+                if (!fileLocations.isEmpty()) {
+                    file.setLink(fileLocations.get(0));
+                    changedFiles.add(file);
+                } else {
+                    exceptions.add(fileNameString);
+                    throw new FileNotFoundException();
+                }
+            }
+        }
+        return new RelinkedResults(changedFiles, exceptions);
+    }
+
+    public List<String> searchFileInDirectoryAndSubdirectories(Path directory, String targetFileName) {
+        List<Path> paths = new ArrayList<>();
+        try {
+            Files.walk(directory, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)
+                 .filter(path -> Files.isRegularFile(path))
+                 .filter(path -> path.getFileName().toString().equals(targetFileName))
+                 .forEach(paths::add);
+        } catch (IOException e) {
+            // Handle any exceptions here
+        }
+        List<String> output = new ArrayList<>();
+        for (Path p : paths) {
+            output.add(p.toString());
+        }
+        return output;
     }
 }

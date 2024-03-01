@@ -1,5 +1,6 @@
 package org.jabref.cli;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -188,7 +189,7 @@ public class ArgumentProcessor {
         }
     }
 
-    public void processArguments() {
+    public void processArguments() throws FileNotFoundException {
         uiCommands.clear();
 
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
@@ -711,7 +712,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void automaticallySetFileLinks(List<ParserResult> loaded) {
+    private void automaticallySetFileLinks(List<ParserResult> loaded) throws FileNotFoundException {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));

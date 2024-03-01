@@ -1,5 +1,6 @@
 package org.jabref.gui.remote;
 
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 
 import javafx.application.Platform;
@@ -42,6 +43,9 @@ public class CLIMessageHandler implements RemoteMessageHandler {
             Platform.runLater(() -> JabRefGUI.getMainFrame().handleUiCommands(argumentProcessor.getUiCommands()));
         } catch (ParseException e) {
             LOGGER.error("Error when parsing CLI args", e);
+        } catch (
+                FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }

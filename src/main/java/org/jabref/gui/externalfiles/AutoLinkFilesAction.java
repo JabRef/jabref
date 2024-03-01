@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import javax.swing.undo.UndoManager;
@@ -55,7 +56,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             @Override
-            protected AutoSetFileLinksUtil.LinkFilesResult call() {
+            protected AutoSetFileLinksUtil.LinkFilesResult call() throws FileNotFoundException {
                 return util.linkAssociatedFiles(entries, nc);
             }
 
