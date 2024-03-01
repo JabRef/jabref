@@ -37,10 +37,10 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
         return new StringConverter<>() {
             @Override
             public String toString(Keyword keyword) {
-                if (keyword != null) {
-                    return keyword.get();
+                if (keyword == null) {
+                    return "";
                 }
-                return "";
+                return keyword.get();
             }
 
             @Override
