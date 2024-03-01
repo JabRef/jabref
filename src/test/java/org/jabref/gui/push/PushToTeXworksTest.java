@@ -72,7 +72,7 @@ class PushToTeXworksTest {
      *
      */
     @Test
-    void testDisplayName() {
+    void displayName() {
         // Test whether the display name is correct
         assertEquals("TeXworks", pushToTeXworks.getDisplayName());
     }
@@ -85,7 +85,7 @@ class PushToTeXworksTest {
      *
      */
     @Test
-    void testGetCommandLine() {
+    void getCommandLine() {
         String keyString = "TestKey";
         String[] expectedCommand = new String[] {"/usr/bin/texworks", "--insert-text", "TestKey"};
 
@@ -117,7 +117,7 @@ class PushToTeXworksTest {
      *
      */
     @Test
-    void testGetTooltip() {
+    void getTooltip() {
         assertEquals("Push entries to external application (TeXworks)", pushToTeXworks.getTooltip());
     }
 }
