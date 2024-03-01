@@ -95,10 +95,9 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         currentEntry = entry;
         Optional<String> citeKey = entry.getCitationKey();
 
-        setListener(directory.get());
-
         if (citeKey.isPresent()) {
             startSearch(citeKey.get());
+            updateListener(directory.get());
         } else {
             searchError.set(Localization.lang("Selected entry does not have an associated citation key."));
             status.set(Status.ERROR);
@@ -180,18 +179,18 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
     }
 
-    private void setListener(Path path) {
+    private void updateListener(Path path) {
         if (!hasListener) {
             try {
                 listenerOnDirectory(path, Action.ADD);
                 hasListener = true;
             } catch (IOException e) {
-                LOGGER.error("Could not find file", e);
+                LOGGER.error("Could add listener", e);
             }
         }
     }
 
-    private void setListener(Path oldPath, Path newPath) {
+    private void updateListener(Path oldPath, Path newPath) {
         try {
             listenerOnDirectory(newPath, Action.ADD);
             listenerOnDirectory(oldPath, Action.REMOVE);
@@ -228,7 +227,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
                     databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath());
-                    setListener(directory.get(), selectedDirectory);
+                    updateListener(directory.get(), selectedDirectory);
         });
 
         init(currentEntry);
@@ -236,7 +235,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     public void refreshLatexDirectory() {
         latexParserResult = null;
-        Platform.runLater(() -> init(currentEntry));
+        Platform.runLater(() -> {
+            cancelSearch();
+            init(currentEntry);
+        });
     }
 
     public boolean shouldShow() {
