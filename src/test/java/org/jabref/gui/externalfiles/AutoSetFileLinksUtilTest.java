@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -38,16 +37,10 @@ public class AutoSetFileLinksUtilTest {
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
     private Path path = null;
-    private Path A;
-    private Path B;
 
     @BeforeEach
     public void setUp(@TempDir Path folder) throws Exception {
-        A = folder.resolve("A");
-        Files.createDirectory(A);
-        B = folder.resolve("B");
-        Files.createDirectory(B);
-        path = A.resolve("CiteKey.pdf");
+        path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
         entry.setCitationKey("CiteKey");
         when(filePreferences.getExternalFileTypes())
@@ -71,30 +64,55 @@ public class AutoSetFileLinksUtilTest {
         assertEquals(Collections.emptyList(), actual);
     }
 
+        /* @BeforeEach
+    public void setUp(@TempDir Path folder) throws Exception {
+        A = folder.resolve("A");
+        Files.createDirectory(A);
+        B = folder.resolve("B");
+        Files.createDirectory(B);
+        path = A.resolve("CiteKey.pdf");
+        Files.createFile(path);
+        entry.setCitationKey("CiteKey");
+        when(filePreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+    } */
+
     @Test
     public void testFileLinksAfterMoving() throws Exception {
         // Run "Automatically set file links" - check that the bib file was not modified
-        LinkedFile linkedFile = new LinkedFile("desc", path, "PDF");
+        path = path.getParent();
+
+        Path A = path.resolve("A");
+        Files.createDirectory(A);
+        Path B = path.resolve("B");
+        Files.createDirectory(B);
+        Path filePath = A.resolve("Test.pdf");
+        Files.createFile(filePath);
+        entry.setCitationKey("CiteKey");
+
+        LinkedFile linkedFile = new LinkedFile("desc", filePath, "PDF");
         List<LinkedFile> listLinked = new ArrayList<>();
         listLinked.add(linkedFile);
         entry.setFiles(listLinked);
 
-        // Copy Bib file from A to B
-        Path destination = B.resolve("CiteKey.pdf");
-        Files.copy(A.resolve("CiteKey.pdf"), destination, StandardCopyOption.REPLACE_EXISTING);
-        Files.deleteIfExists(A.resolve("CiteKey.pdf"));
+        Path destination = B.resolve("Test.pdf");
+        Files.move(A.resolve("Test.pdf"), destination, StandardCopyOption.REPLACE_EXISTING);
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, filePreferences, autoLinkPrefs);
         AutoSetFileLinksUtil.RelinkedResults results = util.relinkingFiles(entry.getFiles());
         List<LinkedFile> list = results.relinkedFiles();
-        List<IOException> exceptions = results.exceptions();
+        List<String> exceptions = results.exceptions();
         assertEquals(Collections.emptyList(), exceptions);
 
         // Change Entry to match required result and run method on bib
-        LinkedFile linkedDestFile = new LinkedFile("desc", B.resolve("CiteKey.pdf"), "PDF");
+        LinkedFile linkedDestFile = new LinkedFile("desc", B.resolve("Test.pdf"), "PDF");
         List<LinkedFile> listLinked2 = new ArrayList<>();
         listLinked2.add(linkedDestFile);
         entry.setFiles(listLinked2);
         assertEquals(entry.getFiles(), list);
     }
+
+    // todo There should be another test where the file stays the same
+    // In test code, it is very OK to have duplicated code fragments.
+
 }

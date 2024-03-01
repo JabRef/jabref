@@ -159,13 +159,16 @@ public class AutoSetFileLinksUtil {
             Path path = Path.of(file.getLink());
             if (!Files.exists(path)) {
                 Path filePath = Path.of(file.getLink());
+                // May need to put some limit since it can cause considerable performance problems.
                 String directoryPath = filePath.getParent().getParent().toString();
 
                 String fileNameString = filePath.getFileName().toString();
 
-                List<String> fileLocations = searchFileInDirectoryAndSubdirectories(Path.of(directoryPath), fileNameString);
+                List<Path> fileLocations = searchFileInDirectoryAndSubdirectories(Path.of(directoryPath), fileNameString);
                 if (!fileLocations.isEmpty()) {
-                    file.setLink(fileLocations.get(0));
+                    // File locations is a list but as stated in the link below, it is a rare case. But can be solved if time allows.
+                    // https://github.com/JabRef/jabref/issues/9798#issuecomment-1524155132
+                    file.setLink(fileLocations.get(0).toString());
                     changedFiles.add(file);
                 } else {
                     exceptions.add(fileNameString);
@@ -176,7 +179,7 @@ public class AutoSetFileLinksUtil {
         return new RelinkedResults(changedFiles, exceptions);
     }
 
-    public List<String> searchFileInDirectoryAndSubdirectories(Path directory, String targetFileName) {
+    public List<Path> searchFileInDirectoryAndSubdirectories(Path directory, String targetFileName) {
         List<Path> paths = new ArrayList<>();
         try {
             Files.walk(directory, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)
@@ -186,9 +189,9 @@ public class AutoSetFileLinksUtil {
         } catch (IOException e) {
             // Handle any exceptions here
         }
-        List<String> output = new ArrayList<>();
+        List<Path> output = new ArrayList<>();
         for (Path p : paths) {
-            output.add(p.toString());
+            output.add(p);
         }
         return output;
     }
