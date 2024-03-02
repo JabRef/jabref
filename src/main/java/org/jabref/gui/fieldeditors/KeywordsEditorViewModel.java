@@ -56,10 +56,17 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
     }
 
     public List<Keyword> getSuggestions(String request) {
-        return suggestionProvider.getPossibleSuggestions().stream()
-                                 .map(String.class::cast)
-                                 .filter(keyword -> keyword.toLowerCase().contains(request.toLowerCase()))
-                                 .map(Keyword::new)
-                                 .collect(Collectors.toList());
+        List<Keyword> suggestions = suggestionProvider.getPossibleSuggestions().stream()
+                                                      .map(String.class::cast)
+                                                      .filter(keyword -> keyword.toLowerCase().contains(request.toLowerCase()))
+                                                      .map(Keyword::new)
+                                                      .collect(Collectors.toList());
+
+        Keyword requestedKeyword = new Keyword(request);
+        if (!suggestions.contains(requestedKeyword)) {
+            suggestions.addFirst(requestedKeyword);
+        }
+
+        return suggestions;
     }
 }

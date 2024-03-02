@@ -72,7 +72,6 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
 
         keywordTagsField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
 
-        keywordTagsField.setPlaceholder(null);
         keywordTagsField.setShowSearchIcon(false);
         keywordTagsField.getEditor().getStyleClass().clear();
         keywordTagsField.getEditor().getStyleClass().add("tags-field-editor");

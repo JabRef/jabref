@@ -65,8 +65,6 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         entryLinkField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
         entryLinkField.setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
         entryLinkField.setComparator(Comparator.comparing(ParsedEntryLink::getKey));
-
-        entryLinkField.setPlaceholder(null);
         entryLinkField.setShowSearchIcon(false);
         entryLinkField.getEditor().getStyleClass().clear();
         entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
