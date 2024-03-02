@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the CrossRef field did not work if autocompletion was disabled [#8145](https://github.com/JabRef/jabref/issues/8145)
 - We fixed an issue where exporting`@electronic` and `@online` entry types to the Office XMl would duplicate the field `title`  [#10807](https://github.com/JabRef/jabref/issues/10807)
 - We fixed an issue where the `CommentsTab` was not properly formatted when the `defaultOwner` contained capital or special letters. [#10870](https://github.com/JabRef/jabref/issues/10870)
+- We fixed an issue where the Document Viewer would show the PDF in only half the window when maximized. [#10934](https://github.com/JabRef/jabref/issues/10934)
 
 ### Removed
 
@@ -88,7 +89,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the issue where the Hayagriva YAML exporter would not include a parent field for the publisher/series. [#10596](https://github.com/JabRef/jabref/issues/10596)
 - We fixed issues in the external file type dialog w.r.t. duplicate entries in the case of a language switch. [#10271](https://github.com/JabRef/jabref/issues/10271)
 - We fixed an issue where the right-click action "Copy cite..." did not respect the configured citation command under "External Programs" -> "[Push Applications](https://docs.jabref.org/cite/pushtoapplications)" [#10615](https://github.com/JabRef/jabref/issues/10615)
-- We fixed an issue where the Document Viewer would show the PDF in only half the window when maximized. [#10934](https://github.com/JabRef/jabref/issues/10934)
 
 ### Removed
 
