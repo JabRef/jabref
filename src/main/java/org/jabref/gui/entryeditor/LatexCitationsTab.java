@@ -137,4 +137,11 @@ public class LatexCitationsTab extends EntryEditorTab {
     public boolean shouldShow(BibEntry entry) {
         return viewModel.shouldShow();
     }
+
+    @Override
+    public void close() {
+        fileUpdateMonitor.removeListener(viewModel.getLatexFiles());
+        viewModel.close();
+    }
+    
 }
