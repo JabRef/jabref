@@ -31,6 +31,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -1378,6 +1379,73 @@ class BibtexParserTest {
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
+    }
+    
+    /**
+     * Checks that BibDesk Static Groups are available after parsing the library
+     */
+    @Test
+    void integrationTestBibDeskStaticGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Static Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>group name</key>
+                        <string>firstTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa,Heyl:2023aa</string>
+                    </dict>
+                    <dict>
+                        <key>group name</key>
+                        <string>secondTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(2, root.getNumberOfChildren());
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(false);
+        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("secondTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(false);
+        assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
+
+        BibDatabase db = result.getDatabase();
+        assertTrue(root.getChildren().get(0).getGroup().containsAll(db.getEntries()));
+        assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Heyl:2023aa").get()));
     }
 
     /**
