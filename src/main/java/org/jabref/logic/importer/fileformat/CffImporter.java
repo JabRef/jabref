@@ -105,6 +105,7 @@ public class CffImporter extends Importer {
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
 
         StandardEntryType entryType = StandardEntryType.Misc;
+
         if (citation.type != null) {
             entryType = mapType(citation.type);
         }
@@ -112,10 +113,10 @@ public class CffImporter extends Importer {
         HashMap<Field, String> entryMap = new HashMap<>();
 
         if (citation.getPreferredCitation() != null) {
-            PreferredCitationMethod(citation.getPreferredCitation(), entryMap, entry);
+            preferredCitationMethod(citation.getPreferredCitation(), entryMap, entry);
         }
 
-        MainCffContentMethod(citation, entryMap, entry);
+        mainCffContentMethod(citation, entryMap, entry);
         entryMap.forEach(entry::setField);
 
         List<BibEntry> entriesList = new ArrayList<>();
@@ -124,8 +125,13 @@ public class CffImporter extends Importer {
         return new ParserResult(entriesList);
     }
 
-    private void PreferredCitationMethod(JsonNode preferredCitation, Map<Field, String> entryMap, BibEntry entry) {
+    private void preferredCitationMethod(JsonNode preferredCitation, Map<Field, String> entryMap, BibEntry entry) {
         if (preferredCitation != null) {
+            if (preferredCitation.has("type")) {
+                String typeValue = preferredCitation.get("type").asText();
+                StandardEntryType entryType = mapType(typeValue);
+                entry.setType(entryType);
+            }
             if (preferredCitation.has("title")) {
                 entryMap.put(StandardField.TITLE, preferredCitation.get("title").asText());
             }
@@ -158,15 +164,10 @@ public class CffImporter extends Importer {
                 String pages = preferredCitation.get("start").asText() + "-" + preferredCitation.get("end").asText();
                 entryMap.put(StandardField.PAGES, pages);
             }
-            if (preferredCitation.has("type")) {
-                String typeValue = preferredCitation.get("type").asText();
-                StandardEntryType entryType = mapType(typeValue);
-                entry.setType(entryType);
-            }
         }
     }
 
-    private void MainCffContentMethod(CffFormat citation, Map<Field, String> entryMap, BibEntry entry) {
+    private void mainCffContentMethod(CffFormat citation, Map<Field, String> entryMap, BibEntry entry) {
         if (!entryMap.containsKey(StandardField.TITLE) && citation.values.containsKey("title")) {
             entryMap.put(StandardField.TITLE, citation.values.get("title"));
         }
@@ -212,7 +213,7 @@ public class CffImporter extends Importer {
 
     private StandardEntryType mapType(String cffType) {
         return switch (cffType) {
-            case "article", "conference-paper" -> StandardEntryType.Article;
+            case "article" -> StandardEntryType.Article;
             case "book" -> StandardEntryType.Book;
             case "conference" -> StandardEntryType.InProceedings;
             case "proceedings" -> StandardEntryType.Proceedings;
@@ -227,6 +228,7 @@ public class CffImporter extends Importer {
 
     private HashMap<String, Field> getFieldMappings() {
         HashMap<String, Field> fieldMappings = new HashMap<>();
+        fieldMappings.put("type", StandardField.TYPE);
         fieldMappings.put("title", StandardField.TITLE);
         fieldMappings.put("version", StandardField.VERSION);
         fieldMappings.put("doi", StandardField.DOI);
