@@ -67,7 +67,7 @@ public class CffImporter extends Importer {
             return preferredCitation;
         }
 
-        public  void setPreferredCitation(JsonNode preferredCitation) {
+        public void setPreferredCitation(JsonNode preferredCitation) {
             this.preferredCitation = preferredCitation;
         }
 

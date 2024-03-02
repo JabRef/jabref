@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CffImporterTest {
 
     @Test
-    public void testImportWithPreferredCitationOverridesMainCitation() throws Exception {
+    public void PreferredCitationTest() throws Exception {
         String cffContent = """
                 cff-version: 1.2.0
                 message: "If you use this software, please cite it as below."
