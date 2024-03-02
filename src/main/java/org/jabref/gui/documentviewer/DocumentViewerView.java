@@ -47,7 +47,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
         ViewLoader.view(this)
                   .load()
-                  .setAsContent(this.getDialogPane());
+                  .setAsDialogPane(this);
 
         // Remove button bar at bottom, but add close button to keep the dialog closable by clicking the "x" window symbol
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
