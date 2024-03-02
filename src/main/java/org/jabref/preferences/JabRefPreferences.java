@@ -816,7 +816,7 @@ public class JabRefPreferences implements PreferencesService {
                         "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
                         "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
-                        "\\begin{comment}<BR><BR><b>Comment: </b>\\format[HTMLChars]{\\comment}\\end{comment}__NEWLINE__" +
+                        "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars]{\\comment}\\end{comment}__NEWLINE__" +
                         "</font>__NEWLINE__");
 
         // set default theme
@@ -1406,8 +1406,9 @@ public class JabRefPreferences implements PreferencesService {
             put(DEFAULT_OWNER, newValue);
             // trigger re-determination of userAndHost and the dependent preferences
             userAndHost = null;
-            filePreferences = null;
-            internalPreferences = null;
+
+            // this propagates down to filePreferences
+            getInternalPreferences().getUserAndHostProperty().setValue(newValue);
         });
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
 
@@ -2205,6 +2206,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 getBoolean(TRASH_INSTEAD_OF_DELETE));
 
+        EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
