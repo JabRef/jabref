@@ -752,11 +752,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public boolean closeCurrentTab() {
-        LibraryTab currentTab = getCurrentLibraryTab();
-        if (currentTab == null) {
-            return false;
-        }
-        return closeTab(currentTab);
+        return closeTab(getCurrentLibraryTab());
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
@@ -1080,6 +1076,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         public void execute() {
             Platform.runLater(() -> {
                 if (libraryTab == null) {
+                    if (tabContainer.getCurrentLibraryTab() == null) {
+                        LOGGER.error("No library tab to close");
+                        return;
+                    }
                     tabContainer.closeCurrentTab();
                 } else {
                     tabContainer.closeTab(libraryTab);
