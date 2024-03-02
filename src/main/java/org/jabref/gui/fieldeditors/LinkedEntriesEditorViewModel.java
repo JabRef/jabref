@@ -22,15 +22,12 @@ import org.jabref.model.entry.field.Field;
 public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 
     private final BibDatabaseContext databaseContext;
-    private final SuggestionProvider<?> suggestionProvider;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
     public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.databaseContext = databaseContext;
-        this.suggestionProvider = suggestionProvider;
-
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
         BindingsHelper.bindContentBidirectional(
                 linkedEntries,
@@ -58,15 +55,6 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
                 return new ParsedEntryLink(key, databaseContext.getDatabase());
             }
         };
-    }
-
-    public List<ParsedEntryLink> getSuggestions(String request) {
-        return ((List<?>) suggestionProvider.getPossibleSuggestions())
-                .stream()
-                .map(suggestion -> suggestion instanceof BibEntry bibEntry ? bibEntry.getCitationKey().orElse("") : (String) suggestion)
-                .filter(suggestion -> suggestion.toLowerCase().contains(request.toLowerCase()))
-                .map(suggestion -> new ParsedEntryLink(suggestion, databaseContext.getDatabase()))
-                .collect(Collectors.toList());
     }
 
     public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
