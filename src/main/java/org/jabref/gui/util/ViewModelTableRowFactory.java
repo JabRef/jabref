@@ -104,7 +104,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
-    public ViewModelTableRowFactory<S> withTooltip(BiConsumer<S, ? super DragEvent> toOnDragOver) {
+    public ViewModelTableRowFactory<S> withTooltipOther(BiConsumer<S, ? super DragEvent> toOnDragOver) {
         this.toTooltip = toTooltip;
         return this;
     }
@@ -113,12 +113,18 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     public TableRow<S> call(TableView<S> tableView) {
         TableRow<S> row = new TableRow<>();
 
-        if (toTooltip != null) {
-            String tooltipText = toTooltip.call(row.getItem());
-            if (StringUtil.isNotBlank(tooltipText)) {
-                row.setTooltip(new Tooltip(tooltipText));
+        row.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) { // Mouse entered the row
+                if (toTooltip != null && row.getItem() != null) {
+                    String tooltipText = toTooltip.call(row.getItem());
+                    if (StringUtil.isNotBlank(tooltipText)) {
+                        Tooltip.install(row, new Tooltip(tooltipText));
+                    }
+                }
+            } else { // Mouse exited the row
+                Tooltip.uninstall(row, null);
             }
-        }
+        });
 
         if (onMouseClickedEvent != null) {
             row.setOnMouseClicked(event -> {

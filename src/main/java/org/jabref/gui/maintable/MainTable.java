@@ -77,6 +77,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
+    /** @noinspection checkstyle:TodoComment*/
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
@@ -152,6 +153,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .withTooltip(this::handleHoverOverEntry)
                 .install(this);
+
+        /* ViewModelTableRowFactory<BibEntryTableViewModel> rowFactory = new ViewModelTableRowFactory<BibEntryTableViewModel>()
+                .withTooltip((entry) -> {
+                    return entry.getBibPreview().toString();
+                }); */
+
+        // rowFactory.install(this);
 
         this.getSortOrder().clear();
 
@@ -370,9 +378,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private String handleHoverOverEntry(BibEntryTableViewModel bibEntryTableViewModel) {
         if (bibEntryTableViewModel != null) {
-            return bibEntryTableViewModel.getBibPreview().toString();
+            return bibEntryTableViewModel.getEntry().getAuthorTitleYear(120);
         }
-        return "hello";
+        return "";
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
