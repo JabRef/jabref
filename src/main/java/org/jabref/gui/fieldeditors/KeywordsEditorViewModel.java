@@ -77,6 +77,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                                                       .map(String.class::cast)
                                                       .filter(keyword -> keyword.toLowerCase().contains(request.toLowerCase()))
                                                       .map(Keyword::new)
+                                                      .distinct()
                                                       .collect(Collectors.toList());
 
         Keyword requestedKeyword = new Keyword(request);
