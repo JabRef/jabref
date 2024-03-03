@@ -140,7 +140,7 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     @Override
     public void close() {
-        viewModel.removeListener();
+        viewModel.shutdown();
     }
-    
+
 }
