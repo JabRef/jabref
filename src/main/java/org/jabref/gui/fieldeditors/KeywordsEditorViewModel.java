@@ -11,14 +11,17 @@ import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
     private final ListProperty<Keyword> keywordListProperty;
+    private final Character keywordSeparator;
     private final SuggestionProvider<?> suggestionProvider;
 
     public KeywordsEditorViewModel(Field field,
@@ -29,9 +32,23 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
-        this.suggestionProvider = suggestionProvider;
-        Character keywordSeparator = preferencesService.getBibEntryPreferences().getKeywordSeparator();
         keywordListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+        this.keywordSeparator = preferencesService.getBibEntryPreferences().getKeywordSeparator();
+        this.suggestionProvider = suggestionProvider;
+
+        BindingsHelper.bindContentBidirectional(
+                keywordListProperty,
+                text,
+                this::serializeKeywords,
+                this::parseKeywords);
+    }
+
+    private String serializeKeywords(List<Keyword> keywords) {
+        return KeywordList.serialize(keywords, keywordSeparator);
+    }
+
+    private List<Keyword> parseKeywords(String newText) {
+        return KeywordList.parse(newText, keywordSeparator).stream().toList();
     }
 
     public ListProperty<Keyword> keywordListProperty() {
