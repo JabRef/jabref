@@ -140,7 +140,16 @@ public class DocumentViewerControl extends StackPane {
 
     public void changePageWidth(int delta) {
         // Assuming the current page is A4 (or has same aspect ratio)
-        setPageWidth(desiredPageDimension.getWidth(Math.sqrt(2)) + delta);
+        int newWidth = desiredPageDimension.getWidth(Math.sqrt(2)) + delta;
+        // Limit zoom out to ~1 page due to occasional display errors when zooming out further
+        int minWidth = (int) (flow.getHeight() / 2 * Math.sqrt(2));
+        if (newWidth < minWidth) {
+            if (newWidth - delta == minWidth) {  // Attempting to zoom out when already at minWidth
+                return;
+            }
+            newWidth = minWidth;
+        }
+        setPageWidth(newWidth);
     }
 
     /**
