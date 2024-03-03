@@ -66,6 +66,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
                 .map(suggestion -> suggestion instanceof BibEntry bibEntry ? bibEntry.getCitationKey().orElse("") : (String) suggestion)
                 .filter(suggestion -> suggestion.toLowerCase().contains(request.toLowerCase()))
                 .map(suggestion -> new ParsedEntryLink(suggestion, databaseContext.getDatabase()))
+                .distinct()
                 .collect(Collectors.toList());
 
         ParsedEntryLink requestedLink = new ParsedEntryLink(request, databaseContext.getDatabase());
