@@ -133,7 +133,6 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             if (watcher != null) {
                 watcher.close();
             }
-            Thread.currentThread().interrupt();
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }
