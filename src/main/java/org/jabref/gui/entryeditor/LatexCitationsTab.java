@@ -138,7 +138,6 @@ public class LatexCitationsTab extends EntryEditorTab {
         return viewModel.shouldShow();
     }
 
-    @Override
     public void close() {
         viewModel.shutdown();
     }
