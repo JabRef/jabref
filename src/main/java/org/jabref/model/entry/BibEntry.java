@@ -29,6 +29,7 @@ import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -44,6 +45,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
+import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
@@ -727,6 +729,12 @@ public class BibEntry implements Cloneable {
             return text;
         }
         return text.substring(0, maxCharacters + 1) + "...";
+    }
+
+    public String getBibPreviewTooltip(PreviewPreferences previewPreferences, BibDatabaseContext databaseContext) {
+        // TODO first row should show full cell content and a second row should be blank
+        String preview = previewPreferences.getCustomPreviewLayout().generatePreview(this, databaseContext);
+        return preview;
     }
 
     /**

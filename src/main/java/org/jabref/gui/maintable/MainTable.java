@@ -53,6 +53,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -76,6 +77,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final UndoManager undoManager;
     private long lastKeyPressTime;
     private String columnSearchTerm;
+    private PreviewPreferences previewPreferences;
 
     /** @noinspection checkstyle:TodoComment*/
     public MainTable(MainTableDataModel model,
@@ -101,6 +103,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
+        this.previewPreferences = preferencesService.getPreviewPreferences();
+
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
@@ -371,7 +375,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private String handleHoverOverEntry(BibEntryTableViewModel bibEntryTableViewModel) {
         if (bibEntryTableViewModel != null) {
-            return bibEntryTableViewModel.getEntry().getAuthorTitleYear(120);
+            return bibEntryTableViewModel.getEntry().getBibPreviewTooltip(previewPreferences, database);
         }
         return "";
     }

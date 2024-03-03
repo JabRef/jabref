@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -15,6 +16,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.util.Callback;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -119,7 +122,13 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
                 if (toTooltip != null && row.getItem() != null) {
                     String tooltipText = toTooltip.call(row.getItem());
                     if (StringUtil.isNotBlank(tooltipText)) {
-                        Tooltip.install(row, new Tooltip(tooltipText));
+                        WebView web = new WebView();
+                        WebEngine webEngine = web.getEngine();
+                        webEngine.loadContent(tooltipText);
+                        Tooltip tip = new Tooltip();
+                        tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        tip.setGraphic(web);
+                        Tooltip.install(row, tip);
                     }
                 }
             } else { // Mouse exited the row
