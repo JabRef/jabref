@@ -22,7 +22,7 @@ public interface FileUpdateMonitor {
     /**
      * Add a new directory to monitor. 
      *
-     * @param path The directory to monitor.
+     * @param directory The directory to monitor.
      * @throws IOException if the directory does not exist.
      */
     void addListenerForDirectory(Path directory, FileUpdateListener listener) throws IOException;
