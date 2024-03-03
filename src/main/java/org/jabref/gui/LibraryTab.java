@@ -796,6 +796,7 @@ public class LibraryTab extends Tab {
      * Perform necessary cleanup when this Library is closed.
      */
     private void onClosed(Event event) {
+        entryEditor.closeAllTabs();
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
