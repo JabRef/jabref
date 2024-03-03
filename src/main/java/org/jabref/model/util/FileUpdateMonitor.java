@@ -20,6 +20,14 @@ public interface FileUpdateMonitor {
     void removeListener(Path path, FileUpdateListener listener);
 
     /**
+     * Add a new directory to monitor. 
+     *
+     * @param path The directory to monitor.
+     * @throws IOException if the directory does not exist.
+     */
+    void addListenerForDirectory(Path directory, FileUpdateListener listener) throws IOException;
+
+    /**
      * Indicates whether the native system's file monitor has successfully started.
      *
      * @return true is process is running; false otherwise.
