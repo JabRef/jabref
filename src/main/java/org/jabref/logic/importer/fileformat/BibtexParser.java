@@ -117,6 +117,10 @@ public class BibtexParser implements Parser {
         }
     }
 
+    public List<BibtexString> getStringValues() {
+        return database.getStringValues().stream().toList();
+    }
+
     public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
         return parseEntries(bibtexString).stream().findFirst();
     }

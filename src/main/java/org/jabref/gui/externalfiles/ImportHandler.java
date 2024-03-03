@@ -40,7 +40,9 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -311,10 +313,27 @@ public class ImportHandler {
     public List<BibEntry> handleBibTeXData(String entries) {
         BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
-            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            List<BibtexString> stringConstants = parser.getStringValues();
+            importStringConstantsWithDuplicateCheck(stringConstants);
+            return result;
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
             return Collections.emptyList();
+        }
+    }
+
+    public void importStringConstantsWithDuplicateCheck(List<BibtexString> stringConstants) {
+        for(BibtexString stringConstantToAdd : stringConstants) {
+            try {
+                bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
+            } catch (KeyCollisionException ex) {
+                LOGGER.debug("Collision when inserting constants");
+                // TODO: Handle collision with merge window.
+
+                // TODO: Use ConstantsItemModel(?) to validate string constants
+                // In the same way as when adding them manually in library properties
+            }
         }
     }
 
