@@ -57,4 +57,11 @@ public abstract class EntryEditorTab extends Tab {
     protected void previousPreviewStyle() {
         // do nothing by default
     }
+
+    /**
+     * Close the tab - should be overriden if a EntryEditorTab has any actions to perform on close
+     */
+    protected void close(){
+        // Do nothing by default
+    }
 }
