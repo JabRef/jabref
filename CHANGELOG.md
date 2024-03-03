@@ -23,7 +23,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When pasting HTML into the abstract or a comment field, the hypertext is automatically converted to Markdown. [#10558](https://github.com/JabRef/jabref/issues/10558)
 - We added the possibility to redownload files that had been present but are no longer in the specified location. [#10848](https://github.com/JabRef/jabref/issues/10848)
 - We added the citation key pattern `[camelN]`. Equivalent to the first N words of the `[camel]` pattern.
-- We added a selection box next to the keywords field, The list is filled with the contents of the content selectors, excluding existing keywords. [#10560](https://github.com/JabRef/jabref/issues/10560)
 - We added ability to export in CFF (Citation File Format) [#10661](https://github.com/JabRef/jabref/issues/10661).
 
 ### Changed
@@ -39,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We made the command "Push to TexShop" more robust to allow cite commands with a character before the first slash. [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699/17?u=siedlerchr)
 - We only show the notification "Saving library..." if the library contains more than 2000 entries. [#9803](https://github.com/JabRef/jabref/issues/9803)
 - We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
+- Keywords filed are now displayed as tags (chips). [#10910](https://github.com/JabRef/jabref/pull/10910)
 
 ### Fixed
 
