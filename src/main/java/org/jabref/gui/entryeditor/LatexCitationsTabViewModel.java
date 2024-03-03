@@ -244,4 +244,18 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     public boolean shouldShow() {
         return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
     }
+
+    public void removeListener() {
+        if (hasListener) {
+            try {
+                listenerOnDirectory(directory.get(), Action.REMOVE);
+                hasListener = false;
+            } catch (IOException e) {
+                LOGGER.error("Could not remove listener", e);
+            }
+        }
+    }
+    
 }
+
+
