@@ -38,6 +38,7 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
 
+    private static final BooleanProperty SHOWTOOLTIP = new SimpleBooleanProperty(false);
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
@@ -47,7 +48,6 @@ public class BibEntryTableViewModel {
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
     private final EasyBinding<Map<Field, String>> bibPreview;
-    private static final BooleanProperty SHOWTOOLTIP = new SimpleBooleanProperty(false);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
