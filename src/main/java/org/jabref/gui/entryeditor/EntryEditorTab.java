@@ -61,7 +61,7 @@ public abstract class EntryEditorTab extends Tab {
     /**
      * Close the tab - should be overriden if a EntryEditorTab has any actions to perform on close
      */
-    protected void close(){
+    protected void close() {
         // Do nothing by default
     }
 }
