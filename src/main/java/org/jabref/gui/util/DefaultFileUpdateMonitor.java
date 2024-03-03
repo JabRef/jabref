@@ -8,6 +8,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,8 +34,8 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
-    private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
-    private volatile WatchService watcher;
+    final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
+    volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
 
@@ -82,7 +84,12 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     }
 
     private void notifyAboutChange(Path path) {
-        listeners.get(path).forEach(FileUpdateListener::fileUpdated);
+        Collection<FileUpdateListener> fileUpdateListeners = Collections.emptyList();
+        while ((path != null) && (fileUpdateListeners.isEmpty())) {
+            fileUpdateListeners = listeners.get(path);
+            path = path.getParent();
+        }
+        fileUpdateListeners.forEach(FileUpdateListener::fileUpdated);
     }
 
     @Override
@@ -126,6 +133,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             if (watcher != null) {
                 watcher.close();
             }
+            Thread.currentThread().interrupt();
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }
