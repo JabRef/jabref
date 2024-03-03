@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -76,6 +77,16 @@ public class DocumentViewerControl extends StackPane {
         flow.estimatedScrollYProperty().addListener((observable, oldValue, newValue) -> scrollY.setValue(newValue));
         scrollY.addListener((observable, oldValue, newValue) -> flow.estimatedScrollYProperty().setValue((double) newValue));
         flow.totalLengthEstimateProperty().addListener((observable, oldValue, newValue) -> scrollYMax.setValue(newValue));
+        flow.addEventFilter(ScrollEvent.SCROLL, (ScrollEvent event) -> {
+            if (event.isControlDown()) {
+                event.consume();
+                if (event.getDeltaY() > 0) {
+                    changePageWidth(100);
+                } else {
+                    changePageWidth(-100);
+                }
+            }
+        });
     }
 
     private void updateCurrentPage(ObservableList<DocumentViewerPage> visiblePages) {
@@ -91,7 +102,8 @@ public class DocumentViewerControl extends StackPane {
                 // Successful hit
                 inMiddleOfViewport = Optional.of(hit.getCell());
             }
-        } catch (NoSuchElementException exception) {
+        } catch (
+                NoSuchElementException exception) {
             // Sometimes throws exception if no page is found -> ignore
         }
 
