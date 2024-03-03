@@ -154,13 +154,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .withTooltip(this::handleHoverOverEntry)
                 .install(this);
 
-        /* ViewModelTableRowFactory<BibEntryTableViewModel> rowFactory = new ViewModelTableRowFactory<BibEntryTableViewModel>()
-                .withTooltip((entry) -> {
-                    return entry.getBibPreview().toString();
-                }); */
-
-        // rowFactory.install(this);
-
         this.getSortOrder().clear();
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->

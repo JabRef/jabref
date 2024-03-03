@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
@@ -45,6 +47,7 @@ public class BibEntryTableViewModel {
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
     private final EasyBinding<Map<Field, String>> bibPreview;
+    private static final BooleanProperty SHOWTOOLTIP = new SimpleBooleanProperty(false);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -162,5 +165,9 @@ public class BibEntryTableViewModel {
 
     public StringProperty bibDatabaseContextProperty() {
         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
+    }
+
+    public static BooleanProperty showTooltipProperty() {
+        return SHOWTOOLTIP;
     }
 }

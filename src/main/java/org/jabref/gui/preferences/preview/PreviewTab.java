@@ -25,6 +25,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
@@ -111,6 +112,8 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         // TODO: connect checkbox to viewModel
         // showTooltipEntryTable.selectedProperty().bindBidirectional(viewModel.showInEntryEditorProperty());
+        showTooltipEntryTable.selectedProperty().bindBidirectional(BibEntryTableViewModel.showTooltipProperty());
+        showTooltipEntryTable.setSelected(BibEntryTableViewModel.showTooltipProperty().get());
 
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());

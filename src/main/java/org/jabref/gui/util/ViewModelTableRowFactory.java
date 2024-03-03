@@ -17,6 +17,7 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.model.strings.StringUtil;
 
 import org.reactfx.util.TriConsumer;
@@ -114,7 +115,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         TableRow<S> row = new TableRow<>();
 
         row.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) { // Mouse entered the row
+            if (newValue && BibEntryTableViewModel.showTooltipProperty().get()) { // Mouse entered the row
                 if (toTooltip != null && row.getItem() != null) {
                     String tooltipText = toTooltip.call(row.getItem());
                     if (StringUtil.isNotBlank(tooltipText)) {
