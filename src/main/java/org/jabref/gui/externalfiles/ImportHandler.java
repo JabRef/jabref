@@ -18,6 +18,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -326,13 +327,14 @@ public class ImportHandler {
     public void importStringConstantsWithDuplicateCheck(List<BibtexString> stringConstants) {
         for(BibtexString stringConstantToAdd : stringConstants) {
             try {
-                bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
+                ConstantsItemModel checker = new ConstantsItemModel(stringConstantToAdd.getName(), stringConstantToAdd.getContent());
+                if(checker.combinedValidationValidProperty().get()) {
+                    bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant \"%0\" was not added because it is not a valid string constant", stringConstantToAdd.getName()));
+                }
             } catch (KeyCollisionException ex) {
-                LOGGER.debug("Collision when inserting constants");
-                // TODO: Handle collision with merge window.
-
-                // TODO: Use ConstantsItemModel(?) to validate string constants
-                // In the same way as when adding them manually in library properties
+                dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
             }
         }
     }
