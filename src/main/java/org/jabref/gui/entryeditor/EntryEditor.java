@@ -442,11 +442,11 @@ public class EntryEditor extends BorderPane {
     public void previousPreviewStyle() {
         this.entryEditorTabs.forEach(EntryEditorTab::previousPreviewStyle);
     }
-    
+
     /**
      *  Close all tabs that needs proper closing
      */
-    private void closeAllTabs() {
+    public void closeAllTabs() {
         tabs.forEach(EntryEditorTab::close);
     }
 }
