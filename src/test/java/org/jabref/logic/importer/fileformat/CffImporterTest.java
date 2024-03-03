@@ -117,7 +117,7 @@ public class CffImporterTest {
         BibEntry entry = bibEntries.getFirst();
 
         BibEntry expected = getPopulatedEntry();
-        expected.setType(StandardEntryType.Dataset);
+        expected.setType(StandardEntryType.Software);
 
         assertEquals(entry, expected);
     }
@@ -143,6 +143,33 @@ public class CffImporterTest {
 
         assertEquals(entry, expected);
     }
+
+    @Test
+    public void importCITATION() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CITATION.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+        BibEntry entry = bibEntries.getFirst();
+
+        BibEntry expected = getPopulatedEntry1();
+
+        assertEquals(entry, expected);
+    }
+
+    public BibEntry getPopulatedEntry1() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+
+        String authors = "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker";
+        entry.setField(StandardField.AUTHOR, authors);
+        entry.setField(StandardField.ISSUE, "138");
+        entry.setField(StandardField.TITLE, "JabRef: BibTeX-based literature management software");
+        entry.setField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref");
+        entry.setField(StandardField.JOURNAL, "TUGboat");
+        entry.setField(StandardField.VOLUME, "44");
+        entry.setField(StandardField.YEAR, "2023");
+
+        return entry;
+    }
+
 
     public BibEntry getPopulatedEntry() {
         BibEntry entry = new BibEntry();

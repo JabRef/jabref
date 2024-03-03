@@ -6,14 +6,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -60,11 +64,11 @@ public class CffImporter extends Importer {
         @JsonProperty("type")
         private String type;
 
-        public CffFormat() {
-        }
-
         public JsonNode getPreferredCitation() {
             return preferredCitation;
+        }
+
+        public CffFormat() {
         }
 
         public void setPreferredCitation(JsonNode preferredCitation) {
@@ -103,98 +107,128 @@ public class CffImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
-
-        StandardEntryType entryType = StandardEntryType.Misc;
-
-        if (citation.type != null) {
-            entryType = mapType(citation.type);
-        }
-        BibEntry entry = new BibEntry(entryType);
-        HashMap<Field, String> entryMap = new HashMap<>();
-
-        if (citation.getPreferredCitation() != null) {
-            preferredCitationMethod(citation.getPreferredCitation(), entryMap, entry);
-        }
-
-        mainCffContentMethod(citation, entryMap, entry);
-        entryMap.forEach(entry::setField);
-
         List<BibEntry> entriesList = new ArrayList<>();
+        HashMap<Field, String> entryMap = new HashMap<>();
+        StandardEntryType entryType = StandardEntryType.Software;
+
+        // Map CFF fields to JabRef Fields
+        HashMap<String, Field> fieldMap = getFieldMappings();
+        for (Map.Entry<String, String> property : citation.values.entrySet()) {
+            if (fieldMap.containsKey(property.getKey())) {
+                entryMap.put(fieldMap.get(property.getKey()), property.getValue());
+            } else if ("type".equals(property.getKey())) {
+                if ("dataset".equals(property.getValue())) {
+                    entryType = StandardEntryType.Dataset;
+                }
+            } else if (getUnmappedFields().contains(property.getKey())) {
+                entryMap.put(new UnknownField(property.getKey()), property.getValue());
+            }
+        }
+
+        // Translate CFF author format to JabRef author format
+        String authorStr = citation.authors.stream()
+                                           .map(author -> author.values)
+                                           .map(vals -> vals.get("name") != null ?
+                                                   new Author(vals.get("name"), "", "", "", "") :
+                                                   new Author(vals.get("given-names"), null, vals.get("name-particle"),
+                                                           vals.get("family-names"), vals.get("name-suffix")))
+                                           .collect(AuthorList.collect())
+                                           .getAsFirstLastNamesWithAnd();
+        entryMap.put(StandardField.AUTHOR, authorStr);
+
+        // Select DOI to keep
+        if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
+            List<CffIdentifier> doiIds = citation.ids.stream()
+                                                     .filter(id -> "doi".equals(id.type))
+                                                     .collect(Collectors.toList());
+            if (doiIds.size() == 1) {
+                entryMap.put(StandardField.DOI, doiIds.getFirst().value);
+            }
+        }
+
+        // Select SWHID to keep
+        if (citation.ids != null) {
+            List<String> swhIds = citation.ids.stream()
+                                              .filter(id -> "swh".equals(id.type))
+                                              .map(id -> id.value)
+                                              .collect(Collectors.toList());
+
+            if (swhIds.size() == 1) {
+                entryMap.put(BiblatexSoftwareField.SWHID, swhIds.getFirst());
+            } else if (swhIds.size() > 1) {
+                List<String> relSwhIds = swhIds.stream()
+                                               .filter(id -> id.split(":").length > 3) // quick filter for invalid swhids
+                                               .filter(id -> "rel".equals(id.split(":")[2]))
+                                               .collect(Collectors.toList());
+                if (relSwhIds.size() == 1) {
+                    entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.getFirst());
+                }
+            }
+        }
+        // Handle the main citation as a separate entry
+        BibEntry mainEntry = new BibEntry(entryType);
+        mainEntry.setField(entryMap);
+
+        HashMap<String, Field> fieldMappings = getFieldMappings();
+        // Now handle preferred citation as its own entry
+        if (citation.getPreferredCitation() != null) {
+            HashMap<Field, String> preferredEntryMap = new HashMap<>();
+            processPreferredCitation(citation.getPreferredCitation(), preferredEntryMap, entriesList, fieldMappings);
+        }
+
+        BibEntry entry = new BibEntry(entryType);
+        entry.setField(entryMap);
+
         entriesList.add(entry);
 
         return new ParserResult(entriesList);
     }
 
-    private void preferredCitationMethod(JsonNode preferredCitation, Map<Field, String> entryMap, BibEntry entry) {
-        if (preferredCitation != null) {
-            if (preferredCitation.has("type")) {
-                String typeValue = preferredCitation.get("type").asText();
-                StandardEntryType entryType = mapType(typeValue);
-                entry.setType(entryType);
-            }
-            if (preferredCitation.has("title")) {
-                entryMap.put(StandardField.TITLE, preferredCitation.get("title").asText());
-            }
-            if (preferredCitation.has("doi")) {
-                entryMap.put(StandardField.DOI, preferredCitation.get("doi").asText());
-            }
-            if (preferredCitation.has("authors")) {
-                List<String> authorsList = new ArrayList<>();
-                preferredCitation.get("authors").forEach(authorNode -> {
-                    String givenName = authorNode.has("given-names") ? authorNode.get("given-names").asText() : "";
-                    String familyName = authorNode.has("family-names") ? authorNode.get("family-names").asText() : "";
-                    authorsList.add((givenName + " " + familyName).trim());
-                });
-                String authors = String.join(" and ", authorsList);
-                entryMap.put(StandardField.AUTHOR, authors);
-            }
-            if (preferredCitation.has("journal")) {
-                entryMap.put(StandardField.JOURNAL, preferredCitation.get("journal").asText());
-            }
-            if (preferredCitation.has("volume")) {
-                entryMap.put(StandardField.VOLUME, preferredCitation.get("volume").asText());
-            }
-            if (preferredCitation.has("issue")) {
-                entryMap.put(StandardField.ISSUE, preferredCitation.get("issue").asText());
-            }
-            if (preferredCitation.has("year")) {
-                entryMap.put(StandardField.YEAR, preferredCitation.get("year").asText());
-            }
-            if (preferredCitation.has("start") && preferredCitation.has("end")) {
-                String pages = preferredCitation.get("start").asText() + "-" + preferredCitation.get("end").asText();
-                entryMap.put(StandardField.PAGES, pages);
+    private void processPreferredCitation(JsonNode preferredCitation, HashMap<Field, String> entryMap, List<BibEntry> entriesList, HashMap<String, Field> fieldMappings) {
+        if (preferredCitation.isObject()) {
+            BibEntry preferredEntry = new BibEntry();
+            preferredCitation.fields().forEachRemaining(field -> {
+                String key = field.getKey();
+                JsonNode value = field.getValue();
+
+                if (fieldMappings.containsKey(key)) {
+                    preferredEntry.setField(fieldMappings.get(key), value.asText());
+                } else if ("authors".equals(key) && value.isArray()) {
+                    preferredEntry.setField(StandardField.AUTHOR, parseAuthors(value));
+                } else if ("journal".equals(key)) {
+                    preferredEntry.setField(StandardField.JOURNAL, value.asText());
+                } else if ("doi".equals(key)) {
+                    preferredEntry.setField(StandardField.DOI, value.asText());
+                } else if ("year".equals(key)) {
+                    preferredEntry.setField(StandardField.YEAR, value.asText());
+                } else if ("volume".equals(key)) {
+                    preferredEntry.setField(StandardField.VOLUME, value.asText());
+                } else if ("issue".equals(key)) {
+                    preferredEntry.setField(StandardField.ISSUE, value.asText());
+                } else if ("pages".equals(key)) {
+                    String pages = value.has("start") && value.has("end")
+                            ? value.get("start").asText() + "--" + value.get("end").asText()
+                            : value.asText();
+                    preferredEntry.setField(StandardField.PAGES, pages);
+                }
+            });
+            if (!preferredEntry.getField(StandardField.TITLE).orElse("").isEmpty()) {
+                entriesList.add(preferredEntry);
             }
         }
     }
 
-    private void mainCffContentMethod(CffFormat citation, Map<Field, String> entryMap, BibEntry entry) {
-        if (!entryMap.containsKey(StandardField.TITLE) && citation.values.containsKey("title")) {
-            entryMap.put(StandardField.TITLE, citation.values.get("title"));
+    private String parseAuthors(JsonNode authorsNode) {
+        StringBuilder authors = new StringBuilder();
+        for (JsonNode authorNode : authorsNode) {
+            String givenNames = authorNode.has("given-names") ? authorNode.get("given-names").asText() : "";
+            String familyNames = authorNode.has("family-names") ? authorNode.get("family-names").asText() : "";
+            authors.append(givenNames).append(" ").append(familyNames).append(" and ");
         }
-        if (!entryMap.containsKey(StandardField.AUTHOR) && citation.authors != null && !citation.authors.isEmpty()) {
-            List<String> authorsList = new ArrayList<>();
-            for (CffAuthor author : citation.authors) {
-                String givenName = author.values.getOrDefault("given-names", "");
-                String familyName = author.values.getOrDefault("family-names", "");
-                authorsList.add((givenName + " " + familyName).trim());
-            }
-            String authors = String.join(" and ", authorsList);
-            entryMap.put(StandardField.AUTHOR, authors);
+        if (authors.lastIndexOf(" and ") == authors.length() - 5) {
+            authors.delete(authors.length() - 5, authors.length());
         }
-        if (!entryMap.containsKey(StandardField.DOI) && citation.values.containsKey("doi")) {
-            entryMap.put(StandardField.DOI, citation.values.get("doi"));
-        }
-        if (!entryMap.containsKey(StandardField.VERSION) && citation.values.containsKey("version")) {
-            entryMap.put(StandardField.VERSION, citation.values.get("version"));
-        }
-        if (!entryMap.containsKey(StandardField.YEAR) && citation.values.containsKey("date-released")) {
-            String dateReleased = citation.values.get("date-released");
-            String year = dateReleased.split("-")[0];
-            entryMap.put(StandardField.YEAR, year);
-        }
-        if (!entryMap.containsKey(StandardField.URL) && citation.values.containsKey("url")) {
-            entryMap.put(StandardField.URL, citation.values.get("url"));
-        }
+        return authors.toString();
     }
 
     @Override
@@ -222,13 +256,12 @@ public class CffImporter extends Importer {
             case "software" -> StandardEntryType.Software;
             case "report" -> StandardEntryType.TechReport;
             case "unpublished" -> StandardEntryType.Unpublished;
-            default -> StandardEntryType.Misc;
+            default -> StandardEntryType.Dataset;
         };
     }
 
     private HashMap<String, Field> getFieldMappings() {
         HashMap<String, Field> fieldMappings = new HashMap<>();
-        fieldMappings.put("type", StandardField.TYPE);
         fieldMappings.put("title", StandardField.TITLE);
         fieldMappings.put("version", StandardField.VERSION);
         fieldMappings.put("doi", StandardField.DOI);
