@@ -246,7 +246,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     public void shutdown() {
-        //remove listeners
+        // remove listeners
         if (hasListener) {
             try {
                 listenerOnDirectory(directory.get(), Action.REMOVE);
@@ -257,7 +257,4 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
         fileUpdateMonitor.shutdown();
     }
-
 }
-
-
