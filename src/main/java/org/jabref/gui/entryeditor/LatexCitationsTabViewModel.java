@@ -195,7 +195,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             listenerOnDirectory(newPath, Action.ADD);
             listenerOnDirectory(oldPath, Action.REMOVE);
         } catch (IOException e) {
-            LOGGER.error("Could not find file", e);
+            LOGGER.error("Could update listener", e);
         }
     }
 
