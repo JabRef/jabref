@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
@@ -44,6 +47,9 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.dd.plist.BinaryPropertyListParser;
+import com.dd.plist.NSDictionary;
+import com.dd.plist.NSString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -624,7 +630,23 @@ public class BibtexParser implements Parser {
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
-                entry.setField(field, content);
+                // If a BibDesk File Field is encountered
+                if (field.getName().length() > 10 && field.getName().substring(0, 10).equals("bdsk-file-")) {
+                    byte[] decodedBytes = Base64.getDecoder().decode(content);
+                    try {
+                        // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
+                        NSDictionary plist = (NSDictionary) BinaryPropertyListParser.parse(decodedBytes);
+                        NSString relativePath = (NSString) plist.objectForKey("relativePath");
+                        Path path = Path.of(relativePath.getContent());
+
+                        LinkedFile file = new LinkedFile("", path, "");
+                        entry.addFile(file);
+                    } catch (Exception e) {
+                        throw new IOException();
+                    }
+                } else {
+                    entry.setField(field, content);
+                }
             }
         }
     }

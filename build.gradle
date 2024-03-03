@@ -241,6 +241,8 @@ dependencies {
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation 'org.jspecify:jspecify:0.3.0'
 
+    implementation 'com.googlecode.plist:dd-plist:1.23'
+
     testImplementation 'io.github.classgraph:classgraph:4.8.165'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'

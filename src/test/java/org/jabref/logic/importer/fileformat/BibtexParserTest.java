@@ -2164,4 +2164,26 @@ class BibtexParserTest {
         ParserResult result = parser.parse(new StringReader(entries));
         assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
     }
+
+    @Test
+    void parseBibDeskLinkedFiles() throws IOException {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kovakkuni:2023aa,
+                    author = {Navyasree Kovakkuni and Federico Lelli and Pierre-alain Duc and M{\\'e}d{\\'e}ric Boquien and Jonathan Braine and Elias Brinks and Vassilis Charmandaris and Francoise Combes and Jeremy Fensch and Ute Lisenfeld and Stacy McGaugh and J. Chris Mihos and Marcel. S. Pawlowski and Yves. Revaz and Peter. M. Weilbacher},
+                    date-added = {2023-09-14 20:09:12 +0200},
+                    date-modified = {2023-09-14 20:09:12 +0200},
+                    eprint = {2309.06478},
+                    month = {09},
+                    title = {Molecular and Ionized Gas in Tidal Dwarf Galaxies: The Spatially Resolved Star-Formation Relation},
+                    url = {https://arxiv.org/pdf/2309.06478.pdf},
+                    year = {2023},
+                    bdsk-file-1 = {YnBsaXN0MDDSAQIDBFxyZWxhdGl2ZVBhdGhZYWxpYXNEYXRhXxAeLi4vLi4vRG93bmxvYWRzLzIzMDkuMDY0NzgucGRmTxEBUgAAAAABUgACAAAMTWFjaW50b3NoIEhEAAAAAAAAAAAAAAAAAAAA4O/yLkJEAAH/////DjIzMDkuMDY0NzgucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/////hKRkeAAAAAAAAAAAAAgACAAAKIGN1AAAAAAAAAAAAAAAAAAlEb3dubG9hZHMAAAIAKy86VXNlcnM6Y2hyaXN0b3BoczpEb3dubG9hZHM6MjMwOS4wNjQ3OC5wZGYAAA4AHgAOADIAMwAwADkALgAwADYANAA3ADgALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAClVc2Vycy9jaHJpc3RvcGhzL0Rvd25sb2Fkcy8yMzA5LjA2NDc4LnBkZgAAEwABLwAAFQACABH//wAAAAgADQAaACQARQAAAAAAAAIBAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAGb},
+                    bdsk-url-1 = {https://arxiv.org/abs/2309.06478}}
+                    }
+                """));
+        BibDatabase database = result.getDatabase();
+        BibEntry entry = database.getEntryByCitationKey("Kovakkuni:2023aa").get();
+        String link = entry.getFiles().getFirst().getLink();
+        assertEquals(link, "../../Downloads/2309.06478.pdf");
+    }
 }
