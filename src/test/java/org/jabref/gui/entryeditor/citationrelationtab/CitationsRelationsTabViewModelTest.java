@@ -139,5 +139,4 @@ class CitationsRelationsTabViewModelTest {
                 assertEquals(Optional.of("Asdf1222"), firstEntryToImport.getField(StandardField.CITES));
                 assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
         }
-
 }
