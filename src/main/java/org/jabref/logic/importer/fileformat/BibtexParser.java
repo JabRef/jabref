@@ -240,6 +240,7 @@ public class BibtexParser implements Parser {
                 // Not a comment, preamble, or string. Thus, it is an entry
                 parseAndAddEntry(entryType);
             }
+
             skipWhitespace();
         }
 
