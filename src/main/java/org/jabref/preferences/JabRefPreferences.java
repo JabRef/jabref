@@ -150,6 +150,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
     public static final String PUSH_LYXPIPE = "lyxpipe";
     public static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
+    public static final String PUSH_TEXWORKS_PATH = "TeXworksPath";
     public static final String PUSH_WINEDT_PATH = "winEdtPath";
     public static final String PUSH_TEXMAKER_PATH = "texmakerPath";
     public static final String PUSH_VIM_SERVER = "vimServer";
@@ -543,6 +544,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXWORKS_PATH, OS.getNativeDesktop().detectProgramPath("texworks", "TeXworks"));
         defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.getNativeDesktop().detectProgramPath("subl", "Sublime"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
@@ -1783,6 +1785,7 @@ public class JabRefPreferences implements PreferencesService {
         applicationCommands.put(PushToApplications.LYX, get(PUSH_LYXPIPE));
         applicationCommands.put(PushToApplications.TEXMAKER, get(PUSH_TEXMAKER_PATH));
         applicationCommands.put(PushToApplications.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplications.TEXWORKS, get(PUSH_TEXWORKS_PATH));
         applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
         applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
         applicationCommands.put(PushToApplications.SUBLIME_TEXT, get(PUSH_SUBLIME_TEXT_PATH));
@@ -1812,6 +1815,8 @@ public class JabRefPreferences implements PreferencesService {
                         put(PUSH_TEXMAKER_PATH, value);
                 case PushToApplications.TEXSTUDIO ->
                         put(PUSH_TEXSTUDIO_PATH, value);
+                case PushToApplications.TEXWORKS ->
+                        put(PUSH_TEXWORKS_PATH, value);
                 case PushToApplications.VIM ->
                         put(PUSH_VIM, value);
                 case PushToApplications.WIN_EDT ->
