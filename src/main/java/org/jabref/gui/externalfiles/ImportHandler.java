@@ -18,6 +18,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -40,7 +41,9 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -311,10 +314,28 @@ public class ImportHandler {
     public List<BibEntry> handleBibTeXData(String entries) {
         BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
-            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            List<BibtexString> stringConstants = parser.getStringValues();
+            importStringConstantsWithDuplicateCheck(stringConstants);
+            return result;
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
             return Collections.emptyList();
+        }
+    }
+
+    public void importStringConstantsWithDuplicateCheck(List<BibtexString> stringConstants) {
+        for(BibtexString stringConstantToAdd : stringConstants) {
+            try {
+                ConstantsItemModel checker = new ConstantsItemModel(stringConstantToAdd.getName(), stringConstantToAdd.getContent());
+                if(checker.combinedValidationValidProperty().get()) {
+                    bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant \"%0\" was not added because it is not a valid string constant", stringConstantToAdd.getName()));
+                }
+            } catch (KeyCollisionException ex) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
+            }
         }
     }
 
