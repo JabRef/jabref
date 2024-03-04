@@ -82,6 +82,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
+    @FXML private RadioButton dirRadioButton;
 
     // Option Groups
     @FXML private TextField keywordGroupSearchTerm;
@@ -101,6 +102,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField autoGroupPersonsField;
 
     @FXML private TextField texGroupFilePath;
+    @FXML private TextField dirGroupFilePath;
 
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
@@ -201,6 +203,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+        dirRadioButton.selectedProperty().bindBidirectional(viewModel.typeDirProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
@@ -237,6 +240,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoGroupPersonsField.textProperty().bindBidirectional(viewModel.autoGroupPersonsFieldProperty());
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
+        dirGroupFilePath.textProperty().bindBidirectional(viewModel.dirGroupFilePathProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
@@ -249,6 +253,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
             validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
+            validationVisualizer.initVisualization(viewModel.dirGroupFilePathValidatonStatus(), dirGroupFilePath);
             nameField.requestFocus();
         });
 
@@ -275,6 +280,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML
     private void texGroupBrowse() {
         viewModel.texGroupBrowse();
+    }
+    @FXML
+    private void dirGroupBrowse() {
+        viewModel.dirGroupBrowse();
     }
 
     @FXML
