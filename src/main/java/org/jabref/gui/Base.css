@@ -1410,14 +1410,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-width: 0;
 }
 
-.chip-view > .chip-container > .close-icon {
-    -fx-background-color: transparent;
-}
-
-.chip-view > .chip-container > .label {
-    -fx-text-fill: -fx-focused-text-base-color;
-}
-
 .searchBar:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
 }
