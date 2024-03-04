@@ -18,6 +18,8 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
+import org.tinylog.Logger;
+
 public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
     private final ListProperty<Keyword> keywordListProperty;
@@ -60,6 +62,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
             @Override
             public String toString(Keyword keyword) {
                 if (keyword == null) {
+                    Logger.debug("Keyword is null");
                     return "";
                 }
                 return keyword.get();
