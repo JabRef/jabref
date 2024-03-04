@@ -44,12 +44,14 @@ import static org.jabref.model.entry.field.StandardField.URL;
  */
 public class JabRefDesktop {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
-
     private static final NativeDesktop NATIVE_DESKTOP = OS.getNativeDesktop();
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
     private JabRefDesktop() {
+    }
+
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(JabRefDesktop.class);
     }
 
     /**
@@ -122,18 +124,17 @@ public class JabRefDesktop {
                 try {
                     NATIVE_DESKTOP.openFile(link, PS.getName(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
-                    LOGGER.error("An error occurred on the command: " + link, e);
+                    getLogger().error("An error occurred on the command: " + link, e);
                 }
             }
             case PDF -> {
                 try {
                     NATIVE_DESKTOP.openFile(link, PDF.getName(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
-                    LOGGER.error("An error occurred on the command: " + link, e);
+                    getLogger().error("An error occurred on the command: " + link, e);
                 }
             }
-            case null, default ->
-                    LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+            case null, default -> getLogger().info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
     }
 
@@ -228,7 +229,7 @@ public class JabRefDesktop {
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
         String command = externalApplicationsPreferences.getCustomFileBrowserCommand();
         if (command.isEmpty()) {
-            LOGGER.info("No custom file browser command defined");
+            getLogger().info("No custom file browser command defined");
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
             return;
         }
@@ -258,7 +259,7 @@ public class JabRefDesktop {
         command = command.trim();
         if (command.isEmpty()) {
             NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
-            LOGGER.info("Preference for custom terminal is empty. Using default terminal.");
+            getLogger().info("Preference for custom terminal is empty. Using default terminal.");
             return;
         }
         executeCommand(command, absolutePath, dialogService);
@@ -271,14 +272,14 @@ public class JabRefDesktop {
         // replace the placeholder if used
         command = command.replace("%DIR", absolutePath);
 
-        LOGGER.info("Executing command \"{}\"...", command);
+        getLogger().info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
         String[] subcommands = command.split(" ");
         try {
             new ProcessBuilder(subcommands).start();
         } catch (IOException exception) {
-            LOGGER.error("Error during command execution", exception);
+            getLogger().error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
         }
     }
@@ -307,7 +308,7 @@ public class JabRefDesktop {
             openBrowser(url, filePreferences);
         } catch (IOException exception) {
             Globals.getClipboardManager().setContent(url);
-            LOGGER.error("Could not open browser", exception);
+            getLogger().error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
