@@ -1,20 +1,22 @@
 package org.jabref.logic.texparser;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+
 import javafx.beans.property.ObjectProperty;
+
 import org.jabref.gui.entryeditor.LatexCitationsTabViewModel;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.preferences.PreferencesService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
 
 public class CitationFinder {
 
