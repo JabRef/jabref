@@ -2202,6 +2202,7 @@ public class JabRefPreferences implements PreferencesService {
                 // We choose the data directory, because a ".bak" file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, OS.getNativeDesktop().getBackupDirectory()),
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
+                // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, OS.getNativeDesktop().moveToTrashSupported()));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
