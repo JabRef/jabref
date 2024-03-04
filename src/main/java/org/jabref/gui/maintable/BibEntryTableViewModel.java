@@ -47,7 +47,6 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
-    private final EasyBinding<Map<Field, String>> bibPreview;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -57,19 +56,6 @@ public class BibEntryTableViewModel {
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
-        this.bibPreview = createBibPreview(entry);
-    }
-
-    private EasyBinding<Map<Field, String>> createBibPreview(BibEntry entry) {
-        return EasyBind.combine(
-            entry.getFieldBinding(StandardField.TITLE),
-            entry.getFieldBinding(StandardField.AUTHOR),
-            (title, author) -> {
-                Map<Field, String> identifiers = new HashMap<>();
-                title.ifPresent(value -> identifiers.put(StandardField.TITLE, value));
-                author.ifPresent(value -> identifiers.put(StandardField.AUTHOR, value));
-                return identifiers;
-        });
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -115,10 +101,6 @@ public class BibEntryTableViewModel {
 
     public ObservableValue<Map<Field, String>> getLinkedIdentifiers() {
         return linkedIdentifiers;
-    }
-
-    public ObservableValue<Map<Field, String>> getBibPreview() {
-        return bibPreview;
     }
 
     public ObservableValue<List<AbstractGroup>> getMatchedGroups() {
