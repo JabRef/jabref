@@ -3,9 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -28,7 +26,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.texparser.DefaultLatexParser;
+import org.jabref.logic.texparser.CitationFinder;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -56,6 +54,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
     private static final String TEX_EXT = ".tex";
+    private final CitationFinder citationFinder;
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
@@ -87,6 +86,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         this.fileUpdateMonitor = (DefaultFileUpdateMonitor) Globals.getFileUpdateMonitor();
         this.hasListener = false;
+        this.citationFinder = new CitationFinder();
     }
 
     public void init(BibEntry entry) {
@@ -121,7 +121,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private void startSearch(String citeKey) {
-        searchTask = BackgroundTask.wrap(() -> searchAndParse(citeKey))
+        searchTask = BackgroundTask.wrap(() -> citationFinder.searchAndParse(databaseContext, preferencesService, directory, citeKey))
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
                                    .onSuccess(result -> {
                                        citationList.setAll(result);
@@ -141,42 +141,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         status.set(Status.IN_PROGRESS);
         searchTask.cancel(true);
-    }
-
-    private Collection<Citation> searchAndParse(String citeKey) throws IOException {
-        // we need to check whether the user meanwhile set the LaTeX file directory or the database changed locations
-        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
-                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
-
-        if (latexParserResult == null || !newDirectory.equals(directory.get())) {
-            directory.set(newDirectory);
-
-            if (!newDirectory.toFile().exists()) {
-                throw new IOException("Current search directory does not exist: %s".formatted(newDirectory));
-            }
-
-            List<Path> texFiles = searchDirectory(newDirectory);
-            LOGGER.debug("Found tex files: {}", texFiles);
-            latexParserResult = new DefaultLatexParser().parse(texFiles);
-        }
-
-        return latexParserResult.getCitationsByKey(citeKey);
-    }
-
-    /**
-     * @param directory the directory to search for. It is recursively searched.
-     */
-    private List<Path> searchDirectory(Path directory) {
-        LOGGER.debug("Searching directory {}", directory);
-        try {
-            return Files.walk(directory)
-                        .filter(Files::isRegularFile)
-                        .filter(path -> path.toString().endsWith(TEX_EXT))
-                        .toList();
-        } catch (IOException e) {
-            LOGGER.error("Error while searching files", e);
-            return List.of();
-        }
     }
 
     private void updateListener(Path path) {
