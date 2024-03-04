@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-// @Disabled("Needs running TeXworks in the background. Start TeXworks with &")
 class PushToTeXworksTest {
 
     private PushToTeXworks pushToTeXworks;
@@ -37,7 +36,7 @@ class PushToTeXworksTest {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
         // Mock the return value for getCommandPaths()
-        String teXworksClientPath = "/usr/bin/texworks"; // For linux OS tobe changed in Windows and Mac
+        String teXworksClientPath = "/usr/bin/texworks";
         String displayName = "TeXworks";
 
         Map<String, String> commandPaths = Map.of(displayName, teXworksClientPath);
@@ -73,7 +72,6 @@ class PushToTeXworksTest {
      */
     @Test
     void displayName() {
-        // Test whether the display name is correct
         assertEquals("TeXworks", pushToTeXworks.getDisplayName());
     }
 
@@ -87,9 +85,9 @@ class PushToTeXworksTest {
     @Test
     void getCommandLine() {
         String keyString = "TestKey";
-        String[] expectedCommand = new String[] {"/usr/bin/texworks", "--insert-text", "TestKey"};
+        String[] expectedCommand = new String[] {"/usr/bin/texworks", "--insert-text", keyString};
 
-        pushToTeXworks.setCommandPath("/usr/bin/texworks"); // TO add the function
+        pushToTeXworks.setCommandPath("/usr/bin/texworks");
 
         String[] actualCommand = pushToTeXworks.getCommandLine(keyString);
 
@@ -101,7 +99,7 @@ class PushToTeXworksTest {
      *
      * Method: pushEntries()
      *
-     * [Precondition]: TeXworks should be running in the background
+     * [Precondition]: TeXworks must run in the background
      */
     @Disabled("Disabled as it needs running TeXworks in the background. Start TeXworks with &")
     @Test
