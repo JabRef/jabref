@@ -30,7 +30,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     @Override
     public StringConverter<T> getStringConverter() {
-        return new StringConverter<T>() {
+        return new StringConverter<>() {
             @Override
             public String toString(T object) {
                 if (object == null) {
