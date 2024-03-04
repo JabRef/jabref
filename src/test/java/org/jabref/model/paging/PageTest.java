@@ -24,8 +24,8 @@ public class PageTest {
     public void setup() {
         testContent.addAll(Arrays.asList(testStrings));
         testContent = Collections.unmodifiableCollection(testContent);
-        page1 = new Page<String>(testQuery, testPageNumber, testContent);
-        page2 = new Page<String>(testQuery, testPageNumber);
+        page1 = new Page<>(testQuery, testPageNumber, testContent);
+        page2 = new Page<>(testQuery, testPageNumber);
     }
 
     @Test
