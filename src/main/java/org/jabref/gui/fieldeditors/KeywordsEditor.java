@@ -8,7 +8,9 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.ClipBoardManager;
@@ -18,6 +20,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -28,7 +31,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.dlsc.gemsfx.ChipView;
 import com.dlsc.gemsfx.TagsField;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -62,7 +64,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 preferencesService,
                 undoManager);
 
-        keywordTagsField.setCellFactory(new ViewModelListCellFactory<Keyword>().withText(Keyword::toString));
+        keywordTagsField.setCellFactory(new ViewModelListCellFactory<Keyword>().withText(Keyword::get));
         keywordTagsField.setTagViewFactory(this::createTag);
 
         keywordTagsField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
@@ -80,10 +82,11 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     }
 
     private Node createTag(Keyword keyword) {
-        ChipView<String> chip = new ChipView<>();
-        chip.setText(keyword.get());
-        chip.setOnClose(event -> keywordTagsField.removeTags(keyword));
-
+        Label tagLabel = new Label();
+        tagLabel.setText(keywordTagsField.getConverter().toString(keyword));
+        tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
+        tagLabel.getGraphic().setOnMouseClicked(event -> keywordTagsField.removeTags(keyword));
+        tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         contextMenu.getItems().addAll(
@@ -91,8 +94,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.CUT, new KeywordsEditor.TagContextAction(StandardActions.CUT, keyword)),
                 factory.createMenuItem(StandardActions.DELETE, new KeywordsEditor.TagContextAction(StandardActions.DELETE, keyword))
         );
-        chip.setContextMenu(contextMenu);
-        return chip;
+        tagLabel.setContextMenu(contextMenu);
+        return tagLabel;
     }
 
     public KeywordsEditorViewModel getViewModel() {
