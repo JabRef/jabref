@@ -54,6 +54,7 @@
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Custom API key"/>
+    <Label text="%( Note: Press return to commit changes in the table! )"/>
     <TableView
             fx:id="apiKeySelectorTable"
             VBox.vgrow="ALWAYS"
