@@ -38,7 +38,7 @@ public class PushToTeXworks extends AbstractPushToApplication {
      */
     @Override
     public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON;
+        return IconTheme.JabRefIcons.APPLICATION_GENERIC;
     }
 
     /**
