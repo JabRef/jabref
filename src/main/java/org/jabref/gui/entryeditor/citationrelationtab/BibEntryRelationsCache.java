@@ -1,16 +1,18 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 
+import org.eclipse.jgit.util.LRUMap;
+
 public class BibEntryRelationsCache {
-    private static final Map<String, List<BibEntry>> CITATIONS_MAP = new HashMap<>();
-    private static final Map<String, List<BibEntry>> REFERENCES_MAP = new HashMap<>();
+    private static final Integer MAX_CACHED_ENTRIES = 100;
+    private static final Map<String, List<BibEntry>> CITATIONS_MAP = new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES);
+    private static final Map<String, List<BibEntry>> REFERENCES_MAP = new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES);
 
     public List<BibEntry> getCitations(BibEntry entry) {
         return CITATIONS_MAP.getOrDefault(entry.getDOI().map(DOI::getDOI).orElse(""), Collections.emptyList());
