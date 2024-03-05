@@ -6,7 +6,12 @@ import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticSc
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BibEntryRelationsRepository {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryRelationsRepository.class);
+
     private final SemanticScholarFetcher fetcher;
     private final BibEntryRelationsCache cache;
 
@@ -25,7 +30,13 @@ public class BibEntryRelationsRepository {
 
     public List<BibEntry> getReferences(BibEntry entry) {
         if (needToRefreshReferences(entry)) {
-            List<BibEntry> references = fetcher.searchCiting(entry);
+            List<BibEntry> references;
+            try {
+                references = fetcher.searchCiting(entry);
+            } catch (FetcherException e) {
+                LOGGER.error("Error while fetching references", e);
+                references = List.of();
+            }
             cache.cacheOrMergeReferences(entry, references);
         }
 
@@ -37,7 +48,7 @@ public class BibEntryRelationsRepository {
             List<BibEntry> citations = fetcher.searchCitedBy(entry);
             cache.cacheOrMergeCitations(entry, citations);
         } catch (FetcherException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Error while fetching citations", e);
         }
     }
 
@@ -50,7 +61,13 @@ public class BibEntryRelationsRepository {
     }
 
     public void forceRefreshReferences(BibEntry entry) {
-        List<BibEntry> references = fetcher.searchCiting(entry);
+        List<BibEntry> references;
+        try {
+            references = fetcher.searchCiting(entry);
+        } catch (FetcherException e) {
+            LOGGER.error("Error while fetching references", e);
+            references = List.of();
+        }
         cache.cacheOrMergeReferences(entry, references);
     }
 }
