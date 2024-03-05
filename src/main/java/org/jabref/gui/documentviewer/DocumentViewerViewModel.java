@@ -62,7 +62,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
         // we need to wrap this in run later so that the max pages number is correctly shown
         Platform.runLater(() -> maxPages.bindBidirectional(
-            EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
+                EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
@@ -138,5 +138,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void showPreviousPage() {
         currentPage.set(getCurrentPage() - 1);
+    }
+
+    public void setLiveMode(boolean value) {
+        this.liveMode.set(value);
     }
 }
