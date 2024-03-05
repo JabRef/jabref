@@ -71,6 +71,10 @@ public class FilePreferences {
         return userAndHost.getValue();
     }
 
+    public StringProperty getUserAndHostProperty() {
+        return userAndHost;
+    }
+
     public Optional<Path> getMainFileDirectory() {
         if (StringUtil.isBlank(mainFileDirectory.getValue())) {
             return Optional.empty();
