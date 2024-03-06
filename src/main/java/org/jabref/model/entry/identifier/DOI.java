@@ -98,6 +98,9 @@ public class DOI implements Identifier {
     // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
     // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
     private static final String CHARS_TO_REMOVE = "[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
+            + "\\\\" // remove backslashes
+            + "{}" // remove curly brackets
+            + "\\[\\]`|" // remove square brackets, backticks, and pipes
             + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
             + "]";
 
@@ -167,6 +170,8 @@ public class DOI implements Identifier {
             LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
             String cleanedDOI = doi;
             cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
+            // needs to be handled before LatexToUnicode, because otherwise `^` will be treated as conversion superscript
+            cleanedDOI = cleanedDOI.replaceAll("\\^", "");
             cleanedDOI = formatter.format(cleanedDOI);
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
