@@ -170,6 +170,7 @@ public class DOI implements Identifier {
             LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
             String cleanedDOI = doi;
             cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
+            // needs to be handled before LatexToUnicode, because otherwise `^` will be treated as conversion superscript
             cleanedDOI = cleanedDOI.replaceAll("\\^", "");
             cleanedDOI = formatter.format(cleanedDOI);
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
