@@ -43,7 +43,7 @@ public class MainTableDataModel {
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, preferencesService.getPreviewPreferences()));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(

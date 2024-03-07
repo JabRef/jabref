@@ -155,7 +155,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnDragOver(this::handleOnDragOver)
                 .setOnDragExited(this::handleOnDragExited)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
-                .withTooltip(this::handleHoverOverEntry)
+                // .withTooltip(this::handleHoverOverEntry)
                 .install(this);
 
         this.getSortOrder().clear();

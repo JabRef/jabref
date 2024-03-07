@@ -1,0 +1,321 @@
+diff --git a/src/main/java/org/jabref/gui/maintable/BibEntryPreview.java b/src/main/java/org/jabref/gui/maintable/BibEntryPreview.java
+new file mode 100644
+index 0000000000..647a6ec67e
+--- /dev/null
++++ b/src/main/java/org/jabref/gui/maintable/BibEntryPreview.java
+@@ -0,0 +1,13 @@
++package org.jabref.gui.maintable;
++
++import javafx.scene.control.Tooltip;
++
++import org.jabref.preferences.PreferencesService;
++
++public class BibEntryPreview {
++
++    public static Tooltip create(BibEntryTableViewModel entry, PreferencesService preferencesService) {
++        Tooltip tooltip = new Tooltip();
++        return tooltip;
++    }
++}
+diff --git a/src/main/java/org/jabref/gui/maintable/BibEntryTableViewModel.java b/src/main/java/org/jabref/gui/maintable/BibEntryTableViewModel.java
+index 6f614cb267..61fcbe12b8 100644
+--- a/src/main/java/org/jabref/gui/maintable/BibEntryTableViewModel.java
++++ b/src/main/java/org/jabref/gui/maintable/BibEntryTableViewModel.java
+@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
+ import javafx.beans.Observable;
+ import javafx.beans.binding.Binding;
+ import javafx.beans.binding.Bindings;
++import javafx.beans.property.BooleanProperty;
+ import javafx.beans.property.ReadOnlyStringWrapper;
++import javafx.beans.property.SimpleBooleanProperty;
+ import javafx.beans.property.StringProperty;
+ import javafx.beans.value.ObservableValue;
+ 
+@@ -36,6 +38,7 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
+ 
+ public class BibEntryTableViewModel {
+ 
++    private static final BooleanProperty SHOWTOOLTIP = new SimpleBooleanProperty(false);
+     private final BibEntry entry;
+     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
+     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
+@@ -145,4 +148,8 @@ public class BibEntryTableViewModel {
+     public StringProperty bibDatabaseContextProperty() {
+         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
+     }
++
++    public static BooleanProperty showTooltipProperty() {
++        return SHOWTOOLTIP;
++    }
+ }
+diff --git a/src/main/java/org/jabref/gui/maintable/MainTable.java b/src/main/java/org/jabref/gui/maintable/MainTable.java
+index e778fa1342..1059aa91d7 100644
+--- a/src/main/java/org/jabref/gui/maintable/MainTable.java
++++ b/src/main/java/org/jabref/gui/maintable/MainTable.java
+@@ -53,6 +53,7 @@ import org.jabref.model.entry.BibEntry;
+ import org.jabref.model.entry.BibEntryTypesManager;
+ import org.jabref.model.util.FileUpdateMonitor;
+ import org.jabref.preferences.PreferencesService;
++import org.jabref.preferences.PreviewPreferences;
+ 
+ import com.google.common.eventbus.Subscribe;
+ import org.slf4j.Logger;
+@@ -76,7 +77,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
+     private final UndoManager undoManager;
+     private long lastKeyPressTime;
+     private String columnSearchTerm;
++    private PreviewPreferences previewPreferences;
+ 
++    /** @noinspection checkstyle:TodoComment*/
+     public MainTable(MainTableDataModel model,
+                      LibraryTab libraryTab,
+                      LibraryTabContainer tabContainer,
+@@ -100,6 +103,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
+         this.entryTypesManager = entryTypesManager;
+         this.taskExecutor = taskExecutor;
+         this.undoManager = libraryTab.getUndoManager();
++        this.previewPreferences = preferencesService.getPreviewPreferences();
++
+         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
+ 
+         importHandler = new ImportHandler(
+@@ -150,6 +155,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
+                 .setOnDragOver(this::handleOnDragOver)
+                 .setOnDragExited(this::handleOnDragExited)
+                 .setOnMouseDragEntered(this::handleOnDragEntered)
++                .withTooltip(this::handleHoverOverEntry)
+                 .install(this);
+ 
+         this.getSortOrder().clear();
+@@ -202,6 +208,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
+ 
+         // Enable the header right-click menu.
+         new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, keyBindingRepository, dialogService).show(true);
++
++        // new ViewModelTableRowFactory<BibEntryTableViewModel>().withTooltip(this::handleHoverOverEntry).install(this);
+     }
+ 
+     /**
+@@ -365,6 +373,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
+         importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
+     }
+ 
++    private String handleHoverOverEntry(BibEntryTableViewModel bibEntryTableViewModel) {
++        if (bibEntryTableViewModel != null) {
++            return bibEntryTableViewModel.getEntry().getBibPreviewTooltip(previewPreferences, database);
++        }
++        return "";
++    }
++
+     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
+         if (event.getDragboard().hasFiles()) {
+             event.acceptTransferModes(TransferMode.ANY);
+diff --git a/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.fxml b/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.fxml
+index 7bd8582ffa..02a9160a8e 100644
+--- a/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.fxml
++++ b/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.fxml
+@@ -20,6 +20,7 @@
+          fx:controller="org.jabref.gui.preferences.preview.PreviewTab">
+     <Label text="%Current Preview" styleClass="titleHeader"/>
+     <CheckBox fx:id="showAsTabCheckBox" text="%Show preview as a tab in entry editor"/>
++    <CheckBox fx:id="showTooltipEntryTable" text="Show preview in entry table tooltip"/>
+     <HBox spacing="4.0">
+         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+             <Label text="%Available" styleClass="sectionHeader"/>
+diff --git a/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.java b/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.java
+index 90d6aa1f7e..f98f6d98f0 100644
+--- a/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.java
++++ b/src/main/java/org/jabref/gui/preferences/preview/PreviewTab.java
+@@ -25,6 +25,7 @@ import org.jabref.gui.actions.ActionFactory;
+ import org.jabref.gui.actions.SimpleCommand;
+ import org.jabref.gui.actions.StandardActions;
+ import org.jabref.gui.icon.IconTheme;
++import org.jabref.gui.maintable.BibEntryTableViewModel;
+ import org.jabref.gui.preferences.AbstractPreferenceTabView;
+ import org.jabref.gui.preferences.PreferencesTab;
+ import org.jabref.gui.preview.PreviewViewer;
+@@ -48,6 +49,7 @@ import org.fxmisc.richtext.LineNumberFactory;
+ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> implements PreferencesTab {
+ 
+     @FXML private CheckBox showAsTabCheckBox;
++    @FXML private CheckBox showTooltipEntryTable;
+     @FXML private ListView<PreviewLayout> availableListView;
+     @FXML private ListView<PreviewLayout> chosenListView;
+     @FXML private Button toRightButton;
+@@ -108,6 +110,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
+         lastKeyPressTime = System.currentTimeMillis();
+ 
+         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
++        // TODO: connect checkbox to viewModel
++        // showTooltipEntryTable.selectedProperty().bindBidirectional(viewModel.showInEntryEditorProperty());
++        showTooltipEntryTable.selectedProperty().bindBidirectional(BibEntryTableViewModel.showTooltipProperty());
++        showTooltipEntryTable.setSelected(BibEntryTableViewModel.showTooltipProperty().get());
+ 
+         searchBox.setPromptText(Localization.lang("Search") + "...");
+         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+diff --git a/src/main/java/org/jabref/gui/preferences/preview/PreviewTabViewModel.java b/src/main/java/org/jabref/gui/preferences/preview/PreviewTabViewModel.java
+index 1f494f006a..7822074072 100644
+--- a/src/main/java/org/jabref/gui/preferences/preview/PreviewTabViewModel.java
++++ b/src/main/java/org/jabref/gui/preferences/preview/PreviewTabViewModel.java
+@@ -60,9 +60,7 @@ import org.slf4j.LoggerFactory;
+ public class PreviewTabViewModel implements PreferenceTabViewModel {
+ 
+     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
+-
+     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
+-
+     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
+     private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
+diff --git a/src/main/java/org/jabref/gui/util/ViewModelTableRowFactory.java b/src/main/java/org/jabref/gui/util/ViewModelTableRowFactory.java
+index 87114e3b6a..9d87854d60 100644
+--- a/src/main/java/org/jabref/gui/util/ViewModelTableRowFactory.java
++++ b/src/main/java/org/jabref/gui/util/ViewModelTableRowFactory.java
+@@ -5,6 +5,7 @@ import java.util.function.Function;
+ 
+ import javafx.geometry.Bounds;
+ import javafx.geometry.Point2D;
++import javafx.scene.control.ContentDisplay;
+ import javafx.scene.control.ContextMenu;
+ import javafx.scene.control.TableRow;
+ import javafx.scene.control.TableView;
+@@ -15,8 +16,11 @@ import javafx.scene.input.KeyCode;
+ import javafx.scene.input.KeyEvent;
+ import javafx.scene.input.MouseDragEvent;
+ import javafx.scene.input.MouseEvent;
++import javafx.scene.web.WebEngine;
++import javafx.scene.web.WebView;
+ import javafx.util.Callback;
+ 
++import org.jabref.gui.maintable.BibEntryTableViewModel;
+ import org.jabref.model.strings.StringUtil;
+ 
+ import org.reactfx.util.TriConsumer;
+@@ -104,16 +108,33 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
+         return this;
+     }
+ 
++    public ViewModelTableRowFactory<S> withTooltipOther(BiConsumer<S, ? super DragEvent> toOnDragOver) {
++        this.toTooltip = toTooltip;
++        return this;
++    }
++
+     @Override
+     public TableRow<S> call(TableView<S> tableView) {
+         TableRow<S> row = new TableRow<>();
+ 
+-        if (toTooltip != null) {
+-            String tooltipText = toTooltip.call(row.getItem());
+-            if (StringUtil.isNotBlank(tooltipText)) {
+-                row.setTooltip(new Tooltip(tooltipText));
++        row.hoverProperty().addListener((observable, oldValue, newValue) -> {
++            if (newValue && BibEntryTableViewModel.showTooltipProperty().get()) { // Mouse entered the row
++                if (toTooltip != null && row.getItem() != null) {
++                    String tooltipText = toTooltip.call(row.getItem());
++                    if (StringUtil.isNotBlank(tooltipText)) {
++                        WebView web = new WebView();
++                        WebEngine webEngine = web.getEngine();
++                        webEngine.loadContent(tooltipText);
++                        Tooltip tip = new Tooltip();
++                        tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
++                        tip.setGraphic(web);
++                        Tooltip.install(row, tip);
++                    }
++                }
++            } else { // Mouse exited the row
++                Tooltip.uninstall(row, null);
+             }
+-        }
++        });
+ 
+         if (onMouseClickedEvent != null) {
+             row.setOnMouseClicked(event -> {
+@@ -200,4 +221,5 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
+     public void install(TableView<S> table) {
+         table.setRowFactory(this);
+     }
++
+ }
+diff --git a/src/main/java/org/jabref/model/entry/BibEntry.java b/src/main/java/org/jabref/model/entry/BibEntry.java
+index a8c940fb3b..30e1c624c8 100644
+--- a/src/main/java/org/jabref/model/entry/BibEntry.java
++++ b/src/main/java/org/jabref/model/entry/BibEntry.java
+@@ -29,6 +29,7 @@ import org.jabref.logic.bibtex.FileFieldWriter;
+ import org.jabref.logic.importer.util.FileFieldParser;
+ import org.jabref.model.FieldChange;
+ import org.jabref.model.database.BibDatabase;
++import org.jabref.model.database.BibDatabaseContext;
+ import org.jabref.model.entry.event.EntriesEventSource;
+ import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
+ import org.jabref.model.entry.event.FieldChangedEvent;
+@@ -44,6 +45,7 @@ import org.jabref.model.entry.types.StandardEntryType;
+ import org.jabref.model.strings.LatexToUnicodeAdapter;
+ import org.jabref.model.strings.StringUtil;
+ import org.jabref.model.util.MultiKeyMap;
++import org.jabref.preferences.PreviewPreferences;
+ 
+ import com.google.common.eventbus.EventBus;
+ import com.tobiasdiez.easybind.EasyBind;
+@@ -729,6 +731,12 @@ public class BibEntry implements Cloneable {
+         return text.substring(0, maxCharacters + 1) + "...";
+     }
+ 
++    public String getBibPreviewTooltip(PreviewPreferences previewPreferences, BibDatabaseContext databaseContext) {
++        // TODO first row should show full cell content and a second row should be blank
++        String preview = previewPreferences.getCustomPreviewLayout().generatePreview(this, databaseContext);
++        return preview;
++    }
++
+     /**
+      * Returns the title of the given BibTeX entry as an Optional.
+      *
+diff --git a/src/test/java/org/jabref/preferences/PreferencesEntryPreviewTest.java b/src/test/java/org/jabref/preferences/PreferencesEntryPreviewTest.java
+new file mode 100644
+index 0000000000..8da7bd19b6
+--- /dev/null
++++ b/src/test/java/org/jabref/preferences/PreferencesEntryPreviewTest.java
+@@ -0,0 +1,44 @@
++package org.jabref.preferences;
++
++import javafx.fxml.FXMLLoader;
++import javafx.scene.Parent;
++import javafx.scene.Scene;
++import javafx.scene.control.CheckBox;
++import javafx.stage.Stage;
++
++import org.hamcrest.CoreMatchers;
++import org.junit.jupiter.api.Test;
++import org.testfx.framework.junit5.ApplicationTest;
++
++import static org.testfx.api.FxAssert.verifyThat;
++
++public class PreferencesEntryPreviewTest extends ApplicationTest {
++
++    @Override
++    public void start(Stage stage) throws Exception {
++        FXMLLoader loader = new FXMLLoader(getClass().getResource("/java/org/jabref/gui/preferences/preview/PreviewTab.fxml"));
++        Parent root = loader.load();
++        Scene scene = new Scene(root);
++        stage.setScene(scene);
++        stage.show();
++    }
++
++    @Test
++    public void testCheckBoxStates() {
++        // Store initial states for later comparison
++        boolean initialCheckBox1State = ((CheckBox) lookup("#showAsTabCheckBox").query()).isSelected();
++        boolean initialCheckBox2State = ((CheckBox) lookup("#showTooltipEntryTable").query()).isSelected();
++
++        // Verify initial states
++        verifyThat(lookup("#showAsTabCheckBox"), CoreMatchers.equalTo(initialCheckBox1State));
++        verifyThat(lookup("#showTooltipEntryTable"), CoreMatchers.equalTo(initialCheckBox2State));
++
++        // Click both checkboxes
++        clickOn("#showAsTabCheckBox");
++        clickOn("#showTooltipEntryTable");
++
++        // Verify states after clicks (opposite of initial states)
++        verifyThat(lookup("#showAsTabCheckBox"), CoreMatchers.equalTo(!initialCheckBox1State));
++        verifyThat(lookup("#showTooltipEntryTable"), CoreMatchers.equalTo(!initialCheckBox2State));
++    }
++}
