@@ -281,6 +281,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private void texGroupBrowse() {
         viewModel.texGroupBrowse();
     }
+
     @FXML
     private void dirGroupBrowse() {
         viewModel.dirGroupBrowse();

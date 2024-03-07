@@ -103,7 +103,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void validateNonExistingDirectoryAsFileAbsolutePath()  throws Exception {
+    void validateNonExistingDirectoryAsFileAbsolutePath() throws Exception {
         var file = temporaryFolder.resolve("file").toAbsolutePath(); // File without .extension
 
         Files.createFile(file);

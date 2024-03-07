@@ -10,7 +10,14 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.scene.control.ButtonType;
@@ -518,6 +525,7 @@ public class GroupDialogViewModel {
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
                      ));
     }
+
     public void dirGroupBrowse() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(currentDatabase.getMetaData()
@@ -579,6 +587,7 @@ public class GroupDialogViewModel {
     public ValidationStatus texGroupFilePathValidatonStatus() {
         return texGroupFilePathValidator.getValidationStatus();
     }
+
     public ValidationStatus dirGroupFilePathValidatonStatus() {
         return dirGroupFilePathValidator.getValidationStatus();
     }
@@ -631,7 +640,9 @@ public class GroupDialogViewModel {
         return typeTexProperty;
     }
 
-    public BooleanProperty typeDirProperty() { return typeDirProperty; }
+    public BooleanProperty typeDirProperty() {
+        return typeDirProperty;
+    }
 
     public StringProperty keywordGroupSearchTermProperty() {
         return keywordGroupSearchTermProperty;
@@ -684,6 +695,7 @@ public class GroupDialogViewModel {
     public StringProperty texGroupFilePathProperty() {
         return texGroupFilePathProperty;
     }
+
     public StringProperty dirGroupFilePathProperty() {
         return dirGroupFilePathProperty;
     }
