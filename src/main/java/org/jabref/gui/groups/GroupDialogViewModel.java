@@ -392,7 +392,6 @@ public class GroupDialogViewModel {
                         fileUpdateMonitor,
                         currentDatabase.getMetaData());
             } else if (typeDirProperty.getValue()) {
-                System.out.println("hello world hello");
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),

@@ -85,6 +85,47 @@ class GroupDialogViewModelTest {
     }
 
     @Test
+    void validateExistingDirectoryAbsolutePath() throws Exception {
+        var directory = temporaryFolder.resolve("directory").toAbsolutePath();
+
+        Files.createDirectory(directory);
+        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
+
+        viewModel.dirGroupFilePathProperty().setValue(directory.toString());
+        assertTrue(viewModel.dirGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void validateNonExistingDirectoryAbsolutePath() {
+        var notDirectory = temporaryFolder.resolve("notdirectory").toAbsolutePath();
+        viewModel.dirGroupFilePathProperty().setValue(notDirectory.toString());
+        assertFalse(viewModel.dirGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void validateNonExistingDirectoryAsFileAbsolutePath()  throws Exception {
+        var file = temporaryFolder.resolve("file").toAbsolutePath(); // File without .extension
+
+        Files.createFile(file);
+        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
+
+        viewModel.dirGroupFilePathProperty().setValue(file.toString());
+        assertFalse(viewModel.dirGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void validateExistingDirectoryRelativePath() throws Exception {
+        var directory = Path.of("directory");
+
+        // The file needs to exist
+        Files.createDirectory(temporaryFolder.resolve(directory));
+        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
+
+        viewModel.dirGroupFilePathProperty().setValue(directory.toString());
+        assertTrue(viewModel.dirGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
     void hierarchicalContextFromGroup() throws Exception {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);
