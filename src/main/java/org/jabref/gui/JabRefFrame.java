@@ -638,7 +638,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab::getBibDatabaseContext)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, prefs, dialogService)),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab)),
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),
                 factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()));
 
@@ -1059,22 +1059,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         private final LibraryTabContainer tabContainer;
         private final LibraryTab libraryTab;
 
-        public CloseDatabaseAction(LibraryTabContainer tabContainer, LibraryTab libraryTab) {
+        public CloseDatabaseAction(LibraryTabContainer tabContainer, LibraryTab libraryTab, StateManager stateManager) {
             this.tabContainer = tabContainer;
             this.libraryTab = libraryTab;
+            this.executable.bind(ActionHelper.needsDatabase(stateManager));
         }
 
         /**
          * Using this constructor will result in executing the command on the currently open library tab
          */
-        public CloseDatabaseAction(LibraryTabContainer tabContainer) {
-            this(tabContainer, null);
+        public CloseDatabaseAction(LibraryTabContainer tabContainer, StateManager stateManager) {
+            this(tabContainer, null, stateManager);
         }
 
         @Override
         public void execute() {
             Platform.runLater(() -> {
                 if (libraryTab == null) {
+                    if (tabContainer.getCurrentLibraryTab() == null) {
+                        LOGGER.error("No library tab to close");
+                        return;
+                    }
                     tabContainer.closeCurrentTab();
                 } else {
                     tabContainer.closeTab(libraryTab);

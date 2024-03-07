@@ -13,10 +13,24 @@ import org.jabref.preferences.PushToApplicationPreferences;
  */
 public interface PushToApplication {
 
+    /**
+     * Gets the display name for the push operation. This name is used
+     * in the GUI to represent the push action to the user.
+     *
+     * @return The display name for the push operation.
+     */
     String getDisplayName();
 
+    /**
+     * Gets a tooltip for the push operation.
+     */
     String getTooltip();
 
+    /**
+     * Gets the icon associated with the application.
+     *
+     * @return The icon for the application.
+     */
     JabRefIcon getApplicationIcon();
 
     /**

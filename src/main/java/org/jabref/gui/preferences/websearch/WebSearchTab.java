@@ -4,7 +4,6 @@ import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -17,7 +16,6 @@ import javafx.scene.input.MouseButton;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.slr.StudyCatalogItem;
-import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.FetcherApiKey;
@@ -38,9 +36,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
-    @FXML private ComboBox<FetcherApiKey> apiKeySelector;
-    @FXML private TextField customApiKey;
-    @FXML private CheckBox useCustomApiKey;
+    @FXML private TableView<FetcherApiKey> apiKeySelectorTable;
+    @FXML private TableColumn<FetcherApiKey, String> apiKeyName;
+    @FXML private TableColumn<FetcherApiKey, String> customApiKey;
+    @FXML private TableColumn<FetcherApiKey, Boolean> useCustomApiKey;
     @FXML private Button testCustomApiKey;
 
     @FXML private CheckBox persistApiKeys;
@@ -96,22 +95,37 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
         catalogTable.setItems(viewModel.getCatalogs());
 
-        new ViewModelListCellFactory<FetcherApiKey>()
-                .withText(FetcherApiKey::getName)
-                .install(apiKeySelector);
-        apiKeySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        testCustomApiKey.setDisable(true);
+
+        new ViewModelTableRowFactory<FetcherApiKey>()
+                .install(apiKeySelectorTable);
+
+        apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
                 updateFetcherApiKey(oldValue);
             }
             if (newValue != null) {
-                useCustomApiKey.setSelected(newValue.shouldUse());
-                customApiKey.setText(newValue.getKey());
+                viewModel.selectedApiKeyProperty().setValue(newValue);
+                testCustomApiKey.disableProperty().bind(newValue.useProperty().not());
             }
         });
-        customApiKey.textProperty().addListener(listener -> updateFetcherApiKey(apiKeySelector.valueProperty().get()));
 
-        customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
-        testCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
+        apiKeyName.setCellValueFactory(param -> param.getValue().nameProperty());
+        apiKeyName.setCellFactory(TextFieldTableCell.forTableColumn());
+        apiKeyName.setReorderable(false);
+        apiKeyName.setEditable(false);
+
+        customApiKey.setCellValueFactory(param -> param.getValue().keyProperty());
+        customApiKey.setCellFactory(TextFieldTableCell.forTableColumn());
+        customApiKey.setReorderable(false);
+        customApiKey.setResizable(true);
+        customApiKey.setEditable(true);
+
+        useCustomApiKey.setCellValueFactory(param -> param.getValue().useProperty());
+        useCustomApiKey.setCellFactory(CheckBoxTableCell.forTableColumn(useCustomApiKey));
+        useCustomApiKey.setEditable(true);
+        useCustomApiKey.setResizable(true);
+        useCustomApiKey.setReorderable(false);
 
         persistApiKeys.selectedProperty().bindBidirectional(viewModel.getApikeyPersistProperty());
         persistApiKeys.disableProperty().bind(viewModel.apiKeyPersistAvailable().not());
@@ -123,17 +137,15 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             }
         });
 
-        apiKeySelector.setItems(viewModel.fetcherApiKeys());
-        viewModel.selectedApiKeyProperty().bind(apiKeySelector.valueProperty());
+        apiKeySelectorTable.setItems(viewModel.fetcherApiKeys());
 
         // Content is set later
-        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelector.getSelectionModel().selectFirst());
+        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelectorTable.getSelectionModel().selectFirst());
     }
 
     private void updateFetcherApiKey(FetcherApiKey apiKey) {
         if (apiKey != null) {
-            apiKey.setUse(useCustomApiKey.isSelected());
-            apiKey.setKey(customApiKey.getText().trim());
+            apiKey.setKey(customApiKey.getCellData(apiKey).trim());
         }
     }
 

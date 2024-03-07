@@ -17,6 +17,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
+        pushEntries(database, entries, keyString, new ProcessBuilder());
+    }
+
+    @VisibleForTesting
+    protected void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString, ProcessBuilder processBuilder) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -77,7 +83,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");
                     return;
                 }
-                ProcessBuilder processBuilder = new ProcessBuilder(
+                processBuilder.command(
                         "open",
                         "-a",
                         commands[0],
@@ -88,7 +94,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                 );
                 processBuilder.start();
             } else {
-                ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+                processBuilder.command(getCommandLine(keyString));
                 processBuilder.start();
             }
         } catch (IOException excep) {
@@ -122,7 +128,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     /**
-     * Function to get the command to be executed for pushing keys to be cited
+     * Constructs the command line arguments for pushing citations to the application.
+     * The method formats the citation key and prefixes/suffixes as per user preferences
+     * before invoking the application with the command to insert text.
      *
      * @param keyString String containing the Bibtex keys to be pushed to the application
      * @return String array with the command to call and its arguments

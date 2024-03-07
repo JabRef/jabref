@@ -96,7 +96,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine, undoManager);
         } else if (StandardField.KEYWORDS == field) {
-            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
