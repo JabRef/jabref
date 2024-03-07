@@ -325,10 +325,10 @@ public class ImportHandler {
     }
 
     public void importStringConstantsWithDuplicateCheck(List<BibtexString> stringConstants) {
-        for(BibtexString stringConstantToAdd : stringConstants) {
+        for (BibtexString stringConstantToAdd : stringConstants) {
             try {
                 ConstantsItemModel checker = new ConstantsItemModel(stringConstantToAdd.getName(), stringConstantToAdd.getContent());
-                if(checker.combinedValidationValidProperty().get()) {
+                if (checker.combinedValidationValidProperty().get()) {
                     bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant \"%0\" was not added because it is not a valid string constant", stringConstantToAdd.getName()));
