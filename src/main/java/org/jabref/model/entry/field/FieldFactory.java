@@ -150,13 +150,6 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a List with all standard fields
-     */
-    public static List<Field> getStandardFields() {
-        return new ArrayList<>(EnumSet.allOf(StandardField.class));
-    }
-
-    /**
      * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones
      */
     public static Set<Field> getAllFieldsWithOutInternal() {

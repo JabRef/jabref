@@ -140,7 +140,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
     }
 
     public List<Field> getSuggestions(String request) {
-        return FieldFactory.getStandardFields().stream()
+        return FieldFactory.getAllFieldsWithOutInternal().stream()
                            .filter(field -> field.getDisplayName().toLowerCase().contains(request.toLowerCase()))
                            .collect(Collectors.toList());
     }
