@@ -66,7 +66,7 @@ public class ClipBoardManagerTest {
 
     @DisplayName("Check that the ClipBoardManager can set a bibentry as its content from the clipboard")
     @Test
-    void testCopyStringBibEntry() throws IOException {
+    void copyStringBibEntry() throws IOException {
         // Arrange
         String expected = "@Article{,\n author = {Claudepierre, S. G.},\n journal = {IEEE},\n}";
 
@@ -94,7 +94,7 @@ public class ClipBoardManagerTest {
 
     @Test
     @DisplayName("Check that the ClipBoardManager can handle a bibentry with string constants correctly from the clipboard")
-    void testCopyStringBibEntryWithStringConstants() throws IOException {
+    void copyStringBibEntryWithStringConstants() throws IOException {
         // Arrange
         String expected = "@String{grl = \"Geophys. Res. Lett.\"}@Article{,\n" + " author = {Claudepierre, S. G.},\n" +
                 " journal = {grl},\n" + "}";
