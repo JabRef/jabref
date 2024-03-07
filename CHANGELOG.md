@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added ability to export in CFF (Citation File Format) [#10661](https://github.com/JabRef/jabref/issues/10661).
 - We added ability to push entries to TeXworks. [#3197](https://github.com/JabRef/jabref/issues/3197)
 - We added the ability to zoom in and out in the document viewer using <kbd>Ctrl</kbd> + <kbd>Scroll</kbd>. [#10964](https://github.com/JabRef/jabref/pull/10964)
+- We added a Cleanup for removing non-existent files and grouped the related options [#10929](https://github.com/JabRef/jabref/issues/10929)
 
 ### Changed
 
@@ -41,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We made the command "Push to TexShop" more robust to allow cite commands with a character before the first slash. [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699/17?u=siedlerchr)
 - We only show the notification "Saving library..." if the library contains more than 2000 entries. [#9803](https://github.com/JabRef/jabref/issues/9803)
 - We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
+- We store the citation relations in an LRU cache to avoid bloating the memory and out-of-memory exceptions. [#10958](https://github.com/JabRef/jabref/issues/10958)
 - Keywords filed are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
 
 ### Fixed
