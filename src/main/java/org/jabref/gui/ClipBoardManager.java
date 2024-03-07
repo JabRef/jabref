@@ -156,29 +156,23 @@ public class ClipBoardManager {
     }
 
     public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
-        final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
-        String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
-        // BibEntry is not Java serializable. Thus, we need to do the serialization manually
-        // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
-        // Furthermore, storing a string also enables other applications to work with the data
-        content.putString(serializedEntries);
-        clipboard.setContent(content);
-        setPrimaryClipboardContent(content);
+        String serializedEntries = serializeEntries(entries, entryTypesManager);
+        setContent(serializedEntries);
     }
 
     public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager, List<BibtexString> stringConstants) throws IOException {
-        final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
         StringBuilder builder = new StringBuilder();
         stringConstants.forEach(strConst -> builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization()));
-        String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
+        String serializedEntries = serializeEntries(entries, entryTypesManager);
         builder.append(serializedEntries);
+        setContent(builder.toString());
+    }
+
+    private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work with the data
-        content.putString(builder.toString());
-        clipboard.setContent(content);
-        setPrimaryClipboardContent(content);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
+        return writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
     }
 }
