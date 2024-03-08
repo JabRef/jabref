@@ -15,6 +15,7 @@ public class CffType implements LayoutFormatter {
             case Misc -> "misc";
             case Manual -> "manual";
             case Software -> "software";
+            case Dataset -> "dataset";
             case Report, TechReport -> "report";
             case Unpublished -> "unpublished";
             default -> "generic";

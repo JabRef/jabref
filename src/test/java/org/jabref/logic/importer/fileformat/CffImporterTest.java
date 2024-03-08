@@ -46,7 +46,8 @@ public class CffImporterTest {
 
     @Test
     public void getDescription() {
-        assertEquals("Importer for the CFF format. Is only used to cite software, one entry per file.",
+        assertEquals("Importer for the CFF format. Is only used to cite software, one entry per file. " +
+                        "Can also cite a preferred citation.",
                 importer.getDescription());
     }
 
@@ -144,10 +145,27 @@ public class CffImporterTest {
         assertEquals(entry, expected);
     }
 
+    @Test
+    public void importEntriesPreferredCitation() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterPreferredCitation.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+
+        BibEntry mainEntry = bibEntries.getFirst();
+        BibEntry preferredEntry = bibEntries.getLast();
+
+        BibEntry expectedMain = getPopulatedEntry();
+        BibEntry expectedPreferred = new BibEntry(StandardEntryType.InProceedings);
+        expectedPreferred.setField(StandardField.AUTHOR, "Jonathan von Duke and Jim Kingston, Jr.");
+        expectedPreferred.setField(StandardField.DOI, "10.0001/TEST");
+        expectedPreferred.setField(StandardField.URL, "www.github.com");
+
+        assertEquals(mainEntry, expectedMain);
+        assertEquals(preferredEntry, expectedPreferred);
+    }
+
     public BibEntry getPopulatedEntry() {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Software);
-
         entry.setField(StandardField.AUTHOR, "Joe van Smith and Bob Jones, Jr.");
         entry.setField(StandardField.TITLE, "Test");
         entry.setField(StandardField.URL, "www.google.com");
