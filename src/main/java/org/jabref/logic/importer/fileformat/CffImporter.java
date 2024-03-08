@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -220,6 +219,10 @@ public class CffImporter extends Importer {
         // specific to preferred-citation
         fieldMappings.put("month", StandardField.MONTH);
         fieldMappings.put("year", StandardField.YEAR);
+        fieldMappings.put("journal", StandardField.JOURNAL);
+        fieldMappings.put("issue", StandardField.ISSUE);
+        fieldMappings.put("volume", StandardField.VOLUME);
+        fieldMappings.put("number", StandardField.NUMBER);
         return fieldMappings;
     }
 
