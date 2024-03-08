@@ -60,7 +60,9 @@ import org.slf4j.LoggerFactory;
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
+
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
+
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());

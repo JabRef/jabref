@@ -110,8 +110,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         lastKeyPressTime = System.currentTimeMillis();
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
-        // TODO: connect checkbox to viewModel
-        // showTooltipEntryTable.selectedProperty().bindBidirectional(viewModel.showInEntryEditorProperty());
         showTooltipEntryTable.selectedProperty().bindBidirectional(BibEntryTableViewModel.showTooltipProperty());
         showTooltipEntryTable.setSelected(BibEntryTableViewModel.showTooltipProperty().get());
 

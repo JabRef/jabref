@@ -16,7 +16,6 @@ import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.junit.jupiter.api.Test;
@@ -33,9 +32,8 @@ class MainTableDataModelTest {
         ObservableList<BibEntry> allEntries = FXCollections.unmodifiableObservableList(entries);
         NameDisplayPreferences nameDisplayPreferences = new NameDisplayPreferences(NameDisplayPreferences.DisplayStyle.AS_IS, NameDisplayPreferences.AbbreviationStyle.FULL);
         SimpleObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
-        PreviewPreferences previewPreferences = new PreviewPreferences(null, 0, null, "", false);
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, previewPreferences));
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
         FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));

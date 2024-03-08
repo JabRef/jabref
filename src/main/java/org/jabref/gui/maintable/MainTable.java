@@ -53,7 +53,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -77,9 +76,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final UndoManager undoManager;
     private long lastKeyPressTime;
     private String columnSearchTerm;
-    private PreviewPreferences previewPreferences;
 
-    /** @noinspection checkstyle:TodoComment*/
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
@@ -103,8 +100,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
-        this.previewPreferences = preferencesService.getPreviewPreferences();
-
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
@@ -155,7 +150,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnDragOver(this::handleOnDragOver)
                 .setOnDragExited(this::handleOnDragExited)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
-                // .withTooltip(this::handleHoverOverEntry)
                 .install(this);
 
         this.getSortOrder().clear();
@@ -208,8 +202,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, keyBindingRepository, dialogService).show(true);
-
-        // new ViewModelTableRowFactory<BibEntryTableViewModel>().withTooltip(this::handleHoverOverEntry).install(this);
     }
 
     /**
@@ -371,13 +363,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
         importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
-    }
-
-    private String handleHoverOverEntry(BibEntryTableViewModel bibEntryTableViewModel) {
-        if (bibEntryTableViewModel != null) {
-            return bibEntryTableViewModel.getEntry().getBibPreviewTooltip(previewPreferences, database);
-        }
-        return "";
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

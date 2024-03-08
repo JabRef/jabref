@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -16,11 +15,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.util.Callback;
 
-import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.model.strings.StringUtil;
 
 import org.reactfx.util.TriConsumer;
@@ -108,33 +104,16 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
-    public ViewModelTableRowFactory<S> withTooltipOther(BiConsumer<S, ? super DragEvent> toOnDragOver) {
-        this.toTooltip = toTooltip;
-        return this;
-    }
-
     @Override
     public TableRow<S> call(TableView<S> tableView) {
         TableRow<S> row = new TableRow<>();
 
-        row.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue && BibEntryTableViewModel.showTooltipProperty().get()) { // Mouse entered the row
-                if (toTooltip != null && row.getItem() != null) {
-                    String tooltipText = toTooltip.call(row.getItem());
-                    if (StringUtil.isNotBlank(tooltipText)) {
-                        WebView web = new WebView();
-                        WebEngine webEngine = web.getEngine();
-                        webEngine.loadContent(tooltipText);
-                        Tooltip tip = new Tooltip();
-                        tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                        tip.setGraphic(web);
-                        Tooltip.install(row, tip);
-                    }
-                }
-            } else { // Mouse exited the row
-                Tooltip.uninstall(row, null);
+        if (toTooltip != null) {
+            String tooltipText = toTooltip.call(row.getItem());
+            if (StringUtil.isNotBlank(tooltipText)) {
+                row.setTooltip(new Tooltip(tooltipText));
             }
-        });
+        }
 
         if (onMouseClickedEvent != null) {
             row.setOnMouseClicked(event -> {
@@ -221,5 +200,4 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     public void install(TableView<S> table) {
         table.setRowFactory(this);
     }
-
 }

@@ -31,7 +31,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -48,13 +47,11 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
-    private final PreviewPreferences previewPreferences;
     private final String bibPreview;
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter, PreviewPreferences previewPreferences) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
-        this.previewPreferences = previewPreferences;
 
         this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
@@ -64,13 +61,16 @@ public class BibEntryTableViewModel {
     }
 
     private String createBibPreviewTooltip(BibEntry entry) {
-        return "DOI: " + entry.getField(StandardField.DOI).toString() + "\n"
-                + entry.getField(StandardField.AUTHOR).toString().replaceAll("Optional\\[|\\]", "") + "\n\n"
-                + entry.getField(StandardField.TITLE).toString().replaceAll("Optional\\[|\\]", "") + "\n"
-                + entry.getField(StandardField.YEAR).toString().replaceAll("Optional\\[|\\]", "") + "\n\n"
-                + entry.getField(StandardField.JOURNAL).toString().replaceAll("Optional\\[|\\]", "") + "\n"
-                + entry.getField(StandardField.PAGES).toString().replaceAll("Optional\\[|\\]", "") + "\n\n"
-                + "Abstract: " + entry.getField(StandardField.ABSTRACT).toString().replaceAll("Optional\\[|\\]", "") + "\n";
+        ArrayList<String> previewValues = new ArrayList<>();
+        entry.getFieldBinding(StandardField.DOI).ifValuePresent(value -> previewValues.add("DOI: " + value + "\n"));
+        entry.getFieldBinding(StandardField.AUTHOR).ifValuePresent(value -> previewValues.add(value));
+        entry.getFieldBinding(StandardField.TITLE).ifValuePresent(value -> previewValues.add(value));
+        entry.getFieldBinding(StandardField.YEAR).ifValuePresent(value -> previewValues.add(value + "\n"));
+        entry.getFieldBinding(StandardField.JOURNAL).ifValuePresent(value -> previewValues.add(value));
+        entry.getFieldBinding(StandardField.PAGES).ifValuePresent(value -> previewValues.add(value + "\n"));
+        entry.getFieldBinding(StandardField.ABSTRACT).ifValuePresent(value -> previewValues.add(value));
+
+        return String.join("\n", previewValues);
     }
 
     public Map<ObservableValue<String>, String> getBibPreview(ObservableValue<String> fieldValue) {
@@ -109,10 +109,10 @@ public class BibEntryTableViewModel {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
-                                        groupTreeNode.getMatchingGroups(entry).stream()
-                                                     .map(GroupTreeNode::getGroup)
-                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                                     .collect(Collectors.toList()))
+                                groupTreeNode.getMatchingGroups(entry).stream()
+                                             .map(GroupTreeNode::getGroup)
+                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                             .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList())));
     }
 

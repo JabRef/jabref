@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable.columns;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -8,8 +9,13 @@ import javafx.beans.value.ObservableValue;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.NumericFieldComparator;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.UnknownField;
+
+import com.google.common.collect.MoreCollectors;
 
 /**
  * A column that displays the text-value of the field
@@ -23,28 +29,28 @@ public class FieldColumn extends MainTableColumn<Map<ObservableValue<String>, St
         this.fields = FieldFactory.parseOrFields(model.getQualifier());
         setText(getDisplayName());
 
-//        this.setCellValueFactory(cellData -> getFieldValue(cellData.getValue())));
-//        new ValueTableCellFactory<BibEntryTableViewModel, String>()
-//                .withText(text -> text)
-//                .install(this);
-
         setCellValueFactory(cellData -> new ReadOnlyObjectWrapper(cellData.getValue().getBibPreview(getFieldValue(cellData.getValue()))));
         new ValueTableCellFactory<BibEntryTableViewModel, Map<ObservableValue<String>, String>>()
                 .withText(this::extractFieldValue)
                 .withTooltip(this::createTooltip)
                 .install(this);
 
-        // TODO DETTA BÖR FUNGERA EGENTLIGEN
-//        if (fields.hasExactlyOne()) {
-//            // comparator can't parse more than one value
-//            Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
-//
-//            if ((field instanceof UnknownField) || field.isNumeric()) {
-//                this.setComparator(new NumericFieldComparator());
-//            }
-//        }
+        if (fields.hasExactlyOne()) {
+            // comparator can't parse more than one value
+            Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
 
-//        this.setSortable(true);
+            if ((field instanceof UnknownField) || field.isNumeric()) {
+                this.setComparator(new Comparator<Map<ObservableValue<String>, String>>() {
+                    @Override
+                    public int compare(Map<ObservableValue<String>, String> o1, Map<ObservableValue<String>, String> o2) {
+                        NumericFieldComparator numericFieldComparator = new NumericFieldComparator();
+                        return numericFieldComparator.compare(extractFieldValue(o1), extractFieldValue(o2));
+                    }
+                });
+            }
+        }
+
+        this.setSortable(true);
     }
 
     private String extractFieldValue(Map<ObservableValue<String>, String> values) {
@@ -61,10 +67,10 @@ public class FieldColumn extends MainTableColumn<Map<ObservableValue<String>, St
         for (ObservableValue<String> key : values.keySet()) {
             cellFieldText = key.getValue();
         }
-        tooltipText += cellFieldText + "\n\n";
+        tooltipText += cellFieldText;
 
         for (String preview : values.values()) {
-            tooltipText += preview;
+            tooltipText += "\n\n" + preview;
         }
         return tooltipText;
     }
