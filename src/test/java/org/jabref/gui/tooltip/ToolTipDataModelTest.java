@@ -1,12 +1,23 @@
 package org.jabref.gui.tooltip;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.TableColumn;
+
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.columns.FieldColumn;
+import org.jabref.gui.util.ValueTableCellFactory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ExtendWith(ApplicationExtension.class)
@@ -16,26 +27,92 @@ public class ToolTipDataModelTest {
     private static MainTableColumnModel.Type testType = MainTableColumnModel.Type.NORMALFIELD;
 
     @Test
-    public void testNullCallBackReturnsNoTooltip() {
-
-//        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
-//        FieldColumn testColumnModel = new FieldColumn(model);
-//        Map<ObservableValue<String>, String> map = new HashMap();
-//        map.put(new ReadOnlyObjectWrapper<>("FieldTEXT"), "FieldDTOOLTIP");
-//        TableColumn column = new TableColumn<>("FieldTEXT");
-//
-//        testColumnModel.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper(cellData.getValue().getBibPreview(testColumnModel.getFieldValue(cellData.getValue()))));
-//        ValueTableCellFactory<BibEntryTableViewModel, Map<ObservableValue<String>, String>> factory = new ValueTableCellFactory<>();
-//        factory.withTooltip(testColumnModel.createTooltip(map));
-//        Map<ObservableValue<String>, String> map = new HashMap();
-//        ValueTableCellFactory<BibEntryTableViewModel, Map<ObservableValue<String>, String>> factory = new ValueTableCellFactory<>();
-//        factory.withTooltip();
-//        factory.install(tableView);
-//        assertEquals(null, tableView.getTooltip());
+    public void testNullCallBackReturnsNoToolTipForCell() {
+        ValueTableCellFactory<BibEntryTableViewModel, Map<ObservableValue<String>, String>> factory = new ValueTableCellFactory<>();
+        TableColumn<BibEntryTableViewModel, Map<ObservableValue<String>, String>> column = new TableColumn<>();
+        factory.withTooltip((Function<Map<ObservableValue<String>, String>, String>) null);
+        factory.install(column);
+        assertEquals(null, column.getTableView());
     }
 
     @Test
-    public void testThatToolTipIsAlwaysTurnedOffByDefault() {
+    public void testExtractFieldValueWithEmptyValuesMap() {
+        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
+        FieldColumn testColumnModel = new FieldColumn(model);
+        Map<ObservableValue<String>, String> values = new HashMap<>();
+        String fieldText = testColumnModel.extractFieldValue(values);
+        assertEquals("", fieldText);
+    }
+
+    @Test
+    public void testExtractFieldValueWithSingleValuePair() {
+        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
+        FieldColumn testColumnModel = new FieldColumn(model);
+        ObservableValue<String> observableValue = new SimpleStringProperty("Field");
+        Map<ObservableValue<String>, String> values = new HashMap<>();
+        values.put(observableValue, "Value");
+
+        String fieldText = testColumnModel.extractFieldValue(values);
+
+        assertEquals("Field", fieldText);
+    }
+
+    @Test
+    public void testExtractFieldValueWithMultipleValuePairs() {
+        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
+        FieldColumn testColumnModel = new FieldColumn(model);
+        ObservableValue<String> observableValue1 = new SimpleStringProperty("Field1");
+        ObservableValue<String> observableValue2 = new SimpleStringProperty("Field2");
+        Map<ObservableValue<String>, String> values = new HashMap<>();
+        values.put(observableValue1, "Value1");
+        values.put(observableValue2, "Value2");
+
+        String fieldText = testColumnModel.extractFieldValue(values);
+
+        assertEquals("Field2", fieldText);
+    }
+
+    @Test
+    public void testCreateTooltipWithEmptyValuesMap() {
+        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
+        FieldColumn testColumnModel = new FieldColumn(model);
+        Map<ObservableValue<String>, String> values = new HashMap<>();
+
+        String tooltip = testColumnModel.createTooltip(values);
+
+        assertEquals("", tooltip);
+    }
+
+    @Test
+    public void testCreateTooltipWithSingleValuePair() {
+        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
+        FieldColumn testColumnModel = new FieldColumn(model);
+        ObservableValue<String> observableValue = new SimpleStringProperty("Field");
+        Map<ObservableValue<String>, String> values = new HashMap<>();
+        values.put(observableValue, "Preview");
+
+        String tooltip = testColumnModel.createTooltip(values);
+
+        assertEquals("Field\n\nPreview", tooltip);
+    }
+
+    @Test
+    public void testCreateTooltipWithMultipleValuePairs() {
+        MainTableColumnModel model = new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD);
+        FieldColumn testColumnModel = new FieldColumn(model);
+        ObservableValue<String> observableValue1 = new SimpleStringProperty("Field1");
+        ObservableValue<String> observableValue2 = new SimpleStringProperty("Field2");
+        Map<ObservableValue<String>, String> values = new HashMap<>();
+        values.put(observableValue1, "Preview1");
+        values.put(observableValue2, "Preview2");
+
+        String tooltip = testColumnModel.createTooltip(values);
+
+        assertEquals("Field2\n\nPreview1\n\nPreview2", tooltip);
+    }
+
+    @Test
+    public void testThatToolTipForEntireEntryIsAlwaysTurnedOffByDefault() {
         assertFalse(BibEntryTableViewModel.showTooltipProperty().get());
     }
 }

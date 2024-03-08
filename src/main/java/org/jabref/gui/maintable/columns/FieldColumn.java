@@ -85,7 +85,7 @@ public class FieldColumn extends MainTableColumn<Map<ObservableValue<String>, St
         return fields.getDisplayName();
     }
 
-    public ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
+    private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
         if (fields.isEmpty()) {
             return null;
         } else {
