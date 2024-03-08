@@ -53,7 +53,7 @@ public class FieldColumn extends MainTableColumn<Map<ObservableValue<String>, St
         this.setSortable(true);
     }
 
-    private String extractFieldValue(Map<ObservableValue<String>, String> values) {
+    public String extractFieldValue(Map<ObservableValue<String>, String> values) {
         String fieldText = "";
         for (ObservableValue<String> key : values.keySet()) {
             fieldText = key.getValue();
@@ -61,7 +61,7 @@ public class FieldColumn extends MainTableColumn<Map<ObservableValue<String>, St
         return fieldText;
     }
 
-    private String createTooltip(Map<ObservableValue<String>, String> values) {
+    public String createTooltip(Map<ObservableValue<String>, String> values) {
         String tooltipText = "";
         String cellFieldText = "";
         for (ObservableValue<String> key : values.keySet()) {
@@ -85,7 +85,7 @@ public class FieldColumn extends MainTableColumn<Map<ObservableValue<String>, St
         return fields.getDisplayName();
     }
 
-    private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
+    public ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
         if (fields.isEmpty()) {
             return null;
         } else {
