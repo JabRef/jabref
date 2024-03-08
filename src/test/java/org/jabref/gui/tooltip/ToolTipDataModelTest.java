@@ -22,10 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ExtendWith(ApplicationExtension.class)
 public class ToolTipDataModelTest {
-    private static String testQualifier = "author";
-    private static String testName = "field:author";
-    private static MainTableColumnModel.Type testType = MainTableColumnModel.Type.NORMALFIELD;
-
+    
     @Test
     public void testNullCallBackReturnsNoToolTipForCell() {
         ValueTableCellFactory<BibEntryTableViewModel, Map<ObservableValue<String>, String>> factory = new ValueTableCellFactory<>();
