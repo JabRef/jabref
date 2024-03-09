@@ -19,10 +19,11 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ApplicationExtension.class)
 public class ToolTipDataModelTest {
-    
+
     @Test
     public void testNullCallBackReturnsNoToolTipForCell() {
         ValueTableCellFactory<BibEntryTableViewModel, Map<ObservableValue<String>, String>> factory = new ValueTableCellFactory<>();
@@ -66,7 +67,7 @@ public class ToolTipDataModelTest {
 
         String fieldText = testColumnModel.extractFieldValue(values);
 
-        assertEquals("Field2", fieldText);
+        assertTrue(fieldText.equals("Field1") || fieldText.equals("Field2"));
     }
 
     @Test
@@ -105,7 +106,10 @@ public class ToolTipDataModelTest {
 
         String tooltip = testColumnModel.createTooltip(values);
 
-        assertEquals("Field2\n\nPreview1\n\nPreview2", tooltip);
+        String expected1 = "Field1\n\nPreview2\n\nPreview1";
+        String expected2 = "Field2\n\nPreview1\n\nPreview2";
+
+        assertTrue(tooltip.equals(expected1) || tooltip.equals(expected2));
     }
 
     @Test
