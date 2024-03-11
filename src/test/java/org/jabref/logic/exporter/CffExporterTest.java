@@ -5,7 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.jabref.logic.importer.fileformat.CffImporter;
+import org.jabref.logic.importer.fileformat.CffImporterTest;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -233,6 +238,99 @@ public class CffExporterTest {
                 "  url: \"http://example.com\"");
 
         assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    public final void roundTripTest(@TempDir Path tempDir) throws Exception {
+
+        // First, import the file which will be parsed as two entries
+        CffImporter importer = new CffImporter();
+        Path file = Path.of(CffImporterTest.class.getResource("CITATION.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+        BibEntry softwareEntry = bibEntries.getFirst();
+        BibEntry articleEntry = bibEntries.getLast();
+
+        // Then, export them separately and check they have all required fields
+        Path softwareFile = tempDir.resolve("CITATION_SOFTWARE.cff");
+        Path articleFile = tempDir.resolve("CITATION_ARTICLE.cff");
+        Files.createFile(softwareFile);
+        Files.createFile(articleFile);
+
+        cffExporter.export(databaseContext, softwareFile, Collections.singletonList(softwareEntry));
+        cffExporter.export(databaseContext, articleFile, Collections.singletonList(articleEntry));
+
+        Set<String> expectedSoftware = Set.of(
+                "# YAML 1.2",
+                "---",
+                "cff-version: 1.2.0",
+                "message: If you use this software, please cite it using the metadata from this file.",
+                "title: \"JabRef\"",
+                "authors:",
+                "  - family-names: Kopp",
+                "    given-names: Oliver",
+                "  - family-names: Diez",
+                "    given-names: Tobias",
+                "  - family-names: Schwentker",
+                "    given-names: Christoph",
+                "  - family-names: Snethlage",
+                "    given-names: Carl Christian",
+                "  - family-names: Asketorp",
+                "    given-names: Jonatan",
+                "  - family-names: Tutzer",
+                "    given-names: Benedikt",
+                "  - family-names: Ertel",
+                "    given-names: Thilo",
+                "  - family-names: Nasri",
+                "    given-names: Houssem",
+                "type: software",
+                "keywords:",
+                "  - reference manager",
+                "  - bibtex",
+                "  - biblatex",
+                "license: \"MIT\"",
+                "repository-code: \"https://github.com/jabref/jabref/\"",
+                "abstract: \"JabRef is an open-source, cross-platform citation and reference management tool.\"",
+                "url: \"https://www.jabref.org\"");
+
+        Set<String> expectedArticle = Set.of(
+                "# YAML 1.2",
+                "---",
+                "cff-version: 1.2.0",
+                "message: If you use this software, please cite it using the metadata from this file.",
+                "title: \"JabRef: BibTeX-based literature management software\"",
+                "authors:",
+                "  - family-names: Kopp",
+                "    given-names: Oliver",
+                "  - family-names: Snethlage",
+                "    given-names: Carl Christian",
+                "  - family-names: Schwentker",
+                "    given-names: Christoph",
+                "preferred-citation:",
+                "  type: article",
+                "  authors:",
+                "    - family-names: Kopp",
+                "      given-names: Oliver",
+                "    - family-names: Snethlage",
+                "      given-names: Carl Christian",
+                "    - family-names: Schwentker",
+                "      given-names: Christoph",
+                "  title: \"JabRef: BibTeX-based literature management software\"",
+                "  month: \"11\"",
+                "  issue: \"138\"",
+                "  volume: \"44\"",
+                "  year: \"2023\"",
+                "  doi: \"10.47397/tb/44-3/tb138kopp-jabref\"",
+                "  journal: \"TUGboat\"",
+                "  number: \"3\"");
+
+        // Tests equality of sets since last lines order is random and relies on entries internal order
+        try (Stream<String> st = Files.lines(softwareFile)) {
+            assertEquals(expectedSoftware, st.collect(Collectors.toSet()));
+        }
+
+        try (Stream<String> st = Files.lines(articleFile)) {
+            assertEquals(expectedArticle, st.collect(Collectors.toSet()));
+        }
     }
 }
 

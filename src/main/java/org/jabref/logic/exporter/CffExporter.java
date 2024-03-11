@@ -76,20 +76,19 @@ class CffExporter extends Exporter {
                 boolean pref = false;
                 switch (entryType) {
                     case StandardEntryType.Software ->
-                            ps.write("type: software");
+                            ps.write("type: software" + OS.NEWLINE);
                     case StandardEntryType.Dataset ->
-                            ps.write("type: dataset");
+                            ps.write("type: dataset" + OS.NEWLINE);
                     default -> {
                         if (typeMap.containsKey(entryType)) {
                             pref = true;
                             ps.write("preferred-citation:" + OS.NEWLINE);
                             ps.write("  type: " + typeMap.get(entryType) + OS.NEWLINE);
                             writeAuthors(ps, authors, true);
-                            ps.write("  title: " + "\"" + title + "\"");
+                            ps.write("  title: " + "\"" + title + "\"" + OS.NEWLINE);
                         }
                     }
                 }
-                ps.write(OS.NEWLINE);
 
                 // Keywords
                 String keywords = entryMap.getOrDefault(StandardField.KEYWORDS, null);
@@ -113,10 +112,11 @@ class CffExporter extends Exporter {
                 // Fields
                 Map<Field, String> fieldMap = getFieldMappings();
                 for (Field field : entryMap.keySet()) {
-                    ps.write(pref ? "  " : "");
                     if (fieldMap.containsKey(field)) {
+                        ps.write(pref ? "  " : "");
                         ps.write(fieldMap.get(field) + ": " + "\"" + entryMap.get(field) + "\"" + OS.NEWLINE);
                     } else if (field instanceof UnknownField) {
+                        ps.write(pref ? "  " : "");
                         ps.write(field.getName() + ": " + "\"" + entryMap.get(field) + "\"" + OS.NEWLINE);
                     }
                 }
