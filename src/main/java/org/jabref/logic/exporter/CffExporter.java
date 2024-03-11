@@ -22,6 +22,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -45,18 +46,22 @@ class CffExporter extends Exporter {
 
         try (AtomicFileWriter ps = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             ps.write("# YAML 1.2" + OS.NEWLINE);
-            ps.write("--" + OS.NEWLINE);
+            ps.write("---" + OS.NEWLINE);
             ps.write("cff-version: 1.2.0" + OS.NEWLINE);
-            ps.write("message: If you use this software, please cite it using the metadata from this file.");
-            ps.write(OS.NEWLINE);
 
             for (BibEntry entry : entries) {
                 // Retrieve all fields
                 Map<Field, String> entryMap = entry.getFieldMap();
 
+                // Compulsory message field
+                String message = entryMap.getOrDefault(StandardField.COMMENT,
+                        "If you use this software, please cite it using the metadata from this file.");
+                ps.write("message: " + message + OS.NEWLINE);
+                entryMap.remove(StandardField.COMMENT);
+
                 // Compulsory title field
                 String title = entryMap.getOrDefault(StandardField.TITLE, "No title specified.");
-                ps.write("title: " + title + OS.NEWLINE);
+                ps.write("title: " + "\"" + title + "\"" + OS.NEWLINE);
                 entryMap.remove(StandardField.TITLE);
 
                 // Compulsory authors field
@@ -79,12 +84,24 @@ class CffExporter extends Exporter {
                             pref = true;
                             ps.write("preferred-citation:" + OS.NEWLINE);
                             ps.write("  type: " + typeMap.get(entryType) + OS.NEWLINE);
-                            writeAuthors(ps, authors, pref);
-                            ps.write("  title: " + title);
+                            writeAuthors(ps, authors, true);
+                            ps.write("  title: " + "\"" + title + "\"");
                         }
                     }
                 }
                 ps.write(OS.NEWLINE);
+
+                // Keywords
+                String keywords = entryMap.getOrDefault(StandardField.KEYWORDS, null);
+                if (keywords != null) {
+                    ps.write(pref ? "  " : "");
+                    ps.write("keywords:" + OS.NEWLINE);
+                    for (String keyword : keywords.split(",\\s*")) {
+                        ps.write(pref ? "  " : "");
+                        ps.write("  - " + keyword + OS.NEWLINE);
+                    }
+                }
+                entryMap.remove(StandardField.KEYWORDS);
 
                 // Date
                 String date = entryMap.getOrDefault(StandardField.DATE, null);
@@ -96,9 +113,11 @@ class CffExporter extends Exporter {
                 // Fields
                 Map<Field, String> fieldMap = getFieldMappings();
                 for (Field field : entryMap.keySet()) {
+                    ps.write(pref ? "  " : "");
                     if (fieldMap.containsKey(field)) {
-                        ps.write(pref ? "  " : "");
-                        ps.write(fieldMap.get(field) + ": " + entryMap.get(field) + OS.NEWLINE);
+                        ps.write(fieldMap.get(field) + ": " + "\"" + entryMap.get(field) + "\"" + OS.NEWLINE);
+                    } else if (field instanceof UnknownField) {
+                        ps.write(field.getName() + ": " + "\"" + entryMap.get(field) + "\"" + OS.NEWLINE);
                     }
                 }
             }

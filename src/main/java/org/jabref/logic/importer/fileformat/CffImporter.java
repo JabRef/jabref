@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -60,6 +61,9 @@ public class CffImporter extends Importer {
 
         @JsonProperty("preferred-citation")
         private CffPreferredCitation citation;
+
+        @JsonProperty("keywords")
+        private List<String> keywords;
 
         public CffFormat() {
         }
@@ -131,6 +135,11 @@ public class CffImporter extends Importer {
             } else if (getUnmappedFields().contains(property.getKey())) {
                 entryMap.put(new UnknownField(property.getKey()), property.getValue());
             }
+        }
+
+        // Parse keywords
+        if (citation.keywords != null) {
+            entryMap.put(StandardField.KEYWORDS, String.join(", ", citation.keywords));
         }
 
         // Translate CFF author format to JabRef author format

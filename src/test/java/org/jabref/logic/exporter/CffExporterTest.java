@@ -50,10 +50,10 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: \"Test Title\"",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -62,8 +62,8 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: Author",
                 "      given-names: Test",
-                "  title: Test Title",
-                "  url: http://example.com");
+                "  title: \"Test Title\"",
+                "  url: \"http://example.com\"");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -81,10 +81,10 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: \"Test Title\"",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -93,8 +93,8 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: Author",
                 "      given-names: Test",
-                "  title: Test Title",
-                "  doi: random_doi_value");
+                "  title: \"Test Title\"",
+                "  doi: \"random_doi_value\"");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -109,10 +109,10 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: No title specified.",
+                "title: \"No title specified.\"",
                 "authors: No author specified."
         );
 
@@ -132,15 +132,15 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: \"Test Title\"",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
                 "type: software",
-                "doi: random_doi_value");
+                "doi: \"random_doi_value\"");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -158,10 +158,10 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: \"Test Title\"",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -184,10 +184,10 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: \"Test Title\"",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -196,7 +196,7 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: Author",
                 "      given-names: Test",
-                "  title: Test Title",
+                "  title: \"Test Title\"",
                 "  month: 11",
                 "  year: 2003");
 
@@ -217,10 +217,10 @@ public class CffExporterTest {
 
         List<String> expected = List.of(
                 "# YAML 1.2",
-                "--",
+                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: 細雪",
+                "title: \"細雪\"",
                 "authors:",
                 "  - family-names: 潤一郎",
                 "    given-names: 谷崎",
@@ -229,8 +229,8 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: 潤一郎",
                 "      given-names: 谷崎",
-                "  title: 細雪",
-                "  url: http://example.com");
+                "  title: \"細雪\"",
+                "  url: \"http://example.com\"");
 
         assertEquals(expected, Files.readAllLines(file));
     }
