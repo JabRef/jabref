@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -25,12 +26,19 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final SuggestionProvider<?> suggestionProvider;
     private final ListProperty<ParsedEntryLink> linkedEntries;
+    private final StateManager stateManager;
 
-    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers, UndoManager undoManager) {
+    public LinkedEntriesEditorViewModel(Field field,
+                                        SuggestionProvider<?> suggestionProvider,
+                                        BibDatabaseContext databaseContext,
+                                        FieldCheckers fieldCheckers,
+                                        UndoManager undoManager,
+                                        StateManager stateManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.databaseContext = databaseContext;
         this.suggestionProvider = suggestionProvider;
+        this.stateManager = stateManager;
 
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
         BindingsHelper.bindContentBidirectional(
@@ -80,13 +88,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
-        // TODO: Implement jump to entry - The implementation can be based on <a href="org.jabref.gui.JabRefFrame.jumpToEntry">JabRefFrame.jumpToEntry</a>
-        // TODO: Add toolitp for tag: Localization.lang("Jump to entry")
-        // This feature was removed while converting the linked entries editor to JavaFX
-        // Right now there is no nice way to re-implement it as we have no good interface to control the focus of the main table
-        // (except directly using the JabRefFrame class as below)
-        // parsedEntryLink.getLinkedEntry().ifPresent(
-        //        e -> frame.getCurrentBasePanel().highlightEntry(e)
-        // );
+        parsedEntryLink.getLinkedEntry().ifPresent(entry ->
+                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entry)));
     }
 }

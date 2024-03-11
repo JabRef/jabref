@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -47,6 +48,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
+    @Inject private StateManager stateManager;
 
     private final LinkedEntriesEditorViewModel viewModel;
 
@@ -55,7 +57,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers, undoManager);
+        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers, undoManager, stateManager);
 
         entryLinkField.setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
         entryLinkField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
@@ -79,7 +81,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {
+            if ((event.getClickCount() == 2 || event.isControlDown()) && event.getButton().equals(MouseButton.PRIMARY)) {
                 viewModel.jumpToEntry(entryLink);
             }
         });
