@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
@@ -50,15 +49,14 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                                         .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
                                         .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FetcherException("Could not fetch", e);
             }
         }
-
-        return new ArrayList<>();
+        return List.of();
     }
 
     @Override
-    public List<BibEntry> searchCiting(BibEntry entry) {
+    public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
             StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
                     .append("paper/")
@@ -82,11 +80,10 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                                          .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
                                          .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FetcherException("Could not fetch", e);
             }
         }
-
-        return new ArrayList<>();
+        return List.of();
     }
 
     @Override

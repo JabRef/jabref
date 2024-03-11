@@ -26,8 +26,7 @@ public class PushToTeXworks extends AbstractPushToApplication {
 
     @Override
     public JabRefIcon getApplicationIcon() {
-        // TODO: replace the placeholder icon with the real one.
-        return IconTheme.JabRefIcons.APPLICATION_GENERIC;
+        return IconTheme.JabRefIcons.APPLICATION_TEXWORS;
     }
 
     @Override
