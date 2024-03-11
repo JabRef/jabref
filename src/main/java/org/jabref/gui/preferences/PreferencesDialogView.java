@@ -142,6 +142,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML
     void importPreferences() {
         viewModel.importPreferences();
+        closeDialog();
     }
 
     @FXML
@@ -152,5 +153,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML
     void resetPreferences() {
         viewModel.resetPreferences();
+        closeDialog();
     }
 }
