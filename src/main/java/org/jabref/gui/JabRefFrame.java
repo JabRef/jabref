@@ -574,9 +574,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), selectedTab -> {
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
+                stateManager.activeTabProperty().set(Optional.of(libraryTab));
             } else if (selectedTab == null) {
                 // All databases are closed
                 stateManager.setActiveDatabase(null);
+                stateManager.activeTabProperty().set(Optional.empty());
             }
         });
 

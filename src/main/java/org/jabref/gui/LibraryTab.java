@@ -282,8 +282,9 @@ public class LibraryTab extends Tab {
             return;
         }
         if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
-            LOGGER.debug("This case should not happen.");
+            LOGGER.warn("This case should not happen.");
             stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.activeTabProperty().set(Optional.of(this));
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
