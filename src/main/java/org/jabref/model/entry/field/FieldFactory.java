@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -64,14 +65,14 @@ public class FieldFactory {
         return new OrFields(fields);
     }
 
-    public static Set<OrFields> parseOrFieldsList(String fieldNames) {
+    public static SequencedSet<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseOrFields)
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public static Set<Field> parseFieldList(String fieldNames) {
+    public static SequencedSet<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseField)
