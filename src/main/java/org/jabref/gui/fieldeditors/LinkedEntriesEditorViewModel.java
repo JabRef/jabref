@@ -22,7 +22,12 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final ListProperty<ParsedEntryLink> linkedEntries;
     private final StateManager stateManager;
 
-    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers, UndoManager undoManager, StateManager stateManager) {
+    public LinkedEntriesEditorViewModel(Field field,
+                                        SuggestionProvider<?> suggestionProvider,
+                                        BibDatabaseContext databaseContext,
+                                        FieldCheckers fieldCheckers,
+                                        UndoManager undoManager,
+                                        StateManager stateManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.databaseContext = databaseContext;
