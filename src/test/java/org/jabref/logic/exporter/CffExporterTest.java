@@ -1,3 +1,4 @@
+
 package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
@@ -5,21 +6,16 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class CffExporterTest {
 
@@ -28,16 +24,7 @@ public class CffExporterTest {
 
     @BeforeAll
     static void setUp() {
-        cffExporter = new TemplateExporter(
-                "CFF",
-                "cff",
-                "cff",
-                null,
-                StandardFileType.CFF,
-                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                SaveOrder.getDefaultSaveOrder(),
-                BlankLineBehaviour.DELETE_BLANKS);
-
+        cffExporter = new CffExporter();
         databaseContext = new BibDatabaseContext();
     }
 
@@ -62,17 +49,21 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-        "cff-version: 1.2.0",
-        "message: \"If you use this, please cite the work from preferred-citation.\"",
-        "authors:",
-        "  - name: Test Author",
-        "title: Test Title",
-        "preferred-citation:",
-        "  type: article",
-        "  authors:",
-        "    - name: Test Author",
-        "  title: Test Title",
-        "  url: \"http://example.com\"");
+                "# YAML 1.2",
+                "--",
+                "cff-version: 1.2.0",
+                "message: If you use this software, please cite it using the metadata from this file.",
+                "title: Test Title",
+                "authors:",
+                "  - family-names: Author",
+                "    given-names: Test",
+                "preferred-citation:",
+                "  type: article",
+                "  authors:",
+                "    - family-names: Author",
+                "      given-names: Test",
+                "  title: Test Title",
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -80,7 +71,6 @@ public class CffExporterTest {
     @Test
     public final void usesCorrectType(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.DOI, "random_doi_value");
@@ -90,15 +80,19 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
+                "# YAML 1.2",
+                "--",
                 "cff-version: 1.2.0",
-                "message: \"If you use this, please cite the work from preferred-citation.\"",
-                "authors:",
-                "  - name: Test Author",
+                "message: If you use this software, please cite it using the metadata from this file.",
                 "title: Test Title",
+                "authors:",
+                "  - family-names: Author",
+                "    given-names: Test",
                 "preferred-citation:",
                 "  type: conference-paper",
                 "  authors:",
-                "    - name: Test Author",
+                "    - family-names: Author",
+                "      given-names: Test",
                 "  title: Test Title",
                 "  doi: random_doi_value");
 
@@ -107,30 +101,110 @@ public class CffExporterTest {
 
     @Test
     public final void usesCorrectDefaultValues(@TempDir Path tempFile) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Thesis)
-                .withCitationKey("test");
+        BibEntry entry = new BibEntry(StandardEntryType.Thesis);
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
+                "# YAML 1.2",
+                "--",
                 "cff-version: 1.2.0",
-                "message: \"If you use this, please cite the work from preferred-citation.\"",
-                "authors:",
-                "  - name: No author specified.",
+                "message: If you use this software, please cite it using the metadata from this file.",
                 "title: No title specified.",
-                "preferred-citation:",
-                "  type: generic",
-                "  authors:",
-                "    - name: No author specified.",
-                "  title: No title specified.");
+                "authors: No author specified."
+        );
 
         assertEquals(expected, Files.readAllLines(file));
     }
 
     @Test
-    void passesModifiedCharset(@TempDir Path tempFile) throws Exception {
+    public final void exportsSoftwareCorrectly(@TempDir Path tempFile) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Software)
+                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.TITLE, "Test Title")
+                .withField(StandardField.DOI, "random_doi_value");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+
+        List<String> expected = List.of(
+                "# YAML 1.2",
+                "--",
+                "cff-version: 1.2.0",
+                "message: If you use this software, please cite it using the metadata from this file.",
+                "title: Test Title",
+                "authors:",
+                "  - family-names: Author",
+                "    given-names: Test",
+                "type: software",
+                "doi: random_doi_value");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    public final void exportsSoftwareDateCorrectly(@TempDir Path tempFile) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Software)
+                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.TITLE, "Test Title")
+                .withField(StandardField.DATE, "2003-11-06");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+
+        List<String> expected = List.of(
+                "# YAML 1.2",
+                "--",
+                "cff-version: 1.2.0",
+                "message: If you use this software, please cite it using the metadata from this file.",
+                "title: Test Title",
+                "authors:",
+                "  - family-names: Author",
+                "    given-names: Test",
+                "type: software",
+                "date-released: 2003-11-06");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    public final void exportsArticleDateCorrectly(@TempDir Path tempFile) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.TITLE, "Test Title")
+                .withField(StandardField.DATE, "2003-11");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+
+        List<String> expected = List.of(
+                "# YAML 1.2",
+                "--",
+                "cff-version: 1.2.0",
+                "message: If you use this software, please cite it using the metadata from this file.",
+                "title: Test Title",
+                "authors:",
+                "  - family-names: Author",
+                "    given-names: Test",
+                "preferred-citation:",
+                "  type: article",
+                "  authors:",
+                "    - family-names: Author",
+                "      given-names: Test",
+                "  title: Test Title",
+                "  month: 11",
+                "  year: 2003");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    public final void passesModifiedCharset(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "谷崎 潤一郎")
@@ -142,18 +216,23 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
+                "# YAML 1.2",
+                "--",
                 "cff-version: 1.2.0",
-                "message: \"If you use this, please cite the work from preferred-citation.\"",
-                "authors:",
-                "  - name: 谷崎 潤一郎",
+                "message: If you use this software, please cite it using the metadata from this file.",
                 "title: 細雪",
+                "authors:",
+                "  - family-names: 潤一郎",
+                "    given-names: 谷崎",
                 "preferred-citation:",
                 "  type: article",
                 "  authors:",
-                "    - name: 谷崎 潤一郎",
+                "    - family-names: 潤一郎",
+                "      given-names: 谷崎",
                 "  title: 細雪",
-                "  url: \"http://example.com\"");
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
 }
+
