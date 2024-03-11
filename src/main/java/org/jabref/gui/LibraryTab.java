@@ -597,8 +597,8 @@ public class LibraryTab extends Tab {
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository, autoCompletePreferences);
         } else {
-            // Create suggestion providers with database for crossref if auto-completion is deactivated
-            suggestionProviders = new SuggestionProviders(getDatabase());
+            // Create empty suggestion providers if auto-completion is deactivated
+            suggestionProviders = new SuggestionProviders();
         }
         searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }

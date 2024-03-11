@@ -1,5 +1,9 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.ListProperty;
@@ -11,6 +15,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
@@ -18,12 +23,15 @@ import org.jabref.model.entry.field.Field;
 public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 
     private final BibDatabaseContext databaseContext;
+    private final SuggestionProvider<?> suggestionProvider;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
     public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers, UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.databaseContext = databaseContext;
+        this.suggestionProvider = suggestionProvider;
+
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
         BindingsHelper.bindContentBidirectional(
                 linkedEntries,
@@ -51,6 +59,24 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
                 return new ParsedEntryLink(key, databaseContext.getDatabase());
             }
         };
+    }
+
+    public List<ParsedEntryLink> getSuggestions(String request) {
+        List<ParsedEntryLink> suggestions = suggestionProvider
+                .getPossibleSuggestions()
+                .stream()
+                .map(suggestion -> suggestion instanceof BibEntry bibEntry ? bibEntry.getCitationKey().orElse("") : (String) suggestion)
+                .filter(suggestion -> suggestion.toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT)))
+                .map(suggestion -> new ParsedEntryLink(suggestion, databaseContext.getDatabase()))
+                .distinct()
+                .collect(Collectors.toList());
+
+        ParsedEntryLink requestedLink = new ParsedEntryLink(request, databaseContext.getDatabase());
+        if (!suggestions.contains(requestedLink)) {
+            suggestions.addFirst(requestedLink);
+        }
+
+        return suggestions;
     }
 
     public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
