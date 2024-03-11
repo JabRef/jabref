@@ -2,6 +2,7 @@ package org.jabref.model.entry;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.SequencedSet;
@@ -21,8 +22,8 @@ import org.jabref.model.entry.types.EntryType;
 public class BibEntryType implements Comparable<BibEntryType> {
 
     private final EntryType type;
-    private final LinkedHashSet<OrFields> requiredFields;
-    private final LinkedHashSet<BibField> fields;
+    private final SequencedSet<OrFields> requiredFields;
+    private final SequencedSet<BibField> fields;
 
     /**
      * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
@@ -43,7 +44,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return type;
     }
 
-    public Set<BibField> getOptionalFields() {
+    public SequencedSet<BibField> getOptionalFields() {
         return getAllBibFields().stream()
                              .filter(field -> !isRequired(field.field()))
                              .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -61,15 +62,15 @@ public class BibEntryType implements Comparable<BibEntryType> {
      *
      * @return a Set of required field name Strings
      */
-    public Set<OrFields> getRequiredFields() {
-        return Collections.unmodifiableSet(requiredFields);
+    public SequencedSet<OrFields> getRequiredFields() {
+        return Collections.unmodifiableSequencedSet(requiredFields);
     }
 
     /**
      * Returns all defined fields.
      */
-    public Set<BibField> getAllBibFields() {
-        return Collections.unmodifiableSet(fields);
+    public SequencedSet<BibField> getAllBibFields() {
+        return Collections.unmodifiableSequencedSet(fields);
     }
 
     public Set<Field> getAllFields() {
@@ -90,11 +91,11 @@ public class BibEntryType implements Comparable<BibEntryType> {
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SequencedSet<Field> getDeprecatedFields(BibDatabaseMode mode) {
+    public Set<Field> getDeprecatedFields(BibDatabaseMode mode) {
         if (mode == BibDatabaseMode.BIBTEX) {
-            return new LinkedHashSet<>();
+            return Set.of();
         }
-        SequencedSet<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
+        Set<Field> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
 
         // Only the optional fields which are mapped to another BibLaTeX name should be shown as "deprecated"
         deprecatedFields.retainAll(getOptionalFieldsAndAliases());
