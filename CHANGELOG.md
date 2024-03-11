@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Keywords filed are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
 - We use another exporter for CFF format and the importer parses more fields. [#10993](https://github.com/JabRef/jabref/issues/10993)
 - Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
+- We use another exporter for CFF format and the importer parses more fields. [#10993](https://github.com/JabRef/jabref/issues/10993)
 
 ### Fixed
 
