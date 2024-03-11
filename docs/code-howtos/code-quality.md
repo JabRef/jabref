@@ -21,6 +21,14 @@ We monitor the general source code quality at three places:
 * [codecov](https://codecov.io) is a solution to check code coverage of test cases. The code coverage metrics for JabRef are available at [https://codecov.io/github/JabRef/jabref](https://codecov.io/github/JabRef/jabref).
 * [Teamscale](https://www.cqse.eu/en/teamscale/overview/) is a popular German product analyzing code quality. The analysis results are available at <https://demo.teamscale.com/findings.html#/jabref/?>.
 
+## Up to date dependencies
+
+We believe that updated dependencies are a sign of maintained code and thus an indidcator of good quality.
+We use [GitHub's dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to keep our versions up to date.
+
+Moreover, we try to test JabRef with the latest Java Development Kit (JDK) builds.
+Our results can be seen at the [Quality Outreach page](https://wiki.openjdk.org/display/quality/Quality+Outreach).
+
 ## Background literature
 
 We strongly recommend reading following two books on code quality:

@@ -14,6 +14,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -40,6 +41,12 @@ public interface DialogService {
      */
     default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
         return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
+    }
+
+    <T> Optional<T> showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices, StringConverter<T> converter);
+
+    default <T> Optional<T> showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices, StringConverter<T> converter) {
+        return showEditableChoiceDialogAndWait(title, content, okButtonLabel, null, choices, converter);
     }
 
     /**

@@ -23,6 +23,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
@@ -126,8 +127,11 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     }
 
     void showInputFieldNameDialog() {
-        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name"))
-                     .map(FieldFactory::parseField)
+        dialogService.showEditableChoiceDialogAndWait(Localization.lang("Add new field name"),
+                             Localization.lang("Field name"),
+                             Localization.lang("Add"),
+                             FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey()),
+                             FieldsUtil.FIELD_STRING_CONVERTER)
                      .ifPresent(this::addFieldIfUnique);
     }
 
