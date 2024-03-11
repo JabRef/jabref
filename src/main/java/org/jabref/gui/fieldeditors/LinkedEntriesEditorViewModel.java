@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -61,10 +62,11 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public List<ParsedEntryLink> getSuggestions(String request) {
-        List<ParsedEntryLink> suggestions = ((List<?>) suggestionProvider.getPossibleSuggestions())
+        List<ParsedEntryLink> suggestions = suggestionProvider
+                .getPossibleSuggestions()
                 .stream()
                 .map(suggestion -> suggestion instanceof BibEntry bibEntry ? bibEntry.getCitationKey().orElse("") : (String) suggestion)
-                .filter(suggestion -> suggestion.toLowerCase().contains(request.toLowerCase()))
+                .filter(suggestion -> suggestion.toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT)))
                 .map(suggestion -> new ParsedEntryLink(suggestion, databaseContext.getDatabase()))
                 .distinct()
                 .collect(Collectors.toList());
