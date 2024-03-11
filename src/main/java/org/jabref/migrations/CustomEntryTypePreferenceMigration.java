@@ -1,6 +1,7 @@
 package org.jabref.migrations;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,18 +58,18 @@ class CustomEntryTypePreferenceMigration {
 
         BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
                 .withType(EntryTypeFactory.parse(name))
-                .withRequiredFields(req.stream().map(FieldFactory::parseOrFields).collect(Collectors.toList()));
+                .withRequiredFields(req.stream().map(FieldFactory::parseOrFields).collect(Collectors.toCollection(LinkedHashSet::new)));
         if (priOpt.isEmpty()) {
             entryTypeBuilder = entryTypeBuilder
-                    .withImportantFields(opt.stream().map(FieldFactory::parseField).collect(Collectors.toSet()));
+                    .withImportantFields(opt.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)));
             return Optional.of(entryTypeBuilder.build());
         } else {
             List<String> secondary = new ArrayList<>(opt);
             secondary.removeAll(priOpt);
 
             entryTypeBuilder = entryTypeBuilder
-                    .withImportantFields(priOpt.stream().map(FieldFactory::parseField).collect(Collectors.toSet()))
-                    .withDetailFields(secondary.stream().map(FieldFactory::parseField).collect(Collectors.toSet()));
+                    .withImportantFields(priOpt.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)))
+                    .withDetailFields(secondary.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)));
             return Optional.of(entryTypeBuilder.build());
         }
     }
