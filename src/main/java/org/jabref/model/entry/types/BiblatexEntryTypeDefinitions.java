@@ -18,6 +18,8 @@ public class BiblatexEntryTypeDefinitions {
 
     private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Article)
+            .withRequiredFields(
+                    StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNALTITLE, StandardField.DATE)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.EDITOR, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
                     StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
@@ -28,8 +30,6 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.JOURNALSUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.LANGUAGE,
                     StandardField.ORIGLANGUAGE, StandardField.VERSION,
                     StandardField.ADDENDUM, StandardField.PUBSTATE)
-            .withRequiredFields(
-                    StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNALTITLE, StandardField.DATE)
             .build();
 
     private static final BibEntryType BOOK = new BibEntryTypeBuilder()
@@ -84,9 +84,9 @@ public class BiblatexEntryTypeDefinitions {
 
     private static final BibEntryType BOOKINBOOK = new BibEntryTypeBuilder()
             .withType(StandardEntryType.BookInBook)
+            .withRequiredFields(INBOOK.getRequiredFields())
             .withImportantFields(INBOOK.getImportantOptionalFields())
             .withDetailFields(INBOOK.getDetailOptionalFields())
-            .withRequiredFields(INBOOK.getRequiredFields())
             .build();
 
     private static final BibEntryType SUPPBOOK = new BibEntryTypeBuilder()
