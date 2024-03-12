@@ -77,14 +77,14 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return fields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SequencedSet<Field> getPrimaryOptionalFields() {
+    public SequencedSet<Field> getImportantOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.IMPORTANT)
                                   .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SequencedSet<Field> getSecondaryOptionalFields() {
+    public SequencedSet<Field> getDetailOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.DETAIL)
                                   .map(BibField::field)
@@ -108,8 +108,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    public SequencedSet<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
-        SequencedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
+    public SequencedSet<Field> getDetailOptionalNotDeprecatedFields(BibDatabaseMode mode) {
+        SequencedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getDetailOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }

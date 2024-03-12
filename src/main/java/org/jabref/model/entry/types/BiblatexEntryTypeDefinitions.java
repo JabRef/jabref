@@ -87,15 +87,15 @@ public class BiblatexEntryTypeDefinitions {
 
     private static final BibEntryType BOOKINBOOK = new BibEntryTypeBuilder()
             .withType(StandardEntryType.BookInBook)
-            .withImportantFields(INBOOK.getPrimaryOptionalFields())
-            .withDetailFields(INBOOK.getSecondaryOptionalFields())
+            .withImportantFields(INBOOK.getImportantOptionalFields())
+            .withDetailFields(INBOOK.getDetailOptionalFields())
             .withRequiredFields(INBOOK.getRequiredFields())
             .build();
 
     private static final BibEntryType SUPPBOOK = new BibEntryTypeBuilder()
             .withType(StandardEntryType.SuppBook)
-            .withImportantFields(INBOOK.getPrimaryOptionalFields())
-            .withDetailFields(INBOOK.getSecondaryOptionalFields())
+            .withImportantFields(INBOOK.getImportantOptionalFields())
+            .withDetailFields(INBOOK.getDetailOptionalFields())
             .withRequiredFields(INBOOK.getRequiredFields())
             .build();
 
@@ -161,8 +161,8 @@ public class BiblatexEntryTypeDefinitions {
     private static final BibEntryType SUPPCOLLECTION = new BibEntryTypeBuilder()
             .withType(StandardEntryType.SuppCollection)
             .withRequiredFields(INCOLLECTION.getRequiredFields())
-            .withImportantFields(INCOLLECTION.getPrimaryOptionalFields())
-            .withDetailFields(INCOLLECTION.getSecondaryOptionalFields())
+            .withImportantFields(INCOLLECTION.getImportantOptionalFields())
+            .withDetailFields(INCOLLECTION.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType MANUAL = new BibEntryTypeBuilder()
@@ -223,8 +223,8 @@ public class BiblatexEntryTypeDefinitions {
     private static final BibEntryType SUPPPERIODICAL = new BibEntryTypeBuilder()
             .withType(StandardEntryType.SuppPeriodical)
             .withRequiredFields(ARTICLE.getRequiredFields())
-            .withImportantFields(ARTICLE.getPrimaryOptionalFields())
-            .withDetailFields(ARTICLE.getSecondaryOptionalFields())
+            .withImportantFields(ARTICLE.getImportantOptionalFields())
+            .withDetailFields(ARTICLE.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType PROCEEDINGS = new BibEntryTypeBuilder()
@@ -276,22 +276,22 @@ public class BiblatexEntryTypeDefinitions {
     private static final BibEntryType REFERENCE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Reference)
             .withRequiredFields(COLLECTION.getRequiredFields())
-            .withImportantFields(COLLECTION.getPrimaryOptionalFields())
-            .withDetailFields(COLLECTION.getSecondaryOptionalFields())
+            .withImportantFields(COLLECTION.getImportantOptionalFields())
+            .withDetailFields(COLLECTION.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType MVREFERENCE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.MvReference)
             .withRequiredFields(MVCOLLECTION.getRequiredFields())
-            .withImportantFields(MVCOLLECTION.getPrimaryOptionalFields())
-            .withDetailFields(MVCOLLECTION.getSecondaryOptionalFields())
+            .withImportantFields(MVCOLLECTION.getImportantOptionalFields())
+            .withDetailFields(MVCOLLECTION.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType INREFERENCE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.InReference)
             .withRequiredFields(INCOLLECTION.getRequiredFields())
-            .withImportantFields(INCOLLECTION.getPrimaryOptionalFields())
-            .withDetailFields(INCOLLECTION.getSecondaryOptionalFields())
+            .withImportantFields(INCOLLECTION.getImportantOptionalFields())
+            .withDetailFields(INCOLLECTION.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType REPORT = new BibEntryTypeBuilder()
@@ -335,15 +335,15 @@ public class BiblatexEntryTypeDefinitions {
     private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Conference)
             .withRequiredFields(INPROCEEDINGS.getRequiredFields())
-            .withImportantFields(INPROCEEDINGS.getPrimaryOptionalFields())
-            .withDetailFields(INPROCEEDINGS.getSecondaryOptionalFields())
+            .withImportantFields(INPROCEEDINGS.getImportantOptionalFields())
+            .withDetailFields(INPROCEEDINGS.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType ELECTRONIC = new BibEntryTypeBuilder()
             .withType(IEEETranEntryType.Electronic)
             .withRequiredFields(ONLINE.getRequiredFields())
-            .withImportantFields(ONLINE.getPrimaryOptionalFields())
-            .withDetailFields(ONLINE.getSecondaryOptionalFields())
+            .withImportantFields(ONLINE.getImportantOptionalFields())
+            .withDetailFields(ONLINE.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType MASTERSTHESIS = new BibEntryTypeBuilder()
@@ -384,8 +384,8 @@ public class BiblatexEntryTypeDefinitions {
     private static final BibEntryType WWW = new BibEntryTypeBuilder()
             .withType(StandardEntryType.WWW)
             .withRequiredFields(ONLINE.getRequiredFields())
-            .withImportantFields(ONLINE.getPrimaryOptionalFields())
-            .withDetailFields(ONLINE.getSecondaryOptionalFields())
+            .withImportantFields(ONLINE.getImportantOptionalFields())
+            .withDetailFields(ONLINE.getDetailOptionalFields())
             .build();
 
     private static final BibEntryType SOFTWARE = new BibEntryTypeBuilder()
