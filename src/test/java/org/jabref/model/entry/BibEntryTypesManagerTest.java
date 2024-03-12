@@ -190,8 +190,8 @@ class BibEntryTypesManagerTest {
     }
 
     @Test
-    void pagesContainedAtArticle() {
+    void translatorDetailOptionalAtArticle() {
         BibEntryType entryType = entryTypesManager.enrich(StandardEntryType.Article, BibDatabaseMode.BIBLATEX).get();
-        assertTrue(entryType.getDetailOptionalFields().contains(StandardField.PAGES));
+        assertTrue(entryType.getDetailOptionalFields().contains(StandardField.TRANSLATOR));
     }
 }
