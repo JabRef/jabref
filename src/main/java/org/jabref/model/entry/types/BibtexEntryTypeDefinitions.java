@@ -10,6 +10,9 @@ import org.jabref.model.entry.field.StandardField;
 
 /**
  * This class represents all supported BibTeX entry types.
+ * It is based on the information of <a href="https://tug.org/texmf-docs/bibtex/btxdoc.pdf">BibTeXing</a>, a manual
+ * by the original BibTeX author. Also enriched by new fields not existing back then (e.g., ISSN).
+ * <p>
  * The BibLaTeX entry types are defined at {@link BiblatexEntryTypeDefinitions}.
  */
 public class BibtexEntryTypeDefinitions {
