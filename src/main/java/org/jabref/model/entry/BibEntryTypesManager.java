@@ -164,8 +164,7 @@ public class BibEntryTypesManager {
         }
 
         private boolean isCustomOrModifiedType(BibEntryType entryType) {
-            return customOrModifiedType.stream()
-                                       .anyMatch(customizedType -> customizedType.equals(entryType));
+            return customOrModifiedType.contains(entryType);
         }
     }
 }
