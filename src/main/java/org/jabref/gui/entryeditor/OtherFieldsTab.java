@@ -64,7 +64,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
 
         this.entryTypesManager = entryTypesManager;
         this.customTabFieldNames = new ArrayList<>();
-        preferences.getEntryEditorPreferences().getDefaultEntryEditorTabs().values().forEach(customTabFieldNames::addAll);
+        preferences.getEntryEditorPreferences().getEntryEditorTabs().values().forEach(customTabFieldNames::addAll);
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
