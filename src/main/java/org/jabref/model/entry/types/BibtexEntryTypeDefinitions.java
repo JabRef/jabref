@@ -26,6 +26,9 @@ public class BibtexEntryTypeDefinitions {
             .withType(StandardEntryType.Article)
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNAL, StandardField.YEAR)
             .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.PAGES, StandardField.MONTH, StandardField.ISSN, StandardField.NOTE)
+            // "Publisher" is missing in @article as default (see https://tex.stackexchange.com/a/16983/9075)
+            // We nevertheless support is as default, because it is a common field in article-like entries (and returned by the DOI fetcher)
+            .withDetailFields(StandardField.PUBLISHER)
             .build();
 
     /**

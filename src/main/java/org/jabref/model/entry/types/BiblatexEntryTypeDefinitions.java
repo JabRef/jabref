@@ -23,6 +23,9 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
             .withDetailFields(
+                    // "Publisher" is missing in @article as default (see https://tex.stackexchange.com/a/16983/9075)
+                    // We nevertheless support is as default, because it is a common field in article-like entries (and returned by the DOI fetcher)
+                    StandardField.PUBLISHER,
                     StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
                     StandardField.TITLEADDON, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
                     StandardField.JOURNALSUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.LANGUAGE,
