@@ -57,7 +57,7 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
-        // backwardcompatibility, as it copies the old values to new variable names and keeps th old sored with the old
+        // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(preferences);
         upgradeColumnPreferences(preferences);
