@@ -7,7 +7,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -78,20 +77,23 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         container.getItems().addAll(resultsTable, previewViewer);
 
         keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());
+
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+
         EasyBind.subscribe(viewModel.keepOnTop(), value -> {
-            Stage stage = (Stage) getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(value);
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
                     : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
 
-        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+        stage.setOnShown(event -> {
             getDialogPane().setPrefHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             getDialogPane().setPrefWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+            stage.centerOnScreen();
         });
 
-        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+        stage.setOnHidden(event -> {
             preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
         });
