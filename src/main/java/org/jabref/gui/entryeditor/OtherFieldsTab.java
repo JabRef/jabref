@@ -26,7 +26,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -36,7 +35,7 @@ import org.jabref.preferences.PreferencesService;
 public class OtherFieldsTab extends FieldsEditorTab {
 
     public static final String NAME = "Other fields";
-    private final List<Field> customTabFieldNames;
+    private final List<Field> customTabsFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
     public OtherFieldsTab(BibDatabaseContext databaseContext,
@@ -63,8 +62,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 indexingTaskManager);
 
         this.entryTypesManager = entryTypesManager;
-        this.customTabFieldNames = new ArrayList<>();
-        preferences.getEntryEditorPreferences().getDefaultEntryEditorTabs().values().forEach(customTabFieldNames::addAll);
+        this.customTabsFieldNames = new ArrayList<>();
+        preferences.getEntryEditorPreferences().getEntryEditorTabs().values().forEach(customTabsFieldNames::addAll);
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
@@ -76,15 +75,21 @@ public class OtherFieldsTab extends FieldsEditorTab {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
+            // Get all required and optional fields configured for the entry
             Set<Field> allKnownFields = entryType.get().getAllFields();
+            // Remove all fields being required or optional
             SequencedSet<Field> otherFields = entry.getFields().stream()
-                                          .filter(field -> !allKnownFields.contains(field) &&
-                                                  !(field.equals(StandardField.COMMENT) || field instanceof UserSpecificCommentField))
+                                          .filter(field -> !allKnownFields.contains(field))
                                           .collect(Collectors.toCollection(LinkedHashSet::new));
-            otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
-            otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::field).toList());
+            // The key field is in the required tab, but has a special treatment
             otherFields.remove(InternalField.KEY_FIELD);
-            customTabFieldNames.forEach(otherFields::remove);
+            // Remove all fields contained in JabRef's tab "Deprecated"
+            otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
+            // Remove all fields contained in the custom tabs
+            customTabsFieldNames.forEach(otherFields::remove);
+            // Remove all user-comment fields (tab org.jabref.gui.entryeditor.CommentsTab)
+            otherFields.removeIf(field -> field.equals(StandardField.COMMENT));
+            otherFields.removeIf(field -> field instanceof UserSpecificCommentField);
             return otherFields;
         } else {
             // Entry type unknown -> treat all fields as required (thus no other fields)
