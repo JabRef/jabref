@@ -550,7 +550,7 @@ public class PreferencesMigrations {
     }
 
     /**
-     * The tab "Comments" is now hard coded using {@link CommentsTab} (and thus hard-wired in {@link EntryEditor#createTabs()}.
+     * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
     static void removeCommentsFromCustomEditorTabs(JabRefPreferences preferences) {
