@@ -190,8 +190,8 @@ class BibEntryTypesManagerTest {
     }
 
     @Test
-    void publicationContainedAtArticle() {
+    void pagesContainedAtArticle() {
         BibEntryType entryType = entryTypesManager.enrich(StandardEntryType.Article, BibDatabaseMode.BIBLATEX).get();
-        assertTrue(entryType.getDetailOptionalFields().contains(StandardField.PUBLISHER));
+        assertTrue(entryType.getDetailOptionalFields().contains(StandardField.PAGES));
     }
 }

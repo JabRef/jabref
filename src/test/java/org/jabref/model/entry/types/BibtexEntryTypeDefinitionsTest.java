@@ -16,11 +16,11 @@ class BibtexEntryTypeDefinitionsTest {
     }
 
     @Test
-    void publisherContained() {
+    void languageContained() {
         BibEntryType articleEntryType = BiblatexEntryTypeDefinitions.ALL.stream()
                                                                     .filter(type -> type.getType().equals(StandardEntryType.Article))
                                                                     .findFirst()
                                                                     .get();
-        assertTrue(articleEntryType.getDetailOptionalFields().contains(StandardField.PUBLISHER));
+        assertTrue(articleEntryType.getDetailOptionalFields().contains(StandardField.LANGUAGE));
     }
 }
