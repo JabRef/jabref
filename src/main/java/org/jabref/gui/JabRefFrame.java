@@ -631,6 +631,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
     }
 
+    public void setCurrentTab(BibDatabaseContext databaseContext) {
+        for (LibraryTab libraryTab : getLibraryTabs()) {
+            if (libraryTab.getBibDatabaseContext() == databaseContext) {
+                tabbedPane.getSelectionModel().select(libraryTab);
+                return;
+            }
+        }
+    }
+
     private ContextMenu createTabContextMenuFor(LibraryTab tab, KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);

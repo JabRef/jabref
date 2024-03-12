@@ -20,6 +20,8 @@ public interface LibraryTabContainer {
 
     void addTab(BibDatabaseContext bibDatabaseContext, boolean raisePanel);
 
+    void setCurrentTab(BibDatabaseContext bibDatabaseContext);
+
     /**
      * Closes a designated libraryTab
      *

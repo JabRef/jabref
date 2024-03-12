@@ -145,4 +145,8 @@ public class BibEntryTableViewModel {
     public StringProperty bibDatabaseContextProperty() {
         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
     }
+
+    public BibDatabaseContext getBibDatabaseContext() {
+        return bibDatabaseContext;
+    }
 }

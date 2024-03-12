@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
@@ -30,6 +31,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @FXML private ToggleButton keepOnTop;
 
     private final UndoManager undoManager;
+    private final LibraryTabContainer libraryTabContainer;
 
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
@@ -39,8 +41,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     private GlobalSearchResultDialogViewModel viewModel;
 
-    public GlobalSearchResultDialog(UndoManager undoManager) {
+    public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
         this.undoManager = undoManager;
+        this.libraryTabContainer = libraryTabContainer;
 
         setTitle(Localization.lang("Search results from open libraries"));
         ViewLoader.view(this)
@@ -60,20 +63,18 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
-        resultsTable.getSelectionModel().selectFirst();
-
-        if (resultsTable.getSelectionModel().getSelectedItem() != null) {
-            previewViewer.setEntry(resultsTable.getSelectionModel().getSelectedItem().getEntry());
-        }
 
         resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
+                libraryTabContainer.setCurrentTab(newValue.getBibDatabaseContext());
+                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(newValue.getEntry()));
             } else {
                 previewViewer.setEntry(old.getEntry());
             }
         });
 
+        resultsTable.getSelectionModel().selectFirst();
         container.getItems().addAll(resultsTable, previewViewer);
 
         keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());

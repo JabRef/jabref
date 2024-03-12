@@ -102,6 +102,7 @@ public class GlobalSearchBar extends HBox {
     private final PreferencesService preferencesService;
     private final Validator regexValidator;
     private final UndoManager undoManager;
+    private final LibraryTabContainer tabContainer;
 
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
@@ -120,6 +121,7 @@ public class GlobalSearchBar extends HBox {
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.undoManager = undoManager;
         this.dialogService = dialogService;
+        this.tabContainer = tabContainer;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -276,7 +278,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> {
             globalSearchActive.setValue(true);
-            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager);
+            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
             updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
