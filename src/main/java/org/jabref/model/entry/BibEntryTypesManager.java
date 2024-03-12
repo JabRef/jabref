@@ -108,8 +108,10 @@ public class BibEntryTypesManager {
      * This class is used to specify entry types for either BIBTEX and BIBLATEX.
      */
     private static class InternalEntryTypes {
-        private final SortedSet<BibEntryType> customOrModifiedType = new TreeSet<>();
         private final SortedSet<BibEntryType> standardTypes;
+
+        // TreeSet needs to be used here, because then, org.jabref.model.entry.BibEntryType.compareTo is used - instead of org.jabref.model.entry.BibEntryType.equals
+        private final SortedSet<BibEntryType> customOrModifiedType = new TreeSet<>();
 
         private InternalEntryTypes(List<BibEntryType> standardTypes) {
             this.standardTypes = new TreeSet<>(standardTypes);
