@@ -1,9 +1,13 @@
 package org.jabref.model.entry;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BibEntryTypeBuilderTest {
@@ -15,6 +19,15 @@ class BibEntryTypeBuilderTest {
                 .withImportantFields(StandardField.AUTHOR)
                 .withImportantFields(StandardField.AUTHOR)
                 .build());
+    }
+
+    @Test
+    void detailOptionalWorks() {
+        BibEntryType bibEntryType = new BibEntryTypeBuilder()
+                .withImportantFields(StandardField.AUTHOR)
+                .withDetailFields(StandardField.NOTE)
+                .build();
+        assertEquals(new LinkedHashSet<>(List.of(StandardField.NOTE)), bibEntryType.getDetailOptionalFields());
     }
 
     @Test
