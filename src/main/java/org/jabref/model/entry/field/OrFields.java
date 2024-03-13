@@ -10,7 +10,7 @@ import java.util.StringJoiner;
 /**
  * Represents a choice between two (or more) fields or any combination of them.
  * <p>
- * Example is that a BibEntry requires either an author or an editor, but both can be be present.
+ * Example is that a BibEntry requires either an author or an editor, but both can be present.
  */
 public class OrFields implements Comparable<OrFields> {
 
