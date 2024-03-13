@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.Globals;
@@ -19,7 +18,6 @@ import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -48,7 +46,6 @@ import org.tinylog.configuration.Configuration;
  * - Handle the command line arguments
  * - Start the JavaFX application (if not in cli mode)
  */
-@AllowedToUseStandardStreams("Direct output to the user")
 public class Launcher {
     private static Logger LOGGER;
     private static boolean isDebugEnabled;
@@ -140,11 +137,13 @@ public class Launcher {
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "writerFile", "shared file",
-                "writerFile.level", isDebugEnabled ? "debug" : "info",
                 "level", isDebugEnabled ? "debug" : "info",
-                "writerFile.file", directory.resolve("log.txt").toString(),
-                "writerFile.charset", "UTF-8");
+                "writerFile", "rolling file",
+                "writerFile.level", isDebugEnabled ? "debug" : "info",
+                "writerFile.file", directory.resolve("log_{date:yyyy-MM-dd_HH-mm-ss}.txt").toString(),
+                "writerFile.charset", "UTF-8",
+                "writerFile.policies", "startup",
+                "writerFile.backups", "30");
 
         configuration.forEach(Configuration::set);
         initializeLogger();
@@ -169,9 +168,8 @@ public class Launcher {
                 LOGGER.debug("Passing arguments passed on to running JabRef...");
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
-                    LOGGER.debug("Arguments passed on to running JabRef instance.");
-                    // Used for script-use output etc. to the user
-                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
+                    LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
                     return false;
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
