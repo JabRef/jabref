@@ -1438,7 +1438,7 @@ class BibtexParserTest {
         assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
         assertEquals(2, root.getNumberOfChildren());
 
-        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup",GroupHierarchyType.INDEPENDENT, ',');
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
         firstTestGroupExpected.setExpanded(true);
         assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
 
