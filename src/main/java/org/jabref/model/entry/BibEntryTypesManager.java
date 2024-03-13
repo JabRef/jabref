@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -116,9 +119,41 @@ public class BibEntryTypesManager {
         if (entryTypes.standardTypes.contains(entryType)) {
             // The method to check containment does a deep equals. Thus, different fields lead to a non-containment property
             entryTypes.removeCustomOrModifiedEntryType(entryType);
-        } else {
+            return;
+        }
+        if (!entryTypes.isStandardType(entryType)) {
             entryTypes.addCustomOrModifiedType(entryType);
         }
+
+        // Workaround for UI not supporting OrFields
+        Optional<BibEntryType> standardTypeOpt = entryTypes.standardTypes.stream()
+                                                                      .filter(InternalEntryTypes.typeEquals(entryType.getType()))
+                                                                      .findFirst();
+        if (standardTypeOpt.isEmpty()) {
+            LOGGER.error("Standard type not found for {}", entryType.getType());
+            entryTypes.addCustomOrModifiedType(entryType);
+            return;
+        }
+
+        BibEntryType standardType = standardTypeOpt.get();
+        Set<Field> standardRequiredFields = standardType.getRequiredFields().stream()
+                                                        .map(OrFields::getFields)
+                                                        .flatMap(Set::stream)
+                                                        .collect(Collectors.toSet());
+        Set<BibField> standardOptionalFields = standardType.getOptionalFields();
+
+        Set<Field> entryTypeRequiredFields = entryType.getRequiredFields().stream()
+                                                                  .map(OrFields::getFields)
+                                                                  .flatMap(Set::stream)
+                                                      .collect(Collectors.toSet());
+        Set<BibField> entryTypeOptionalFields = entryType.getOptionalFields();
+
+        if (standardRequiredFields.equals(entryTypeRequiredFields) && standardOptionalFields.equals(entryTypeOptionalFields)) {
+            entryTypes.removeCustomOrModifiedEntryType(entryType);
+            return;
+        }
+        LOGGER.debug("Different standard type fields for {} and standard {}", entryType, standardType);
+        entryTypes.addCustomOrModifiedType(entryType);
     }
 
     public void removeCustomOrModifiedEntryType(BibEntryType entryType, BibDatabaseMode mode) {
@@ -187,7 +222,7 @@ public class BibEntryTypesManager {
             }
         }
 
-        private Predicate<BibEntryType> typeEquals(EntryType toCompare) {
+        static Predicate<BibEntryType> typeEquals(EntryType toCompare) {
             return item -> item.getType().equals(toCompare);
         }
 

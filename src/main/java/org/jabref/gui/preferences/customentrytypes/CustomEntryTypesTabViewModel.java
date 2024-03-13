@@ -102,9 +102,9 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
-            BibEntryType type = typeViewModel.entryType().getValue();
             List<FieldViewModel> allFields = typeViewModel.fields();
 
+            // Collect multilineFields for storage in preferences later
             multilineFields.addAll(allFields.stream()
                                             .filter(FieldViewModel::isMultiline)
                                             .map(FieldViewModel::toField)
@@ -115,9 +115,12 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                                                .map(FieldViewModel::toField)
                                                .map(OrFields::new)
                                                .collect(Collectors.toList());
+
             List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
 
+            BibEntryType type = typeViewModel.entryType().getValue();
             BibEntryType newType = new BibEntryType(type.getType(), fields, required);
+
             entryTypesManager.update(newType, bibDatabaseMode);
         }
 
