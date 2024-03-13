@@ -206,26 +206,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     VBox vContainer = new VBox();
 
-                    Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
-                    openWeb.setTooltip(new Tooltip(Localization.lang("Go to website")));
-                    openWeb.setOnMouseClicked(event -> {
-                        String url = null;
-                        if (entry.entry().getDOI().isPresent() && entry.entry().getDOI().get().getExternalURI().isPresent()) {
-                            url = entry.entry().getDOI().get().getExternalURI().get().toString();
-                        } else if (entry.entry().getField(StandardField.URL).isPresent()) {
-                            url = entry.entry().getField(StandardField.URL).get();
-                        }
-                        if (StringUtil.isNullOrEmpty(url)) {
-                            return;
-                        }
-
-                        try {
-                            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
-                        } catch (java.io.IOException ex) {
-                            dialogService.notify(Localization.lang("Unable to open link."));
-                        }
-                    });
-
                     if (entry.isLocal()) {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
@@ -252,7 +232,29 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().add(addToggle);
                     }
 
-                    vContainer.getChildren().addLast(openWeb);
+                    if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
+                        Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
+                        openWeb.setTooltip(new Tooltip(Localization.lang("Go to website")));
+                        openWeb.setOnMouseClicked(event -> {
+                            String url = null;
+                            if (entry.entry().getDOI().isPresent() && entry.entry().getDOI().get().getExternalURI().isPresent()) {
+                                url = entry.entry().getDOI().get().getExternalURI().get().toString();
+                            } else if (entry.entry().getField(StandardField.URL).isPresent()) {
+                                url = entry.entry().getField(StandardField.URL).get();
+                            }
+                            if (StringUtil.isNullOrEmpty(url)) {
+                                return;
+                            }
+
+                            try {
+                                JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+                            } catch (
+                                    java.io.IOException ex) {
+                                dialogService.notify(Localization.lang("Unable to open link."));
+                            }
+                        });
+                        vContainer.getChildren().addLast(openWeb);
+                    }
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
