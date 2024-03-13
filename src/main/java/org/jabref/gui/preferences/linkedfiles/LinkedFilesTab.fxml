@@ -76,4 +76,8 @@
         <TextField fx:id="fileDirectoryPattern" GridPane.columnIndex="1" GridPane.rowIndex="1"
                    prefWidth="300" minWidth="300" maxWidth="300"/>
     </GridPane>
+
+    <Label styleClass="sectionHeader" text="%Attached files"/>
+    <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
+    <CheckBox fx:id="moveToTrash" text="%Move deleted files to trash (instead of deleting them)"/>
 </fx:root>

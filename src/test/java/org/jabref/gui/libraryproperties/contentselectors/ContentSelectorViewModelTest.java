@@ -9,9 +9,11 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
@@ -146,10 +148,13 @@ public class ContentSelectorViewModelTest {
     }
 
     private void addField(Field field) {
-        when(dialogService.showInputDialogAndWait(
-                Localization.lang("Add new field name"), Localization.lang("Field name")))
-                .thenReturn(Optional.of(field.getDisplayName()));
-
+        when(dialogService.showEditableChoiceDialogAndWait(
+                Localization.lang("Add new field name"),
+                Localization.lang("Field name"),
+                Localization.lang("Add"),
+                FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey()),
+                FieldsUtil.FIELD_STRING_CONVERTER))
+                .thenReturn(Optional.of(field));
         viewModel.showInputFieldNameDialog();
     }
 

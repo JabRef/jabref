@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -13,15 +14,16 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.DecorationPane;
@@ -31,32 +33,34 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents the outer stage and the scene of the JabRef window.
  */
-public class JabRefGUI {
+public class JabRefGUI extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
+    private static List<UiCommand> uiCommands;
+    private static JabRefPreferences preferencesService;
+    private static FileUpdateMonitor fileUpdateMonitor;
     private static JabRefFrame mainFrame;
     private static DialogService dialogService;
     private static ThemeManager themeManager;
 
-    private final Stage mainStage;
-    private final PreferencesService preferencesService;
+    private boolean correctedWindowPos = false;
+    private Stage mainStage;
 
-    private final List<ParserResult> parserResults;
-    private final boolean isBlank;
-    private boolean correctedWindowPos;
+    public static void setup(List<UiCommand> uiCommands,
+                             JabRefPreferences preferencesService,
+                             FileUpdateMonitor fileUpdateMonitor) {
+        JabRefGUI.uiCommands = uiCommands;
+        JabRefGUI.preferencesService = preferencesService;
+        JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
+    }
 
-    public JabRefGUI(Stage mainStage,
-                     List<ParserResult> parserResults,
-                     boolean isBlank,
-                     PreferencesService preferencesService,
-                     FileUpdateMonitor fileUpdateMonitor) {
-        this.mainStage = mainStage;
-        this.parserResults = parserResults;
-        this.isBlank = isBlank;
-        this.preferencesService = preferencesService;
+    @Override
+    public void start(Stage stage) {
+        this.mainStage = stage;
 
-        this.correctedWindowPos = false;
+        FallbackExceptionHandler.installExceptionHandler();
+        Globals.startBackgroundTasks();
 
         WebViewStore.init();
 
@@ -91,6 +95,18 @@ public class JabRefGUI {
         });
 
         setupProxy();
+    }
+
+    @Override
+    public void stop() {
+        OOBibBaseConnect.closeOfficeConnection();
+        Globals.stopBackgroundTasks();
+        Globals.shutdownThreadPools();
+        try {
+            Globals.predatoryJournalRepository.close();
+        } catch (Exception e) {
+            LOGGER.warn("Cloud not shut down predatoryJournalRepository", e);
+        }
     }
 
     private void setupProxy() {
@@ -157,11 +173,20 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
+        mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
         mainStage.show();
 
-        Platform.runLater(() -> mainFrame.openDatabases(parserResults, isBlank));
+        Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
+    }
+
+    public void onShowing(WindowEvent event) {
+        // Open last edited databases
+        if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
+            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+            mainFrame.openLastEditedDatabases();
+        }
     }
 
     public void onCloseRequest(WindowEvent event) {

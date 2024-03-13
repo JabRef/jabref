@@ -29,6 +29,7 @@ package org.jabref.gui.autocompleter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,7 +61,7 @@ public abstract class SuggestionProvider<T> {
 
     protected abstract Equivalence<T> getEquivalence();
 
-    public Collection<T> getPossibleSuggestions() {
+    public List<T> getPossibleSuggestions() {
         Comparator<T> comparator = getComparator().reversed();
         Equivalence<T> equivalence = getEquivalence();
         return getSource().map(equivalence::wrap) // Need to do a bit of acrobatic as there is no distinctBy method

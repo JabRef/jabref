@@ -32,7 +32,7 @@ public enum StandardField implements Field {
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
-    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
+    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     CITES("cites", FieldProperty.MULTIPLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
@@ -104,7 +104,7 @@ public enum StandardField implements Field {
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
     REPORTNO("reportno"),
-    REVIEW("review", FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM),
+    REVIEW("review", FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     REVISION("revision"),
     SCHOOL("school"),
     SERIES("series"),

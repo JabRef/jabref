@@ -34,7 +34,7 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
     }
     ```
 
-    we would have five tests containing a single `assert` statement and named accordingly (`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, , etc.). See [JUnit AntiPattern](https://exubero.com/junit/anti-patterns/#Multiple\_Assertions) for background.
+    we would have five tests containing a single `assert` statement and named accordingly (`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, , etc.). See [JUnit AntiPattern](https://exubero.com/junit/anti-patterns/#Multiple_Assertions) for background.
 * Do _not just test happy paths_, but also wrong/weird input.
 * It is recommended to write tests _before_ you actually implement the functionality (test driven development).
 * _Bug fixing:_ write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.

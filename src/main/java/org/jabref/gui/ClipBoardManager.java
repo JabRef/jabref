@@ -87,6 +87,18 @@ public class ClipBoardManager {
         return result;
     }
 
+    public static String getHtmlContents() {
+        String result = clipboard.getHtml();
+        if (result == null) {
+            return "";
+        }
+        return result;
+    }
+
+    public static boolean hasHtml() {
+        return clipboard.hasHtml();
+    }
+
     /**
      * Get the String residing on the primary clipboard (if it exists).
      *

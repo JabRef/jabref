@@ -137,6 +137,9 @@ public class FileFieldParser {
      *
      * SIDE EFFECT: The given entry list is cleared upon completion
      *
+     * Expected format is: description:link:fileType:sourceURL
+     * fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
+     *
      * @param entry the list of elements in the linked file textual representation
      * @return a LinkedFile object
      */
@@ -154,9 +157,7 @@ public class FileFieldParser {
                 // in case the URL is malformed, store it nevertheless
                 field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
             }
-        }
-
-        if (field == null) {
+        } else {
             String pathStr = entry.get(1);
             if (pathStr.contains("//")) {
                 // In case the path contains //, we assume it is a malformed URL, not a malformed path.
@@ -165,14 +166,17 @@ public class FileFieldParser {
             } else {
                 try {
                     // there is no Path.isValidPath(String) method
-                    Path path = Path.of(pathStr);
-                    field = new LinkedFile(entry.getFirst(), path, entry.get(2));
+                    field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
                 } catch (InvalidPathException e) {
                     // Ignored
-                    LOGGER.debug("Invalid path object, continueing with string", e);
+                    LOGGER.debug("Invalid path object, continuing with string", e);
                     field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
                 }
             }
+        }
+
+        if (entry.size() > 3) {
+            field.setSourceURL(entry.get(3));
         }
 
         // link is the only mandatory field

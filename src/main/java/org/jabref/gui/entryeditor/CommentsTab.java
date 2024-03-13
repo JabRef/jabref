@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
@@ -64,7 +65,7 @@ public class CommentsTab extends FieldsEditorTab {
                 journalAbbreviationRepository,
                 indexingTaskManager
         );
-        this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner();
+        this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         setText(Localization.lang("Comments"));
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
 

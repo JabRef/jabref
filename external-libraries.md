@@ -233,6 +233,13 @@ License: BSD-2-Clause
 ```
 
 ```yaml
+Id:      com.vladsch.flexmark:flexmark-html2md-converter
+Project: flexmark-java
+URL:     https://github.com/vsch/flexmark-java
+License: BSD-2-Clause
+```
+
+```yaml
 Id:      commons-beanutils:commons-beanutils
 Project: Apache Commons Beanutils
 URL:     https://commons.apache.org/proper/commons-beanutils/
@@ -708,6 +715,7 @@ com.squareup.okio:okio:1.15.0
 com.squareup.retrofit2:retrofit:2.6.1
 com.sun.istack:istack-commons-runtime:4.1.2
 com.tobiasdiez:easybind:2.2.1-SNAPSHOT
+com.vladsch.flexmark:flexmark-html2md-converter:0.64.8
 com.vladsch.flexmark:flexmark-util-ast:0.64.8
 com.vladsch.flexmark:flexmark-util-builder:0.64.8
 com.vladsch.flexmark:flexmark-util-collection:0.64.8

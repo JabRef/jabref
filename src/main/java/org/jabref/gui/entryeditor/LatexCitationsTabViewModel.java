@@ -170,6 +170,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         init(currentEntry);
     }
 
+    public void refreshLatexDirectory() {
+        latexParserResult = null;
+        init(currentEntry);
+    }
+
     public boolean shouldShow() {
         return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
     }

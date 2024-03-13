@@ -94,8 +94,6 @@ recipeList:
   #  - org.openrewrite.staticanalysis.UseAsBuilder
   # "Upgrades" too much, deletes fields
   #  - org.openrewrite.staticanalysis.UseCollectionInterfaces
-  # Does not work at TreeNode
-  #  - org.openrewrite.staticanalysis.UseDiamondOperator
   # States that it gains performance, but the code is more unreable
   #  - org.openrewrite.staticanalysis.UseForEachRemoveInsteadOfSetRemoveAll
   # We voted against it
@@ -189,6 +187,7 @@ recipeList:
   - org.openrewrite.staticanalysis.TypecastParenPad
   - org.openrewrite.staticanalysis.UnwrapRepeatableAnnotations
   - org.openrewrite.staticanalysis.UpperCaseLiteralSuffixes
+  - org.openrewrite.staticanalysis.UseDiamondOperator
 #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
 #  - org.openrewrite.staticanalysis.UseListSort
