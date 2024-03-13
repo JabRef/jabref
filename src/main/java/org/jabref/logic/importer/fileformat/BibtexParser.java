@@ -103,7 +103,6 @@ public class BibtexParser implements Parser {
     private final Map<String, String> parsedBibdeskGroups;
     private final DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
 
-
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         this.fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
@@ -365,22 +364,18 @@ public class BibtexParser implements Parser {
 
     /**
      * Adds BibDesk group entries to the JabRef database
-     * */
+     */
     private void addBibDeskGroupEntriesToJabRefGroups() {
-
-   //    List<String> citekeys = parsedBibdeskGroups.keySet().stream().flatMap(s-> Arrays.stream(s.split(","))).toList();
-
         for (String groupName: parsedBibdeskGroups.keySet()) {
             String[] citationKeys = parsedBibdeskGroups.get(groupName).split(",");
             for (String citation : citationKeys) {
-                if (database.getEntryByCitationKey(citation).isPresent()) {
-
-                    String groupValue = database.getEntryByCitationKey(citation).get().getField(StandardField.GROUPS).orElse(null);
-                    if (groupValue == null) { // if the citation does not belong to a group already
-                        database.getEntryByCitationKey(citation).get().setField(StandardField.GROUPS, groupName);
+                    Optional<BibEntry> bibEntry = database.getEntryByCitationKey(citation);
+                    Optional<String> groupValue = bibEntry.flatMap(entry -> entry.getField(StandardField.GROUPS));
+                    if (groupValue.isEmpty()) { // if the citation does not belong to a group already
+                         bibEntry.flatMap(entry -> entry.setField(StandardField.GROUPS, groupName));
                     } else { // if the citation does belong to a group already, we concatenate
-                        groupValue += "," + groupName;
-                        database.getEntryByCitationKey(citation).get().setField(StandardField.GROUPS, groupValue);
+                        String concatGroup = groupValue.get() + "," + groupName;
+                        bibEntry.flatMap(entryByCitationKey -> entryByCitationKey.setField(StandardField.GROUPS, concatGroup));
                     }
                 }
             }
