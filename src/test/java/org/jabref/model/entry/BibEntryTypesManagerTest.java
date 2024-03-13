@@ -141,7 +141,7 @@ class BibEntryTypesManagerTest {
     @EnumSource(BibDatabaseMode.class)
     void standardTypeIsStillAccessibleIfOverwritten(BibDatabaseMode mode) {
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
-        assertFalse(entryTypesManager.isCustomType(overwrittenStandardType.getType(), mode));
+        assertFalse(entryTypesManager.isCustomType(overwrittenStandardType, mode));
     }
 
     @ParameterizedTest

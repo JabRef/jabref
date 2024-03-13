@@ -133,6 +133,10 @@ public class BibEntryTypesManager {
         return !getEntryTypes(mode).isStandardType(type);
     }
 
+    public boolean isCustomType(BibEntryType type, BibDatabaseMode mode) {
+        return !getEntryTypes(mode).isStandardType(type);
+    }
+
     /**
      * This method returns the BibEntryType for the entry type.
      *
@@ -233,6 +237,10 @@ public class BibEntryTypesManager {
 
         private Optional<BibEntryType> getStandardType(BibEntryType entryType) {
             return standardTypes.stream().filter(item -> item.getType().equals(entryType.getType())).findAny();
+        }
+
+        private boolean isStandardType(BibEntryType entryType) {
+            return getStandardType(entryType).isPresent();
         }
 
         private boolean isStandardType(EntryType entryType) {

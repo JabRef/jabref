@@ -89,7 +89,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
-            if (entryTypesManager.isCustomType(entryType.getType(), bibDatabaseMode)) {
+            if (entryTypesManager.isCustomType(entryType, bibDatabaseMode)) {
                 viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);
             } else {
                 viewModel = new EntryTypeViewModel(entryType, isMultiline);
