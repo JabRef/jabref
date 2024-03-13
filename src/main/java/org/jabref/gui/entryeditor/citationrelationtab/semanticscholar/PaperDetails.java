@@ -17,6 +17,7 @@ public class PaperDetails {
 
     @SerializedName("abstract")
     private String abstr;
+    private String url;
     private int citationCount;
     private int referenceCount;
     private List<AuthorResponse> authors;
@@ -53,6 +54,14 @@ public class PaperDetails {
 
     public void setAbstract(String abstr) {
         this.abstr = abstr;
+    }
+
+    public String getURL() {
+        return url;
+    }
+
+    public void setURL(String url) {
+        this.url = url;
     }
 
     public int getCitationCount() {
@@ -139,7 +148,13 @@ public class PaperDetails {
 
         bibEntry.setType(StandardEntryType.valueOf(getPublicationType()));
 
-        bibEntry.setField(StandardField.DOI, getDOI());
+        if (getDOI() != null) {
+            bibEntry.setField(StandardField.DOI, getDOI());
+        }
+
+        if (getURL() != null) {
+            bibEntry.setField(StandardField.URL, getURL());
+        }
 
         if (getAbstract() != null) {
             bibEntry.setField(StandardField.ABSTRACT, getAbstract());

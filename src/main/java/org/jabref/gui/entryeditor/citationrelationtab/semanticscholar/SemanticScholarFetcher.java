@@ -31,7 +31,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                 .append("DOI:").append(entry.getDOI().orElseThrow().getDOI())
                 .append("/").append(entry_point)
                 .append("?fields=")
-                .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract")
+                .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url")
                 .append("&limit=1000").toString();
     }
 
