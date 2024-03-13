@@ -25,18 +25,21 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
         this.importerPreferences = importerPreferences;
     }
 
+    public String getAPIUrl(String entry_point, BibEntry entry) {
+        return new StringBuilder(SEMANTIC_SCHOLAR_API)
+                .append("paper/")
+                .append("DOI:").append(entry.getDOI().orElseThrow().getDOI())
+                .append("/").append(entry_point)
+                .append("?fields=")
+                .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract")
+                .append("&limit=1000").toString();
+    }
+
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
-            StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
-                    .append("paper/")
-                    .append("DOI:").append(entry.getDOI().get().getDOI())
-                    .append("/citations")
-                    .append("?fields=")
-                    .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes")
-                    .append("&limit=1000");
             try {
-                URL citationsUrl = URI.create(urlBuilder.toString()).toURL();
+                URL citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
                 URLDownload urlDownload = new URLDownload(citationsUrl);
 
                 String apiKey = getApiKey();
@@ -59,15 +62,8 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
     @Override
     public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
-            StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
-                    .append("paper/")
-                    .append("DOI:").append(entry.getDOI().get().getDOI())
-                    .append("/references")
-                    .append("?fields=")
-                    .append("title,authors,year,citationCount,referenceCount,externalIds,publicationTypes")
-                    .append("&limit=1000");
             try {
-                URL referencesUrl = URI.create(urlBuilder.toString()).toURL();
+                URL referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
                 URLDownload urlDownload = new URLDownload(referencesUrl);
                 String apiKey = getApiKey();
                 if (!apiKey.isEmpty()) {

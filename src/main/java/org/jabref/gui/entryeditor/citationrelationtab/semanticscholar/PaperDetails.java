@@ -8,10 +8,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.gson.annotations.SerializedName;
+
 public class PaperDetails {
     private String paperId;
     private String title;
     private String year;
+
+    @SerializedName("abstract")
+    private String abstr;
     private int citationCount;
     private int referenceCount;
     private List<AuthorResponse> authors;
@@ -40,6 +45,14 @@ public class PaperDetails {
 
     public void setYear(String year) {
         this.year = year;
+    }
+
+    public String getAbstract() {
+        return abstr;
+    }
+
+    public void setAbstract(String abstr) {
+        this.abstr = abstr;
     }
 
     public int getCitationCount() {
@@ -122,6 +135,10 @@ public class PaperDetails {
         bibEntry.setType(StandardEntryType.valueOf(getPublicationType()));
 
         bibEntry.setField(StandardField.DOI, getDOI());
+
+        if (getAbstract() != null) {
+            bibEntry.setField(StandardField.ABSTRACT, getAbstract());
+        }
 
         return bibEntry;
     }
