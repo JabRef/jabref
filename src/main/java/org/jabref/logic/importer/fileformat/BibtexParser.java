@@ -174,8 +174,7 @@ public class BibtexParser implements Parser {
         StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
         int i = 0;
         int currentChar;
-        do
-        {
+        do {
             currentChar = pushbackReader.read();
             stringWriter.append((char) currentChar);
             i++;
@@ -359,7 +358,11 @@ public class BibtexParser implements Parser {
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
         } else if (comment.startsWith(MetaData.BIBDESK_STATIC_FLAG)) {
-            parseBibDeskComment(comment, meta);
+            try {
+                parseBibDeskComment(comment, meta);
+            } catch (ParseException ex) {
+                parserResult.addException(ex);
+            }
         }
     }
 
@@ -385,7 +388,7 @@ public class BibtexParser implements Parser {
     /**
      * Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
      */
-    private void parseBibDeskComment(String comment, Map<String, String> meta) {
+    private void parseBibDeskComment(String comment, Map<String, String> meta) throws ParseException {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
             // Build a document to handle the xml tags
@@ -423,7 +426,7 @@ public class BibtexParser implements Parser {
                 parsedBibdeskGroups.putIfAbsent(groupName, citationKeys);
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {
-            throw new RuntimeException(e);
+            throw new ParseException(e);
         }
     }
 
@@ -812,8 +815,7 @@ public class BibtexParser implements Parser {
         char currentChar;
 
         // Find a char which ends key (','&&'\n') or entryfield ('='):
-        do
-        {
+        do {
             currentChar = (char) read();
             key.append(currentChar);
             lookaheadUsed++;
