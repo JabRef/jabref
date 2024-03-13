@@ -1101,8 +1101,7 @@ public class BibtexParser implements Parser {
 
     private boolean consumeUncritically(char expected) throws IOException {
         int character;
-        do
-        {
+        do {
             character = read();
         } while ((character != expected) && (character != -1) && (character != 65535));
 
