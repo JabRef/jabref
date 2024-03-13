@@ -174,7 +174,8 @@ public class BibtexParser implements Parser {
         StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
         int i = 0;
         int currentChar;
-        do {
+        do
+        {
             currentChar = pushbackReader.read();
             stringWriter.append((char) currentChar);
             i++;
@@ -366,17 +367,16 @@ public class BibtexParser implements Parser {
      * Adds BibDesk group entries to the JabRef database
      */
     private void addBibDeskGroupEntriesToJabRefGroups() {
-        for (String groupName: parsedBibdeskGroups.keySet()) {
+        for (String groupName : parsedBibdeskGroups.keySet()) {
             String[] citationKeys = parsedBibdeskGroups.get(groupName).split(",");
             for (String citation : citationKeys) {
-                    Optional<BibEntry> bibEntry = database.getEntryByCitationKey(citation);
-                    Optional<String> groupValue = bibEntry.flatMap(entry -> entry.getField(StandardField.GROUPS));
-                    if (groupValue.isEmpty()) { // if the citation does not belong to a group already
-                         bibEntry.flatMap(entry -> entry.setField(StandardField.GROUPS, groupName));
-                    } else { // if the citation does belong to a group already, we concatenate
-                        String concatGroup = groupValue.get() + "," + groupName;
-                        bibEntry.flatMap(entryByCitationKey -> entryByCitationKey.setField(StandardField.GROUPS, concatGroup));
-                    }
+                Optional<BibEntry> bibEntry = database.getEntryByCitationKey(citation);
+                Optional<String> groupValue = bibEntry.flatMap(entry -> entry.getField(StandardField.GROUPS));
+                if (groupValue.isEmpty()) { // if the citation does not belong to a group already
+                    bibEntry.flatMap(entry -> entry.setField(StandardField.GROUPS, groupName));
+                } else { // if the citation does belong to a group already, we concatenate
+                    String concatGroup = groupValue.get() + "," + groupName;
+                    bibEntry.flatMap(entryByCitationKey -> entryByCitationKey.setField(StandardField.GROUPS, concatGroup));
                 }
             }
         }
@@ -384,7 +384,7 @@ public class BibtexParser implements Parser {
 
     /**
      * Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
-     * */
+     */
     private void parseBibDeskComment(String comment, Map<String, String> meta) {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
@@ -411,10 +411,9 @@ public class BibtexParser implements Parser {
                 for (int j = 0; j < keyList.getLength(); j++) {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
-                        var staticGroup = new ExplicitGroup(groupName,  GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                        var staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                         String oldValue = meta.get(MetaData.GROUPSTREE);
                         groupsTree.addSubgroup(staticGroup);
-
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
                     }
@@ -813,7 +812,8 @@ public class BibtexParser implements Parser {
         char currentChar;
 
         // Find a char which ends key (','&&'\n') or entryfield ('='):
-        do {
+        do
+        {
             currentChar = (char) read();
             key.append(currentChar);
             lookaheadUsed++;
@@ -885,7 +885,6 @@ public class BibtexParser implements Parser {
 
     /**
      * returns a new <code>StringBuilder</code> which corresponds to <code>toRemove</code> without whitespaces
-     *
      */
     private StringBuilder removeWhitespaces(StringBuilder toRemove) {
         StringBuilder result = new StringBuilder();
@@ -1100,7 +1099,8 @@ public class BibtexParser implements Parser {
 
     private boolean consumeUncritically(char expected) throws IOException {
         int character;
-        do {
+        do
+        {
             character = read();
         } while ((character != expected) && (character != -1) && (character != 65535));
 
