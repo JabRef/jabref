@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -249,7 +250,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                             try {
                                 JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
                             } catch (
-                                    java.io.IOException ex) {
+                                    IOException ex) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });
@@ -422,8 +423,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void showNodes(Node... nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(true));
     }
-
-    // Absolute-phase phenomena in photoionization with few-cycle laser pulses
 
     /**
      * Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field
