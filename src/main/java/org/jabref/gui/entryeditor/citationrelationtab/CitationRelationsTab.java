@@ -234,7 +234,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
                         Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
-                        openWeb.setTooltip(new Tooltip(Localization.lang("Go to website")));
+                        openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
                         openWeb.setOnMouseClicked(event -> {
                             String url = null;
                             if (entry.entry().getDOI().isPresent() && entry.entry().getDOI().get().getExternalURI().isPresent()) {
