@@ -21,14 +21,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.GroupSerializer;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -48,6 +50,9 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -95,7 +100,9 @@ public class BibtexParser implements Parser {
     private int line = 1;
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
-    private Map<String, String> parsedBibdeskGroups;
+    private final Map<String, String> parsedBibdeskGroups;
+    private final DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
+
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
@@ -226,19 +233,21 @@ public class BibtexParser implements Parser {
             // Try to read the entry type
             String entryType = parseTextToken().toLowerCase(Locale.ROOT).trim();
 
-            if ("preamble".equals(entryType)) {
-                database.setPreamble(parsePreamble());
-                // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
-                skipOneNewline();
-                // the preamble is saved verbatim anyway, so the text read so far can be dropped
-                dumpTextReadSoFarToString();
-            } else if ("string".equals(entryType)) {
-                parseBibtexString();
-            } else if ("comment".equals(entryType)) {
-                parseJabRefComment(meta);
-            } else {
-                // Not a comment, preamble, or string. Thus, it is an entry
-                parseAndAddEntry(entryType);
+            switch (entryType) {
+                case "preamble" -> {
+                    database.setPreamble(parsePreamble());
+                    // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
+                    skipOneNewline();
+                    // the preamble is saved verbatim anyway, so the text read so far can be dropped
+                    dumpTextReadSoFarToString();
+                }
+                case "string" ->
+                        parseBibtexString();
+                case "comment" ->
+                        parseJabRefComment(meta);
+                default ->
+                    // Not a comment, preamble, or string. Thus, it is an entry
+                        parseAndAddEntry(entryType);
             }
 
             skipWhitespace();
@@ -358,14 +367,18 @@ public class BibtexParser implements Parser {
      * Adds BibDesk group entries to the JabRef database
      * */
     private void addBibDeskGroupEntriesToJabRefGroups() {
+
+   //    List<String> citekeys = parsedBibdeskGroups.keySet().stream().flatMap(s-> Arrays.stream(s.split(","))).toList();
+
         for (String groupName: parsedBibdeskGroups.keySet()) {
             String[] citationKeys = parsedBibdeskGroups.get(groupName).split(",");
             for (String citation : citationKeys) {
                 if (database.getEntryByCitationKey(citation).isPresent()) {
+
                     String groupValue = database.getEntryByCitationKey(citation).get().getField(StandardField.GROUPS).orElse(null);
                     if (groupValue == null) { // if the citation does not belong to a group already
                         database.getEntryByCitationKey(citation).get().setField(StandardField.GROUPS, groupName);
-                    } else { // if the citation does belong to a group already, we concatinate
+                    } else { // if the citation does belong to a group already, we concatenate
                         groupValue += "," + groupName;
                         database.getEntryByCitationKey(citation).get().setField(StandardField.GROUPS, groupValue);
                     }
@@ -381,13 +394,14 @@ public class BibtexParser implements Parser {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
             // Build a document to handle the xml tags
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+            Document doc = builder.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
             doc.getDocumentElement().normalize();
 
             NodeList dictList = doc.getElementsByTagName("dict");
-            meta.putIfAbsent("databaseType", "bibtex;");
-            meta.putIfAbsent("grouping", "0 AllEntriesGroup:;");
+            meta.putIfAbsent(MetaData.DATABASE_TYPE, "bibtex;");
+            var groupsTree = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+
+            meta.putIfAbsent(MetaData.GROUPSTREE, new GroupSerializer().serializeTree(groupsTree).getFirst());
 
             // Since each static group has their own dict element, we iterate through them
             for (int i = 0; i < dictList.getLength(); i++) {
@@ -402,14 +416,17 @@ public class BibtexParser implements Parser {
                 for (int j = 0; j < keyList.getLength(); j++) {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
-                        String oldValue = meta.get("grouping"); // if there are multiple groups we concatinate to the existing String
-                        meta.put("grouping", oldValue + "1 StaticGroup:" + groupName + "\\;0\\;0\\;\\;\\;\\;;");
+                        var staticGroup = new ExplicitGroup(groupName,  GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                        String oldValue = meta.get(MetaData.GROUPSTREE);
+                        groupsTree.addSubgroup(staticGroup);
+
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
                     }
                 }
+                meta.put(MetaData.GROUPSTREE, MetaDataSerializer.serializeGroups(groupsTree));
                 // Adds the group name and citation keys to the field so all the entries can be added in the groups once parsed
-                parsedBibdeskGroups.put(groupName, citationKeys);
+                parsedBibdeskGroups.putIfAbsent(groupName, citationKeys);
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
@@ -701,14 +718,14 @@ public class BibtexParser implements Parser {
                 // it inconvenient
                 // for users if JabRef did not accept it.
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
-                    entry.setField(field, entry.getField(field).get() + " and " + content);
+                    entry.setField(field, entry.getField(field).orElse("") + " and " + content);
                 } else if (StandardField.KEYWORDS == field) {
                     // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
                 // If a BibDesk File Field is encountered
-                if (field.getName().length() > 10 && field.getName().substring(0, 10).equals("bdsk-file-")) {
+                if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) {
                     byte[] decodedBytes = Base64.getDecoder().decode(content);
                     try {
                         // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
@@ -1018,20 +1035,16 @@ public class BibtexParser implements Parser {
                     // Check for "\},\n" - Example context: `  path = {c:\temp\},\n`
                     // On Windows, it could be "\},\r\n", thus we rely in OS.NEWLINE.charAt(0) (which returns '\r' or '\n').
                     //   In all cases, we should check for '\n' as the file could be encoded with Linux line endings on Windows.
-                    if ((nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'))) {
-                        // We hit '\}\r` or `\}\n`
-                        // Heuristics: Unwanted escaping of }
-                        //
-                        // Two consequences:
-                        //
-                        // 1. Keep `\` as read
-                        //   This is already done
-                        //
-                        // 2. Treat `}` as closing bracket
-                        isClosingBracket = true;
-                    } else {
-                        isClosingBracket = false;
-                    }
+                    // We hit '\}\r` or `\}\n`
+                    // Heuristics: Unwanted escaping of }
+                    //
+                    // Two consequences:
+                    //
+                    // 1. Keep `\` as read
+                    //   This is already done
+                    //
+                    // 2. Treat `}` as closing bracket
+                    isClosingBracket = (nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'));
                 } else {
                     isClosingBracket = true;
                 }
