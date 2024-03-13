@@ -141,7 +141,7 @@ public class MetaDataSerializer {
         return stringyPattern;
     }
 
-    public static String serializeGroups(GroupTreeNode root) {
+    private static String serializeGroups(GroupTreeNode root) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(OS.NEWLINE);
 

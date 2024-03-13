@@ -27,8 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.GroupSerializer;
-import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -101,6 +99,8 @@ public class BibtexParser implements Parser {
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibdeskGroups;
+
+    private GroupTreeNode bibDeskGroupTreeNode;
     private final DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
@@ -255,9 +255,13 @@ public class BibtexParser implements Parser {
         addBibDeskGroupEntriesToJabRefGroups();
 
         try {
-            parserResult.setMetaData(metaDataParser.parse(
+            MetaData metaData = metaDataParser.parse(
                     meta,
-                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
+                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+            if (bibDeskGroupTreeNode != null) {
+                metaData.setGroups(bibDeskGroupTreeNode);
+            }
+            parserResult.setMetaData(metaData);
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -397,9 +401,7 @@ public class BibtexParser implements Parser {
 
             NodeList dictList = doc.getElementsByTagName("dict");
             meta.putIfAbsent(MetaData.DATABASE_TYPE, "bibtex;");
-            var groupsTree = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
-
-            meta.putIfAbsent(MetaData.GROUPSTREE, new GroupSerializer().serializeTree(groupsTree).getFirst());
+            bibDeskGroupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
 
             // Since each static group has their own dict element, we iterate through them
             for (int i = 0; i < dictList.getLength(); i++) {
@@ -415,13 +417,11 @@ public class BibtexParser implements Parser {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
                         var staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-                        String oldValue = meta.get(MetaData.GROUPSTREE);
-                        groupsTree.addSubgroup(staticGroup);
+                        bibDeskGroupTreeNode.addSubgroup(staticGroup);
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
                     }
                 }
-                meta.put(MetaData.GROUPSTREE, MetaDataSerializer.serializeGroups(groupsTree));
                 // Adds the group name and citation keys to the field so all the entries can be added in the groups once parsed
                 parsedBibdeskGroups.putIfAbsent(groupName, citationKeys);
             }
