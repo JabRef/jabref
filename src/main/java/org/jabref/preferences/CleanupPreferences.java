@@ -88,6 +88,7 @@ public class CleanupPreferences {
          * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
          */
         CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+        CLEAN_UP_DELETED_LINKED_FILES,
         /**
          * Converts to biblatex format
          */
