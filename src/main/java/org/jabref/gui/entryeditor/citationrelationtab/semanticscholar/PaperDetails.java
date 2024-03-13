@@ -114,8 +114,13 @@ public class PaperDetails {
     }
 
     public String getDOI() {
-        if (externalIds != null && externalIds.containsKey("DOI")) {
-            return externalIds.get("DOI");
+        if (externalIds != null) {
+            if (externalIds.containsKey("DOI")) {
+                return externalIds.get("DOI");
+            } else if (externalIds.containsKey("ArXiv")) {
+                // Some ArXiv articles don't return the DOI, even though it's easy to obtain from the ArXiv ID
+                return "10.48550/arXiv." + externalIds.get("ArXiv");
+            }
         }
         return "";
     }
