@@ -1,8 +1,10 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -68,6 +70,19 @@ public class BibEntryTypesManager {
         getEntryTypes(mode).addCustomOrModifiedType(entryType);
     }
 
+    /**
+     * Updates the internal list. In case the given entry type equals a standard type, it is removed from the list of customized types.
+     * Otherwise, it is stored as customized.
+     */
+    public void update(BibEntryType entryType, BibDatabaseMode mode) {
+        InternalEntryTypes entryTypes = getEntryTypes(mode);
+        if (entryTypes.standardTypes.contains(entryType)) {
+            entryTypes.removeCustomOrModifiedEntryType(entryType);
+        } else {
+            entryTypes.addCustomOrModifiedType(entryType);
+        }
+    }
+
     public void removeCustomOrModifiedEntryType(BibEntryType entryType, BibDatabaseMode mode) {
         getEntryTypes(mode).removeCustomOrModifiedEntryType(entryType);
     }
@@ -108,13 +123,13 @@ public class BibEntryTypesManager {
      * This class is used to specify entry types for either BIBTEX and BIBLATEX.
      */
     private static class InternalEntryTypes {
-        private final SortedSet<BibEntryType> standardTypes;
+        private final Set<BibEntryType> standardTypes;
 
         // TreeSet needs to be used here, because then, org.jabref.model.entry.BibEntryType.compareTo is used - instead of org.jabref.model.entry.BibEntryType.equals
         private final SortedSet<BibEntryType> customOrModifiedType = new TreeSet<>();
 
         private InternalEntryTypes(List<BibEntryType> standardTypes) {
-            this.standardTypes = new TreeSet<>(standardTypes);
+            this.standardTypes = new HashSet<>(standardTypes);
         }
 
         private List<BibEntryType> getAllCustomTypes() {

@@ -118,7 +118,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
 
             BibEntryType newType = new BibEntryType(type.getType(), fields, required);
-            entryTypesManager.addCustomOrModifiedType(newType, bibDatabaseMode);
+            entryTypesManager.update(newType, bibDatabaseMode);
         }
 
         for (var entryType : entryTypesToDelete) {
