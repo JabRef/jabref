@@ -15,7 +15,6 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
  * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
-
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
     ADDRESS("address"),
@@ -148,7 +147,6 @@ public enum StandardField implements Field {
     private final String name;
     private final String displayName;
     private final Set<FieldProperty> properties;
-
 
     static {
         for (StandardField field : StandardField.values()) {
