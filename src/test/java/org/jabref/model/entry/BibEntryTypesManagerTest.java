@@ -57,7 +57,7 @@ class BibEntryTypesManagerTest {
     }
 
     private BibEntryType getStandardArticleType(BibDatabaseMode mode) {
-        return entryTypesManager.getEntryTypes(mode).standardTypes.stream().filter(t -> StandardEntryType.Article.equals(t.getType())).findAny().get();
+        return entryTypesManager.getEntryTypes(mode).standardTypes.stream().filter(t -> StandardEntryType.Article == t.getType()).findAny().get();
     }
 
     @ParameterizedTest
