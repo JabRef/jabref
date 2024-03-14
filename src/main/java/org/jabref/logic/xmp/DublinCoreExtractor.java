@@ -18,7 +18,6 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.field.BiblatexApaField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -188,7 +187,7 @@ public class DublinCoreExtractor {
     private void extractSource() {
         String source = dcSchema.getSource();
         if (!StringUtil.isNullOrEmpty(source)) {
-            bibEntry.setField(BiblatexApaField.SOURCE, source);
+            bibEntry.setField(new UnknownField(DC_SOURCE), source);
         }
     }
 

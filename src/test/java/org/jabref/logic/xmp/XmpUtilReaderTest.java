@@ -85,9 +85,9 @@ class XmpUtilReaderTest {
     void readArticleDublinCoreReadXmpPartialDate() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.pdf").toURI());
         List<BibEntry> entries = xmpUtilReader.readXmp(pathPdf, xmpPreferences);
-
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.bib").toURI());
         List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
+
         expected.forEach(bibEntry -> bibEntry.setFiles(List.of(
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         ));

@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.BiblatexApaField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.BibEntryPreferences;
@@ -46,7 +45,7 @@ public class LibraryOfCongressTest {
                 .withField(new UnknownField("lccn"), "2010045158")
                 .withField(StandardField.NOTE, "Matthew West., Includes index.")
                 .withField(new UnknownField("oclc"), "ocn665135773")
-                .withField(BiblatexApaField.SOURCE, "aacr")
+                .withField(new UnknownField("source"), "aacr")
                 .withField(StandardField.TITLE, "Developing high quality data models")
                 .withField(StandardField.YEAR, "2011");
 

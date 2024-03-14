@@ -33,7 +33,6 @@ import org.jabref.logic.importer.fileformat.mods.RecordInfo;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
-import org.jabref.model.entry.field.BiblatexApaField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -423,7 +422,7 @@ public class ModsImporter extends Importer implements Parser {
         }
 
         for (String recordContent : recordContents) {
-            putIfValueNotNull(fields, BiblatexApaField.SOURCE, recordContent);
+            putIfValueNotNull(fields, new UnknownField("source"), recordContent);
         }
         putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
     }

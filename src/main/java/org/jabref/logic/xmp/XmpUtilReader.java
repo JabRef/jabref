@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class XmpUtilReader {
     public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences)
             throws IOException {
 
-        List<BibEntry> result = new ArrayList<>();
+        List<BibEntry> result = new LinkedList<>();
 
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
             List<XMPMetadata> xmpMetaList = getXmpMetadata(document);
