@@ -10,6 +10,12 @@ import java.util.StringJoiner;
 /**
  * Represents a choice between two (or more) fields or any combination of them.
  * <p>
+ * The idea of OrFields originates from BibLaTeX, where the manual lists following
+ * <br>
+ * Required fields: author, title, journaltitle, year/date
+ * <br>
+ * The class OrFields is used to model "year/date" in this case.
+ * <p>
  * Example is that a BibEntry requires either an author or an editor, but both can be present.
  */
 public class OrFields implements Comparable<OrFields> {
