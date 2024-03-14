@@ -164,12 +164,20 @@ public class BibEntryTypesManager {
         getEntryTypes(mode).clearAllCustomEntryTypes();
     }
 
+    /**
+     * Checks if the given type is NOT a standard type AND customized inside the entry types manager.
+     * There might be also types not known to the entry types manager, which are neither standard nor customized.
+     */
     public boolean isCustomType(EntryType type, BibDatabaseMode mode) {
-        return !getEntryTypes(mode).isStandardType(type);
+        return !getEntryTypes(mode).isStandardType(type) && enrich(type, mode).isPresent();
     }
 
+    /**
+     * Checks if the given type is NOT a standard type AND customized inside the entry types manager.
+     * There might be also types not known to the entry types manager, which are neither standard nor customized.
+     */
     public boolean isCustomType(BibEntryType type, BibDatabaseMode mode) {
-        return !getEntryTypes(mode).isStandardType(type);
+        return !getEntryTypes(mode).isStandardType(type) && getEntryTypes(mode).isCustomOrModifiedType(type);
     }
 
     /**
