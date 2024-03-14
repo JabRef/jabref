@@ -104,22 +104,24 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
             List<FieldViewModel> allFields = typeViewModel.fields();
 
+            BibEntryType type = typeViewModel.entryType().getValue();
+            EntryType newPlainType = type.getType();
+
             // Collect multilineFields for storage in preferences later
             multilineFields.addAll(allFields.stream()
                                             .filter(FieldViewModel::isMultiline)
-                                            .map(FieldViewModel::toField)
+                                            .map(model -> model.toField(newPlainType))
                                             .toList());
 
             List<OrFields> required = allFields.stream()
                                                .filter(FieldViewModel::isRequired)
-                                               .map(FieldViewModel::toField)
+                                               .map(model -> model.toField(newPlainType))
                                                .map(OrFields::new)
                                                .collect(Collectors.toList());
 
-            List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
+            List<BibField> fields = allFields.stream().map(model -> model.toBibField(newPlainType)).collect(Collectors.toList());
 
-            BibEntryType type = typeViewModel.entryType().getValue();
-            BibEntryType newType = new BibEntryType(type.getType(), fields, required);
+            BibEntryType newType = new BibEntryType(newPlainType, fields, required);
 
             entryTypesManager.update(newType, bibDatabaseMode);
         }
