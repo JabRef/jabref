@@ -140,7 +140,8 @@ public class Launcher {
                 "level", isDebugEnabled ? "debug" : "info",
                 "writerFile", "rolling file",
                 "writerFile.level", isDebugEnabled ? "debug" : "info",
-                "writerFile.file", directory.resolve("log_{date:yyyy-MM-dd_HH-mm-ss}.txt").toString(),
+                // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
+                "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
                 "writerFile.charset", "UTF-8",
                 "writerFile.policies", "startup",
                 "writerFile.backups", "30");
