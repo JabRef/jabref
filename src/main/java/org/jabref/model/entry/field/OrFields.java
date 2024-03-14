@@ -16,7 +16,7 @@ import java.util.StringJoiner;
  * <br>
  * The class OrFields is used to model "year/date" in this case.
  * <p>
- * Example is that a BibEntry requires either an author or an editor, but both can be be present.
+ * Example is that a BibEntry requires either an author or an editor, but both can be present.
  */
 public class OrFields implements Comparable<OrFields> {
 
