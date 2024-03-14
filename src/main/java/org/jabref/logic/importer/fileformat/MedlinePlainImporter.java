@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.BiblatexApaField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -159,7 +160,7 @@ public class MedlinePlainImporter extends Importer {
                 hashMap.put("GS", new UnknownField("gene-symbol"));
                 hashMap.put("GN", StandardField.NOTE);
                 hashMap.put("GR", new UnknownField("grantno"));
-                hashMap.put("SO", new UnknownField("source"));
+                hashMap.put("SO", BiblatexApaField.SOURCE);
                 hashMap.put("NR", new UnknownField("number-of-references"));
                 hashMap.put("SFM", new UnknownField("space-flight-mission"));
                 hashMap.put("STAT", new UnknownField("status"));

@@ -33,6 +33,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.BiblatexApaField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -235,7 +236,7 @@ public class MedlineImporter extends Importer implements Parser {
             fields.put(new UnknownField("pubtype"), String.join(", ", publicationTypeList));
         }
         if (!articleTitleList.isEmpty()) {
-            fields.put(new UnknownField("article"), String.join(", ", articleTitleList));
+            fields.put(BiblatexApaField.ARTICLE, String.join(", ", articleTitleList));
         }
     }
 
