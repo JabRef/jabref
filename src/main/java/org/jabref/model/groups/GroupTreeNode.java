@@ -197,6 +197,10 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return result;
     }
 
+    /**
+     * Get the name of the underlying group
+     * @return String the name of the group
+     */
     public String getName() {
         return group.getName();
     }

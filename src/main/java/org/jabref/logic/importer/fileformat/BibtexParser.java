@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,6 +65,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_QUOTE_CHAR;
+import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYPE_SUFFIX;
 
 /**
  * Class for importing BibTeX-files.
@@ -259,7 +263,23 @@ public class BibtexParser implements Parser {
                     meta,
                     importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
             if (bibDeskGroupTreeNode != null) {
-                metaData.setGroups(bibDeskGroupTreeNode);
+                metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
+                          var existingGroups = meta.get(MetaData.GROUPSTREE);
+                            // We only have one Group BibDeskGroup with n children
+                            // instead of iterating through the whole group structure every time we just search in the metadata for the group name
+                            var groupsToAdd = bibDeskGroupTreeNode.getChildren()
+                                                                  .stream().
+                                                                  filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)));
+                            groupsToAdd.forEach(existingGroupTree::addChild);
+
+                        },
+                        // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
+                        () -> {
+                            GroupTreeNode rootNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+                            bibDeskGroupTreeNode.moveTo(rootNode);
+                            metaData.setGroups(rootNode);
+                        }
+                );
             }
             parserResult.setMetaData(metaData);
         } catch (ParseException exception) {
@@ -313,7 +333,6 @@ public class BibtexParser implements Parser {
         } catch (IOException ex) {
             // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
-
             LOGGER.warn("Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry."));
@@ -381,7 +400,8 @@ public class BibtexParser implements Parser {
                 Optional<String> groupValue = bibEntry.flatMap(entry -> entry.getField(StandardField.GROUPS));
                 if (groupValue.isEmpty()) { // if the citation does not belong to a group already
                     bibEntry.flatMap(entry -> entry.setField(StandardField.GROUPS, groupName));
-                } else { // if the citation does belong to a group already, we concatenate
+                } else if (!groupValue.get().contains(groupName)) {
+                    // if the citation does belong to a group already and is not yet assigned to the same group, we concatenate
                     String concatGroup = groupValue.get() + "," + groupName;
                     bibEntry.flatMap(entryByCitationKey -> entryByCitationKey.setField(StandardField.GROUPS, concatGroup));
                 }
@@ -401,7 +421,7 @@ public class BibtexParser implements Parser {
 
             NodeList dictList = doc.getElementsByTagName("dict");
             meta.putIfAbsent(MetaData.DATABASE_TYPE, "bibtex;");
-            bibDeskGroupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+            bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup("BibDeskGroups", GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
 
             // Since each static group has their own dict element, we iterate through them
             for (int i = 0; i < dictList.getLength(); i++) {

@@ -89,6 +89,10 @@ public class BibDatabaseDiff {
                 }
             }
 
+            // Prevent IndexOutOfBoundException
+            if (newEntries.isEmpty()) {
+                return differences;
+            }
             BibEntry bestEntry = newEntries.get(bestMatchIndex);
             if (bestMatch > MATCH_THRESHOLD
                     || hasEqualCitationKey(originalEntry, bestEntry)
