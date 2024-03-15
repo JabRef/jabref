@@ -20,6 +20,8 @@ public class NormalizeNamesFormatterTest {
     @Test
     public void normalizeAuthorList() {
         assertEquals("{Society of Automotive Engineers}", formatter.format("{Society of Automotive Engineers}"));
+        assertEquals("{Company Name, LLC}", formatter.format("{Company Name, LLC}"));
+
         assertEquals("Bilbo, Staci D.", formatter.format("Staci D Bilbo"));
         assertEquals("Bilbo, Staci D.", formatter.format("Staci D. Bilbo"));
 
