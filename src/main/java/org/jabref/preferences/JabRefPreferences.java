@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -835,10 +836,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT.getName());
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
-        // Entry editor tab 2: Comments Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
-
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
 
@@ -1508,7 +1505,7 @@ public class JabRefPreferences implements PreferencesService {
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
 
         if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            // Nothing set, so we use the default values
+            // Nothing set (or wrong configuration), then we use default values
             tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
             tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
         }
@@ -1543,8 +1540,8 @@ public class JabRefPreferences implements PreferencesService {
         getEntryEditorTabs();
     }
 
-    private Map<String, Set<Field>> getDefaultEntryEditorTabs() {
-        Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
+    private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
+        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
 
         int defNumber = 0;
         while (true) {
