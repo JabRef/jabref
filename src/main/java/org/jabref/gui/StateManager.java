@@ -59,6 +59,8 @@ public class StateManager {
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
+    private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
+    private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.getValue().progressProperty(), task.getValue().runningProperty()});
@@ -108,6 +110,14 @@ public class StateManager {
         return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
     }
 
+    public OptionalObjectProperty<SearchQuery> activeGlobalSearchQueryProperty() {
+        return activeGlobalSearchQuery;
+    }
+
+    public IntegerProperty getGlobalSearchResultSize() {
+        return globalSearchResultSize;
+    }
+
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
         return activeGroups.getReadOnlyProperty();
     }
@@ -153,6 +163,14 @@ public class StateManager {
 
     public void setSearchQuery(SearchQuery searchQuery) {
         activeSearchQuery.setValue(Optional.of(searchQuery));
+    }
+
+    public void clearGlobalSearchQuery() {
+        activeGlobalSearchQuery.setValue(Optional.empty());
+    }
+
+    public void setGlobalSearchQuery(SearchQuery searchQuery) {
+        activeGlobalSearchQuery.setValue(Optional.of(searchQuery));
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {
