@@ -49,6 +49,11 @@ public class BibDatabaseDiff {
     private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries, BibDatabaseMode mode) {
         List<BibEntryDiff> differences = new ArrayList<>();
 
+        // Prevent IndexOutOfBoundException
+        if (newEntries.isEmpty()) {
+            return differences;
+        }
+
         // Create a HashSet where we can put references to entries in the new
         // database that we have matched. This is to avoid matching them twice.
         Set<Integer> used = new HashSet<>(newEntries.size());
@@ -87,11 +92,6 @@ public class BibDatabaseDiff {
                         bestMatchIndex = i;
                     }
                 }
-            }
-
-            // Prevent IndexOutOfBoundException
-            if (newEntries.isEmpty()) {
-                return differences;
             }
             BibEntry bestEntry = newEntries.get(bestMatchIndex);
             if (bestMatch > MATCH_THRESHOLD
