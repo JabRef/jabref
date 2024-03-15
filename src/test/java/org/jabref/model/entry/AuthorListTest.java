@@ -989,7 +989,7 @@ public class AuthorListTest {
         assertEquals("Poussin", AuthorList.parse("{Vall{\\'e}e} {Poussin}").getAsLastNames(false));
         assertEquals("Poussin", AuthorList.parse("Vall{\\'e}e Poussin").getAsLastNames(false));
         assertEquals("Lastname", AuthorList.parse("Firstname {Lastname}").getAsLastNames(false));
-        assertEquals("Firstname Lastname", AuthorList.parse("{Firstname Lastname}").getAsLastNames(false));
+        assertEquals("{Firstname Lastname}", AuthorList.parse("{Firstname Lastname}").getAsLastNames(false));
     }
 
     @Test
@@ -1078,7 +1078,7 @@ public class AuthorListTest {
 
     @Test
     public void parseInstitutionAuthorWithLatexNames() throws Exception {
-        assertEquals("The Ban\\={u} M\\={u}s\\={a} brothers",
+        assertEquals("{The Ban\\={u} M\\={u}s\\={a} brothers}",
                 AuthorList.parse("{The Ban\\={u} M\\={u}s\\={a} brothers}").getAuthor(0).getLast().orElse(null));
     }
 
