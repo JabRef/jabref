@@ -193,7 +193,7 @@ public class Author {
     }
 
     /**
-     * Removes start and end brace at a string
+     * Removes start and end brace both at the complete string and at beginning/end of a word
      * <p>
      * E.g.,
      * <ul>
