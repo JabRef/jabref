@@ -771,13 +771,13 @@ public class AuthorListTest {
     @Test
     public void companyAuthor() {
         Author author = AuthorList.parse("{JabRef Developers}").getAuthor(0);
-        Author expected = new Author(null, null, null, "JabRef Developers", null);
+        Author expected = new Author(null, null, null, "{JabRef Developers}", null);
         assertEquals(expected, author);
     }
 
     @Test
     public void companyAuthorAndPerson() {
-        Author company = new Author(null, null, null, "JabRef Developers", null);
+        Author company = new Author(null, null, null, "{JabRef Developers}", null);
         Author person = new Author("Stefan", "S.", null, "Kolb", null);
         assertEquals(Arrays.asList(company, person), AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthors());
     }
@@ -785,7 +785,7 @@ public class AuthorListTest {
     @Test
     public void companyAuthorWithLowerCaseWord() {
         Author author = AuthorList.parse("{JabRef Developers on Fire}").getAuthor(0);
-        Author expected = new Author(null, null, null, "JabRef Developers on Fire", null);
+        Author expected = new Author(null, null, null, "{JabRef Developers on Fire}", null);
         assertEquals(expected, author);
     }
 
@@ -985,7 +985,7 @@ public class AuthorListTest {
     @Test
     public void removeStartAndEndBraces() {
         assertEquals("{A}bbb{c}", AuthorList.parse("{A}bbb{c}").getAsLastNames(false));
-        assertEquals("Vall{\\'e}e Poussin", AuthorList.parse("{Vall{\\'e}e Poussin}").getAsLastNames(false));
+        assertEquals("{Vall{\\'e}e Poussin}", AuthorList.parse("{Vall{\\'e}e Poussin}").getAsLastNames(false));
         assertEquals("Poussin", AuthorList.parse("{Vall{\\'e}e} {Poussin}").getAsLastNames(false));
         assertEquals("Poussin", AuthorList.parse("Vall{\\'e}e Poussin").getAsLastNames(false));
         assertEquals("Lastname", AuthorList.parse("Firstname {Lastname}").getAsLastNames(false));
