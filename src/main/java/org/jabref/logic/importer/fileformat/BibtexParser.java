@@ -92,6 +92,7 @@ public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
 
     private static final Integer LOOKAHEAD = 1024;
+    public static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
@@ -271,7 +272,6 @@ public class BibtexParser implements Parser {
                                                                   .stream().
                                                                   filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)));
                             groupsToAdd.forEach(existingGroupTree::addChild);
-
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
                         () -> {
@@ -421,7 +421,7 @@ public class BibtexParser implements Parser {
 
             NodeList dictList = doc.getElementsByTagName("dict");
             meta.putIfAbsent(MetaData.DATABASE_TYPE, "bibtex;");
-            bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup("BibDeskGroups", GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
+            bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup(BIB_DESK_ROOT_GROUP_NAME, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
 
             // Since each static group has their own dict element, we iterate through them
             for (int i = 0; i < dictList.getLength(); i++) {

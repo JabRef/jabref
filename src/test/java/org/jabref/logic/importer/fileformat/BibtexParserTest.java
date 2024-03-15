@@ -31,6 +31,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
+import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -64,6 +65,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
+import static org.jabref.logic.importer.fileformat.BibtexParser.BIB_DESK_ROOT_GROUP_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -74,7 +76,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
  * <p>
- * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
+ * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#sparseAndAddEntry(String)}
  */
 class BibtexParserTest {
 
@@ -1436,19 +1438,21 @@ class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
         assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
-        assertEquals(2, root.getNumberOfChildren());
+        assertEquals(Optional.of(BIB_DESK_ROOT_GROUP_NAME), root.getFirstChild().map(GroupTreeNode::getName));
 
         ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
         firstTestGroupExpected.setExpanded(true);
-        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+
+        assertEquals(Optional.of(firstTestGroupExpected), root.getFirstChild().flatMap(TreeNode::getFirstChild).map(GroupTreeNode::getGroup));
 
         ExplicitGroup secondTestGroupExpected = new ExplicitGroup("secondTestGroup", GroupHierarchyType.INDEPENDENT, ',');
         secondTestGroupExpected.setExpanded(true);
-        assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
+        assertEquals(Optional.of(secondTestGroupExpected), root.getFirstChild().flatMap(TreeNode::getLastChild).map(GroupTreeNode::getGroup));
 
         BibDatabase db = result.getDatabase();
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(db.getEntries()));
-        assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Heyl:2023aa").get()));
+
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntries(),true).stream().map(GroupTreeNode::getGroup).toList());
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
     }
 
     /**
