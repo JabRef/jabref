@@ -3,7 +3,6 @@ package org.jabref.logic.openoffice.style;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
@@ -19,6 +18,8 @@ import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 import org.jabref.model.openoffice.style.PageInfo;
 import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 class OOBibStyleGetCitationMarker {
 
@@ -87,12 +88,9 @@ class OOBibStyleGetCitationMarker {
      *          - andString  is only emitted if nAuthors is at least 2.
      */
     private static String formatAuthorList(OOBibStyle style,
-                                           AuthorList authorList,
+                                           @NonNull AuthorList authorList,
                                            int maxAuthors,
                                            String andString) {
-
-        Objects.requireNonNull(authorList);
-
         // Apparently maxAuthorsBeforeEtAl is always 1 for in-text citations.
         // In reference lists can be for example 7,
         // (https://www.chicagomanualofstyle.org/turabian/turabian-author-date-citation-quick-guide.html)
@@ -224,12 +222,9 @@ class OOBibStyleGetCitationMarker {
      * field (or alias) from {@code fields} found in {@code entry}.
      * Return {@code Optional.empty()} if found nothing.
      */
-    private static Optional<FieldAndContent> getRawCitationMarkerField(BibEntry entry,
-                                                                       BibDatabase database,
-                                                                       OrFields fields) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(database, "database cannot be null");
-
+    private static Optional<FieldAndContent> getRawCitationMarkerField(@NonNull BibEntry entry,
+                                                                       @NonNull BibDatabase database,
+                                                                       @NonNull OrFields fields) {
         for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
             Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
             final boolean foundSomething = optionalContent.isPresent()
@@ -264,10 +259,8 @@ class OOBibStyleGetCitationMarker {
      *
      */
     private static String getCitationMarkerField(OOBibStyle style,
-                                                 CitationLookupResult db,
+                                                 @NonNull CitationLookupResult db,
                                                  OrFields fields) {
-        Objects.requireNonNull(db);
-
         Optional<FieldAndContent> optionalFieldAndContent =
             getRawCitationMarkerField(db.entry, db.database, fields);
 
