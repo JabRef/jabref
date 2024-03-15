@@ -39,7 +39,7 @@ public class Author {
      * @param jrPart        the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
      */
     public Author(String firstPart, String firstAbbr, String vonPart, String lastPart, String jrPart) {
-        boolean keepBracesAtLastPart = (firstPart == null) && (firstAbbr == null) && (vonPart == null) && (lastPart != null) && (jrPart == null);
+        boolean keepBracesAtLastPart = StringUtil.isBlank(firstPart) && StringUtil.isBlank(firstAbbr) && StringUtil.isBlank(vonPart) && !StringUtil.isBlank(lastPart) && StringUtil.isBlank(jrPart);
 
         this.firstPart = addDotIfAbbreviation(removeStartAndEndBraces(firstPart));
         this.firstAbbr = removeStartAndEndBraces(firstAbbr);

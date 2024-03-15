@@ -29,9 +29,11 @@ class AuthorListParserTest {
                 Arguments.of("Nu{\\~{n}}ez, Jose", new Author("Jose", "J.", null, "Nu{\\~{n}}ez", null)),
                 // parseAuthorWithFirstNameAbbreviationContainingUmlaut
                 Arguments.of("{\\OE}rjan Umlauts", new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
-                Arguments.of("{Company Name, LLC}", new Author("", "", null, "Company Name, LLC", null)),
+                Arguments.of("{Company Name, LLC}", new Author("", "", null, "{Company Name, LLC}", null)),
                 Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null)),
-                Arguments.of("Society of Automotive Engineers", new Author("", "", null, "Society of Automotive Engineers", null))
+
+                // Demonstrate the "von" part parsing of a non-braced name
+                Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null))
         );
     }
 
