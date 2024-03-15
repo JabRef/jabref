@@ -1,7 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,67 +14,52 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class RemoveBracesFormatterTest {
 
-    private RemoveBracesFormatter formatter;
+    private RemoveBracesFormatter formatter = new RemoveBracesFormatter();
 
-    @BeforeEach
-    public void setUp() {
-        formatter = new RemoveBracesFormatter();
+    @ParameterizedTest
+    @MethodSource
+    public void format(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
-    @Test
-    public void formatRemovesSingleEnclosingBraces() {
-        assertEquals("test", formatter.format("{test}"));
-    }
+    private static Stream<Arguments> format() {
+        return Stream.of(
+                // formatRemovesSingleEnclosingBraces
+                Arguments.of("test", "{test}"),
 
-    @Test
-    public void formatKeepsUnmatchedBracesAtBeginning() {
-        assertEquals("{test", formatter.format("{test"));
-    }
+                // formatKeepsUnmatchedBracesAtBeginning
+                Arguments.of("{test", "{test"),
 
-    @Test
-    public void formatKeepsUnmatchedBracesAtEnd() {
-        assertEquals("test}", formatter.format("test}"));
-    }
+                // formatKeepsUnmatchedBracesAtEnd
+                Arguments.of("test}", "test}"),
 
-    @Test
-    public void formatKeepsShortString() {
-        assertEquals("t", formatter.format("t"));
-    }
+                // formatKeepsShortString
+                Arguments.of("t", "t"),
 
-    @Test
-    public void formatRemovesBracesOnly() {
-        assertEquals("", formatter.format("{}"));
-    }
+                // formatRemovesBracesOnly
+                Arguments.of("", "{}"),
 
-    @Test
-    public void formatKeepsEmptyString() {
-        assertEquals("", formatter.format(""));
-    }
+                // formatKeepsEmptyString
+                Arguments.of("", ""),
 
-    @Test
-    public void formatRemovesDoubleEnclosingBraces() {
-        assertEquals("test", formatter.format("{{test}}"));
-    }
+                // formatRemovesDoubleEnclosingBraces
+                Arguments.of("test", "{{test}}"),
 
-    @Test
-    public void formatRemovesTripleEnclosingBraces() {
-        assertEquals("test", formatter.format("{{{test}}}"));
-    }
+                // formatRemovesTripleEnclosingBraces
+                Arguments.of("test", "{{{test}}}"),
 
-    @Test
-    public void formatKeepsNonMatchingBraces() {
-        assertEquals("{A} and {B}", formatter.format("{A} and {B}"));
-    }
+                // formatKeepsNonMatchingBraces
+                Arguments.of("{A} and {B}", "{A} and {B}"),
 
-    @Test
-    public void formatRemovesOnlyMatchingBraces() {
-        assertEquals("{A} and {B}", formatter.format("{{A} and {B}}"));
-    }
+                // formatRemovesOnlyMatchingBraces
+                Arguments.of("{A} and {B}", "{{A} and {B}}"),
 
-    @Test
-    public void formatDoesNotRemoveBracesInBrokenString() {
-        // We opt here for a conservative approach although one could argue that "A} and {B}" is also a valid return
-        assertEquals("{A} and {B}}", formatter.format("{A} and {B}}"));
+                // formatDoesNotRemoveBracesInBrokenString
+                Arguments.of("{A} and {B}}", "{A} and {B}}"),
+
+                Arguments.of("Vall{\\'e}e Poussin", "{Vall{\\'e}e Poussin}"),
+                Arguments.of("Vall{\\'e}e Poussin", "Vall{\\'e}e Poussin")
+        );
     }
 
     @Test
