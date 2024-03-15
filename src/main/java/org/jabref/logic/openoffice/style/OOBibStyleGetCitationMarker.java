@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -22,6 +23,8 @@ import org.jabref.model.strings.StringUtil;
 import org.jspecify.annotations.NonNull;
 
 class OOBibStyleGetCitationMarker {
+
+    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
     private OOBibStyleGetCitationMarker() {
     }
@@ -49,7 +52,7 @@ class OOBibStyleGetCitationMarker {
                 stringBuilder.append(' ');
             }
             // last name if it exists
-            stringBuilder.append(author.getLast().orElse(""));
+            stringBuilder.append(author.getLast().map(last -> REMOVE_BRACES_FORMATTER.format(last)).orElse(""));
         }
 
         return stringBuilder.toString();
@@ -226,7 +229,8 @@ class OOBibStyleGetCitationMarker {
                                                                        @NonNull BibDatabase database,
                                                                        @NonNull OrFields fields) {
         for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
-            Optional<String> optionalContent = entry.getResolvedFieldOrAliasLatexFree(field, database);
+            // NOT LaTeX free, because there is some latextohtml in org.jabref.logic.openoffice.style.OOPreFormatter
+            Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
             final boolean foundSomething = !StringUtil.isBlank(optionalContent);
             if (foundSomething) {
                 return Optional.of(new FieldAndContent(field, optionalContent.get()));
