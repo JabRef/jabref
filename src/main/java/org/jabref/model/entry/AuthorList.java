@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.importer.AuthorListParser;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This is an immutable class representing information of either <CODE>author</CODE> or <CODE>editor</CODE> field in bibtex record.
  * <p>
@@ -169,16 +171,11 @@ public class AuthorList {
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList parse(final String authors) {
-        Objects.requireNonNull(authors);
-
-        AuthorList authorList = AUTHOR_CACHE.get(authors);
-        if (authorList == null) {
+    public static AuthorList parse(@NonNull final String authors) {
+        return AUTHOR_CACHE.computeIfAbsent(authors, string -> {
             AuthorListParser parser = new AuthorListParser();
-            authorList = parser.parse(authors);
-            AUTHOR_CACHE.put(authors, authorList);
-        }
-        return authorList;
+            return parser.parse(string);
+        });
     }
 
     /**

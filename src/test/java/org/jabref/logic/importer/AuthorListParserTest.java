@@ -28,7 +28,8 @@ class AuthorListParserTest {
                 Arguments.of("Uhlenhaut, N Henriette", new Author("N Henriette", "N. H.", null, "Uhlenhaut", null)),
                 Arguments.of("Nu{\\~{n}}ez, Jose", new Author("Jose", "J.", null, "Nu{\\~{n}}ez", null)),
                 // parseAuthorWithFirstNameAbbreviationContainingUmlaut
-                Arguments.of("{\\OE}rjan Umlauts", new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null))
+                Arguments.of("{\\OE}rjan Umlauts", new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
+                Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null))
         );
     }
 
