@@ -14,21 +14,21 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
-public class OptionalFields2Tab extends OptionalFieldsTabBase {
+public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
 
     public static final String NAME = "Optional fields 2";
 
-    public OptionalFields2Tab(BibDatabaseContext databaseContext,
-                              SuggestionProviders suggestionProviders,
-                              UndoManager undoManager,
-                              DialogService dialogService,
-                              PreferencesService preferences,
-                              StateManager stateManager,
-                              ThemeManager themeManager,
-                              IndexingTaskManager indexingTaskManager,
-                              BibEntryTypesManager entryTypesManager,
-                              TaskExecutor taskExecutor,
-                              JournalAbbreviationRepository journalAbbreviationRepository) {
+    public DetailOptionalFieldsTab(BibDatabaseContext databaseContext,
+                                   SuggestionProviders suggestionProviders,
+                                   UndoManager undoManager,
+                                   DialogService dialogService,
+                                   PreferencesService preferences,
+                                   StateManager stateManager,
+                                   ThemeManager themeManager,
+                                   IndexingTaskManager indexingTaskManager,
+                                   BibEntryTypesManager entryTypesManager,
+                                   TaskExecutor taskExecutor,
+                                   JournalAbbreviationRepository journalAbbreviationRepository) {
         super(
                 Localization.lang("Optional fields 2"),
                 false,

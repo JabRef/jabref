@@ -188,4 +188,10 @@ class BibEntryTypesManagerTest {
 
         assertEquals(overwrittenStandardType.getOptionalFields(), type.get().getOptionalFields());
     }
+
+    @Test
+    void translatorDetailOptionalAtArticle() {
+        BibEntryType entryType = entryTypesManager.enrich(StandardEntryType.Article, BibDatabaseMode.BIBLATEX).get();
+        assertTrue(entryType.getDetailOptionalFields().contains(StandardField.TRANSLATOR));
+    }
 }
