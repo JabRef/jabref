@@ -29,19 +29,29 @@ public class Author {
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
+     * <p>
+     * In case only the last part is passed, enclosing braces are
      *
-     * @param first     the first name of the author (may consist of several tokens, like "Charles Louis Xavier Joseph" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
-     * @param firstabbr the abbreviated first name of the author (may consist of several tokens, like "C. L. X. J." in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin"). It is a responsibility of the caller to create a reasonable abbreviation of the first name.
-     * @param von       the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
-     * @param last      the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
-     * @param jr        the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
+     * @param firstPart     the first name of the author (may consist of several tokens, like "Charles Louis Xavier Joseph" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     * @param firstAbbr the abbreviated first name of the author (may consist of several tokens, like "C. L. X. J." in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin"). It is a responsibility of the caller to create a reasonable abbreviation of the first name.
+     * @param vonPart       the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     * @param lastPart      the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     * @param jrPart        the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
      */
-    public Author(String first, String firstabbr, String von, String last, String jr) {
-        firstPart = addDotIfAbbreviation(removeStartAndEndBraces(first));
-        firstAbbr = removeStartAndEndBraces(firstabbr);
-        vonPart = removeStartAndEndBraces(von);
-        lastPart = removeStartAndEndBraces(last);
-        jrPart = removeStartAndEndBraces(jr);
+    public Author(String firstPart, String firstAbbr, String vonPart, String lastPart, String jrPart) {
+        boolean keepBracesAtLastPart = (firstPart == null) && (firstAbbr == null) && (vonPart == null) && (lastPart != null) && (jrPart == null);
+
+        this.firstPart = addDotIfAbbreviation(removeStartAndEndBraces(firstPart));
+        this.firstAbbr = removeStartAndEndBraces(firstAbbr);
+        this.vonPart = removeStartAndEndBraces(vonPart);
+        if (keepBracesAtLastPart) {
+            // We do not remove braces here to keep institutions protected
+            // https://github.com/JabRef/jabref/issues/10031
+            this.lastPart = lastPart;
+        } else {
+            this.lastPart = removeStartAndEndBraces(lastPart);
+        }
+        this.jrPart = removeStartAndEndBraces(jrPart);
     }
 
     public static String addDotIfAbbreviation(String name) {
