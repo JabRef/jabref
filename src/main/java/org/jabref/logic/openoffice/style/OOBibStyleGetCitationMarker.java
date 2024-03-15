@@ -226,9 +226,8 @@ class OOBibStyleGetCitationMarker {
                                                                        @NonNull BibDatabase database,
                                                                        @NonNull OrFields fields) {
         for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
-            Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
-            final boolean foundSomething = optionalContent.isPresent()
-                                            && !optionalContent.get().trim().isEmpty();
+            Optional<String> optionalContent = entry.getResolvedFieldOrAliasLatexFree(field, database);
+            final boolean foundSomething = !StringUtil.isBlank(optionalContent);
             if (foundSomething) {
                 return Optional.of(new FieldAndContent(field, optionalContent.get()));
             }
