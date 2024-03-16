@@ -90,9 +90,8 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
  */
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
-
     private static final Integer LOOKAHEAD = 1024;
-    public static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
+    private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;

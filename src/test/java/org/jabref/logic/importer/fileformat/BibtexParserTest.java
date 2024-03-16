@@ -65,7 +65,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
-import static org.jabref.logic.importer.fileformat.BibtexParser.BIB_DESK_ROOT_GROUP_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -79,7 +78,7 @@ import static org.mockito.Mockito.when;
  * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#sparseAndAddEntry(String)}
  */
 class BibtexParserTest {
-
+    private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
 
@@ -1451,7 +1450,7 @@ class BibtexParserTest {
 
         BibDatabase db = result.getDatabase();
 
-        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntries(),true).stream().map(GroupTreeNode::getGroup).toList());
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntries(), true).stream().map(GroupTreeNode::getGroup).toList());
         assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
     }
 
