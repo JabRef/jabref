@@ -288,4 +288,15 @@ public class DOITest {
     public void rejectMissingDividerInShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("10gf4gqc end"));
     }
+
+    @Test
+    public void acceptEncodedDoiUrl() {
+        assertEquals("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2").getDOI());
+        assertEquals("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").getDOI());
+    }
+
+    @Test
+    public void rejectNullDoiParameter() {
+        assertThrows(NullPointerException.class, () -> new DOI(null));
+    }
 }
