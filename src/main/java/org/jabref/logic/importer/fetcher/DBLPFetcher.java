@@ -68,7 +68,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
                 List.of(
                         new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
-                        // unescape the the contents of the URL field, e.g., some\_url\_part becomes some_url_part
+                        // unescape the contents of the URL field, e.g., some\_url\_part becomes some_url_part
                         new FieldFormatterCleanup(StandardField.URL, new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter()))
                 ));
         cleanups.applySaveActions(entry);

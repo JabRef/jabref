@@ -27,10 +27,10 @@ import org.jabref.preferences.PreferencesService;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
-    private final boolean isPrimaryOptionalFields;
+    private final boolean isImportantOptionalFields;
 
     public OptionalFieldsTabBase(String title,
-                                 boolean isPrimaryOptionalFields,
+                                 boolean isImportantOptionalFields,
                                  BibDatabaseContext databaseContext,
                                  SuggestionProviders suggestionProviders,
                                  UndoManager undoManager,
@@ -54,7 +54,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 journalAbbreviationRepository,
                 indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
-        this.isPrimaryOptionalFields = isPrimaryOptionalFields;
+        this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
@@ -65,10 +65,10 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
-            if (isPrimaryOptionalFields) {
-                return entryType.get().getPrimaryOptionalFields();
+            if (isImportantOptionalFields) {
+                return entryType.get().getImportantOptionalFields();
             } else {
-                return entryType.get().getSecondaryOptionalNotDeprecatedFields(mode);
+                return entryType.get().getDetailOptionalNotDeprecatedFields(mode);
             }
         } else {
             // Entry type unknown -> treat all fields as required (thus no optional fields)

@@ -123,6 +123,24 @@ public class DOITest {
                 Arguments.of("10/gf4gqc", DOI.parse("�https : \n  ␛ / / doi.org / \t 10 / \r gf4gqc�␛").get().getDOI()),
                 Arguments.of("10/gf4gqc", DOI.parse(" 10 / gf4gqc ").get().getDOI()),
                 Arguments.of("10.3218/3846-0", DOI.parse(" �10.3218\n/384␛6-0�").get().getDOI()),
+                // parse DOI with backslashes
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/978-3-030-02671-4\\_7").get().getDOI()),
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/\\978-3-03\\0-02671-4\\_7").get().getDOI()),
+                Arguments.of("https://doi.org/10.1007/978-3-030-02671-4_7", DOI.parse("https://doi.org/10.\\\\1007/9\\\\78-3\\\\-030-026\\\\\\71-4_7").get().getURIAsASCIIString()),
+                // parse DOI with {}
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9{}78{-3{-03{0-0}}}26}{71-4}_7").get().getDOI()),
+                // parse DOI with `
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9`78`-3`-03`0-0``26````71-4}_7").get().getDOI()),
+                // parse DOI with |
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9||78|-3|-03|0-0|26|71-4|||_7").get().getDOI()),
+                // parse DOI with ~
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9~~~78~-3~-03~0-0~26~71-4~_7").get().getDOI()),
+                // parse DOI with []
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/][9[][]78-3-03[[]0-02671-4_7").get().getDOI()),
+                // parse DOI with ^
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("^^^10.10^07/978-3^-0^30-02671-4_7").get().getDOI()),
+                // parse DOI with special characters
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1^00^^7/9|~^]`7^8-3~[[[]]-0^3]~0-0~26``71-4~||_7").get().getDOI()),
                 // parse already-cleaned DOI
                 Arguments.of("10.3218/3846-0", DOI.parse("10.3218/3846-0").get().getDOI()),
 

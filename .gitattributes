@@ -11,5 +11,4 @@ gradlew text eol=lf
 *.java text eol=lf
 *.properties text eol=lf
 
-# disable after a release (otherwise, duplicate CHANGELOG.md entries will be generated)
-# CHANGELOG.md merge=union
+CHANGELOG.md merge=union

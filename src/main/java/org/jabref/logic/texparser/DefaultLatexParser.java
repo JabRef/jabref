@@ -76,7 +76,7 @@ public class DefaultLatexParser implements LatexParser {
         List<Path> referencedFiles = new ArrayList<>();
 
         for (Path file : latexFiles) {
-            if (!file.toFile().exists()) {
+            if (!Files.exists(file)) {
                 LOGGER.error("File does not exist: {}", file);
                 continue;
             }
@@ -141,7 +141,7 @@ public class DefaultLatexParser implements LatexParser {
                                 ? bibString
                                 : "%s%s".formatted(bibString, BIB_EXT));
 
-                if (bibFile.toFile().exists()) {
+                if (Files.exists(bibFile)) {
                     latexParserResult.addBibFile(file, bibFile);
                 }
             }
@@ -160,7 +160,7 @@ public class DefaultLatexParser implements LatexParser {
                     ? filenamePassedToInclude
                     : "%s%s".formatted(filenamePassedToInclude, TEX_EXT);
             Path nestedFile = texFile.getParent().resolve(texFileName);
-            if (nestedFile.toFile().exists() && !texFiles.contains(nestedFile)) {
+            if (Files.exists(nestedFile) && !texFiles.contains(nestedFile)) {
                 referencedFiles.add(nestedFile);
             }
         }

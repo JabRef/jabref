@@ -15,7 +15,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
@@ -89,14 +88,12 @@ public class FieldEditors {
             } else {
                 return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             }
-        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
-        } else if (fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine, undoManager);
         } else if (StandardField.KEYWORDS == field) {
-            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {

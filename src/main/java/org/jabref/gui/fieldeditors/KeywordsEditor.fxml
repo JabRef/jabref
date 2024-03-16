@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import com.dlsc.gemsfx.TagsField?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.KeywordsEditor" >
+    <TagsField fx:id="keywordTagsField" HBox.hgrow="ALWAYS"/>
+</fx:root>
