@@ -339,8 +339,8 @@ public class ImportHandler {
                failures.add(Localization.lang("String constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
             }
         }
-        if(! failures.isEmpty()){
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not import the following string constants:\n %0", String.join("\n", failures)));
+        if(!failures.isEmpty()){
+            dialogService.showWarningDialogAndWait(Localization.lang("Importing String constants"),Localization.lang("Could not import the following string constants:\n %0", String.join("\n", failures)));
         }
     }
 

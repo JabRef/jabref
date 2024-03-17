@@ -18,6 +18,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.preferences.FilePreferences;
@@ -90,7 +91,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
                 .map(this::fromBibtexStringViewModel)
                 .toList();
         strings.forEach(string -> string.setParsedSerialization("@String{" +
-                string.getName() + " = " + string.getContent() + "}\n"));
+                string.getName() + " = " + string.getContent() + "}"+ OS.NEWLINE));
         databaseContext.getDatabase().setStrings(strings);
     }
 
