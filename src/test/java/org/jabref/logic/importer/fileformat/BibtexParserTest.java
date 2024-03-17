@@ -75,7 +75,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
  * <p>
- * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#sparseAndAddEntry(String)}
+ * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
  */
 class BibtexParserTest {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
