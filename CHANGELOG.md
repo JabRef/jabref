@@ -91,7 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Short DOI formatter now checks, if the value is already formatted. If so, it returns the value instead of calling the ShortDOIService again. [#10589](https://github.com/JabRef/jabref/issues/10589)
 - We upgraded to JavaFX 21.0.1. As a consequence JabRef requires now macOS 11 or later and GTK 3.8 or later on Linux [10627](https://github.com/JabRef/jabref/pull/10627).
 - A user-specific comment fields is not enabled by default, but can be enabled using the "Add" button. [#10424](https://github.com/JabRef/jabref/issues/10424)
-- We upgraded to Lucene 9.9 for the fulltext search. The search index will be rebuilt. [#10686](https://github.com/JabRef/jabref/pull/10686)
+- We upgraded to Lucene 9.9 for the fulltext search. The search index will be rebuild. [#10686](https://github.com/JabRef/jabref/pull/10686)
 - When using "Copy..." -> "Copy citation key", the delimiter configured at "Push applications" is respected. [#10707](https://github.com/JabRef/jabref/pull/10707)
 
 ### Fixed
