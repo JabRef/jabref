@@ -4,9 +4,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,7 +13,6 @@ import javafx.scene.input.Clipboard;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
@@ -28,7 +25,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +39,7 @@ public class ClipBoardManagerTest {
         // create preference service mock
         PreferencesService preferencesService = mock(PreferencesService.class);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
-        List<Field> fields = Arrays.asList(StandardField.URL);
+        List<Field> fields = List.of(StandardField.URL);
         ObservableList<Field> nonWrappableFields = FXCollections.observableArrayList(fields);
         // set up mock behaviours for preferences service
         when(fieldPreferences.getNonWrappableFields()).thenReturn(nonWrappableFields);
@@ -57,9 +53,8 @@ public class ClipBoardManagerTest {
         clipboardPrimary.setContents(selection, selection);
 
         // create mock entry manager and set up behaviour for mock
-        entryTypesManager = mock(BibEntryTypesManager.class);
-        BibEntryType entryTypeMock = mock(BibEntryType.class);
-        when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
+        entryTypesManager = new BibEntryTypesManager();
+
         // initialize a clipBoardManager
         clipBoardManager = new ClipBoardManager(clipboard, clipboardPrimary, preferencesService);
     }
