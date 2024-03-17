@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -44,8 +43,8 @@ public class MSBibExportFormatFilesTest {
             return stream.map(n -> n.getFileName().toString())
                          .filter(n -> n.endsWith(".bib"))
                          .filter(n -> n.startsWith("MsBib"))
-                         .collect(Collectors.toList())
-                         .stream();
+                         // mapping required, because we get "source already consumed or closed" otherwise
+                         .toList().stream();
         }
     }
 
@@ -75,7 +74,7 @@ public class MSBibExportFormatFilesTest {
         String expected = String.join("\n", Files.readAllLines(expectedFile));
         String actual = String.join("\n", Files.readAllLines(exportedFile));
 
-        // The order of elements changes from Windows to Travis environment somehow
+        // The order of the XML elements changes from Windows to Travis environment somehow
         // The order does not really matter, so we ignore it.
         // Source: https://stackoverflow.com/a/16540679/873282
         assertThat(expected, isSimilarTo(actual)
