@@ -1,8 +1,11 @@
 package org.jabref.logic.msbib;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.model.entry.Author;
 
 public class MsBibAuthor {
+
+    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
     private String firstName;
     private String middleName;
@@ -45,7 +48,7 @@ public class MsBibAuthor {
     }
 
     public String getLastName() {
-        return author.getLastOnly();
+        return REMOVE_BRACES_FORMATTER.format(author.getLastOnly());
     }
 
     public String getFirstLast() {
