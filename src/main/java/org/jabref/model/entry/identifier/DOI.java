@@ -1,6 +1,5 @@
 package org.jabref.model.entry.identifier;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -125,12 +124,8 @@ public class DOI implements Identifier {
 
         // HTTP URL decoding
         if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {
-            try {
-                // decodes path segment
-                trimmedDoi = java.net.URLDecoder.decode(trimmedDoi, StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalArgumentException(doi + " is not a valid HTTP DOI/Short DOI.");
-            }
+            // decodes path segment
+            trimmedDoi = URLDecoder.decode(trimmedDoi, StandardCharsets.UTF_8);
         }
 
         // Extract DOI/Short DOI

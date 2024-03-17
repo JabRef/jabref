@@ -161,6 +161,11 @@ public class DOITest {
                 // ? -> (%3F)
                 Arguments.of("https://doi.org/10.1006/rwei.1999%3F.0001",
                         new DOI("https://doi.org/10.1006/rwei.1999%3F.0001").getURIAsASCIIString()),
+                Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").getDOI()),
+                // <,> -> (%3C, %3E)
+
+                // acceptDoiWithSpecialCharacters
+                Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2").getDOI()),
 
                 // constructCorrectURLForDoi
                 // add / to RESOLVER url if missing
@@ -305,12 +310,6 @@ public class DOITest {
     @Test
     public void rejectMissingDividerInShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("10gf4gqc end"));
-    }
-
-    @Test
-    public void acceptEncodedDoiUrl() {
-        assertEquals("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2").getDOI());
-        assertEquals("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").getDOI());
     }
 
     @Test
