@@ -88,10 +88,10 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     @Override
     public void storeSettings() {
         List<BibtexString> strings = stringsListProperty.stream()
-                .map(this::fromBibtexStringViewModel)
-                .toList();
+                                                        .map(this::fromBibtexStringViewModel)
+                                                        .toList();
         strings.forEach(string -> string.setParsedSerialization("@String{" +
-                string.getName() + " = " + string.getContent() + "}"+ OS.NEWLINE));
+                string.getName() + " = " + string.getContent() + "}" + OS.NEWLINE));
         databaseContext.getDatabase().setStrings(strings);
     }
 
