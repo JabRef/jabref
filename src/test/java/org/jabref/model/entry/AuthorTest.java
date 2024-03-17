@@ -74,7 +74,7 @@ class AuthorTest {
 
     @Test
     void bracesKept() {
-        assertEquals(Optional.of("{Company Name, LLC}"), new Author("", "", null, "{Company Name, LLC}", null).getLast());
+        assertEquals(Optional.of("{Company Name, LLC}"), new Author("", "", null, "{Company Name, LLC}", null).getFamilyName());
     }
 
     @ParameterizedTest

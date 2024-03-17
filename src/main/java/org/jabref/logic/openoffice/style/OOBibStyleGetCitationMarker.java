@@ -46,13 +46,13 @@ class OOBibStyleGetCitationMarker {
         if (authorList.getNumberOfAuthors() > number) {
             Author author = authorList.getAuthor(number);
             // "von " if von exists
-            Optional<String> von = author.getVon();
+            Optional<String> von = author.getNamePrefix();
             if (von.isPresent() && !von.get().isEmpty()) {
                 stringBuilder.append(von.get());
                 stringBuilder.append(' ');
             }
             // last name if it exists
-            stringBuilder.append(author.getLast().map(last -> REMOVE_BRACES_FORMATTER.format(last)).orElse(""));
+            stringBuilder.append(author.getFamilyName().map(last -> REMOVE_BRACES_FORMATTER.format(last)).orElse(""));
         }
 
         return stringBuilder.toString();
