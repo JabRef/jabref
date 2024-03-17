@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +40,7 @@ public class MsBibImporter extends Importer {
      */
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader); // Required by test case
         Document docin;
         try {
             DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
@@ -68,6 +70,7 @@ public class MsBibImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader); // Required by test case
         MSBibDatabase dbase = new MSBibDatabase();
         return new ParserResult(dbase.importEntriesFromXml(reader));
     }
