@@ -54,6 +54,7 @@ public class StateManager {
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
+    private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
@@ -89,6 +90,10 @@ public class StateManager {
 
     public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {
         return activeDatabase;
+    }
+
+    public OptionalObjectProperty<LibraryTab> activeTabProperty() {
+        return activeTab;
     }
 
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
