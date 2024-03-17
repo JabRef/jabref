@@ -107,8 +107,7 @@ public class FileFieldParser {
                 } else if (charactersOfCurrentElement.length() == 1 && value.charAt(i + 1) == '\\') {
                     charactersOfCurrentElement.append(c);
                     windowsPath = true;
-                }
-                else {
+                } else {
                     // We are in the next LinkedFile data element
                     linkedFileData.add(charactersOfCurrentElement.toString());
                     resetDataStructuresForNextElement();
