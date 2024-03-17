@@ -325,17 +325,22 @@ public class ImportHandler {
     }
 
     public void importStringConstantsWithDuplicateCheck(List<BibtexString> stringConstants) {
+        List<String> failures = new ArrayList<>();
+
         for (BibtexString stringConstantToAdd : stringConstants) {
             try {
                 ConstantsItemModel checker = new ConstantsItemModel(stringConstantToAdd.getName(), stringConstantToAdd.getContent());
                 if (checker.combinedValidationValidProperty().get()) {
                     bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
                 } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant \"%0\" was not added because it is not a valid string constant", stringConstantToAdd.getName()));
+                    failures.add(Localization.lang("String constant \"%0\" was not imported because it is not a valid string constant", stringConstantToAdd.getName()));
                 }
             } catch (KeyCollisionException ex) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Pasted string constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
+               failures.add(Localization.lang("String constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
             }
+        }
+        if(! failures.isEmpty()){
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not import the following string constants:\n %0", String.join("\n", failures)));
         }
     }
 
@@ -377,7 +382,7 @@ public class ImportHandler {
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info("Found DOI identifer in clipboard");
+        LOGGER.info("Found DOI identifier in clipboard");
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
