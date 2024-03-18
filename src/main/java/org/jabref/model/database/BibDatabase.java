@@ -371,7 +371,6 @@ public class BibDatabase {
      * Get all strings used in the entries.
      */
     public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
-        List<BibtexString> result = new ArrayList<>();
         Set<String> allUsedIds = new HashSet<>();
 
         // All entries
@@ -386,11 +385,7 @@ public class BibDatabase {
             resolveContent(preamble, new HashSet<>(), allUsedIds);
         }
 
-        for (String stringId : allUsedIds) {
-            result.add((BibtexString) bibtexStrings.get(stringId).clone());
-        }
-
-        return result;
+        return allUsedIds.stream().map(bibtexStrings::get).toList();
     }
 
     /**
