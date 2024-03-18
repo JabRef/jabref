@@ -163,6 +163,31 @@ public class CffImporterTest {
         assertEquals(preferredEntry, expectedPreferred);
     }
 
+    @Test
+    public void importEntriesReferences() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterReferences.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+        BibEntry mainEntry = bibEntries.getFirst();
+        BibEntry referenceEntry1 = bibEntries.get(1);
+        BibEntry referenceEntry2 = bibEntries.getLast();
+
+        BibEntry expectedMain = getPopulatedEntry();
+        BibEntry expectedReference1 = new BibEntry(StandardEntryType.InProceedings);
+        expectedReference1.setField(StandardField.AUTHOR, "Jonathan von Duke and Jim Kingston, Jr.");
+        expectedReference1.setField(StandardField.YEAR, "2007");
+        expectedReference1.setField(StandardField.DOI, "10.0001/TEST");
+        expectedReference1.setField(StandardField.URL, "www.example.com");
+
+        BibEntry expectedReference2 = new BibEntry(StandardEntryType.Manual);
+        expectedReference2.setField(StandardField.AUTHOR, "Arthur Clark, Jr. and Luca von Diamond");
+        expectedReference2.setField(StandardField.DOI, "10.0002/TEST");
+        expectedReference2.setField(StandardField.URL, "www.facebook.com");
+
+        assertEquals(mainEntry, expectedMain);
+        assertEquals(referenceEntry1, expectedReference1);
+        assertEquals(referenceEntry2, expectedReference2);
+    }
+
     public BibEntry getPopulatedEntry() {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Software);

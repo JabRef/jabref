@@ -53,13 +53,16 @@ public class CffImporter extends Importer {
         private final HashMap<String, String> values = new HashMap<>();
 
         @JsonProperty("authors")
-        private List<CffAuthor> authors;
+        private List<CffEntity> authors;
 
         @JsonProperty("identifiers")
         private List<CffIdentifier> ids;
 
         @JsonProperty("preferred-citation")
-        private CffPreferredCitation citation;
+        private CffReference citation;
+
+        @JsonProperty("references")
+        private List<CffReference> references;
 
         @JsonProperty("keywords")
         private List<String> keywords;
@@ -73,10 +76,22 @@ public class CffImporter extends Importer {
         }
     }
 
-    private static class CffAuthor {
+    private static class CffEntity {
         private final HashMap<String, String> values = new HashMap<>();
 
-        public CffAuthor() {
+        public CffEntity() {
+        }
+
+        @JsonAnySetter
+        private void setValues(String key, String value) {
+            values.put(key, value);
+        }
+    }
+
+    private static class CffConference {
+        private final HashMap<String, String> values = new HashMap<>();
+
+        public CffConference() {
         }
 
         @JsonAnySetter
@@ -95,16 +110,55 @@ public class CffImporter extends Importer {
         }
     }
 
-    private static class CffPreferredCitation {
+    private static class CffReference {
         private final HashMap<String, String> values = new HashMap<>();
+
+        @JsonProperty("authors")
+        private List<CffEntity> authors;
+
+        @JsonProperty("conference")
+        private CffConference conference;
+
+        @JsonProperty("contact")
+        private CffEntity contact;
+
+        @JsonProperty("editors")
+        private List<CffEntity> editors;
+
+        @JsonProperty("editors-series")
+        private List<CffEntity> editorsSeries;
+
+        @JsonProperty("database-provider")
+        private CffEntity databaseProvider;
+
+        @JsonProperty("institution")
+        private CffEntity institution;
+
+        @JsonProperty("keywords")
+        private List<String> keywords;
+
+        @JsonProperty("languages")
+        private List<String> languages;
+
+        @JsonProperty("location")
+        private CffEntity location;
+
+        @JsonProperty("publisher")
+        private CffEntity publisher;
+
+        @JsonProperty("recipients")
+        private List<CffEntity> recipients;
+
+        @JsonProperty("senders")
+        private List<CffEntity> senders;
+
+        @JsonProperty("translators")
+        private List<CffEntity> translators;
 
         @JsonProperty("type")
         private String type;
 
-        @JsonProperty("authors")
-        private List<CffAuthor> authors;
-
-        public CffPreferredCitation() {
+        public CffReference() {
         }
 
         @JsonAnySetter
@@ -185,6 +239,8 @@ public class CffImporter extends Importer {
             for (Map.Entry<String, String> property : citation.citation.values.entrySet()) {
                 if (fieldMap.containsKey(property.getKey())) {
                     preferredEntryMap.put(fieldMap.get(property.getKey()), property.getValue());
+                } else if (getUnmappedFields().contains(property.getKey())) {
+                    entryMap.put(new UnknownField(property.getKey()), property.getValue());
                 }
             }
 
@@ -194,6 +250,24 @@ public class CffImporter extends Importer {
             entriesList.add(preferredEntry);
         }
 
+        // Handle `references` field
+        if (citation.references != null) {
+            for (CffReference ref : citation.references) {
+                HashMap<Field, String> refEntryMap = new HashMap<>();
+                EntryType refEntryType = typeMap.getOrDefault(ref.type, StandardEntryType.Article);
+                for (Map.Entry<String, String> property : ref.values.entrySet()) {
+                    if (fieldMap.containsKey(property.getKey())) {
+                        refEntryMap.put(fieldMap.get(property.getKey()), property.getValue());
+                    } else if (getUnmappedFields().contains(property.getKey())) {
+                        entryMap.put(new UnknownField(property.getKey()), property.getValue());
+                    }
+                }
+                refEntryMap.put(StandardField.AUTHOR, parseAuthors(ref.authors));
+                BibEntry refEntry = new BibEntry(refEntryType);
+                refEntry.setField(refEntryMap);
+                entriesList.add(refEntry);
+            }
+        }
         return new ParserResult(entriesList);
     }
 
@@ -213,25 +287,72 @@ public class CffImporter extends Importer {
 
     private HashMap<String, Field> getFieldMappings() {
         HashMap<String, Field> fieldMappings = new HashMap<>();
-        fieldMappings.put("title", StandardField.TITLE);
-        fieldMappings.put("version", StandardField.VERSION);
-        fieldMappings.put("doi", StandardField.DOI);
-        fieldMappings.put("license", BiblatexSoftwareField.LICENSE);
-        fieldMappings.put("repository", BiblatexSoftwareField.REPOSITORY);
-        fieldMappings.put("url", StandardField.URL);
         fieldMappings.put("abstract", StandardField.ABSTRACT);
-        fieldMappings.put("message", StandardField.COMMENT);
         fieldMappings.put("date-released", StandardField.DATE);
+        fieldMappings.put("doi", StandardField.DOI);
         fieldMappings.put("keywords", StandardField.KEYWORDS);
+        fieldMappings.put("license", BiblatexSoftwareField.LICENSE);
+        fieldMappings.put("message", StandardField.COMMENT);
+        fieldMappings.put("repository", BiblatexSoftwareField.REPOSITORY);
+        fieldMappings.put("title", StandardField.TITLE);
+        fieldMappings.put("url", StandardField.URL);
+        fieldMappings.put("version", StandardField.VERSION);
 
-        // specific to preferred-citation
-        fieldMappings.put("month", StandardField.MONTH);
-        fieldMappings.put("year", StandardField.YEAR);
-        fieldMappings.put("journal", StandardField.JOURNAL);
+        // specific to references and preferred-citation
+        fieldMappings.put("edition", StandardField.EDITION);
+        fieldMappings.put("isbn", StandardField.ISBN);
+        fieldMappings.put("issn", StandardField.ISSN);
         fieldMappings.put("issue", StandardField.ISSUE);
-        fieldMappings.put("volume", StandardField.VOLUME);
+        fieldMappings.put("journal", StandardField.JOURNAL);
+        fieldMappings.put("month", StandardField.MONTH);
+        fieldMappings.put("notes", StandardField.NOTE);
         fieldMappings.put("number", StandardField.NUMBER);
+        fieldMappings.put("pages", StandardField.PAGES);
+        fieldMappings.put("status", StandardField.PUBSTATE);
+        fieldMappings.put("volume", StandardField.VOLUME);
+        fieldMappings.put("year", StandardField.YEAR);
         return fieldMappings;
+    }
+
+    private List<String> getUnmappedFields() {
+        List<String> fields = new ArrayList<>();
+
+        fields.add("abbreviation");
+        fields.add("collection-doi");
+        fields.add("collection-title");
+        fields.add("collection-type");
+        fields.add("commit");
+        fields.add("copyright");
+        fields.add("data-type");
+        fields.add("database");
+        fields.add("date-accessed");
+        fields.add("date-downloaded");
+        fields.add("date-published");
+        fields.add("department");
+        fields.add("end");
+        fields.add("entry");
+        fields.add("filename");
+        fields.add("format");
+        fields.add("issue-date");
+        fields.add("issue-title");
+        fields.add("license-url");
+        fields.add("loc-end");
+        fields.add("loc-start");
+        fields.add("medium");
+        fields.add("nihmsid");
+        fields.add("number-volumes");
+        fields.add("patent-states");
+        fields.add("pmcid");
+        fields.add("repository-artifact");
+        fields.add("repository-code");
+        fields.add("scope");
+        fields.add("section");
+        fields.add("start");
+        fields.add("term");
+        fields.add("thesis-type");
+        fields.add("volume-title");
+        fields.add("year-original");
+        return fields;
     }
 
     private HashMap<String, EntryType> getTypeMappings() {
@@ -249,18 +370,7 @@ public class CffImporter extends Importer {
         return typeMappings;
     }
 
-    private List<String> getUnmappedFields() {
-        List<String> fields = new ArrayList<>();
-
-        fields.add("commit");
-        fields.add("license-url");
-        fields.add("repository-code");
-        fields.add("repository-artifact");
-
-        return fields;
-    }
-
-    private String parseAuthors(List<CffAuthor> authors) {
+    private String parseAuthors(List<CffEntity> authors) {
         return authors.stream()
                       .map(author -> author.values)
                       .map(vals -> vals.get("name") != null ?
