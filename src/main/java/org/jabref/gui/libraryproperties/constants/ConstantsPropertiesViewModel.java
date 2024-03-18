@@ -1,9 +1,9 @@
 package org.jabref.gui.libraryproperties.constants;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -18,6 +18,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.preferences.FilePreferences;
@@ -86,9 +87,12 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        databaseContext.getDatabase().setStrings(stringsListProperty.stream()
-                                                                    .map(this::fromBibtexStringViewModel)
-                                                                    .collect(Collectors.toList()));
+        List<BibtexString> strings = stringsListProperty.stream()
+                                                        .map(this::fromBibtexStringViewModel)
+                                                        .toList();
+        strings.forEach(string -> string.setParsedSerialization("@String{" +
+                string.getName() + " = " + string.getContent() + "}" + OS.NEWLINE));
+        databaseContext.getDatabase().setStrings(strings);
     }
 
     private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {

@@ -15,7 +15,6 @@ public class ReplaceStringAction extends SimpleCommand {
     public ReplaceStringAction(Supplier<LibraryTab> tabSupplier, StateManager stateManager, DialogService dialogService) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
-
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
