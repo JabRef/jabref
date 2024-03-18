@@ -370,9 +370,13 @@ public class BibDatabase {
     /**
      * Get all strings used in the entries.
      */
-    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
-        List<BibtexString> result = new ArrayList<>();
+    public List<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
         Set<String> allUsedIds = new HashSet<>();
+
+        // Preamble
+        if (preamble != null) {
+            resolveContent(preamble, new HashSet<>(), allUsedIds);
+        }
 
         // All entries
         for (BibEntry entry : entries) {
@@ -381,16 +385,7 @@ public class BibDatabase {
             }
         }
 
-        // Preamble
-        if (preamble != null) {
-            resolveContent(preamble, new HashSet<>(), allUsedIds);
-        }
-
-        for (String stringId : allUsedIds) {
-            result.add((BibtexString) bibtexStrings.get(stringId).clone());
-        }
-
-        return result;
+        return allUsedIds.stream().map(bibtexStrings::get).toList();
     }
 
     /**
@@ -459,7 +454,7 @@ public class BibDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    LOGGER.info("Stopped due to circular reference in strings: " + label);
+                    LOGGER.info("Stopped due to circular reference in strings: {}", label);
                     return label;
                 }
                 // If not, log this string's ID now.

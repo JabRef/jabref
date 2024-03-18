@@ -572,7 +572,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Return the LaTeX-free contents of the given field or its alias an an Optional
+     * Return the LaTeX-free contents of the given field or its alias an Optional
      * <p>
      * For details see also {@link #getFieldOrAlias(Field)}
      *

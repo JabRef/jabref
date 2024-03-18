@@ -18,6 +18,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -40,7 +41,9 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -311,10 +314,33 @@ public class ImportHandler {
     public List<BibEntry> handleBibTeXData(String entries) {
         BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
-            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            Collection<BibtexString> stringConstants = parser.getStringValues();
+            importStringConstantsWithDuplicateCheck(stringConstants);
+            return result;
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
             return Collections.emptyList();
+        }
+    }
+
+    public void importStringConstantsWithDuplicateCheck(Collection<BibtexString> stringConstants) {
+        List<String> failures = new ArrayList<>();
+
+        for (BibtexString stringConstantToAdd : stringConstants) {
+            try {
+                ConstantsItemModel checker = new ConstantsItemModel(stringConstantToAdd.getName(), stringConstantToAdd.getContent());
+                if (checker.combinedValidationValidProperty().get()) {
+                    bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
+                } else {
+                    failures.add(Localization.lang("String constant \"%0\" was not imported because it is not a valid string constant", stringConstantToAdd.getName()));
+                }
+            } catch (KeyCollisionException ex) {
+                failures.add(Localization.lang("String constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
+            }
+        }
+        if (!failures.isEmpty()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Importing String constants"), Localization.lang("Could not import the following string constants:\n %0", String.join("\n", failures)));
         }
     }
 
@@ -356,7 +382,7 @@ public class ImportHandler {
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info("Found DOI identifer in clipboard");
+        LOGGER.info("Found DOI identifier in clipboard");
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }

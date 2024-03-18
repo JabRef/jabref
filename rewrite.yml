@@ -103,8 +103,6 @@ recipeList:
   - org.openrewrite.java.migrate.lang.StringFormatted
   - org.openrewrite.java.migrate.util.SequencedCollection
 
-  - org.openrewrite.java.recipes.UseJavaParserBuilderInJavaTemplate
-
   - org.openrewrite.java.RemoveObjectsIsNull
   - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 

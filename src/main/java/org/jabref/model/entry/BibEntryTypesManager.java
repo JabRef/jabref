@@ -18,7 +18,12 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BibEntryTypesManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryTypesManager.class);
+
     private final InternalEntryTypes BIBTEX_ENTRYTYPES = new InternalEntryTypes(
             Stream.concat(BibtexEntryTypeDefinitions.ALL.stream(), IEEETranEntryTypeDefinitions.ALL.stream())
                   .collect(Collectors.toList()));
@@ -132,6 +137,7 @@ public class BibEntryTypesManager {
                                                                       .filter(typeEquals(type))
                                                                       .findFirst();
             if (enrichedType.isPresent()) {
+                LOGGER.debug("Using customized entry type for {}", type.getName());
                 return enrichedType;
             } else {
                 return standardTypes.stream()

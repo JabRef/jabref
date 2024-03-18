@@ -140,7 +140,7 @@ class BibEntryTypesManagerTest {
 
     @ParameterizedTest
     @EnumSource(BibDatabaseMode.class)
-    void sModifyingArticle(BibDatabaseMode mode) {
+    void modifyingArticle(BibDatabaseMode mode) {
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -155,7 +155,7 @@ class BibEntryTypesManagerTest {
 
     @ParameterizedTest
     @EnumSource(BibDatabaseMode.class)
-    void sModifyingArticleWithParsing(BibDatabaseMode mode) {
+    void modifyingArticleWithParsing(BibDatabaseMode mode) {
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -173,7 +173,7 @@ class BibEntryTypesManagerTest {
 
     @ParameterizedTest
     @EnumSource(BibDatabaseMode.class)
-    void sModifyingArticleWithParsingKeepsListOrder(BibDatabaseMode mode) {
+    void modifyingArticleWithParsingKeepsListOrder(BibDatabaseMode mode) {
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -187,5 +187,11 @@ class BibEntryTypesManagerTest {
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
 
         assertEquals(overwrittenStandardType.getOptionalFields(), type.get().getOptionalFields());
+    }
+
+    @Test
+    void translatorDetailOptionalAtArticle() {
+        BibEntryType entryType = entryTypesManager.enrich(StandardEntryType.Article, BibDatabaseMode.BIBLATEX).get();
+        assertTrue(entryType.getDetailOptionalFields().contains(StandardField.TRANSLATOR));
     }
 }
