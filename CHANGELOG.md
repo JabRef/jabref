@@ -49,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
 - We store the citation relations in an LRU cache to avoid bloating the memory and out-of-memory exceptions. [#10958](https://github.com/JabRef/jabref/issues/10958)
 - Keywords filed are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
+- Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
 
 ### Fixed
 
