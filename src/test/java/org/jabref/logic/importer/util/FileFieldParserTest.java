@@ -203,6 +203,16 @@ class FileFieldParserTest {
                 Arguments.of(
                         Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "", "https://arxiv.org/pdf/1109.0517.pdf")),
                         ":matheus.ea explicit.pdf::https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // Absolute path
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
+                        ":A:\\Zotero\\storage\\test.pdf"
+                ),
+                // zotero absolute path
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
+                        "A:\\Zotero\\storage\\test.pdf"
                 )
         );
     }
