@@ -48,6 +48,7 @@ public class MetaData {
     public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
+    public static final String BIBDESK_STATIC_FLAG = "BibDesk Static Groups";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
