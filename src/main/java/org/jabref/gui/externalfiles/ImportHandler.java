@@ -315,7 +315,7 @@ public class ImportHandler {
         BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
             List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
-            List<BibtexString> stringConstants = parser.getStringValues();
+            Collection<BibtexString> stringConstants = parser.getStringValues();
             importStringConstantsWithDuplicateCheck(stringConstants);
             return result;
         } catch (ParseException ex) {
@@ -324,7 +324,7 @@ public class ImportHandler {
         }
     }
 
-    public void importStringConstantsWithDuplicateCheck(List<BibtexString> stringConstants) {
+    public void importStringConstantsWithDuplicateCheck(Collection<BibtexString> stringConstants) {
         List<String> failures = new ArrayList<>();
 
         for (BibtexString stringConstantToAdd : stringConstants) {

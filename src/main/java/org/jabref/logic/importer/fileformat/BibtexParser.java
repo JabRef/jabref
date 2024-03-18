@@ -144,8 +144,8 @@ public class BibtexParser implements Parser {
         }
     }
 
-    public List<BibtexString> getStringValues() {
-        return database.getStringValues().stream().toList();
+    public Collection<BibtexString> getStringValues() {
+        return database.getStringValues();
     }
 
     public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {

@@ -454,7 +454,7 @@ public class BibDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    LOGGER.info("Stopped due to circular reference in strings: " + label);
+                    LOGGER.info("Stopped due to circular reference in strings: {}", label);
                     return label;
                 }
                 // If not, log this string's ID now.
