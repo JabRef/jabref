@@ -497,6 +497,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private List<BibtexString> getUsedStringValues(List<BibEntry> entries) {
-        return database.getDatabase().getUsedStrings(entries).stream().toList();
+        return database.getDatabase().getUsedStrings(entries);
     }
 }

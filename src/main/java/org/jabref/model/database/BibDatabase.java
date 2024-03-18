@@ -370,19 +370,19 @@ public class BibDatabase {
     /**
      * Get all strings used in the entries.
      */
-    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
+    public List<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
         Set<String> allUsedIds = new HashSet<>();
+
+        // Preamble
+        if (preamble != null) {
+            resolveContent(preamble, new HashSet<>(), allUsedIds);
+        }
 
         // All entries
         for (BibEntry entry : entries) {
             for (String fieldContent : entry.getFieldValues()) {
                 resolveContent(fieldContent, new HashSet<>(), allUsedIds);
             }
-        }
-
-        // Preamble
-        if (preamble != null) {
-            resolveContent(preamble, new HashSet<>(), allUsedIds);
         }
 
         return allUsedIds.stream().map(bibtexStrings::get).toList();
