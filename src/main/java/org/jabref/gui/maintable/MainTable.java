@@ -260,10 +260,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (!selectedEntries.isEmpty()) {
             List<BibtexString> stringConstants = getUsedStringValues(selectedEntries);
             try {
-                if (!stringConstants.isEmpty()) {
-                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
-                } else {
+                if (stringConstants.isEmpty()) {
                     clipBoardManager.setContent(selectedEntries, entryTypesManager);
+                } else {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
                 }
                 dialogService.notify(Localization.lang("Copied %0 entry(ies)", selectedEntries.size()));
             } catch (IOException e) {
