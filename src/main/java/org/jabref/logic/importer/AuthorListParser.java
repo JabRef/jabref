@@ -6,13 +6,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class AuthorListParser {
 
@@ -94,9 +95,7 @@ public class AuthorListParser {
      * @param listOfNames the String containing the person names to be parsed
      * @return a parsed list of persons
      */
-    public AuthorList parse(String listOfNames) {
-        Objects.requireNonNull(listOfNames);
-
+    public AuthorList parse(@NonNull String listOfNames) {
         // Handling of "and others"
         // Remove it from the list; it will be added at the very end of this method as special Author.OTHERS
         listOfNames = listOfNames.trim();

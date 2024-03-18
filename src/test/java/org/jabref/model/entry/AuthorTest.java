@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -68,6 +70,11 @@ class AuthorTest {
     @Test
     void addDotIfAbbreviationEndsWithDoubleAbbreviation() {
         assertEquals("Ameli A. A.", Author.addDotIfAbbreviation("Ameli AA"));
+    }
+
+    @Test
+    void bracesKept() {
+        assertEquals(Optional.of("{Company Name, LLC}"), new Author("", "", null, "{Company Name, LLC}", null).getFamilyName());
     }
 
     @ParameterizedTest

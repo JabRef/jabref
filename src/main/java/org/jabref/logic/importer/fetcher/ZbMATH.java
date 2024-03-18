@@ -71,7 +71,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             // replace "and" by ";" as citation matching API uses ";" for separation
             AuthorList authors = AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());
             String authorsWithSemicolon = authors.getAuthors().stream()
-                                                 .map(author -> author.getLastFirst(false))
+                                                 .map(author -> author.getFamilyGiven(false))
                                                  .collect(Collectors.joining(";"));
             uriBuilder.addParameter("a", authorsWithSemicolon);
         }

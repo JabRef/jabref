@@ -9,7 +9,7 @@ plugins {
 
     id 'me.champeau.jmh' version '0.7.2'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.14'
+    id 'org.javamodularity.moduleplugin' version '1.8.15'
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
@@ -114,8 +114,8 @@ dependencies {
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
     implementation 'org.apache.pdfbox:pdfbox:3.0.1'
-    implementation 'org.apache.pdfbox:fontbox:3.0.1'
-    implementation ('org.apache.pdfbox:xmpbox:3.0.1') {
+    implementation 'org.apache.pdfbox:fontbox:3.0.2'
+    implementation ('org.apache.pdfbox:xmpbox:3.0.2') {
         exclude group: 'org.junit.jupiter'
     }
 
@@ -177,7 +177,7 @@ dependencies {
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.2.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.4.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
@@ -196,14 +196,14 @@ dependencies {
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.9'
     // route all requests to log4j to SLF4J
-    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.0'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
 
     implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
         exclude group: 'org.antlr'
     }
 
     // jakarta.activation is already dependency of glassfish
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.1'
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.3'
 
     implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
@@ -228,7 +228,7 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.5'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.5'
-    implementation 'org.glassfish.hk2:hk2-api:3.0.6'
+    implementation 'org.glassfish.hk2:hk2-api:3.1.0'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
@@ -242,7 +242,10 @@ dependencies {
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation 'org.jspecify:jspecify:0.3.0'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.165'
+    // parse plist files
+    implementation 'com.googlecode.plist:dd-plist:1.28'
+
+    testImplementation 'io.github.classgraph:classgraph:4.8.168'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 
