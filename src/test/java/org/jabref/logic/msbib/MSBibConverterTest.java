@@ -1,7 +1,5 @@
 package org.jabref.logic.msbib;
 
-import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -30,13 +28,9 @@ class MSBibConverterTest {
             .withField(StandardField.TITLE, "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers")
             .withField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7886910:PDF");
 
-    private BibEntry entry;
-
     @Test
     void convert() {
-        entry = BIB_ENTRY_TEST;
-        MSBibConverter.convert(entry);
-
-        assertEquals(Optional.of("english"), entry.getField(StandardField.LANGUAGE));
+        MSBibEntry result = MSBibConverter.convert(BIB_ENTRY_TEST);
+        assertEquals("1033", result.fields.get("LCID"));
     }
 }

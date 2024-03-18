@@ -299,7 +299,7 @@ public class DublinCoreExtractor {
     private void fillContributor(String authors) {
         AuthorList list = AuthorList.parse(authors);
         for (Author author : list.getAuthors()) {
-            dcSchema.addContributor(author.getFirstLast(false));
+            dcSchema.addContributor(author.getGivenFamily(false));
         }
     }
 
@@ -309,7 +309,7 @@ public class DublinCoreExtractor {
     private void fillCreator(String creators) {
         AuthorList list = AuthorList.parse(creators);
         for (Author author : list.getAuthors()) {
-            dcSchema.addCreator(author.getFirstLast(false));
+            dcSchema.addCreator(author.getGivenFamily(false));
         }
     }
 

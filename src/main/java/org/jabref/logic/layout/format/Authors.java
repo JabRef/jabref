@@ -254,21 +254,21 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     private void addSingleName(StringBuilder sb, Author a, boolean firstFirst) {
         StringBuilder lastNameSB = new StringBuilder();
-        a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> lastNameSB.append(von).append(' '));
-        a.getLast().ifPresent(lastNameSB::append);
+        a.getNamePrefix().filter(von -> !von.isEmpty()).ifPresent(von -> lastNameSB.append(von).append(' '));
+        a.getFamilyName().ifPresent(lastNameSB::append);
         String jrSeparator = " ";
-        a.getJr().filter(jr -> !jr.isEmpty()).ifPresent(jr -> lastNameSB.append(jrSeparator).append(jr));
+        a.getNameSuffix().filter(jr -> !jr.isEmpty()).ifPresent(jr -> lastNameSB.append(jrSeparator).append(jr));
 
         String firstNameResult = "";
-        if (a.getFirst().isPresent()) {
+        if (a.getGivenName().isPresent()) {
             if (abbreviate) {
-                firstNameResult = a.getFirstAbbr().orElse("");
+                firstNameResult = a.getGivenNameAbbreviated().orElse("");
 
                 if (firstInitialOnly && (firstNameResult.length() > 2)) {
                     firstNameResult = firstNameResult.substring(0, 2);
                 } else if (middleInitial) {
                     String abbr = firstNameResult;
-                    firstNameResult = a.getFirst().get();
+                    firstNameResult = a.getGivenName().get();
                     int index = firstNameResult.indexOf(' ');
                     if (index >= 0) {
                         firstNameResult = firstNameResult.substring(0, index + 1);
@@ -284,7 +284,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                     firstNameResult = firstNameResult.replace(" ", "");
                 }
             } else {
-                firstNameResult = a.getFirst().get();
+                firstNameResult = a.getGivenName().get();
             }
         }
 

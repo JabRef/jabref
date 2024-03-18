@@ -25,7 +25,7 @@ public class LastNameGroup extends KeywordGroup {
                        .map(AuthorList::latexFree)
                        .map(AuthorList::getAuthors)
                        .flatMap(Collection::stream)
-                       .map(Author::getLast)
+                       .map(Author::getFamilyName)
                        .flatMap(Optional::stream)
                        .collect(Collectors.toList());
     }
