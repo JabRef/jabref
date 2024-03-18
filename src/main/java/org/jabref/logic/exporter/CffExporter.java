@@ -138,27 +138,27 @@ class CffExporter extends Exporter {
             }
             for (Author author : authors) {
                 boolean hyphen = false;
-                if (author.getLast().isPresent()) {
+                if (author.getFamilyName().isPresent()) {
                     ps.write(pref ? "  " : "");
-                    ps.write("  - family-names: " + author.getLast().get() + OS.NEWLINE);
+                    ps.write("  - family-names: " + author.getFamilyName().get() + OS.NEWLINE);
                     hyphen = true;
                 }
-                if (author.getFirst().isPresent()) {
+                if (author.getGivenName().isPresent()) {
                     ps.write(pref ? "  " : "");
                     ps.write(hyphen ? "    " : "  - ");
-                    ps.write("given-names: " + author.getFirst().get() + OS.NEWLINE);
+                    ps.write("given-names: " + author.getGivenName().get() + OS.NEWLINE);
                     hyphen = true;
                 }
-                if (author.getVon().isPresent()) {
+                if (author.getNamePrefix().isPresent()) {
                     ps.write(pref ? "  " : "");
                     ps.write(hyphen ? "    " : "  - ");
-                    ps.write("name-particle: " + author.getVon().get() + OS.NEWLINE);
+                    ps.write("name-particle: " + author.getNamePrefix().get() + OS.NEWLINE);
                     hyphen = true;
                 }
-                if (author.getJr().isPresent()) {
+                if (author.getNameSuffix().isPresent()) {
                     ps.write(pref ? "  " : "");
                     ps.write(hyphen ? "    " : "  - ");
-                    ps.write("name-suffix: " + author.getJr().get() + OS.NEWLINE);
+                    ps.write("name-suffix: " + author.getNameSuffix().get() + OS.NEWLINE);
                 }
             }
         } catch (IOException ex) {
