@@ -243,7 +243,7 @@ dependencies {
     implementation 'org.jspecify:jspecify:0.3.0'
 
     // parse plist files
-    implementation 'com.googlecode.plist:dd-plist:1.23'
+    implementation 'com.googlecode.plist:dd-plist:1.28'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.168'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
