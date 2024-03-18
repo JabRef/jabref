@@ -22,17 +22,9 @@ public class MSBibMapping {
 
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
-    private static final BiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
     private static final BiMap<String, Integer> LANG_TO_LCID = HashBiMap.create();
-    private static final Map<String, EntryType> MSBIB_ENTRYTYPE_MAPPING = Map.of(
-            "Book", StandardEntryType.Book,
-            "BookSection", StandardEntryType.Book,
-            "JournalArticle", StandardEntryType.Article,
-            "ArticleInAPeriodical", IEEETranEntryType.Periodical,
-            "ConferenceProceedings", StandardEntryType.InProceedings,
-            "Report", StandardEntryType.TechReport,
-            "Patent", IEEETranEntryType.Patent,
-            "InternetSite", StandardEntryType.Online);
+    private static final BiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
+    private static final Map<String, EntryType> MSBIB_ENTRYTYPE_MAPPING;
     private static final Map<EntryType, MSBibEntryType> BIB_ENTRYTYPE_MAPPING = new HashMap<>();
 
     static {
@@ -129,6 +121,19 @@ public class MSBibMapping {
     }
 
     static {
+        MSBIB_ENTRYTYPE_MAPPING = Map.of(
+                "Book", StandardEntryType.Book,
+                "BookSection", StandardEntryType.Book,
+                "JournalArticle", StandardEntryType.Article,
+                "ArticleInAPeriodical", IEEETranEntryType.Periodical,
+                "ConferenceProceedings", StandardEntryType.InProceedings,
+                "Report", StandardEntryType.TechReport,
+                "Patent", IEEETranEntryType.Patent,
+                "InternetSite", StandardEntryType.Online);
+    }
+
+    static {
+        // We need to add the entries "manually", because Map.of does not allow that many entries
         BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Book, MSBibEntryType.Book);
         BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.InBook, MSBibEntryType.BookSection);
         BIB_ENTRYTYPE_MAPPING.put(StandardEntryType.Booklet, MSBibEntryType.BookSection);
