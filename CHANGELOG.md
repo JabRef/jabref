@@ -30,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability to zoom in and out in the document viewer using <kbd>Ctrl</kbd> + <kbd>Scroll</kbd>. [#10964](https://github.com/JabRef/jabref/pull/10964)
 - We added a Cleanup for removing non-existent files and grouped the related options [#10929](https://github.com/JabRef/jabref/issues/10929)
 - We added the functionality to parse the bibliography of PDFs using the GROBID online service. [#10200](https://github.com/JabRef/jabref/issues/10200)
+- We added support for BibTeX String constants during copy & paste between libraries [#10872](https://github.com/JabRef/jabref/issues/10872)
 
 ### Changed
 
