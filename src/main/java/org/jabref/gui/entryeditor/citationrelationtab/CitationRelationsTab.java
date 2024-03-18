@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -237,20 +239,14 @@ public class CitationRelationsTab extends EntryEditorTab {
                         Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
                         openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
                         openWeb.setOnMouseClicked(event -> {
-                            String url = null;
-                            if (entry.entry().getDOI().isPresent() && entry.entry().getDOI().get().getExternalURI().isPresent()) {
-                                url = entry.entry().getDOI().get().getExternalURI().get().toString();
-                            } else if (entry.entry().getField(StandardField.URL).isPresent()) {
-                                url = entry.entry().getField(StandardField.URL).get();
-                            }
+                            String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
+                                              .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
                             if (StringUtil.isNullOrEmpty(url)) {
                                 return;
                             }
-
                             try {
                                 JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
-                            } catch (
-                                    IOException ex) {
+                            } catch (IOException ex) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });
