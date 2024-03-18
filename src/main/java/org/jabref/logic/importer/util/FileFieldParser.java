@@ -102,6 +102,11 @@ public class FileFieldParser {
                     // We are at the second : (position 3 in the example) and "just" add it to the current element
                     charactersOfCurrentElement.append(c);
                     windowsPath = true;
+                    // special case for zotero absolute path on windows that do not have a colon in front
+                    // e.g. A:\zotero\paper.pdf
+                } else if (charactersOfCurrentElement.length() == 1 && value.charAt(i + 1) == '\\') {
+                    charactersOfCurrentElement.append(c);
+                    windowsPath = true;
                 } else {
                     // We are in the next LinkedFile data element
                     linkedFileData.add(charactersOfCurrentElement.toString());

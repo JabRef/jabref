@@ -15,6 +15,11 @@ public class OOPreFormatterTest {
     }
 
     @Test
+    public void removeBraces() {
+        assertEquals("aaa", new OOPreFormatter().format("{aaa}"));
+    }
+
+    @Test
     public void formatAccents() {
         assertEquals("ä", new OOPreFormatter().format("{\\\"{a}}"));
         assertEquals("Ä", new OOPreFormatter().format("{\\\"{A}}"));

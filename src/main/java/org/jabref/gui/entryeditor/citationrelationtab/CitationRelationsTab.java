@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
@@ -40,6 +43,9 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -201,6 +207,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
+                    VBox vContainer = new VBox();
+
                     if (entry.isLocal()) {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
@@ -211,7 +219,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                             citingTask.cancel();
                             citedByTask.cancel();
                         });
-                        hContainer.getChildren().addAll(entryNode, separator, jumpTo);
+                        vContainer.getChildren().add(jumpTo);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
@@ -224,8 +232,28 @@ public class CitationRelationsTab extends EntryEditorTab {
                         });
                         addToggle.getStyleClass().add("addEntryButton");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
-                        hContainer.getChildren().addAll(entryNode, separator, addToggle);
+                        vContainer.getChildren().add(addToggle);
                     }
+
+                    if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
+                        Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
+                        openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
+                        openWeb.setOnMouseClicked(event -> {
+                            String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
+                                              .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
+                            if (StringUtil.isNullOrEmpty(url)) {
+                                return;
+                            }
+                            try {
+                                JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+                            } catch (IOException ex) {
+                                dialogService.notify(Localization.lang("Unable to open link."));
+                            }
+                        });
+                        vContainer.getChildren().addLast(openWeb);
+                    }
+
+                    hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
 
                     return hContainer;
@@ -391,8 +419,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void showNodes(Node... nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(true));
     }
-
-    // Absolute-phase phenomena in photoionization with few-cycle laser pulses
 
     /**
      * Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field
