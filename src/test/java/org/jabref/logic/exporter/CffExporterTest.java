@@ -54,11 +54,9 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"Test Title\"",
+                "title: Test Title",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -67,8 +65,8 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: Author",
                 "      given-names: Test",
-                "  title: \"Test Title\"",
-                "  url: \"http://example.com\"");
+                "  title: Test Title",
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -85,11 +83,9 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"Test Title\"",
+                "title: Test Title",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -98,8 +94,8 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: Author",
                 "      given-names: Test",
-                "  title: \"Test Title\"",
-                "  doi: \"random_doi_value\"");
+                "  title: Test Title",
+                "  doi: random_doi_value");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -113,11 +109,9 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"No title specified.\"",
+                "title: No title specified.",
                 "authors: No author specified."
         );
 
@@ -136,16 +130,14 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"Test Title\"",
+                "title: Test Title",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
                 "type: software",
-                "doi: \"random_doi_value\"");
+                "doi: random_doi_value");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -162,16 +154,14 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"Test Title\"",
+                "title: Test Title",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
                 "type: software",
-                "date-released: 2003-11-06");
+                "date-released: '2003-11-06'");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -188,11 +178,9 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"Test Title\"",
+                "title: Test Title",
                 "authors:",
                 "  - family-names: Author",
                 "    given-names: Test",
@@ -201,7 +189,7 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: Author",
                 "      given-names: Test",
-                "  title: \"Test Title\"",
+                "  title: Test Title",
                 "  month: 11",
                 "  year: 2003");
 
@@ -221,11 +209,9 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"細雪\"",
+                "title: 細雪",
                 "authors:",
                 "  - family-names: 潤一郎",
                 "    given-names: 谷崎",
@@ -234,8 +220,8 @@ public class CffExporterTest {
                 "  authors:",
                 "    - family-names: 潤一郎",
                 "      given-names: 谷崎",
-                "  title: \"細雪\"",
-                "  url: \"http://example.com\"");
+                "  title: 細雪",
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -260,11 +246,9 @@ public class CffExporterTest {
         cffExporter.export(databaseContext, articleFile, Collections.singletonList(articleEntry));
 
         Set<String> expectedSoftware = Set.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"JabRef\"",
+                "title: JabRef",
                 "authors:",
                 "  - family-names: Kopp",
                 "    given-names: Oliver",
@@ -287,17 +271,15 @@ public class CffExporterTest {
                 "  - reference manager",
                 "  - bibtex",
                 "  - biblatex",
-                "license: \"MIT\"",
-                "repository-code: \"https://github.com/jabref/jabref/\"",
-                "abstract: \"JabRef is an open-source, cross-platform citation and reference management tool.\"",
-                "url: \"https://www.jabref.org\"");
+                "license: MIT",
+                "repository-code: https://github.com/jabref/jabref/",
+                "abstract: JabRef is an open-source, cross-platform citation and reference management tool.",
+                "url: https://www.jabref.org");
 
         Set<String> expectedArticle = Set.of(
-                "# YAML 1.2",
-                "---",
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: \"JabRef: BibTeX-based literature management software\"",
+                "title: 'JabRef: BibTeX-based literature management software'",
                 "authors:",
                 "  - family-names: Kopp",
                 "    given-names: Oliver",
@@ -314,14 +296,14 @@ public class CffExporterTest {
                 "      given-names: Carl Christian",
                 "    - family-names: Schwentker",
                 "      given-names: Christoph",
-                "  title: \"JabRef: BibTeX-based literature management software\"",
-                "  month: \"11\"",
-                "  issue: \"138\"",
-                "  volume: \"44\"",
-                "  year: \"2023\"",
-                "  doi: \"10.47397/tb/44-3/tb138kopp-jabref\"",
-                "  journal: \"TUGboat\"",
-                "  number: \"3\"");
+                "  title: 'JabRef: BibTeX-based literature management software'",
+                "  month: '11'",
+                "  issue: '138'",
+                "  volume: '44'",
+                "  year: '2023'",
+                "  doi: 10.47397/tb/44-3/tb138kopp-jabref",
+                "  journal: TUGboat",
+                "  number: '3'");
 
         // Tests equality of sets since last lines order is random and relies on entries internal order
         try (Stream<String> st = Files.lines(softwareFile)) {

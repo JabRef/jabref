@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -8,12 +9,13 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
@@ -25,6 +27,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Exporter for exporting in CFF format.
@@ -44,10 +49,25 @@ class CffExporter extends Exporter {
             return;
         }
 
-        try (AtomicFileWriter ps = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
-            ps.write("# YAML 1.2" + OS.NEWLINE);
-            ps.write("---" + OS.NEWLINE);
-            ps.write("cff-version: 1.2.0" + OS.NEWLINE);
+        try (FileWriter writer = new FileWriter(file.toFile(), StandardCharsets.UTF_8)) {
+            DumperOptions options = new DumperOptions();
+
+            // Set line width to infinity to avoid line wrapping
+            options.setWidth(Integer.MAX_VALUE);
+
+            // Set collections to be written in block rather than inline
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            options.setPrettyFlow(true);
+
+            // Set indent for sequences to two spaces
+            options.setIndentWithIndicator(true);
+            options.setIndicatorIndent(2);
+            Yaml yaml = new Yaml(options);
+
+            Map<String, Object> originalData = new LinkedHashMap<>();
+            Map<String, Object> preferredData = new LinkedHashMap<>();
+            Map<String, Object> data = originalData;
+            data.put("cff-version", "1.2.0");
 
             for (BibEntry entry : entries) {
                 // Retrieve all fields
@@ -56,36 +76,59 @@ class CffExporter extends Exporter {
                 // Compulsory message field
                 String message = entryMap.getOrDefault(StandardField.COMMENT,
                         "If you use this software, please cite it using the metadata from this file.");
-                ps.write("message: " + message + OS.NEWLINE);
+                data.put("message", message);
                 entryMap.remove(StandardField.COMMENT);
 
                 // Compulsory title field
                 String title = entryMap.getOrDefault(StandardField.TITLE, "No title specified.");
-                ps.write("title: " + "\"" + title + "\"" + OS.NEWLINE);
+                data.put("title", title);
                 entryMap.remove(StandardField.TITLE);
 
                 // Compulsory authors field
                 List<Author> authors = AuthorList.parse(entryMap.getOrDefault(StandardField.AUTHOR, ""))
                                                  .getAuthors();
-                writeAuthors(ps, authors, false);
+
+                // Create two copies of the same list to avoid using YAML anchors and aliases
+                List<Map<String, String>> authorsList = new ArrayList<>();
+                List<Map<String, String>> authorsListPreferred = new ArrayList<>();
+                authors.forEach(author -> {
+                    Map<String, String> authorMap = new LinkedHashMap<>();
+                    Map<String, String> authorMapPreferred = new LinkedHashMap<>();
+                    if (author.getFamilyName().isPresent()) {
+                        authorMap.put("family-names", author.getFamilyName().get());
+                        authorMapPreferred.put("family-names", author.getFamilyName().get());
+                    }
+                    if (author.getGivenName().isPresent()) {
+                        authorMap.put("given-names", author.getGivenName().get());
+                        authorMapPreferred.put("given-names", author.getGivenName().get());
+                    }
+                    if (author.getNamePrefix().isPresent()) {
+                        authorMap.put("name-particle", author.getNamePrefix().get());
+                        authorMapPreferred.put("name-particle", author.getNamePrefix().get());
+                    }
+                    if (author.getNameSuffix().isPresent()) {
+                        authorMap.put("name-suffix", author.getNameSuffix().get());
+                        authorMapPreferred.put("name-suffix", author.getNameSuffix().get());
+                    }
+                    authorsList.add(authorMap);
+                    authorsListPreferred.add(authorMapPreferred);
+                });
+                data.put("authors", authorsList.isEmpty() ? "No author specified." : authorsList);
                 entryMap.remove(StandardField.AUTHOR);
 
                 // Type
                 Map<EntryType, String> typeMap = getTypeMappings();
                 EntryType entryType = entry.getType();
-                boolean pref = false;
                 switch (entryType) {
-                    case StandardEntryType.Software ->
-                            ps.write("type: software" + OS.NEWLINE);
-                    case StandardEntryType.Dataset ->
-                            ps.write("type: dataset" + OS.NEWLINE);
+                    case StandardEntryType.Software, StandardEntryType.Dataset ->
+                            data.put("type", entryType.getName());
                     default -> {
                         if (typeMap.containsKey(entryType)) {
-                            pref = true;
-                            ps.write("preferred-citation:" + OS.NEWLINE);
-                            ps.write("  type: " + typeMap.get(entryType) + OS.NEWLINE);
-                            writeAuthors(ps, authors, true);
-                            ps.write("  title: " + "\"" + title + "\"" + OS.NEWLINE);
+                            data.put("preferred-citation", preferredData);
+                            data = preferredData;
+                            data.put("type", typeMap.get(entryType));
+                            data.put("authors", authorsListPreferred.isEmpty() ? "No author specified." : authorsListPreferred);
+                            data.put("title", title);
                         }
                     }
                 }
@@ -93,19 +136,37 @@ class CffExporter extends Exporter {
                 // Keywords
                 String keywords = entryMap.getOrDefault(StandardField.KEYWORDS, null);
                 if (keywords != null) {
-                    ps.write(pref ? "  " : "");
-                    ps.write("keywords:" + OS.NEWLINE);
-                    for (String keyword : keywords.split(",\\s*")) {
-                        ps.write(pref ? "  " : "");
-                        ps.write("  - " + keyword + OS.NEWLINE);
-                    }
+                    data.put("keywords", keywords.split(",\\s*"));
                 }
                 entryMap.remove(StandardField.KEYWORDS);
 
                 // Date
                 String date = entryMap.getOrDefault(StandardField.DATE, null);
                 if (date != null) {
-                    writeDate(ps, date, pref);
+                    String formatString;
+                    try {
+                        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+                        data.put("date-released", localDate.toString());
+                    } catch (DateTimeParseException e) {
+                        try {
+                            formatString = "yyyy-MM";
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
+                            YearMonth yearMonth = YearMonth.parse(date, formatter);
+                            int month = yearMonth.getMonth().getValue();
+                            int year = yearMonth.getYear();
+                            data.put("month", month);
+                            data.put("year", year);
+                        } catch (DateTimeParseException f) {
+                            try {
+                                formatString = "yyyy";
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
+                                int year = Year.parse(date, formatter).getValue();
+                                data.put("year", year);
+                            } catch (DateTimeParseException g) {
+                                data.put("issue-date", date);
+                            }
+                        }
+                    }
                 }
                 entryMap.remove(StandardField.DATE);
 
@@ -113,90 +174,14 @@ class CffExporter extends Exporter {
                 Map<Field, String> fieldMap = getFieldMappings();
                 for (Field field : entryMap.keySet()) {
                     if (fieldMap.containsKey(field)) {
-                        ps.write(pref ? "  " : "");
-                        ps.write(fieldMap.get(field) + ": " + "\"" + entryMap.get(field) + "\"" + OS.NEWLINE);
+                        data.put(fieldMap.get(field), entryMap.get(field));
                     } else if (field instanceof UnknownField) {
-                        ps.write(pref ? "  " : "");
-                        ps.write(field.getName() + ": " + "\"" + entryMap.get(field) + "\"" + OS.NEWLINE);
+                        data.put(field.getName(), entryMap.get(field));
                     }
                 }
             }
-        } catch (IOException ex) {
-            throw new SaveException(ex);
-        }
-    }
 
-    private void writeAuthors(AtomicFileWriter ps, List<Author> authors, boolean pref) throws Exception {
-        try {
-            ps.write(pref ? "  " : "");
-            ps.write("authors:");
-            if (authors.isEmpty()) {
-                ps.write(pref ? "  " : "");
-                ps.write(" No author specified.");
-            } else {
-                ps.write(OS.NEWLINE);
-            }
-            for (Author author : authors) {
-                boolean hyphen = false;
-                if (author.getFamilyName().isPresent()) {
-                    ps.write(pref ? "  " : "");
-                    ps.write("  - family-names: " + author.getFamilyName().get() + OS.NEWLINE);
-                    hyphen = true;
-                }
-                if (author.getGivenName().isPresent()) {
-                    ps.write(pref ? "  " : "");
-                    ps.write(hyphen ? "    " : "  - ");
-                    ps.write("given-names: " + author.getGivenName().get() + OS.NEWLINE);
-                    hyphen = true;
-                }
-                if (author.getNamePrefix().isPresent()) {
-                    ps.write(pref ? "  " : "");
-                    ps.write(hyphen ? "    " : "  - ");
-                    ps.write("name-particle: " + author.getNamePrefix().get() + OS.NEWLINE);
-                    hyphen = true;
-                }
-                if (author.getNameSuffix().isPresent()) {
-                    ps.write(pref ? "  " : "");
-                    ps.write(hyphen ? "    " : "  - ");
-                    ps.write("name-suffix: " + author.getNameSuffix().get() + OS.NEWLINE);
-                }
-            }
-        } catch (IOException ex) {
-            throw new SaveException(ex);
-        }
-    }
-
-    private void writeDate(AtomicFileWriter ps, String dateField, boolean pref) throws Exception {
-        StringBuilder builder = new StringBuilder();
-        String formatString = "yyyy-MM-dd";
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
-            LocalDate date = LocalDate.parse(dateField, DateTimeFormatter.ISO_LOCAL_DATE);
-            builder.append(pref ? "  " : "").append("date-released: ").append(date.format(formatter));
-        } catch (DateTimeParseException e) {
-            if (pref) {
-                try {
-                    formatString = "yyyy-MM";
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
-                    YearMonth yearMonth = YearMonth.parse(dateField, formatter);
-                    int month = yearMonth.getMonth().getValue();
-                    int year = yearMonth.getYear();
-                    builder.append("  month: ").append(month).append(OS.NEWLINE);
-                    builder.append("  year: ").append(year).append(OS.NEWLINE);
-                } catch (DateTimeParseException f) {
-                    try {
-                        formatString = "yyyy";
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
-                        int year = Year.parse(dateField, formatter).getValue();
-                        builder.append("  year: ").append(year).append(OS.NEWLINE);
-                    } catch (DateTimeParseException g) {
-                        builder.append("  issue-date: ").append(dateField).append(OS.NEWLINE);
-                    }
-                }
-            }
-        }
-        try {
-            ps.write(builder.toString());
+            yaml.dump(originalData, writer);
         } catch (IOException ex) {
             throw new SaveException(ex);
         }
