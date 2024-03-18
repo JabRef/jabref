@@ -102,14 +102,10 @@ public class BstNameFormatter {
                 char type = control.charAt(0);
 
                 Optional<String> tokenS = switch (type) {
-                    case 'f' ->
-                            author.getFirst();
-                    case 'v' ->
-                            author.getVon();
-                    case 'l' ->
-                            author.getLast();
-                    case 'j' ->
-                            author.getJr();
+                    case 'f' -> author.getGivenName();
+                    case 'v' -> author.getNamePrefix();
+                    case 'l' -> author.getFamilyName();
+                    case 'j' -> author.getNameSuffix();
                     default ->
                             throw new BstVMException("Internal error");
                 };

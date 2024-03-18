@@ -372,19 +372,15 @@ class OOBibStyleTest {
                 abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
-        BibDatabase database = new BibDatabase();
 
-        BibEntry entry = new BibEntry();
-        entry.setCitationKey("JabRef2016");
-        entry.setType(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "{JabRef Development Team}");
-        entry.setField(StandardField.TITLE, "JabRef Manual");
-        entry.setField(StandardField.YEAR, "2016");
-        database.insertEntry(entry);
-        entries.add(entry);
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("JabRef2016")
+                .withField(StandardField.AUTHOR, "{JabRef Development Team}")
+                .withField(StandardField.TITLE, "JabRef Manual")
+                .withField(StandardField.YEAR, "2016");
+        List<BibEntry> entries = List.of(entry);
+        BibDatabase database = new BibDatabase(entries);
         entryDBMap.put(entry, database);
-
         assertEquals("[JabRef Development Team, 2016]",
                 getCitationMarker2(style,
                         entries, entryDBMap, true, null, null, null));
