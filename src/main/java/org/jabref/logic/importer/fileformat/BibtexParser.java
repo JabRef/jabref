@@ -274,7 +274,7 @@ public class BibtexParser implements Parser {
                             var groupsToAdd = bibDeskGroupTreeNode.getChildren()
                                                                   .stream().
                                                                   filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)));
-                            groupsToAdd.forEach(existingGroupTree::addChild);
+                            groupsToAdd.forEach(existingGroupTree::moveTo);
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
                         () -> {
