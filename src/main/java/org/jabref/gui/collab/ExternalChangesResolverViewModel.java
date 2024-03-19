@@ -86,7 +86,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             selectedChange.accept();
             getVisibleChanges().remove(selectedChange);
         });
-        if(activeTab!=null){
+        if (activeTab != null) {
             activeTab.get().get().updateTabTitle(false);
             activeTab.get().get().resetChangedProperties();
         }
@@ -94,7 +94,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     public void denyChange() {
         getSelectedChange().ifPresent(getVisibleChanges()::remove);
-        if(activeTab!=null){
+        if (activeTab != null) {
             activeTab.get().get().updateTabTitle(true);
             activeTab.get().get().markBaseChanged();
         }
