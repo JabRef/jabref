@@ -265,23 +265,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return true;
     }
 
-    /**
-     * outprints the Data from the Screen (only in debug mode)
-     *
-     * @param mainStage JabRefs stage
-     */
-    private void debugLogWindowState(Stage mainStage) {
-        if (LOGGER.isDebugEnabled()) {
-            String debugLogString = "SCREEN DATA:" +
-                    "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
-                    "mainStage.POS_X: " + mainStage.getX() + "\n" +
-                    "mainStage.POS_Y: " + mainStage.getY() + "\n" +
-                    "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
-                    "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
-            LOGGER.debug(debugLogString);
-        }
-    }
-
     private void initLayout() {
         setId("frame");
 
@@ -460,7 +443,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
             // Set window title - copy tab title
             StringBinding windowTitle = Bindings.createStringBinding(
-                    () -> libraryTab.textProperty().getValue() + " \u2013 " + FRAME_TITLE,
+                    () -> libraryTab.textProperty().getValue() + " – " + FRAME_TITLE, // not a minus, but codepoint 2013
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
@@ -472,7 +455,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * Returns the currently viewed BasePanel.
      */
     public LibraryTab getCurrentLibraryTab() {
-        if ((tabbedPane == null) || (tabbedPane.getSelectionModel().getSelectedItem() == null)) {
+        if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
             return null;
         }
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
@@ -495,7 +478,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public void addTab(LibraryTab libraryTab, boolean raisePanel) {
-        assert libraryTab != null;
         tabbedPane.getTabs().add(libraryTab);
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -659,16 +641,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                             this,
                             dialogService,
                             prefs,
-                            Globals.stateManager,
-                            Globals.entryTypesManager,
+                            stateManager,
+                            entryTypesManager,
                             fileUpdateMonitor,
                             undoManager,
-                            Globals.TASK_EXECUTOR);
-                } catch (
-                        SQLException |
-                        DatabaseNotSupportedException |
-                        InvalidDBMSConnectionPropertiesException |
-                        NotASharedDatabaseException e) {
+                            taskExecutor);
+                } catch (SQLException |
+                         DatabaseNotSupportedException |
+                         InvalidDBMSConnectionPropertiesException |
+                         NotASharedDatabaseException e) {
                     LOGGER.error("Connection error", e);
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Connection error"),
@@ -805,12 +786,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        List<ObservableBooleanValue> loadings = getLibraryTabs().stream().map(LibraryTab::getLoading)
+        List<ObservableBooleanValue> loadings = getLibraryTabs().stream()
+                                                                .map(LibraryTab::getLoading)
                                                                 .collect(Collectors.toList());
 
         // Create a listener for each observable
         ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
-            assert newValue = false;
             if (observable != null) {
                 loadings.remove(observable);
             }
