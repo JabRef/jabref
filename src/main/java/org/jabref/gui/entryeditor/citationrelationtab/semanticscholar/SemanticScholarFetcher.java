@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
@@ -26,17 +25,17 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
         this.importerPreferences = importerPreferences;
     }
 
+    public String getAPIUrl(String entry_point, BibEntry entry) {
+        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().getDOI() + "/" + entry_point
+                + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
+                + "&limit=1000";
+    }
+
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
-            StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
-                    .append("paper/")
-                    .append("DOI:").append(entry.getDOI().get().getDOI())
-                    .append("/citations")
-                    .append("?fields=").append("title,authors,year,citationCount,referenceCount")
-                    .append("&limit=1000");
             try {
-                URL citationsUrl = URI.create(urlBuilder.toString()).toURL();
+                URL citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
                 URLDownload urlDownload = new URLDownload(citationsUrl);
 
                 String apiKey = getApiKey();
@@ -50,25 +49,17 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                                         .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
                                         .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FetcherException("Could not fetch", e);
             }
         }
-
-        return new ArrayList<>();
+        return List.of();
     }
 
     @Override
-    public List<BibEntry> searchCiting(BibEntry entry) {
+    public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
-            StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
-                    .append("paper/")
-                    .append("DOI:").append(entry.getDOI().get().getDOI())
-                    .append("/references")
-                    .append("?fields=")
-                    .append("title,authors,year,citationCount,referenceCount")
-                    .append("&limit=1000");
             try {
-                URL referencesUrl = URI.create(urlBuilder.toString()).toURL();
+                URL referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
                 URLDownload urlDownload = new URLDownload(referencesUrl);
                 String apiKey = getApiKey();
                 if (!apiKey.isEmpty()) {
@@ -82,11 +73,10 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                                          .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
                                          .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FetcherException("Could not fetch", e);
             }
         }
-
-        return new ArrayList<>();
+        return List.of();
     }
 
     @Override
