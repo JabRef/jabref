@@ -5,11 +5,10 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -23,20 +22,19 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import kong.unirest.JsonNode;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,32 +100,139 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     public Parser getParser() {
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
-            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
-
             List<BibEntry> entries = new ArrayList<>();
+
             try {
                 // Depending on the type of query we might get either a json object or directly a json array
                 JsonNode node = new JsonNode(response);
+
                 if (node.isArray()) {
                     JSONArray entriesArray = node.getArray();
                     for (int i = 0; i < entriesArray.length(); i++) {
-                        String bibTexFormat = entriesArray.getJSONObject(i).getString("bib");
-                        entries.addAll(bibtexParser.parseEntries(bibTexFormat));
+                        JSONObject entryObject = entriesArray.getJSONObject(i);
+                        BibEntry bibEntry = jsonItemToBibEntry(entryObject);
+                        entries.add(bibEntry);
                     }
                 } else {
                     var element = node.getObject();
-                    JSONArray entriesArray = element.getJSONObject("all").getJSONArray("results");
-                    for (int i = 0; i < entriesArray.length(); i++) {
-                        String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
-                        entries.addAll(bibtexParser.parseEntries(bibTexFormat));
+
+                    if (element.has("all")) {
+                        JSONArray entriesArray = element.getJSONObject("all").getJSONArray("results");
+                        for (int i = 0; i < entriesArray.length(); i++) {
+                            JSONObject entryObject = entriesArray.getJSONObject(i);
+                            BibEntry bibEntry = jsonItemToBibEntry(entryObject);
+                            entries.add(bibEntry);
+                        }
+                    } else if (element.has("results")) {
+                        JSONArray entriesArray = element.getJSONArray("results");
+                        for (int i = 0; i < entriesArray.length(); i++) {
+                            JSONObject entryObject = entriesArray.getJSONObject(i);
+                            BibEntry bibEntry = jsonItemToBibEntry(entryObject);
+                            entries.add(bibEntry);
+                        }
                     }
                 }
-            } catch (JSONException | TokenMgrException e) {
+            } catch (JSONException | ParseException e) {
                 LOGGER.error("An error occurred while parsing fetched data", e);
                 throw new ParseException("Error when parsing entry", e);
             }
             return entries;
         };
+    }
+
+    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
+        try {
+            BibEntry entry = new BibEntry();
+            entry.setType(StandardEntryType.Article);
+
+            // Define the field mappings
+            Map<StandardField, String[]> fieldMappings = Map.ofEntries(
+                    Map.entry(StandardField.TITLE, new String[]{"titles", "title"}),
+                    Map.entry(StandardField.AUTHOR, new String[]{"authors"}),
+                    Map.entry(StandardField.YEAR, new String[]{"issue", "issue", "pubYear"}),
+                    Map.entry(StandardField.JOURNAL, new String[]{"issue", "issue", "journal", "shortTitle"}),
+                    Map.entry(StandardField.VOLUME, new String[]{"issue", "issue", "volume"}),
+                    Map.entry(StandardField.NUMBER, new String[]{"issue", "issue", "number"}),
+                    Map.entry(StandardField.PAGES, new String[]{"paging", "paging", "text"}),
+                    Map.entry(StandardField.KEYWORDS, new String[]{"primaryClass"}),
+                    Map.entry(StandardField.ISSN, new String[]{"issue", "issue", "journal", "issn"})
+            );
+
+            // Set fields based on the mappings
+            for (Map.Entry<StandardField, String[]> mapEntry : fieldMappings.entrySet()) {
+                StandardField field = mapEntry.getKey();
+                String[] path = mapEntry.getValue();
+
+                String value;
+                if (field == StandardField.AUTHOR) {
+                    value = toAuthors(item.optJSONArray(path[0]));
+                } else if (field == StandardField.KEYWORDS) {
+                    value = getKeywords(item.optJSONObject(path[0]));
+                } else {
+                    value = getOrNull(item, path);
+                }
+
+                if (value != null) {
+                    entry.setField(field, value);
+                }
+            }
+
+            // Handle articleUrl and mrnumber fields separately
+            String doi = item.optString("articleUrl", "");
+            if (!doi.isEmpty()) {
+                entry.setField(StandardField.DOI, doi);
+            }
+
+            String mrNumber = item.optString("mrnumber", "");
+            if (!mrNumber.isEmpty()) {
+                entry.setField(StandardField.MR_NUMBER, mrNumber);
+            }
+
+            return entry;
+        } catch (JSONException exception) {
+            throw new ParseException("MathSciNet API JSON format has changed", exception);
+        }
+    }
+
+    private String getOrNull(JSONObject item, String... keys) {
+        Object value = item;
+        for (String key : keys) {
+            if (value instanceof JSONObject) {
+                value = ((JSONObject) value).opt(key);
+            } else if (value instanceof JSONArray) {
+                value = ((JSONArray) value).opt(Integer.parseInt(key));
+            } else {
+                break;
+            }
+        }
+
+        if (value instanceof String) {
+            String stringValue = (String) value;
+            return new String(stringValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        }
+
+        return null;
+    }
+
+    private String toAuthors(JSONArray authors) {
+        if (authors == null) {
+            return "";
+        }
+
+        return IntStream.range(0, authors.length())
+                .mapToObj(authors::getJSONObject)
+                .map(author -> {
+                    String name = author.optString("name", "");
+                    return new String(name.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                })
+                .collect(Collectors.joining(" and "));
+    }
+
+    private String getKeywords(JSONObject primaryClass) {
+        if (primaryClass == null) {
+            return "";
+        }
+        return primaryClass.optString("description", "");
     }
 
     @Override
@@ -142,4 +247,3 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         entry.setCommentsBeforeEntry("");
     }
 }
-
