@@ -781,6 +781,18 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesStringWithQuotes() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@string{bourdieu = \"Bourdieu, Pierre\"}"));
+
+        BibtexString string = result.getDatabase().getStringValues().iterator().next();
+
+        assertEquals(1, result.getDatabase().getStringCount());
+        assertEquals("bourdieu", string.getName());
+        assertEquals("Bourdieu, Pierre", string.getContent());
+    }
+
+    @Test
     void parseSavesOneNewlineAfterStringInParsedSerialization() throws IOException {
         String string = "@string{bourdieu = {Bourdieu, Pierre}}" + OS.NEWLINE;
         ParserResult result = parser

@@ -325,6 +325,17 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void writeStringWithQuotes() throws Exception {
+        BibtexString bibtexString = new BibtexString("name", "content");
+        bibtexString.setParsedSerialization("name = \"content\"");
+        database.addString(bibtexString);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("@String{name = \"content\"}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
     void writeStringAndEncoding() throws Exception {
         metaData.setEncoding(StandardCharsets.US_ASCII);
         database.addString(new BibtexString("name", "content"));
