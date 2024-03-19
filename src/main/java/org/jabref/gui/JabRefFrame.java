@@ -55,6 +55,7 @@ import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -136,7 +137,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.entryTypesManager = Globals.entryTypesManager;
         this.taskExecutor = Globals.TASK_EXECUTOR;
 
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService, SearchType.NORMAL_SEARCH);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs, taskExecutor);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
 
