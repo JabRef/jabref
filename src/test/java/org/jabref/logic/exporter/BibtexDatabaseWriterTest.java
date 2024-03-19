@@ -326,8 +326,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeStringWithQuotes() throws Exception {
-        BibtexString bibtexString = new BibtexString("name", "content");
-        bibtexString.setParsedSerialization("name = \"content\"");
+        BibtexString bibtexString = new BibtexString("name", "content", "name = \"content\"");
         database.addString(bibtexString);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -702,8 +701,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeSavedSerializationOfStringIfUnchanged() throws Exception {
-        BibtexString string = new BibtexString("name", "content");
-        string.setParsedSerialization("serialization");
+        BibtexString string = new BibtexString("name", "content", "serialization");
         database.addString(string);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -713,8 +711,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void reformatStringIfAskedToDoSo() throws Exception {
-        BibtexString string = new BibtexString("name", "content");
-        string.setParsedSerialization("wrong serialization");
+        BibtexString string = new BibtexString("name", "content", "wrong serialization");
         database.addString(string);
 
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);

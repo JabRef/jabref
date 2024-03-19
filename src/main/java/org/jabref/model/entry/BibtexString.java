@@ -87,6 +87,12 @@ public class BibtexString implements Cloneable {
         type = Type.get(name);
     }
 
+    public BibtexString(String name, String content, String parsedSerialization) {
+        this(name, content);
+        this.parsedSerialization = parsedSerialization;
+        hasChanged = false;
+    }
+
     public String getId() {
         return id;
     }
@@ -125,11 +131,6 @@ public class BibtexString implements Cloneable {
         return type;
     }
 
-    public void setParsedSerialization(String parsedSerialization) {
-        this.parsedSerialization = parsedSerialization;
-        hasChanged = false;
-    }
-
     public String getParsedSerialization() {
         return parsedSerialization;
     }
@@ -156,12 +157,13 @@ public class BibtexString implements Cloneable {
 
     @Override
     public Object clone() {
-        BibtexString clone = new BibtexString(name, content);
-        clone.setId(id);
-        if (parsedSerialization != null) {
-            clone.setParsedSerialization(parsedSerialization);
+        BibtexString clone;
+        if (parsedSerialization == null) {
+             clone = new BibtexString(name, content);
+        } else {
+            clone = new BibtexString(name, content, parsedSerialization);
         }
-
+        clone.setId(id);
         return clone;
     }
 
