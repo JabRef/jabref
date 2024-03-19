@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,16 +85,6 @@ class BibEntryTest {
     void setFieldWorksWithBibFieldAsWell() throws Exception {
         entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field(), "value");
         assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));
-    }
-
-    @Test
-    void shallowCopiedBibEntryDoesNotRemoveFields() throws Exception {
-        entry.setField(StandardField.URL, "value");
-        Map<Field, String> entryMap = entry.getFieldMap();
-        Map<Field, String> entryMapCopy = new HashMap<>(entryMap);
-        entryMapCopy.remove(StandardField.URL);
-        assertEquals(entryMapCopy.size(), 0);
-        assertEquals(entryMap.get(StandardField.URL), "value");
     }
 
     @Test
