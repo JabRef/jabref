@@ -103,6 +103,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for exporting to Hayagriva YAML format. [#10382](https://github.com/JabRef/jabref/issues/10382)
 - We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
 - We added the 'Bachelor's thesis' type for Biblatex's 'Thesis' EntryType [#10029](https://github.com/JabRef/jabref/issues/10029).
+- We added 'langid' field which is important for hyphenation and casing. [#10868](https://github.com/JabRef/jabref/issues/10868).
 
 ### Changed
 
