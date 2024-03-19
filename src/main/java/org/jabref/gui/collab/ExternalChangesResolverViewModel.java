@@ -116,5 +116,4 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         ce.end();
         undoManager.addEdit(ce);
     }
-
 }
