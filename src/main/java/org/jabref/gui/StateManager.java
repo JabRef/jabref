@@ -118,6 +118,14 @@ public class StateManager {
         return globalSearchResultSize;
     }
 
+    public IntegerProperty getSearchResultSize(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+        if (searchQueryProperty.equals(activeSearchQuery)) {
+            return getSearchResultSize();
+        } else {
+            return getGlobalSearchResultSize();
+        }
+    }
+
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
         return activeGroups.getReadOnlyProperty();
     }
@@ -161,16 +169,12 @@ public class StateManager {
         activeSearchQuery.setValue(Optional.empty());
     }
 
-    public void setSearchQuery(SearchQuery searchQuery) {
-        activeSearchQuery.setValue(Optional.of(searchQuery));
+    public void setSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty, SearchQuery query) {
+        searchQueryProperty.setValue(Optional.of(query));
     }
 
-    public void clearGlobalSearchQuery() {
-        activeGlobalSearchQuery.setValue(Optional.empty());
-    }
-
-    public void setGlobalSearchQuery(SearchQuery searchQuery) {
-        activeGlobalSearchQuery.setValue(Optional.of(searchQuery));
+    public void clearSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+        searchQueryProperty.setValue(Optional.empty());
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {

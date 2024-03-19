@@ -57,7 +57,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
-        SearchResultDialogSearchBar searchBar = new SearchResultDialogSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager);
+        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
@@ -101,7 +101,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
             preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
-            stateManager.clearGlobalSearchQuery();
         });
     }
 }
