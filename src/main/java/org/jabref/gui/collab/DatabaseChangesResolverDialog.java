@@ -71,7 +71,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
      * @param changes The list of changes
      * @param database The database to apply the changes to
      */
-    public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle,  LibraryTab libraryTab) {
+    public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle, LibraryTab libraryTab) {
         this.changes = changes;
         this.database = database;
         this.libraryTab = libraryTab;
@@ -118,7 +118,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
             if (isResolved) {
                 viewModel.applyChanges();
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab,dialogService,preferencesService,entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, dialogService, preferencesService, entryTypesManager);
                 saveAction.save();
                 close();
             }
