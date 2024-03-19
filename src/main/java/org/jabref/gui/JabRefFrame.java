@@ -380,11 +380,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                          .toList();
     }
 
-    @Deprecated
-    public void showLibraryTabAt(int i) {
-        tabbedPane.getSelectionModel().select(i);
-    }
-
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
         tabbedPane.getSelectionModel().select(libraryTab);
     }
@@ -697,22 +692,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             first = false;
         }
 
-        for (ParserResult pr : failed) {
+        for (ParserResult parserResult : failed) {
             String message = Localization.lang("Error opening file '%0'",
-                    pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
-                    pr.getErrorMessage();
+                    parserResult.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
+                    parserResult.getErrorMessage();
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
 
         // Display warnings, if any
-        for (int tabNumber = 0; tabNumber < parserResults.size(); tabNumber++) {
-            // ToDo: Method needs to be rewritten, because the index of the parser result and of the libraryTab may not
-            //  be identical, if there are also other tabs opened, that are not libraryTabs. Currently there are none,
-            //  therefore for now this ok.
-            ParserResult pr = parserResults.get(tabNumber);
-            if (pr.hasWarnings()) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, dialogService);
-                showLibraryTabAt(tabNumber);
+        for (ParserResult parserResult : parserResults) {
+            if (parserResult.hasWarnings()) {
+                ParserResultWarningDialog.showParserResultWarningDialog(parserResult, dialogService);
+                getLibraryTabs().stream()
+                                .filter(tab -> parserResult.getDatabase().equals(tab.getDatabase()))
+                                .findAny()
+                                .ifPresent(this::showLibraryTab);
             }
         }
 
