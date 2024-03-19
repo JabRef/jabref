@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,7 @@ public class FieldWriter {
             return FIELD_START + String.valueOf(FIELD_END);
         }
 
-        if (!shouldResolveStrings(field)) {
+        if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {
             return formatWithoutResolvingStrings(content, field);
         }
 
