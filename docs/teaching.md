@@ -41,13 +41,13 @@ For a near-to-perfect preparation and effect of the course, we ask you to get in
 
 It is also possible to just direct students to our [Contribution Guide](https://devdocs.jabref.org/contributing.html#contribute-code). The learning effect may be lower as the time of the students has to be spent to a) learn about JabRef and b) select an appropriate issue.
 
-Since a huge fraction of software costs is spent on [software maintenance](https://en.wikipedia.org/wiki/Software\_maintenance), adding new features also educates in that aspect: perfective maintenance[1](teaching.md#LientzSwanson) is trained. When fixing bugs, corrective maintenance [2](teaching.md#LientzSwanson) is trained.
+Since a huge fraction of software costs is spent on [software maintenance](https://en.wikipedia.org/wiki/Software_maintenance), adding new features also educates in that aspect: perfective maintenance[1](teaching.md#LientzSwanson) is trained. When fixing bugs, corrective maintenance [2](teaching.md#LientzSwanson) is trained.
 
 ## Process for contributions
 
 There is no special process for student contributions. We want to discuss it nevertheless to increase awareness of the time required from starting the contribution until the inclusion in a release of JabRef.
 
-The process for accepting contributions is as below. The syntax is [BPMN](https://en.wikipedia.org/wiki/Business\_Process\_Model\_and\_Notation) modeled using [bpmn.io](https://bpmn.io).
+The process for accepting contributions is as below. The syntax is [BPMN](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation) modeled using [bpmn.io](https://bpmn.io).
 
 [![process](images/contribution-process-reviews.svg)](https://raw.githubusercontent.com/JabRef/jabref/main/docs/images/contribution-process-reviews.svg)
 
@@ -82,8 +82,6 @@ Course: BSc Computer Science Individual Project
 
 * Summary: Students experience the procedure of finding and fixing small and medium issues in an open source project.
 * Successfully run in 2022/2023
-
-Do you have additions/suggestions for improvement?
 
 #### Northern Arizona University (NAU), USA
 
@@ -129,7 +127,7 @@ Course "Programming and Software Development" as part of the [BSc Software Engin
 Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 
 * Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements' specification to the final pull request.
-* Successfully run in 2020
+* Successfully run in 2020, 2024, and other years.
 
 ### Portuguese
 

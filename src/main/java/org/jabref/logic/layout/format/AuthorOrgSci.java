@@ -30,9 +30,9 @@ public class AuthorOrgSci implements LayoutFormatter {
         }
         Author first = a.getAuthor(0);
         StringBuilder sb = new StringBuilder();
-        sb.append(first.getLastFirst(true));
+        sb.append(first.getFamilyGiven(true));
         for (int i = 1; i < a.getNumberOfAuthors(); i++) {
-            sb.append(", ").append(a.getAuthor(i).getFirstLast(true));
+            sb.append(", ").append(a.getAuthor(i).getGivenFamily(true));
         }
         return sb.toString();
     }

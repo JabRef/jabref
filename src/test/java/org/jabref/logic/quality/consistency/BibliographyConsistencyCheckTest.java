@@ -20,7 +20,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-class PaperConsistencyCheckTest {
+class BibliographyConsistencyCheckTest {
 
     private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
@@ -32,10 +32,10 @@ class PaperConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
 
-        PaperConsistencyCheck.EntryTypeResult entryTypeResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
+        BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
         assertEquals(expected, result);
     }
 
@@ -49,10 +49,10 @@ class PaperConsistencyCheckTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
 
-        PaperConsistencyCheck.EntryTypeResult entryTypeResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.TITLE, customField), List.of(first));
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
+        BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.TITLE, customField), List.of(first));
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
         assertEquals(expected, result);
     }
 
@@ -78,11 +78,11 @@ class PaperConsistencyCheckTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
 
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
 
-        PaperConsistencyCheck.EntryTypeResult articleResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
-        PaperConsistencyCheck.EntryTypeResult inProceedingsResult = new PaperConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION), List.of(fourth, third));
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of(
+        BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
+        BibliographyConsistencyCheck.EntryTypeResult inProceedingsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION), List.of(fourth, third));
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
                 StandardEntryType.Article, articleResult,
                 StandardEntryType.InProceedings, inProceedingsResult
         ));
@@ -97,9 +97,9 @@ class PaperConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        PaperConsistencyCheck.Result result = new PaperConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
 
-        PaperConsistencyCheck.Result expected = new PaperConsistencyCheck.Result(Map.of());
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of());
         assertEquals(expected, result);
     }
 }

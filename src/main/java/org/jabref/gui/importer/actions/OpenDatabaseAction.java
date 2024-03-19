@@ -169,15 +169,18 @@ public class OpenDatabaseAction extends SimpleCommand {
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);
             });
-        } else if (toRaise != null) {
+        } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
+            // If there is already a library focused, do not show this library
             tabContainer.showLibraryTab(toRaise);
         }
     }
 
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
+     *
+     * Similar method: {@link org.jabref.gui.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
      *
      * @param file the file, may be NOT null, but may not be existing
      */
@@ -201,6 +204,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 undoManager,
                 taskExecutor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
+        tabContainer.addTab(newTab, true);
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {

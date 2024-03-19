@@ -153,8 +153,8 @@ class OOBibStyleTestHelper {
         return result;
     }
 
-    /*
-     * Similar to old API. pageInfo is new, and unlimAuthors is
+    /**
+     * @implNote Similar to old API. pageInfo is new, and unlimAuthors is
      * replaced with isFirstAppearanceOfSource
      */
     static String getCitationMarker2ab(OOBibStyle style,
@@ -177,7 +177,7 @@ class OOBibStyleTestHelper {
             isFirstAppearanceOfSource = new Boolean[entries.size()];
             Arrays.fill(isFirstAppearanceOfSource, false);
         }
-        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>(entries.size());
         for (int i = 0; i < entries.size(); i++) {
             BibEntry entry = entries.get(i);
             CitationMarkerEntry e = makeCitationMarkerEntry(entry,

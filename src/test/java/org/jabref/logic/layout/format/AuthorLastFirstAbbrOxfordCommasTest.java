@@ -12,7 +12,7 @@ public class AuthorLastFirstAbbrOxfordCommasTest {
      * Test method for {@link org.jabref.logic.layout.format.AuthorLastFirstAbbrOxfordCommas#format(java.lang.String)}.
      */
     @Test
-    public void testFormat() {
+    public void format() {
         LayoutFormatter a = new AuthorLastFirstAbbrOxfordCommas();
 
         // Empty case

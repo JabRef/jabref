@@ -21,7 +21,7 @@ class WrapFileLinksTest {
     }
 
     @Test
-    void testEmpty() {
+    void empty() {
         assertEquals("", formatter.format(""));
     }
 
@@ -31,72 +31,72 @@ class WrapFileLinksTest {
     }
 
     @Test
-    void testNoFormatSetNonEmptyString() {
+    void noFormatSetNonEmptyString() {
         assertThrows(NullPointerException.class, () -> formatter.format("test.pdf"));
     }
 
     @Test
-    void testFileExtension() {
+    void fileExtension() {
         formatter.setArgument("\\x");
         assertEquals("pdf", formatter.format("test.pdf"));
     }
 
     @Test
-    void testFileExtensionNoExtension() {
+    void fileExtensionNoExtension() {
         formatter.setArgument("\\x");
         assertEquals("", formatter.format("test"));
     }
 
     @Test
-    void testPlainTextString() {
+    void plainTextString() {
         formatter.setArgument("x");
         assertEquals("x", formatter.format("test.pdf"));
     }
 
     @Test
-    void testDescription() {
+    void description() {
         formatter.setArgument("\\d");
         assertEquals("Test file", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    void testDescriptionNoDescription() {
+    void descriptionNoDescription() {
         formatter.setArgument("\\d");
         assertEquals("", formatter.format("test.pdf"));
     }
 
     @Test
-    void testType() {
+    void type() {
         formatter.setArgument("\\f");
         assertEquals("PDF", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    void testTypeNoType() {
+    void typeNoType() {
         formatter.setArgument("\\f");
         assertEquals("", formatter.format("test.pdf"));
     }
 
     @Test
-    void testIterator() {
+    void iterator() {
         formatter.setArgument("\\i");
         assertEquals("1", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    void testIteratorTwoItems() {
+    void iteratorTwoItems() {
         formatter.setArgument("\\i\n");
         assertEquals("1\n2\n", formatter.format("Test file:test.pdf:PDF;test2.pdf"));
     }
 
     @Test
-    void testEndingBracket() {
+    void endingBracket() {
         formatter.setArgument("(\\d)");
         assertEquals("(Test file)", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    void testPath() throws IOException {
+    void path() throws IOException {
         formatter = new WrapFileLinks(Collections.singletonList(Path.of("src/test/resources/pdfs/")), "");
         formatter.setArgument("\\p");
         assertEquals(new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
@@ -104,7 +104,7 @@ class WrapFileLinksTest {
     }
 
     @Test
-    void testPathFallBackToGeneratedDir() throws IOException {
+    void pathFallBackToGeneratedDir() throws IOException {
         formatter = new WrapFileLinks(Collections.emptyList(), "src/test/resources/pdfs/");
         formatter.setArgument("\\p");
         assertEquals(new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
@@ -112,14 +112,14 @@ class WrapFileLinksTest {
     }
 
     @Test
-    void testPathReturnsRelativePathIfNotFound() {
+    void pathReturnsRelativePathIfNotFound() {
         formatter = new WrapFileLinks(Collections.singletonList(Path.of("src/test/resources/pdfs/")), "");
         formatter.setArgument("\\p");
         assertEquals("test.pdf", formatter.format("Preferences:test.pdf:PDF"));
     }
 
     @Test
-    void testRelativePath() {
+    void relativePath() {
         formatter.setArgument("\\r");
         assertEquals("test.pdf", formatter.format("Test file:test.pdf:PDF"));
     }

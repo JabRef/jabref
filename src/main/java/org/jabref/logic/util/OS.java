@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OS {
     // No LOGGER may be initialized directly
-    // Otherwise, org.jabref.cli.Launcher.addLogToDisk will fail, because tinylog's properties are frozen
+    // Otherwise, org.jabref.Launcher.addLogToDisk will fail, because tinylog's properties are frozen
 
     public static final String NEWLINE = System.lineSeparator();
 

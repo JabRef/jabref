@@ -44,6 +44,7 @@ import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
+import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
@@ -136,7 +137,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferencesService, dialogService)),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame)),
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -287,7 +288,11 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferencesService.getFilePreferences(), taskExecutor))
+                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferencesService.getFilePreferences(), taskExecutor)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.REDOWNLOAD_MISSING_FILES, new RedownloadMissingFilesAction(stateManager, dialogService, preferencesService.getFilePreferences(), taskExecutor))
         );
         SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
         SidePaneType groupsPane = SidePaneType.GROUPS;

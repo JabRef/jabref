@@ -1,6 +1,7 @@
 package org.jabref.gui.libraryproperties.constants;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import javafx.beans.property.StringProperty;
 
@@ -30,7 +31,7 @@ class ConstantsPropertiesViewModelTest {
 
     @DisplayName("Check that the list of strings is sorted according to their keys")
     @Test
-    void testStringsListPropertySorting() {
+    void stringsListPropertySorting() {
         BibtexString string1 = new BibtexString("TSE", "Transactions on Software Engineering");
         BibtexString string2 = new BibtexString("ICSE", "International Conference on Software Engineering");
         BibDatabase db = new BibDatabase();
@@ -51,7 +52,7 @@ class ConstantsPropertiesViewModelTest {
 
     @DisplayName("Check that the list of strings is sorted after resorting it")
     @Test
-    void testStringsListPropertyResorting() {
+    void stringsListPropertyResorting() {
         BibDatabase db = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of("ICSE", "TSE");
@@ -69,5 +70,66 @@ class ConstantsPropertiesViewModelTest {
                 .toList();
 
         assertEquals(expected, actual);
+    }
+
+   @Test
+   @DisplayName("Check that the storeSettings method store settings on the model")
+   void storeSettingsTest() {
+       // Setup
+       // create a bibdatabse
+       BibDatabase db = new BibDatabase();
+       BibDatabaseContext context = new BibDatabaseContext(db);
+       List<String> expected = List.of("KTH", "Royal Institute of Technology");
+       // initialize a constantsPropertiesViewModel
+       ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
+
+       // construct value to store in model
+       var stringsList = model.stringsListProperty();
+       stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));
+
+       // Act
+       model.storeSettings();
+
+       // Assert
+       // get the names stored
+       List<String> names = context.getDatabase().getStringValues().stream()
+                                    .map(BibtexString::getName).toList();
+       // get the content stored
+       List<String> content = context.getDatabase().getStringValues().stream()
+                                          .map(BibtexString::getContent).toList();
+
+       List<String> actual = Stream.concat(names.stream(), content.stream()).toList();
+
+       assertEquals(expected, actual);
+   }
+
+    @Test
+    @DisplayName("Check that the storeSettings method can identify string constants")
+    void storeSettingsWithStringConstantTest() {
+        // Setup
+        // create a bibdatabse
+        BibDatabase db = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(db);
+        List<String> expected = List.of("@String{KTH = Royal Institute of Technology}");
+        // initialize a constantsPropertiesViewModel
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, filePreferences);
+
+        // construct value to store in model
+        var stringsList = model.stringsListProperty();
+        stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));
+
+        // Act
+        model.storeSettings();
+
+        // Assert
+        // get string the constants through parsedSerialization() method
+        List<String> actual = context.getDatabase().getStringValues().stream()
+                                     .map(BibtexString::getParsedSerialization).toList();
+
+        // get the first value and clean strings
+        String actual_value = actual.getFirst().replaceAll("\\s+", " ").trim();
+        String expected_value = expected.getFirst().replaceAll("\\s+", " ").trim();
+
+        assertEquals(expected_value, actual_value);
     }
 }

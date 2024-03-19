@@ -62,7 +62,7 @@ public class OpenOfficeDocumentCreatorTest {
     }
 
     @Test
-    void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
+    void performExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path zipPath = testFolder.resolve("OpenOfficeRandomNamedFile");
 
         exporter.export(databaseContext, zipPath, entries);

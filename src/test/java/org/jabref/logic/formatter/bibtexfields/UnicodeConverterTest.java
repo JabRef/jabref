@@ -18,24 +18,24 @@ public class UnicodeConverterTest {
     }
 
     @Test
-    public void testBasic() {
+    public void basic() {
         assertEquals("aaa", formatter.format("aaa"));
     }
 
     @Test
-    public void testUnicodeCombiningAccents() {
+    public void unicodeCombiningAccents() {
         assertEquals("{\\\"{a}}", formatter.format("a\u0308"));
         assertEquals("{\\\"{a}}b", formatter.format("a\u0308b"));
     }
 
     @Test
-    public void testUnicode() {
+    public void unicode() {
         assertEquals("{\\\"{a}}", formatter.format("ä"));
         assertEquals("{{$\\Epsilon$}}", formatter.format("\u0395"));
     }
 
     @Test
-    public void testUnicodeSingle() {
+    public void unicodeSingle() {
         assertEquals("a", formatter.format("a"));
     }
 }

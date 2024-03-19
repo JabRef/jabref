@@ -37,7 +37,7 @@ public class NewEntryActionTest {
     }
 
     @Test
-    public void testExecuteOnSuccessWithFixedType() {
+    public void executeOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
         newEntryAction = new NewEntryAction(() -> libraryTab, type, dialogService, preferencesService, stateManager);
         when(tabContainer.getLibraryTabs()).thenReturn(List.of(libraryTab));

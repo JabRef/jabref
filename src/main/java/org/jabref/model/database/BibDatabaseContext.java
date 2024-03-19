@@ -10,18 +10,19 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -241,8 +242,9 @@ public class BibDatabaseContext {
     /**
      * @return The path to store the lucene index files. One directory for each library.
      */
+    @NonNull
     public Path getFulltextIndexPath() {
-        Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path appData = JabRefDesktop.getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {

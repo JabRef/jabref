@@ -23,6 +23,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -35,6 +36,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
@@ -129,8 +131,7 @@ public class JabRefDialogService implements DialogService {
         return (dialogMessage.substring(0, Math.min(dialogMessage.length(), JabRefDialogService.DIALOG_SIZE_LIMIT)) + "...").trim();
     }
 
-    @Override
-    public <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
+    private <T> ChoiceDialog<T> createChoiceDialog(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
         ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
         ((Stage) choiceDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefImage());
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
@@ -139,6 +140,21 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         choiceDialog.initOwner(mainWindow);
+        return choiceDialog;
+    }
+
+    @Override
+    public <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
+        return createChoiceDialog(title, content, okButtonLabel, defaultChoice, choices).showAndWait();
+    }
+
+    @Override
+    public <T> Optional<T> showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices, StringConverter<T> converter) {
+        ChoiceDialog<T> choiceDialog = createChoiceDialog(title, content, okButtonLabel, defaultChoice, choices);
+        ComboBox<T> comboBox = (ComboBox<T>) choiceDialog.getDialogPane().lookup(".combo-box");
+        comboBox.setEditable(true);
+        comboBox.setConverter(converter);
+        EasyBind.subscribe(comboBox.getEditor().textProperty(), text -> comboBox.setValue(converter.fromString(text)));
         return choiceDialog.showAndWait();
     }
 
@@ -297,8 +313,7 @@ public class JabRefDialogService implements DialogService {
         return dialog.showAndWait();
     }
 
-    @Override
-    public <V> void showProgressDialog(String title, String content, Task<V> task) {
+    private <V> ProgressDialog createProgressDialog(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
         progressDialog.setHeaderText(null);
         progressDialog.setTitle(title);
@@ -314,7 +329,19 @@ public class JabRefDialogService implements DialogService {
             progressDialog.close();
         });
         progressDialog.initOwner(mainWindow);
+        return progressDialog;
+    }
+
+    @Override
+    public <V> void showProgressDialog(String title, String content, Task<V> task) {
+        ProgressDialog progressDialog = createProgressDialog(title, content, task);
         progressDialog.show();
+    }
+
+    @Override
+    public <V> void showProgressDialogAndWait(String title, String content, Task<V> task) {
+        ProgressDialog progressDialog = createProgressDialog(title, content, task);
+        progressDialog.showAndWait();
     }
 
     @Override

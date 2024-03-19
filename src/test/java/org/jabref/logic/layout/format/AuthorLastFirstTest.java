@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AuthorLastFirstTest {
 
     @Test
-    public void testFormat() {
+    public void format() {
         LayoutFormatter a = new AuthorLastFirst();
 
         // Empty case

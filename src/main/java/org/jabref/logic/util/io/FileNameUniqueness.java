@@ -117,4 +117,10 @@ public class FileNameUniqueness {
         Matcher m = DUPLICATE_MARK_PATTERN.matcher(fileName);
         return m.find() ? fileName.substring(0, fileName.lastIndexOf('(') - 1) : fileName;
     }
+
+    public static Path eraseDuplicateMarks(Path filePath) {
+        String extensionSuffix = FileUtil.getFileExtension(filePath).map(ext -> "." + ext).orElse("");
+
+        return filePath.resolveSibling(eraseDuplicateMarks(FileUtil.getBaseName(filePath)) + extensionSuffix);
+    }
 }
