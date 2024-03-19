@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -87,17 +88,17 @@ class MathSciNetTest {
     }
 
     @Test
-    void testGetParser() throws Exception {
+    void getParser() throws Exception {
         String json = "{\"results\":[{\"mrnumber\":4158623,\"titles\":{\"title\":\"On the weights of general MDS codes\",\"translatedTitle\":null},\"entryType\":\"J\",\"primaryClass\":{\"code\":\"94B65\",\"description\":\"Bounds on codes\"},\"authors\":[{\"id\":758603,\"name\":\"Alderson, Tim L.\"}],\"issue\":{\"issue\":{\"pubYear\":2020,\"pubYear2\":null,\"volume\":\"66\",\"volume2\":null,\"volume3\":null,\"number\":\"9\",\"journal\":{\"id\":2292,\"shortTitle\":\"IEEE Trans. Inform. Theory\",\"issn\":\"0018-9448\"},\"volSlash\":\"N\",\"isbn\":null,\"elementOrd\":null},\"translatedIssue\":null},\"book\":null,\"reviewer\":{\"public\":true,\"reviewers\":[{\"authId\":889610,\"rvrCode\":85231,\"name\":\"Jitman, Somphong\"}]},\"paging\":{\"paging\":{\"text\":\"5414--5418\"},\"translatedPaging\":null},\"counts\":{\"cited\":2},\"itemType\":\"Reviewed\",\"articleUrl\":\"https://doi.org/10.1109/TIT.2020.2977319\",\"openURL\":{\"imageLink\":\"http://www.lib.unb.ca/img/asin/res20x150.gif\",\"targetLink\":\"https://unb.on.worldcat.org/atoztitles/link?ctx_ver=Z39.88-2004&ctx_enc=info:ofi/enc:UTF-8&rfr_id=info:sid/ams.org:MathSciNet&rft_val_fmt=info:ofi/fmt:kev:mtx:journal&rft_id=info:doi/10.1109%2FTIT.2020.2977319&rft.aufirst=Tim&rft.auinit=TL&rft.auinit1=T&rft.auinitm=L&rft.aulast=Alderson&rft.genre=article&rft.issn=00189448&rft.title=Institute of Electrical and Electronics Engineers  Transactions on Information Theory&rft.atitle=On the weights of general MDS codes&rft.stitle=IEEE Trans  Inform  Theory&rft.volume=66&rft.date=2020&rft.spage=5414&rft.epage=5418&rft.pages=5414-5418&rft.issue=9&rft.jtitle=Institute of Electrical and Electronics Engineers  Transactions on Information Theory\",\"textLink\":\"\"},\"prePubl\":null,\"public\":true}],\"total\":31}";
 
-        InputStream inputStream = new java.io.ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         List<BibEntry> entries = fetcher.getParser().parseEntries(inputStream);
 
         assertNotNull(entries);
         assertFalse(entries.isEmpty());
         assertEquals(1, entries.size());
 
-        BibEntry parsedEntry = entries.get(0);
+        BibEntry parsedEntry = entries.getFirst();
         assertEquals("On the weights of general MDS codes", parsedEntry.getField(StandardField.TITLE).orElse(null));
         assertEquals("Alderson, Tim L.", parsedEntry.getField(StandardField.AUTHOR).orElse(null));
         assertEquals("2020", parsedEntry.getField(StandardField.YEAR).orElse(null));

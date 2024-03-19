@@ -210,8 +210,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             }
         }
 
-        if (value instanceof String) {
-            String stringValue = (String) value;
+        if (value instanceof String stringValue) {
             return new String(stringValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
         }
 
