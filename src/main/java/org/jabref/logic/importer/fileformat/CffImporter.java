@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.exporter.CffExporter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -24,8 +25,12 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.collect.HashBiMap;
 
 public class CffImporter extends Importer {
+
+    public static final Map<String, Field> FIELDS_MAP = HashBiMap.create(CffExporter.FIELDS_MAP).inverse();
+    public static final Map<String, EntryType> TYPES_MAP = HashBiMap.create(CffExporter.TYPES_MAP).inverse();
 
     @Override
     public String getName() {
@@ -44,8 +49,7 @@ public class CffImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Importer for the CFF format. Is only used to cite software, one entry per file. Can also " +
-                "cite a preferred citation.";
+        return "Importer for the CFF format, which is intended to make software and datasets citable.";
     }
 
     // POJO classes for yaml data
@@ -173,19 +177,19 @@ public class CffImporter extends Importer {
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         List<BibEntry> entriesList = new ArrayList<>();
 
-        // Retrieve mappings from CFF to JabRef
-        HashMap<String, Field> fieldMap = getFieldMappings();
-        HashMap<String, EntryType> typeMap = getTypeMappings();
+        // Remove CFF version and type
+        citation.values.remove("cff-version");
 
         // Parse main entry
         HashMap<Field, String> entryMap = new HashMap<>();
-        EntryType entryType = typeMap.getOrDefault(citation.values.get("type"), StandardEntryType.Software);
+        EntryType entryType = TYPES_MAP.getOrDefault(citation.values.get("type"), StandardEntryType.Software);
+        citation.values.remove("type");
 
         // Map CFF fields to JabRef Fields
         for (Map.Entry<String, String> property : citation.values.entrySet()) {
-            if (fieldMap.containsKey(property.getKey())) {
-                entryMap.put(fieldMap.get(property.getKey()), property.getValue());
-            } else if (getUnmappedFields().contains(property.getKey())) {
+            if (FIELDS_MAP.containsKey(property.getKey())) {
+                entryMap.put(FIELDS_MAP.get(property.getKey()), property.getValue());
+            } else {
                 entryMap.put(new UnknownField(property.getKey()), property.getValue());
             }
         }
@@ -232,42 +236,14 @@ public class CffImporter extends Importer {
         entry.setField(entryMap);
         entriesList.add(entry);
 
-        // Handle `preferred-citation` field
         if (citation.citation != null) {
-            HashMap<Field, String> preferredEntryMap = new HashMap<>();
-            EntryType preferredEntryType = typeMap.getOrDefault(citation.citation.type, StandardEntryType.Article);
-            for (Map.Entry<String, String> property : citation.citation.values.entrySet()) {
-                if (fieldMap.containsKey(property.getKey())) {
-                    preferredEntryMap.put(fieldMap.get(property.getKey()), property.getValue());
-                } else if (getUnmappedFields().contains(property.getKey())) {
-                    entryMap.put(new UnknownField(property.getKey()), property.getValue());
-                }
-            }
-
-            preferredEntryMap.put(StandardField.AUTHOR, parseAuthors(citation.citation.authors));
-            BibEntry preferredEntry = new BibEntry(preferredEntryType);
-            preferredEntry.setField(preferredEntryMap);
-            entriesList.add(preferredEntry);
+            entriesList.add(parsePreferredCitation(citation.citation));
         }
 
-        // Handle `references` field
         if (citation.references != null) {
-            for (CffReference ref : citation.references) {
-                HashMap<Field, String> refEntryMap = new HashMap<>();
-                EntryType refEntryType = typeMap.getOrDefault(ref.type, StandardEntryType.Article);
-                for (Map.Entry<String, String> property : ref.values.entrySet()) {
-                    if (fieldMap.containsKey(property.getKey())) {
-                        refEntryMap.put(fieldMap.get(property.getKey()), property.getValue());
-                    } else if (getUnmappedFields().contains(property.getKey())) {
-                        entryMap.put(new UnknownField(property.getKey()), property.getValue());
-                    }
-                }
-                refEntryMap.put(StandardField.AUTHOR, parseAuthors(ref.authors));
-                BibEntry refEntry = new BibEntry(refEntryType);
-                refEntry.setField(refEntryMap);
-                entriesList.add(refEntry);
-            }
+            entriesList.addAll(parseReferences(citation.references));
         }
+
         return new ParserResult(entriesList);
     }
 
@@ -285,91 +261,6 @@ public class CffImporter extends Importer {
         }
     }
 
-    private HashMap<String, Field> getFieldMappings() {
-        HashMap<String, Field> fieldMappings = new HashMap<>();
-        fieldMappings.put("abstract", StandardField.ABSTRACT);
-        fieldMappings.put("date-released", StandardField.DATE);
-        fieldMappings.put("doi", StandardField.DOI);
-        fieldMappings.put("keywords", StandardField.KEYWORDS);
-        fieldMappings.put("license", BiblatexSoftwareField.LICENSE);
-        fieldMappings.put("message", StandardField.COMMENT);
-        fieldMappings.put("repository", BiblatexSoftwareField.REPOSITORY);
-        fieldMappings.put("title", StandardField.TITLE);
-        fieldMappings.put("url", StandardField.URL);
-        fieldMappings.put("version", StandardField.VERSION);
-
-        // specific to references and preferred-citation
-        fieldMappings.put("edition", StandardField.EDITION);
-        fieldMappings.put("isbn", StandardField.ISBN);
-        fieldMappings.put("issn", StandardField.ISSN);
-        fieldMappings.put("issue", StandardField.ISSUE);
-        fieldMappings.put("journal", StandardField.JOURNAL);
-        fieldMappings.put("month", StandardField.MONTH);
-        fieldMappings.put("notes", StandardField.NOTE);
-        fieldMappings.put("number", StandardField.NUMBER);
-        fieldMappings.put("pages", StandardField.PAGES);
-        fieldMappings.put("status", StandardField.PUBSTATE);
-        fieldMappings.put("volume", StandardField.VOLUME);
-        fieldMappings.put("year", StandardField.YEAR);
-        return fieldMappings;
-    }
-
-    private List<String> getUnmappedFields() {
-        List<String> fields = new ArrayList<>();
-
-        fields.add("abbreviation");
-        fields.add("collection-doi");
-        fields.add("collection-title");
-        fields.add("collection-type");
-        fields.add("commit");
-        fields.add("copyright");
-        fields.add("data-type");
-        fields.add("database");
-        fields.add("date-accessed");
-        fields.add("date-downloaded");
-        fields.add("date-published");
-        fields.add("department");
-        fields.add("end");
-        fields.add("entry");
-        fields.add("filename");
-        fields.add("format");
-        fields.add("issue-date");
-        fields.add("issue-title");
-        fields.add("license-url");
-        fields.add("loc-end");
-        fields.add("loc-start");
-        fields.add("medium");
-        fields.add("nihmsid");
-        fields.add("number-volumes");
-        fields.add("patent-states");
-        fields.add("pmcid");
-        fields.add("repository-artifact");
-        fields.add("repository-code");
-        fields.add("scope");
-        fields.add("section");
-        fields.add("start");
-        fields.add("term");
-        fields.add("thesis-type");
-        fields.add("volume-title");
-        fields.add("year-original");
-        return fields;
-    }
-
-    private HashMap<String, EntryType> getTypeMappings() {
-        HashMap<String, EntryType> typeMappings = new HashMap<>();
-        typeMappings.put("article", StandardEntryType.Article);
-        typeMappings.put("book", StandardEntryType.Book);
-        typeMappings.put("pamphlet", StandardEntryType.Booklet);
-        typeMappings.put("conference-paper", StandardEntryType.InProceedings);
-        typeMappings.put("misc", StandardEntryType.Misc);
-        typeMappings.put("manual", StandardEntryType.Manual);
-        typeMappings.put("software", StandardEntryType.Software);
-        typeMappings.put("dataset", StandardEntryType.Dataset);
-        typeMappings.put("report", StandardEntryType.Report);
-        typeMappings.put("unpublished", StandardEntryType.Unpublished);
-        return typeMappings;
-    }
-
     private String parseAuthors(List<CffEntity> authors) {
         return authors.stream()
                       .map(author -> author.values)
@@ -379,5 +270,35 @@ public class CffImporter extends Importer {
                                       vals.get("family-names"), vals.get("name-suffix")))
                       .collect(AuthorList.collect())
                       .getAsFirstLastNamesWithAnd();
+    }
+
+    private BibEntry parsePreferredCitation(CffReference preferred) {
+        // TODO add `cites` relation to main entry
+        return parseEntry(preferred);
+    }
+
+    private List<BibEntry> parseReferences(List<CffReference> references) {
+        // TODO add `related` relation to main entry
+        List<BibEntry> refEntries = new ArrayList<>();
+        for (CffReference ref : references) {
+            refEntries.add(parseEntry(ref));
+        }
+        return refEntries;
+    }
+
+    private BibEntry parseEntry(CffReference reference) {
+        HashMap<Field, String> entryMap = new HashMap<>();
+        EntryType entryType = TYPES_MAP.getOrDefault(reference.type, StandardEntryType.Article);
+        for (Map.Entry<String, String> property : reference.values.entrySet()) {
+            if (FIELDS_MAP.containsKey(property.getKey())) {
+                entryMap.put(FIELDS_MAP.get(property.getKey()), property.getValue());
+            } else {
+                entryMap.put(new UnknownField(property.getKey()), property.getValue());
+            }
+        }
+        entryMap.put(StandardField.AUTHOR, parseAuthors(reference.authors));
+        BibEntry entry = new BibEntry(entryType);
+        entry.setField(entryMap);
+        return entry;
     }
 }

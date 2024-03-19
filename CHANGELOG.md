@@ -49,10 +49,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
 - We store the citation relations in an LRU cache to avoid bloating the memory and out-of-memory exceptions. [#10958](https://github.com/JabRef/jabref/issues/10958)
 - Keywords filed are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
-- We use another exporter for CFF format and the importer parses more fields. [#10993](https://github.com/JabRef/jabref/issues/10993)
 - Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
-- We use another exporter for CFF format and the importer parses more fields. [#10993](https://github.com/JabRef/jabref/issues/10993)
-- Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
+- Importer/Exporter for CFF format now support JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
 
 ### Fixed
 
@@ -72,7 +70,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Document Viewer would show the PDF in only half the window when maximized. [#10934](https://github.com/JabRef/jabref/issues/10934)
 - Clicking on the crossref and related tags in the entry editor jumps to the linked entry. [#5484](https://github.com/JabRef/jabref/issues/5484) [#9369](https://github.com/JabRef/jabref/issues/9369)
 - We fixed an issue where JabRef could not parse absolute file paths from Zotero exports. [#10959](https://github.com/JabRef/jabref/issues/10959)
-- We fixed an issue where an exception occured when toggling between "Live" or "Locked" in the internal Document Viewer. [#10935](https://github.com/JabRef/jabref/issues/10935)
+- We fixed an issue where an exception occurred when toggling between "Live" or "Locked" in the internal Document Viewer. [#10935](https://github.com/JabRef/jabref/issues/10935)
 
 ### Removed
 
