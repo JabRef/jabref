@@ -186,6 +186,11 @@ public class DOITest {
                 Arguments.of("10.1006/rwei.1999 .0001", new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getDOI()),
                 // ? -> (%3F)
                 Arguments.of("10.1006/rwei.1999?.0001", new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getDOI()),
+                // <,> -> (%3C, %3E)
+                Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").getDOI()),
+
+                // acceptDoiWithSpecialCharacters
+                Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2").getDOI()),
 
                 // findDoiInsideArbitraryText
                 Arguments.of("10.1006/jmbi.1998.2354",
@@ -305,5 +310,10 @@ public class DOITest {
     @Test
     public void rejectMissingDividerInShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("10gf4gqc end"));
+    }
+
+    @Test
+    public void rejectNullDoiParameter() {
+        assertThrows(NullPointerException.class, () -> new DOI(null));
     }
 }

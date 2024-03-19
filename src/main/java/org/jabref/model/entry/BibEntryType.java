@@ -164,6 +164,9 @@ public class BibEntryType implements Comparable<BibEntryType> {
                 '}';
     }
 
+    /**
+     * WARNING! This does not follow the equals contract. Even if this here returns 0, the objects can be different.
+     */
     @Override
     public int compareTo(BibEntryType o) {
         return this.getType().getName().compareTo(o.getType().getName());

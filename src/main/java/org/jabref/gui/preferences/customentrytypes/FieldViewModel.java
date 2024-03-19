@@ -13,6 +13,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.types.EntryType;
 
 public class FieldViewModel {
 
@@ -55,18 +56,18 @@ public class FieldViewModel {
         return priorityProperty.getValue();
     }
 
-    public Field toField() {
+    public Field toField(EntryType type) {
         // If the field name is known by JabRef, JabRef's casing will win.
         // If the field is not known by JabRef (UnknownField), the new casing will be taken.
-        Field field = FieldFactory.parseField(displayName.getValue());
+        Field field = FieldFactory.parseField(type, displayName.getValue());
         if (multiline.getValue()) {
             field.getProperties().add(FieldProperty.MULTILINE_TEXT);
         }
         return field;
     }
 
-    public BibField toBibField() {
-        return new BibField(toField(), priorityProperty.getValue());
+    public BibField toBibField(EntryType type) {
+        return new BibField(toField(type), priorityProperty.getValue());
     }
 
     @Override

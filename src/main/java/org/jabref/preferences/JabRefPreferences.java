@@ -1271,8 +1271,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
         clearAllBibEntryTypes();
-        storeBibEntryTypes(entryTypesManager.getAllTypes(BibDatabaseMode.BIBTEX), BibDatabaseMode.BIBTEX);
-        storeBibEntryTypes(entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX);
+        storeBibEntryTypes(entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBTEX), BibDatabaseMode.BIBTEX);
+        storeBibEntryTypes(entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX);
     }
 
     private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
