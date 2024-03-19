@@ -455,11 +455,10 @@ public class BibtexParser implements Parser {
 
     private void parseBibtexString() throws IOException {
         BibtexString bibtexString = parseString();
-        bibtexString.setParsedSerialization(dumpTextReadSoFarToString());
         try {
             database.addString(bibtexString);
         } catch (KeyCollisionException ex) {
-            parserResult.addWarning(Localization.lang("Duplicate string name") + ": " + bibtexString.getName());
+            parserResult.addWarning(Localization.lang("Duplicate string name: '%0'", bibtexString.getName()));
         }
     }
 
@@ -669,7 +668,7 @@ public class BibtexParser implements Parser {
         skipOneNewline();
         LOGGER.debug("Finished string parsing.");
 
-        return new BibtexString(name, content);
+        return new BibtexString(name, content, dumpTextReadSoFarToString());
     }
 
     private String parsePreamble() throws IOException {
