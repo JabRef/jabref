@@ -14,7 +14,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
@@ -40,14 +42,16 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     private final BooleanBinding canAskUserToResolveChange;
 
     private final UndoManager undoManager;
+    private final OptionalObjectProperty<LibraryTab> activeTab;
 
-    public ExternalChangesResolverViewModel(List<DatabaseChange> externalChanges, UndoManager undoManager) {
+    public ExternalChangesResolverViewModel(List<DatabaseChange> externalChanges, UndoManager undoManager, OptionalObjectProperty<LibraryTab> activeTab) {
         Objects.requireNonNull(externalChanges);
         assert !externalChanges.isEmpty();
 
         this.visibleChanges.addAll(externalChanges);
         this.changes.addAll(externalChanges);
         this.undoManager = undoManager;
+        this.activeTab = activeTab;
 
         areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
@@ -82,10 +86,18 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             selectedChange.accept();
             getVisibleChanges().remove(selectedChange);
         });
+        if(activeTab!=null){
+            activeTab.get().get().updateTabTitle(false);
+            activeTab.get().get().resetChangedProperties();
+        }
     }
 
     public void denyChange() {
         getSelectedChange().ifPresent(getVisibleChanges()::remove);
+        if(activeTab!=null){
+            activeTab.get().get().updateTabTitle(true);
+            activeTab.get().get().markBaseChanged();
+        }
     }
 
     public void acceptMergedChange(DatabaseChange databaseChange) {
@@ -104,4 +116,5 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         ce.end();
         undoManager.addEdit(ce);
     }
+
 }

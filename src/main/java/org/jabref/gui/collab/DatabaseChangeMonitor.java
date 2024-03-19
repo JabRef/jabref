@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -31,18 +32,20 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final OptionalObjectProperty<LibraryTab> activeTab;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
                                  PreferencesService preferencesService,
-                                 LibraryTab.DatabaseNotification notificationPane) {
+                                 LibraryTab.DatabaseNotification notificationPane, OptionalObjectProperty<LibraryTab> activeTab) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.activeTab = activeTab;
 
         this.listeners = new ArrayList<>();
 
@@ -59,7 +62,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
                         new Action(Localization.lang("Review changes"), event -> {
-                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver")));
+                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver"), activeTab));
                             notificationPane.hide();
                         })),
                 Duration.ZERO));
