@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When pasting HTML into the abstract or a comment field, the hypertext is automatically converted to Markdown. [#10558](https://github.com/JabRef/jabref/issues/10558)
 - We added the possibility to redownload files that had been present but are no longer in the specified location. [#10848](https://github.com/JabRef/jabref/issues/10848)
 - We added the citation key pattern `[camelN]`. Equivalent to the first N words of the `[camel]` pattern.
+- We added 'langid' field which is important for hyphenation and casing. [#10868](https://github.com/JabRef/jabref/issues/10868).
 
 ### Changed
 
@@ -103,7 +104,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for exporting to Hayagriva YAML format. [#10382](https://github.com/JabRef/jabref/issues/10382)
 - We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
 - We added the 'Bachelor's thesis' type for Biblatex's 'Thesis' EntryType [#10029](https://github.com/JabRef/jabref/issues/10029).
-- We added 'langid' field which is important for hyphenation and casing. [#10868](https://github.com/JabRef/jabref/issues/10868).
 
 ### Changed
 
