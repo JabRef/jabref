@@ -237,11 +237,15 @@ public class CffImporter extends Importer {
         entriesList.add(entry);
 
         if (citation.citation != null) {
-            entriesList.add(parsePreferredCitation(citation.citation));
+            // TODO add `preferred-citation` relation from main entry
+            entriesList.add(parseEntry(citation.citation));
         }
 
         if (citation.references != null) {
-            entriesList.addAll(parseReferences(citation.references));
+            // TODO add `related` relation from main entry
+            for (CffReference ref : citation.references) {
+                entriesList.add(parseEntry(ref));
+            }
         }
 
         return new ParserResult(entriesList);
@@ -270,20 +274,6 @@ public class CffImporter extends Importer {
                                       vals.get("family-names"), vals.get("name-suffix")))
                       .collect(AuthorList.collect())
                       .getAsFirstLastNamesWithAnd();
-    }
-
-    private BibEntry parsePreferredCitation(CffReference preferred) {
-        // TODO add `cites` relation to main entry
-        return parseEntry(preferred);
-    }
-
-    private List<BibEntry> parseReferences(List<CffReference> references) {
-        // TODO add `related` relation to main entry
-        List<BibEntry> refEntries = new ArrayList<>();
-        for (CffReference ref : references) {
-            refEntries.add(parseEntry(ref));
-        }
-        return refEntries;
     }
 
     private BibEntry parseEntry(CffReference reference) {
