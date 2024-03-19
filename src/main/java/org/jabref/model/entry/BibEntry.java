@@ -602,7 +602,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value must not be null");
+        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
         Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
         if (value.isEmpty()) {

@@ -171,11 +171,15 @@ jobs:
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+      - name: Prepare format failed test results
+        if: failure()
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: xml-twig-tools xsltproc
+          version: 1.0
       - name: Format failed test results
         if: failure()
-        run: |
-          sudo apt-get install -qq -y xml-twig-tools xsltproc
-          scripts/after-failure.sh
+        run: scripts/after-failure.sh
   databasetests:
     name: Database tests
     runs-on: ubuntu-latest

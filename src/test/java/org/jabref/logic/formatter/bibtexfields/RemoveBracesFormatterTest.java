@@ -1,7 +1,8 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,67 +11,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class RemoveBracesFormatterTest {
 
-    private RemoveBracesFormatter formatter;
+    private final RemoveBracesFormatter formatter = new RemoveBracesFormatter();
 
-    @BeforeEach
-    public void setUp() {
-        formatter = new RemoveBracesFormatter();
-    }
-
-    @Test
-    public void formatRemovesSingleEnclosingBraces() {
-        assertEquals("test", formatter.format("{test}"));
-    }
-
-    @Test
-    public void formatKeepsUnmatchedBracesAtBeginning() {
-        assertEquals("{test", formatter.format("{test"));
-    }
-
-    @Test
-    public void formatKeepsUnmatchedBracesAtEnd() {
-        assertEquals("test}", formatter.format("test}"));
-    }
-
-    @Test
-    public void formatKeepsShortString() {
-        assertEquals("t", formatter.format("t"));
-    }
-
-    @Test
-    public void formatRemovesBracesOnly() {
-        assertEquals("", formatter.format("{}"));
-    }
-
-    @Test
-    public void formatKeepsEmptyString() {
-        assertEquals("", formatter.format(""));
-    }
-
-    @Test
-    public void formatRemovesDoubleEnclosingBraces() {
-        assertEquals("test", formatter.format("{{test}}"));
-    }
-
-    @Test
-    public void formatRemovesTripleEnclosingBraces() {
-        assertEquals("test", formatter.format("{{{test}}}"));
-    }
-
-    @Test
-    public void formatKeepsNonMatchingBraces() {
-        assertEquals("{A} and {B}", formatter.format("{A} and {B}"));
-    }
-
-    @Test
-    public void formatRemovesOnlyMatchingBraces() {
-        assertEquals("{A} and {B}", formatter.format("{{A} and {B}}"));
-    }
-
-    @Test
-    public void formatDoesNotRemoveBracesInBrokenString() {
-        // We opt here for a conservative approach although one could argue that "A} and {B}" is also a valid return
-        assertEquals("{A} and {B}}", formatter.format("{A} and {B}}"));
+    @ParameterizedTest
+    @CsvSource({
+            "test, {test}", // formatRemovesSingleEnclosingBraces
+            "{test, {test", // formatKeepsUnmatchedBracesAtBeginning
+            "test}, test}", // formatKeepsUnmatchedBracesAtEnd
+            "t, t", // formatKeepsShortString
+            "'', {}", // formatRemovesBracesOnly
+            "test, {{test}}", // formatKeepsEmptyString
+            "test, {{{test}}}", // formatRemovesDoubleEnclosingBraces
+            "{A} and {B}, {A} and {B}", // formatRemovesTripleEnclosingBraces
+            "{A} and {B}, {{A} and {B}}", // formatKeepsNonMatchingBraces
+            "{A} and {B}}, {A} and {B}}", // formatRemovesOnlyMatchingBraces
+            "Vall{\\'e}e Poussin, {Vall{\\'e}e Poussin}", // formatDoesNotRemoveBracesInBrokenString
+            "Vall{\\'e}e Poussin, Vall{\\'e}e Poussin"
+    })
+    public void format(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
     @Test

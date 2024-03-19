@@ -83,8 +83,6 @@ Course: BSc Computer Science Individual Project
 * Summary: Students experience the procedure of finding and fixing small and medium issues in an open source project.
 * Successfully run in 2022/2023
 
-Do you have additions/suggestions for improvement?
-
 #### Northern Arizona University (NAU), USA
 
 Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
@@ -129,7 +127,7 @@ Course "Programming and Software Development" as part of the [BSc Software Engin
 Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 
 * Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements' specification to the final pull request.
-* Successfully run in 2020
+* Successfully run in 2020, 2024, and other years.
 
 ### Portuguese
 
