@@ -478,7 +478,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return contextMenu;
     }
 
-    public void addTab(LibraryTab libraryTab, boolean raisePanel) {
+    public void addTab(@NonNull LibraryTab libraryTab, boolean raisePanel) {
         tabbedPane.getTabs().add(libraryTab);
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -495,7 +495,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
      * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
-    public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
+    public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
@@ -558,7 +558,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         dialogService.showCustomDialogAndWait(dialog);
     }
 
-    public boolean closeTab(LibraryTab libraryTab) {
+    public boolean closeTab(@NonNull LibraryTab libraryTab) {
         if (libraryTab.requestClose()) {
             tabbedPane.getTabs().remove(libraryTab);
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
