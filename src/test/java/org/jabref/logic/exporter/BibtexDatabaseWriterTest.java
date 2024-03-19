@@ -326,12 +326,13 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeStringWithQuotes() throws Exception {
-        BibtexString bibtexString = new BibtexString("name", "content", "name = \"content\"");
+        String parsedSerialization = "@String{name = \"content\"}";
+        BibtexString bibtexString = new BibtexString("name", "content", parsedSerialization);
         database.addString(bibtexString);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals("@String{name = \"content\"}" + OS.NEWLINE, stringWriter.toString());
+        assertEquals(parsedSerialization + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
