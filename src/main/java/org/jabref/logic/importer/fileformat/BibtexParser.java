@@ -455,7 +455,9 @@ public class BibtexParser implements Parser {
 
     private void parseBibtexString() throws IOException {
         BibtexString bibtexString = parseString();
-        bibtexString.setParsedSerialization(dumpTextReadSoFarToString());
+        String parsedSerialization = dumpTextReadSoFarToString();
+        LOGGER.debug("Parsed serialization of @String: {}", parsedSerialization);
+        bibtexString.setParsedSerialization(parsedSerialization);
         try {
             database.addString(bibtexString);
         } catch (KeyCollisionException ex) {
