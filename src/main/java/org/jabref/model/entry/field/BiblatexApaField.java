@@ -48,6 +48,8 @@ public enum BiblatexApaField implements Field {
 
     public static <T> Optional<BiblatexApaField> fromName(T type, String name) {
         if (!(type instanceof BiblatexApaEntryType)) {
+            // Also returns nothing if no type is given.
+            // Reason: The field should also be recognized in the presence of a BiblatexApa entry type.
             return Optional.empty();
         }
         return Arrays.stream(BiblatexApaField.values())
