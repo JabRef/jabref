@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -53,7 +52,6 @@ import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.importer.ImportCleanup;
@@ -72,7 +70,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.TelemetryPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -211,33 +208,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 }
             }
         });
-    }
-
-    private void initShowTrackingNotification() {
-        if (prefs.getTelemetryPreferences().shouldAskToCollectTelemetry()) {
-            JabRefExecutorService.INSTANCE.submit(new TimerTask() {
-                @Override
-                public void run() {
-                    DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
-                }
-            }, 60000); // run in one minute
-        }
-    }
-
-    private void showTrackingNotification() {
-        TelemetryPreferences telemetryPreferences = prefs.getTelemetryPreferences();
-        boolean shouldCollect = telemetryPreferences.shouldCollectTelemetry();
-
-        if (!telemetryPreferences.shouldCollectTelemetry()) {
-            shouldCollect = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Telemetry: Help make JabRef better"),
-                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via File -> Preferences -> General."),
-                    Localization.lang("Share anonymous statistics"),
-                    Localization.lang("Don't share"));
-        }
-
-        telemetryPreferences.setCollectTelemetry(shouldCollect);
-        telemetryPreferences.setAskToCollectTelemetry(false);
     }
 
     private void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
@@ -499,7 +469,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
-        initShowTrackingNotification();
+
+        Telemetry.initTrackingNotification(dialogService, prefs.getTelemetryPreferences());
     }
 
     /**
