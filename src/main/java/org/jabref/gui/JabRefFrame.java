@@ -285,6 +285,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private void initLayout() {
         setId("frame");
 
+        sidePane = new SidePane(
+                this,
+                prefs,
+                Globals.journalAbbreviationRepository,
+                taskExecutor,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
+
         MainToolBar mainToolBar = new MainToolBar(
                 this,
                 pushToApplicationCommand,
@@ -379,17 +390,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public void init() {
-        sidePane = new SidePane(
-                this,
-                prefs,
-                Globals.journalAbbreviationRepository,
-                taskExecutor,
-                dialogService,
-                stateManager,
-                fileUpdateMonitor,
-                entryTypesManager,
-                undoManager);
-
         initLayout();
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
