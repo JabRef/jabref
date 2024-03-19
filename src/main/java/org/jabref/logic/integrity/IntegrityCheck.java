@@ -52,7 +52,7 @@ public class IntegrityCheck {
             entryCheckers.addAll(List.of(
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
-                    new UnicodeNormalFormCCheck(),
+                    new UnicodeNormalFormCanonicalCompositionCheck(),
                     new BibTeXEntryTypeChecker())
             );
         }
