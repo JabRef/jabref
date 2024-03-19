@@ -31,18 +31,21 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final LibraryTab libraryTab;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
                                  PreferencesService preferencesService,
-                                 LibraryTab.DatabaseNotification notificationPane) {
+                                 LibraryTab.DatabaseNotification notificationPane,
+                                 LibraryTab libraryTab) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.libraryTab = libraryTab;
 
         this.listeners = new ArrayList<>();
 
@@ -59,7 +62,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
                         new Action(Localization.lang("Review changes"), event -> {
-                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver")));
+                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver"),libraryTab));
                             notificationPane.hide();
                         })),
                 Duration.ZERO));

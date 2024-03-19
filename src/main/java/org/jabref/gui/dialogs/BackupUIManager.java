@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
@@ -41,7 +42,8 @@ public class BackupUIManager {
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  Path originalPath,
                                                                  PreferencesService preferencesService,
-                                                                 FileUpdateMonitor fileUpdateMonitor) {
+                                                                 FileUpdateMonitor fileUpdateMonitor,
+                                                                 LibraryTab libraryTab) {
         var actionOpt = showBackupResolverDialog(
                 dialogService,
                 preferencesService.getExternalApplicationsPreferences(),
@@ -52,7 +54,7 @@ public class BackupUIManager {
                 BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
+                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, libraryTab);
             }
             return Optional.empty();
         });
@@ -70,7 +72,8 @@ public class BackupUIManager {
             DialogService dialogService,
             Path originalPath,
             PreferencesService preferencesService,
-            FileUpdateMonitor fileUpdateMonitor) {
+            FileUpdateMonitor fileUpdateMonitor,
+            LibraryTab libraryTab) {
         try {
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
 
@@ -88,12 +91,13 @@ public class BackupUIManager {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
-                        originalDatabase, "Review Backup"
+                        originalDatabase, "Review Backup",
+                        libraryTab
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
                     // In case not all changes are resolved, start from scratch
-                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
+                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, libraryTab);
                 }
 
                 // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
