@@ -910,7 +910,8 @@ public class LibraryTab extends Tab {
                 taskExecutor,
                 dialogService,
                 preferencesService,
-                databaseNotificationPane));
+                databaseNotificationPane,
+                stateManager.activeTabProperty()));
     }
 
     public void copy() {
