@@ -9,6 +9,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/deployment-jdk-ea.yml
+      - build.gradle
   workflow_dispatch:
     inputs:
       notarization:
