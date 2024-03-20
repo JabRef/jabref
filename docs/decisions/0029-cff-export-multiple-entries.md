@@ -1,13 +1,6 @@
 ---
-# Replace this with the number of the ADR
 nav_order: 28
-
-# Keep this
 parent: Decision Records
-
-# These are optional elements. Feel free to remove any of them.
-status:  {'accepted'}
-date: {2024-03-19 when the decision was last updated}
 ---
 
 <!-- we need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template -->
