@@ -163,7 +163,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                 StandardField field = mapEntry.getKey();
                 List<String> path = mapEntry.getValue();
 
-                String value;
+                Optional<String> value;
                 if (field == StandardField.AUTHOR) {
                     value = toAuthors(item.optJSONArray(path.getFirst()));
                 } else if (field == StandardField.KEYWORDS) {
