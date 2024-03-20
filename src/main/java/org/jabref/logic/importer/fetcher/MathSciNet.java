@@ -167,7 +167,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                 if (field == StandardField.AUTHOR) {
                     value = toAuthors(item.optJSONArray(path.getFirst()));
                 } else if (field == StandardField.KEYWORDS) {
-                    value = getKeywords(item.optJSONObject(path.getFirst()));
+                    value = Optional.of(getKeywords(item.optJSONObject(path.getFirst())));
                 } else {
                     value = getOrNull(item, path).orElse(null);
                 }
