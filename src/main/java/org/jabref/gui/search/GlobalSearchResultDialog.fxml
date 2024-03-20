@@ -13,7 +13,7 @@
             prefHeight="400.0" prefWidth="600.0">
     <content>
         <VBox>
-            <HBox spacing="10" alignment="CENTER_RIGHT">
+            <HBox fx:id="searchBarContainer" spacing="10" alignment="CENTER_RIGHT">
                 <ToggleButton fx:id="keepOnTop" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
                     <graphic>
                         <JabRefIconView glyph="KEEP_ON_TOP"/>

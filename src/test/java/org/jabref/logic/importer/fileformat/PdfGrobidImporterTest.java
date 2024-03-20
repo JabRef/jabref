@@ -42,7 +42,7 @@ public class PdfGrobidImporterTest {
     }
 
     @Test
-    public void sGetExtensions() {
+    public void getExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 

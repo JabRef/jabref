@@ -22,8 +22,8 @@ import org.jabref.model.entry.types.EntryType;
 public class BibEntryType implements Comparable<BibEntryType> {
 
     private final EntryType type;
+    private final SequencedSet<BibField> allFields;
     private final SequencedSet<OrFields> requiredFields;
-    private final SequencedSet<BibField> fields;
 
     /**
      * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
@@ -31,12 +31,12 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * A builder is available at {@link BibEntryTypeBuilder}
      *
      * @param type              The EntryType this BibEntryType is wrapped around.
-     * @param fields            A BibFields list of all fields, including the required fields
+     * @param allFields         A BibFields list of all fields, including the required fields
      * @param requiredFields    A OrFields list of just the required fields
      */
-    public BibEntryType(EntryType type, Collection<BibField> fields, Collection<OrFields> requiredFields) {
+    public BibEntryType(EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
         this.type = Objects.requireNonNull(type);
-        this.fields = new LinkedHashSet<>(fields);
+        this.allFields = new LinkedHashSet<>(allFields);
         this.requiredFields = new LinkedHashSet<>(requiredFields);
     }
 
@@ -70,21 +70,21 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * Returns all defined fields.
      */
     public SequencedSet<BibField> getAllBibFields() {
-        return Collections.unmodifiableSequencedSet(fields);
+        return Collections.unmodifiableSequencedSet(allFields);
     }
 
     public Set<Field> getAllFields() {
-        return fields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new));
+        return allFields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SequencedSet<Field> getPrimaryOptionalFields() {
+    public SequencedSet<Field> getImportantOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.IMPORTANT)
                                   .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SequencedSet<Field> getSecondaryOptionalFields() {
+    public SequencedSet<Field> getDetailOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.priority() == FieldPriority.DETAIL)
                                   .map(BibField::field)
@@ -108,8 +108,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    public SequencedSet<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
-        SequencedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
+    public SequencedSet<Field> getDetailOptionalNotDeprecatedFields(BibDatabaseMode mode) {
+        SequencedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getDetailOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }
@@ -139,12 +139,12 @@ public class BibEntryType implements Comparable<BibEntryType> {
         BibEntryType that = (BibEntryType) o;
         return type.equals(that.type) &&
                Objects.equals(requiredFields, that.requiredFields) &&
-               Objects.equals(fields, that.fields);
+               Objects.equals(allFields, that.allFields);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, requiredFields, fields);
+        return Objects.hash(type, requiredFields, allFields);
     }
 
     /**
@@ -159,11 +159,14 @@ public class BibEntryType implements Comparable<BibEntryType> {
     public String toString() {
         return "BibEntryType{" +
                 "type=" + type +
-                ", allFields=" + fields +
+                ", allFields=" + allFields +
                 ", requiredFields=" + requiredFields +
                 '}';
     }
 
+    /**
+     * WARNING! This does not follow the equals contract. Even if this here returns 0, the objects can be different.
+     */
     @Override
     public int compareTo(BibEntryType o) {
         return this.getType().getName().compareTo(o.getType().getName());

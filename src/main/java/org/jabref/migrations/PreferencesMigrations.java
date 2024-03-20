@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.entryeditor.CommentsTab;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
@@ -57,13 +59,14 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
-        // backwardcompatibility, as it copies the old values to new variable names and keeps th old sored with the old
+        // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(preferences);
         upgradeColumnPreferences(preferences);
         restoreVariablesForBackwardCompatibility(preferences);
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
+        removeCommentsFromCustomEditorTabs(preferences);
     }
 
     /**
@@ -544,5 +547,13 @@ public class PreferencesMigrations {
                 LOGGER.error("Unable to open key store", ex);
             }
         }
+    }
+
+    /**
+     * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link EntryEditor#createTabs()}.
+     * Thus, the configuration ih the preferences is obsolete
+     */
+    static void removeCommentsFromCustomEditorTabs(JabRefPreferences preferences) {
+        preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
 }

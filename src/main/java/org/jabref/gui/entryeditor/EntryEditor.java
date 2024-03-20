@@ -249,45 +249,45 @@ public class EntryEditor extends BorderPane {
     private List<EntryEditorTab> createTabs() {
         entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor));
 
-        // Required, optional, deprecated, and "other" fields
+        // Required, optional (important+detail), deprecated, and "other" fields
         entryEditorTabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        entryEditorTabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        entryEditorTabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
         entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
         entryEditorTabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
 
         // Comment Tab: Tab for general and user-specific comments
         entryEditorTabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
 
-        // General fields from preferences
-        // First, remove all tabs that are already handled above or below; except for the source tab (which has different titles for BibTeX and BibLaTeX mode)
+        // The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
+        // These should be shown. Already hard-coded ones should be removed.
         Map<String, Set<Field>> entryEditorTabList = new HashMap<>(entryEditorPreferences.getEntryEditorTabs());
         entryEditorTabList.remove(PreviewTab.NAME);
         entryEditorTabList.remove(RequiredFieldsTab.NAME);
-        entryEditorTabList.remove(OptionalFieldsTab.NAME);
-        entryEditorTabList.remove(OptionalFields2Tab.NAME);
+        entryEditorTabList.remove(ImportantOptionalFieldsTab.NAME);
+        entryEditorTabList.remove(DetailOptionalFieldsTab.NAME);
         entryEditorTabList.remove(DeprecatedFieldsTab.NAME);
+        entryEditorTabList.remove(OtherFieldsTab.NAME);
         entryEditorTabList.remove(CommentsTab.NAME);
         entryEditorTabList.remove(MathSciNetTab.NAME);
         entryEditorTabList.remove(FileAnnotationTab.NAME);
+        entryEditorTabList.remove(SciteTab.NAME);
+        // CitationRelationsTab
         entryEditorTabList.remove(RelatedArticlesTab.NAME);
+        // SourceTab -- not listed, because it has different names for BibTeX and biblatex mode
         entryEditorTabList.remove(LatexCitationsTab.NAME);
         entryEditorTabList.remove(FulltextSearchResultsTab.NAME);
-        entryEditorTabList.remove(SciteTab.NAME);
-        entryEditorTabList.remove("Comments");
-        // Then show the remaining configured
+
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
             entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
         }
 
-        // "Special" tabs
         entryEditorTabs.add(new MathSciNetTab());
         entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
         entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext,
                 undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
         entryEditorTabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
-
         sourceTab = new SourceTab(
                 databaseContext,
                 undoManager,
@@ -299,9 +299,7 @@ public class EntryEditor extends BorderPane {
                 bibEntryTypesManager,
                 keyBindingRepository);
         entryEditorTabs.add(sourceTab);
-
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
-
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
 
         return entryEditorTabs;

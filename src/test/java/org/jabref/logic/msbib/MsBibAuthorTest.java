@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class MsBibAuthorTest {
 
     @Test
-    public void getFirstName() {
+    public void getGivenNameName() {
         Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Gustav", msBibAuthor.getFirstName());
@@ -38,14 +38,14 @@ public class MsBibAuthorTest {
     }
 
     @Test
-    public void getLastName() {
+    public void getFamilyNameName() {
         Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Bach", msBibAuthor.getLastName());
     }
 
     @Test
-    public void getVonAndLastName() {
+    public void getNamePrefixAndLastName() {
         Author author = new Author("John", null, "von", "Neumann", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("von Neumann", msBibAuthor.getLastName());

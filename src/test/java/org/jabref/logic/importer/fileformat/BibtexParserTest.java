@@ -31,6 +31,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
+import org.jabref.model.TreeNode;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -56,6 +58,7 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -75,7 +78,7 @@ import static org.mockito.Mockito.when;
  * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
  */
 class BibtexParserTest {
-
+    private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
 
@@ -87,7 +90,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseWithNullThrowsNullPointerException() throws Exception {
+    void parseWithNullThrowsNullPointerException() {
         Executable toBeTested = () -> parser.parse(null);
         assertThrows(NullPointerException.class, toBeTested);
     }
@@ -778,6 +781,18 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesStringWithQuotes() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@string{bourdieu = \"Bourdieu, Pierre\"}"));
+
+        BibtexString string = result.getDatabase().getStringValues().iterator().next();
+
+        assertEquals(1, result.getDatabase().getStringCount());
+        assertEquals("bourdieu", string.getName());
+        assertEquals("Bourdieu, Pierre", string.getContent());
+    }
+
+    @Test
     void parseSavesOneNewlineAfterStringInParsedSerialization() throws IOException {
         String string = "@string{bourdieu = {Bourdieu, Pierre}}" + OS.NEWLINE;
         ParserResult result = parser
@@ -1381,6 +1396,311 @@ class BibtexParserTest {
     }
 
     /**
+     * Checks that BibDesk Static Groups are available after parsing the library
+     */
+    @Test
+    void integrationTestBibDeskStaticGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Static Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>group name</key>
+                        <string>firstTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa,Heyl:2023aa</string>
+                    </dict>
+                    <dict>
+                        <key>group name</key>
+                        <string>secondTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(Optional.of(BIB_DESK_ROOT_GROUP_NAME), root.getFirstChild().map(GroupTreeNode::getName));
+
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(true);
+
+        assertEquals(Optional.of(firstTestGroupExpected), root.getFirstChild().flatMap(TreeNode::getFirstChild).map(GroupTreeNode::getGroup));
+
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("secondTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(true);
+        assertEquals(Optional.of(secondTestGroupExpected), root.getFirstChild().flatMap(TreeNode::getLastChild).map(GroupTreeNode::getGroup));
+
+        BibDatabase db = result.getDatabase();
+
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntries(), true).stream().map(GroupTreeNode::getGroup).toList());
+        assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
+    }
+
+    /**
+     * Checks that BibDesk Smart Groups are available after parsing the library
+     */
+    @Test
+    @Disabled("Not yet supported")
+    void integrationTestBibDeskSmartGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kraljic:2023aa,
+                    author = {Katarina Kraljic and Florent Renaud and Yohan Dubois and Christophe Pichon and Oscar Agertz and Eric Andersson and Julien Devriendt and Jonathan Freundlich and Sugata Kaviraj and Taysun Kimm and Garreth Martin and S{\\'e}bastien Peirani and {\\'A}lvaro Segovia Otero and Marta Volonteri and Sukyoung K. Yi},
+                    date-added = {2023-09-14 20:09:10 +0200},
+                    date-modified = {2023-09-14 20:09:10 +0200},
+                    eprint = {2309.06485},
+                    month = {09},
+                    title = {Emergence and cosmic evolution of the Kennicutt-Schmidt relation driven by interstellar turbulence},
+                    url = {https://arxiv.org/pdf/2309.06485.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
+
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Smart Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>conditions</key>
+                        <array>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>4</integer>
+                                <key>key</key>
+                                <string>BibTeX Type</string>
+                                <key>value</key>
+                                <string>article</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>2</integer>
+                                <key>key</key>
+                                <string>Title</string>
+                                <key>value</key>
+                                <string>the</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                        </array>
+                        <key>conjunction</key>
+                        <integer>0</integer>
+                        <key>group name</key>
+                        <string>article</string>
+                    </dict>
+                    <dict>
+                        <key>conditions</key>
+                        <array>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>3</integer>
+                                <key>key</key>
+                                <string>Author</string>
+                                <key>value</key>
+                                <string>Swain</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                        </array>
+                        <key>conjunction</key>
+                        <integer>0</integer>
+                        <key>group name</key>
+                        <string>Swain</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(2, root.getNumberOfChildren());
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(false);
+        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("Swain", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(false);
+        assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
+
+        BibDatabase db = result.getDatabase();
+        List<BibEntry> firstTestGroupEntriesExpected = new ArrayList<>();
+        firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
+        firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
+        assertTrue(root.getChildren().get(0).getGroup().containsAll(firstTestGroupEntriesExpected));
+        assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Swain:2023aa").get()));
+    }
+
+    /**
+     * Checks that both BibDesk Static Groups and Smart Groups are available after parsing the library
+     */
+    @Test
+    @Disabled("Not yet supported")
+    void integrationTestBibDeskMultipleGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kraljic:2023aa,
+                    author = {Katarina Kraljic and Florent Renaud and Yohan Dubois and Christophe Pichon and Oscar Agertz and Eric Andersson and Julien Devriendt and Jonathan Freundlich and Sugata Kaviraj and Taysun Kimm and Garreth Martin and S{\\'e}bastien Peirani and {\\'A}lvaro Segovia Otero and Marta Volonteri and Sukyoung K. Yi},
+                    date-added = {2023-09-14 20:09:10 +0200},
+                    date-modified = {2023-09-14 20:09:10 +0200},
+                    eprint = {2309.06485},
+                    month = {09},
+                    title = {Emergence and cosmic evolution of the Kennicutt-Schmidt relation driven by interstellar turbulence},
+                    url = {https://arxiv.org/pdf/2309.06485.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
+
+                @article{Swain:2023aa,
+                    author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06758},
+                    month = {09},
+                    title = {Unravelling the Nuclear Dust Morphology of NGC 1365: A Two Phase Polar - RAT Model for the Ultraviolet to Infrared Spectral Energy Distribution},
+                    url = {https://arxiv.org/pdf/2309.06758.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
+
+                @article{Heyl:2023aa,
+                    author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
+                    date-added = {2023-09-14 20:09:08 +0200},
+                    date-modified = {2023-09-14 20:09:08 +0200},
+                    eprint = {2309.06784},
+                    month = {09},
+                    title = {Understanding Molecular Abundances in Star-Forming Regions Using Interpretable Machine Learning},
+                    url = {https://arxiv.org/pdf/2309.06784.pdf},
+                    year = {2023},
+                    bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
+                    bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
+
+                @comment{BibDesk Static Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>group name</key>
+                        <string>firstTestGroup</string>
+                        <key>keys</key>
+                        <string>Swain:2023aa,Heyl:2023aa</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+
+                @comment{BibDesk Smart Groups{
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <array>
+                    <dict>
+                        <key>conditions</key>
+                        <array>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>4</integer>
+                                <key>key</key>
+                                <string>BibTeX Type</string>
+                                <key>value</key>
+                                <string>article</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                            <dict>
+                                <key>comparison</key>
+                                <integer>2</integer>
+                                <key>key</key>
+                                <string>Title</string>
+                                <key>value</key>
+                                <string>the</string>
+                                <key>version</key>
+                                <string>1</string>
+                            </dict>
+                        </array>
+                        <key>conjunction</key>
+                        <integer>0</integer>
+                        <key>group name</key>
+                        <string>article</string>
+                    </dict>
+                </array>
+                </plist>
+                }}
+                """));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
+        assertEquals(2, root.getNumberOfChildren());
+        ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
+        firstTestGroupExpected.setExpanded(false);
+        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        ExplicitGroup secondTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
+        secondTestGroupExpected.setExpanded(false);
+        assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
+
+        BibDatabase db = result.getDatabase();
+        assertTrue(root.getChildren().get(0).getGroup().containsAll(db.getEntries()));
+        List<BibEntry> smartGroupEntriesExpected = new ArrayList<>();
+        smartGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
+        smartGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
+        assertTrue(root.getChildren().get(0).getGroup().containsAll(smartGroupEntriesExpected));
+    }
+
+    /**
      * Checks that a TexGroup finally gets the required data, after parsing the library.
      */
     @Test
@@ -1862,5 +2182,40 @@ class BibtexParserTest {
                 """;
         ParserResult result = parser.parse(new StringReader(entries));
         assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseBibDeskLinkedFiles() throws IOException {
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+        expectedEntry.withCitationKey("Kovakkuni:2023aa")
+                     .withField(StandardField.AUTHOR, "Navyasree Kovakkuni and Federico Lelli and Pierre-alain Duc and M{\\'e}d{\\'e}ric Boquien and Jonathan Braine and Elias Brinks and Vassilis Charmandaris and Francoise Combes and Jeremy Fensch and Ute Lisenfeld and Stacy McGaugh and J. Chris Mihos and Marcel. S. Pawlowski and Yves. Revaz and Peter. M. Weilbacher")
+                     .withField(new UnknownField("date-added"), "2023-09-14 20:09:12 +0200")
+                     .withField(new UnknownField("date-modified"), "2023-09-14 20:09:12 +0200")
+                     .withField(StandardField.EPRINT, "2309.06478")
+                     .withField(StandardField.MONTH, "09")
+                     .withField(StandardField.TITLE, "Molecular and Ionized Gas in Tidal Dwarf Galaxies: The Spatially Resolved Star-Formation Relation")
+                     .withField(StandardField.URL, "https://arxiv.org/pdf/2309.06478.pdf")
+                     .withField(StandardField.YEAR, "2023")
+                     .withField(new UnknownField("bdsk-url-1"), "https://arxiv.org/abs/2309.06478")
+                     .withField(StandardField.FILE, ":../../Downloads/2309.06478.pdf:");
+
+        ParserResult result = parser.parse(new StringReader("""
+                @article{Kovakkuni:2023aa,
+                    author = {Navyasree Kovakkuni and Federico Lelli and Pierre-alain Duc and M{\\'e}d{\\'e}ric Boquien and Jonathan Braine and Elias Brinks and Vassilis Charmandaris and Francoise Combes and Jeremy Fensch and Ute Lisenfeld and Stacy McGaugh and J. Chris Mihos and Marcel. S. Pawlowski and Yves. Revaz and Peter. M. Weilbacher},
+                    date-added = {2023-09-14 20:09:12 +0200},
+                    date-modified = {2023-09-14 20:09:12 +0200},
+                    eprint = {2309.06478},
+                    month = {09},
+                    title = {Molecular and Ionized Gas in Tidal Dwarf Galaxies: The Spatially Resolved Star-Formation Relation},
+                    url = {https://arxiv.org/pdf/2309.06478.pdf},
+                    year = {2023},
+                    bdsk-file-1 = {YnBsaXN0MDDSAQIDBFxyZWxhdGl2ZVBhdGhZYWxpYXNEYXRhXxAeLi4vLi4vRG93bmxvYWRzLzIzMDkuMDY0NzgucGRmTxEBUgAAAAABUgACAAAMTWFjaW50b3NoIEhEAAAAAAAAAAAAAAAAAAAA4O/yLkJEAAH/////DjIzMDkuMDY0NzgucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/////hKRkeAAAAAAAAAAAAAgACAAAKIGN1AAAAAAAAAAAAAAAAAAlEb3dubG9hZHMAAAIAKy86VXNlcnM6Y2hyaXN0b3BoczpEb3dubG9hZHM6MjMwOS4wNjQ3OC5wZGYAAA4AHgAOADIAMwAwADkALgAwADYANAA3ADgALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAClVc2Vycy9jaHJpc3RvcGhzL0Rvd25sb2Fkcy8yMzA5LjA2NDc4LnBkZgAAEwABLwAAFQACABH//wAAAAgADQAaACQARQAAAAAAAAIBAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAGb},
+                    bdsk-url-1 = {https://arxiv.org/abs/2309.06478}}
+                    }
+                """));
+        BibDatabase database = result.getDatabase();
+
+        assertEquals(Collections.singletonList(expectedEntry), database.getEntries());
     }
 }

@@ -101,7 +101,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "21.0.2"
+    version = "22"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -113,9 +113,11 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:3.0.1'
-    implementation 'org.apache.pdfbox:fontbox:3.0.1'
-    implementation ('org.apache.pdfbox:xmpbox:3.0.1') {
+    // 3.0.2 is buggy!
+    def pdfbox = "3.0.1"
+    implementation "org.apache.pdfbox:pdfbox:$pdfbox"
+    implementation "org.apache.pdfbox:fontbox:$pdfbox"
+    implementation ("org.apache.pdfbox:xmpbox:$pdfbox") {
         exclude group: 'org.junit.jupiter'
     }
 
@@ -177,7 +179,7 @@ dependencies {
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.2.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.4.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
@@ -241,6 +243,9 @@ dependencies {
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation 'org.jspecify:jspecify:0.3.0'
+
+    // parse plist files
+    implementation 'com.googlecode.plist:dd-plist:1.28'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.168'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'

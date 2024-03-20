@@ -5,6 +5,8 @@ import javax.swing.undo.UndoManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -28,6 +30,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML private SplitPane container;
     @FXML private ToggleButton keepOnTop;
+    @FXML private HBox searchBarContainer;
 
     private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
@@ -54,6 +57,10 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
+
+        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
+        searchBarContainer.getChildren().addFirst(searchBar);
+        HBox.setHgrow(searchBar, Priority.ALWAYS);
 
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
@@ -93,7 +100,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         stage.setOnShown(event -> {
             getDialogPane().setPrefHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             getDialogPane().setPrefWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
-            stage.centerOnScreen();
         });
 
         stage.setOnHidden(event -> {
