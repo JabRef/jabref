@@ -73,22 +73,30 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
+            } else {
+                previewViewer.setEntry(oldValue.getEntry());
+            }
+        });
+
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+
+        resultsTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                var selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
                 libraryTabContainer.getLibraryTabs().stream()
-                                   .filter(tab -> tab.getBibDatabaseContext().equals(newValue.getBibDatabaseContext()))
+                                   .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
                                    .findFirst()
                                    .ifPresent(libraryTabContainer::showLibraryTab);
 
-                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(newValue.getEntry()));
-            } else {
-                previewViewer.setEntry(oldValue.getEntry());
+                stateManager.clearSearchQuery();
+                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
+                stage.close();
             }
         });
 
         container.getItems().addAll(resultsTable, previewViewer);
 
         keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());
-
-        Stage stage = (Stage) getDialogPane().getScene().getWindow();
 
         EasyBind.subscribe(viewModel.keepOnTop(), value -> {
             stage.setAlwaysOnTop(value);
@@ -98,8 +106,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         });
 
         stage.setOnShown(event -> {
-            getDialogPane().setPrefHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
-            getDialogPane().setPrefWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+            stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
+            stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
         });
 
         stage.setOnHidden(event -> {
