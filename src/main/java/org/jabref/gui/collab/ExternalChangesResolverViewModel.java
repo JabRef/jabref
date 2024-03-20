@@ -14,13 +14,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.Globals.stateManager;
+
 
 public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
@@ -42,16 +43,14 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     private final BooleanBinding canAskUserToResolveChange;
 
     private final UndoManager undoManager;
-    private final OptionalObjectProperty<LibraryTab> activeTab;
 
-    public ExternalChangesResolverViewModel(List<DatabaseChange> externalChanges, UndoManager undoManager, OptionalObjectProperty<LibraryTab> activeTab) {
+    public ExternalChangesResolverViewModel(List<DatabaseChange> externalChanges, UndoManager undoManager) {
         Objects.requireNonNull(externalChanges);
         assert !externalChanges.isEmpty();
 
         this.visibleChanges.addAll(externalChanges);
         this.changes.addAll(externalChanges);
         this.undoManager = undoManager;
-        this.activeTab = activeTab;
 
         areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
@@ -86,18 +85,10 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             selectedChange.accept();
             getVisibleChanges().remove(selectedChange);
         });
-        if(activeTab!=null){
-            activeTab.get().get().updateTabTitle(false);
-            activeTab.get().get().resetChangedProperties();
-        }
     }
 
     public void denyChange() {
         getSelectedChange().ifPresent(getVisibleChanges()::remove);
-        if(activeTab!=null){
-            activeTab.get().get().updateTabTitle(true);
-            activeTab.get().get().markBaseChanged();
-        }
     }
 
     public void acceptMergedChange(DatabaseChange databaseChange) {
@@ -112,8 +103,15 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     }
 
     public void applyChanges() {
-        changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
-        ce.end();
-        undoManager.addEdit(ce);
+        if (changes.stream().noneMatch(change -> !change.isAccepted())){
+            changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
+            ce.end();
+            undoManager.addEdit(ce);
+            stateManager.activeTabProperty().get().get().updateTabTitle(false);
+            stateManager.activeTabProperty().get().get().resetChangedProperties();
+        } else {
+            stateManager.activeTabProperty().get().get().updateTabTitle(true);
+            stateManager.activeTabProperty().get().get().markBaseChanged();
+        }
     }
 }

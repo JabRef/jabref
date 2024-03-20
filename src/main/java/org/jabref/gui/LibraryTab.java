@@ -423,6 +423,7 @@ public class LibraryTab extends Tab {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
+
         this.changedProperty.setValue(true);
     }
 
@@ -910,8 +911,7 @@ public class LibraryTab extends Tab {
                 taskExecutor,
                 dialogService,
                 preferencesService,
-                databaseNotificationPane,
-                stateManager.activeTabProperty()));
+                databaseNotificationPane));
     }
 
     public void copy() {
