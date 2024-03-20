@@ -70,7 +70,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 
-        resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
+        resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
                 libraryTabContainer.getLibraryTabs().stream()
@@ -80,7 +80,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(newValue.getEntry()));
             } else {
-                previewViewer.setEntry(old.getEntry());
+                previewViewer.setEntry(oldValue.getEntry());
             }
         });
 
