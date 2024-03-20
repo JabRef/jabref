@@ -37,8 +37,8 @@ jobs:
     steps:
       - id: javafx_versions
         run: |
-          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=5&core=gav" > /tmp/versions.json
-          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
+          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
+          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
           versions_json=$(jq -r '[.[].version]' /tmp/versions-latest.json | jq -r tostring)
           include_json=$(jq -n '[
             {"os": "ubuntu-latest", "displayName": "linux", "archivePortable": "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef"},
@@ -49,7 +49,7 @@ jobs:
           matrix=$(jq -n \
             --argjson versionsContent "$versions_json" \
             --argjson includeContent "$include_json" \
-            '{"os": ["ubuntu-latest", "windows-latest", "macos-latest", "buildjet-4vcpu-ubuntu-2204-arm"], "jdk": [22, 23], "javafx": $versionsContent, "include": $includeContent}')
+            '{"os": ["ubuntu-latest", "windows-latest", "macos-latest", "buildjet-4vcpu-ubuntu-2204-arm"], "jdk": [23], "javafx": $versionsContent, "include": $includeContent}')
           echo matrix=$matrix >> $GITHUB_OUTPUT
   build:
     needs: setup-matrix
