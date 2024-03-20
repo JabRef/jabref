@@ -52,6 +52,7 @@ java {
         // - .gitpod.Dockerfile
         // - .devcontainer/devcontainer.json#L34 and
         // - .github/workflows/deployment-jdk-ea.yml#L53
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
