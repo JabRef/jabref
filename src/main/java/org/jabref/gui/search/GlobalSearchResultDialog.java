@@ -74,16 +74,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
                 libraryTabContainer.getLibraryTabs().stream()
-                                   .filter(tab -> tab.getBibDatabaseContext() == newValue.getBibDatabaseContext())
+                                   .filter(tab -> tab.getBibDatabaseContext().equals(newValue.getBibDatabaseContext()))
                                    .findFirst()
                                    .ifPresent(libraryTabContainer::showLibraryTab);
+
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(newValue.getEntry()));
             } else {
                 previewViewer.setEntry(old.getEntry());
             }
         });
 
-        resultsTable.getSelectionModel().selectFirst();
         container.getItems().addAll(resultsTable, previewViewer);
 
         keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());
