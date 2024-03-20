@@ -49,9 +49,10 @@ java {
 
     toolchain {
         // If this is updated, also update
-        // - .devcontainer/devcontainer.json#L34 and
         // - .gitpod.Dockerfile
-        languageVersion = JavaLanguageVersion.of(21)
+        // - .devcontainer/devcontainer.json#L34 and
+        // - .github/workflows/deployment-jdk-ea.yml#L53
+        languageVersion = JavaLanguageVersion.of(22)
     }
 }
 
