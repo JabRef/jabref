@@ -193,10 +193,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     private Optional<String> getOrNull(JSONObject item, List<String> keys) {
         Object value = item;
         for (String key : keys) {
-            if (value instanceof JSONObject) {
-                value = ((JSONObject) value).opt(key);
-            } else if (value instanceof JSONArray) {
-                value = ((JSONArray) value).opt(Integer.parseInt(key));
+            if (value instanceof JSONObject obj) {
+                value = value.opt(key);
+            } else if (value instanceof JSONArray arr) {
+                value = value.opt(Integer.parseInt(key);
             } else {
                 break;
             }
