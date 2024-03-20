@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.CffExporter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -31,6 +33,12 @@ public class CffImporter extends Importer {
 
     public static final Map<String, Field> FIELDS_MAP = HashBiMap.create(CffExporter.FIELDS_MAP).inverse();
     public static final Map<String, EntryType> TYPES_MAP = HashBiMap.create(CffExporter.TYPES_MAP).inverse();
+
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+
+    public CffImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+    }
 
     @Override
     public String getName() {
@@ -62,14 +70,14 @@ public class CffImporter extends Importer {
         @JsonProperty("identifiers")
         private List<CffIdentifier> ids;
 
+        @JsonProperty("keywords")
+        private List<String> keywords;
+
         @JsonProperty("preferred-citation")
-        private CffReference citation;
+        private CffReference preferred;
 
         @JsonProperty("references")
         private List<CffReference> references;
-
-        @JsonProperty("keywords")
-        private List<String> keywords;
 
         public CffFormat() {
         }
@@ -84,18 +92,6 @@ public class CffImporter extends Importer {
         private final HashMap<String, String> values = new HashMap<>();
 
         public CffEntity() {
-        }
-
-        @JsonAnySetter
-        private void setValues(String key, String value) {
-            values.put(key, value);
-        }
-    }
-
-    private static class CffConference {
-        private final HashMap<String, String> values = new HashMap<>();
-
-        public CffConference() {
         }
 
         @JsonAnySetter
@@ -121,7 +117,7 @@ public class CffImporter extends Importer {
         private List<CffEntity> authors;
 
         @JsonProperty("conference")
-        private CffConference conference;
+        private CffEntity conference;
 
         @JsonProperty("contact")
         private CffEntity contact;
@@ -185,22 +181,16 @@ public class CffImporter extends Importer {
         EntryType entryType = TYPES_MAP.getOrDefault(citation.values.get("type"), StandardEntryType.Software);
         citation.values.remove("type");
 
-        // Map CFF fields to JabRef Fields
-        for (Map.Entry<String, String> property : citation.values.entrySet()) {
-            if (FIELDS_MAP.containsKey(property.getKey())) {
-                entryMap.put(FIELDS_MAP.get(property.getKey()), property.getValue());
-            } else {
-                entryMap.put(new UnknownField(property.getKey()), property.getValue());
-            }
-        }
+        // Translate CFF author format to JabRef author format
+        entryMap.put(StandardField.AUTHOR, parseAuthors(citation.authors));
 
         // Parse keywords
         if (citation.keywords != null) {
             entryMap.put(StandardField.KEYWORDS, String.join(", ", citation.keywords));
         }
 
-        // Translate CFF author format to JabRef author format
-        entryMap.put(StandardField.AUTHOR, parseAuthors(citation.authors));
+        // Map CFF simple fields to JabRef Fields
+        parseFields(citation.values, entryMap);
 
         // Select DOI to keep
         if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
@@ -236,19 +226,37 @@ public class CffImporter extends Importer {
         entry.setField(entryMap);
         entriesList.add(entry);
 
-        if (citation.citation != null) {
-            // TODO add `preferred-citation` relation from main entry
-            entriesList.add(parseEntry(citation.citation));
+        // Handle `preferred-citation` and `references` fields
+        BibEntry preferred = null;
+        List<BibEntry> references = null;
+
+        if (citation.preferred != null) {
+            preferred = parseEntry(citation.preferred);
+            entriesList.add(preferred);
         }
 
         if (citation.references != null) {
-            // TODO add `related` relation from main entry
-            for (CffReference ref : citation.references) {
-                entriesList.add(parseEntry(ref));
-            }
+            references = citation.references.stream().map(this::parseEntry).toList();
+            entriesList.addAll(references);
         }
 
-        return new ParserResult(entriesList);
+        ParserResult res = new ParserResult(entriesList);
+        CitationKeyGenerator gen = new CitationKeyGenerator(res.getDatabaseContext(), citationKeyPatternPreferences);
+
+        if (preferred != null) {
+            gen.generateAndSetKey(preferred);
+            entry.setField(StandardField.CITES, preferred.getCitationKey().orElse(""));
+        }
+
+        if (references != null) {
+            references.forEach(ref -> {
+                gen.generateAndSetKey(ref);
+                String citeKey = ref.getCitationKey().orElse("");
+                String related = entry.getField(StandardField.RELATED).orElse("");
+                entry.setField(StandardField.RELATED, related.isEmpty() ? citeKey : related + ", " + citeKey);
+            });
+        }
+        return res;
     }
 
     @Override
@@ -277,18 +285,22 @@ public class CffImporter extends Importer {
     }
 
     private BibEntry parseEntry(CffReference reference) {
-        HashMap<Field, String> entryMap = new HashMap<>();
+        Map<Field, String> entryMap = new HashMap<>();
         EntryType entryType = TYPES_MAP.getOrDefault(reference.type, StandardEntryType.Article);
-        for (Map.Entry<String, String> property : reference.values.entrySet()) {
+        entryMap.put(StandardField.AUTHOR, parseAuthors(reference.authors));
+        parseFields(reference.values, entryMap);
+        BibEntry entry = new BibEntry(entryType);
+        entry.setField(entryMap);
+        return entry;
+    }
+
+    private void parseFields(Map<String, String> values, Map<Field, String> entryMap) {
+        for (Map.Entry<String, String> property : values.entrySet()) {
             if (FIELDS_MAP.containsKey(property.getKey())) {
                 entryMap.put(FIELDS_MAP.get(property.getKey()), property.getValue());
             } else {
                 entryMap.put(new UnknownField(property.getKey()), property.getValue());
             }
         }
-        entryMap.put(StandardField.AUTHOR, parseAuthors(reference.authors));
-        BibEntry entry = new BibEntry(entryType);
-        entry.setField(entryMap);
-        return entry;
     }
 }

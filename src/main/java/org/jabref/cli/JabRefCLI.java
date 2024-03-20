@@ -317,7 +317,8 @@ public class JabRefCLI {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
-                new DummyFileUpdateMonitor());
+                new DummyFileUpdateMonitor(),
+                preferencesService.getCitationKeyPatternPreferences());
         List<Pair<String, String>> importFormats = importFormatReader
                 .getImportFormats().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))

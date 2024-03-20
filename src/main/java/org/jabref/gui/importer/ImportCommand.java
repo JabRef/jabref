@@ -79,7 +79,8 @@ public class ImportCommand extends SimpleCommand {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
-                fileUpdateMonitor);
+                fileUpdateMonitor,
+                preferencesService.getCitationKeyPatternPreferences());
         SortedSet<Importer> importers = importFormatReader.getImportFormats();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -134,7 +135,8 @@ public class ImportCommand extends SimpleCommand {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
-                fileUpdateMonitor);
+                fileUpdateMonitor,
+                preferencesService.getCitationKeyPatternPreferences());
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {

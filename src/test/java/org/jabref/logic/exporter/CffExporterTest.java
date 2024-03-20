@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.CffImporter;
 import org.jabref.logic.importer.fileformat.CffImporterTest;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class CffExporterTest {
 
@@ -234,7 +236,7 @@ public class CffExporterTest {
     public final void roundTripTest(@TempDir Path tempDir) throws Exception {
 
         // First, import the file which will be parsed as two entries
-        CffImporter importer = new CffImporter();
+        CffImporter importer = new CffImporter(mock(CitationKeyPatternPreferences.class));
         Path file = Path.of(CffImporterTest.class.getResource("CITATION.cff").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry softwareEntry = bibEntries.getFirst();

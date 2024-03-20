@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
@@ -15,10 +17,13 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CffImporterTest {
 
@@ -26,7 +31,9 @@ public class CffImporterTest {
 
     @BeforeEach
     public void setUp() {
-        importer = new CffImporter();
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_SMART_NULLS);
+        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(GlobalCitationKeyPattern.fromPattern("[auth][year]"));
+        importer = new CffImporter(citationKeyPatternPreferences);
     }
 
     @Test
@@ -151,9 +158,12 @@ public class CffImporterTest {
 
         BibEntry mainEntry = bibEntries.getFirst();
         BibEntry preferredEntry = bibEntries.getLast();
+        String citeKey = preferredEntry.getCitationKey().orElse("");
 
         BibEntry expectedMain = getPopulatedEntry();
-        BibEntry expectedPreferred = new BibEntry(StandardEntryType.InProceedings);
+        expectedMain.setField(StandardField.CITES, citeKey);
+
+        BibEntry expectedPreferred = new BibEntry(StandardEntryType.InProceedings).withCitationKey(citeKey);
         expectedPreferred.setField(StandardField.AUTHOR, "Jonathan von Duke and Jim Kingston, Jr.");
         expectedPreferred.setField(StandardField.DOI, "10.0001/TEST");
         expectedPreferred.setField(StandardField.URL, "www.github.com");
@@ -169,15 +179,19 @@ public class CffImporterTest {
         BibEntry mainEntry = bibEntries.getFirst();
         BibEntry referenceEntry1 = bibEntries.get(1);
         BibEntry referenceEntry2 = bibEntries.getLast();
+        String citeKey1 = referenceEntry1.getCitationKey().orElse("");
+        String citeKey2 = referenceEntry2.getCitationKey().orElse("");
 
         BibEntry expectedMain = getPopulatedEntry();
-        BibEntry expectedReference1 = new BibEntry(StandardEntryType.InProceedings);
+        expectedMain.setField(StandardField.RELATED, citeKey1 + ", " + citeKey2);
+
+        BibEntry expectedReference1 = new BibEntry(StandardEntryType.InProceedings).withCitationKey(citeKey1);
         expectedReference1.setField(StandardField.AUTHOR, "Jonathan von Duke and Jim Kingston, Jr.");
         expectedReference1.setField(StandardField.YEAR, "2007");
         expectedReference1.setField(StandardField.DOI, "10.0001/TEST");
         expectedReference1.setField(StandardField.URL, "www.example.com");
 
-        BibEntry expectedReference2 = new BibEntry(StandardEntryType.Manual);
+        BibEntry expectedReference2 = new BibEntry(StandardEntryType.Manual).withCitationKey(citeKey2);
         expectedReference2.setField(StandardField.AUTHOR, "Arthur Clark, Jr. and Luca von Diamond");
         expectedReference2.setField(StandardField.DOI, "10.0002/TEST");
         expectedReference2.setField(StandardField.URL, "www.facebook.com");
