@@ -152,6 +152,31 @@ public class CffImporterTest {
     }
 
     @Test
+    public void importEntriesMultilineAbstract() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestMultilineAbstract.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+        BibEntry entry = bibEntries.getFirst();
+
+        BibEntry expected = getPopulatedEntry().withField(StandardField.ABSTRACT,
+                """
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Morbi vel tortor sem. Suspendisse posuere nibh commodo nunc iaculis,
+                        sed eleifend justo malesuada. Curabitur sodales auctor cursus.
+                        Fusce non elit elit. Mauris sollicitudin lobortis pulvinar.
+                        Nullam vel enim quis tellus pellentesque sagittis non at justo.
+                        Nam convallis et velit non auctor. Praesent id ex eros. Nullam
+                        ullamcorper leo vitae leo rhoncus porta. In lobortis rhoncus nisl,
+                        sit amet aliquet elit cursus ut. Cras laoreet justo in tortor vehicula,
+                        quis semper tortor maximus. Nulla vitae ante ullamcorper, viverra
+                        est at, laoreet tortor. Suspendisse rutrum hendrerit est in commodo.
+                        Aenean urna purus, lobortis a condimentum et, varius ut augue.
+                        Praesent ac lectus id mi posuere elementum.
+                        """);
+
+        assertEquals(entry, expected);
+    }
+
+    @Test
     public void importEntriesPreferredCitation() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterPreferredCitation.cff").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
