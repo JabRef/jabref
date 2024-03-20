@@ -146,8 +146,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
-            BibEntry entry = new BibEntry();
-            entry.setType(StandardEntryType.Article);
+            BibEntry entry = new BibEntry(StandardEntryType.Article);
 
             // Define the field mappings
             Map<StandardField, String[]> fieldMappings = Map.ofEntries(
