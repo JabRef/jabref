@@ -320,6 +320,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 
     inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
@@ -331,6 +332,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     description = "Generates java files for Search.g antlr4."
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
@@ -342,19 +344,21 @@ tasks.register("generateJournalListMV", JavaExec) {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
     mainClass = "org.jabref.cli.JournalListMvGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     onlyIf {
         !file("build/resources/main/journals/journal-list.mv").exists()
     }
 }
 
 tasks.register("generatePredatoryJournalListMV", JavaExec) {
-        group = "JabRef"
-        description = "Load predatory journal information from online sources to a H2 MVStore"
-        classpath = sourceSets.main.runtimeClasspath
-        mainClass = "org.jabref.cli.PredatoryJournalsMvGenerator"
-        onlyIf {
-            !file("build/resources/main/journals/predatory-journals.mv").exists()
-        }
+    group = "JabRef"
+    description = "Load predatory journal information from online sources to a H2 MVStore"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "org.jabref.cli.PredatoryJournalsMvGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    onlyIf {
+        !file("build/resources/main/journals/predatory-journals.mv").exists()
+    }
 }
 
 jar.dependsOn("generateJournalListMV", "generatePredatoryJournalListMV")
