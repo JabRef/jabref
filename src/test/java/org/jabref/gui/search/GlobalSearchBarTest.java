@@ -55,7 +55,8 @@ public class GlobalSearchBarTest {
                 stateManager,
                 prefs,
                 mock(CountingUndoManager.class),
-                mock(DialogService.class)
+                mock(DialogService.class),
+                SearchType.NORMAL_SEARCH
         );
 
         hBox = new HBox(searchBar);

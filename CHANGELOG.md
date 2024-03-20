@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the possibility to show the BibTeX source in the [web search](https://docs.jabref.org/collect/import-using-online-bibliographic-database) import screen. [#560](https://github.com/koppor/jabref/issues/560)
 - We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)
 - When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added a new integrity check and clean up option for strings having Unicode characters not encoded in [Unicode "Normalization Form Canonical Composition" (NFC)](https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms"). [#10506](https://github.com/JabRef/jabref/issues/10506)
 - We added a new group icon column to the main table showing the icons of the entry's groups. [#10801](https://github.com/JabRef/jabref/pull/10801)
 - When deleting an entry, the files linked to the entry are now optionally deleted as well. [#10509](https://github.com/JabRef/jabref/issues/10509)
 - We added support to move the file to the system trash (instead of deleting it). [#10591](https://github.com/JabRef/jabref/pull/10591)
@@ -31,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a Cleanup for removing non-existent files and grouped the related options [#10929](https://github.com/JabRef/jabref/issues/10929)
 - We added the functionality to parse the bibliography of PDFs using the GROBID online service. [#10200](https://github.com/JabRef/jabref/issues/10200)
 - We added support for BibTeX String constants during copy & paste between libraries [#10872](https://github.com/JabRef/jabref/issues/10872)
+- We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868).
 
 ### Changed
 
@@ -63,6 +65,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
 - We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
 - We fixed an issue where the CrossRef field did not work if autocompletion was disabled [#8145](https://github.com/JabRef/jabref/issues/8145)
+- In biblatex mode, JabRef distinguishes between "Optional fields" and "Optional fields 2" again. [#11022](https://github.com/JabRef/jabref/pull/11022)
 - We fixed an issue where exporting`@electronic` and `@online` entry types to the Office XMl would duplicate the field `title`  [#10807](https://github.com/JabRef/jabref/issues/10807)
 - We fixed an issue where the `CommentsTab` was not properly formatted when the `defaultOwner` contained capital or special letters. [#10870](https://github.com/JabRef/jabref/issues/10870)
 - We fixed an issue where the `File -> Close library` menu item was not disabled when no library was open. [#10948](https://github.com/JabRef/jabref/issues/10948)
@@ -71,6 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef could not parse absolute file paths from Zotero exports. [#10959](https://github.com/JabRef/jabref/issues/10959)
 - We fixed an issue where an exception occured when toggling between "Live" or "Locked" in the internal Document Viewer. [#10935](https://github.com/JabRef/jabref/issues/10935)
 - Fixed an issue on Windows where the browser extension reported failure to send an entry to JabRef even though it was sent properly. [JabRef-Browser-Extension#493](https://github.com/JabRef/JabRef-Browser-Extension/issues/493)
+- We fixed an issue where library shown as unsaved and marked (*) after accepting changes made externally to the file. [#11027](https://github.com/JabRef/jabref/issues/11027)
 
 ### Removed
 

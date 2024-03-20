@@ -124,13 +124,8 @@ public class DOI implements Identifier {
 
         // HTTP URL decoding
         if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {
-            try {
-                // decodes path segment
-                URI url = new URI(trimmedDoi);
-                trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(doi + " is not a valid HTTP DOI/Short DOI.");
-            }
+            // decodes path segment
+            trimmedDoi = URLDecoder.decode(trimmedDoi, StandardCharsets.UTF_8);
         }
 
         // Extract DOI/Short DOI
