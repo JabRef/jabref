@@ -21,6 +21,12 @@ class LatexToUnicodeFormatterTest {
     }
 
     @Test
+    void smallIwithoutDot() {
+        assertEquals("ı", formatter.format("\\i"));
+        assertEquals("ı", formatter.format("{\\i}"));
+    }
+
+    @Test
     void preserveUnknownCommand() {
         assertEquals("\\mbox{-}", formatter.format("\\mbox{-}"));
     }
@@ -161,6 +167,11 @@ class LatexToUnicodeFormatterTest {
     @Test
     void conversionOfUnderscoreWithBraces() {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
+    }
+
+    @Test
+    void twoDifferentMacrons() {
+        assertEquals("Puṇya-pattana-vidyā-pı̄ṭhādhi-kṛtaiḥ prā-kaśyaṃ nı̄taḥ", formatter.format("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}"));
     }
 
     @Test

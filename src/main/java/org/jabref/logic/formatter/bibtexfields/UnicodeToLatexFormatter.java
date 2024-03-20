@@ -26,6 +26,9 @@ public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatte
         // Standard symbols
         for (Map.Entry<String, String> unicodeLatexPair : HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP
                 .entrySet()) {
+            if (HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP_AFTER_COMBINING_ACCENTS.containsKey(unicodeLatexPair.getKey())) {
+                continue;
+            }
             result = result.replace(unicodeLatexPair.getKey(), unicodeLatexPair.getValue());
         }
 
@@ -55,6 +58,12 @@ public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatte
             sb.append((char) result.codePointAt(result.length() - 1));
         }
         result = sb.toString();
+
+        // conversions after combining accents
+        for (Map.Entry<String, String> unicodeLatexPair : HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP_AFTER_COMBINING_ACCENTS
+                .entrySet()) {
+            result = result.replace(unicodeLatexPair.getKey(), unicodeLatexPair.getValue());
+        }
 
         // Check if any symbols is not converted
         for (int i = 0; i <= (result.length() - 1); i++) {

@@ -16,6 +16,7 @@ public class HTMLUnicodeConversionMaps {
     public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP_AFTER_COMBINING_ACCENTS = new HashMap<>();
 
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
@@ -292,6 +293,12 @@ public class HTMLUnicodeConversionMaps {
             {"978", "upsih", "{{$\\Upsilon$}}"}, // greek upsilon with hook symbol,
             //                                   U+03D2 NEW
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
+            /* Letters with Dot Below */
+            {"7751", "", "{\\d{n}}"}, // Latin Small Letter N with Dot Below, U+1E47
+            {"7789", "", "{\\d{t}}"}, // Latin Small Letter T with Dot Below, U+1E6D
+            {"7717", "", "{\\d{h}}"}, // Latin Small Letter H with Dot Below, U+1E25
+            {"7747", "", "{\\d{m}}"}, // Latin Small Letter M with Dot Below, U+1E43
+            {"7771", "", "{\\d{r}}"}, // Latin Small Letter R with Dot Below, U+1E5B
 
             /* General Punctuation */
             {"8211", "ndash", "$\\textendash$"},
@@ -897,6 +904,8 @@ public class HTMLUnicodeConversionMaps {
         // Support a special version of apostrophe
         LATEX_HTML_CONVERSION_MAP.put("textquotesingle", "&#39;");
         LATEX_UNICODE_CONVERSION_MAP.put("textquotesingle", "'"); // apostrophe, U+00027
+        // conversions after combining accents
+        UNICODE_LATEX_CONVERSION_MAP_AFTER_COMBINING_ACCENTS.put(String.valueOf(Character.toChars(Integer.decode("305"))), "\\i");
     }
 
     private HTMLUnicodeConversionMaps() {
