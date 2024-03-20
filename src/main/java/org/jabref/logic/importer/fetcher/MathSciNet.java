@@ -172,9 +172,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     value = getOrNull(item, path).orElse(null);
                 }
 
-                if (value != null) {
-                    entry.setField(field, value);
-                }
+  value.ifPresent(v -> entry.setField(field, v));
             }
             // Handle articleUrl and mrnumber fields separately
             String doi = item.optString("articleUrl", "");
