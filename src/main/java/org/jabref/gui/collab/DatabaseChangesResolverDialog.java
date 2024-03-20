@@ -52,7 +52,6 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final List<DatabaseChange> changes;
     private final BibDatabaseContext database;
-    private final OptionalObjectProperty<LibraryTab> activeTab;
 
     private ExternalChangesResolverViewModel viewModel;
 
@@ -71,10 +70,9 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
      * @param changes The list of changes
      * @param database The database to apply the changes to
      */
-    public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle, OptionalObjectProperty<LibraryTab> activeTab) {
+    public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle) {
         this.changes = changes;
         this.database = database;
-        this.activeTab = activeTab;
 
         this.setTitle(dialogTitle);
         ViewLoader.view(this)
@@ -97,7 +95,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
 
-        viewModel = new ExternalChangesResolverViewModel(changes, undoManager, activeTab);
+        viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 
         changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());

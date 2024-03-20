@@ -88,7 +88,7 @@ public class BackupUIManager {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
-                        originalDatabase, "Review Backup", null
+                        originalDatabase, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
