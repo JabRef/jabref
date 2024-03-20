@@ -48,7 +48,18 @@ import org.slf4j.LoggerFactory;
 public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathSciNet.class);
     private final ImportFormatPreferences preferences;
-
+    // Define the field mappings
+    private final Map<StandardField, List<String>> fieldMappings = Map.ofEntries(
+            Map.entry(StandardField.TITLE, List.of("titles", "title")),
+            Map.entry(StandardField.AUTHOR, List.of("authors")),
+            Map.entry(StandardField.YEAR, List.of("issue", "issue", "pubYear")),
+            Map.entry(StandardField.JOURNAL, List.of("issue", "issue", "journal", "shortTitle")),
+            Map.entry(StandardField.VOLUME, List.of("issue", "issue", "volume")),
+            Map.entry(StandardField.NUMBER, List.of("issue", "issue", "number")),
+            Map.entry(StandardField.PAGES, List.of("paging", "paging", "text")),
+            Map.entry(StandardField.KEYWORDS, List.of("primaryClass")),
+            Map.entry(StandardField.ISSN, List.of("issue", "issue", "journal", "issn"))
+    );
     public MathSciNet(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
@@ -147,39 +158,24 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
             BibEntry entry = new BibEntry(StandardEntryType.Article);
-
-            // Define the field mappings
-            Map<StandardField, String[]> fieldMappings = Map.ofEntries(
-                    Map.entry(StandardField.TITLE, new String[]{"titles", "title"}),
-                    Map.entry(StandardField.AUTHOR, new String[]{"authors"}),
-                    Map.entry(StandardField.YEAR, new String[]{"issue", "issue", "pubYear"}),
-                    Map.entry(StandardField.JOURNAL, new String[]{"issue", "issue", "journal", "shortTitle"}),
-                    Map.entry(StandardField.VOLUME, new String[]{"issue", "issue", "volume"}),
-                    Map.entry(StandardField.NUMBER, new String[]{"issue", "issue", "number"}),
-                    Map.entry(StandardField.PAGES, new String[]{"paging", "paging", "text"}),
-                    Map.entry(StandardField.KEYWORDS, new String[]{"primaryClass"}),
-                    Map.entry(StandardField.ISSN, new String[]{"issue", "issue", "journal", "issn"})
-            );
-
             // Set fields based on the mappings
-            for (Map.Entry<StandardField, String[]> mapEntry : fieldMappings.entrySet()) {
+            for (Map.Entry<StandardField, List<String>> mapEntry : fieldMappings.entrySet()) {
                 StandardField field = mapEntry.getKey();
-                String[] path = mapEntry.getValue();
+                List<String> path = mapEntry.getValue();
 
                 String value;
                 if (field == StandardField.AUTHOR) {
-                    value = toAuthors(item.optJSONArray(path[0]));
+                    value = toAuthors(item.optJSONArray(path.getFirst()));
                 } else if (field == StandardField.KEYWORDS) {
-                    value = getKeywords(item.optJSONObject(path[0]));
+                    value = getKeywords(item.optJSONObject(path.getFirst()));
                 } else {
-                    value = getOrNull(item, path);
+                    value = getOrNull(item, path).orElse(null);
                 }
 
                 if (value != null) {
                     entry.setField(field, value);
                 }
             }
-
             // Handle articleUrl and mrnumber fields separately
             String doi = item.optString("articleUrl", "");
             if (!doi.isEmpty()) {
@@ -190,14 +186,13 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             if (!mrNumber.isEmpty()) {
                 entry.setField(StandardField.MR_NUMBER, mrNumber);
             }
-
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("MathSciNet API JSON format has changed", exception);
         }
     }
 
-    private String getOrNull(JSONObject item, String... keys) {
+    private Optional<String> getOrNull(JSONObject item, List<String> keys) {
         Object value = item;
         for (String key : keys) {
             if (value instanceof JSONObject) {
@@ -210,10 +205,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         }
 
         if (value instanceof String stringValue) {
-            return new String(stringValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            return Optional.of(new String(stringValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private String toAuthors(JSONArray authors) {
