@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.Globals.stateManager;
 
-
 public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);
@@ -103,7 +102,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     }
 
     public void applyChanges() {
-        if (changes.stream().noneMatch(change -> !change.isAccepted())){
+        if (changes.stream().noneMatch(change -> !change.isAccepted())) {
             changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
             ce.end();
             undoManager.addEdit(ce);
