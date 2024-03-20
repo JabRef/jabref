@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.importer.fileformat.CffImporter;
 import org.jabref.logic.importer.fileformat.CffImporterTest;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,9 +21,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CffExporterTest {
 
@@ -236,7 +239,9 @@ public class CffExporterTest {
     public final void roundTripTest(@TempDir Path tempDir) throws Exception {
 
         // First, import the file which will be parsed as two entries
-        CffImporter importer = new CffImporter(mock(CitationKeyPatternPreferences.class));
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_SMART_NULLS);
+        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(GlobalCitationKeyPattern.fromPattern("[auth][year]"));
+        CffImporter importer = new CffImporter(citationKeyPatternPreferences);
         Path file = Path.of(CffImporterTest.class.getResource("CITATION.cff").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry softwareEntry = bibEntries.getFirst();
