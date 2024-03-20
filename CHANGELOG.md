@@ -31,7 +31,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability to zoom in and out in the document viewer using <kbd>Ctrl</kbd> + <kbd>Scroll</kbd>. [#10964](https://github.com/JabRef/jabref/pull/10964)
 - We added a Cleanup for removing non-existent files and grouped the related options [#10929](https://github.com/JabRef/jabref/issues/10929)
 - We added the functionality to parse the bibliography of PDFs using the GROBID online service. [#10200](https://github.com/JabRef/jabref/issues/10200)
-- We added ability for selected entry in the search window to automatically select corresponding item in the main table. [#11010](https://github.com/JabRef/jabref/pull/11010)
+- We added a seperated search bar for the global search window. [#11032](https://github.com/JabRef/jabref/pull/11032)
+- We added ability for selected entry in the global search window to automatically select corresponding item in the main table. [#11010](https://github.com/JabRef/jabref/pull/11010)
 - We added support for BibTeX String constants during copy & paste between libraries [#10872](https://github.com/JabRef/jabref/issues/10872)
 - We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868).
 
@@ -52,7 +53,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
 - We store the citation relations in an LRU cache to avoid bloating the memory and out-of-memory exceptions. [#10958](https://github.com/JabRef/jabref/issues/10958)
 - Keywords field are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
-- Keywords filed are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
 - Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
 
 ### Fixed
