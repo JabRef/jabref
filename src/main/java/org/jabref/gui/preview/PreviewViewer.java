@@ -170,6 +170,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             if (!registered) {
                 stateManager.activeSearchQueryProperty().addListener(listener);
+                stateManager.activeGlobalSearchQueryProperty().addListener(listener);
                 registered = true;
             }
             highlightSearchPattern();

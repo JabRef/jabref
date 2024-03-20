@@ -5,11 +5,14 @@ import javax.swing.undo.UndoManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
@@ -28,9 +31,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML private SplitPane container;
     @FXML private ToggleButton keepOnTop;
-
+    @FXML private HBox searchBarContainer;
     private final UndoManager undoManager;
-
+    private final LibraryTabContainer libraryTabContainer;
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
@@ -39,8 +42,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     private GlobalSearchResultDialogViewModel viewModel;
 
-    public GlobalSearchResultDialog(UndoManager undoManager) {
+    public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
         this.undoManager = undoManager;
+        this.libraryTabContainer = libraryTabContainer;
 
         setTitle(Localization.lang("Search results from open libraries"));
         ViewLoader.view(this)
@@ -52,6 +56,10 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
+
+        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
+        searchBarContainer.getChildren().addFirst(searchBar);
+        HBox.setHgrow(searchBar, Priority.ALWAYS);
 
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
