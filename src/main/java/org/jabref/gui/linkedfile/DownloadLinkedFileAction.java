@@ -160,7 +160,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
             if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
                 newLinkedFile.setDescription((linkedFile.getDescription()));
             }
-            newLinkedFile.setSourceURL(linkedFile.getLink());
+            if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+                newLinkedFile.setSourceURL(linkedFile.getLink());
+            } else {
+                newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
+            }
             entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
             isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
         }
