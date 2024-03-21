@@ -16,8 +16,6 @@ public class HTMLUnicodeConversionMaps {
     public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
-    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP_AFTER_COMBINING_ACCENTS = new HashMap<>();
-
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
      conforming SGML systems and applications as defined in
@@ -904,8 +902,6 @@ public class HTMLUnicodeConversionMaps {
         // Support a special version of apostrophe
         LATEX_HTML_CONVERSION_MAP.put("textquotesingle", "&#39;");
         LATEX_UNICODE_CONVERSION_MAP.put("textquotesingle", "'"); // apostrophe, U+00027
-        // conversions after combining accents
-        UNICODE_LATEX_CONVERSION_MAP_AFTER_COMBINING_ACCENTS.put(String.valueOf(Character.toChars(Integer.decode("305"))), "\\i");
     }
 
     private HTMLUnicodeConversionMaps() {

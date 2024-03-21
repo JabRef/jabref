@@ -26,9 +26,10 @@ class UnicodeToLatexFormatterTest {
                          Arguments.of("", "\u0081"), // high code point unicode, boundary case: cp = 129
                          Arguments.of("", "\u0080"), // high code point unicode, boundary case: cp = 128 < 129
                          Arguments.of("M{\\\"{o}}nch", new UnicodeToLatexFormatter().getExampleInput()),
-                         Arguments.of("\\i", "ı"),
-                         Arguments.of("\\i {\\={\\i}}", "ı ı̄"),
-                         Arguments.of("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}", "Puṇya-pattana-vidyā-pı̄ṭhādhi-kṛtaiḥ prā-kaśyaṃ nı̄taḥ")
+                         Arguments.of("{\\i}", "ı"),
+                         Arguments.of("{\\i} {\\={\\i}}", "ı ī"),
+                         Arguments.of("{\\={\\i}}{\\={\\i}}", "\u0069\u0304\u0069\u0304"),
+                         Arguments.of("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}", "Puṇya-pattana-vidyā-pīṭhādhi-kṛtaiḥ prā-kaśyaṃ nītaḥ")
         );
     }
 

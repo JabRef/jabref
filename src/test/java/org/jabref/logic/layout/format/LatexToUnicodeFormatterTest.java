@@ -2,6 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,10 +22,14 @@ class LatexToUnicodeFormatterTest {
         assertEquals("Ä", formatter.format("{\\\"{A}}"));
     }
 
-    @Test
-    void smallIwithoutDot() {
-        assertEquals("ı", formatter.format("\\i"));
-        assertEquals("ı", formatter.format("{\\i}"));
+    @ParameterizedTest
+    @CsvSource({
+            "ı, \\i",
+            "ı, {\\i}"
+    })
+
+    void smallIwithoutDot(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
     @Test
