@@ -18,7 +18,6 @@ import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -149,8 +148,31 @@ public class AstrophysicsDataSystem
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
+        // Normalize abstract
+        entry.getField(StandardField.ABSTRACT)
+             .ifPresent(abstractText -> {
+                 String normalizedAbstract = abstractText.replaceAll("\\s+", " ")
+                                                         .replaceAll("\\{\\\\ensuremath\\{([^}]*)\\}\\}", "{$1}")
+                                                         .trim();
+                 entry.setField(StandardField.ABSTRACT, normalizedAbstract);
+             });
+
+        // Remove backslash from journal name
+        entry.getField(StandardField.JOURNAL)
+             .ifPresent(journalName -> {
+                 String normalizedJournal = journalName.replace("\\", "");
+                 entry.setField(StandardField.JOURNAL, normalizedJournal);
+             });
+
+        // Check if the abstract field is present and format it
+        entry.getField(StandardField.ABSTRACT)
+             .ifPresent(abstractText -> {
+                 String formattedAbstract = abstractText.replace("<P />", "")
+                                                        .replace("\\textbackslash", "")
+                                                        .trim();
+                 entry.setField(StandardField.ABSTRACT, formattedAbstract);
+             });
+
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
@@ -159,15 +181,7 @@ public class AstrophysicsDataSystem
         new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
-        entry.getField(StandardField.ABSTRACT)
-             .filter("Not Available <P />"::equals)
-             .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
-        entry.getField(StandardField.ABSTRACT)
-             .map(abstractText -> abstractText.replace("<P />", ""))
-             .map(abstractText -> abstractText.replace("\\textbackslash", ""))
-             .map(String::trim)
-             .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }
