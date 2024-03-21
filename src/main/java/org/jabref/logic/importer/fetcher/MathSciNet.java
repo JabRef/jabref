@@ -47,19 +47,21 @@ import org.slf4j.LoggerFactory;
  */
 public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathSciNet.class);
-    private final ImportFormatPreferences preferences;
-    // Define the field mappings
-    private final Map<StandardField, List<String>> fieldMappings = Map.ofEntries(
-            Map.entry(StandardField.TITLE, List.of("titles", "title")),
-            Map.entry(StandardField.AUTHOR, List.of("authors")),
-            Map.entry(StandardField.YEAR, List.of("issue", "issue", "pubYear")),
-            Map.entry(StandardField.JOURNAL, List.of("issue", "issue", "journal", "shortTitle")),
-            Map.entry(StandardField.VOLUME, List.of("issue", "issue", "volume")),
-            Map.entry(StandardField.NUMBER, List.of("issue", "issue", "number")),
-            Map.entry(StandardField.PAGES, List.of("paging", "paging", "text")),
-            Map.entry(StandardField.KEYWORDS, List.of("primaryClass")),
-            Map.entry(StandardField.ISSN, List.of("issue", "issue", "journal", "issn"))
+
+    private static final Map<StandardField, List<String>> FIELD_MAPPINGS = Map.of(
+            StandardField.TITLE, List.of("titles", "title"),
+            StandardField.AUTHOR, List.of("authors"),
+            StandardField.YEAR, List.of("issue", "issue", "pubYear"),
+            StandardField.JOURNAL, List.of("issue", "issue", "journal", "shortTitle"),
+            StandardField.VOLUME, List.of("issue", "issue", "volume"),
+            StandardField.NUMBER, List.of("issue", "issue", "number"),
+            StandardField.PAGES, List.of("paging", "paging", "text"),
+            StandardField.KEYWORDS, List.of("primaryClass"),
+            StandardField.ISSN, List.of("issue", "issue", "journal", "issn")
     );
+
+    private final ImportFormatPreferences preferences;
+
     public MathSciNet(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
@@ -158,23 +160,29 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
             BibEntry entry = new BibEntry(StandardEntryType.Article);
-            // Set fields based on the mappings
-            for (Map.Entry<StandardField, List<String>> mapEntry : fieldMappings.entrySet()) {
+
+            // Set the author and keywords field
+            Optional<String> authors = toAuthors(item.optJSONArray("authors"));
+            authors.ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
+
+            Optional<String> keywords = Optional.ofNullable(getKeywords(item.optJSONObject("primaryClass")));
+            keywords.ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
+
+            // Set the rest of the fields based on the mappings
+            for (Map.Entry<StandardField, List<String>> mapEntry : FIELD_MAPPINGS.entrySet()) {
                 StandardField field = mapEntry.getKey();
                 List<String> path = mapEntry.getValue();
 
-                Optional<String> value;
-                if (field == StandardField.AUTHOR) {
-                    value = toAuthors(item.optJSONArray(path.getFirst()));
-                } else if (field == StandardField.KEYWORDS) {
-                    value = Optional.of(getKeywords(item.optJSONObject(path.getFirst())));
-                } else {
-                    value = getOrNull(item, path).orElse(null);
+                // Skip author and keywords fields as they are already set
+                if (field == StandardField.AUTHOR || field == StandardField.KEYWORDS) {
+                    continue;
                 }
 
-  value.ifPresent(v -> entry.setField(field, v));
+                Optional<String> value = getOthers(item, path);
+                value.ifPresent(v -> entry.setField(field, v));
             }
-            // Handle articleUrl and mrnumber fields separately
+
+            // Handle articleUrl and mrnumber fields separately, as they are non-nested properties in the JSON and can be retrieved as Strings directly
             String doi = item.optString("articleUrl", "");
             if (!doi.isEmpty()) {
                 entry.setField(StandardField.DOI, doi);
@@ -184,43 +192,27 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             if (!mrNumber.isEmpty()) {
                 entry.setField(StandardField.MR_NUMBER, mrNumber);
             }
+
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("MathSciNet API JSON format has changed", exception);
         }
     }
 
-    private Optional<String> getOrNull(JSONObject item, List<String> keys) {
-        Object value = item;
-        for (String key : keys) {
-            if (value instanceof JSONObject obj) {
-                value = value.opt(key);
-            } else if (value instanceof JSONArray arr) {
-                value = value.opt(Integer.parseInt(key);
-            } else {
-                break;
-            }
-        }
-
-        if (value instanceof String stringValue) {
-            return Optional.of(new String(stringValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-        }
-
-        return Optional.empty();
-    }
-
-    private String toAuthors(JSONArray authors) {
+    private Optional<String> toAuthors(JSONArray authors) {
         if (authors == null) {
-            return "";
+            return Optional.empty();
         }
 
-        return IntStream.range(0, authors.length())
-                .mapToObj(authors::getJSONObject)
-                .map(author -> {
-                    String name = author.optString("name", "");
-                    return new String(name.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                })
-                .collect(Collectors.joining(" and "));
+        String authorsString = IntStream.range(0, authors.length())
+                                        .mapToObj(authors::getJSONObject)
+                                        .map(author -> {
+                                            String name = author.optString("name", "");
+                                            return fixStringEncoding(name);
+                                        })
+                                        .collect(Collectors.joining(" and "));
+
+        return Optional.of(authorsString);
     }
 
     private String getKeywords(JSONObject primaryClass) {
@@ -228,6 +220,32 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             return "";
         }
         return primaryClass.optString("description", "");
+    }
+
+    private Optional<String> getOthers(JSONObject item, List<String> keys) {
+        Object value = item;
+        for (String key : keys) {
+            if (value instanceof JSONObject obj) {
+                value = ((JSONObject) value).opt(key);
+            } else if (value instanceof JSONArray) {
+                value = ((JSONArray) value).opt(Integer.parseInt(key));
+            } else {
+                break;
+            }
+        }
+
+        if (value instanceof String stringValue) {
+            return Optional.of(fixStringEncoding(stringValue));
+        } else if (value instanceof Integer intValue) {
+            return Optional.of(intValue.toString());
+        }
+
+        return Optional.empty();
+    }
+
+    // Method to change character set, to fix output string encoding
+    private String fixStringEncoding(String value) {
+        return new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     @Override
