@@ -106,11 +106,15 @@ jobs:
       - name: 'Set JDK${{ matrix.jdk }} in toolchain (linux, Windows)'
         if: (matrix.os != 'macos-latest')
         shell: bash
-        run: sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+        run: |
+          sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+          sed -i 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
       - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
         if: (matrix.os == 'macos-latest')
         shell: bash
-        run: sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+        run: |
+          sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+          sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
       - name: 'Set JavaFX (linux, Windows)'
         if: (matrix.os != 'macos-latest')
         run: sed -i '/javafx {/{n;s/version = ".*"/version = "${{ matrix.javafx }}"/}' build.gradle

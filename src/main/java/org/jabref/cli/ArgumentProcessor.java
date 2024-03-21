@@ -166,7 +166,9 @@ public class ArgumentProcessor {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     preferencesService.getImporterPreferences(),
                     preferencesService.getImportFormatPreferences(),
-                    fileUpdateMonitor);
+                    preferencesService.getCitationKeyPatternPreferences(),
+                    fileUpdateMonitor
+            );
 
             if (!"*".equals(importFormat)) {
                 System.out.println(Localization.lang("Importing %0", file));
