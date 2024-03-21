@@ -137,8 +137,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         boolean isHtml;
         try {
             isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, destination.getFileName(), dialogService);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
             return;
         }
