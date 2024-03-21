@@ -52,7 +52,9 @@ public class Windows extends NativeDesktop {
                 try {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
-                } catch (IOException | ShellLinkException ignored) { }
+                } catch (IOException | ShellLinkException ignored) {
+                    // No handling. Just fallback to default behaviour.
+                }
             }
         }
 
