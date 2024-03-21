@@ -33,13 +33,15 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 public class CffExporter extends Exporter {
-    public static final List<String> UNMAPPED_FIELDS = Arrays.asList(
+    // Fields that are taken 1:1 from BibTeX to CFF
+    public static final List<String> UNMAPPED_FIELDS = List.of(
             "abbreviation", "collection-doi", "collection-title", "collection-type", "commit", "copyright",
             "data-type", "database", "date-accessed", "date-downloaded", "date-published", "department", "end",
             "entry", "filename", "format", "issue-date", "issue-title", "license-url", "loc-end", "loc-start",
             "medium", "nihmsid", "number-volumes", "patent-states", "pmcid", "repository-artifact", "repository-code",
             "scope", "section", "start", "term", "thesis-type", "volume-title", "year-original"
     );
+
     public static final Map<Field, String> FIELDS_MAP = Map.ofEntries(
             Map.entry(StandardField.ABSTRACT, "abstract"),
             Map.entry(StandardField.DATE, "date-released"),
@@ -89,7 +91,8 @@ public class CffExporter extends Exporter {
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
 
-        if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
+        // Do not export if no entries to export -- avoids exports with only template text
+        if (entries.isEmpty()) {
             return;
         }
 
@@ -105,25 +108,26 @@ public class CffExporter extends Exporter {
         options.setIndicatorIndent(2);
         Yaml yaml = new Yaml(options);
 
-        // Check number of `software` or `dataset` entries
-        int counter = 0;
-        boolean dummy = false;
         BibEntry main = null;
+        boolean mainIsDummy = false;
+        int countofSoftwareAndDataSetEntries = 0;
         for (BibEntry entry : entries) {
             if (entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset) {
                 main = entry;
-                counter++;
+                countofSoftwareAndDataSetEntries++;
             }
         }
-        if (counter == 1) {
+        if (countofSoftwareAndDataSetEntries == 1) {
+            // If there is only one software or dataset entry, use it as the main entry
             entries.remove(main);
         } else {
+            // If there are no software or dataset entries, create a dummy main entry holding the given entries
             main = new BibEntry(StandardEntryType.Software);
-            dummy = true;
+            mainIsDummy = true;
         }
 
-        // Main entry
-        Map<String, Object> data = parseEntry(main, true, dummy);
+        // Transform main entry to CFF format
+        Map<String, Object> cffData = transformEntry(main, true, mainIsDummy);
 
         // Preferred citation
         if (main.hasField(StandardField.CITES)) {
@@ -132,7 +136,7 @@ public class CffExporter extends Exporter {
             entries.removeAll(citedEntries);
             if (!citedEntries.isEmpty()) {
                 BibEntry citedEntry = citedEntries.getFirst();
-                data.put("preferred-citation", parseEntry(citedEntry, false, false));
+                cffData.put("preferred-citation", transformEntry(citedEntry, false, false));
             }
         }
 
@@ -145,84 +149,82 @@ public class CffExporter extends Exporter {
                     relatedEntries.addAll(databaseContext.getDatabase().getEntriesByCitationKey(citeKey)));
             entries.removeAll(relatedEntries);
             if (!relatedEntries.isEmpty()) {
-                relatedEntries.forEach(entry -> related.add(parseEntry(entry, false, false)));
+                relatedEntries.forEach(entry -> related.add(transformEntry(entry, false, false)));
             }
         }
 
         // Add remaining entries as references
         for (BibEntry entry : entries) {
-            related.add(parseEntry(entry, false, false));
+            related.add(transformEntry(entry, false, false));
         }
         if (!related.isEmpty()) {
-            data.put("references", related);
+            cffData.put("references", related);
         }
 
-        // Write to file
         try (FileWriter writer = new FileWriter(file.toFile(), StandardCharsets.UTF_8)) {
-            yaml.dump(data, writer);
-        } catch (
-                IOException ex) {
+            yaml.dump(cffData, writer);
+        } catch (IOException ex) {
             throw new SaveException(ex);
         }
     }
 
-    private Map<String, Object> parseEntry(BibEntry entry, boolean main, boolean dummy) {
-        Map<String, Object> data = new LinkedHashMap<>();
-        Map<Field, String> entryMap = new HashMap<>(entry.getFieldMap());
+    private Map<String, Object> transformEntry(BibEntry entry, boolean main, boolean dummy) {
+        Map<String, Object> cffData = new LinkedHashMap<>();
+        Map<Field, String> fields = new HashMap<>(entry.getFieldMap());
 
         if (main) {
             // Mandatory CFF version field
-            data.put("cff-version", "1.2.0");
+            cffData.put("cff-version", "1.2.0");
 
             // Mandatory message field
-            String message = entryMap.getOrDefault(StandardField.COMMENT,
+            String message = fields.getOrDefault(StandardField.COMMENT,
                     "If you use this software, please cite it using the metadata from this file.");
-            data.put("message", message);
-            entryMap.remove(StandardField.COMMENT);
+            cffData.put("message", message);
+            fields.remove(StandardField.COMMENT);
         }
 
         // Mandatory title field
-        String title = entryMap.getOrDefault(StandardField.TITLE, "No title specified.");
-        data.put("title", title);
-        entryMap.remove(StandardField.TITLE);
+        String title = fields.getOrDefault(StandardField.TITLE, "No title specified.");
+        cffData.put("title", title);
+        fields.remove(StandardField.TITLE);
 
         // Mandatory authors field
-        List<Author> authors = AuthorList.parse(entryMap.getOrDefault(StandardField.AUTHOR, ""))
+        List<Author> authors = AuthorList.parse(fields.getOrDefault(StandardField.AUTHOR, ""))
                                          .getAuthors();
-        parseAuthors(data, authors);
-        entryMap.remove(StandardField.AUTHOR);
+        parseAuthors(cffData, authors);
+        fields.remove(StandardField.AUTHOR);
 
         // Type
         if (!dummy) {
-            data.put("type", TYPES_MAP.getOrDefault(entry.getType(), "misc"));
+            cffData.put("type", TYPES_MAP.getOrDefault(entry.getType(), "misc"));
         }
 
         // Keywords
-        String keywords = entryMap.getOrDefault(StandardField.KEYWORDS, null);
+        String keywords = fields.getOrDefault(StandardField.KEYWORDS, null);
         if (keywords != null) {
-            data.put("keywords", keywords.split(",\\s*"));
+            cffData.put("keywords", keywords.split(",\\s*"));
         }
-        entryMap.remove(StandardField.KEYWORDS);
+        fields.remove(StandardField.KEYWORDS);
 
         // Date
-        String date = entryMap.getOrDefault(StandardField.DATE, null);
+        String date = fields.getOrDefault(StandardField.DATE, null);
         if (date != null) {
-            parseDate(data, date);
+            parseDate(cffData, date);
         }
-        entryMap.remove(StandardField.DATE);
+        fields.remove(StandardField.DATE);
 
-        // Fields
-        for (Field field : entryMap.keySet()) {
+        // Remaining fields not handled above
+        for (Field field : fields.keySet()) {
             if (FIELDS_MAP.containsKey(field)) {
-                data.put(FIELDS_MAP.get(field), entryMap.get(field));
+                cffData.put(FIELDS_MAP.get(field), fields.get(field));
             } else if (field instanceof UnknownField) {
                 // Check that field is accepted by CFF format specification
                 if (UNMAPPED_FIELDS.contains(field.getName())) {
-                    data.put(field.getName(), entryMap.get(field));
+                    cffData.put(field.getName(), fields.get(field));
                 }
             }
         }
-        return data;
+        return cffData;
     }
 
     private void parseAuthors(Map<String, Object> data, List<Author> authors) {
