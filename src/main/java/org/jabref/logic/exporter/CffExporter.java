@@ -4,10 +4,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,12 +12,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.layout.format.DateFormatter;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -250,33 +246,18 @@ public class CffExporter extends Exporter {
     }
 
     private void parseDate(Map<String, Object> data, String date) {
-        String formatString;
-        try {
-            DateFormatter dateFormatter = new DateFormatter();
-            data.put("date-released", dateFormatter.format(date));
-        } catch (
-                DateTimeParseException e) {
-            try {
-                formatString = "yyyy-MM";
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
-                YearMonth yearMonth = YearMonth.parse(date, formatter);
-                int month = yearMonth.getMonth().getValue();
-                int year = yearMonth.getYear();
-                data.put("month", month);
-                data.put("year", year);
-            } catch (
-                    DateTimeParseException f) {
-                try {
-                    formatString = "yyyy";
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
-                    int year = Year.parse(date, formatter).getValue();
-                    data.put("year", year);
-                } catch (
-                        DateTimeParseException g) {
-                    data.put("issue-date", date);
-                }
-            }
+        Optional<Date> parsedDateOpt = Date.parse(date);
+        if (parsedDateOpt.isEmpty()) {
+            data.put("issue-date", date);
+            return;
         }
+        Date parsedDate = parsedDateOpt.get();
+        if (parsedDate.getYear().isPresent() && parsedDate.getMonth().isPresent() && parsedDate.getDay().isPresent()) {
+            data.put("date-released", parsedDate.getNormalized());
+            return;
+        }
+        parsedDate.getMonth().ifPresent(month -> data.put("month", month.getNumber()));
+        parsedDate.getYear().ifPresent(year -> data.put("year", year));
     }
 }
 
