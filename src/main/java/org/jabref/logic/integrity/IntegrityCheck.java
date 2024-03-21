@@ -42,10 +42,8 @@ public class IntegrityCheck {
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
                 new AmpersandChecker(),
                 new LatexIntegrityChecker(),
-                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
-                new PredatoryJournalChecker(predatoryJournalRepository,
-                        List.of(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE))
-                ));
+                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)));
+
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.add(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8)));
         } else {
