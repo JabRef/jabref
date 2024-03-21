@@ -111,8 +111,6 @@ jacoco {
 }
 
 dependencies {
-    implementation 'com.github.vatbub:mslinks:1.0.6.2'
-
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
