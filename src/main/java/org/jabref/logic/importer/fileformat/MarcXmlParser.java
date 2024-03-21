@@ -54,11 +54,12 @@ import org.xml.sax.SAXException;
  */
 public class MarcXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder documentBuilder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
             Document content = documentBuilder.parse(inputStream);
             return this.parseEntries(content);
         } catch (ParserConfigurationException | SAXException | IOException exception) {
@@ -384,8 +385,7 @@ public class MarcXmlParser implements Parser {
                 try {
                     LinkedFile linkedFile = new LinkedFile(new URL(resource), "PDF");
                     bibEntry.setField(StandardField.FILE, linkedFile.toString());
-                } catch (
-                        MalformedURLException e) {
+                } catch (MalformedURLException e) {
                     LOGGER.info("Malformed URL: {}", resource);
                 }
             } else {
@@ -407,8 +407,7 @@ public class MarcXmlParser implements Parser {
                 try {
                     LinkedFile linkedFile = new LinkedFile(new URL(resource), "PDF");
                     bibEntry.setField(StandardField.FILE, linkedFile.toString());
-                } catch (
-                        MalformedURLException e) {
+                } catch (MalformedURLException e) {
                     LOGGER.info("Malformed URL: {}", resource);
                 }
             } else {
