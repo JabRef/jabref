@@ -16,6 +16,7 @@ public class HTMLUnicodeConversionMaps {
     public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
+
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
      conforming SGML systems and applications as defined in
