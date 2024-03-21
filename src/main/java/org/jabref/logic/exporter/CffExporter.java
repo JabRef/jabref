@@ -93,125 +93,157 @@ public class CffExporter extends Exporter {
             return;
         }
 
+        // Make a copy of the list to avoid modifying the original list
+        entries = new ArrayList<>(entries);
+
+        // Set up YAML options
         DumperOptions options = new DumperOptions();
-
-        // Set line width to infinity to avoid line wrapping
         options.setWidth(Integer.MAX_VALUE);
-
-        // Set collections to be written in block rather than inline
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(true);
-
-        // Set indent for sequences to two spaces
         options.setIndentWithIndicator(true);
         options.setIndicatorIndent(2);
         Yaml yaml = new Yaml(options);
 
-        Map<String, Object> originalData = new LinkedHashMap<>();
-        Map<String, Object> referencesData = new LinkedHashMap<>();
-        Map<String, Object> data = originalData;
-        data.put("cff-version", "1.2.0");
-
+        // Check number of `software` or `dataset` entries
+        int counter = 0;
+        boolean dummy = false;
+        BibEntry main = null;
         for (BibEntry entry : entries) {
-            Map<Field, String> entryMap = new HashMap<>(entry.getFieldMap());
-
-            // Mandatory message field
-            String message = entryMap.getOrDefault(StandardField.COMMENT,
-                    "If you use this software, please cite it using the metadata from this file.");
-            data.put("message", message);
-            entryMap.remove(StandardField.COMMENT);
-
-            // Mandatory title field
-            String title = entryMap.getOrDefault(StandardField.TITLE, "No title specified.");
-            data.put("title", title);
-            entryMap.remove(StandardField.TITLE);
-
-            // Mandatory authors field
-            List<Author> authors = AuthorList.parse(entryMap.getOrDefault(StandardField.AUTHOR, ""))
-                                             .getAuthors();
-            List<Map<String, String>> authorsList = parseAuthors(data, authors);
-            entryMap.remove(StandardField.AUTHOR);
-
-            // Type;
-            EntryType entryType = entry.getType();
-            switch (entryType) {
-                case StandardEntryType.Software, StandardEntryType.Dataset ->
-                        data.put("type", entryType.getName());
-                default -> {
-                    if (TYPES_MAP.containsKey(entryType)) {
-                        data.put("references", referencesData);
-                        data = referencesData;
-                        data.put("type", TYPES_MAP.get(entryType));
-                        data.put("authors", authorsList.isEmpty() ?
-                                "No author specified." : authorsList);
-                        data.put("title", title);
-                    }
-                }
+            if (entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset) {
+                main = entry;
+                counter++;
             }
+        }
+        if (counter == 1) {
+            entries.remove(main);
+        } else {
+            main = new BibEntry(StandardEntryType.Software);
+            dummy = true;
+        }
 
-            // Keywords
-            String keywords = entryMap.getOrDefault(StandardField.KEYWORDS, null);
-            if (keywords != null) {
-                data.put("keywords", keywords.split(",\\s*"));
-            }
-            entryMap.remove(StandardField.KEYWORDS);
+        // Main entry
+        Map<String, Object> data = parseEntry(main, true, dummy);
 
-            // Date
-            String date = entryMap.getOrDefault(StandardField.DATE, null);
-            if (date != null) {
-                parseDate(data, date);
-            }
-            entryMap.remove(StandardField.DATE);
-
-            // Fields
-            for (Field field : entryMap.keySet()) {
-                if (FIELDS_MAP.containsKey(field)) {
-                    data.put(FIELDS_MAP.get(field), entryMap.get(field));
-                } else if (field instanceof UnknownField) {
-                    // Check that field is accepted by CFF format specification
-                    if (UNMAPPED_FIELDS.contains(field.getName())) {
-                        data.put(field.getName(), entryMap.get(field));
-                    }
-                }
+        // Preferred citation
+        if (main.hasField(StandardField.CITES)) {
+            String citeKey = main.getField(StandardField.CITES).orElse("").split(",")[0];
+            List<BibEntry> citedEntries = databaseContext.getDatabase().getEntriesByCitationKey(citeKey);
+            entries.removeAll(citedEntries);
+            if (!citedEntries.isEmpty()) {
+                BibEntry citedEntry = citedEntries.getFirst();
+                data.put("preferred-citation", parseEntry(citedEntry, false, false));
             }
         }
 
+        // References
+        List<Map<String, Object>> related = new ArrayList<>();
+        if (main.hasField(StandardField.RELATED)) {
+            String[] citeKeys = main.getField(StandardField.RELATED).orElse("").split(",");
+            List<BibEntry> relatedEntries = new ArrayList<>();
+            Arrays.stream(citeKeys).forEach(citeKey ->
+                    relatedEntries.addAll(databaseContext.getDatabase().getEntriesByCitationKey(citeKey)));
+            entries.removeAll(relatedEntries);
+            if (!relatedEntries.isEmpty()) {
+                relatedEntries.forEach(entry -> related.add(parseEntry(entry, false, false)));
+            }
+        }
+
+        // Add remaining entries as references
+        for (BibEntry entry : entries) {
+            related.add(parseEntry(entry, false, false));
+        }
+        if (!related.isEmpty()) {
+            data.put("references", related);
+        }
+
+        // Write to file
         try (FileWriter writer = new FileWriter(file.toFile(), StandardCharsets.UTF_8)) {
-            yaml.dump(originalData, writer);
+            yaml.dump(data, writer);
         } catch (
                 IOException ex) {
             throw new SaveException(ex);
         }
     }
 
-    private List<Map<String, String>> parseAuthors(Map<String, Object> data, List<Author> authors) {
+    private Map<String, Object> parseEntry(BibEntry entry, boolean main, boolean dummy) {
+        Map<String, Object> data = new LinkedHashMap<>();
+        Map<Field, String> entryMap = new HashMap<>(entry.getFieldMap());
+
+        if (main) {
+            // Mandatory CFF version field
+            data.put("cff-version", "1.2.0");
+
+            // Mandatory message field
+            String message = entryMap.getOrDefault(StandardField.COMMENT,
+                    "If you use this software, please cite it using the metadata from this file.");
+            data.put("message", message);
+            entryMap.remove(StandardField.COMMENT);
+        }
+
+        // Mandatory title field
+        String title = entryMap.getOrDefault(StandardField.TITLE, "No title specified.");
+        data.put("title", title);
+        entryMap.remove(StandardField.TITLE);
+
+        // Mandatory authors field
+        List<Author> authors = AuthorList.parse(entryMap.getOrDefault(StandardField.AUTHOR, ""))
+                                         .getAuthors();
+        parseAuthors(data, authors);
+        entryMap.remove(StandardField.AUTHOR);
+
+        // Type
+        if (!dummy) {
+            data.put("type", TYPES_MAP.getOrDefault(entry.getType(), "misc"));
+        }
+
+        // Keywords
+        String keywords = entryMap.getOrDefault(StandardField.KEYWORDS, null);
+        if (keywords != null) {
+            data.put("keywords", keywords.split(",\\s*"));
+        }
+        entryMap.remove(StandardField.KEYWORDS);
+
+        // Date
+        String date = entryMap.getOrDefault(StandardField.DATE, null);
+        if (date != null) {
+            parseDate(data, date);
+        }
+        entryMap.remove(StandardField.DATE);
+
+        // Fields
+        for (Field field : entryMap.keySet()) {
+            if (FIELDS_MAP.containsKey(field)) {
+                data.put(FIELDS_MAP.get(field), entryMap.get(field));
+            } else if (field instanceof UnknownField) {
+                // Check that field is accepted by CFF format specification
+                if (UNMAPPED_FIELDS.contains(field.getName())) {
+                    data.put(field.getName(), entryMap.get(field));
+                }
+            }
+        }
+        return data;
+    }
+
+    private void parseAuthors(Map<String, Object> data, List<Author> authors) {
         List<Map<String, String>> authorsList = new ArrayList<>();
-        // Copy the original list to avoid using YAML anchors and aliases;
-        List<Map<String, String>> authorsListCopy = new ArrayList<>();
         authors.forEach(author -> {
             Map<String, String> authorMap = new LinkedHashMap<>();
-            Map<String, String> authorMapCopy = new LinkedHashMap<>();
             if (author.getFamilyName().isPresent()) {
                 authorMap.put("family-names", author.getFamilyName().get());
-                authorMapCopy.put("family-names", author.getFamilyName().get());
             }
             if (author.getGivenName().isPresent()) {
                 authorMap.put("given-names", author.getGivenName().get());
-                authorMapCopy.put("given-names", author.getGivenName().get());
             }
             if (author.getNamePrefix().isPresent()) {
                 authorMap.put("name-particle", author.getNamePrefix().get());
-                authorMapCopy.put("name-particle", author.getNamePrefix().get());
             }
             if (author.getNameSuffix().isPresent()) {
                 authorMap.put("name-suffix", author.getNameSuffix().get());
-                authorMapCopy.put("name-suffix", author.getNameSuffix().get());
             }
             authorsList.add(authorMap);
-            authorsListCopy.add(authorMapCopy);
         });
-        data.put("authors", authorsList.isEmpty() ? "No author specified." : authorsList);
-        return authorsListCopy;
+        data.put("authors", authorsList.isEmpty() ? List.of(Map.of("name", "/")) : authorsList);
     }
 
     private void parseDate(Map<String, Object> data, String date) {

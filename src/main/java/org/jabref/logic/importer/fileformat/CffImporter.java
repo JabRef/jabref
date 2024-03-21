@@ -253,7 +253,7 @@ public class CffImporter extends Importer {
                 gen.generateAndSetKey(ref);
                 String citeKey = ref.getCitationKey().orElse("");
                 String related = entry.getField(StandardField.RELATED).orElse("");
-                entry.setField(StandardField.RELATED, related.isEmpty() ? citeKey : related + ", " + citeKey);
+                entry.setField(StandardField.RELATED, related.isEmpty() ? citeKey : related + "," + citeKey);
             });
         }
         return res;

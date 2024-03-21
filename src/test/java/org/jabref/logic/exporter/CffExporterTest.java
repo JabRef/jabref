@@ -13,6 +13,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.importer.fileformat.CffImporter;
 import org.jabref.logic.importer.fileformat.CffImporterTest;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -61,17 +62,16 @@ public class CffExporterTest {
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: No title specified.",
                 "authors:",
-                "  - family-names: Author",
-                "    given-names: Test",
+                "  - name: /",
                 "references:",
-                "  type: article",
-                "  authors:",
-                "    - family-names: Author",
-                "      given-names: Test",
-                "  title: Test Title",
-                "  url: http://example.com");
+                "  - title: Test Title",
+                "    authors:",
+                "      - family-names: Author",
+                "        given-names: Test",
+                "    type: article",
+                "    url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -91,17 +91,16 @@ public class CffExporterTest {
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: No title specified.",
                 "authors:",
-                "  - family-names: Author",
-                "    given-names: Test",
+                "  - name: /",
                 "references:",
-                "  type: conference-paper",
-                "  authors:",
-                "    - family-names: Author",
-                "      given-names: Test",
-                "  title: Test Title",
-                "  doi: random_doi_value");
+                "  - title: Test Title",
+                "    authors:",
+                "      - family-names: Author",
+                "        given-names: Test",
+                "    type: conference-paper",
+                "    doi: random_doi_value");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -118,8 +117,13 @@ public class CffExporterTest {
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
                 "title: No title specified.",
-                "authors: No author specified."
-        );
+                "authors:",
+                "  - name: /",
+                "references:",
+                "  - title: No title specified.",
+                "    authors:",
+                "      - name: /",
+                "    type: misc");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -189,18 +193,17 @@ public class CffExporterTest {
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: Test Title",
+                "title: No title specified.",
                 "authors:",
-                "  - family-names: Author",
-                "    given-names: Test",
+                "  - name: /",
                 "references:",
-                "  type: article",
-                "  authors:",
-                "    - family-names: Author",
-                "      given-names: Test",
-                "  title: Test Title",
-                "  month: 11",
-                "  year: 2003");
+                "  - title: Test Title",
+                "    authors:",
+                "      - family-names: Author",
+                "        given-names: Test",
+                "    type: article",
+                "    month: 11",
+                "    year: 2003");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -220,41 +223,39 @@ public class CffExporterTest {
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
                 "message: If you use this software, please cite it using the metadata from this file.",
-                "title: 細雪",
+                "title: No title specified.",
                 "authors:",
-                "  - family-names: 潤一郎",
-                "    given-names: 谷崎",
+                "  - name: /",
                 "references:",
-                "  type: article",
-                "  authors:",
-                "    - family-names: 潤一郎",
-                "      given-names: 谷崎",
-                "  title: 細雪",
-                "  url: http://example.com");
+                "  - title: 細雪",
+                "    authors:",
+                "      - family-names: 潤一郎",
+                "        given-names: 谷崎",
+                "    type: article",
+                "    url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
 
     @Test
     public final void roundTripTest(@TempDir Path tempDir) throws Exception {
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(
+                CitationKeyPatternPreferences.class,
+                Answers.RETURNS_SMART_NULLS
+        );
+        when(citationKeyPatternPreferences.getKeyPattern())
+                .thenReturn(GlobalCitationKeyPattern.fromPattern("[auth][year]"));
 
         // First, import the file which will be parsed as two entries
-        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_SMART_NULLS);
-        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(GlobalCitationKeyPattern.fromPattern("[auth][year]"));
         CffImporter importer = new CffImporter(citationKeyPatternPreferences);
         Path file = Path.of(CffImporterTest.class.getResource("CITATION.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
-        BibEntry softwareEntry = bibEntries.getFirst();
-        BibEntry articleEntry = bibEntries.getLast();
+        BibDatabase db = importer.importDatabase(file).getDatabase();
+        BibDatabaseContext dbc = new BibDatabaseContext(db);
 
-        // Then, export them separately and check they have all required fields
-        Path softwareFile = tempDir.resolve("CITATION_SOFTWARE.cff");
-        Path articleFile = tempDir.resolve("CITATION_ARTICLE.cff");
-        Files.createFile(softwareFile);
-        Files.createFile(articleFile);
-
-        cffExporter.export(databaseContext, softwareFile, Collections.singletonList(softwareEntry));
-        cffExporter.export(databaseContext, articleFile, Collections.singletonList(articleEntry));
+        // Then, export both entries that will be exported as one file
+        Path out = tempDir.resolve("OUT.cff");
+        Files.createFile(out);
+        cffExporter.export(dbc, out, db.getEntries());
 
         Set<String> expectedSoftware = Set.of(
                 "cff-version: 1.2.0",
@@ -285,21 +286,9 @@ public class CffExporterTest {
                 "license: MIT",
                 "repository-code: https://github.com/jabref/jabref/",
                 "abstract: JabRef is an open-source, cross-platform citation and reference management tool.",
-                "url: https://www.jabref.org");
-
-        Set<String> expectedArticle = Set.of(
-                "cff-version: 1.2.0",
-                "message: If you use this software, please cite it using the metadata from this file.",
-                "title: 'JabRef: BibTeX-based literature management software'",
-                "authors:",
-                "  - family-names: Kopp",
-                "    given-names: Oliver",
-                "  - family-names: Snethlage",
-                "    given-names: Carl Christian",
-                "  - family-names: Schwentker",
-                "    given-names: Christoph",
-                "references:",
-                "  type: article",
+                "url: https://www.jabref.org",
+                "preferred-citation:",
+                "  title: 'JabRef: BibTeX-based literature management software'",
                 "  authors:",
                 "    - family-names: Kopp",
                 "      given-names: Oliver",
@@ -307,7 +296,7 @@ public class CffExporterTest {
                 "      given-names: Carl Christian",
                 "    - family-names: Schwentker",
                 "      given-names: Christoph",
-                "  title: 'JabRef: BibTeX-based literature management software'",
+                "  type: article",
                 "  month: '11'",
                 "  issue: '138'",
                 "  volume: '44'",
@@ -319,12 +308,8 @@ public class CffExporterTest {
                 "  end: '447'");
 
         // Tests equality of sets since last lines order is random and relies on entries internal order
-        try (Stream<String> st = Files.lines(softwareFile)) {
+        try (Stream<String> st = Files.lines(out)) {
             assertEquals(expectedSoftware, st.collect(Collectors.toSet()));
-        }
-
-        try (Stream<String> st = Files.lines(articleFile)) {
-            assertEquals(expectedArticle, st.collect(Collectors.toSet()));
         }
     }
 }
