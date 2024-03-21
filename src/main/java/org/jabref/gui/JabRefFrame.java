@@ -455,7 +455,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 taskExecutor,
                 dialogService,
                 Globals.journalAbbreviationRepository,
-                Globals.predatoryJournalRepository,
                 entryTypesManager,
                 undoManager,
                 Globals.getClipboardManager());

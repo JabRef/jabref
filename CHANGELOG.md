@@ -75,6 +75,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed the predatory journal checking due to many false positives [#11066](https://github.com/JabRef/jabref/pull/11066)
+
 ## [5.12] – 2023-12-24
 
 ### Added

@@ -346,18 +346,8 @@ tasks.register("generateJournalListMV", JavaExec) {
     }
 }
 
-tasks.register("generatePredatoryJournalListMV", JavaExec) {
-        group = "JabRef"
-        description = "Load predatory journal information from online sources to a H2 MVStore"
-        classpath = sourceSets.main.runtimeClasspath
-        mainClass = "org.jabref.cli.PredatoryJournalsMvGenerator"
-        onlyIf {
-            !file("build/resources/main/journals/predatory-journals.mv").exists()
-        }
-}
-
-jar.dependsOn("generateJournalListMV", "generatePredatoryJournalListMV")
-compileTestJava.dependsOn("generateJournalListMV","generatePredatoryJournalListMV")
+jar.dependsOn("generateJournalListMV")
+compileTestJava.dependsOn("generateJournalListMV")
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
