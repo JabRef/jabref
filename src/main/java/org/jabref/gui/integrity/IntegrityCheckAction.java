@@ -36,7 +36,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 TaskExecutor taskExecutor,
-                                JournalAbbreviationRepository abbreviationRepository){
+                                JournalAbbreviationRepository abbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
