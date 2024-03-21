@@ -945,6 +945,7 @@ public class JabRefPreferences implements PreferencesService {
         if ("".equals(result)) {
             return defaultValue;
         }
+        return result;
     }
 
     public Optional<String> getAsOptional(String key) {
