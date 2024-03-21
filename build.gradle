@@ -277,6 +277,8 @@ dependencies {
             select("com.google.guava:guava:0")
         }
     }
+
+    implementation 'com.github.vatbub:mslinks:1.0.6.2'
 }
 
 clean {
