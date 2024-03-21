@@ -159,15 +159,16 @@ public class AstrophysicsDataSystem
         new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
-        entry.getField(StandardField.ABSTRACT)
-             .filter("Not Available <P />"::equals)
-             .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
+        // Check if the abstract field is present and format it
         entry.getField(StandardField.ABSTRACT)
-             .map(abstractText -> abstractText.replace("<P />", ""))
-             .map(abstractText -> abstractText.replace("\\textbackslash", ""))
-             .map(String::trim)
-             .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
+             .ifPresent(abstractText -> {
+                 String formattedAbstract = abstractText.replace("<P />", "")
+                                                        .replace("\\textbackslash", "")
+                                                        .trim();
+                 entry.setField(StandardField.ABSTRACT, formattedAbstract);
+             });
+
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }
