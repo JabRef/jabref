@@ -9,12 +9,12 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.layout.format.DateFormatter;
 import org.jabref.logic.util.StandardFileType;
@@ -97,7 +97,7 @@ public class CffExporter extends Exporter {
         }
 
         // Make a copy of the list to avoid modifying the original list
-        entries = new ArrayList<>(entries);
+        final List<BibEntry> entriesToTransform = new ArrayList<>(entries);
 
         // Set up YAML options
         DumperOptions options = new DumperOptions();
@@ -110,16 +110,16 @@ public class CffExporter extends Exporter {
 
         BibEntry main = null;
         boolean mainIsDummy = false;
-        int countofSoftwareAndDataSetEntries = 0;
-        for (BibEntry entry : entries) {
+        int countOfSoftwareAndDataSetEntries = 0;
+        for (BibEntry entry : entriesToTransform) {
             if (entry.getType() == StandardEntryType.Software || entry.getType() == StandardEntryType.Dataset) {
                 main = entry;
-                countofSoftwareAndDataSetEntries++;
+                countOfSoftwareAndDataSetEntries++;
             }
         }
-        if (countofSoftwareAndDataSetEntries == 1) {
+        if (countOfSoftwareAndDataSetEntries == 1) {
             // If there is only one software or dataset entry, use it as the main entry
-            entries.remove(main);
+            entriesToTransform.remove(main);
         } else {
             // If there are no software or dataset entries, create a dummy main entry holding the given entries
             main = new BibEntry(StandardEntryType.Software);
@@ -133,7 +133,7 @@ public class CffExporter extends Exporter {
         if (main.hasField(StandardField.CITES)) {
             String citeKey = main.getField(StandardField.CITES).orElse("").split(",")[0];
             List<BibEntry> citedEntries = databaseContext.getDatabase().getEntriesByCitationKey(citeKey);
-            entries.removeAll(citedEntries);
+            entriesToTransform.removeAll(citedEntries);
             if (!citedEntries.isEmpty()) {
                 BibEntry citedEntry = citedEntries.getFirst();
                 cffData.put("preferred-citation", transformEntry(citedEntry, false, false));
@@ -143,18 +143,19 @@ public class CffExporter extends Exporter {
         // References
         List<Map<String, Object>> related = new ArrayList<>();
         if (main.hasField(StandardField.RELATED)) {
-            String[] citeKeys = main.getField(StandardField.RELATED).orElse("").split(",");
-            List<BibEntry> relatedEntries = new ArrayList<>();
-            Arrays.stream(citeKeys).forEach(citeKey ->
-                    relatedEntries.addAll(databaseContext.getDatabase().getEntriesByCitationKey(citeKey)));
-            entries.removeAll(relatedEntries);
-            if (!relatedEntries.isEmpty()) {
-                relatedEntries.forEach(entry -> related.add(transformEntry(entry, false, false)));
-            }
+            main.getEntryLinkList(StandardField.RELATED, databaseContext.getDatabase())
+                .stream()
+                .map(link -> link.getLinkedEntry())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(entry -> {
+                    related.add(transformEntry(entry, false, false));
+                    entriesToTransform.remove(entry);
+                });
         }
 
         // Add remaining entries as references
-        for (BibEntry entry : entries) {
+        for (BibEntry entry : entriesToTransform) {
             related.add(transformEntry(entry, false, false));
         }
         if (!related.isEmpty()) {
