@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.Launcher;
@@ -16,6 +17,8 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
 import com.sun.jna.platform.win32.Win32Exception;
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -43,6 +46,16 @@ public class Windows extends NativeDesktop {
 
     @Override
     public String detectProgramPath(String programName, String directoryName) {
+        if (Objects.equals(programName, "texworks")) {
+            Path texworksLinkPath = Path.of(System.getenv("APPDATA") + "\\Microsoft\\Windows\\Start Menu\\Programs\\MiKTeX\\TeXworks.lnk");
+            if (Files.exists(texworksLinkPath)) {
+                try {
+                    ShellLink link = new ShellLink(texworksLinkPath);
+                    return link.resolveTarget();
+                } catch (IOException | ShellLinkException ignored) { }
+            }
+        }
+
         String progFiles = System.getenv("ProgramFiles(x86)");
         String programPath;
         if (progFiles != null) {
