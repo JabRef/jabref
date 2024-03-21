@@ -20,6 +20,8 @@ import org.jabref.logic.l10n.Localization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.Globals.stateManager;
+
 public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);
@@ -100,8 +102,15 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     }
 
     public void applyChanges() {
-        changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
-        ce.end();
-        undoManager.addEdit(ce);
+        if (changes.stream().noneMatch(change -> !change.isAccepted())) {
+            changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
+            ce.end();
+            undoManager.addEdit(ce);
+            stateManager.activeTabProperty().get().get().updateTabTitle(false);
+            stateManager.activeTabProperty().get().get().resetChangedProperties();
+        } else {
+            stateManager.activeTabProperty().get().get().updateTabTitle(true);
+            stateManager.activeTabProperty().get().get().markBaseChanged();
+        }
     }
 }
