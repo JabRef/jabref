@@ -31,6 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import kong.unirest.JsonNode;
@@ -50,13 +51,11 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     private static final Map<StandardField, List<String>> FIELD_MAPPINGS = Map.of(
             StandardField.TITLE, List.of("titles", "title"),
-            StandardField.AUTHOR, List.of("authors"),
             StandardField.YEAR, List.of("issue", "issue", "pubYear"),
             StandardField.JOURNAL, List.of("issue", "issue", "journal", "shortTitle"),
             StandardField.VOLUME, List.of("issue", "issue", "volume"),
             StandardField.NUMBER, List.of("issue", "issue", "number"),
             StandardField.PAGES, List.of("paging", "paging", "text"),
-            StandardField.KEYWORDS, List.of("primaryClass"),
             StandardField.ISSN, List.of("issue", "issue", "journal", "issn")
     );
 
@@ -165,19 +164,13 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             Optional<String> authors = toAuthors(item.optJSONArray("authors"));
             authors.ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
 
-            Optional<String> keywords = Optional.ofNullable(getKeywords(item.optJSONObject("primaryClass")));
+            Optional<String> keywords = getKeywords(item.optJSONObject("primaryClass"));
             keywords.ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
 
             // Set the rest of the fields based on the mappings
             for (Map.Entry<StandardField, List<String>> mapEntry : FIELD_MAPPINGS.entrySet()) {
                 StandardField field = mapEntry.getKey();
                 List<String> path = mapEntry.getValue();
-
-                // Skip author and keywords fields as they are already set
-                if (field == StandardField.AUTHOR || field == StandardField.KEYWORDS) {
-                    continue;
-                }
-
                 Optional<String> value = getOthers(item, path);
                 value.ifPresent(v -> entry.setField(field, v));
             }
@@ -185,7 +178,13 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             // Handle articleUrl and mrnumber fields separately, as they are non-nested properties in the JSON and can be retrieved as Strings directly
             String doi = item.optString("articleUrl", "");
             if (!doi.isEmpty()) {
-                entry.setField(StandardField.DOI, doi);
+                try {
+                    Optional<DOI> parsedDoi = DOI.parse(doi);
+                    parsedDoi.ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.getNormalized()));
+                } catch (IllegalArgumentException e) {
+                    // If DOI parsing fails, use the original DOI string
+                    entry.setField(StandardField.DOI, doi);
+                }
             }
 
             String mrNumber = item.optString("mrnumber", "");
@@ -215,20 +214,20 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return Optional.of(authorsString);
     }
 
-    private String getKeywords(JSONObject primaryClass) {
+    private Optional<String> getKeywords(JSONObject primaryClass) {
         if (primaryClass == null) {
-            return "";
+            return Optional.empty();
         }
-        return primaryClass.optString("description", "");
+        return Optional.ofNullable(primaryClass.optString("description", null));
     }
 
     private Optional<String> getOthers(JSONObject item, List<String> keys) {
         Object value = item;
         for (String key : keys) {
             if (value instanceof JSONObject obj) {
-                value = ((JSONObject) value).opt(key);
-            } else if (value instanceof JSONArray) {
-                value = ((JSONArray) value).opt(Integer.parseInt(key));
+                value = obj.opt(key);
+            } else if (value instanceof JSONArray arr) {
+                value = arr.opt(Integer.parseInt(key));
             } else {
                 break;
             }
@@ -243,7 +242,12 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return Optional.empty();
     }
 
-    // Method to change character set, to fix output string encoding
+    /**
+     * Method to change character set, to fix output string encoding
+     * If we don't convert to the correct character set, the parser outputs anomalous characters.
+     * This is observed in case of non-UTF-8 characters, such as accented characters.
+     */
+
     private String fixStringEncoding(String value) {
         return new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }

@@ -77,7 +77,7 @@ class MathSciNetTest {
 
     @Test
     void getParser() throws Exception {
-        String fileName = "/importer/fetcher/jsonTest.json";
+        String fileName = "../../../../../../resources/org/jabref/logic/importer/fetcher/jsonTest.json";
         try (InputStream is = MathSciNetTest.class.getResourceAsStream(fileName)) {
             List<BibEntry> entries = fetcher.getParser().parseEntries(is);
 
