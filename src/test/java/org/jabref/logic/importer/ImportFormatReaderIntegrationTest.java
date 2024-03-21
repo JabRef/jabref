@@ -31,8 +31,8 @@ class ImportFormatReaderIntegrationTest {
         reader = new ImportFormatReader(
                 importerPreferences,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                new DummyFileUpdateMonitor(),
-                mock(CitationKeyPatternPreferences.class));
+                mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor()
+        );
     }
 
     @ParameterizedTest

@@ -55,8 +55,7 @@ public class ImportFormatReader {
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
-                              FileUpdateMonitor fileUpdateMonitor,
-                              CitationKeyPatternPreferences citationKeyPatternPreferences) {
+                              CitationKeyPatternPreferences citationKeyPatternPreferences, FileUpdateMonitor fileUpdateMonitor) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;

@@ -26,7 +26,7 @@ class ImportFormatReaderParameterlessTest {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, fileMonitor, mock(CitationKeyPatternPreferences.class));
+        reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), fileMonitor);
     }
 
     @Test
