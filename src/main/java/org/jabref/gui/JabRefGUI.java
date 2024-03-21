@@ -102,11 +102,6 @@ public class JabRefGUI extends Application {
         OOBibBaseConnect.closeOfficeConnection();
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
-        try {
-            Globals.predatoryJournalRepository.close();
-        } catch (Exception e) {
-            LOGGER.warn("Cloud not shut down predatoryJournalRepository", e);
-        }
     }
 
     private void setupProxy() {
