@@ -26,6 +26,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
@@ -33,6 +34,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.JsonNode;
 import kong.unirest.json.JSONArray;
@@ -117,6 +119,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
             List<BibEntry> entries = new ArrayList<>();
+            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
 
             try {
                 // Depending on the type of query we might get either a json object or directly a json array
@@ -126,8 +129,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     JSONArray entriesArray = node.getArray();
                     for (int i = 0; i < entriesArray.length(); i++) {
                         JSONObject entryObject = entriesArray.getJSONObject(i);
-                        BibEntry bibEntry = jsonItemToBibEntry(entryObject);
-                        entries.add(bibEntry);
+                        if (entryObject.has("bib")) {
+                            String bibTexFormat = entriesArray.getJSONObject(i).getString("bib");
+                            entries.addAll(bibtexParser.parseEntries(bibTexFormat));
+                        }
                     }
                 } else {
                     var element = node.getObject();
@@ -135,9 +140,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     if (element.has("all")) {
                         JSONArray entriesArray = element.getJSONObject("all").getJSONArray("results");
                         for (int i = 0; i < entriesArray.length(); i++) {
-                            JSONObject entryObject = entriesArray.getJSONObject(i);
-                            BibEntry bibEntry = jsonItemToBibEntry(entryObject);
-                            entries.add(bibEntry);
+                            String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
+                            entries.addAll(bibtexParser.parseEntries(bibTexFormat));
                         }
                     } else if (element.has("results")) {
                         JSONArray entriesArray = element.getJSONArray("results");

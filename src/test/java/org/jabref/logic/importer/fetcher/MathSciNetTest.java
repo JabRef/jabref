@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -42,7 +43,7 @@ class MathSciNetTest {
         ratiuEntry.setField(StandardField.PAGES, "571--589");
         ratiuEntry.setField(StandardField.KEYWORDS, "76A15 (35A01 35A02 35K61 82D30)");
         ratiuEntry.setField(StandardField.MR_NUMBER, "3537908");
-        ratiuEntry.setField(StandardField.ISSN, "1422-6928, 1422-6952");
+        ratiuEntry.setField(StandardField.ISSN, "1422-6928,1422-6952");
         ratiuEntry.setField(StandardField.DOI, "10.1007/s00021-016-0250-0");
     }
 
@@ -77,11 +78,11 @@ class MathSciNetTest {
 
     @Test
     void getParser() throws Exception {
-        String fileName = "../../../../../../resources/org/jabref/logic/importer/fetcher/jsonTest.json";
+        String fileName = "mathscinet.json";
         try (InputStream is = MathSciNetTest.class.getResourceAsStream(fileName)) {
             List<BibEntry> entries = fetcher.getParser().parseEntries(is);
 
-            assertEquals(List.of(
+            assertEquals(Optional.of(
                     new BibEntry(StandardEntryType.Article)
                             .withField(StandardField.TITLE, "On the weights of general MDS codes")
                             .withField(StandardField.AUTHOR, "Alderson, Tim L.")
@@ -92,9 +93,8 @@ class MathSciNetTest {
                             .withField(StandardField.PAGES, "5414--5418")
                             .withField(StandardField.MR_NUMBER, "4158623")
                             .withField(StandardField.KEYWORDS, "Bounds on codes")
-                            .withField(StandardField.DOI, "https://doi.org/10.1109/TIT.2020.2977319")
-                            .withField(StandardField.ISSN, "0018-9448")
-            ), entries);
+                            .withField(StandardField.DOI, "10.1109/TIT.2020.2977319")
+            ), entries.stream().findFirst());
         }
     }
 }
