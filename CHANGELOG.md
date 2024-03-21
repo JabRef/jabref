@@ -76,6 +76,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef could not parse absolute file paths from Zotero exports. [#10959](https://github.com/JabRef/jabref/issues/10959)
 - We fixed an issue where an exception occured when toggling between "Live" or "Locked" in the internal Document Viewer. [#10935](https://github.com/JabRef/jabref/issues/10935)
 - Fixed an issue on Windows where the browser extension reported failure to send an entry to JabRef even though it was sent properly. [JabRef-Browser-Extension#493](https://github.com/JabRef/JabRef-Browser-Extension/issues/493)
+- We fixed an issue with where JabRef would throw an error when using MathSciNet search, as it was unable to parse the fetched JSON coreectly. [10996](https://github.com/JabRef/jabref/issues/10996)
 
 ### Removed
 
