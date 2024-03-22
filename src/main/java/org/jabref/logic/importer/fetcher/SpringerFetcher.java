@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,7 +89,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
             List<String> authorList = new ArrayList<>();
             for (int i = 0; i < authors.length(); i++) {
                 if (authors.getJSONObject(i).has("creator")) {
-                    authorList.add(authors.getJSONObject(i).getString("creator"));
+                    authorList.add(fixStringEncoding(authors.getJSONObject(i).getString("creator")));
                 } else {
                     LOGGER.info("Empty author name.");
                 }
@@ -159,6 +161,10 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
         });
 
         return entry;
+    }
+
+    private static String fixStringEncoding(String value) {
+        return new String(value.getBytes(Charset.forName("windows-1252")), StandardCharsets.UTF_8);
     }
 
     @Override
