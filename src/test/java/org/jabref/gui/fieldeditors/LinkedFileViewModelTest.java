@@ -47,7 +47,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -201,27 +200,27 @@ class LinkedFileViewModelTest {
 
     @FetcherTest
     @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
+    void downloadHtmlWhenLinkedFilePointsToHtml() throws Exception {
         // use google as test url, wiley is protected by CloudFlare
         String url = "https://google.com";
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
-    
+
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
-    
+
         databaseContext.setDatabasePath(tempFile);
-    
-        doNothing().when(JabRefDesktop.class);
-        JabRefDesktop.openExternalViewer(any(Path.class), any(ExternalFileType.class));
-    
+
+        doReturn(true).when(JabRefDesktop.class);
+        JabRefDesktop.openExternalFileAnyFormat(any(BibDatabaseContext.class), any(FilePreferences.class), anyString(), any(Optional.class));
+
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-    
+
         viewModel.download();
-    
+
         List<LinkedFile> linkedFiles = entry.getFiles();
-    
+
         for (LinkedFile file: linkedFiles) {
             if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
                 assertEquals("URL", file.getFileType());
