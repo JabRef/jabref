@@ -145,5 +145,6 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires com.jthemedetector;
     requires dd.plist;
+    requires mslinks;
     requires org.yaml.snakeyaml;
 }
