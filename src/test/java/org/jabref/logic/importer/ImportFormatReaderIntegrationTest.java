@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,8 @@ class ImportFormatReaderIntegrationTest {
         reader = new ImportFormatReader(
                 importerPreferences,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                new DummyFileUpdateMonitor());
+                mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor()
+        );
     }
 
     @ParameterizedTest

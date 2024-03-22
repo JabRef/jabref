@@ -146,4 +146,5 @@ open module org.jabref {
     requires com.jthemedetector;
     requires dd.plist;
     requires mslinks;
+    requires org.yaml.snakeyaml;
 }

@@ -396,6 +396,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 
+        private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+
         private final ImportFormatPreferences importFormatPreferences;
 
         public ArXiv(ImportFormatPreferences importFormatPreferences) {
@@ -541,8 +543,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 uriBuilder.addParameter("max_results", String.valueOf(maxResults));
                 URL url = uriBuilder.build().toURL();
 
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
+                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {

@@ -31,8 +31,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability to zoom in and out in the document viewer using <kbd>Ctrl</kbd> + <kbd>Scroll</kbd>. [#10964](https://github.com/JabRef/jabref/pull/10964)
 - We added a Cleanup for removing non-existent files and grouped the related options [#10929](https://github.com/JabRef/jabref/issues/10929)
 - We added the functionality to parse the bibliography of PDFs using the GROBID online service. [#10200](https://github.com/JabRef/jabref/issues/10200)
-- We added support for BibTeX String constants during copy & paste between libraries [#10872](https://github.com/JabRef/jabref/issues/10872)
-- We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868).
+- We added a seperated search bar for the global search window. [#11032](https://github.com/JabRef/jabref/pull/11032)
+- We added ability to double-click on an entry in the global search window to select the corresponding entry in the main table. [#11010](https://github.com/JabRef/jabref/pull/11010)
+- We added support for BibTeX String constants during copy & paste between libraries. [#10872](https://github.com/JabRef/jabref/issues/10872)
+- We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868)
 
 ### Changed
 
@@ -50,8 +52,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When normalizing author names, complete enclosing braces are kept. [#10031](https://github.com/JabRef/jabref/issues/10031)
 - We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
 - We store the citation relations in an LRU cache to avoid bloating the memory and out-of-memory exceptions. [#10958](https://github.com/JabRef/jabref/issues/10958)
-- Keywords filed are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
+- Keywords field are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
 - Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
+- Importer/Exporter for CFF format now supports JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
 
 ### Fixed
 
@@ -75,8 +78,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception occured when toggling between "Live" or "Locked" in the internal Document Viewer. [#10935](https://github.com/JabRef/jabref/issues/10935)
 - Fixed an issue on Windows where the browser extension reported failure to send an entry to JabRef even though it was sent properly. [JabRef-Browser-Extension#493](https://github.com/JabRef/JabRef-Browser-Extension/issues/493)
 - Fixed an issue on Windows where TeXworks path was not resolved if it was installed with MiKTeX. [#10977](https://github.com/JabRef/jabref/issues/10977)
+- We fixed an issue with where JabRef would throw an error when using MathSciNet search, as it was unable to parse the fetched JSON coreectly. [10996](https://github.com/JabRef/jabref/issues/10996)
 
 ### Removed
+
+- We removed the predatory journal checks due to a high rate of false positives. [#11066](https://github.com/JabRef/jabref/pull/11066)
 
 ## [5.12] – 2023-12-24
 
