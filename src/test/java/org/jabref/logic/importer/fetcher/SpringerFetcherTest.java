@@ -209,6 +209,27 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
                           .map(Optional::get).forEach(authorField -> assertTrue(authorField.contains("Redmiles")));
     }
 
+    @Test
+    void searchByQueryFindsCorrectlyEncoded() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Carvalho, Érica C. R. and Carvalho, José Pedro G. and Bernardino, Heder S. and Lemonge, Afonso C. C. and Hallak, Patrícia H. and Vargas, Dênis E. C.")
+                .withField(StandardField.DATE, "2024-04-01")
+                .withField(StandardField.DOI, "10.1016/j.engappai.2023.105678")
+                .withField(StandardField.FILE, ":https\\://linkinghub.elsevier.com/retrieve/pii/S0952197623001240:PDF")
+                .withField(StandardField.ISSN, "0952-1976")
+                .withField(StandardField.JOURNAL, "Engineering Applications of Artificial Intelligence")
+                .withField(StandardField.MONTH, "#apr#")
+                .withField(StandardField.PAGES, "105678")
+                .withField(StandardField.PUBLISHER, "Elsevier BV")
+                .withField(StandardField.TITLE, "Solving multi-objective truss structural optimization problems considering natural frequencies of vibration and automatic member grouping")
+                .withField(StandardField.VOLUME, "117")
+                .withField(StandardField.YEAR, "2024")
+                .withField(StandardField.ABSTRACT, "Designing truss structures considering multiple objectives can be a challenging task, mainly when the objectives are conflicting, such as minimizing weight and maximizing structural frequency. Additionally, when automatic member grouping is considered, the optimization process becomes even more complex. This paper presents an approach to solve multi-objective truss structural optimization problems considering natural frequencies and automatic member grouping. The Jaya algorithm is applied to solve this problem, and the results are compared with those found by the Non-dominated Sorting Genetic Algorithm II (NSGA-II). Computational experiments are carried out using four benchmark problems. The results show that the Jaya algorithm is competitive when compared to the NSGA-II.");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Solving multi-objective truss structural optimization problems considering natural frequencies of vibration and automatic member grouping");
+        assertEquals(List.of(expected), fetchedEntries);
+    }
+
     @Override
     public SearchBasedFetcher getFetcher() {
         return fetcher;
