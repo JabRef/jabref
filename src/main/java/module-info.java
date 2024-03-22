@@ -144,5 +144,6 @@ open module org.jabref {
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
+    requires mslinks;
     requires org.yaml.snakeyaml;
 }

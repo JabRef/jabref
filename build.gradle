@@ -251,6 +251,9 @@ dependencies {
     // parse plist files
     implementation 'com.googlecode.plist:dd-plist:1.28'
 
+    // Parse lnk files
+    implementation 'com.github.vatbub:mslinks:1.0.6.2'
+
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
 
