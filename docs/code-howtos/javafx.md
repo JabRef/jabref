@@ -208,6 +208,7 @@ If an instance of `DialogService` is unavailable within current class/scope in w
 ```java
 DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
 ```
+
 ## Properties and Bindings
 
 JabRef makes heavy use of Properties and Bindings. These are wrappers around Observables. A good explanation on the concept can be found here:
