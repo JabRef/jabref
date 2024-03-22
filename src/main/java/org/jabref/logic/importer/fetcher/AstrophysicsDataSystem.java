@@ -153,6 +153,8 @@ public class AstrophysicsDataSystem
              .ifPresent(abstractText -> {
                  String normalizedAbstract = abstractText.replaceAll("\\s+", " ")
                                                          .replaceAll("\\{\\\\ensuremath\\{([^}]*)\\}\\}", "{$1}")
+                                                         .replaceAll("\\{\\{", "{")
+                                                         .replaceAll("\\}\\}", "}")
                                                          .trim();
                  entry.setField(StandardField.ABSTRACT, normalizedAbstract);
              });
