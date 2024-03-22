@@ -22,7 +22,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -200,7 +199,7 @@ class LinkedFileViewModelTest {
 
     @FetcherTest
     @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml() throws Exception {
+    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
         // use google as test url, wiley is protected by CloudFlare
         String url = "https://google.com";
         String fileType = StandardExternalFileType.URL.getName();
@@ -211,9 +210,6 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
         databaseContext.setDatabasePath(tempFile);
-
-        doReturn(true).when(JabRefDesktop.class);
-        JabRefDesktop.openExternalFileAnyFormat(any(BibDatabaseContext.class), any(FilePreferences.class), anyString(), any(Optional.class));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
