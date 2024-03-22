@@ -47,7 +47,7 @@ public class FieldContentFormatter {
             return fieldContent;
         }
 
-        return WHITESPACE.matcher(fieldContent).replaceAll(" ");
+        return WHITESPACE.matcher(fieldContent).replaceAll(" ").replaceAll("&amp;#x2014;", "—");
     }
 
     public String format(StringBuilder fieldContent, Field field) {

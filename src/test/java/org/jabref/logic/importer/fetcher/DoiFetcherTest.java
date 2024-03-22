@@ -14,6 +14,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -123,5 +124,14 @@ public class DoiFetcherTest {
     public void aPSJournalCopiesArticleIdToPageField() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1103/physreva.102.023315");
         assertEquals(Optional.of(bibEntryStenzel2020), fetchedEntry);
+    }
+
+    @Test
+    public void emDashCleanupTest() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("https://doi.org/10.1109/PERCOMW.2015.7133989");
+        assertTrue(fetchedEntry.isPresent());
+        Optional<String> titleField = fetchedEntry.get().getField(StandardField.TITLE);
+        assertTrue(titleField.isPresent());
+        assertEquals(titleField.get(), "Towards situation-aware adaptive workflows: SitOPT — A general purpose situation-aware workflow management system");
     }
 }
