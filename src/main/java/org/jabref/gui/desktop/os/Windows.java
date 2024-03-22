@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
@@ -20,7 +22,6 @@ import com.sun.jna.platform.win32.Win32Exception;
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
 import org.slf4j.LoggerFactory;
-import org.tinylog.Logger;
 
 /**
  * This class contains Windows specific implementations for file directories and file/application open handling methods <br>
@@ -54,7 +55,9 @@ public class Windows extends NativeDesktop {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
                 } catch (IOException | ShellLinkException e) {
-                    Logger.debug(e, "Had an error while reading .lnk file for TeXworks");
+                    // Static logger instance cannot be used. See the class comment.
+                    Logger logger = Logger.getLogger(Windows.class.getName());
+                    logger.log(Level.WARNING, "Had an error while reading .lnk file for TeXworks", e);
                 }
             }
         }
