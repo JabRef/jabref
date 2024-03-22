@@ -53,4 +53,15 @@ class FieldContentFormatterTest {
         assertEquals(expected, abstrakt);
         assertEquals(expected, any);
     }
+
+    @Test
+    void emDashFormat() {
+        // Taken from https://doi.org/10.1109/PERCOMW.2015.7133989.
+        String original = "Towards situation-aware adaptive workflows: SitOPT &amp;#x2014; A general purpose situation-aware workflow management system";
+        String expected = "Towards situation-aware adaptive workflows: SitOPT — A general purpose situation-aware workflow management system";
+
+        String actual = parser.format(new StringBuilder(original), StandardField.TITLE);
+
+        assertEquals(expected, actual);
+    }
 }
