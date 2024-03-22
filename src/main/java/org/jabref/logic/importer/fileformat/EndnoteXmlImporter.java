@@ -114,7 +114,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 if (isStartXMLEvent(reader)) {
                     String elementName = reader.getName().getLocalPart();
                     if ("record".equals(elementName)) {
-                         parseRecord(reader, bibItems, elementName);
+                        parseRecord(reader, bibItems, elementName);
                     }
                 }
             }
@@ -126,7 +126,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     private void parseRecord(XMLStreamReader reader, List<BibEntry> bibItems, String startElement)
-        throws XMLStreamException {
+            throws XMLStreamException {
 
         Map<Field, String> fields = new HashMap<>();
         EntryType entryType = StandardEntryType.Article;
@@ -165,7 +165,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         parseStyleContent(reader, fields, StandardField.NOTE, elementName);
                     }
                     case "urls" -> {
-                       handleUrlList(reader, fields, linkedFiles);
+                        handleUrlList(reader, fields, linkedFiles);
                     }
                     case "keywords" -> {
                         handleKeywordsList(reader, keywordList, elementName);
@@ -443,8 +443,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             if (isCharacterXMLEvent(reader)) {
                                 try {
                                     linkedFiles.add(new LinkedFile(new URL(reader.getText()), "PDF"));
-                                } catch (
-                                        MalformedURLException e) {
+                                } catch (MalformedURLException e) {
                                     LOGGER.info("Unable to parse {}", reader.getText());
                                 }
                             }
@@ -455,8 +454,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isCharacterXMLEvent(reader)) {
                 try {
                     linkedFiles.add(new LinkedFile(new URL(reader.getText()), "PDF"));
-                } catch (
-                        MalformedURLException e) {
+                } catch (MalformedURLException e) {
                     LOGGER.info("Unable to parse {}", reader.getText());
                 }
             }

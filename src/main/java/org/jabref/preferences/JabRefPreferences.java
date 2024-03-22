@@ -1674,8 +1674,7 @@ public class JabRefPreferences implements PreferencesService {
                         EntryTypeFactory.parse(key),
                         preferences.get(key, null));
             }
-        } catch (
-                BackingStoreException ex) {
+        } catch (BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
 
@@ -1695,8 +1694,7 @@ public class JabRefPreferences implements PreferencesService {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
-        } catch (
-                BackingStoreException ex) {
+        } catch (BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
         }
 
@@ -1934,8 +1932,7 @@ public class JabRefPreferences implements PreferencesService {
                 .map(string -> {
                     try {
                         return Double.parseDouble(string);
-                    } catch (
-                            NumberFormatException e) {
+                    } catch (NumberFormatException e) {
                         LOGGER.error("Exception while parsing column widths. Choosing default.", e);
                         return defaultWidth;
                     }

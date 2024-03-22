@@ -12,8 +12,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.predatory.PredatoryJournalListLoader;
-import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -137,14 +135,12 @@ class IntegrityCheckTest {
         bibDatabase.insertEntry(entry);
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
-        try (PredatoryJournalRepository predatoryJournalRepository = PredatoryJournalListLoader.loadRepository()) {
-            new IntegrityCheck(context,
-                    mock(FilePreferences.class),
-                    createCitationKeyPatternPreferences(),
-                    JournalAbbreviationLoader.loadBuiltInRepository(),
-                    predatoryJournalRepository, false)
-                    .check();
-        }
+        new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                false)
+                .check();
 
         assertEquals(clonedEntry, entry);
     }
@@ -173,14 +169,14 @@ class IntegrityCheckTest {
 
     private void assertWrong(BibDatabaseContext context) throws Exception {
         List<IntegrityMessage> messages;
-        try (PredatoryJournalRepository predatoryJournalRepository = PredatoryJournalListLoader.loadRepository()) {
-            messages = new IntegrityCheck(context,
-                    mock(FilePreferences.class),
-                    createCitationKeyPatternPreferences(),
-                    JournalAbbreviationLoader.loadBuiltInRepository(),
-                    predatoryJournalRepository, false)
-                    .check();
-        }
+
+        messages = new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                false)
+                .check();
+
         assertNotEquals(Collections.emptyList(), messages);
     }
 
@@ -188,14 +184,14 @@ class IntegrityCheckTest {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
         when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages;
-        try (PredatoryJournalRepository predatoryJournalRepository = PredatoryJournalListLoader.loadRepository()) {
-            messages = new IntegrityCheck(context,
-                    filePreferencesMock,
-                    createCitationKeyPatternPreferences(),
-                    JournalAbbreviationLoader.loadBuiltInRepository(),
-                    predatoryJournalRepository, false)
-                    .check();
-        }
+
+        messages = new IntegrityCheck(context,
+                filePreferencesMock,
+                createCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                false)
+                .check();
+
         assertEquals(Collections.emptyList(), messages);
     }
 

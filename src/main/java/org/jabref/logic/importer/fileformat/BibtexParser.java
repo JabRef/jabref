@@ -92,6 +92,7 @@ public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final Integer LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
@@ -105,7 +106,6 @@ public class BibtexParser implements Parser {
     private final Map<String, String> parsedBibdeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
-    private final DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
@@ -419,7 +419,7 @@ public class BibtexParser implements Parser {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
             // Build a document to handle the xml tags
-            Document doc = builder.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
+            Document doc = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
             doc.getDocumentElement().normalize();
 
             NodeList dictList = doc.getElementsByTagName("dict");

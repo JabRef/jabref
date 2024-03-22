@@ -114,12 +114,16 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    // 3.0.2 is buggy!
-    def pdfbox = "3.0.1"
-    implementation "org.apache.pdfbox:pdfbox:$pdfbox"
-    implementation "org.apache.pdfbox:fontbox:$pdfbox"
+    def pdfbox = "3.0.2"
+    implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
+        exclude group: 'commons-logging'
+    }
+    implementation ("org.apache.pdfbox:fontbox:$pdfbox") {
+        exclude group: 'commons-logging'
+    }
     implementation ("org.apache.pdfbox:xmpbox:$pdfbox") {
         exclude group: 'org.junit.jupiter'
+        exclude group: 'commons-logging'
     }
 
     def luceneVersion = "9.10.0"
@@ -248,6 +252,9 @@ dependencies {
     // parse plist files
     implementation 'com.googlecode.plist:dd-plist:1.28'
 
+    // YAML formatting
+    implementation 'org.yaml:snakeyaml:2.2'
+
     testImplementation 'io.github.classgraph:classgraph:4.8.168'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
@@ -320,6 +327,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 
     inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
@@ -331,6 +339,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     description = "Generates java files for Search.g antlr4."
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
@@ -342,23 +351,14 @@ tasks.register("generateJournalListMV", JavaExec) {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
     mainClass = "org.jabref.cli.JournalListMvGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     onlyIf {
         !file("build/resources/main/journals/journal-list.mv").exists()
     }
 }
 
-tasks.register("generatePredatoryJournalListMV", JavaExec) {
-        group = "JabRef"
-        description = "Load predatory journal information from online sources to a H2 MVStore"
-        classpath = sourceSets.main.runtimeClasspath
-        mainClass = "org.jabref.cli.PredatoryJournalsMvGenerator"
-        onlyIf {
-            !file("build/resources/main/journals/predatory-journals.mv").exists()
-        }
-}
-
-jar.dependsOn("generateJournalListMV", "generatePredatoryJournalListMV")
-compileTestJava.dependsOn("generateJournalListMV","generatePredatoryJournalListMV")
+jar.dependsOn("generateJournalListMV")
+compileTestJava.dependsOn("generateJournalListMV")
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
