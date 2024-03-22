@@ -30,6 +30,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,6 +54,7 @@ import static org.mockito.Mockito.when;
 
 // Need to run on JavaFX thread since {@link org.jabref.gui.linkedfile.DeleteFileAction.execute} creates a DialogPane
 @ExtendWith(ApplicationExtension.class)
+@GUITest
 class LinkedFileViewModelTest {
 
     private Path tempFile;
