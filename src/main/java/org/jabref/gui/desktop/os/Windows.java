@@ -20,6 +20,7 @@ import com.sun.jna.platform.win32.Win32Exception;
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
 import org.slf4j.LoggerFactory;
+import org.tinylog.Logger;
 
 /**
  * This class contains Windows specific implementations for file directories and file/application open handling methods <br>
@@ -52,8 +53,8 @@ public class Windows extends NativeDesktop {
                 try {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
-                } catch (IOException | ShellLinkException ignored) {
-                    // No handling. Just fallback to default behaviour.
+                } catch (IOException | ShellLinkException e) {
+                    Logger.debug(e, "Had an error while reading .lnk file for TeXworks");
                 }
             }
         }

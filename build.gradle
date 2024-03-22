@@ -248,6 +248,9 @@ dependencies {
     // parse plist files
     implementation 'com.googlecode.plist:dd-plist:1.28'
 
+    // Parse lnk files
+    implementation 'com.github.vatbub:mslinks:1.0.6.2'
+
     testImplementation 'io.github.classgraph:classgraph:4.8.168'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
@@ -277,8 +280,6 @@ dependencies {
             select("com.google.guava:guava:0")
         }
     }
-
-    implementation 'com.github.vatbub:mslinks:1.0.6.2'
 }
 
 clean {
