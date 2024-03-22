@@ -22,6 +22,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,6 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -204,19 +206,22 @@ class LinkedFileViewModelTest {
         String url = "https://google.com";
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
-
+    
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
-
+    
         databaseContext.setDatabasePath(tempFile);
-
+    
+        doNothing().when(JabRefDesktop.class);
+        JabRefDesktop.openExternalViewer(any(Path.class), any(ExternalFileType.class));
+    
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-
+    
         viewModel.download();
-
+    
         List<LinkedFile> linkedFiles = entry.getFiles();
-
+    
         for (LinkedFile file: linkedFiles) {
             if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
                 assertEquals("URL", file.getFileType());
