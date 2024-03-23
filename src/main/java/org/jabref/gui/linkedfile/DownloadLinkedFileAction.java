@@ -100,7 +100,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory needs to be set or does not exist. Please save the library."));
+            dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory needs to be set or does not exist.\nPlease save your library and check the preferences."));
             return;
         }
 
