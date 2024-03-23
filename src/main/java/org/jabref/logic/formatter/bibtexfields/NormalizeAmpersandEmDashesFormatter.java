@@ -3,15 +3,15 @@ package org.jabref.logic.formatter.bibtexfields;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-public class NormalizeEmDashesIEEEFormatter extends Formatter {
+public class NormalizeAmpersandEmDashesFormatter extends Formatter {
     @Override
     public String getName() {
-        return Localization.lang("Normalize em dashes from IEEE");
+        return Localization.lang("Normalize an ampersand and em dash");
     }
 
     @Override
     public String getKey() {
-        return "normalize_em_dash_ieee";
+        return "normalize_ampersand_em_dash";
     }
 
     @Override
@@ -21,7 +21,7 @@ public class NormalizeEmDashesIEEEFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return "Convert em dashes from IEEE Xplore";
+        return "Convert a sequence of ampersand and em dash (written in HTML) to a single unicode em dash";
     }
 
     @Override

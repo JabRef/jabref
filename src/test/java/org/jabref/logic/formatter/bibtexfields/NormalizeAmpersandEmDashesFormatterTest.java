@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class NormalizeEmDashesIEEEFormatterTest {
-    private NormalizeEmDashesIEEEFormatter formatter;
+public class NormalizeAmpersandEmDashesFormatterTest {
+    private NormalizeAmpersandEmDashesFormatter formatter;
 
     @BeforeEach
     public void setUp() {
-        formatter = new NormalizeEmDashesIEEEFormatter();
+        formatter = new NormalizeAmpersandEmDashesFormatter();
     }
 
     @Test
