@@ -319,7 +319,7 @@ public class DOITest {
 
     @Test
     public void findDoiWithSpecialCharactersInText() {
-        assertEquals(Optional.of(new DOI("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2")),
+        assertEquals(Optional.of(new DOI("10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2")),
                 DOI.findInText("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2"));
     }
 }
