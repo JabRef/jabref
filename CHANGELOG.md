@@ -55,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Keywords field are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
 - Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
 - Importer/Exporter for CFF format now supports JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
+- The XMP-Exporter no longer writes the content of the `file`-field [#]
 
 ### Fixed
 

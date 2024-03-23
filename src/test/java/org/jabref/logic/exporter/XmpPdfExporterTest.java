@@ -48,9 +48,9 @@ class XmpPdfExporterTest {
 
     @TempDir static Path tempDir;
 
-    private static BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry OLLY_2018 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry TORAL_2006 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry VAPNIK_2000 = new BibEntry(StandardEntryType.Article);
 
     private XmpPdfExporter exporter;
     private PdfXmpImporter importer;
@@ -61,46 +61,46 @@ class XmpPdfExporterTest {
     private FilePreferences filePreferences;
 
     private static void initBibEntries() throws IOException {
-        olly2018.setCitationKey("Olly2018");
-        olly2018.setField(StandardField.AUTHOR, "Olly and Johannes");
-        olly2018.setField(StandardField.TITLE, "Stefan's palace");
-        olly2018.setField(StandardField.JOURNAL, "Test Journal");
-        olly2018.setField(StandardField.VOLUME, "1");
-        olly2018.setField(StandardField.NUMBER, "1");
-        olly2018.setField(StandardField.PAGES, "1-2");
-        olly2018.setMonth(Month.MARCH);
-        olly2018.setField(StandardField.ISSN, "978-123-123");
-        olly2018.setField(StandardField.NOTE, "NOTE");
-        olly2018.setField(StandardField.ABSTRACT, "ABSTRACT");
-        olly2018.setField(StandardField.COMMENT, "COMMENT");
-        olly2018.setField(StandardField.DOI, "10/3212.3123");
-        olly2018.setField(StandardField.FILE, ":article_dublinCore.pdf:PDF");
-        olly2018.setField(StandardField.GROUPS, "NO");
-        olly2018.setField(StandardField.HOWPUBLISHED, "online");
-        olly2018.setField(StandardField.KEYWORDS, "k1, k2");
-        olly2018.setField(StandardField.OWNER, "me");
-        olly2018.setField(StandardField.REVIEW, "review");
-        olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
+        OLLY_2018.setCitationKey("Olly2018");
+        OLLY_2018.setField(StandardField.AUTHOR, "Olly and Johannes");
+        OLLY_2018.setField(StandardField.TITLE, "Stefan's palace");
+        OLLY_2018.setField(StandardField.JOURNAL, "Test Journal");
+        OLLY_2018.setField(StandardField.VOLUME, "1");
+        OLLY_2018.setField(StandardField.NUMBER, "1");
+        OLLY_2018.setField(StandardField.PAGES, "1-2");
+        OLLY_2018.setMonth(Month.MARCH);
+        OLLY_2018.setField(StandardField.ISSN, "978-123-123");
+        OLLY_2018.setField(StandardField.NOTE, "NOTE");
+        OLLY_2018.setField(StandardField.ABSTRACT, "ABSTRACT");
+        OLLY_2018.setField(StandardField.COMMENT, "COMMENT");
+        OLLY_2018.setField(StandardField.DOI, "10/3212.3123");
+        OLLY_2018.setField(StandardField.FILE, ":article_dublinCore.pdf:PDF");
+        OLLY_2018.setField(StandardField.GROUPS, "NO");
+        OLLY_2018.setField(StandardField.HOWPUBLISHED, "online");
+        OLLY_2018.setField(StandardField.KEYWORDS, "k1, k2");
+        OLLY_2018.setField(StandardField.OWNER, "me");
+        OLLY_2018.setField(StandardField.REVIEW, "review");
+        OLLY_2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
         LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
-        olly2018.setFiles(List.of(linkedFile));
+        OLLY_2018.setFiles(List.of(linkedFile));
 
-        toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
-        toral2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
-        toral2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
-        toral2006.setField(StandardField.PAGES, "56--61");
-        toral2006.setField(StandardField.EPRINTTYPE, "asdf");
-        toral2006.setField(StandardField.OWNER, "Ich");
-        toral2006.setField(StandardField.URL, "www.url.de");
+        TORAL_2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
+        TORAL_2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
+        TORAL_2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
+        TORAL_2006.setField(StandardField.PAGES, "56--61");
+        TORAL_2006.setField(StandardField.EPRINTTYPE, "asdf");
+        TORAL_2006.setField(StandardField.OWNER, "Ich");
+        TORAL_2006.setField(StandardField.URL, "www.url.de");
 
-        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+        TORAL_2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
 
-        vapnik2000.setCitationKey("vapnik2000");
-        vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
-        vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
-        vapnik2000.setField(StandardField.AUTHOR, "Vapnik, Vladimir N.");
-        vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
-        vapnik2000.setField(StandardField.OWNER, "Ich");
+        VAPNIK_2000.setCitationKey("vapnik2000");
+        VAPNIK_2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
+        VAPNIK_2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
+        VAPNIK_2000.setField(StandardField.AUTHOR, "Vapnik, Vladimir N.");
+        VAPNIK_2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
+        VAPNIK_2000.setField(StandardField.OWNER, "Ich");
     }
 
     /**
@@ -124,9 +124,9 @@ class XmpPdfExporterTest {
         BibDatabase dataBase = databaseContext.getDatabase();
 
         initBibEntries();
-        dataBase.insertEntry(olly2018);
-        dataBase.insertEntry(toral2006);
-        dataBase.insertEntry(vapnik2000);
+        dataBase.insertEntry(OLLY_2018);
+        dataBase.insertEntry(TORAL_2006);
+        dataBase.insertEntry(VAPNIK_2000);
     }
 
     @AfterEach
@@ -136,28 +136,28 @@ class XmpPdfExporterTest {
             entry.clearField(StandardField.FILE);
         }
         LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
-        olly2018.setFiles(List.of(linkedFile));
-        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+        OLLY_2018.setFiles(List.of(linkedFile));
+        TORAL_2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
     }
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
     void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018), abbreviationRepository));
+        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(OLLY_2018), abbreviationRepository));
     }
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithInvalidPdfFileLinks")
     void unsuccessfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018), abbreviationRepository));
+        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(OLLY_2018), abbreviationRepository));
     }
 
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
-        return Stream.of(Arguments.of(olly2018));
+        return Stream.of(Arguments.of(OLLY_2018));
     }
 
     public static Stream<Arguments> provideBibEntriesWithInvalidPdfFileLinks() {
-        return Stream.of(Arguments.of(vapnik2000), Arguments.of(toral2006));
+        return Stream.of(Arguments.of(VAPNIK_2000), Arguments.of(TORAL_2006));
     }
 
     @ParameterizedTest
