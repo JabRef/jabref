@@ -939,6 +939,15 @@ public class JabRefPreferences implements PreferencesService {
         return prefs.get(key, (String) defaults.get(key));
     }
 
+    public String getEmptyIsDefault(String key) {
+        String defaultValue = (String) defaults.get(key);
+        String result = prefs.get(key, defaultValue);
+        if ("".equals(result)) {
+            return defaultValue;
+        }
+        return result;
+    }
+
     public Optional<String> getAsOptional(String key) {
         return Optional.ofNullable(prefs.get(key, (String) defaults.get(key)));
     }
@@ -1774,14 +1783,16 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         Map<String, String> applicationCommands = new HashMap<>();
-        applicationCommands.put(PushToApplications.EMACS, get(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToApplications.LYX, get(PUSH_LYXPIPE));
-        applicationCommands.put(PushToApplications.TEXMAKER, get(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToApplications.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToApplications.TEXWORKS, get(PUSH_TEXWORKS_PATH));
-        applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
-        applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
-        applicationCommands.put(PushToApplications.SUBLIME_TEXT, get(PUSH_SUBLIME_TEXT_PATH));
+        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
+        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
+        applicationCommands.put(PushToApplications.EMACS, getEmptyIsDefault(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToApplications.LYX, getEmptyIsDefault(PUSH_LYXPIPE));
+        applicationCommands.put(PushToApplications.TEXMAKER, getEmptyIsDefault(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToApplications.TEXSTUDIO, getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplications.TEXWORKS, getEmptyIsDefault(PUSH_TEXWORKS_PATH));
+        applicationCommands.put(PushToApplications.VIM, getEmptyIsDefault(PUSH_VIM));
+        applicationCommands.put(PushToApplications.WIN_EDT, getEmptyIsDefault(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplications.SUBLIME_TEXT, getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
 
         pushToApplicationPreferences = new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION),
