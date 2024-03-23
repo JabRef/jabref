@@ -200,7 +200,7 @@ public class DOITest {
                 Arguments.of("10.1007/s10549-018-4743-9",
                         DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9, ").get().getDOI()),
                 Arguments.of("10.1007/s10549-018-4743-9",
-                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9;something else").get().getDOI()),
+                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9; something else").get().getDOI()),
                 Arguments.of("10.1007/s10549-018-4743-9.1234",
                         DOI.findInText("bla doi:10.1007/s10549-018-4743-9.1234 with . in doi").get().getDOI()),
 
