@@ -64,7 +64,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        Field[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.ABSTRACT, StandardField.DOI, StandardField.TITLE, StandardField.NUMBER,
+        Field[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.DOI, StandardField.NUMBER,
                 StandardField.PUBLISHER};
 
         BibEntry entry = new BibEntry();
@@ -88,10 +88,9 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
             JSONArray authors = springerJsonEntry.getJSONArray("creators");
             List<String> authorList = new ArrayList<>();
             for (int i = 0; i < authors.length(); i++) {
-                if (authors.getJSONObject(i).has("creator")) {
-                    authorList.add(fixStringEncoding(authors.getJSONObject(i).getString("creator")));
-                } else {
-                    LOGGER.info("Empty author name.");
+                JSONObject author = authors.getJSONObject(i);
+                if (author.has("creator")) {
+                    authorList.add(fixStringEncoding(author.getString("creator")));
                 }
             }
             entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
@@ -109,6 +108,18 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
             }
         }
 
+        // Title
+        if (springerJsonEntry.has("title")) {
+            entry.setField(StandardField.TITLE, fixStringEncoding(springerJsonEntry.getString("title")));
+        }
+
+        // Abstract
+        if (springerJsonEntry.has("abstract")) {
+            String abstractText = fixStringEncoding(springerJsonEntry.getString("abstract"));
+            // Clean up abstract (often starting with Abstract)
+            entry.setField(StandardField.ABSTRACT, abstractText.startsWith("Abstract") ? abstractText.substring(8) : abstractText);
+        }
+
         // Page numbers
         if (springerJsonEntry.has("startingPage") && !springerJsonEntry.getString("startingPage").isEmpty()) {
             if (springerJsonEntry.has("endingPage") && !springerJsonEntry.getString("endingPage").isEmpty()) {
@@ -121,7 +132,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
 
         // Journal
         if (springerJsonEntry.has("publicationName")) {
-            entry.setField(nametype, springerJsonEntry.getString("publicationName"));
+            entry.setField(nametype, fixStringEncoding(springerJsonEntry.getString("publicationName")));
         }
 
         // Online file
@@ -152,13 +163,6 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
             Optional<Month> month = Month.getMonthByNumber(Integer.parseInt(dateparts[1]));
             month.ifPresent(entry::setMonth);
         }
-
-        // Clean up abstract (often starting with Abstract)
-        entry.getField(StandardField.ABSTRACT).ifPresent(abstractContents -> {
-            if (abstractContents.startsWith("Abstract")) {
-                entry.setField(StandardField.ABSTRACT, abstractContents.substring(8));
-            }
-        });
 
         return entry;
     }
