@@ -16,7 +16,7 @@ public class NormalizeAmpersandEmDashesFormatter extends Formatter {
 
     @Override
     public String format(String value) {
-        return value.replaceAll("&amp;#x2014;", "—");
+        return value.replace("&amp;#x2014;", "—");
     }
 
     @Override
