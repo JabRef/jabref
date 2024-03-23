@@ -214,17 +214,18 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Carvalho, Érica C. R. and Carvalho, José Pedro G. and Bernardino, Heder S. and Lemonge, Afonso C. C. and Hallak, Patrícia H. and Vargas, Dênis E. C.")
                 .withField(StandardField.DATE, "2024-04-01")
-                .withField(StandardField.DOI, "10.1016/j.engappai.2023.105678")
-                .withField(StandardField.FILE, ":https\\://linkinghub.elsevier.com/retrieve/pii/S0952197623001240:PDF")
-                .withField(StandardField.ISSN, "0952-1976")
-                .withField(StandardField.JOURNAL, "Engineering Applications of Artificial Intelligence")
+                .withField(StandardField.DOI, "10.1007/s12065-022-00804-0")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s12065-022-00804-0:PDF")
+                .withField(StandardField.ISSN, "1864-5909")
+                .withField(StandardField.JOURNAL, "Evolutionary Intelligence")
                 .withField(StandardField.MONTH, "#apr#")
-                .withField(StandardField.PAGES, "105678")
-                .withField(StandardField.PUBLISHER, "Elsevier BV")
+                .withField(StandardField.PAGES, "653--678")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.PUBLISHER, "Springer")
                 .withField(StandardField.TITLE, "Solving multi-objective truss structural optimization problems considering natural frequencies of vibration and automatic member grouping")
-                .withField(StandardField.VOLUME, "117")
+                .withField(StandardField.VOLUME, "17")
                 .withField(StandardField.YEAR, "2024")
-                .withField(StandardField.ABSTRACT, "Designing truss structures considering multiple objectives can be a challenging task, mainly when the objectives are conflicting, such as minimizing weight and maximizing structural frequency. Additionally, when automatic member grouping is considered, the optimization process becomes even more complex. This paper presents an approach to solve multi-objective truss structural optimization problems considering natural frequencies and automatic member grouping. The Jaya algorithm is applied to solve this problem, and the results are compared with those found by the Non-dominated Sorting Genetic Algorithm II (NSGA-II). Computational experiments are carried out using four benchmark problems. The results show that the Jaya algorithm is competitive when compared to the NSGA-II.");
+                .withField(StandardField.ABSTRACT, "Minimizing the mass of a structure and maximizing its first natural frequency of vibration are conflicting objectives of real interest in structural design. To avoid problems with resonance, which can lead to their collapse, structures can be designed by making the first natural frequency of vibration high. Furthermore, it is crucial to stay away from excitation frequencies. Here we formulate and solve multi-objective structural optimization problems of trusses with these conflicting objectives. This type of problem is uncommon in the literature, since the natural frequencies of vibration are generally set as constraints rather than as objective functions. The generalized differential evolution 3 (GDE3), the nondominated sorting genetic algorithm II (NSGA-II), decision space-based niching (DN-NSGA-II), the competitive mechanism-based multi-objective particle swarm optimizer (CMOPSO), and the MOPSO with multiple search strategies (MMOPSO) are the algorithms used in this paper. Additionally, cardinality constraints are used to manage the difficulty of discovering the best member grouping, which is very effective in addressing the problems analyzed in this paper. The experiments refer to the 10-, 25-, 72-, and 200-bar trusses. Each involves two analyses, taking into account the performance indicators and the use of a multi tournament decision (MTD) method to extract the desired solutions. Furthermore, the design variables of each extracted solution, including its optimized topology, are provided.");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Solving multi-objective truss structural optimization problems considering natural frequencies of vibration and automatic member grouping");
         assertEquals(List.of(expected), fetchedEntries);
