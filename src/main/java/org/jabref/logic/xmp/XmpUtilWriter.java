@@ -266,7 +266,8 @@ public class XmpUtilWriter {
                 case StandardField.ABSTRACT ->
                         di.setSubject(value);
                 // do not write file field
-                case StandardField.FILE -> {}
+                case StandardField.FILE -> {
+                }
                 case null, default ->
                         resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue("bibtex/" + field, val));
                 // We hit the case of an PDF-unsupported field --> write it directly
