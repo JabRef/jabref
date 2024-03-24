@@ -1,5 +1,6 @@
 package org.jabref.gui.linkedfile;
 
+import java.io.File;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -79,6 +80,48 @@ class DownloadLinkedFileActionTest {
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor());
         downloadLinkedFileAction.execute();
+
+        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
+    }
+
+    @Test
+    void doesntReplaceSourceURL(@TempDir Path tempFolder) throws Exception {
+        String url = "http://arxiv.org/pdf/1207.0408v1";
+
+        LinkedFile linkedFile = new LinkedFile(new URL(url), "");
+        when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+
+        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
+                databaseContext,
+                entry,
+                linkedFile,
+                linkedFile.getLink(),
+                dialogService,
+                preferences.getFilePreferences(),
+                new CurrentThreadTaskExecutor());
+        downloadLinkedFileAction.execute();
+
+        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
+
+        linkedFile = entry.getFiles().getFirst();
+
+        File downloadedFile = new File(linkedFile.getLink());
+
+        // Verify that re-downloading the file after the first download doesn't modify the entry
+        downloadedFile.delete();
+
+        DownloadLinkedFileAction downloadLinkedFileAction2 = new DownloadLinkedFileAction(
+                databaseContext,
+                entry,
+                linkedFile,
+                linkedFile.getSourceUrl(),
+                dialogService,
+                preferences.getFilePreferences(),
+                new CurrentThreadTaskExecutor(),
+                Path.of(linkedFile.getLink()).getFileName().toString());
+        downloadLinkedFileAction2.execute();
 
         assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
     }

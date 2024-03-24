@@ -143,6 +143,7 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
-    requires com.jthemedetector;
     requires dd.plist;
+    requires mslinks;
+    requires org.yaml.snakeyaml;
 }

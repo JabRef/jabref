@@ -186,10 +186,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
                 BibEntry entry = jsonResultToBibEntry(item);
                 try {
                     entry = parseBibJSONtoBibtex(item, entry);
-                } catch (
-                        JSONException |
-                        IOException |
-                        URISyntaxException exception) {
+                } catch (JSONException | IOException | URISyntaxException exception) {
                     throw new ParseException("Error when parsing entry", exception);
                 }
                 entries.add(entry);

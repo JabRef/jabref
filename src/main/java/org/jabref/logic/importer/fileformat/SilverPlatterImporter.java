@@ -144,8 +144,7 @@ public class SilverPlatterImporter extends Importer {
                                 try {
                                     Integer.parseInt(yr);
                                     h.put(StandardField.YEAR, yr);
-                                } catch (
-                                        NumberFormatException ex) {
+                                } catch (NumberFormatException ex) {
                                     // Let's assume that this wasn't a number, since it
                                     // couldn't be parsed as an integer.
                                 }

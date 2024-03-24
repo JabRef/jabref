@@ -298,7 +298,9 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> {
             globalSearchActive.setValue(true);
-            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
+            if (globalSearchResultDialog == null) {
+                globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
+            }
             updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);

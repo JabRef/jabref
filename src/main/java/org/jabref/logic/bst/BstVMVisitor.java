@@ -93,8 +93,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                                                                    .orElse(result);
                                                    }
                                                    return result;
-                                               } catch (
-                                                       InvalidFieldValueException invalidFieldValueException) {
+                                               } catch (InvalidFieldValueException invalidFieldValueException) {
                                                    // in case there is something wrong with the content, just return the content itself
                                                    return content;
                                                }

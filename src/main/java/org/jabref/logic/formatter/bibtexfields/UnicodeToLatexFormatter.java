@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatter {
 
+    public static final NormalizeUnicodeFormatter UNICODE_NORMALIZER = new NormalizeUnicodeFormatter();
     private static final Logger LOGGER = LoggerFactory.getLogger(UnicodeToLatexFormatter.class);
 
     @Override
@@ -22,6 +23,8 @@ public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatte
         if (result.isEmpty()) {
             return result;
         }
+
+        result = UNICODE_NORMALIZER.format(result);
 
         // Standard symbols
         for (Map.Entry<String, String> unicodeLatexPair : HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP

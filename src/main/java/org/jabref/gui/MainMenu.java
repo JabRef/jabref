@@ -66,7 +66,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -84,7 +83,6 @@ public class MainMenu extends MenuBar {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
-    private final PredatoryJournalRepository predatoryJournalRepository;
     private final BibEntryTypesManager entryTypesManager;
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
@@ -98,7 +96,6 @@ public class MainMenu extends MenuBar {
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
                     JournalAbbreviationRepository abbreviationRepository,
-                    PredatoryJournalRepository predatoryJournalRepository,
                     BibEntryTypesManager entryTypesManager,
                     UndoManager undoManager,
                     ClipBoardManager clipBoardManager) {
@@ -111,7 +108,6 @@ public class MainMenu extends MenuBar {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
-        this.predatoryJournalRepository = predatoryJournalRepository;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
@@ -229,7 +225,7 @@ public class MainMenu extends MenuBar {
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository, predatoryJournalRepository)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
