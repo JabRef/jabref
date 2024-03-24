@@ -47,7 +47,7 @@ public class DOI implements Identifier {
             + "10"                              // directory indicator
             + "(?:\\.[0-9]+)+"                  // registrant codes
             + "[/:]"                            // divider
-            + "(?:[^\\s,;]+[^,;(\\.\\s)])"      // suffix alphanumeric without " "/","/";" and not ending on "."/","/";"
+            + "(?:[^\\s,]+[^,;(\\.\\s)])"       // suffix alphanumeric without " "/"," and not ending on "."/","/";"
             + ")";                              // end group \1
 
     // Regex (Short DOI)
