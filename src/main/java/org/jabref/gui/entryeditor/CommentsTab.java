@@ -70,6 +70,7 @@ public class CommentsTab extends FieldsEditorTab {
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
 
         userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
+        System.out.println(userSpecificCommentField);
         entryEditorPreferences = preferences.getEntryEditorPreferences();
     }
 
@@ -138,7 +139,7 @@ public class CommentsTab extends FieldsEditorTab {
 
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
         // button would just disappear and no change **in the current** editor would be made
-        if (entryEditorPreferences.shouldShowUserCommentsFields() && !entry.hasField(userSpecificCommentField)) {
+        if (entryEditorPreferences.shouldShowUserCommentsFields()) {
             Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user comments"));
             hideDefaultOwnerCommentButton.setOnAction(e -> {
                 var labelForField = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
@@ -150,6 +151,19 @@ public class CommentsTab extends FieldsEditorTab {
                 setupPanel(entry, false);
             });
             gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
+            setCompressedRowLayout();
+        } else {
+            Button showDefaultOwnerCommentButton = new Button(Localization.lang("Show user comments"));
+            showDefaultOwnerCommentButton.setOnAction(e -> {
+                var labelForField = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
+                labelForField.ifPresent(label -> gridPane.getChildren().remove(label));
+                fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
+//                editors.add(userSpecificCommentField);
+
+                entryEditorPreferences.setShowUserCommentsFields(true);
+                setupPanel(entry, compressed);
+            });
+            gridPane.add(showDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
             setCompressedRowLayout();
         }
     }
