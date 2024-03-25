@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -177,6 +178,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter()).cleanup(entry);
     }
 
     private void updateCrossrefAPIRate(URLConnection existingConnection) {

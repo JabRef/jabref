@@ -70,8 +70,8 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {
-                result = result.replace("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
-                        HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num));
+                result = result.replaceAll("\\\\?&#" + m.group(1) + m.group(2) + m.group(3) + ";",
+                        Matcher.quoteReplacement(HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num)));
             }
         }
 
