@@ -135,6 +135,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -168,7 +169,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:33.0.0-jre') {
+    implementation ('com.google.guava:guava:33.1.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -186,6 +187,7 @@ dependencies {
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.4.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude module: 'commons-lang3'
         exclude group: 'org.apache.logging.log4j'
     }
 
@@ -614,6 +616,7 @@ jlink {
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
         requires 'org.apache.commons.lang3'
+        requires 'org.apache.commons.text'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
