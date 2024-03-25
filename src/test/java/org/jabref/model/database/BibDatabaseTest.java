@@ -42,7 +42,7 @@ class BibDatabaseTest {
         database.insertEntry(entry);
         assertEquals(1, database.getEntries().size());
         assertEquals(1, database.getEntryCount());
-        assertEquals(entry, database.getEntries().get(0));
+        assertEquals(entry, database.getEntries().getFirst());
     }
 
     @Test

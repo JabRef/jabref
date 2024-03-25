@@ -128,14 +128,14 @@ public class MetaDataSerializer {
         for (EntryType key : citationKeyPattern.getAllKeys()) {
             if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
-                data.add(citationKeyPattern.getValue(key).get(0));
+                data.add(citationKeyPattern.getValue(key).getFirst());
                 String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();
                 stringyPattern.put(metaDataKey, data);
             }
         }
         if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
-            data.add(citationKeyPattern.getDefaultValue().get(0));
+            data.add(citationKeyPattern.getDefaultValue().getFirst());
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
         }
         return stringyPattern;

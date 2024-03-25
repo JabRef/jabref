@@ -103,7 +103,7 @@ public class BiodiversityLibraryTest {
             .withField(StandardField.PAGES, "89-97")
             .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
 
-        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").get(0));
+        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").getFirst());
     }
 
     @Test

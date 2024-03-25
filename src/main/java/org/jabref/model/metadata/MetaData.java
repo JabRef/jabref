@@ -144,7 +144,7 @@ public class MetaData {
 
         // Set new value if it is not a default value
         for (Map.Entry<EntryType, List<String>> pattern : nonDefaultPatterns.entrySet()) {
-            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().get(0));
+            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().getFirst());
         }
 
         // Store default pattern
