@@ -56,7 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
 - Importer/Exporter for CFF format now supports JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
 - The XMP-Exporter no longer writes the content of the `file`-field. [#11083](https://github.com/JabRef/jabref/pull/11083)
-- We added notes and warnings for the case of selection of non-empty directories while starting a new Systematic Literature Review. [#600](https://github.com/koppor/jabref/issues/600)
+- We added notes, checks and warnings for the case of selection of non-empty directories while starting a new Systematic Literature Review. [#600](https://github.com/koppor/jabref/issues/600)
 
 ### Fixed
 
@@ -83,7 +83,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Fixed an issue on Windows where TeXworks path was not resolved if it was installed with MiKTeX. [#10977](https://github.com/JabRef/jabref/issues/10977)
 - We fixed an issue with where JabRef would throw an error when using MathSciNet search, as it was unable to parse the fetched JSON coreectly. [10996](https://github.com/JabRef/jabref/issues/10996)
 - We fixed an issue where the "Import by ID" function would throw an error when a DOI that contains URL-encoded characters was entered. [#10648](https://github.com/JabRef/jabref/issues/10648)
-- We fixed a bug where a new Systematic Literature Review was allowed to start even if a non-empty directory is selected, later throwing an error. [#620](https://github.com/koppor/jabref/issues/620)
 
 ### Removed
 

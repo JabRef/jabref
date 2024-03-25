@@ -196,7 +196,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 }
             } catch (
                     IOException e) {
-                // Handle the exception appropriately (e.g., log the error)
                 directoryWarning.setText(Localization.lang("Warning: Failed to check if the directory is empty."));
                 directoryWarning.setVisible(true);
             }
