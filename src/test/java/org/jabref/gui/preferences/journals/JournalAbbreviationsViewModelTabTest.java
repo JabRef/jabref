@@ -222,7 +222,7 @@ class JournalAbbreviationsViewModelTabTest {
     @ParameterizedTest
     @MethodSource("provideTestFiles")
     void addDuplicatedFileResultsInErrorDialog(TestData testData) throws IOException {
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.getFirst())));
         viewModel.addNewFile();
         viewModel.addNewFile();
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
@@ -231,7 +231,7 @@ class JournalAbbreviationsViewModelTabTest {
     @ParameterizedTest
     @MethodSource("provideTestFiles")
     void openDuplicatedFileResultsInAnException(TestData testData) throws IOException {
-        when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
+        when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.getFirst())));
         viewModel.openFile();
         viewModel.openFile();
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
@@ -245,7 +245,7 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.selectLastJournalFile();
         assertEquals(0, viewModel.abbreviationsCountProperty().get());
 
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.getFirst())));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         assertEquals(1, viewModel.abbreviationsCountProperty().get());
@@ -267,7 +267,7 @@ class JournalAbbreviationsViewModelTabTest {
     @ParameterizedTest
     @MethodSource("provideTestFiles")
     void removeLastListSetsCurrentFileAndCurrentAbbreviationToNull(TestData testData) throws IOException {
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.get(0))));
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testData.csvFiles.getFirst())));
         viewModel.addNewFile();
         viewModel.removeCurrentFile();
 
@@ -326,7 +326,7 @@ class JournalAbbreviationsViewModelTabTest {
     void builtInListsIncludeAllBuiltInAbbreviations() {
         viewModel.addBuiltInList();
         assertEquals(1, viewModel.journalFilesProperty().getSize());
-        viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
+        viewModel.currentFileProperty().set(viewModel.journalFilesProperty().getFirst());
         ObservableList<Abbreviation> expected = FXCollections.observableArrayList(repository.getAllLoaded());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
@@ -345,7 +345,7 @@ class JournalAbbreviationsViewModelTabTest {
         }
         viewModel.selectLastJournalFile();
 
-        AbbreviationsFileViewModel test1 = viewModel.journalFilesProperty().get(0);
+        AbbreviationsFileViewModel test1 = viewModel.journalFilesProperty().getFirst();
         AbbreviationsFileViewModel test3 = viewModel.journalFilesProperty().get(1);
         AbbreviationsFileViewModel test4 = viewModel.journalFilesProperty().get(2);
         AbbreviationsFileViewModel test5 = viewModel.journalFilesProperty().get(3);

@@ -133,7 +133,7 @@ public class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getSharedEntriesNotPresentEvent());
         // client B tries to update the entry
-        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
         bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
@@ -156,7 +156,7 @@ public class SynchronizationSimulatorTest {
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getUpdateRefusedEvent());
 
-        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
         // B also tries to change something
         bibEntryOfClientB.setField(StandardField.YEAR, "2016");
 

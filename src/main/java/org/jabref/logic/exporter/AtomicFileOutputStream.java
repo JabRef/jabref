@@ -49,7 +49,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().get(0);
+    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().getFirst();
 
     /**
      * The file we want to create/replace.
