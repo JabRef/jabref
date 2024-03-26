@@ -104,6 +104,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
                 if ((event == null) || empty) {
                     setGraphic(null);
+                    setContextMenu(null);
                 } else {
                     icon = event.getIcon().getGraphicNode();
                     heading.setText(event.getDisplayText());
@@ -112,18 +113,16 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                     graphic.getStyleClass().setAll(event.getStyleClass());
                     graphic.getChildren().setAll(icon, message);
                     setGraphic(graphic);
+                    setContextMenu(createContextMenu(event));
                 }
             }
 
-            {
+            private ContextMenu createContextMenu(LogEventViewModel selectedLogEntry) {
                 ContextMenu contextMenu = new ContextMenu();
                 MenuItem copyItem = new MenuItem("Copy");
-                copyItem.setOnAction(event -> {
-                    LogEventViewModel selectedLogEntry = getItem();
-                    viewModel.copyLogEntry(selectedLogEntry);
-                });
+                copyItem.setOnAction(event -> viewModel.copyLogEntry(selectedLogEntry));
                 contextMenu.getItems().add(copyItem);
-                setContextMenu(contextMenu);
+                return contextMenu;
             }
         };
     }
