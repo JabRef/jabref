@@ -173,19 +173,44 @@ class BracketedPatternTest {
         return Stream.of(
                 Arguments.of("Ne", "Isaac Newton"),
                 Arguments.of("NM", "Isaac Newton and James Maxwell"),
-                Arguments.of("N+", "Isaac Newton and James Maxwell and Albert Einstein"),
-                Arguments.of("N+", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("NM", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("NM", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
                 Arguments.of("Aa", "Aachen"),
                 Arguments.of("A+", "Aachen and others"),
                 Arguments.of("AB", "Aachen and Berlin"),
-                Arguments.of("A+", "Aachen and Berlin and others"),
-                Arguments.of("A+", "Aachen and Berlin and Chemnitz"),
-                Arguments.of("D+", "John Doe and Donald Smith and Will Wonder"),
-                Arguments.of("A+", "Aachen and Berlin and Chemnitz and others"),
-                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf"),
-                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
-                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("A+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("AB", "Aachen and Berlin and others"),
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("DS", "John Doe and Donald Smith and Will Wonder"),
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("AB", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void authIni3(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.authIniN(list, 3));
+    }
+
+    static Stream<Arguments> authIni3() {
+        return Stream.of(
+                Arguments.of("New", "Isaac Newton"),
+                Arguments.of("NeM", "Isaac Newton and James Maxwell"),
+                Arguments.of("NME", "Isaac Newton and James Maxwell and Albert Einstein"),
+                Arguments.of("NME", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
+                Arguments.of("Aac", "Aachen"),
+                Arguments.of("Aa+", "Aachen and others"),
+                Arguments.of("AaB", "Aachen and Berlin"),
+                Arguments.of("AB+", "Aachen and Berlin and others"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("DSW", "John Doe and Donald Smith and Will Wonder"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABC", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
     }
 
     @ParameterizedTest
@@ -207,9 +232,9 @@ class BracketedPatternTest {
                 Arguments.of("AaBC", "Aachen and Berlin and Chemnitz"),
                 Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and others"),
                 Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("ABC+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("ABCD", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
     }
 
     @ParameterizedTest

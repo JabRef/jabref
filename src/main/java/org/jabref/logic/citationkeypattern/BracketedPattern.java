@@ -1037,7 +1037,7 @@ public class BracketedPattern {
 
         final int numberOfAuthors = authorList.getNumberOfAuthors();
         final boolean lastAuthorIsOthers = authorList.getAuthor(numberOfAuthors - 1).equals(Author.OTHERS);
-        if ((n > 1) && ((n < numberOfAuthors) || lastAuthorIsOthers)) {
+        if (n >= numberOfAuthors && lastAuthorIsOthers) {
             final int limit = Math.min(n - 1, numberOfAuthors - 1);
             // special handling if the last author is "Others"
             // This gets the single char "+" only
