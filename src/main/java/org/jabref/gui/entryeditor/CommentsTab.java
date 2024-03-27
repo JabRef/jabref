@@ -151,6 +151,19 @@ public class CommentsTab extends FieldsEditorTab {
             });
             gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
             setCompressedRowLayout();
+        } else {
+            Button showDefaultOwnerCommentButton = new Button(Localization.lang("Show user comments"));
+            showDefaultOwnerCommentButton.setOnAction(e -> {
+                var labelForField = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
+                labelForField.ifPresent(label -> gridPane.getChildren().remove(label));
+                fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
+//                editors.add(userSpecificCommentField);
+
+                entryEditorPreferences.setShowUserCommentsFields(true);
+                setupPanel(entry, compressed);
+            });
+            gridPane.add(showDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
+            setCompressedRowLayout();
         }
     }
 }
