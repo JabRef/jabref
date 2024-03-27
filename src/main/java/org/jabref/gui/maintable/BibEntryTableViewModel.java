@@ -45,6 +45,7 @@ public class BibEntryTableViewModel {
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
 
+
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
@@ -133,6 +134,8 @@ public class BibEntryTableViewModel {
         }
 
         ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
+        Optional<BibEntry> referenced = bibDatabaseContext.getDatabase().getReferencedEntry(entry);
+        referenced.ifPresent(bibEntry -> observables.addAll(List.of(bibEntry.getObservables())));
         observables.add(fieldValueFormatter);
 
         value = Bindings.createStringBinding(() ->
