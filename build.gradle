@@ -191,7 +191,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j'
     }
 
-    implementation 'org.controlsfx:controlsfx:11.2.0'
+    implementation 'org.controlsfx:controlsfx:11.2.1'
 
     implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'com.konghq:unirest-java:3.14.5'
