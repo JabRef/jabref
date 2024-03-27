@@ -35,7 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added ability to double-click on an entry in the global search window to select the corresponding entry in the main table. [#11010](https://github.com/JabRef/jabref/pull/11010)
 - We added support for BibTeX String constants during copy & paste between libraries. [#10872](https://github.com/JabRef/jabref/issues/10872)
 - We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868)
-- We added the functionality for users to be able to copy event log entries via a context menu by right click. [#11100](https://github.com/JabRef/jabref/issues/11100)
+- Event log entries can now be copied via a context menu. [#11100](https://github.com/JabRef/jabref/issues/11100)
 
 ### Changed
 
