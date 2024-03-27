@@ -82,10 +82,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      * Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
      */
     public void copyLogEntry(LogEventViewModel logEvent) {
-        if (logEvent != null) {
-            clipBoardManager.setContent(logEvent.getDetailedText());
-            dialogService.notify(Localization.lang("Log entry copied to clipboard."));
-        }
+        clipBoardManager.setContent(logEvent.getDetailedText());
     }
 
     /**

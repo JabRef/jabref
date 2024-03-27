@@ -104,7 +104,6 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
                 if ((event == null) || empty) {
                     setGraphic(null);
-                    setContextMenu(null);
                 } else {
                     icon = event.getIcon().getGraphicNode();
                     heading.setText(event.getDisplayText());
