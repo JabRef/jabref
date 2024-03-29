@@ -1387,7 +1387,7 @@ class BibtexParserTest {
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new RegexKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "FrechetSpace", false),
-                root.getChildren().get(0).getGroup());
+                root.getChildren().getFirst().getGroup());
         assertEquals(
                 new WordKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "GIT", false, ',', false),
                 root.getChildren().get(1).getGroup());
@@ -1572,7 +1572,7 @@ class BibtexParserTest {
         assertEquals(2, root.getNumberOfChildren());
         ExplicitGroup firstTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
         firstTestGroupExpected.setExpanded(false);
-        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        assertEquals(firstTestGroupExpected, root.getChildren().getFirst().getGroup());
         ExplicitGroup secondTestGroupExpected = new ExplicitGroup("Swain", GroupHierarchyType.INDEPENDENT, ',');
         secondTestGroupExpected.setExpanded(false);
         assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
@@ -1581,7 +1581,7 @@ class BibtexParserTest {
         List<BibEntry> firstTestGroupEntriesExpected = new ArrayList<>();
         firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
         firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(firstTestGroupEntriesExpected));
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(firstTestGroupEntriesExpected));
         assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Swain:2023aa").get()));
     }
 
@@ -1687,17 +1687,17 @@ class BibtexParserTest {
         assertEquals(2, root.getNumberOfChildren());
         ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
         firstTestGroupExpected.setExpanded(false);
-        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        assertEquals(firstTestGroupExpected, root.getChildren().getFirst().getGroup());
         ExplicitGroup secondTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
         secondTestGroupExpected.setExpanded(false);
         assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
 
         BibDatabase db = result.getDatabase();
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(db.getEntries()));
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(db.getEntries()));
         List<BibEntry> smartGroupEntriesExpected = new ArrayList<>();
         smartGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
         smartGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(smartGroupEntriesExpected));
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(smartGroupEntriesExpected));
     }
 
     /**
@@ -1724,7 +1724,7 @@ class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(((TexGroup) root.getChildren().get(0).getGroup()).getFilePath(),
+        assertEquals(((TexGroup) root.getChildren().getFirst().getGroup()).getFilePath(),
                 Path.of("src/test/resources/org/jabref/model/groups/paper.aux"));
     }
 

@@ -48,7 +48,7 @@ public class CitationKeyPatternPanelViewModel {
         if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().isEmpty()) {
             defaultPattern = "";
         } else {
-            defaultPattern = initialKeyPattern.getDefaultValue().get(0);
+            defaultPattern = initialKeyPattern.getDefaultValue().getFirst();
         }
 
         defaultItemProperty.setValue(new CitationKeyPatternPanelItemModel(new DefaultEntryType(), defaultPattern));
@@ -62,7 +62,7 @@ public class CitationKeyPatternPanelViewModel {
                          if (initialKeyPattern.isDefaultValue(entryType)) {
                              pattern = "";
                          } else {
-                             pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
+                             pattern = initialKeyPattern.getPatterns().get(entryType).getFirst();
                          }
                          patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
                      });

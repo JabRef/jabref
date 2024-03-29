@@ -87,7 +87,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        BstEntry bstEntry = vm.latestContext.entries().get(0);
+        BstEntry bstEntry = vm.latestContext.entries().getFirst();
         assertTrue(bstEntry.fields.containsKey("address"));
         assertTrue(bstEntry.fields.containsKey("author"));
         assertTrue(bstEntry.fields.containsKey("title"));
@@ -107,7 +107,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        Map<String, String> fields = vm.latestContext.entries().get(0).fields;
+        Map<String, String> fields = vm.latestContext.entries().getFirst().fields;
         assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", fields.get("author"));
         assertEquals("Effective work practices for floss development: A model and propositions", fields.get("title"));
         assertEquals("Hawaii International Conference On System Sciences (HICSS)", fields.get("booktitle"));

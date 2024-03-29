@@ -176,7 +176,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                 .withField(StandardField.VENUE, "The Practice of Enterprise Modeling");
 
         entry.withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns");
-        BibEntry actual = fetcher.performSearch(entry).get(0);
+        BibEntry actual = fetcher.performSearch(entry).getFirst();
         // Abstract should not be included in JabRef tests
         actual.clearField(StandardField.ABSTRACT);
         assertEquals(barrosEntry, actual);

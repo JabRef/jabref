@@ -35,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added ability to double-click on an entry in the global search window to select the corresponding entry in the main table. [#11010](https://github.com/JabRef/jabref/pull/11010)
 - We added support for BibTeX String constants during copy & paste between libraries. [#10872](https://github.com/JabRef/jabref/issues/10872)
 - We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868)
+- Event log entries can now be copied via a context menu. [#11100](https://github.com/JabRef/jabref/issues/11100)
 
 ### Changed
 
@@ -57,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Importer/Exporter for CFF format now supports JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
 - The XMP-Exporter no longer writes the content of the `file`-field. [#11083](https://github.com/JabRef/jabref/pull/11083)
 - We added notes, checks and warnings for the case of selection of non-empty directories while starting a new Systematic Literature Review. [#600](https://github.com/koppor/jabref/issues/600)
+- Text in the import dialog (web search results) will now be wrapped to prevent horizontal scrolling. [#10931](https://github.com/JabRef/jabref/issues/10931)
 - We added test cases for DatabaseFileLookup to cover file presence and absence scenarios. [koppor#678](https://github.com/koppor/jabref/issues/678)
 
 ### Fixed
@@ -84,6 +86,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Fixed an issue on Windows where TeXworks path was not resolved if it was installed with MiKTeX. [#10977](https://github.com/JabRef/jabref/issues/10977)
 - We fixed an issue with where JabRef would throw an error when using MathSciNet search, as it was unable to parse the fetched JSON coreectly. [10996](https://github.com/JabRef/jabref/issues/10996)
 - We fixed an issue where the "Import by ID" function would throw an error when a DOI that contains URL-encoded characters was entered. [#10648](https://github.com/JabRef/jabref/issues/10648)
+- We fixed an issue with handling of an "overflow" of authors at `[authIniN]`. [#11087](https://github.com/JabRef/jabref/issues/11087)
+- We fixed an issue where an exception occurred when selecting entries in the web search results. [#11081](https://github.com/JabRef/jabref/issues/11081)
 
 ### Removed
 

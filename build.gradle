@@ -135,6 +135,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -152,7 +153,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.1'
     implementation 'org.antlr:antlr4-runtime:4.13.1'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.8.0.202311291450-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.9.0.202403050737-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.16.1'
@@ -161,14 +162,14 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
-    implementation 'org.postgresql:postgresql:42.7.1'
+    implementation 'org.postgresql:postgresql:42.7.3'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:33.0.0-jre') {
+    implementation ('com.google.guava:guava:33.1.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -186,10 +187,11 @@ dependencies {
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.4.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude module: 'commons-lang3'
         exclude group: 'org.apache.logging.log4j'
     }
 
-    implementation 'org.controlsfx:controlsfx:11.2.0'
+    implementation 'org.controlsfx:controlsfx:11.2.1'
 
     implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'com.konghq:unirest-java:3.14.5'
@@ -200,11 +202,11 @@ dependencies {
     implementation "org.tinylog:tinylog-impl:2.7.0"
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.9'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.12'
     // route all requests to log4j to SLF4J
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
 
-    implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
+    implementation('de.undercouch:citeproc-java:3.0.0') {
         exclude group: 'org.antlr'
     }
 
@@ -270,12 +272,12 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.13.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.14.2'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.7.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.8.1"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -614,6 +616,7 @@ jlink {
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
         requires 'org.apache.commons.lang3'
+        requires 'org.apache.commons.text'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'

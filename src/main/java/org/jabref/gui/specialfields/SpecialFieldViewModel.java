@@ -91,6 +91,6 @@ public class SpecialFieldViewModel {
     }
 
     public void toggle(BibEntry entry) {
-        setSpecialFieldValue(entry, getField().getValues().get(0));
+        setSpecialFieldValue(entry, getField().getValues().getFirst());
     }
 }

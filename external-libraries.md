@@ -782,7 +782,7 @@ org.apache.pdfbox:xmpbox:3.0.1
 org.bouncycastle:bcprov-jdk18on:1.77
 org.checkerframework:checker-qual:3.37.0
 org.codehaus.woodstox:stax2-api:4.2
-org.controlsfx:controlsfx:11.2.0
+org.controlsfx:controlsfx:11.2.1
 org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r
 org.fxmisc.flowless:flowless:0.7.2
 org.fxmisc.richtext:richtextfx:0.11.2
