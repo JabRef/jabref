@@ -1,6 +1,11 @@
 package org.jabref.logic.importer;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,7 +40,7 @@ class DatabaseFileLookupTest {
     private Path tempDir;
     private Path txtFileDir;
     private FilePreferences filePreferences;
-    private static DatabaseFileLookup fileLookup;
+    private DatabaseFileLookup fileLookup;
 
     /**
      * Sets up the test environment before each test case.
