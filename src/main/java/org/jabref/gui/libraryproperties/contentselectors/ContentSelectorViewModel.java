@@ -1,11 +1,9 @@
 package org.jabref.gui.libraryproperties.contentselectors;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +32,7 @@ import org.jabref.model.metadata.MetaData;
 
 public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
-    private static final List<Field> DEFAULT_FIELD_NAMES = Arrays.asList(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
+    private static final List<Field> DEFAULT_FIELD_NAMES = List.of(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
     private final MetaData metaData;
     private final DialogService dialogService;
@@ -69,18 +67,19 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     @Override
     public void storeSettings() {
         List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
+        List<Field> fieldNamesToRemove = new ArrayList<>(filterFieldsToRemove());
 
         if (isDefaultMap(fieldKeywordsMap)) {
-            Iterator<ContentSelector> iterator = metaData.getContentSelectors().getContentSelectors().iterator();
-            while (iterator.hasNext()) {
-                metaData.clearContentSelectors(iterator.next().getField());
-            }
+            fieldNamesToRemove.addAll(metaData.getContentSelectorList().stream().map(ContentSelector::getField).toList());
+            fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
+            fieldNamesToRemove.forEach(metaData::clearContentSelectors);
+        } else {
+            List<Field> toRemove = fieldKeywordsMap.entrySet().stream().filter(entry -> DEFAULT_FIELD_NAMES.contains(entry
+                    .getKey()) && entry.getValue().isEmpty()).map(Map.Entry::getKey).toList();
+            fieldNamesToRemove.addAll(toRemove);
+            fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
+            fieldNamesToRemove.forEach(metaData::clearContentSelectors);
         }
-
-        fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
-
-        List<Field> fieldNamesToRemove = filterFieldsToRemove();
-        fieldNamesToRemove.forEach(metaData::clearContentSelectors);
     }
 
     private boolean isDefaultMap(Map<Field, List<String>> fieldKeywordsMap) {
