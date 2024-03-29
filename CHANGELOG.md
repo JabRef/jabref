@@ -57,6 +57,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Importer/Exporter for CFF format now supports JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
 - The XMP-Exporter no longer writes the content of the `file`-field. [#11083](https://github.com/JabRef/jabref/pull/11083)
 - We added notes, checks and warnings for the case of selection of non-empty directories while starting a new Systematic Literature Review. [#600](https://github.com/koppor/jabref/issues/600)
+- We added test cases for DatabaseFileLookup to cover file presence and absence scenarios. [koppor#678](https://github.com/koppor/jabref/issues/678)
 
 ### Fixed
 
