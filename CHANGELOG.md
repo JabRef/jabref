@@ -87,6 +87,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Import by ID" function would throw an error when a DOI that contains URL-encoded characters was entered. [#10648](https://github.com/JabRef/jabref/issues/10648)
 - We fixed an issue with handling of an "overflow" of authors at `[authIniN]`. [#11087](https://github.com/JabRef/jabref/issues/11087)
 - We fixed an issue where an exception occurred when selecting entries in the web search results. [#11081](https://github.com/JabRef/jabref/issues/11081)
+- We fixed a bug where the "Directory not set" warning would come up multiple times when importing multiple entries without saving library, and would not come up at all for some fetchers if there was no pdf associated. [#10075](https://github.com/JabRef/jabref/issues/11075)
 
 ### Removed
 
