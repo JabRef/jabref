@@ -2,6 +2,7 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -140,6 +141,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
         // Remember the selection in the dialog
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
+
+        Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+        if (targetDirectory.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Import entries"), Localization.lang("File directory needs to be set or does not exist.\nPlease save your library and check the preferences."));
+        }
 
         new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(
                 databaseContext.getDatabase(),
