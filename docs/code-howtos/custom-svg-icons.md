@@ -7,7 +7,7 @@ JabRef uses [Material Design Icons](https://materialdesignicons.com) for most bu
 
 ![toolbar](http://i.imgur.com/KlyYrNn.png)
 
-This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ (TTF) to fit seamlessly into the JabRef framework. Already existing custom icons will be published (link is coming soon) as they need to be repacked as well.
+This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ (TTF) to fit seamlessly into the JabRef framework.
 
 The process consists of 5 steps:
 
