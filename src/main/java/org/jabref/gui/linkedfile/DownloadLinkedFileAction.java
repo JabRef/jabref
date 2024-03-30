@@ -100,6 +100,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
+            LOGGER.warn("File directory not available while downloading {}. Storing as URL in file field.", downloadUrl);
             return;
         }
 
