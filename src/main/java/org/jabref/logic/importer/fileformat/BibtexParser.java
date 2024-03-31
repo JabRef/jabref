@@ -758,7 +758,7 @@ public class BibtexParser implements Parser {
                             LinkedFile file = new LinkedFile("", path, "");
                             entry.addFile(file);
                         } else {
-                            LOGGER.warn("Could not parse Bibdesk file for entry {}", entry);
+                            LOGGER.warn("Could not parse Bibdesk file path for entry {}", entry);
                         }
                     } catch (Exception e) {
                         throw new IOException("Could not parse Bibdesk files content (bdsk-file..) for entry " + entry, e);
