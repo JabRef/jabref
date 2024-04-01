@@ -130,7 +130,7 @@ public class BibEntryTypesManager {
                                                                       .filter(InternalEntryTypes.typeEquals(entryType.getType()))
                                                                       .findFirst();
         if (standardTypeOpt.isEmpty()) {
-            LOGGER.error("Standard type not found for {}", entryType.getType());
+            LOGGER.debug("Standard type not found for {}", entryType.getType());
             entryTypes.addCustomOrModifiedType(entryType);
             return;
         }

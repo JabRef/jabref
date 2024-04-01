@@ -27,7 +27,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.8.4'
+    id 'org.openrewrite.rewrite' version '6.11.2'
 }
 
 // Enable following for debugging
@@ -155,8 +155,8 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.9.0.202403050737-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.16.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.0'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
 
     implementation 'com.fasterxml:aalto-xml:1.3.2'
 
@@ -185,7 +185,7 @@ dependencies {
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.4.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.6.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.logging.log4j'
@@ -272,7 +272,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.14.2'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.15.0'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
