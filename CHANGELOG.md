@@ -59,6 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The XMP-Exporter no longer writes the content of the `file`-field. [#11083](https://github.com/JabRef/jabref/pull/11083)
 - We added notes, checks and warnings for the case of selection of non-empty directories while starting a new Systematic Literature Review. [#600](https://github.com/koppor/jabref/issues/600)
 - Text in the import dialog (web search results) will now be wrapped to prevent horizontal scrolling. [#10931](https://github.com/JabRef/jabref/issues/10931)
+- We improved the error handling when invalid bibdesk-files are encountered [#11117](https://github.com/JabRef/jabref/issues/11117)
 
 ### Fixed
 
@@ -87,6 +88,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Import by ID" function would throw an error when a DOI that contains URL-encoded characters was entered. [#10648](https://github.com/JabRef/jabref/issues/10648)
 - We fixed an issue with handling of an "overflow" of authors at `[authIniN]`. [#11087](https://github.com/JabRef/jabref/issues/11087)
 - We fixed an issue where an exception occurred when selecting entries in the web search results. [#11081](https://github.com/JabRef/jabref/issues/11081)
+- When a new library is unsaved, there is now no warning when fetching entries with PDFs. [#11075](https://github.com/JabRef/jabref/issues/11075)
 
 ### Removed
 
