@@ -73,7 +73,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
         if (isDefaultMap(fieldKeywordsMap)) {
             // Remove all fields of the content selector
-            fieldNamesToRemove = metaData.getContentSelectorList().stream().map(ContentSelector::getField).toList();
+            fieldNamesToRemove = metaData.getContentSelectorsSorted().stream().map(ContentSelector::getField).toList();
         } else {
             fieldNamesToRemove = determineFieldsToRemove();
         }

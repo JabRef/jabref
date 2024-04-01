@@ -188,7 +188,7 @@ public class MetaData {
         return contentSelectors;
     }
 
-    public SortedSet<ContentSelector> getContentSelectorList() {
+    public SortedSet<ContentSelector> getContentSelectorsSorted() {
         return contentSelectors.getContentSelectors();
     }
 
