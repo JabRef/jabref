@@ -758,10 +758,10 @@ public class BibtexParser implements Parser {
                             LinkedFile file = new LinkedFile("", path, "");
                             entry.addFile(file);
                         } else {
-                            LOGGER.warn("Could not parse Bibdesk file path for entry {}", entry);
+                            LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
                         }
                     } catch (Exception e) {
-                        throw new IOException("Could not parse Bibdesk files content (bdsk-file..) for entry " + entry, e);
+                        LOGGER.error("Could not parse Bibdesk files content (field: bdsk-file...) for entry {}", entry, e);
                     }
                 } else {
                     entry.setField(field, content);
