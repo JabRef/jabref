@@ -147,7 +147,7 @@ public enum StandardField implements Field {
 
     private final String name;
     private final String displayName;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
 
     static {
         for (StandardField field : StandardField.values()) {
@@ -184,7 +184,7 @@ public enum StandardField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 

@@ -6,7 +6,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.model.entry.KeywordList;
 
@@ -86,7 +85,7 @@ public enum SpecialField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return EnumSet.noneOf(FieldProperty.class);
     }
 
