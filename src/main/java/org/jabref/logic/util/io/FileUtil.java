@@ -376,7 +376,7 @@ public class FileUtil {
         Objects.requireNonNull(directory);
 
         if (detectBadFileName(fileName)) {
-            LOGGER.error("Invalid characters in path for file {} ", fileName);
+            LOGGER.error("Invalid characters in path for file {}", fileName);
             return Optional.empty();
         }
 
