@@ -95,7 +95,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v1.1.1
       - name: 'Set up JDK ${{ matrix.jdk }}'
-        uses: oracle-actions/setup-java@v1.3.3
+        uses: oracle-actions/setup-java@v1.3.4
         with:
           website: jdk.java.net
           release: ${{ matrix.jdk }}
