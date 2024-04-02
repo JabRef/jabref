@@ -36,6 +36,9 @@ public class BibEntryTypeBuilder {
 
     public BibEntryTypeBuilder withImportantFields(SequencedSet<Field> newFields) {
         List<Field> containedFields = containedInSeenFields(newFields);
+        if (!containedFields.isEmpty()) {
+            LOGGER.debug("Fields {} already added", containedFields);
+        }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
                                      .collect(Collectors.toCollection(LinkedHashSet::new));
