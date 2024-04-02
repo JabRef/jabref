@@ -9,8 +9,12 @@ public class UserSpecificCommentField implements Field {
     private final String name;
 
     public UserSpecificCommentField(String username) {
-        this.name = "comment-" + username;
+    if (username == null || username.isEmpty()) {
+        throw new IllegalArgumentException("Username cannot be null or empty");
     }
+    this.name = "comment-" + username;
+}
+
 
     @Override
     public Set<FieldProperty> getProperties() {
