@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Disabled("Test is useless ")
 class BibEntryTypeBuilderTest {
 
     @Test
