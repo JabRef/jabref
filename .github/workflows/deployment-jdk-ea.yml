@@ -69,7 +69,11 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Download JavaFX ${{ matrix.javafx }}"
+      - name: Add Msys64 to PATH
+        if: matrix.os == 'windows-latest'
+        run: echo "::add-path::/c/msys64/mingw64/bin:/c/msys64/usr/bin"
+        shell: bash
+      - name: Download JavaFX ${{ matrix.javafx }}
         shell: bash
         run: |
           mkdir javafx
