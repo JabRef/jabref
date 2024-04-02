@@ -78,7 +78,7 @@ jobs:
         run: |
           mkdir javafx
           cd javafx
-          wget https://jdk.java.net/javafx${{ matrix.javafx }}/ -O javafx.html
+          curl https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
 
           case $matrixos in
             "ubuntu-latest")
@@ -105,7 +105,7 @@ jobs:
           echo "OS set to $OS"
 
           URL=$(grep -o "https://download.java.net/java/early_access/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
-          wget $URL
+          curl -OJ $URL
           $EXTRACT
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
