@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Disabled("Test is useless ")
 class BibEntryTypeBuilderTest {
 
     @Test
+    @Disabled("There is just a log message written, but no exception thrown")
     void fieldAlreadySeenSameCategory() {
         assertThrows(IllegalArgumentException.class, () ->
         new BibEntryTypeBuilder()
@@ -33,6 +33,7 @@ class BibEntryTypeBuilderTest {
     }
 
     @Test
+    @Disabled("There is just a log message written, but no exception thrown")
     void fieldAlreadySeenDifferentCategories() {
         assertThrows(IllegalArgumentException.class, () ->
         new BibEntryTypeBuilder()

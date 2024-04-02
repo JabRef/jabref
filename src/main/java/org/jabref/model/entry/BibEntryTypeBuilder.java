@@ -37,7 +37,7 @@ public class BibEntryTypeBuilder {
     public BibEntryTypeBuilder withImportantFields(SequencedSet<Field> newFields) {
         List<Field> containedFields = containedInSeenFields(newFields);
         if (!containedFields.isEmpty()) {
-            LOGGER.debug("Fields {} already added", containedFields);
+            LOGGER.warn("Fields {} already added to type {}.", containedFields, type.getDisplayName());
         }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
@@ -52,7 +52,7 @@ public class BibEntryTypeBuilder {
     public BibEntryTypeBuilder withDetailFields(SequencedCollection<Field> newFields) {
         List<Field> containedFields = containedInSeenFields(newFields);
         if (!containedFields.isEmpty()) {
-            LOGGER.debug("Fields {} already added", containedFields);
+            LOGGER.warn("Fields {} already added to type {}.", containedFields, type.getDisplayName());
         }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.DETAIL)))
@@ -72,7 +72,7 @@ public class BibEntryTypeBuilder {
         Set<Field> fieldsToAdd = requiredFields.stream().map(OrFields::getFields).flatMap(Set::stream).collect(Collectors.toSet());
         List<Field> containedFields = containedInSeenFields(fieldsToAdd);
         if (!containedFields.isEmpty()) {
-            LOGGER.debug("Fields {} already added", containedFields);
+            LOGGER.warn("Fields {} already added to type {}.", containedFields, type.getDisplayName());
         }
         this.seenFields.addAll(fieldsToAdd);
         this.requiredFields.addAll(requiredFields);
