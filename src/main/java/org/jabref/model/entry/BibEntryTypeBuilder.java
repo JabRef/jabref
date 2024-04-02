@@ -19,15 +19,15 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BibEntryTypeBuilder {
-
-    private EntryType type = StandardEntryType.Misc;
-
-    private SequencedSet<OrFields> requiredFields = new LinkedHashSet<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryTypeBuilder.class);
+    private final SequencedSet<OrFields> requiredFields = new LinkedHashSet<>();
+    private final Set<Field> seenFields = new HashSet<>();
     private SequencedSet<BibField> optionalFields = new LinkedHashSet<>();
-
-    private Set<Field> seenFields = new HashSet<>();
+    private EntryType type = StandardEntryType.Misc;
 
     public BibEntryTypeBuilder withType(EntryType type) {
         this.type = type;
@@ -36,9 +36,6 @@ public class BibEntryTypeBuilder {
 
     public BibEntryTypeBuilder withImportantFields(SequencedSet<Field> newFields) {
         List<Field> containedFields = containedInSeenFields(newFields);
-        if (!containedFields.isEmpty()) {
-            throw new IllegalArgumentException("Fields " + containedFields + " already added");
-        }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
                                      .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -52,7 +49,7 @@ public class BibEntryTypeBuilder {
     public BibEntryTypeBuilder withDetailFields(SequencedCollection<Field> newFields) {
         List<Field> containedFields = containedInSeenFields(newFields);
         if (!containedFields.isEmpty()) {
-            throw new IllegalArgumentException("Fields " + containedFields + " already added");
+            LOGGER.debug("Fields {} already added", containedFields);
         }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.DETAIL)))
@@ -72,7 +69,7 @@ public class BibEntryTypeBuilder {
         Set<Field> fieldsToAdd = requiredFields.stream().map(OrFields::getFields).flatMap(Set::stream).collect(Collectors.toSet());
         List<Field> containedFields = containedInSeenFields(fieldsToAdd);
         if (!containedFields.isEmpty()) {
-            throw new IllegalArgumentException("Fields " + containedFields + " already added");
+            LOGGER.debug("Fields {} already added", containedFields);
         }
         this.seenFields.addAll(fieldsToAdd);
         this.requiredFields.addAll(requiredFields);
@@ -80,7 +77,7 @@ public class BibEntryTypeBuilder {
     }
 
     public BibEntryTypeBuilder addRequiredFields(OrFields... requiredFields) {
-        return addRequiredFields(Arrays.asList(requiredFields).stream().collect(Collectors.toCollection(LinkedHashSet::new)));
+        return addRequiredFields(new LinkedHashSet<>(List.of(requiredFields)));
     }
 
     public BibEntryTypeBuilder addRequiredFields(Field... requiredFields) {
