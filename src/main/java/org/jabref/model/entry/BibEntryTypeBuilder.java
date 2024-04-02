@@ -28,6 +28,7 @@ public class BibEntryTypeBuilder {
     private final Set<Field> seenFields = new HashSet<>();
     private SequencedSet<BibField> optionalFields = new LinkedHashSet<>();
     private EntryType type = StandardEntryType.Misc;
+    private boolean hasWarnings = false;
 
     public BibEntryTypeBuilder withType(EntryType type) {
         this.type = type;
@@ -38,6 +39,7 @@ public class BibEntryTypeBuilder {
         List<Field> containedFields = containedInSeenFields(newFields);
         if (!containedFields.isEmpty()) {
             LOGGER.warn("Fields {} already added to type {}.", containedFields, type.getDisplayName());
+            hasWarnings = true;
         }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
@@ -53,6 +55,7 @@ public class BibEntryTypeBuilder {
         List<Field> containedFields = containedInSeenFields(newFields);
         if (!containedFields.isEmpty()) {
             LOGGER.warn("Fields {} already added to type {}.", containedFields, type.getDisplayName());
+            hasWarnings = true;
         }
         this.seenFields.addAll(newFields);
         this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.DETAIL)))
@@ -73,6 +76,7 @@ public class BibEntryTypeBuilder {
         List<Field> containedFields = containedInSeenFields(fieldsToAdd);
         if (!containedFields.isEmpty()) {
             LOGGER.warn("Fields {} already added to type {}.", containedFields, type.getDisplayName());
+            hasWarnings = true;
         }
         this.seenFields.addAll(fieldsToAdd);
         this.requiredFields.addAll(requiredFields);
@@ -107,6 +111,10 @@ public class BibEntryTypeBuilder {
                 .map(field -> new BibField(field, FieldPriority.IMPORTANT));
         SequencedSet<BibField> allFields = Stream.concat(optionalFields.stream(), requiredAsImportant).collect(Collectors.toCollection(LinkedHashSet::new));
         return new BibEntryType(type, allFields, requiredFields);
+    }
+
+    public boolean hasWarnings() {
+        return hasWarnings;
     }
 
     private List<Field> containedInSeenFields(Collection<Field> fields) {
