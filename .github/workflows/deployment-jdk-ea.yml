@@ -104,10 +104,8 @@ jobs:
               exit 1
               ;;
           esac
-
           echo "OS set to $OS"
-
-          URL=$(grep -o "https://download.java.net/java/early_access/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
+          URL=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
           echo "Downloading $URL..."
           curl -OJ $URL
           $EXTRACT
