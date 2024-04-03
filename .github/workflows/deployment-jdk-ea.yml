@@ -76,7 +76,7 @@ jobs:
           cd javafx
           curl https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
 
-          case $matrixos in
+          case "${{ matrix.os }}" in
             "ubuntu-latest")
               OS="linux"
               EXTRACT="tar xzf *.tar.gz"
