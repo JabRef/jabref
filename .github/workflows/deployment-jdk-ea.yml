@@ -80,12 +80,12 @@ jobs:
           case "${{ matrix.os }}" in
             "ubuntu-latest")
               OS="linux"
-              EXTRACT="tar xzf *.tar.gz"
+              EXTRACT="tar xvzf *.tar.gz"
               EXT="tar.gz"
               ;;
             "buildjet-4vcpu-ubuntu-2204-arm")
               OS="linux"
-              EXTRACT="tar xzf *.tar.gz"
+              EXTRACT="tar xvzf *.tar.gz"
               EXT="tar.gz"
               echo "There are no ARM EA builds"
               ;;
@@ -96,7 +96,7 @@ jobs:
               ;;
             "macos-latest")
               OS="macos"
-              EXTRACT="tar xzf *.tar.gz"
+              EXTRACT="tar xvzf *.tar.gz"
               EXT="tar.gz"
               ;;
             *)
@@ -108,9 +108,9 @@ jobs:
           echo "OS set to $OS"
 
           URL=$(grep -o "https://download.java.net/java/early_access/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL..."
           curl -OJ $URL
           $EXTRACT
-          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/javafx.fxml.jar || true
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
