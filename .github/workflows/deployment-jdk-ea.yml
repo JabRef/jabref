@@ -110,6 +110,7 @@ jobs:
           URL=$(grep -o "https://download.java.net/java/early_access/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
           curl -OJ $URL
           $EXTRACT
+          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/javafx.fxml.jar || true
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
