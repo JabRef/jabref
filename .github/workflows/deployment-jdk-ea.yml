@@ -70,7 +70,7 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Setup JavaFX ${{ matrix.javafx }}
+      - name: Download and extract JavaFX ${{ matrix.javafx }}
         shell: bash
         run: |
           mkdir javafx
@@ -110,12 +110,6 @@ jobs:
           URL=$(grep -o "https://download.java.net/java/early_access/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
           curl -OJ $URL
           $EXTRACT
-
-          pwd
-          ls -la /home/runner/work/jabref/jabref/javafx/
-          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23
-          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/
-
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
@@ -156,10 +150,10 @@ jobs:
         run: |
           sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
           sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
-      - name: 'Set JavaFX (linux, Windows)'
+      - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-latest')
         run: sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle && cat build.gradle
-      - name: 'Set JavaFX (macOS)'
+      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
         if: (matrix.os == 'macos-latest')
         run: sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
       - name: Setup JDK
