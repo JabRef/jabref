@@ -45,9 +45,10 @@ jobs:
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: buildjet-4vcpu-ubuntu-2204-arm
-            displayName: "linux-arm"
-            archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
+          # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/
+          #- os: buildjet-4vcpu-ubuntu-2204-arm
+          #  displayName: "linux-arm"
+          #  archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
           - os: macos-latest
             displayName: macOS
             archivePortable: "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"
@@ -81,6 +82,12 @@ jobs:
               OS="linux"
               EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
+              ;;
+            "buildjet-4vcpu-ubuntu-2204-arm")
+              OS="linux"
+              EXTRACT="tar xzf *.tar.gz"
+              EXT="tar.gz"
+              echo "There are no ARM EA builds"
               ;;
             "windows-latest")
               OS="windows"
