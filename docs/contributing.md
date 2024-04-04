@@ -12,7 +12,7 @@ nav_order: 2
 
 ### Understanding the basics of code contributions
 
-We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
 1. Get the JabRef code on your local machine. Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
    1. Fork the JabRef into your GitHub account.
