@@ -68,27 +68,27 @@ public class CitationTest {
 
     @Test
     public void getPathTest() {
-        assertEquals(path, citation.getPath());
+        assertEquals(path, citation.path());
     }
 
     @Test
     public void getLineTest() {
-        assertEquals(10, citation.getLine());
+        assertEquals(10, citation.line());
     }
 
     @Test
     public void getColStartTest() {
-        assertEquals(1, citation.getColStart());
+        assertEquals(1, citation.colStart());
     }
 
     @Test
     public void getColEndTest() {
-        assertEquals(4, citation.getColEnd());
+        assertEquals(4, citation.colEnd());
     }
 
     @Test
     public void getLineTextTest() {
-        assertEquals("lineText", citation.getLineText());
+        assertEquals("lineText", citation.lineText());
     }
 
     @Test

@@ -67,7 +67,7 @@ public class TexBibEntriesResolver {
     }
 
     private Stream<? extends BibEntry> apply(Map.Entry<String, Citation> mapEntry, LatexParserResult latexParserResult, Map<Path, BibDatabase> bibDatabases) {
-        return latexParserResult.getBibFiles().get(mapEntry.getValue().getPath()).stream().distinct().flatMap(bibFile ->
+        return latexParserResult.getBibFiles().get(mapEntry.getValue().path()).stream().distinct().flatMap(bibFile ->
                 // Get a specific entry from an entryKey and a BIB file.
                 bibDatabases.get(bibFile).getEntriesByCitationKey(mapEntry.getKey()).stream().distinct()
                             // Check if there is already an entry with the same key in the given database.
