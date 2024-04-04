@@ -3,13 +3,13 @@ package org.jabref.model.texparser;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public record Citation(Path path, int line, int colStart, int colEnd, String lineText, String key) {
+public record Citation(String key, Path path, int line, int colStart, int colEnd, String lineText) {
     /**
      * The total number of characters that are shown around a cite (cite width included).
      */
     private static final int CONTEXT_WIDTH = 300;
 
-    public Citation(Path path, int line, int colStart, int colEnd, String lineText, String key) {
+    public Citation(String key, Path path, int line, int colStart, int colEnd, String lineText) {
         if (line <= 0) {
             throw new IllegalArgumentException("Line has to be greater than 0.");
         }
@@ -18,12 +18,12 @@ public record Citation(Path path, int line, int colStart, int colEnd, String lin
             throw new IllegalArgumentException("Citation has to be between 0 and line length.");
         }
 
+        this.key = key;
         this.path = Objects.requireNonNull(path);
         this.line = line;
         this.colStart = colStart;
         this.colEnd = colEnd;
         this.lineText = lineText;
-        this.key = key;
     }
 
     /**

@@ -23,7 +23,7 @@ public class CitationTest {
     @BeforeEach
     public void init() {
         path = Path.of("test");
-        citation = new Citation(path, 10, 1, 4, "lineText", "key");
+        citation = new Citation("key", path, 10, 1, 4, "lineText");
     }
 
     private static Stream<Arguments> colStartColEndNotInBounds() {
@@ -43,27 +43,27 @@ public class CitationTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 0})
     public void constructorLineSmallerEqualZeroTest(int line) {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, line, 1, 5, "lineText", "key"));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation("key", path, line, 1, 5, "lineText"));
         assertEquals("Line has to be greater than 0.", e.getMessage());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2})
     public void constructorLineLargerZeroTest(int line) {
-        Citation citation = new Citation(path, line, 1, 5, "lineText", "key");
+        Citation citation = new Citation("key", path, line, 1, 5, "lineText");
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndNotInBounds")
     public void constructorColStartColEndNotInBoundsTest(int colStart, int colEnd) {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 10, colStart, colEnd, "lineText", "key"));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation("key", path, 10, colStart, colEnd, "lineText"));
         assertEquals("Citation has to be between 0 and line length.", e.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndInBounds")
     public void constructorColStartColEndInBoundsTest(int colStart, int colEnd) {
-        Citation citation = new Citation(path, 10, colStart, colEnd, "lineText", "key");
+        Citation citation = new Citation("key", path, 10, colStart, colEnd, "lineText");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class CitationTest {
 
     @Test
     public void equalsTest() {
-        Citation citation1 = new Citation(path, 10, 1, 4, "lineText", "key");
+        Citation citation1 = new Citation("key", path, 10, 1, 4, "lineText");
         Citation citation2 = null;
         assertEquals(citation, citation1);
         assertNotEquals(citation, citation2);

@@ -95,7 +95,6 @@ public class LatexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
         expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
@@ -124,7 +123,6 @@ public class LatexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2));
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addBibFile(texFile2, texFile2.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");

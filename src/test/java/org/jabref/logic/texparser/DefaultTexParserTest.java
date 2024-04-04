@@ -74,7 +74,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
         expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
 
         assertEquals(expectedParserResult, parserResult);
@@ -87,7 +86,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
         // The character � is on purpose - we cannot use Apache Tika's CharsetDetector - see ADR-0005
         expectedParserResult
                 .addKey("anykey", texFile, 1, 32, 45, "Danach wir anschlie�end mittels \\cite{anykey}.");
@@ -102,7 +100,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
         // The character � is on purpose - we cannot use Apache Tika's CharsetDetector - see ADR-0005
         expectedParserResult
                 .addKey("anykey", texFile, 1, 32, 45, "Danach wir anschlie�end mittels \\cite{anykey}.");
@@ -120,7 +117,6 @@ public class DefaultTexParserTest {
                 .parse(Arrays.asList(texFile, texFile2, texFile3));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2, texFile3));
         expectedParserResult
                 .addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
         expectedParserResult
@@ -138,7 +134,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
         expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
@@ -156,7 +151,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2));
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addBibFile(texFile2, texFile2.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
@@ -177,7 +171,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile));
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile));
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
         expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
@@ -194,7 +187,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(DARWIN, texFile, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}");
         expectedParserResult.addKey(EINSTEIN, texFile, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
@@ -210,8 +202,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
-
         assertEquals(expectedParserResult, parserResult);
     }
 
@@ -224,8 +214,6 @@ public class DefaultTexParserTest {
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
 
-        expectedParserResult.getFileList().add(texFile);
-        expectedParserResult.getNestedFiles().addAll(Arrays.asList(texFile2, texFile3));
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addBibFile(texFile2, texFile2.getParent().resolve("origin.bib"));
         expectedParserResult.addBibFile(texFile3, texFile3.getParent().resolve("origin.bib"));
