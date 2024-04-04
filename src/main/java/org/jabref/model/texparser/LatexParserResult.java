@@ -3,12 +3,8 @@ package org.jabref.model.texparser;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-
-import org.jabref.model.entry.BibEntry;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -20,7 +16,7 @@ public class LatexParserResult {
     private final Multimap<Path, Path> bibFiles;
 
     // BibTeXKey --> set of citations
-    private final Multimap<String, Citation> citations;
+    private final Multimap<Path, Citation> citations;
 
     public LatexParserResult() {
         this.fileList = new ArrayList<>();
@@ -41,29 +37,18 @@ public class LatexParserResult {
         return bibFiles;
     }
 
-    public Multimap<String, Citation> getCitations() {
+    public Multimap<Path, Citation> getCitations() {
         return citations;
-    }
-
-    /**
-     * Return a set of strings with the keys of the citations multimap.
-     */
-    public Set<String> getCitationsKeySet() {
-        return citations.keySet();
     }
 
     /**
      * Return a collection of citations using a string as key reference.
      */
     public Collection<Citation> getCitationsByKey(String key) {
-        return citations.get(key);
-    }
-
-    /**
-     * Return a collection of citations using a BibEntry as reference.
-     */
-    public Collection<Citation> getCitationsByKey(BibEntry entry) {
-        return entry.getCitationKey().map(this::getCitationsByKey).orElse(Collections.emptyList());
+        return citations.values()
+                        .stream()
+                        .filter(citation -> citation.key().equals(key))
+                        .toList();
     }
 
     /**
@@ -88,8 +73,8 @@ public class LatexParserResult {
      * Add a citation to the citations multimap.
      */
     public void addKey(String key, Path file, int lineNumber, int start, int end, String line) {
-        Citation citation = new Citation(file, lineNumber, start, end, line);
-        citations.put(key, citation);
+        Citation citation = new Citation(file, lineNumber, start, end, line, key);
+        citations.put(file, citation);
     }
 
     @Override

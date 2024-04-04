@@ -41,7 +41,7 @@ public class LatexBibEntriesResolverResult {
     /**
      * @return the citations multimap from the LatexParserResult object.
      */
-    public Multimap<String, Citation> getCitations() {
+    public Multimap<Path, Citation> getCitations() {
         return latexParserResult.getCitations();
     }
 

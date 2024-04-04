@@ -55,8 +55,7 @@ public class TexBibEntriesResolver {
                     }
                 }));
 
-        // Get all pairs Entry<String entryKey, Citation>.
-        Stream<Map.Entry<String, Citation>> citationsStream = latexParserResult.getCitations().entries().stream().distinct();
+        Stream<Map.Entry<Path, Citation>> citationsStream = latexParserResult.getCitations().entries().stream().distinct();
 
         Set<BibEntry> newEntries = citationsStream.flatMap(mapEntry -> apply(mapEntry, latexParserResult, bibDatabases)).collect(Collectors.toSet());
 
@@ -66,10 +65,10 @@ public class TexBibEntriesResolver {
         return resolverResult;
     }
 
-    private Stream<? extends BibEntry> apply(Map.Entry<String, Citation> mapEntry, LatexParserResult latexParserResult, Map<Path, BibDatabase> bibDatabases) {
-        return latexParserResult.getBibFiles().get(mapEntry.getValue().path()).stream().distinct().flatMap(bibFile ->
+    private Stream<? extends BibEntry> apply(Map.Entry<Path, Citation> mapEntry, LatexParserResult latexParserResult, Map<Path, BibDatabase> bibDatabases) {
+        return latexParserResult.getBibFiles().get(mapEntry.getKey()).stream().distinct().flatMap(bibFile ->
                 // Get a specific entry from an entryKey and a BIB file.
-                bibDatabases.get(bibFile).getEntriesByCitationKey(mapEntry.getKey()).stream().distinct()
+                bibDatabases.get(bibFile).getEntriesByCitationKey(mapEntry.getValue().key()).stream().distinct()
                             // Check if there is already an entry with the same key in the given database.
                             .filter(entry -> !entry.equals(masterDatabase.getEntryByCitationKey(entry.getCitationKey().orElse("")).orElse(new BibEntry())))
                             // Add cross-referencing data to the entry (fill empty fields).
