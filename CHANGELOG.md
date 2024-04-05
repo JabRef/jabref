@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added key binding to open preferences <kbd>ctrl</kbd> + <kbd>,</kbd>
+
 ### Changed
 
 ### Fixed

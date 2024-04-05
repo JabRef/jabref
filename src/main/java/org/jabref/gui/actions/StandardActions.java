@@ -117,7 +117,7 @@ public enum StandardActions implements Action {
     SETUP_GENERAL_FIELDS(Localization.lang("Set up general fields")),
     MANAGE_PROTECTED_TERMS(Localization.lang("Manage protected terms")),
     CITATION_KEY_PATTERN(Localization.lang("Citation key patterns")),
-    SHOW_PREFS(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES),
+    SHOW_PREFS(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES, KeyBinding.SHOW_PREFS),
     MANAGE_JOURNALS(Localization.lang("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize key bindings"), IconTheme.JabRefIcons.KEY_BINDINGS),
 
