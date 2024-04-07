@@ -48,7 +48,6 @@ jobs:
           - os: buildjet-4vcpu-ubuntu-2204-arm
             displayName: "linux-arm"
             archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
-            javafxARM: "23-ea+3"
           - os: macos-latest
             displayName: macOS
             archivePortable: "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"
@@ -160,7 +159,7 @@ jobs:
           jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
           JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
           echo "Using JavaFX ${JAVAFX}"
-          sed -i '/javafx {/{n;s#version = ".*"#version = "${JAVAFX}"#}' build.gradle && cat build.gradle
+          sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" build.gradle && cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
         if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         run: sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
