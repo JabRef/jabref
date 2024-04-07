@@ -17,6 +17,7 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.BibliopgraphyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
@@ -32,23 +33,31 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * SIDE EFFECT: Sets the "cites" field of the entry having the linked files
+ *
+ * Mode choice A: online or offline
+ * Mode choice B: complete entry or single file (the latter is not implemented)
+ *
+ * The different modes should be implemented as sub classes. However, this was too complicated, thus we use variables at the constructor to parameterize this class.
  */
 public class ExtractReferencesAction extends SimpleCommand {
     private final int FILES_LIMIT = 10;
 
+    private final boolean online;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final BibEntry entry;
     private final LinkedFile linkedFile;
     private final TaskExecutor taskExecutor;
+
     private final BibliopgraphyFromPdfImporter bibliopgraphyFromPdfImporter;
 
-    public ExtractReferencesAction(DialogService dialogService,
+    public ExtractReferencesAction(boolean online,
+                                   DialogService dialogService,
                                    StateManager stateManager,
                                    PreferencesService preferencesService,
                                    TaskExecutor taskExecutor) {
-        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
+        this(online, dialogService, stateManager, preferencesService, null, null, taskExecutor);
     }
 
     /**
@@ -57,12 +66,14 @@ public class ExtractReferencesAction extends SimpleCommand {
      * @param entry the entry to handle (can be null)
      * @param linkedFile the linked file (can be null)
      */
-    private ExtractReferencesAction(@NonNull DialogService dialogService,
+    private ExtractReferencesAction(boolean online,
+                                    @NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
                                     @NonNull PreferencesService preferencesService,
                                     @Nullable BibEntry entry,
                                     @Nullable LinkedFile linkedFile,
                                     @NonNull TaskExecutor taskExecutor) {
+        this.online = online;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -70,6 +81,9 @@ public class ExtractReferencesAction extends SimpleCommand {
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
         bibliopgraphyFromPdfImporter = new BibliopgraphyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
+
+        String text;
+        GrobidPreferences grobidPreferences = preferencesService.getGrobidPreferences();
 
         if (this.linkedFile == null) {
             this.executable.bind(
@@ -88,7 +102,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     private void extractReferences() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-            boolean online = this.preferencesService.getGrobidPreferences().isGrobidEnabled();
+            assert online == this.preferencesService.getGrobidPreferences().isGrobidEnabled();
 
             List<BibEntry> selectedEntries;
             if (entry == null) {
