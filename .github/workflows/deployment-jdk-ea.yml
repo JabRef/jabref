@@ -70,6 +70,12 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Download and extract JavaFX ${{ matrix.javafx }}
         shell: bash
         run: |
@@ -111,12 +117,6 @@ jobs:
           $EXTRACT
           echo Debug JDK21, JavaFX23
           ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/javafx.base.jar || true
-      - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: 'true'
-          show-progress: 'false'
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
         uses: awalsh128/cache-apt-pkgs-action@master
