@@ -1,12 +1,17 @@
 package org.jabref.gui.maintable;
 
+import java.util.List;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.CopyEntryToLibraryAction;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.SendAsKindleEmailAction;
@@ -29,6 +34,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
@@ -46,13 +52,14 @@ public class RightClickMenu {
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
-                                     BibEntryTypesManager entryTypesManager) {
+                                     BibEntryTypesManager entryTypesManager, TabPane tabPane) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferencesService, clipBoardManager, abbreviationRepository, taskExecutor),
+                createCopyToSubmenu(dialogService, factory, stateManager, libraryTab, tabPane),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
@@ -124,6 +131,38 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService)));
 
         return copySpecialMenu;
+    }
+
+    /**
+     * Creates a submenu of all possible libraries that we can copy the selected entry to.
+     * */
+    private static Menu createCopyToSubmenu(DialogService dialogService, ActionFactory factory, StateManager stateManager, LibraryTab currLibraryTab, TabPane tabPane) {
+        BibDatabaseContext activeDatabase = stateManager.getActiveDatabase().orElseThrow();
+        List<BibDatabaseContext> possibleDestinations = stateManager.getOpenDatabases()
+                                                        .stream().filter(database -> database != activeDatabase)
+                                                        .toList();
+
+        Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
+        for (BibDatabaseContext destDatabase : possibleDestinations) {
+            LibraryTab destLibraryTab = null;
+            for (Tab tab : tabPane.getTabs()) {
+                LibraryTab libraryTab = (LibraryTab) tab;
+                if (libraryTab.getBibDatabaseContext() == destDatabase) {
+                    destLibraryTab = libraryTab;
+                    break;
+                }
+            }
+
+            if (destLibraryTab == null) {
+                // TODO: log a warning
+                break;
+            }
+
+            String destLibraryName = destDatabase.getDatabasePath().orElseThrow().getFileName().toString();
+            copyToMenu.getItems().add(factory.createMenuItem(() -> destLibraryName, new CopyEntryToLibraryAction(dialogService, stateManager, currLibraryTab, destLibraryTab, tabPane)));
+        }
+
+        return copyToMenu;
     }
 
     private static Menu createSendSubMenu(ActionFactory factory,

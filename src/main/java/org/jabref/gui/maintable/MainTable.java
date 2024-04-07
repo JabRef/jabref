@@ -12,6 +12,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -89,7 +90,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
-                     FileUpdateMonitor fileUpdateMonitor) {
+                     FileUpdateMonitor fileUpdateMonitor, TabPane tabPane) {
         super();
 
         this.libraryTab = libraryTab;
@@ -145,7 +146,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         clipBoardManager,
                         taskExecutor,
                         Globals.journalAbbreviationRepository,
-                        entryTypesManager))
+                        entryTypesManager, tabPane))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)

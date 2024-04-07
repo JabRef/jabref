@@ -547,7 +547,7 @@ public class LibraryTab extends Tab {
                 Globals.getClipboardManager(),
                 entryTypesManager,
                 taskExecutor,
-                fileUpdateMonitor);
+                fileUpdateMonitor, getTabPane());
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
         mainTable.addSelectionListener(event -> {
