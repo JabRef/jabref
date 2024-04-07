@@ -80,28 +80,28 @@ jobs:
         shell: bash
         run: |
           cd javafx
-          curl https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
+          curl --no-progress-meter https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
 
           case "${{ matrix.os }}" in
             "ubuntu-latest")
               OS="linux"
-              EXTRACT="tar xvzf *.tar.gz"
+              EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               ;;
             "buildjet-4vcpu-ubuntu-2204-arm")
               OS="linux"
-              EXTRACT="tar xvzf *.tar.gz"
+              EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               echo "There are no ARM EA builds"
               ;;
             "windows-latest")
               OS="windows"
-              EXTRACT="unzip *.zip"
+              EXTRACT="unzip -qq *.zip"
               EXT="zip"
               ;;
             "macos-latest")
               OS="macos"
-              EXTRACT="tar xvzf *.tar.gz"
+              EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               ;;
             *)
@@ -112,7 +112,7 @@ jobs:
           echo "OS set to $OS"
           URL=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
           echo "Downloading $URL..."
-          curl -OJ $URL
+          curl -OJ --no-progress-meter $URL
           $EXTRACT
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
@@ -182,9 +182,7 @@ jobs:
       - name: Build runtime image and installer
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
-        run: |
-          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/javafx.base.jar || true
-          ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
       - name: Package application image
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
