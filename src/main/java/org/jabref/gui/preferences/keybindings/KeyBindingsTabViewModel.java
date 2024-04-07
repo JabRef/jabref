@@ -88,13 +88,13 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         preferences.storeKeyBindingRepository(keyBindingRepository);
 
         if (!keyBindingRepository.equals(initialKeyBindingRepository)) {
-            restartWarning.add(Localization.lang("Key bindings changed"));
+            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
         }
     }
 
     public void resetToDefault() {
-        String title = Localization.lang("Resetting all key bindings");
-        String content = Localization.lang("All key bindings will be reset to their defaults.");
+        String title = Localization.lang("Resetting all keyboard shortcuts");
+        String content = Localization.lang("All keyboard shortcuts will be reset to their defaults.");
         ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
