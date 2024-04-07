@@ -44,6 +44,16 @@ public class BibliographyFromPdfImporter extends Importer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\[(\\d+)\\](.*?)(?=\\[|$)", Pattern.DOTALL);
+    private static final Pattern YEAR_AT_END = Pattern.compile(", (\\d{4})\\.$");
+    private static final Pattern PAGES = Pattern.compile(", pp\\. (\\d+--?\\d+)\\.?(.*)");
+    private static final Pattern PAGE = Pattern.compile(", p\\. (\\d+)(.*)");
+    private static final Pattern MONTH_RANGE_AND_YEAR = Pattern.compile(", ([A-Z][a-z]{2,7}\\.?)-[A-Z][a-z]{2,7}\\.? (\\d+)(.*)");
+    private static final Pattern MONTH_AND_YEAR = Pattern.compile(", ([A-Z][a-z]{2,7}\\.? \\d+),? ?(.*)");
+    private static final Pattern VOLUME = Pattern.compile(", vol\\. (\\d+)(.*)");
+    private static final Pattern NO = Pattern.compile(", no\\. (\\d+)(.*)");
+    private static final Pattern AUTHORS_AND_TITLE_AT_BEGINNING = Pattern.compile("^([^“]+), “(.*?)”, ");
+    private static final Pattern TITLE = Pattern.compile("“(.*?)”, (.*)");
+
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     public BibliographyFromPdfImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
@@ -155,23 +165,19 @@ public class BibliographyFromPdfImporter extends Importer {
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017.
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019, pp. 977-979
-        Pattern yearAtEnd = Pattern.compile(", (\\d{4})\\.$");
-        Matcher matcher = yearAtEnd.matcher(reference);
+        Matcher matcher = YEAR_AT_END.matcher(reference);
         if (matcher.find()) {
             result.setField(StandardField.YEAR, matcher.group(1));
             reference = reference.substring(0, matcher.start()).trim();
         }
 
-        Pattern pages = Pattern.compile(", pp\\. (\\d+--?\\d+)\\.?(.*)");
-        reference = updateEntryAndReferenceIfMatches(reference, pages, result, StandardField.PAGES);
+        reference = updateEntryAndReferenceIfMatches(reference, PAGES, result, StandardField.PAGES);
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019
-        Pattern page = Pattern.compile(", p\\. (\\d+)(.*)");
-        reference = updateEntryAndReferenceIfMatches(reference, page, result, StandardField.PAGES);
+        reference = updateEntryAndReferenceIfMatches(reference, PAGE, result, StandardField.PAGES);
 
-        Pattern monthRangeAndYear = Pattern.compile(", ([A-Z][a-z]{2,7}\\.?)-[A-Z][a-z]{2,7}\\.? (\\d+)(.*)");
-        matcher = monthRangeAndYear.matcher(reference);
+        matcher = MONTH_RANGE_AND_YEAR.matcher(reference);
         if (matcher.find()) {
             // strip out second month
             reference = reference.substring(0, matcher.start()) + ", " + matcher.group(1) + " " + matcher.group(2) + matcher.group(3);
@@ -179,8 +185,7 @@ public class BibliographyFromPdfImporter extends Importer {
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019
-        Pattern monthAndYear = Pattern.compile(", ([A-Z][a-z]{2,7}\\.? \\d+),? ?(.*)");
-        matcher = monthAndYear.matcher(reference);
+        matcher = MONTH_AND_YEAR.matcher(reference);
         if (matcher.find()) {
             Optional<Date> parsedDate = Date.parse(matcher.group(1));
             if (parsedDate.isPresent()) {
@@ -201,16 +206,13 @@ public class BibliographyFromPdfImporter extends Importer {
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
-        Pattern volume = Pattern.compile(", vol\\. (\\d+)(.*)");
-        reference = updateEntryAndReferenceIfMatches(reference, volume, result, StandardField.VOLUME);
+        reference = updateEntryAndReferenceIfMatches(reference, VOLUME, result, StandardField.VOLUME);
 
-        Pattern no = Pattern.compile(", no\\. (\\d+)(.*)");
-        reference = updateEntryAndReferenceIfMatches(reference, no, result, StandardField.NUMBER);
+        reference = updateEntryAndReferenceIfMatches(reference, NO, result, StandardField.NUMBER);
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
-        Pattern authorsAndTitleAtBeginning = Pattern.compile("^([^“]+), “(.*?)”, ");
-        matcher = authorsAndTitleAtBeginning.matcher(reference);
+        matcher = AUTHORS_AND_TITLE_AT_BEGINNING.matcher(reference);
         if (matcher.find()) {
             result.setField(StandardField.AUTHOR, matcher.group(1)
                                                          .replace("- ", "")
@@ -222,8 +224,7 @@ public class BibliographyFromPdfImporter extends Importer {
         } else {
             // No authors present
             // Example: “AF4.1.1 SRF Linac Engineering Design Report”, Internal note.
-            Pattern title = Pattern.compile("“(.*?)”, (.*)");
-            reference = updateEntryAndReferenceIfMatches(reference, title, result, StandardField.TITLE);
+            reference = updateEntryAndReferenceIfMatches(reference, TITLE, result, StandardField.TITLE);
         }
 
         // Nucl. Fusion
