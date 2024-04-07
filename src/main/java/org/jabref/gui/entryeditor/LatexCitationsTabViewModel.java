@@ -73,6 +73,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     public void init(BibEntry entry) {
         cancelSearch();
+
         currentEntry = entry;
         Optional<String> citeKey = entry.getCitationKey();
 

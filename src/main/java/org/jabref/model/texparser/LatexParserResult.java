@@ -10,6 +10,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 public class LatexParserResult {
+
     private final Path path;
     private final Multimap<String, Citation> citations;
     private final List<Path> nestedFiles;

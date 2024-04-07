@@ -90,7 +90,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find cites along a specific line and store them.
      */
-    private static void matchCitation(Path file, int lineNumber, String line, LatexParserResult result) {
+    private void matchCitation(Path file, int lineNumber, String line, LatexParserResult result) {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
@@ -103,7 +103,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find BIB files along a specific line and store them.
      */
-    private static void matchBibFile(Path file, String line, LatexParserResult result) {
+    private void matchBibFile(Path file, String line, LatexParserResult result) {
         Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
 
         while (bibliographyMatch.find()) {
@@ -124,7 +124,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find inputs and includes along a specific line and store them for parsing later.
      */
-    private static void matchNestedFile(Path texFile, String line, LatexParserResult result) {
+    private void matchNestedFile(Path texFile, String line, LatexParserResult result) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
 
         while (includeMatch.find()) {
