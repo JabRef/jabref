@@ -175,9 +175,14 @@ public class ExtractReferencesAction extends SimpleCommand {
         for (BibEntry importedEntry : result.getDatabase().getEntries()) {
             count++;
             Optional<String> citationKey = importedEntry.getCitationKey();
+            String citationKeyToAdd;
             if (citationKey.isPresent()) {
-                cites.add(citationKey.get());
+                citationKeyToAdd = citationKey.get();
             } else {
+                // No key present -> generate one based on
+                //   the citation key of the entry holding the files and
+                //   the number of the current entry (extracted from the reference; fallback: current number of the entry (count variable))
+
                 String sourceCitationKey = currentEntry.getCitationKey().orElse("unknown");
                 String newCitationKey;
                 // Could happen if no author and no year is present
@@ -190,8 +195,9 @@ public class ExtractReferencesAction extends SimpleCommand {
                     newCitationKey = sourceCitationKey + "-" + count;
                 }
                 importedEntry.setCitationKey(newCitationKey);
-                cites.add(newCitationKey);
+                citationKeyToAdd = newCitationKey;
             }
+            cites.add(citationKeyToAdd);
         }
         currentEntry.setField(StandardField.CITES, cites.toString());
     }
