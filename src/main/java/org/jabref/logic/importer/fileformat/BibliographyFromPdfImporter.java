@@ -39,14 +39,14 @@ import org.slf4j.LoggerFactory;
  * Currently, IEEE two column format is supported.
  * <p>
  */
-public class BibliopgraphyFromPdfImporter extends Importer {
+public class BibliographyFromPdfImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibliopgraphyFromPdfImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\[(\\d+)\\](.*?)(?=\\[|$)", Pattern.DOTALL);
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
-    public BibliopgraphyFromPdfImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public BibliographyFromPdfImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
     }
 

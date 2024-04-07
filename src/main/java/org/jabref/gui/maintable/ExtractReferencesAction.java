@@ -18,7 +18,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
-import org.jabref.logic.importer.fileformat.BibliopgraphyFromPdfImporter;
+import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -50,7 +50,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     private final LinkedFile linkedFile;
     private final TaskExecutor taskExecutor;
 
-    private final BibliopgraphyFromPdfImporter bibliopgraphyFromPdfImporter;
+    private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
 
     public ExtractReferencesAction(boolean online,
                                    DialogService dialogService,
@@ -80,7 +80,7 @@ public class ExtractReferencesAction extends SimpleCommand {
         this.entry = entry;
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
-        bibliopgraphyFromPdfImporter = new BibliopgraphyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
+        bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
 
         String text;
         GrobidPreferences grobidPreferences = preferencesService.getGrobidPreferences();
@@ -143,7 +143,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
 
             // We need to have ParserResult handled at the importer, because it imports the meta data (library type, encoding, ...)
-            ParserResult result = bibliopgraphyFromPdfImporter.importDatabase(fileList.getFirst());
+            ParserResult result = bibliographyFromPdfImporter.importDatabase(fileList.getFirst());
 
             // subsequent files are just appended to result
             Iterator<Path> fileListIterator = fileList.iterator();
@@ -166,7 +166,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     private void extractReferences(Iterator<Path> fileListIterator, ParserResult result, BibEntry currentEntry) {
         while (fileListIterator.hasNext()) {
-            result.getDatabase().insertEntries(bibliopgraphyFromPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
+            result.getDatabase().insertEntries(bibliographyFromPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
         }
 
         StringJoiner cites = new StringJoiner(",");

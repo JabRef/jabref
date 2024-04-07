@@ -20,9 +20,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class BibliopgraphyFromPdfImporterTest {
+class BibliographyFromPdfImporterTest {
 
-    private BibliopgraphyFromPdfImporter bibliopgraphyFromPdfImporter;
+    private BibliographyFromPdfImporter bibliographyFromPdfImporter;
 
     @BeforeEach
     void setup() {
@@ -38,13 +38,13 @@ class BibliopgraphyFromPdfImporterTest {
                 globalCitationKeyPattern,
                 "",
                 ',');
-        bibliopgraphyFromPdfImporter = new BibliopgraphyFromPdfImporter(citationKeyPatternPreferences);
+        bibliographyFromPdfImporter = new BibliographyFromPdfImporter(citationKeyPatternPreferences);
     }
 
     @Test
     void tua3i2refpage() throws Exception {
-        Path file = Path.of(BibliopgraphyFromPdfImporterTest.class.getResource("tua3i2refpage.pdf").toURI());
-        ParserResult parserResult = bibliopgraphyFromPdfImporter.importDatabase(file);
+        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("tua3i2refpage.pdf").toURI());
+        ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
         BibEntry entry01 = new BibEntry();
         assertEquals(List.of(entry01), parserResult.getDatabase().getEntries());
     }
@@ -151,6 +151,6 @@ class BibliopgraphyFromPdfImporterTest {
     @ParameterizedTest
     @MethodSource
     void references(BibEntry expectedEntry, String number, String reference) {
-        assertEquals(expectedEntry, bibliopgraphyFromPdfImporter.parseReference(number, reference));
+        assertEquals(expectedEntry, bibliographyFromPdfImporter.parseReference(number, reference));
     }
 }
