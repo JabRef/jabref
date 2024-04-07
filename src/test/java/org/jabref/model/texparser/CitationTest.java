@@ -18,12 +18,17 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 public class CitationTest {
 
     Path path;
+    int line;
+    String key;
+    String lineText;
     Citation citation;
 
     @BeforeEach
     public void init() {
         path = Path.of("test");
-        citation = new Citation("key", path, 10, 1, 4, "lineText");
+        line = 10;
+        lineText = "lineText";
+        citation = new Citation(path, line, 1, 4, lineText);
     }
 
     private static Stream<Arguments> colStartColEndNotInBounds() {
@@ -43,27 +48,27 @@ public class CitationTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 0})
     public void constructorLineSmallerEqualZeroTest(int line) {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation("key", path, line, 1, 5, "lineText"));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, line, 1, 5, lineText));
         assertEquals("Line has to be greater than 0.", e.getMessage());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2})
     public void constructorLineLargerZeroTest(int line) {
-        Citation citation = new Citation("key", path, line, 1, 5, "lineText");
+        Citation citation = new Citation(path, line, 1, 5, lineText);
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndNotInBounds")
     public void constructorColStartColEndNotInBoundsTest(int colStart, int colEnd) {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation("key", path, 10, colStart, colEnd, "lineText"));
+        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, line, colStart, colEnd, lineText));
         assertEquals("Citation has to be between 0 and line length.", e.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("colStartColEndInBounds")
     public void constructorColStartColEndInBoundsTest(int colStart, int colEnd) {
-        Citation citation = new Citation("key", path, 10, colStart, colEnd, "lineText");
+        Citation citation = new Citation(path, line, colStart, colEnd, lineText);
     }
 
     @Test
@@ -88,17 +93,17 @@ public class CitationTest {
 
     @Test
     public void getLineTextTest() {
-        assertEquals("lineText", citation.lineText());
+        assertEquals(lineText, citation.lineText());
     }
 
     @Test
     public void getContextTest() {
-        assertEquals("lineText", citation.getContext());
+        assertEquals(lineText, citation.getContext());
     }
 
     @Test
     public void equalsTest() {
-        Citation citation1 = new Citation("key", path, 10, 1, 4, "lineText");
+        Citation citation1 = new Citation(path, line, 1, 4, lineText);
         Citation citation2 = null;
         assertEquals(citation, citation1);
         assertNotEquals(citation, citation2);
