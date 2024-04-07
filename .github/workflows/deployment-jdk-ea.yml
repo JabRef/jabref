@@ -155,7 +155,12 @@ jobs:
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
         if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
         # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
-        run: sed -i '/javafx {/{n;s#version = ".*"#version = "${{ matrix.javafxARM }}"#}' build.gradle && cat build.gradle
+        run: |
+          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
+          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
+          JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
+          echo "Using JavaFX ${JAVAFX}"
+          sed -i '/javafx {/{n;s#version = ".*"#version = "${JAVAFX}"#}' build.gradle && cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
         if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         run: sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
