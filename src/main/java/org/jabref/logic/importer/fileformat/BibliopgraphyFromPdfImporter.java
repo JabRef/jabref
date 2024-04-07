@@ -103,8 +103,8 @@ public class BibliopgraphyFromPdfImporter extends Importer {
     }
 
     /**
-     * In: "[1] ...\n...\n...[2]...\n...\n...\n[3]..."
-     * Out: List<String> = ["[1] ...", "[2]...", "[3]..."]
+     * In: <code>"[1] ...\n...\n...[2]...\n...\n...\n[3]..."</code><br>
+     * Out: <code>List&lt;String> = ["[1] ...", "[2]...", "[3]..."]</code>
      */
     private List<BibEntry> getEntriesFromPDFContent(String contents) {
         List<IntermediateData> referencesStrings = new ArrayList<>();
