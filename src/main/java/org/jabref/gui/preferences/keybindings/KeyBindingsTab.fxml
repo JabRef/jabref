@@ -12,7 +12,7 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.keybindings.KeyBindingsTab">
 
-    <Label styleClass="titleHeader" text="%Key bindings"/>
+    <Label styleClass="titleHeader" text="%Keyboard shortcuts"/>
 
     <TreeTableView fx:id="keyBindingsTable" showRoot="false" styleClass="keybinding-table">
         <columns>

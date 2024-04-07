@@ -84,6 +84,7 @@ public enum KeyBinding {
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4", KeyBindingCategory.TOOLS),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl+shift+O", KeyBindingCategory.TOOLS),
     OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt+0", KeyBindingCategory.TOOLS),
+    SHOW_PREFS("Preferences", Localization.lang("Preferences"), "ctrl+,", KeyBindingCategory.FILE),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl+V", KeyBindingCategory.EDIT),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl+shift+R", KeyBindingCategory.FILE),
