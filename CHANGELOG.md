@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for parsing the "References" section of IEEE papers offline. [#11156](https://github.com/JabRef/jabref/pull/11156)
+
 ### Changed
 
 ### Fixed
