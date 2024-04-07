@@ -113,10 +113,11 @@ public class ExtractReferencesAction extends SimpleCommand {
 
             Callable<ParserResult> parserResultCallable;
             if (online) {
-                parserResultCallable = getParserResultCallableOnline(databaseContext, selectedEntries);
-                if (parserResultCallable == null) {
+                Optional<Callable<ParserResult>> parserResultCallableOnline = getParserResultCallableOnline(databaseContext, selectedEntries);
+                if (parserResultCallableOnline.isEmpty()) {
                     return;
                 }
+                parserResultCallable = parserResultCallableOnline.get();
             } else {
                 parserResultCallable = getParserResultCallableOffline(databaseContext, selectedEntries);
             }
@@ -195,20 +196,18 @@ public class ExtractReferencesAction extends SimpleCommand {
         currentEntry.setField(StandardField.CITES, cites.toString());
     }
 
-    private @Nullable Callable<ParserResult> getParserResultCallableOnline(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries) {
-        Callable<ParserResult> parserResultCallable;
+    private Optional<Callable<ParserResult>> getParserResultCallableOnline(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries) {
         List<Path> fileList = FileUtil.getListOfLinkedFiles(selectedEntries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
         if (fileList.size() > FILES_LIMIT) {
             boolean continueOpening = dialogService.showConfirmationDialogAndWait(Localization.lang("Processing a large number of files"),
                     Localization.lang("You are about to process %0 files. Continue?", fileList.size()),
                     Localization.lang("Continue"), Localization.lang("Cancel"));
             if (!continueOpening) {
-                return null;
+                return Optional.empty();
             }
         }
-        parserResultCallable = () -> new ParserResult(
+        return Optional.of(() -> new ParserResult(
                 new GrobidService(this.preferencesService.getGrobidPreferences()).processReferences(fileList, preferencesService.getImportFormatPreferences())
-        );
-        return parserResultCallable;
+        ));
     }
 }
