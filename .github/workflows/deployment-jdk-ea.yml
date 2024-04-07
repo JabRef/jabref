@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-4vcpu-ubuntu-2204-arm]
-        jdk: [21, 22]
-        javafx: [22, 23]
+        jdk: [22]
+        javafx: [23]
         include:
           - os: ubuntu-latest
             displayName: linux
@@ -45,10 +45,10 @@ jobs:
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/
-          #- os: buildjet-4vcpu-ubuntu-2204-arm
-          #  displayName: "linux-arm"
-          #  archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
+          - os: buildjet-4vcpu-ubuntu-2204-arm
+            displayName: "linux-arm"
+            archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
+            javafxARM: "23-ea+3"
           - os: macos-latest
             displayName: macOS
             archivePortable: "brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app"
@@ -77,6 +77,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Download and extract JavaFX ${{ matrix.javafx }}
+        if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         shell: bash
         run: |
           cd javafx
@@ -93,6 +94,7 @@ jobs:
               EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               echo "There are no ARM EA builds"
+              exit 0
               ;;
             "windows-latest")
               OS="windows"
@@ -148,10 +150,14 @@ jobs:
           sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
           sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
-        if: (matrix.os != 'macos-latest')
-        run: sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle && cat build.gradle
+        if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
+        run: sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
+      - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
+        if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
+        # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
+        run: sed -i '/javafx {/{n;s#version = ".*"#version = "${{ matrix.javafxARM }}"#}' build.gradle && cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
-        if: (matrix.os == 'macos-latest')
+        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         run: sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
       - name: Setup JDK
         uses: actions/setup-java@v4
