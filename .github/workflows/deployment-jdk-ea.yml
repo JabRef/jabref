@@ -79,7 +79,6 @@ jobs:
       - name: Download and extract JavaFX ${{ matrix.javafx }}
         shell: bash
         run: |
-          mkdir javafx
           cd javafx
           curl https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
 
@@ -115,8 +114,6 @@ jobs:
           echo "Downloading $URL..."
           curl -OJ $URL
           $EXTRACT
-          echo Debug JDK21, JavaFX23
-          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/javafx.base.jar || true
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
         uses: awalsh128/cache-apt-pkgs-action@master
