@@ -109,6 +109,8 @@ jobs:
           echo "Downloading $URL..."
           curl -OJ $URL
           $EXTRACT
+          echo Debug JDK21, JavaFX23
+          ls -la /home/runner/work/jabref/jabref/javafx/javafx-sdk-23/lib/javafx.base.jar || true
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
