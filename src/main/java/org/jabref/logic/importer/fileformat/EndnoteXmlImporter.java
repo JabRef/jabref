@@ -158,6 +158,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "number" -> {
                         parseStyleContent(reader, fields, StandardField.NUMBER, elementName);
                     }
+                    case "tertiary-title" -> {
+                        parseStyleContent(reader, fields, StandardField.BOOKTITLE, elementName);
+                    }
                     case "dates" -> {
                         parseYear(reader, fields);
                     }
@@ -207,7 +210,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             case "book section" -> StandardEntryType.InBook;
             case "book" -> StandardEntryType.Book;
             case "report" -> StandardEntryType.Report;
-            // case "journal article" -> StandardEntryType.Article;
+            case "conference paper" -> StandardEntryType.InProceedings;
+            case "conference" -> StandardEntryType.Conference;
+            case "conference proceedings" -> StandardEntryType.Proceedings;
             default -> StandardEntryType.Article;
         };
     }
