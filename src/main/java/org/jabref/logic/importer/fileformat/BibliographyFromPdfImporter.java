@@ -21,6 +21,7 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
@@ -214,9 +215,10 @@ public class BibliographyFromPdfImporter extends Importer {
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
         matcher = AUTHORS_AND_TITLE_AT_BEGINNING.matcher(reference);
         if (matcher.find()) {
-            result.setField(StandardField.AUTHOR, matcher.group(1)
-                                                         .replace("- ", "")
-                                                         .replaceAll("et al\\.?", "and others"));
+            String authors = matcher.group(1)
+                                      .replace("- ", "")
+                                      .replaceAll("et al\\.?", "and others");
+            result.setField(StandardField.AUTHOR, AuthorList.fixAuthorFirstNameFirst(authors));
             result.setField(StandardField.TITLE, matcher.group(2)
                                                          .replace("- ", "")
                                                          .replaceAll("et al\\.?", "and others"));
