@@ -171,14 +171,13 @@ public class ExtractReferencesAction extends SimpleCommand {
         }
 
         StringJoiner cites = new StringJoiner(",");
-        // required because of "orElseGet"
-        var ref = new Object() {
-            int count = 0;
-        };
+        int count = 0;
         for (BibEntry importedEntry : result.getDatabase().getEntries()) {
-            ref.count++;
+            count++;
             Optional<String> citationKey = importedEntry.getCitationKey();
-            cites.add(citationKey.orElseGet(() -> {
+            if (citationKey.isPresent()) {
+                cites.add(citationKey.get());
+            } else {
                 String sourceCitationKey = currentEntry.getCitationKey().orElse("unknown");
                 String newCitationKey;
                 // Could happen if no author and no year is present
@@ -188,11 +187,11 @@ public class ExtractReferencesAction extends SimpleCommand {
                 if (matcher.hasMatch()) {
                     newCitationKey = sourceCitationKey + "-" + matcher.group(1);
                 } else {
-                    newCitationKey = sourceCitationKey + "-" + ref.count;
+                    newCitationKey = sourceCitationKey + "-" + count;
                 }
                 importedEntry.setCitationKey(newCitationKey);
-                return newCitationKey;
-            }));
+                cites.add(newCitationKey);
+            }
         }
         currentEntry.setField(StandardField.CITES, cites.toString());
     }
