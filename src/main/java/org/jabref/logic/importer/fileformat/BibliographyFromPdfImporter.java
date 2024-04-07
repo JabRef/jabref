@@ -158,7 +158,7 @@ public class BibliographyFromPdfImporter extends Importer {
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019, pp. 977-979. doi:10.18429/ JACoW-IPAC2019-MOPTS051
         int pos = reference.indexOf("doi:");
         if (pos >= 0) {
-            String doi = reference.substring(pos + 4).trim();
+            String doi = reference.substring(pos + "doi:".length()).trim();
             doi = doi.replace(" ", "");
             result.setField(StandardField.DOI, doi);
             reference = reference.substring(0, pos).trim();
