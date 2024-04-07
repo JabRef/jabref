@@ -36,10 +36,7 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
         this.citationList = FXCollections.observableArrayList();
 
         Set<String> newEntryKeys = resolverResult.getNewEntries().stream().map(entry -> entry.getCitationKey().orElse("")).collect(Collectors.toSet());
-        resolverResult.getCitations().values()
-                      .stream()
-                      .collect(Collectors.groupingBy(Citation::key))
-                      .forEach((key, value) -> referenceList.add(new ReferenceViewModel(key, newEntryKeys.contains(key), value)));
+        resolverResult.getCitations().asMap().forEach((key, value) -> referenceList.add(new ReferenceViewModel(key, newEntryKeys.contains(key), value)));
 
         this.importButtonDisabled = new SimpleBooleanProperty(referenceList.stream().noneMatch(ReferenceViewModel::isHighlighted));
     }

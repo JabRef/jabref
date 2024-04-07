@@ -1,26 +1,32 @@
 package org.jabref.model.texparser;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 public class LatexParserResult {
-    private final Multimap<Path, Path> bibFiles;
-    private final Multimap<Path, Citation> citations;
+    private final Path path;
+    private final Multimap<String, Citation> citations;
+    private final List<Path> nestedFiles;
+    private final List<Path> bibFiles;
 
-    public LatexParserResult() {
-        this.bibFiles = HashMultimap.create();
+    public LatexParserResult(Path path) {
+        this.path = path;
         this.citations = HashMultimap.create();
+        this.nestedFiles = new ArrayList<>();
+        this.bibFiles = new ArrayList<>();
     }
 
-    public Multimap<Path, Path> getBibFiles() {
-        return bibFiles;
+    public Path getPath() {
+        return path;
     }
 
-    public Multimap<Path, Citation> getCitations() {
+    public Multimap<String, Citation> getCitations() {
         return citations;
     }
 
@@ -28,32 +34,39 @@ public class LatexParserResult {
      * Return a collection of citations using a string as key reference.
      */
     public Collection<Citation> getCitationsByKey(String key) {
-        return citations.values()
-                        .stream()
-                        .filter(citation -> citation.key().equals(key))
-                        .toList();
-    }
-
-    /**
-     * Add a bibliography file to the BIB files set.
-     */
-    public void addBibFile(Path file, Path bibFile) {
-        bibFiles.put(file, bibFile);
+        return citations.get(key);
     }
 
     /**
      * Add a citation to the citations multimap.
      */
-    public void addKey(String key, Path file, int lineNumber, int start, int end, String line) {
-        Citation citation = new Citation(key, file, lineNumber, start, end, line);
-        citations.put(file, citation);
+    public void addKey(String key, Path path, int lineNumber, int start, int end, String line) {
+        citations.put(key, new Citation(path, lineNumber, start, end, line));
+    }
+
+    public List<Path> getNestedFiles() {
+        return nestedFiles;
+    }
+
+    public void addNestedFile(Path nestedFile) {
+        nestedFiles.add(nestedFile);
+    }
+
+    public List<Path> getBibFiles() {
+        return bibFiles;
+    }
+
+    public void addBibFile(Path bibFile) {
+        bibFiles.add(bibFile);
     }
 
     @Override
     public String toString() {
-        return String.format("TexParserResult{bibFiles=%s, citations=%s}",
-                this.bibFiles,
-                this.citations);
+        return String.format("TexParserResult{path=%s, citations=%s, nestedFiles=%s, bibFiles=%s}",
+                this.path,
+                this.citations,
+                this.nestedFiles,
+                this.bibFiles);
     }
 
     @Override
@@ -68,12 +81,14 @@ public class LatexParserResult {
 
         LatexParserResult that = (LatexParserResult) obj;
 
-        return Objects.equals(bibFiles, that.bibFiles)
-                && Objects.equals(citations, that.citations);
+        return Objects.equals(path, that.path)
+                && Objects.equals(citations, that.citations)
+                && Objects.equals(nestedFiles, that.nestedFiles)
+                && Objects.equals(bibFiles, that.bibFiles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bibFiles, citations);
+        return Objects.hash(path, citations, nestedFiles, bibFiles);
     }
 }
