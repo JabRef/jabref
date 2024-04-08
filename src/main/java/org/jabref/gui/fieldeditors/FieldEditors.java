@@ -114,8 +114,7 @@ public class FieldEditors {
             // Enrich auto completion by content selector values
             try {
                 return new ContentSelectorSuggestionProvider((SuggestionProvider<String>) suggestionProvider, contentSelectorValues);
-            } catch (
-                    ClassCastException exception) {
+            } catch (ClassCastException exception) {
                 LOGGER.error("Content selectors are only supported for normal fields with string-based auto completion.");
                 return suggestionProvider;
             }
