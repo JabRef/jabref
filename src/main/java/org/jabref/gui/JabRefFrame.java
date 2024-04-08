@@ -566,20 +566,30 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return false;
     }
 
-    private boolean closeTabs() {
+    public boolean closeTabs(List<LibraryTab> tabs) {
+        // Only accept library tabs that are shown in the tab container
+        List<LibraryTab> toClose = tabs.stream()
+                .distinct()
+                .filter(getLibraryTabs()::contains)
+                .toList();
+
         // Ask before closing any tab, if any tab has changes
-        for (LibraryTab libraryTab : getLibraryTabs()) {
+        for (LibraryTab libraryTab : toClose) {
             if (!libraryTab.requestClose()) {
                 return false;
             }
         }
 
         // Close after checking for changes and saving all databases
-        for (LibraryTab libraryTab : getLibraryTabs()) {
+        for (LibraryTab libraryTab : toClose) {
             tabbedPane.getTabs().remove(libraryTab);
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
         return true;
+    }
+
+    public boolean closeTabs() {
+        return closeTabs(getLibraryTabs());
     }
 
     public boolean closeCurrentTab() {
