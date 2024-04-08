@@ -188,6 +188,7 @@ dependencies {
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.7.4') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
+        exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
     }
 
