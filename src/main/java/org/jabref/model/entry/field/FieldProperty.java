@@ -26,5 +26,6 @@ public enum FieldProperty {
     TYPE,
     VERBATIM,
     YES_NO,
-    COMMENT
+    COMMENT,
+    CUSTOM_FIELD
 }
