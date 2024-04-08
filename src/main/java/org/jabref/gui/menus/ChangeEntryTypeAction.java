@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 
 import org.jabref.gui.EntryTypeView;
@@ -35,15 +34,5 @@ public class ChangeEntryTypeAction extends SimpleCommand {
         entries.forEach(e -> e.setType(type)
                               .ifPresent(change -> compound.addEdit(new UndoableChangeType(change))));
         undoManager.addEdit(compound);
-    }
-
-    @Override
-    public String getStatusMessage() {
-        return statusMessage.get();
-    }
-
-    @Override
-    public ReadOnlyStringProperty statusMessageProperty() {
-        return statusMessageProperty.getReadOnlyProperty();
     }
 }
