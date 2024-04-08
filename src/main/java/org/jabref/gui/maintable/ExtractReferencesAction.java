@@ -17,7 +17,6 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
@@ -81,9 +80,6 @@ public class ExtractReferencesAction extends SimpleCommand {
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
         bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
-
-        String text;
-        GrobidPreferences grobidPreferences = preferencesService.getGrobidPreferences();
 
         if (this.linkedFile == null) {
             this.executable.bind(
