@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- [azatayamanaev](https://github.com/azatyamanaev) added value selection(like for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
+
 ### Changed
 
 ### Fixed
