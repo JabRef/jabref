@@ -1,5 +1,7 @@
 package org.jabref.gui;
 
+import java.util.function.Supplier;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.event.ActionEvent;
@@ -40,6 +42,7 @@ import org.jabref.gui.help.SearchForUpdateAction;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -86,6 +89,7 @@ public class MainMenu extends MenuBar {
     private final BibEntryTypesManager entryTypesManager;
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
+    private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
 
     public MainMenu(JabRefFrame frame,
                     SidePane sidePane,
@@ -98,7 +102,8 @@ public class MainMenu extends MenuBar {
                     JournalAbbreviationRepository abbreviationRepository,
                     BibEntryTypesManager entryTypesManager,
                     UndoManager undoManager,
-                    ClipBoardManager clipBoardManager) {
+                    ClipBoardManager clipBoardManager,
+                    Supplier<OpenDatabaseAction> openDatabaseActionSupplier) {
         this.frame = frame;
         this.sidePane = sidePane;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -111,6 +116,7 @@ public class MainMenu extends MenuBar {
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
+        this.openDatabaseActionSupplier = openDatabaseActionSupplier;
 
         createMenu();
     }
@@ -128,7 +134,7 @@ public class MainMenu extends MenuBar {
 
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                factory.createMenuItem(StandardActions.OPEN_LIBRARY, frame.getOpenDatabaseAction()),
+                factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
                 frame.getFileHistory(),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
@@ -278,9 +284,9 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, frame::getOpenDatabaseAction, fileUpdateMonitor, taskExecutor, preferencesService, stateManager, dialogService)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, openDatabaseActionSupplier, fileUpdateMonitor, taskExecutor, preferencesService, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, frame.getOpenDatabaseAction(), dialogService, fileUpdateMonitor, taskExecutor, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, openDatabaseActionSupplier, dialogService, fileUpdateMonitor, taskExecutor, preferencesService, stateManager)),
 
                 new SeparatorMenuItem(),
 

@@ -28,6 +28,8 @@ public interface LibraryTabContainer {
      */
     boolean closeTab(LibraryTab libraryTab);
 
+    boolean closeTabs();
+
     /**
      * Closes the currently viewed libraryTab
      *

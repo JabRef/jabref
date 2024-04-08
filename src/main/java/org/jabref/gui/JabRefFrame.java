@@ -22,7 +22,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -110,6 +109,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final TabPane tabbedPane = new TabPane();
 
     private Subscription dividerSubscription;
+    private JabRefFrameViewModel viewModel;
 
     private final TaskExecutor taskExecutor;
 
@@ -126,6 +126,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.undoManager = Globals.undoManager;
         this.entryTypesManager = Globals.entryTypesManager;
         this.taskExecutor = Globals.TASK_EXECUTOR;
+
+        this.viewModel = new JabRefFrameViewModel(preferencesService, stateManager, dialogService, this);
 
         this.frameDndHandler = new FrameDndHandler(tabbedPane, mainStage::getScene, this::getOpenDatabaseAction, stateManager);
 
@@ -211,61 +213,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         });
     }
 
-    private void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
-        if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
-            // Here we store the names of all current files. If there is no current file, we remove any
-            // previously stored filename.
-            if (filenames.isEmpty()) {
-                prefs.getGuiPreferences().getLastFilesOpened().clear();
-            } else {
-                prefs.getGuiPreferences().setLastFilesOpened(filenames);
-                prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
-            }
-        }
-    }
-
-    /**
-     * Quit JabRef
-     *
-     * @return true if the user chose to quit; false otherwise
-     */
-    public boolean close() {
-        // Ask if the user really wants to close, if there are still background tasks running
-        // The background tasks may make changes themselves that need saving.
-        if (stateManager.getAnyTasksThatWillNotBeRecoveredRunning().getValue()) {
-            Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
-                    Localization.lang("Please wait..."),
-                    Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
-                    stateManager);
-            if (!(shouldClose.isPresent() && (shouldClose.get() == ButtonType.YES))) {
-                return false;
-            }
-        }
-
-        // Read the opened and focused databases before closing them
-        List<Path> openedLibraries = getLibraryTabs().stream()
-                                                     .map(LibraryTab::getBibDatabaseContext)
-                                                     .map(BibDatabaseContext::getDatabasePath)
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
-        Path focusedLibraries = Optional.ofNullable(getCurrentLibraryTab())
-                                        .map(LibraryTab::getBibDatabaseContext)
-                                        .flatMap(BibDatabaseContext::getDatabasePath)
-                                        .orElse(null);
-
-        // Then ask if the user really wants to close, if the library has not been saved since last save.
-        if (!closeTabs()) {
-            return false;
-        }
-
-        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
-
-        ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
-        processingLibraryDialog.showAndWait(getLibraryTabs());
-
-        return true;
-    }
-
     private void initLayout() {
         setId("frame");
 
@@ -304,7 +251,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 Globals.journalAbbreviationRepository,
                 entryTypesManager,
                 undoManager,
-                Globals.getClipboardManager());
+                Globals.getClipboardManager(),
+                this::getOpenDatabaseAction);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
@@ -557,6 +505,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         dialogService.showCustomDialogAndWait(dialog);
     }
 
+    public boolean close() {
+        return viewModel.close();
+    }
+
     public boolean closeTab(@NonNull LibraryTab libraryTab) {
         if (libraryTab.requestClose()) {
             tabbedPane.getTabs().remove(libraryTab);
@@ -596,7 +548,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return closeTab(getCurrentLibraryTab());
     }
 
-    public OpenDatabaseAction getOpenDatabaseAction() {
+    private OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(
                 this,
                 prefs,
@@ -851,7 +803,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         @Override
         public void execute() {
-            if (frame.close()) {
+            if (frame.viewModel.close()) {
                 frame.mainStage.close();
             }
         }
