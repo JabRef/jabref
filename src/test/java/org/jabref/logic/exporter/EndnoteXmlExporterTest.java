@@ -63,7 +63,7 @@ public class EndnoteXmlExporterTest {
                 "        <key app=\"EN\">" + entry.getId() + "</key>",
                 "      </foreign-keys>",
                 "      <ref-type name=\"Journal Article\">",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">5</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">9</style>",
                 "      </ref-type>",
                 "      <contributors>",
                 "        <authors>",
