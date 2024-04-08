@@ -11,9 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added support for parsing the "References" section of IEEE papers offline. [#11156](https://github.com/JabRef/jabref/pull/11156)
+- We added support for offline extracting refereferences from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
 - We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
-
 
 ### Changed
 
