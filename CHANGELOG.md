@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
 - [azatayamanaev](https://github.com/azatyamanaev) added value selection(like for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
 
 ### Changed
